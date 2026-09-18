@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-002 implemented and verified
+**Last updated:** 2026-09-18 — TASK-003 specified (planning only, not implemented)
 
 ## Current state
 
@@ -12,10 +12,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED.** All 20 acceptance items resolved or explicitly, narrowly carried forward — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
-| Application source code | `packages/sources` added (schema + fail-closed parser/validator for the PESEL national CSV shape). No canonical domain table, no importer, no resolver. |
+| **TASK-003 — exact surname resolver** | **SPECIFIED, NOT IMPLEMENTED.** `tasks/003-exact-surname-resolver.md` created this session. Contains one contract decision (the minimal identity migration — task file §6.2) flagged for approval before an implementation session starts. |
+| Application source code | unchanged since TASK-002 — `packages/sources` (PESEL CSV schema/parser) exists; no canonical domain table, no `packages/resolver`, no identity tables. |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
-| CI | configured (`.github/workflows/ci.yml`) — not yet updated to run `packages/sources` tests explicitly; they run under the existing `pnpm test` sweep, which CI already calls |
-| Next approved task | TASK-003 (exact surname resolver) is next per `PLAN.md`, but is **not specified in detail yet** — only the control-plane session may write `tasks/003-*.md`. This session does not create it. |
+| CI | configured (`.github/workflows/ci.yml`) |
+| Next approved task | TASK-003 is specified and awaiting approval of §6.2's contract decision. Once approved, a fresh implementation session follows `tasks/003-exact-surname-resolver.md`. |
 
 ## What TASK-001 built
 
@@ -217,6 +218,18 @@ Built as a result, all real and tested:
 
 No canonical surname resolution, `NameForm` relationship, historical ingestion, `EvidenceItem`, `Claim`, trend calculation, API, or UI code was written — `packages/sources` parses raw source bytes into `{ surname, count }` rows only, with no mapping to any Name Atlas domain entity.
 
+## TASK-003 specified — planning only, no code written (this session)
+
+Created `tasks/003-exact-surname-resolver.md`. This session made no application-code change: `git status` before this task's commit shows only the new task file. `docs/canonical/` checksum re-verified unchanged.
+
+What it specifies: an exact-only surname resolver (`packages/resolver`, `@name-atlas/resolver`) that takes a surname string and returns one of a small set of typed outcomes — `EXACT`, `KNOWN_VARIANT`, `MULTIPLE_EXACT`, `UNKNOWN`, `REVIEW_REQUIRED`, or a validation-stage outcome — never a guess. No fuzzy/phonetic/candidate-generation matching, no gendered-form generation, no PESEL ingestion.
+
+**Baseline confirmed by direct inspection, not assumed:** no identity table (`knowledge_entities`, `surnames`, `name_forms`) exists anywhere in the repository; only one migration exists (`0001_bootstrap_extensions.ts`, extensions only); `packages/resolver` does not exist. TASK-002's completeness does not affect this task — the resolver depends only on TASK-001 (per the canonical roadmap's own dependency table: RES-001 depends on DB-001 and QA-001, not on the PESEL source epics).
+
+**One contract decision requires approval before an implementation session begins** (task file §6.2): the task's own migration creates only `knowledge_entities`, `surnames`, `name_forms` — a deliberately narrower slice of `docs/canonical/23` §9.1's Migration Group A than the full group, omitting `name_form_relations`, `entity_external_ids`, `sources`, `rights_profiles`, `research_runs` (none of which this task's matching logic touches), and omitting two FK columns (`NameForm.geographic_scope_place_id`, `NameForm.created_by_run_id`) whose target tables don't exist yet. This is this planning session's engineering judgement applying the canonical staged-migration principle, not a project-level blocker — but it is flagged for a human's explicit sign-off rather than asserted silently, since it is the one place this task adds real schema ahead of TASK-004.
+
+No entry was added to `docs/DECISIONS_NEEDED.md` — there is no genuine project-level blocker, only the in-task contract decision above.
+
 ## Next action
 
-TASK-001 and TASK-002 are both implemented and verified. D-001 is resolved. Per AGENTS.md §8: **STOP.** This session does not implement the production importer (TASK-004), does not implement the surname resolver (TASK-003), does not touch D-004 beyond what the prior session already recorded, and does not write `tasks/003-*.md` or `tasks/004-*.md` — only the control-plane session specifies a new task in detail.
+TASK-001 and TASK-002 remain implemented and verified. TASK-003 is specified and **awaiting approval of §6.2** before an implementation session starts. Per AGENTS.md §8: **STOP.** This session does not implement TASK-003, does not touch application code, and does not write `tasks/004-*.md`.
