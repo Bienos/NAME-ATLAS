@@ -20,7 +20,8 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/SOURCE_MAP.md` | Corpus classification and ownership | active |
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done) | active |
+| `docs/sources/pesel.md` | TASK-002 PESEL source-verification research record (dataset-level facts verified; resource-level facts open — D-001) | active, in progress |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (in progress) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |

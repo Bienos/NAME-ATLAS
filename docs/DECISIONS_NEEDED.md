@@ -37,6 +37,14 @@ Per TASK-002 §11 and this session's own instructions: no dataset fact, resource
 
 Once supplied, a fresh TASK-002 implementation session can proceed directly to §4–§8 of `tasks/002-pesel-source-spike.md` without repeating this network check.
 
+### Update — dataset-level facts supplied by the project owner
+
+The project owner manually retrieved the official `dane.gov.pl` API response for dataset 1681 and relayed the dataset-level facts into this session (this session independently reconfirmed the API is still `EGRESS_BLOCKED`/`403` for it — the block persists; this is why manual supply was used). Full detail and exact status per fact: `docs/sources/pesel.md`.
+
+This resolves items **7 (partially — living-only, current-surname-field and suppression-threshold semantics are now dataset-level confirmed; resource-level cross-check still pending) and 8 (licence: CC0 1.0)** of the "what must be supplied" list above. Items 1–6 and 9 remain exactly as unresolved as before — dataset-level metadata does not identify which of the dataset's 21 resources are the current male/female production files, nor does it supply a resource reference date, checksum, encoding, headers, or real rows. The next required evidence is the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, which this session also cannot reach and which the project owner will supply the same way.
+
+**D-001 remains OPEN.** Do not close it until the resource-level items above are verified.
+
 What is settled (`docs/canonical/12` §2.1): the source is the `dane.gov.pl` dataset *"Nazwiska występujące w rejestrze PESEL"*, dataset 1681, published by the Ministry of Digital Affairs. It covers surnames of living people using the current-surname field, omits surnames occurring only once, excludes deceased people, is updated annually, and was updated 2026-01-28. It is national, not regional.
 
 What is not settled and must be pinned before ingestion:

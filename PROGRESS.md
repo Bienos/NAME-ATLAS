@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-002 implementation attempt (BLOCKED)
+**Last updated:** 2026-09-18 — TASK-002 in progress (dataset-level facts verified; resource-level facts open)
 
 ## Current state
 
@@ -11,11 +11,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Repository control plane | created (prior session) |
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
-| **TASK-002 — PESEL source spike** | **BLOCKED — not implemented.** Specified in `tasks/002-pesel-source-spike.md`; this session's attempt could not reach `dane.gov.pl` (egress policy), so no source fact was verified and none was fabricated. See below. |
+| **TASK-002 — PESEL source spike** | **IN PROGRESS.** Dataset-level facts verified (project-owner-supplied, manual API retrieval — `docs/sources/pesel.md`). Resource-level facts (resource IDs, structure, dates, checksum, fixture) remain unresolved. `packages/sources`/`fixtures/pesel/` not yet created — no resource-level data to build them from. |
 | Application source code | unchanged since TASK-001 — foundation only, no domain logic, no `packages/sources` |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | TASK-002 remains the next task, unimplemented. It needs a session (or manual data supply) with real outbound access to `dane.gov.pl`/`api.dane.gov.pl` — see `docs/DECISIONS_NEEDED.md` D-001 for exactly what is needed. |
+| Next approved task | TASK-002 continues. Next required evidence: the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, unreachable from this session (confirmed again) — the project owner will supply it manually, as with the dataset-level facts. |
 
 ## What TASK-001 built
 
@@ -116,7 +116,7 @@ This substitutes for, but does not replace, an actual `pnpm test:integration` ru
 |---|---|---|
 | D-005 | ~~PostgreSQL image~~ — **resolved this session**, see above. | — |
 | — | `pnpm test:integration` unverified via actual Testcontainers run in this sandbox (see above) — needs confirmation in an environment with normal Docker registry access. | Full TASK-001 sign-off; not a code change |
-| D-001 | Exact production PESEL resource ID(s), file structure, resource reference date vs portal updated date, checksum, rights metadata and rarity denominator are not pinned. | TASK-004 |
+| D-001 | Dataset-level facts now verified (licence, living/deceased and current-surname semantics, suppression threshold — see `docs/sources/pesel.md`). Resource ID(s), file structure, resource reference date vs portal updated date, checksum and rarity denominator remain unpinned. | TASK-004 |
 | D-002 | Onomastics rights/source strategy unresolved. | meaning/etymology capability, M2+ |
 | D-003 | Polona per-surface rights (metadata / OCR / image) unresolved. | M3 |
 | D-004 | No lawful current regional surname dataset established. | current-geography capability; not on the paid-MVP critical path |
@@ -153,6 +153,21 @@ Every `dane.gov.pl` host is blocked at this session's network egress policy, con
 
 No verification commands were run beyond confirming the repository is unchanged from TASK-001 (`git status --porcelain` — clean before this session's doc-only edits); there is no new code to typecheck, lint, or test.
 
+## TASK-002 continued — dataset-level facts supplied by the project owner (this session)
+
+The project owner manually retrieved the official `dane.gov.pl` API response for dataset 1681 and relayed the dataset-level facts into this session, per the "what must be supplied manually" list recorded above. This session:
+
+- reconfirmed the API is still unreachable directly (`curl https://api.dane.gov.pl/1.4/datasets/.../resources` → `CONNECT tunnel failed, response 403`; `WebFetch` on the same URL → `EGRESS_BLOCKED`) — the block persists, which is why manual supply is being used;
+- recorded the supplied facts in a new file, `docs/sources/pesel.md`, attributed explicitly as project-owner-supplied, not independently fetched;
+- did **not** infer any resource-level fact from the dataset-level response, per the project owner's explicit instruction — in particular, the dataset's `verified`/`modified` timestamps are recorded as existing dataset-level fields only, not as the PESEL data reference date, and no value for either was given to this session to record;
+- did **not** create `packages/sources` or `fixtures/pesel/` — there is still no resource-level data (headers, types, real rows) to build a schema, validator, or fixture from.
+
+Facts now verified at the dataset level (full detail in `docs/sources/pesel.md`): dataset ID 1681, full API slug, title, publishing institution (333 / Ministerstwo Cyfryzacji), licence (CC0 1.0), yearly update frequency, national (Poland) scope, living-persons-only scope, current-surname-field semantics, and the suppression rule (surnames occurring exactly once excluded).
+
+Still unresolved: exact resource ID(s) and which of the dataset's 21 resources are the current male/female production files, resource reference date, portal-update-date value, checksum, encoding, headers, field types, the fixture, and the schema validator. Next required evidence: the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, also unreachable from this session, to be supplied the same way.
+
+`docs/DECISIONS_NEEDED.md` D-001 updated accordingly. **D-001 remains OPEN — not resolved.**
+
 ## Next action
 
-TASK-001 remains implemented and verified as recorded above. TASK-002 is specified but **blocked** — it needs a session (or manual data supply) with real outbound access to `dane.gov.pl`/`api.dane.gov.pl`. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement TASK-002 with fabricated data, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
+TASK-001 remains implemented and verified as recorded above. TASK-002 is in progress: dataset-level facts are verified (`docs/sources/pesel.md`), and resource-level facts are still open pending the resource listing, which this session cannot reach directly. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement the production importer, does not create `packages/sources`/`fixtures/pesel/` without real resource-level data, does not mark D-001 resolved, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
