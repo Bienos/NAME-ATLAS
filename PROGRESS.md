@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-002 planning session
+**Last updated:** 2026-09-18 — TASK-002 implementation attempt (BLOCKED)
 
 ## Current state
 
@@ -11,11 +11,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Repository control plane | created (prior session) |
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
-| **TASK-002 — PESEL source spike** | **specified, not implemented** — `tasks/002-pesel-source-spike.md` |
-| Application source code | exists — foundation only, no domain logic (verified below) |
+| **TASK-002 — PESEL source spike** | **BLOCKED — not implemented.** Specified in `tasks/002-pesel-source-spike.md`; this session's attempt could not reach `dane.gov.pl` (egress policy), so no source fact was verified and none was fabricated. See below. |
+| Application source code | unchanged since TASK-001 — foundation only, no domain logic, no `packages/sources` |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | TASK-002 is specified and ready for a fresh implementation session. That session needs real outbound access to `dane.gov.pl` — see note below; this planning session did not have it. |
+| Next approved task | TASK-002 remains the next task, unimplemented. It needs a session (or manual data supply) with real outbound access to `dane.gov.pl`/`api.dane.gov.pl` — see `docs/DECISIONS_NEEDED.md` D-001 for exactly what is needed. |
 
 ## What TASK-001 built
 
@@ -122,12 +122,37 @@ This substitutes for, but does not replace, an actual `pnpm test:integration` ru
 | D-004 | No lawful current regional surname dataset established. | current-geography capability; not on the paid-MVP critical path |
 | — | `dane.gov.pl` (the PESEL source domain) was unreachable from this planning session's environment — `EGRESS_BLOCKED` on the dataset landing page. TASK-002's own file records this as an explicit environment dependency for whichever session implements it. | TASK-002 implementation (not this planning task) |
 
-## TASK-002 planning session (this update)
+## TASK-002 planning session
 
 `tasks/002-pesel-source-spike.md` created per `docs/canonical/23` SPIKE-01. No code was written; no canonical document was touched (byte-identical, verified again). The task requires the implementing session to establish 20 specific facts about the real PESEL resource from the live source, or explicitly record each as unresolved — never guessed (`AGENTS.md` §9). It commits no fixture, no schema, no validator itself; those are TASK-002's implementation output, not this planning session's.
 
-A live check of `https://dane.gov.pl/pl/dataset/1681,nazwis` was attempted while writing the task, purely to confirm the URL already recorded in `docs/canonical/12` §2.1 was still reachable — it returned `EGRESS_BLOCKED` from this session's network policy. No dataset facts were re-derived or guessed to compensate; the task file states this as a precondition the implementing session must check first, and to stop and report rather than substitute canonical-corpus knowledge for fresh verification if it recurs.
+A live check of `https://dane.gov.pl/pl/dataset/1681,nazwis` was attempted while writing the task, purely to confirm the URL already recorded in `docs/canonical/12` §2.1 was still reachable — it returned `EGRESS_BLOCKED` from this session's network policy.
+
+## TASK-002 implementation attempt — BLOCKED (this session)
+
+Per TASK-002's own source preflight, this session tested real outbound access to `dane.gov.pl` before doing anything else, as required. Result:
+
+| Check | Result |
+|---|---|
+| `WebFetch https://dane.gov.pl/pl/dataset/1681,nazwis` | `EGRESS_BLOCKED` |
+| `curl https://dane.gov.pl/` | `curl: (56) CONNECT tunnel failed, response 403` |
+| `curl https://www.dane.gov.pl/` | `curl: (56) CONNECT tunnel failed, response 403` |
+| `curl https://api.dane.gov.pl/` | `curl: (56) CONNECT tunnel failed, response 403` |
+| `getent hosts dane.gov.pl` | Resolves (`185.41.93.178`) — confirms this is an egress-proxy policy block, not a DNS or connectivity fault |
+
+Every `dane.gov.pl` host is blocked at this session's network egress policy, consistently, across two different tools (`WebFetch` and `curl`). This is the same domain-level block encountered in the TASK-002 planning session, now confirmed again and more thoroughly.
+
+**Nothing else was implemented as a result**, matching TASK-002 §11 and this session's explicit instructions:
+
+- No dataset ID, resource ID, URL, date, schema, checksum, field type, or licence term was fabricated, inferred, or reconstructed from the canonical corpus and presented as freshly verified.
+- No unofficial mirror or third-party source was substituted for the official portal.
+- No different surname dataset (e.g., one including deceased persons) was substituted for the living-person dataset.
+- No fixture, schema description, or validator was written — all twenty items in TASK-002 §8 require either a verified fact from the live source or an explicit `UNRESOLVED`, and with the source unreachable, every one of them is unresolved. Writing a document of twenty `UNRESOLVED` entries with no real content would not have added information beyond what is recorded here.
+- `packages/sources`, `fixtures/pesel/`, and `docs/sources/pesel.md` were **not** created.
+- `docs/DECISIONS_NEEDED.md` D-001 was **not** marked resolved. It was updated to record this attempt and to list exactly what must be supplied — either by a session with real access to `dane.gov.pl`, or manually by the project owner — to unblock it (see D-001 for the full list).
+
+No verification commands were run beyond confirming the repository is unchanged from TASK-001 (`git status --porcelain` — clean before this session's doc-only edits); there is no new code to typecheck, lint, or test.
 
 ## Next action
 
-TASK-001 remains implemented and verified as recorded above. TASK-002 is now specified and ready for a fresh implementation session with real outbound access to `dane.gov.pl`. Per AGENTS.md §8: **STOP.** This session does not implement TASK-002, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
+TASK-001 remains implemented and verified as recorded above. TASK-002 is specified but **blocked** — it needs a session (or manual data supply) with real outbound access to `dane.gov.pl`/`api.dane.gov.pl`. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement TASK-002 with fabricated data, and does not write `tasks/003-*.md` or `tasks/004-*.md`.

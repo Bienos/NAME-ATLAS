@@ -10,8 +10,32 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ## D-001 — Exact production PESEL resource, scope and version metadata
 
-**Status:** BLOCKS TASK-004 (PESEL ingestion). Does not block TASK-001.
+**Status:** BLOCKS TASK-004 (PESEL ingestion). Does not block TASK-001. **Still OPEN — TASK-002 attempted verification and was blocked before any source fact could be checked.**
 **Owner:** project owner + TASK-002 source spike.
+
+### TASK-002 attempt — BLOCKED (this session)
+
+TASK-002 (`tasks/002-pesel-source-spike.md`) was picked up to resolve this decision. Its own source preflight requires confirming real outbound access to `dane.gov.pl` before doing anything else. That check failed:
+
+- `https://dane.gov.pl/pl/dataset/1681,nazwis` — `EGRESS_BLOCKED` (confirmed via WebFetch)
+- `https://dane.gov.pl/`, `https://www.dane.gov.pl/`, `https://api.dane.gov.pl/` — all returned `curl: (56) CONNECT tunnel failed, response 403` (confirmed via direct `curl` through this session's egress proxy)
+- DNS resolution for `dane.gov.pl` succeeds (`185.41.93.178`) — this is a policy-level block at the egress proxy, not a DNS or connectivity fault, and not transient.
+
+Per TASK-002 §11 and this session's own instructions: no dataset fact, resource ID, URL, date, schema, checksum or licence term was fabricated, inferred, or reconstructed from the canonical corpus to compensate. No mirror or third-party source was substituted. **Every one of the 20 facts TASK-002 §8 requires remains exactly as unverified as before this session** — none can be marked resolved without live access to the source.
+
+**What must be supplied to unblock this**, either by a session with real outbound access to `dane.gov.pl`/`api.dane.gov.pl`, or manually by the project owner:
+
+1. The current resource list from `https://dane.gov.pl/pl/dataset/1681,nazwis` — exact resource ID(s), title(s), and whether male/female surnames are separate resources.
+2. The actual resource file(s) for the current annual snapshot, downloaded from that page (or via the Open Data API — its real endpoint also needs recording; `docs/canonical/12` §2.1 only describes it generically).
+3. The portal's "Updated" timestamp for the dataset, as currently displayed.
+4. Whether the resource file itself states its own reference date (distinct from the portal's "Updated" timestamp) — and if so, its value.
+5. A SHA-256 checksum computed over the exact downloaded file(s).
+6. The file's real encoding, delimiter, header row (exact column names as written), and one representative sample of values per column (to derive real types, not assumed ones).
+7. Any resource-level notes or accompanying documentation stating: living-only scope, current-surname-field semantics, and the single-occurrence suppression rule and its exact threshold.
+8. The dataset's licence/reuse/attribution statement as shown on the portal.
+9. Approximately 20–50 representative real rows (or the full file, from which such a sample can be drawn) covering: Polish diacritics, common surnames, any distinct male/female forms the resource carries, and a near-threshold row if the resource's shape makes that observable.
+
+Once supplied, a fresh TASK-002 implementation session can proceed directly to §4–§8 of `tasks/002-pesel-source-spike.md` without repeating this network check.
 
 What is settled (`docs/canonical/12` §2.1): the source is the `dane.gov.pl` dataset *"Nazwiska występujące w rejestrze PESEL"*, dataset 1681, published by the Ministry of Digital Affairs. It covers surnames of living people using the current-surname field, omits surnames occurring only once, excludes deceased people, is updated annually, and was updated 2026-01-28. It is national, not regional.
 
