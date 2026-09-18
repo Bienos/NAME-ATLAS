@@ -86,20 +86,17 @@ Until this is resolved, the current map stays conditional and the product ships 
 
 ---
 
-## D-005 — Local/CI PostgreSQL image providing PostGIS and pg_trgm
+## D-005 — RESOLVED (TASK-001)
 
-**Status:** **BLOCKS TASK-001** if it cannot be satisfied.
-**Owner:** TASK-001 implementation session — resolve in-task, do not escalate unless it fails.
+**Resolution:** pin `postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5` everywhere PostgreSQL is needed — local development, CI and Testcontainers.
 
-TASK-001 must provide a PostgreSQL environment where both `postgis` and `pg_trgm` can be enabled, locally and in CI, and where Testcontainers can start the same image (ADR-0002; `docs/canonical/23` §12).
+- The digest was confirmed against Docker Hub's registry API at implementation time (not guessed): PostgreSQL 16, PostGIS 3.4.2.
+- Used in `packages/testing/src/postgres-container.ts` (`POSTGRES_TEST_IMAGE`, Testcontainers), and in `.github/workflows/ci.yml`'s `services.postgres` block (same tag+digest, kept in sync by comment).
+- Because `postgis/postgis` is built on top of the official `postgres` image, it carries every contrib module the stock image ships, including `pg_trgm`, in addition to PostGIS — one image satisfies both extensions.
+- The bootstrap migration (`packages/db/migrations/0001_bootstrap_extensions.ts`) runs `CREATE EXTENSION IF NOT EXISTS postgis` and `CREATE EXTENSION IF NOT EXISTS pg_trgm`. Both are asserted present by `tests/integration/src/extensions.test.ts` (querying `pg_extension`), not by eye.
+- Locally, this was additionally cross-checked against `postgresql-16` + the `postgresql-16-postgis-3` apt package (PostgreSQL 16.13, PostGIS 3.4.2) — see PROGRESS.md for why, and for the exact verification performed against a real database.
 
-To be settled by the implementing session, then recorded in `PROGRESS.md`:
-
-- the exact image and tag used (a PostGIS-bundled PostgreSQL image is expected, since `postgis` is not present in the stock image);
-- the same image is used by local development, CI and Testcontainers — no divergence;
-- both extensions are enabled by the bootstrap migration and the enablement is asserted by a test.
-
-This is the only item on this list that genuinely blocks TASK-001, and it is expected to be resolvable within the task. If it cannot be — for example the CI runner cannot pull or run the image — stop and report rather than substituting a stock PostgreSQL image without PostGIS.
+No further action needed. Do not revisit unless the pinned digest is deliberately rotated (a new ADR-0002-adjacent decision, not a re-litigation of the choice of image).
 
 ---
 

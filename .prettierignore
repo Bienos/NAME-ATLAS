@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+node_modules/
+.next/
+dist/
+coverage/
+packages/db/src/generated/
+
+# Markdown is prose (control plane + delivered specification corpus), not
+# code. It is intentionally hand-formatted (long lines, hard line breaks in
+# the delivered corpus) and is out of scope for code formatting/lint checks
+# (AGENTS.md §6 — no unrelated reformatting). docs/canonical/, docs/library/,
+# docs/archive/, docs/review/ and prompts/ are additionally read-only
+# (AGENTS.md §2) regardless of this rule.
+*.md

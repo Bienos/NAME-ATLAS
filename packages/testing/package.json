@@ -1,0 +1,23 @@
+{
+  "name": "@name-atlas/testing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@testcontainers/postgresql": "12.1.0",
+    "kysely": "0.29.6",
+    "pg": "8.23.0",
+    "testcontainers": "12.1.0"
+  },
+  "devDependencies": {
+    "@types/pg": "8.23.1"
+  }
+}

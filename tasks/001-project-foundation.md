@@ -1,6 +1,6 @@
 # TASK-001 — Project foundation
 
-- **Status:** NOT STARTED
+- **Status:** IMPLEMENTED — see PROGRESS.md for verification detail, including one item (`pnpm test:integration` via actual Testcontainers) not yet confirmed due to a sandbox network restriction in the implementing session.
 - **Milestone:** M0
 - **Depends on:** nothing
 - **Blocks:** TASK-002, TASK-003, and everything after

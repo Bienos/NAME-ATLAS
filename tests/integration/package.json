@@ -1,0 +1,15 @@
+{
+  "name": "@name-atlas/integration-tests",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:integration": "vitest run"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/testing": "workspace:*",
+    "kysely": "0.29.6"
+  }
+}

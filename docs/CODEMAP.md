@@ -1,8 +1,8 @@
 # CODEMAP.md — repository areas
 
-Where things live. Minimal by design: **no application code exists yet.**
+Where things live. Updated by whichever task changes the repository structure (`AGENTS.md` §8).
 
-Updated by whichever task changes the repository structure (`AGENTS.md` §8).
+**TASK-001 status:** implemented. The monorepo foundation exists — pnpm workspace, three apps, four packages, one integration-test package, CI, migration mechanism. No domain logic anywhere in it (verified in PROGRESS.md).
 
 ## Current — exists now
 
@@ -20,23 +20,27 @@ Updated by whichever task changes the repository structure (`AGENTS.md` §8).
 | `docs/SOURCE_MAP.md` | Corpus classification and ownership | active |
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
-| `tasks/` | Task specifications — `001-project-foundation.md` | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
+| `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
+| `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Single lint/format configuration for the whole workspace (`AGENTS.md` §6) | stable (TASK-001) |
+| `.github/workflows/ci.yml` | CI: install → typecheck → lint → format check → unit tests → migrate → verify generated types → integration tests → build | stable (TASK-001) |
+| `apps/web` | Next.js public application. One page, one `/api/health` route handler (tested). No BFF logic yet — that arrives with the first real endpoint at M2. | stable (TASK-001 skeleton) |
+| `apps/admin` | Minimal internal Next.js application. One page. No auth, no admin features. | stable (TASK-001 skeleton) |
+| `apps/worker` | Node entry point (`runWorker()`). Logs a structured startup line with a correlation ID and exits. No queue, no Redis, no BullMQ (ADR-0001) — those arrive at M3. | stable (TASK-001 skeleton, buildable, no queue) |
+| `packages/domain` | `uuidv7()`/`isUuidV7()` (via the `uuid` package) and `createCorrelationId()`. Nothing domain-specific yet — no `Surname`, no `Claim`. | stable (TASK-001 skeleton) |
+| `packages/contracts` | Empty but buildable. One placeholder export/test. Filled at M2 (`docs/contracts/README.md`). | stable (TASK-001 skeleton) |
+| `packages/db` | `pg` pool, Kysely instance, `Migrator`/`FileMigrationProvider` (ADR-0002), one bootstrap migration (`postgis` + `pg_trgm`), `kysely-codegen` wiring, generated `DB` type. **No canonical domain tables** — those are TASK-004/TASK-005. | stable (TASK-001 mechanism only) |
+| `packages/testing` | Testcontainers Postgres harness pinned to `postgis/postgis:16-3.4@sha256:44126d87…` (resolves D-005), frozen-clock helper. | stable (TASK-001) |
+| `tests/integration` | Testcontainers-backed test: starts the pinned image, runs the bootstrap migration, asserts `postgis`/`pg_trgm` are enabled and that no domain table exists. | stable (TASK-001) |
 
 ## Planned — does not exist yet
 
-Nothing below has been created. The shape comes from `docs/canonical/23` §7; the task that creates each area is named so nobody builds ahead of schedule.
+The shape comes from `docs/canonical/23` §7; the task that creates each area is named so nobody builds ahead of schedule.
 
 | Path | Purpose | Created by |
 |---|---|---|
-| `apps/web` | Next.js public application + thin same-origin BFF | TASK-001 (skeleton) |
-| `apps/admin` | Internal admin/research console | TASK-001 (minimal skeleton) |
-| `apps/worker` | Background worker process | TASK-001 (buildable skeleton only; no queue until M3) |
-| `packages/contracts` | Shared schemas → JSON Schema → OpenAPI → client types | TASK-001 (skeleton), filled at M2 |
-| `packages/domain` | Shared domain types and primitives (incl. UUIDv7) | TASK-001 (skeleton) |
-| `packages/db` | Connection, migrations, generated schema types | TASK-001 (mechanism only, no domain tables) |
-| `packages/testing` | Test harness, Testcontainers helpers, fixtures, frozen clock | TASK-001 |
 | `packages/resolver` | Surname resolution engine | TASK-003 |
 | `packages/sources` | Source connectors and rights registry | TASK-002 / TASK-004 |
 | `packages/evidence`, `packages/claims`, `packages/confidence` | Trust chain | TASK-005 |
@@ -47,9 +51,9 @@ Nothing below has been created. The shape comes from `docs/canonical/23` §7; th
 | `packages/commerce` | Offer/Order/Entitlement | M6 |
 | `packages/seo`, `packages/analytics`, `packages/auth`, `packages/observability`, `packages/ui` | Supporting domains | later milestones |
 | `fixtures/pesel/` | Small lawful real source fixture | TASK-002 |
-| `tests/golden`, `tests/integration`, `tests/e2e`, `tests/load` | Test corpora and suites | TASK-001 (structure), filled per task |
-| `ops/` | Deployment blueprint and scripts | TASK-001 (minimal) / M0 |
-| `.github/workflows/` | CI | TASK-001 |
-| `.env.example` | Environment variable names only, never values | TASK-001 |
+| `tests/golden`, `tests/e2e`, `tests/load` | Test corpora and suites | filled per task (`tests/integration` already exists as of TASK-001) |
+| `ops/` | Deployment blueprint and scripts | M0 infrastructure epic (INF-001), not TASK-001 — TASK-001 explicitly excludes provisioning any cloud resource |
+
+Correction from the control-plane session's original plan: `ops/` was listed there as "TASK-001 (minimal)/M0". TASK-001's own out-of-scope list explicitly excludes "deployment to any hosting provider; provisioning any cloud resource", so `ops/` was correctly left uncreated by this task. It now belongs solely to the M0 infrastructure epic (INF-001, `docs/canonical/23` §48).
 
 A package appearing before the task that owns it is scope creep. See `AGENTS.md` §6.
