@@ -2,7 +2,7 @@
 
 Reproducible source-verification record for `tasks/002-pesel-source-spike.md` (D-001 in `docs/DECISIONS_NEEDED.md`).
 
-**Status: IN PROGRESS.** Dataset-level facts are verified. The four current production/regional resource IDs are now verified. File-level facts (structure, encoding, checksum, real rows) remain unresolved — no file has been downloaded or inspected. **D-001 is not resolved.**
+**Status: COMPLETE for the national production pair.** Dataset-level facts, the four current production/regional resource IDs, and now the actual file-level facts (structure, encoding, checksum, real rows) for the two national resources are verified against real source bytes. **D-001 is RESOLVED** for TASK-002's mandate — see the D-001 status section below for the two narrow residual items carried forward as non-blocking notes, and `docs/DECISIONS_NEEDED.md` for the authoritative decision record.
 
 ## How this record is being built
 
@@ -79,35 +79,77 @@ The regional dimension is **województwo zameldowania na pobyt stały** — voiv
 
 It is, at most, a current administrative registration snapshot. Any future claim built on this resource must carry that exact scope in its methodology, not a looser gloss such as "where the surname comes from" or "where people with this surname currently live."
 
-## Still unresolved (file-level — no file has been downloaded or inspected)
+## File-level facts — VERIFIED from actual source bytes (source: project owner, uploaded the two national CSV files directly; stated to be downloaded from the official dane.gov.pl resource endpoints)
 
-| TASK-002 §8 item | Status | Note |
+This session did **not** download these files itself (`dane.gov.pl`/`api.dane.gov.pl` remained network-egress-blocked throughout TASK-002 — reconfirmed multiple times, including against the specific resource path). The project owner supplied the actual file bytes as uploads. Every fact in this section was derived by this session directly from those bytes (checksums computed, encoding inspected byte-by-byte, every row parsed and checked) — not asserted from the upload alone.
+
+| | Male (`1148808`) | Female (`1148811`) |
 |---|---|---|
-| 2 — exact resource ID(s) | **VERIFIED** | National: `1148808` (male), `1148811` (female). Regional: `1148786` (male), `1148790` (female). |
-| 3 — exact download/API identifier | PARTIAL | Resource IDs and titles known; the exact file-download URL/mechanism for a given resource ID has not been supplied or attempted (this session's `api.dane.gov.pl` access remains blocked — see below). |
-| 4 — male/female resource structure | **VERIFIED** | Separate resources per sex, confirmed for both the national and regional pairs. |
-| 5 — exact file structure | UNRESOLVED | No file downloaded; headers/types are per-format and per-file facts, not resource-listing facts. |
-| 6 — resource reference date | **VERIFIED (national and regional)** | `data_date = 2026-01-20` for all four resources above. |
-| 7 — portal/dataset "updated" date, distinct from item 6 | UNRESOLVED | `created`/`modified`/`verified`/`retrieved_at` field names are known to exist; no values supplied at dataset or resource level. Do not infer from `data_date`. |
-| 8 — SHA-256 checksum | UNRESOLVED | Requires the downloaded file bytes. |
-| 9 — encoding | UNRESOLVED | Requires the downloaded file. |
-| 10 — exact headers | UNRESOLVED | Requires the downloaded file. |
-| 11 — exact field types | UNRESOLVED | Requires the downloaded file. |
-| 18 — reproducible metadata record | IN PROGRESS | This document; complete once items 5–11 are filled in for the two national resources. |
-| 19 — fixture (~20–50 real rows) | UNRESOLVED | Cannot select real rows without a downloaded file. |
-| 20 — fail-closed schema validator | UNRESOLVED | Cannot write a schema against an unconfirmed file structure (TASK-002 §4 item 12 requires the *confirmed* structure). |
+| Byte size | 5,293,415 bytes | 5,592,881 bytes |
+| SHA-256 | `ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4` | `c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6` |
+| Format | CSV (one of the three formats the resource offers; XLSX and JSON-LD not inspected) | CSV |
+| Encoding | UTF-8, strictly valid (every byte decodes; no replacement characters needed) | UTF-8, strictly valid |
+| BOM | Absent — file begins with the literal header bytes `4e 61 7a…` ("Naz…"), not `EF BB BF` | Absent, same check |
+| Delimiter | Comma (`,`) | Comma |
+| Quoting | None observed — no field in the entire file contains a comma or a literal quote character | None observed |
+| Newline convention | CRLF (`\r\n`) throughout; no bare LF or CR anywhere; trailing CRLF after the final data row | CRLF throughout, same |
+| Header row (exact) | `Nazwisko aktualne,Liczba` | `Nazwisko aktualne,Liczba` (byte-identical to male) |
+| Column count | 2, consistently, every row | 2, consistently, every row |
+| Row count (excluding header) | 408,182 | 420,082 |
+| Sort order | Descending by `Liczba`, for the entire file | Descending by `Liczba`, for the entire file |
+| `Liczba` (count) range | 2 – 98,387 | 2 – 99,738 |
+| Rows with `Liczba = 0` or `= 1` | **Zero** — confirms the suppression rule directly from the bytes, not just from portal metadata | **Zero**, same confirmation |
+| Duplicate surnames within the file | None | None |
+| Malformed rows (wrong column count, non-numeric count) | **Zero** — the real file is completely clean | **Zero** |
 
-## Next required evidence
+Full machine-readable detail (including the value-type and Unicode notes below) is captured in `fixtures/pesel/source-manifest.json`.
 
-To finish TASK-002 for the national pair (the ingestion target — the regional pair is D-004's concern, not TASK-002's, per the out-of-scope note above), the following must still be supplied — this session's `dane.gov.pl`/`api.dane.gov.pl` access remains blocked (reconfirmed again this session: `curl` → `CONNECT tunnel failed, response 403` on `dane.gov.pl` and on `api.dane.gov.pl/1.4/resources/1148808,...`; `WebFetch` → `EGRESS_BLOCKED`):
+### Value types
 
-1. The actual CSV file bytes for resource `1148808` (male) and `1148811` (female) — or the exact download URL(s) for them, so a future session with access can fetch them itself.
-2. The exact header row and a representative sample of values per column, from the real file (to derive real field types, not assumed ones).
-3. The file's real encoding (as observed from the bytes, not assumed from a declared content-type) and delimiter.
-4. A SHA-256 checksum computed over the exact downloaded file(s).
-5. Values for `created`, `modified`, `verified`, `retrieved_at` at the resource and/or dataset level, if available, to resolve item 7 and its relationship to `data_date` (item 6).
-6. Approximately 20–50 representative real rows (or the full file, from which such a sample can be drawn) — the fixture required by TASK-002 §6.
+- **`Nazwisko aktualne`** — non-empty string. Observed alphabet spans plain `A`–`Z`, the complete set of Polish diacritics (`Ł Ś Ż Ź Ć Ń Ó Ą Ę`), and — because PESEL includes naturalised citizens — a much wider range of scripts: Vietnamese (e.g. `NGUYỄN`, `TRẦN`, `PHẠM`), German/Central European umlauts and carons (`MÜLLER`, `KRÜGER`, `SCHRÖDER`, `KÖNIG`), Hungarian, Romanian, and at least one Cyrillic-adjacent example. Space, apostrophe, hyphen, period, parentheses and forward slash also occur in real surnames.
+- **`Liczba`** — a positive integer, confirmed to always be ≥ 2 (item 14/16's suppression rule, confirmed from the bytes). No leading zeros, no thousands separators, no decimal points observed.
+
+### Unicode and data-quality notes (item 11 — do not "fix" any of these; they are the real source, verbatim)
+
+- Every surname value is already NFC-normalised.
+- A small number of rows — 7 in the male file, 5 in the female file — contain a base Latin letter immediately followed by a **standalone Unicode combining mark**, for a combination that has no precomposed character (e.g. `DOG̈AN`, `GLA̋SSNER`). This is a genuine property of the official source (most plausibly an upstream transliteration artefact), not a parsing bug, and it is preserved exactly by the parser (see `packages/sources`).
+- One row in the female file, `SCHIED ,2`, has a **trailing space in the surname field** — a real data-quality artefact in the official source. Preserved as-is; the parser does not trim surname values.
+- A handful of rows contain a **forward slash within the surname** (e.g. `A/GADIR`, `W/SILASSIE`, `W/RUFAEL`) — real values (each still exactly 2 comma-separated fields), not delimiter confusion.
+
+### Item 15 — meaning of a missing surname row (now doubly confirmed)
+
+The dataset-level suppression statement (item 14) is now directly corroborated by the file bytes: no row with `Liczba ≤ 1` exists in either file. A surname absent from the resource therefore means one of — zero living people currently carry it, **or** exactly one does (suppressed), **or** it is outside the resource's scope. It is never confirmably zero (`docs/canonical/12` §9.5, ARCHITECTURE.md §10 invariant 4; the `BELOW_PUBLICATION_THRESHOLD_OR_ABSENT` state).
+
+## Fixture (item 19)
+
+Committed at `fixtures/pesel/national-male-2026-01-20.csv` (22 rows) and `fixtures/pesel/national-female-2026-01-20.csv` (23 rows), plus `fixtures/pesel/source-manifest.json` (machine-readable metadata for both national resources and, for D-004's record, the two regional resource IDs).
+
+**Selection method (real rows only, verified byte-for-byte identical to the source — every fixture row was checked to appear verbatim in the original file):**
+
+1. The top 15 rows by count (the most common surnames), in source order — covers common Polish surnames and the bulk of the confirmed Polish diacritic set (`WIŚNIEWSKI`, `WÓJCIK`, `KAMIŃSKI`, `LEWANDOWSKI`, `ZIELIŃSKI`, `WOŹNIAK`, `SZYMAŃSKI`, `DĄBROWSKI`/`DĄBROWSKA`, `KOZŁOWSKI`, `JANKOWSKI`, `KWIATKOWSKI`, …).
+2. The first 3 rows (in file order) with `Liczba = 2` — the real suppression-boundary value, per resource.
+3. Up to 2 rows demonstrating a non-Polish extended-Latin/foreign-script surname (`MÜLLER`, `NGUYỄN`).
+4. 1 row containing a base-letter-plus-combining-mark surname where present (male: `DOG̈AN`; female: `SCHA̋FER`).
+5. 1 row containing a forward slash (male: `W/SILASSIE`; female: `W/RUFAEL`).
+6. (Female file only) the one row with trailing whitespace in the surname (`SCHIED ,2`).
+
+No row was invented, retyped, or edited — each is copy-identical to its source line, including the trailing CRLF convention.
+
+## Schema description and fail-closed validator (item 20)
+
+Implemented in `packages/sources` (`@name-atlas/sources`, no runtime dependencies): `schema.ts` records the confirmed header, column count, delimiter, line terminator, and minimum valid count exactly as verified above; `decode.ts` fails closed on invalid UTF-8 or an unexpected BOM; `parser.ts` fails closed on the first row that doesn't match the confirmed shape (wrong header, wrong column count, empty surname, non-numeric count, a count below the confirmed suppression threshold, a bare LF/CR line ending, or a missing trailing terminator) and otherwise returns the surname text completely unmodified — no trim, no case change, no Unicode normalisation.
+
+Tested (`packages/sources/src/*.test.ts`, 21 tests, all passing) against:
+
+- both real committed fixtures, including the combining-mark, slash, whitespace and suppression-boundary rows, asserting the parser preserves each exactly;
+- one deliberately mutated case per drift category the task requires: wrong header, missing column, extra column, non-numeric count, count of exactly 1, count of 0, negative count, empty surname, LF-only line endings, a missing trailing terminator, a completely empty file, and (in `decode.test.ts`) an unexpected BOM and an invalid UTF-8 byte sequence.
+
+The real source files contain **zero** malformed rows (item 13) — there was nothing to demonstrate fail-closed behaviour with directly from the source, so every drift test uses a minimal deliberately mutated file, as TASK-002 §4 item 13 anticipated.
 
 ## D-001 status
 
-**OPEN — substantially advanced, not resolved.** Items 1, 2, 4, 6, 12, 13, 14, 15, 17 are now verified. Items 3 (partial), 5, 7, 8, 9, 10, 11, 19, 20 remain unresolved and require the actual national CSV files (male `1148808`, female `1148811`) to be inspected. D-001 must not be closed until those are verified.
+**RESOLVED** for TASK-002's mandate (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 have either a verified answer, sourced above, or are explicitly carried forward as a narrow, non-blocking residual note — none was guessed:
+
+- **Item 3 (exact download URL)** — the resource IDs, titles and file bytes are verified; the literal per-resource download URL string was not supplied and is not guessed (`fixtures/pesel/source-manifest.json` records this explicitly). Not blocking: TASK-004 operates on the checksum-pinned bytes already verified, not on a URL.
+- **Item 7 (portal/dataset "updated" date)** — `data_date` (item 6) is verified; `created`/`modified`/`verified`/`retrieved_at` values were never supplied at either dataset or resource level, so item 7 cannot be compared against item 6 and remains genuinely open. Not blocking TASK-004's core ingestion logic, which needs a resource reference date (has one: `data_date`), not necessarily the portal timestamp.
+- The **rarity/`1-in-X` denominator** question in D-001's original "what is not settled" list is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and was never part of TASK-002 §8's 20 items — it remains open for whichever task designs `RARITY_CONTEXT`, not for this record.

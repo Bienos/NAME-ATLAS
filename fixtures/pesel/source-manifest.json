@@ -1,0 +1,91 @@
+{
+  "$comment": "Machine-readable source metadata for TASK-002 (docs/sources/pesel.md, D-001 in docs/DECISIONS_NEEDED.md). Fields kept explicitly separate per project-owner instruction: data_date, created, modified, verified and retrieved_at are never inferred from one another. A null value means the fact was not supplied to the implementing session and must not be assumed equal to a sibling field.",
+  "dataset": {
+    "dataset_id": "1681",
+    "dataset_slug": "1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
+    "dataset_title": "Nazwiska występujące w rejestrze PESEL",
+    "publishing_institution_id": "333",
+    "publishing_institution_name": "Ministerstwo Cyfryzacji",
+    "licence": "CC0 1.0",
+    "update_frequency": "yearly",
+    "geography": "Poland",
+    "official_dataset_url": "https://dane.gov.pl/pl/dataset/1681,nazwis"
+  },
+  "resources": [
+    {
+      "role": "national_male",
+      "resource_id": "1148808",
+      "resource_title": "Nazwiska męskie - stan na 2026-01-20",
+      "data_date": "2026-01-20",
+      "created": null,
+      "modified": null,
+      "verified": null,
+      "retrieved_at": null,
+      "official_source_url": null,
+      "official_source_url_note": "Exact per-resource download URL not independently confirmed by this session. The dataset landing page (dataset.official_dataset_url) and this resource_id are confirmed; the resource's own download URL was not supplied and is not guessed. Likely pattern (unverified): https://api.dane.gov.pl/1.4/resources/1148808,<slug> — do not treat as confirmed.",
+      "format_supplied": "CSV",
+      "formats_offered": ["XLSX", "CSV", "JSON-LD"],
+      "encoding": "UTF-8, no BOM",
+      "checksum_sha256": "ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4",
+      "byte_size": 5293415,
+      "row_count_excluding_header": 408182,
+      "provenance": "File bytes supplied directly by the project owner (uploaded), stated to be downloaded from the official dane.gov.pl resource endpoint. Not independently downloaded by this session (dane.gov.pl/api.dane.gov.pl remained network-egress-blocked throughout TASK-002)."
+    },
+    {
+      "role": "national_female",
+      "resource_id": "1148811",
+      "resource_title": "Nazwiska żeńskie - stan na 2026-01-20",
+      "data_date": "2026-01-20",
+      "created": null,
+      "modified": null,
+      "verified": null,
+      "retrieved_at": null,
+      "official_source_url": null,
+      "official_source_url_note": "Exact per-resource download URL not independently confirmed by this session. The dataset landing page (dataset.official_dataset_url) and this resource_id are confirmed; the resource's own download URL was not supplied and is not guessed. Likely pattern (unverified): https://api.dane.gov.pl/1.4/resources/1148811,<slug> — do not treat as confirmed.",
+      "format_supplied": "CSV",
+      "formats_offered": ["XLSX", "CSV", "JSON-LD"],
+      "encoding": "UTF-8, no BOM",
+      "checksum_sha256": "c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6",
+      "byte_size": 5592881,
+      "row_count_excluding_header": 420082,
+      "provenance": "File bytes supplied directly by the project owner (uploaded), stated to be downloaded from the official dane.gov.pl resource endpoint. Not independently downloaded by this session (dane.gov.pl/api.dane.gov.pl remained network-egress-blocked throughout TASK-002)."
+    }
+  ],
+  "regional_resources_not_ingested": [
+    {
+      "role": "regional_male",
+      "resource_id": "1148786",
+      "resource_title": "Nazwiska męskie wg województwa zameldowania na pobyt stały - stan na 2026-01-20",
+      "data_date": "2026-01-20",
+      "note": "Recorded for D-004 (docs/DECISIONS_NEEDED.md) as evidence a current regional source exists. Not downloaded, not parsed, not ingested — out of TASK-002 scope. See D-004 for the required semantic restriction on this data."
+    },
+    {
+      "role": "regional_female",
+      "resource_id": "1148790",
+      "resource_title": "Nazwiska żeńskie wg województwa zameldowania na pobyt stały - stan na 2026-01-20",
+      "data_date": "2026-01-20",
+      "note": "Recorded for D-004 (docs/DECISIONS_NEEDED.md) as evidence a current regional source exists. Not downloaded, not parsed, not ingested — out of TASK-002 scope. See D-004 for the required semantic restriction on this data."
+    }
+  ],
+  "file_structure": {
+    "header_row": "Nazwisko aktualne,Liczba",
+    "columns": ["Nazwisko aktualne", "Liczba"],
+    "column_count": 2,
+    "delimiter": ",",
+    "quoting": "none observed — no field in either file contains a comma or a literal quote character",
+    "newline": "CRLF (\\r\\n) throughout both files, no stray LF-only or CR-only lines; file ends with a trailing CRLF after the last data row",
+    "bom": "absent (confirmed from the first bytes: 4e 61 7a ... = literal \"Naz...\", not EF BB BF)",
+    "sort_order": "descending by Liczba, confirmed for the full file in both male and female resources",
+    "value_types": {
+      "Nazwisko aktualne": "non-empty string; observed alphabet spans plain A-Z, the full set of Polish diacritics (Ł Ś Ż Ź Ć Ń Ó Ą Ę), and a much wider set of Latin-extended, Vietnamese, Cyrillic and other script characters reflecting naturalised citizens; space, apostrophe, hyphen, period, parentheses and forward slash also occur in real values",
+      "Liczba": "positive integer; observed range 2 to 99738 across both files; zero, negative and non-numeric values do not occur"
+    },
+    "suppression_confirmed_from_bytes": "No row with Liczba = 1 or Liczba = 0 exists in either file — directly confirms the dataset-level suppression rule (surnames occurring exactly once are excluded) from the actual bytes, not merely from portal metadata.",
+    "unicode_notes": [
+      "All observed surname values are already NFC-normalised.",
+      "A small number of rows (7 in the male file, 5 in the female file) contain a base Latin letter followed by a standalone Unicode combining mark (e.g. \"DOG̈AN\", \"GLA̋SSNER\") for which no precomposed character exists — this is a property of the source data, not a parsing artefact, and must be preserved exactly, not repaired or re-mapped.",
+      "One row in the female file (\"SCHIED ,2\") has a trailing space in the surname field — a real data-quality artefact in the official source, preserved as-is in the fixture; do not silently trim surname values.",
+      "A small number of rows contain a forward slash within the surname (e.g. \"A/GADIR\", \"W/SILASSIE\", \"W/RUFAEL\") — real values, not delimiter confusion (confirmed: exactly 2 comma-separated fields on every such row)."
+    ]
+  }
+}

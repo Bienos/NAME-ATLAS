@@ -4,6 +4,8 @@ Where things live. Updated by whichever task changes the repository structure (`
 
 **TASK-001 status:** implemented. The monorepo foundation exists — pnpm workspace, three apps, four packages, one integration-test package, CI, migration mechanism. No domain logic anywhere in it (verified in PROGRESS.md).
 
+**TASK-002 status:** implemented. The official PESEL national surname resources are pinned, understood and fixtured — real fixture files, a machine-readable source manifest, and a fail-closed schema validator package. D-001 resolved (`docs/DECISIONS_NEEDED.md`). No canonical domain table, no importer, no resolver (verified in PROGRESS.md).
+
 ## Current — exists now
 
 | Path | Contents | Status |
@@ -20,8 +22,8 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/SOURCE_MAP.md` | Corpus classification and ownership | active |
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
-| `docs/sources/pesel.md` | TASK-002 PESEL source-verification research record (dataset-level facts verified; resource-level facts open — D-001) | active, in progress |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (in progress) | active |
+| `docs/sources/pesel.md` | TASK-002 PESEL source-verification record — complete for the national production pair; D-001 resolved | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
@@ -34,6 +36,8 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `packages/contracts` | Empty but buildable. One placeholder export/test. Filled at M2 (`docs/contracts/README.md`). | stable (TASK-001 skeleton) |
 | `packages/db` | `pg` pool, Kysely instance, `Migrator`/`FileMigrationProvider` (ADR-0002), one bootstrap migration (`postgis` + `pg_trgm`), `kysely-codegen` wiring, generated `DB` type. **No canonical domain tables** — those are TASK-004/TASK-005. | stable (TASK-001 mechanism only) |
 | `packages/testing` | Testcontainers Postgres harness pinned to `postgis/postgis:16-3.4@sha256:44126d87…` (resolves D-005), frozen-clock helper. | stable (TASK-001) |
+| `packages/sources` | `@name-atlas/sources`: schema description + fail-closed parser/validator for the PESEL national CSV shape confirmed in TASK-002. No database, no domain types, no importer — parses raw source bytes into `{ surname, count }` rows only. Source connectors and the rights registry (`docs/canonical/12`) are not built yet — that is TASK-004's addition to this same path. | stable (TASK-002 subset); connectors/rights registry pending (TASK-004) |
+| `fixtures/pesel/` | Real PESEL fixtures: `national-male-2026-01-20.csv` (22 rows), `national-female-2026-01-20.csv` (23 rows), `source-manifest.json` (machine-readable resource metadata). Every row verbatim from the official source; selection method documented in `docs/sources/pesel.md`. | stable (TASK-002) |
 | `tests/integration` | Testcontainers-backed test: starts the pinned image, runs the bootstrap migration, asserts `postgis`/`pg_trgm` are enabled and that no domain table exists. | stable (TASK-001) |
 
 ## Planned — does not exist yet
@@ -43,7 +47,6 @@ The shape comes from `docs/canonical/23` §7; the task that creates each area is
 | Path | Purpose | Created by |
 |---|---|---|
 | `packages/resolver` | Surname resolution engine | TASK-003 |
-| `packages/sources` | Source connectors and rights registry | TASK-002 / TASK-004 |
 | `packages/evidence`, `packages/claims`, `packages/confidence` | Trust chain | TASK-005 |
 | `packages/places` | Place identity and resolution | M3 |
 | `packages/runtime` | Research run orchestration | M3 |

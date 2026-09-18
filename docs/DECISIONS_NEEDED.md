@@ -8,68 +8,30 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-001 — Exact production PESEL resource, scope and version metadata
+## D-001 — RESOLVED (TASK-002)
 
-**Status:** BLOCKS TASK-004 (PESEL ingestion). Does not block TASK-001. **OPEN, substantially advanced — the exact production resource IDs, sex split and reference date are now verified; file-level facts (structure, encoding, checksum, fixture) are not.**
-**Owner:** project owner + TASK-002 source spike.
+**Resolution:** the exact official PESEL surname source is pinned, understood, and safety-railed. Full detail: `docs/sources/pesel.md`.
 
-### TASK-002 attempt — BLOCKED (this session)
+- **Dataset:** `dane.gov.pl` dataset `1681` ("Nazwiska występujące w rejestrze PESEL"), slug `1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel`, publisher institution `333` (Ministerstwo Cyfryzacji), licence CC0 1.0, updated yearly.
+- **National production resources (the ingestion target):** male `1148808` ("Nazwiska męskie - stan na 2026-01-20"), female `1148811` ("Nazwiska żeńskie - stan na 2026-01-20"), both `data_date = 2026-01-20`.
+- **File-level facts, verified directly from the actual downloaded bytes:** SHA-256 checksums, exact byte sizes, UTF-8 encoding (no BOM), comma delimiter, no quoting, CRLF line endings, exact header (`Nazwisko aktualne,Liczba`), 2 columns, row counts (408,182 male / 420,082 female), sort order, value ranges, and — directly from the bytes, not just from portal metadata — that no row has `Liczba ≤ 1`, corroborating the suppression rule.
+- **Semantics confirmed:** living persons only, current-surname field, single-occurrence surnames excluded, missing row ≠ zero (`BELOW_PUBLICATION_THRESHOLD_OR_ABSENT`).
+- **Deliverables:** `fixtures/pesel/national-male-2026-01-20.csv` and `national-female-2026-01-20.csv` (22/23 real rows each, verbatim from source, covering common surnames, Polish diacritics, the real suppression boundary, foreign-script surnames, a combining-mark artefact, an embedded-slash surname, and a trailing-whitespace artefact), `fixtures/pesel/source-manifest.json` (machine-readable metadata), and `@name-atlas/sources` (`packages/sources`) — a schema description and fail-closed parser/validator, tested against both real fixtures and a deliberately mutated case per drift category (21 tests, all passing).
 
-TASK-002 (`tasks/002-pesel-source-spike.md`) was picked up to resolve this decision. Its own source preflight requires confirming real outbound access to `dane.gov.pl` before doing anything else. That check failed:
+**How it was resolved:** `dane.gov.pl`/`api.dane.gov.pl` remained network-egress-blocked for every session that worked this task (confirmed repeatedly: `WebFetch` → `EGRESS_BLOCKED`, `curl` → `CONNECT tunnel failed, response 403`, DNS resolves fine so this is a policy block, not a connectivity fault). The project owner manually retrieved the dataset metadata, then the resource listing, then the two actual national CSV files, and supplied each directly. Nothing was fabricated, inferred, or reconstructed from the canonical corpus to fill a gap at any stage; every item that could not yet be verified was carried forward as explicitly unresolved until the next supply closed it. No mirror or third-party source was used; no different (e.g. deceased-inclusive) dataset was substituted; no 2025-or-earlier resource was substituted for the current 2026 one.
 
-- `https://dane.gov.pl/pl/dataset/1681,nazwis` — `EGRESS_BLOCKED` (confirmed via WebFetch)
-- `https://dane.gov.pl/`, `https://www.dane.gov.pl/`, `https://api.dane.gov.pl/` — all returned `curl: (56) CONNECT tunnel failed, response 403` (confirmed via direct `curl` through this session's egress proxy)
-- DNS resolution for `dane.gov.pl` succeeds (`185.41.93.178`) — this is a policy-level block at the egress proxy, not a DNS or connectivity fault, and not transient.
+**Two narrow residual items, carried forward as non-blocking notes for TASK-004 (not reasons this item is reopened):**
 
-Per TASK-002 §11 and this session's own instructions: no dataset fact, resource ID, URL, date, schema, checksum or licence term was fabricated, inferred, or reconstructed from the canonical corpus to compensate. No mirror or third-party source was substituted. **Every one of the 20 facts TASK-002 §8 requires remains exactly as unverified as before this session** — none can be marked resolved without live access to the source.
+1. The literal per-resource download URL string was never supplied and is not guessed (`fixtures/pesel/source-manifest.json` records this explicitly). The resource IDs and checksum-pinned bytes are already verified, so TASK-004 does not need to guess or re-derive a URL to proceed.
+2. The portal/dataset "updated" timestamp (`created`/`modified`/`verified`/`retrieved_at`) was never supplied at dataset or resource level, so it cannot be compared against the verified resource reference date (`data_date = 2026-01-20`). TASK-004's ingestion logic has a real resource reference date to use; the portal timestamp remains a distinct, still-unknown fact and must not be assumed equal to `data_date`.
 
-**What must be supplied to unblock this**, either by a session with real outbound access to `dane.gov.pl`/`api.dane.gov.pl`, or manually by the project owner:
+The rarity/`1-in-X` denominator question from this decision's original scope (below) is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and remains open for whichever task designs `RARITY_CONTEXT`.
 
-1. The current resource list from `https://dane.gov.pl/pl/dataset/1681,nazwis` — exact resource ID(s), title(s), and whether male/female surnames are separate resources.
-2. The actual resource file(s) for the current annual snapshot, downloaded from that page (or via the Open Data API — its real endpoint also needs recording; `docs/canonical/12` §2.1 only describes it generically).
-3. The portal's "Updated" timestamp for the dataset, as currently displayed.
-4. Whether the resource file itself states its own reference date (distinct from the portal's "Updated" timestamp) — and if so, its value.
-5. A SHA-256 checksum computed over the exact downloaded file(s).
-6. The file's real encoding, delimiter, header row (exact column names as written), and one representative sample of values per column (to derive real types, not assumed ones).
-7. Any resource-level notes or accompanying documentation stating: living-only scope, current-surname-field semantics, and the single-occurrence suppression rule and its exact threshold.
-8. The dataset's licence/reuse/attribution statement as shown on the portal.
-9. Approximately 20–50 representative real rows (or the full file, from which such a sample can be drawn) covering: Polish diacritics, common surnames, any distinct male/female forms the resource carries, and a near-threshold row if the resource's shape makes that observable.
+**Original decision, for reference:** the source is the `dane.gov.pl` dataset *"Nazwiska występujące w rejestrze PESEL"*, dataset 1681, published by the Ministry of Digital Affairs, covering surnames of living people using the current-surname field, omitting surnames occurring only once, excluding deceased people, updated annually, national not regional. What had to be pinned before ingestion — resource ID(s) and file(s), the resource structure, the resource reference date distinct from the portal update date, a checksum, reuse/attribution metadata, and the absence-is-not-zero semantics — is now resolved as recorded above, except the two residual items noted.
 
-Once supplied, a fresh TASK-002 implementation session can proceed directly to §4–§8 of `tasks/002-pesel-source-spike.md` without repeating this network check.
+**Why it blocked:** ingesting before this was pinned would have produced a `DistributionSnapshot` with unverifiable provenance and a rarity claim that may be arithmetically invalid. That risk is now closed for the national production pair.
 
-### Update — dataset-level facts supplied by the project owner
-
-The project owner manually retrieved the official `dane.gov.pl` API response for dataset 1681 and relayed the dataset-level facts into this session (this session independently reconfirmed the API is still `EGRESS_BLOCKED`/`403` for it — the block persists; this is why manual supply was used). Full detail and exact status per fact: `docs/sources/pesel.md`.
-
-This resolves items **7 (partially — living-only, current-surname-field and suppression-threshold semantics are now dataset-level confirmed; resource-level cross-check still pending) and 8 (licence: CC0 1.0)** of the "what must be supplied" list above. Items 1–6 and 9 remain exactly as unresolved as before — dataset-level metadata does not identify which of the dataset's 21 resources are the current male/female production files, nor does it supply a resource reference date, checksum, encoding, headers, or real rows. The next required evidence is the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, which this session also cannot reach and which the project owner will supply the same way.
-
-**D-001 remains OPEN.** Do not close it until the resource-level items above are verified.
-
-### Update — production resource IDs supplied by the project owner
-
-The project owner manually retrieved the dataset 1681 resource listing (`/resources?per_page=100`) and relayed the current 2026 production resources. Full detail: `docs/sources/pesel.md`.
-
-**Now verified:** the exact national production resource pair — male `1148808` ("Nazwiska męskie - stan na 2026-01-20"), female `1148811` ("Nazwiska żeńskie - stan na 2026-01-20") — confirming items 1 (resource IDs) and 2 (male/female are separate resources) of the "what must be supplied" list above, plus the resource reference date (`data_date = 2026-01-20`, item 4 above / item 6 of TASK-002 §8). Do not fall back to a 2025 or earlier resource.
-
-**Still open:** item 3 (the file itself was not downloaded — no checksum, no confirmed encoding/headers/types), and the portal/dataset "updated" timestamp is still not distinguished from `data_date` (no value for `created`/`modified`/`verified`/`retrieved_at` has been supplied at either dataset or resource level — do not assume any of them equal `data_date`). Item 9 (representative rows) still requires the actual file.
-
-A current, lawful **regional** resource pair was also identified — male `1148786`, female `1148790`, same `data_date` — relevant to D-004 below, not to this decision's national-count scope.
-
-**D-001 remains OPEN.** Do not close it until the actual national CSV files (1148808, 1148811) have been inspected: exact headers, exact field types, actual encoding, checksums, parser behaviour, schema validation, and a representative real fixture.
-
-What is settled (`docs/canonical/12` §2.1): the source is the `dane.gov.pl` dataset *"Nazwiska występujące w rejestrze PESEL"*, dataset 1681, published by the Ministry of Digital Affairs. It covers surnames of living people using the current-surname field, omits surnames occurring only once, excludes deceased people, is updated annually, and was updated 2026-01-28. It is national, not regional.
-
-What is not settled and must be pinned before ingestion:
-
-- exact resource ID(s) and file(s) to import, and whether male and female surnames are separate resources;
-- the resource structure: headers, column types, encoding, delimiter;
-- the **resource reference date** as distinct from the **portal/dataset updated date** — both are needed, and they are not the same field;
-- checksum of the exact file imported;
-- reuse/attribution metadata sufficient to populate a `RightsProfile`;
-- the denominator to be used for any `1-in-X` claim, and whether its population universe is actually compatible with the dataset's universe (living PESEL entries with a current-surname field) — if not, rarity is expressed as rank/percentile only;
-- how "absent from the dataset" is represented, given single-occurrence suppression. Absence is not zero; a state such as `BELOW_PUBLICATION_THRESHOLD_OR_ABSENT` is required.
-
-**Why it blocks:** ingesting before this is pinned produces a `DistributionSnapshot` with unverifiable provenance and a rarity claim that may be arithmetically invalid.
+Do not revisit unless the 2026 resources are superseded by a new annual snapshot (a routine, expected refresh — repeat this verification for the new resource, do not assume it matches this record) or a resource-level fact recorded above is found to be wrong on closer inspection.
 
 ---
 

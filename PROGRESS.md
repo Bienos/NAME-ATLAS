@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-002 in progress (production resource IDs verified; file-level facts open)
+**Last updated:** 2026-09-18 — TASK-002 implemented and verified
 
 ## Current state
 
@@ -11,11 +11,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Repository control plane | created (prior session) |
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
-| **TASK-002 — PESEL source spike** | **IN PROGRESS.** Dataset-level facts and the exact national production resource pair (male `1148808`, female `1148811`, `data_date` 2026-01-20) verified (project-owner-supplied, manual API retrieval — `docs/sources/pesel.md`). File-level facts (headers, types, encoding, checksum, fixture) remain unresolved — no file downloaded. `packages/sources`/`fixtures/pesel/` not yet created. |
-| Application source code | unchanged since TASK-001 — foundation only, no domain logic, no `packages/sources` |
+| **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED.** All 20 acceptance items resolved or explicitly, narrowly carried forward — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
+| Application source code | `packages/sources` added (schema + fail-closed parser/validator for the PESEL national CSV shape). No canonical domain table, no importer, no resolver. |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
-| CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | TASK-002 continues. Next required evidence: the actual CSV file bytes (or a reachable download URL) for resources `1148808`/`1148811`, plus header/type/encoding/checksum facts derived from them — unreachable from this session (confirmed again), to be supplied by the project owner the same way as before. |
+| CI | configured (`.github/workflows/ci.yml`) — not yet updated to run `packages/sources` tests explicitly; they run under the existing `pnpm test` sweep, which CI already calls |
+| Next approved task | TASK-003 (exact surname resolver) is next per `PLAN.md`, but is **not specified in detail yet** — only the control-plane session may write `tasks/003-*.md`. This session does not create it. |
 
 ## What TASK-001 built
 
@@ -116,7 +116,7 @@ This substitutes for, but does not replace, an actual `pnpm test:integration` ru
 |---|---|---|
 | D-005 | ~~PostgreSQL image~~ — **resolved this session**, see above. | — |
 | — | `pnpm test:integration` unverified via actual Testcontainers run in this sandbox (see above) — needs confirmation in an environment with normal Docker registry access. | Full TASK-001 sign-off; not a code change |
-| D-001 | Dataset-level facts and the exact national production resource pair (male `1148808`, female `1148811`, reference date 2026-01-20) now verified — see `docs/sources/pesel.md`. File structure, encoding, checksum, exact headers/types, portal-update date, and the rarity denominator remain unpinned; no file has been downloaded. | TASK-004 |
+| D-001 | ~~PESEL source uncertainty~~ — **RESOLVED this session**, see below and `docs/DECISIONS_NEEDED.md`. Two narrow non-blocking residuals carried forward for TASK-004: exact per-resource download URL string; portal-update timestamp (distinct from the verified `data_date`). | — |
 | D-002 | Onomastics rights/source strategy unresolved. | meaning/etymology capability, M2+ |
 | D-003 | Polona per-surface rights (metadata / OCR / image) unresolved. | M3 |
 | D-004 | Source *existence* now verified: a current (2026-01-20), lawful, official regional resource pair exists (male `1148786`, female `1148790`) — see `docs/DECISIONS_NEEDED.md` D-004 and `docs/sources/pesel.md`. Whether/how to adopt it (voivodeship-of-registered-residence, not origin/ancestry/current-physical-residence) is a separate, still-open decision. No map or regional logic built. | current-geography capability; not on the paid-MVP critical path |
@@ -183,8 +183,40 @@ The project owner manually retrieved the dataset 1681 resource listing (`/resour
 
 `docs/DECISIONS_NEEDED.md` updated: D-001 records the verified resource IDs and reference date, still open on file-level facts; D-004 records that a current regional source now verifiably exists, with adoption/framing/implementation explicitly left open — not resolved, no map built.
 
-Still unresolved for TASK-002: the actual national CSV file bytes, exact headers, field types, encoding, checksum, the portal-update date (distinct from `data_date`), and the fixture. None of these can be produced without the actual file, which this session cannot download.
+Still unresolved for TASK-002 at that point: the actual national CSV file bytes, exact headers, field types, encoding, checksum, the portal-update date (distinct from `data_date`), and the fixture. None of these could be produced without the actual file, which this session could not download.
+
+## TASK-002 completed — real CSV files supplied, all remaining acceptance items verified (this session)
+
+The project owner uploaded the two actual national CSV files (male `1148808`, female `1148811`), stated to be downloaded from the official resource endpoints. This session inspected the real bytes directly (not the upload metadata alone) and verified, from the bytes themselves:
+
+- SHA-256 (`ce4238fe…62f4` male, `c508680d…09f6e6` female — full values in `docs/sources/pesel.md` and `fixtures/pesel/source-manifest.json`), exact byte sizes (5,293,415 / 5,592,881), UTF-8 encoding with no decode errors, no BOM, comma delimiter, no quoting anywhere, CRLF line endings throughout with a trailing terminator, exact header (`Nazwisko aktualne,Liczba`) identical in both files, 2 columns consistently, row counts (408,182 / 420,082), descending sort by count, value ranges (2–98,387 / 2–99,738);
+- directly from the bytes: **zero** rows with `Liczba ≤ 1` in either file — the suppression rule confirmed independently of the earlier dataset-level metadata claim;
+- **zero** malformed rows in either real file — both are completely clean, so fail-closed behaviour had to be demonstrated with deliberately mutated test files (as TASK-002 §4 item 13 anticipated), not with any real row;
+- genuine Unicode/data-quality findings, preserved exactly rather than "fixed": 7 (male) / 5 (female) rows with a base Latin letter plus a standalone combining mark with no precomposed equivalent (e.g. `DOG̈AN`); one female row (`SCHIED ,2`) with a trailing space in the surname; several rows with a forward slash inside the surname (e.g. `W/SILASSIE`); a much wider real character set than just Polish diacritics (Vietnamese, German, Hungarian, Romanian, Cyrillic-adjacent).
+
+Built as a result, all real and tested:
+
+- `fixtures/pesel/national-male-2026-01-20.csv` (22 rows) and `national-female-2026-01-20.csv` (23 rows) — every row copy-identical to its source line (verified programmatically, not just by construction), selected by a documented, reproducible stratified method: top 15 by count, first 3 real rows at the count=2 suppression boundary, a foreign-script row, a combining-mark row, a slash row, and (female only) the whitespace row.
+- `fixtures/pesel/source-manifest.json` — machine-readable metadata for both national resources (and, for D-004's record only, the two regional resource IDs), keeping `dataset_id`, `resource_id`, `resource_title`, `data_date`, `created`, `modified`, `verified`, `retrieved_at`, `official_source_url`, `checksum`, `format` and `encoding` as explicitly separate fields — the four still-unsupplied date fields are `null` with a note, never assumed equal to `data_date` or to each other; `official_source_url` is `null` with a note that the exact per-resource download URL was never supplied and is not guessed.
+- `packages/sources` (`@name-atlas/sources`, zero runtime dependencies): `schema.ts` (confirmed header/column/delimiter/terminator/minimum-count constants), `decode.ts` (strict UTF-8 decode, fails closed on invalid bytes or an unexpected BOM), `parser.ts` (fails closed on the first row deviating from the confirmed shape; returns surname text completely unmodified — no trim, no case change, no normalisation), `errors.ts` (`PeselSchemaError` with reason code and line number). 21 tests (`decode.test.ts`, `parser.test.ts`) — passing against both real fixtures (including every edge-case row above) and one deliberately mutated file per drift category: wrong header, missing column, extra column, non-numeric count, count of 1, count of 0, negative count, empty surname, LF-only endings, missing trailing terminator, empty file, unexpected BOM, invalid UTF-8.
+
+`docs/DECISIONS_NEEDED.md` D-001 rewritten as **RESOLVED (TASK-002)**, with the full resolution recorded and two narrow, explicitly non-blocking residual items carried forward for TASK-004 (exact download URL string; portal-update timestamp distinct from `data_date`) — neither fabricated, both stated plainly as still unknown. D-004 unchanged from the prior session's update (source existence verified, adoption/implementation still open) — no map or regional logic was built.
+
+## Verification run this session (after adding `packages/sources` and the fixtures)
+
+| Command | Result |
+|---|---|
+| `pnpm install` | Passed — recognised the new `packages/sources` workspace member (10 of 10 projects). |
+| `pnpm typecheck` | Passed — all 9 packages with a `typecheck` script, including the new `packages/sources`. |
+| `pnpm lint` | Passed — zero errors, zero warnings. |
+| `pnpm format:check` | Passed after one `pnpm format` auto-fix pass on a newly created test file. |
+| `pnpm test` | Passed — **40 tests** across 8 packages (19 from TASK-001 + 21 new in `packages/sources`), including every fail-closed drift case. No Docker required. |
+| `pnpm build` | Passed — `apps/web`, `apps/admin` (`next build`), `apps/worker` (`tsc`), unchanged from TASK-001. |
+| `git status --porcelain` / `git diff --check` | Clean — only the files listed below; no whitespace errors. |
+| `docs/canonical/` checksum | Unchanged (verified again). |
+
+No canonical surname resolution, `NameForm` relationship, historical ingestion, `EvidenceItem`, `Claim`, trend calculation, API, or UI code was written — `packages/sources` parses raw source bytes into `{ surname, count }` rows only, with no mapping to any Name Atlas domain entity.
 
 ## Next action
 
-TASK-001 remains implemented and verified as recorded above. TASK-002 is in progress: the exact national production resource IDs and reference date are verified; file-level facts (structure, encoding, checksum, fixture) remain open and require the actual CSV files, which this session cannot download. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement the production importer, does not create `packages/sources`/`fixtures/pesel/` without real file-level data, does not mark D-001 resolved, does not implement any D-004 regional/map logic, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
+TASK-001 and TASK-002 are both implemented and verified. D-001 is resolved. Per AGENTS.md §8: **STOP.** This session does not implement the production importer (TASK-004), does not implement the surname resolver (TASK-003), does not touch D-004 beyond what the prior session already recorded, and does not write `tasks/003-*.md` or `tasks/004-*.md` — only the control-plane session specifies a new task in detail.
