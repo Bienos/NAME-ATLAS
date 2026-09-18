@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-002 in progress (dataset-level facts verified; resource-level facts open)
+**Last updated:** 2026-09-18 — TASK-002 in progress (production resource IDs verified; file-level facts open)
 
 ## Current state
 
@@ -11,11 +11,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Repository control plane | created (prior session) |
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
-| **TASK-002 — PESEL source spike** | **IN PROGRESS.** Dataset-level facts verified (project-owner-supplied, manual API retrieval — `docs/sources/pesel.md`). Resource-level facts (resource IDs, structure, dates, checksum, fixture) remain unresolved. `packages/sources`/`fixtures/pesel/` not yet created — no resource-level data to build them from. |
+| **TASK-002 — PESEL source spike** | **IN PROGRESS.** Dataset-level facts and the exact national production resource pair (male `1148808`, female `1148811`, `data_date` 2026-01-20) verified (project-owner-supplied, manual API retrieval — `docs/sources/pesel.md`). File-level facts (headers, types, encoding, checksum, fixture) remain unresolved — no file downloaded. `packages/sources`/`fixtures/pesel/` not yet created. |
 | Application source code | unchanged since TASK-001 — foundation only, no domain logic, no `packages/sources` |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | TASK-002 continues. Next required evidence: the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, unreachable from this session (confirmed again) — the project owner will supply it manually, as with the dataset-level facts. |
+| Next approved task | TASK-002 continues. Next required evidence: the actual CSV file bytes (or a reachable download URL) for resources `1148808`/`1148811`, plus header/type/encoding/checksum facts derived from them — unreachable from this session (confirmed again), to be supplied by the project owner the same way as before. |
 
 ## What TASK-001 built
 
@@ -116,10 +116,10 @@ This substitutes for, but does not replace, an actual `pnpm test:integration` ru
 |---|---|---|
 | D-005 | ~~PostgreSQL image~~ — **resolved this session**, see above. | — |
 | — | `pnpm test:integration` unverified via actual Testcontainers run in this sandbox (see above) — needs confirmation in an environment with normal Docker registry access. | Full TASK-001 sign-off; not a code change |
-| D-001 | Dataset-level facts now verified (licence, living/deceased and current-surname semantics, suppression threshold — see `docs/sources/pesel.md`). Resource ID(s), file structure, resource reference date vs portal updated date, checksum and rarity denominator remain unpinned. | TASK-004 |
+| D-001 | Dataset-level facts and the exact national production resource pair (male `1148808`, female `1148811`, reference date 2026-01-20) now verified — see `docs/sources/pesel.md`. File structure, encoding, checksum, exact headers/types, portal-update date, and the rarity denominator remain unpinned; no file has been downloaded. | TASK-004 |
 | D-002 | Onomastics rights/source strategy unresolved. | meaning/etymology capability, M2+ |
 | D-003 | Polona per-surface rights (metadata / OCR / image) unresolved. | M3 |
-| D-004 | No lawful current regional surname dataset established. | current-geography capability; not on the paid-MVP critical path |
+| D-004 | Source *existence* now verified: a current (2026-01-20), lawful, official regional resource pair exists (male `1148786`, female `1148790`) — see `docs/DECISIONS_NEEDED.md` D-004 and `docs/sources/pesel.md`. Whether/how to adopt it (voivodeship-of-registered-residence, not origin/ancestry/current-physical-residence) is a separate, still-open decision. No map or regional logic built. | current-geography capability; not on the paid-MVP critical path |
 | — | `dane.gov.pl` (the PESEL source domain) was unreachable from this planning session's environment — `EGRESS_BLOCKED` on the dataset landing page. TASK-002's own file records this as an explicit environment dependency for whichever session implements it. | TASK-002 implementation (not this planning task) |
 
 ## TASK-002 planning session
@@ -168,6 +168,23 @@ Still unresolved: exact resource ID(s) and which of the dataset's 21 resources a
 
 `docs/DECISIONS_NEEDED.md` D-001 updated accordingly. **D-001 remains OPEN — not resolved.**
 
+## TASK-002 continued — production resource IDs supplied by the project owner (this session)
+
+The project owner manually retrieved the dataset 1681 resource listing (`/resources?per_page=100`) and relayed the current 2026 production resource IDs. This session:
+
+- reconfirmed the API is still unreachable directly — `curl https://dane.gov.pl/` and `curl https://api.dane.gov.pl/1.4/resources/1148808,...` both → `CONNECT tunnel failed, response 403`; the block is domain-wide, not resource-specific;
+- recorded the supplied facts in `docs/sources/pesel.md`, attributed as project-owner-supplied;
+- kept `data_date`, `created`, `modified`, `verified`, `retrieved_at` explicitly distinct per the project owner's instruction — only `data_date` (`2026-01-20`) has a stated value; the other four field names are recorded as known to exist, with no value assumed for any of them;
+- did **not** download any file, compute any checksum, or infer any header/type/encoding — none of that was supplied, and none was guessed;
+- did **not** create `packages/sources` or `fixtures/pesel/` — still no file-level data to build them from;
+- did **not** implement any regional/map logic — the regional resources are recorded as evidence of source existence only.
+
+**Now verified:** national production resource pair — male `1148808` ("Nazwiska męskie - stan na 2026-01-20"), female `1148811` ("Nazwiska żeńskie - stan na 2026-01-20"), both `data_date = 2026-01-20`. Also verified: a current regional resource pair exists (male `1148786`, female `1148790`, same date) — voivodeship of *registered permanent residence*, explicitly not origin/ancestry/birthplace/historical distribution/necessarily-current-physical-residence per the project owner's instruction.
+
+`docs/DECISIONS_NEEDED.md` updated: D-001 records the verified resource IDs and reference date, still open on file-level facts; D-004 records that a current regional source now verifiably exists, with adoption/framing/implementation explicitly left open — not resolved, no map built.
+
+Still unresolved for TASK-002: the actual national CSV file bytes, exact headers, field types, encoding, checksum, the portal-update date (distinct from `data_date`), and the fixture. None of these can be produced without the actual file, which this session cannot download.
+
 ## Next action
 
-TASK-001 remains implemented and verified as recorded above. TASK-002 is in progress: dataset-level facts are verified (`docs/sources/pesel.md`), and resource-level facts are still open pending the resource listing, which this session cannot reach directly. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement the production importer, does not create `packages/sources`/`fixtures/pesel/` without real resource-level data, does not mark D-001 resolved, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
+TASK-001 remains implemented and verified as recorded above. TASK-002 is in progress: the exact national production resource IDs and reference date are verified; file-level facts (structure, encoding, checksum, fixture) remain open and require the actual CSV files, which this session cannot download. Per AGENTS.md §8 and TASK-002 §11: **STOP.** This session does not implement the production importer, does not create `packages/sources`/`fixtures/pesel/` without real file-level data, does not mark D-001 resolved, does not implement any D-004 regional/map logic, and does not write `tasks/003-*.md` or `tasks/004-*.md`.

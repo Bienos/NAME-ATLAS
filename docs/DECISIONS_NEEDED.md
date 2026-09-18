@@ -10,7 +10,7 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ## D-001 — Exact production PESEL resource, scope and version metadata
 
-**Status:** BLOCKS TASK-004 (PESEL ingestion). Does not block TASK-001. **Still OPEN — TASK-002 attempted verification and was blocked before any source fact could be checked.**
+**Status:** BLOCKS TASK-004 (PESEL ingestion). Does not block TASK-001. **OPEN, substantially advanced — the exact production resource IDs, sex split and reference date are now verified; file-level facts (structure, encoding, checksum, fixture) are not.**
 **Owner:** project owner + TASK-002 source spike.
 
 ### TASK-002 attempt — BLOCKED (this session)
@@ -44,6 +44,18 @@ The project owner manually retrieved the official `dane.gov.pl` API response for
 This resolves items **7 (partially — living-only, current-surname-field and suppression-threshold semantics are now dataset-level confirmed; resource-level cross-check still pending) and 8 (licence: CC0 1.0)** of the "what must be supplied" list above. Items 1–6 and 9 remain exactly as unresolved as before — dataset-level metadata does not identify which of the dataset's 21 resources are the current male/female production files, nor does it supply a resource reference date, checksum, encoding, headers, or real rows. The next required evidence is the resource listing at `https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources`, which this session also cannot reach and which the project owner will supply the same way.
 
 **D-001 remains OPEN.** Do not close it until the resource-level items above are verified.
+
+### Update — production resource IDs supplied by the project owner
+
+The project owner manually retrieved the dataset 1681 resource listing (`/resources?per_page=100`) and relayed the current 2026 production resources. Full detail: `docs/sources/pesel.md`.
+
+**Now verified:** the exact national production resource pair — male `1148808` ("Nazwiska męskie - stan na 2026-01-20"), female `1148811` ("Nazwiska żeńskie - stan na 2026-01-20") — confirming items 1 (resource IDs) and 2 (male/female are separate resources) of the "what must be supplied" list above, plus the resource reference date (`data_date = 2026-01-20`, item 4 above / item 6 of TASK-002 §8). Do not fall back to a 2025 or earlier resource.
+
+**Still open:** item 3 (the file itself was not downloaded — no checksum, no confirmed encoding/headers/types), and the portal/dataset "updated" timestamp is still not distinguished from `data_date` (no value for `created`/`modified`/`verified`/`retrieved_at` has been supplied at either dataset or resource level — do not assume any of them equal `data_date`). Item 9 (representative rows) still requires the actual file.
+
+A current, lawful **regional** resource pair was also identified — male `1148786`, female `1148790`, same `data_date` — relevant to D-004 below, not to this decision's national-count scope.
+
+**D-001 remains OPEN.** Do not close it until the actual national CSV files (1148808, 1148811) have been inspected: exact headers, exact field types, actual encoding, checksums, parser behaviour, schema validation, and a representative real fixture.
 
 What is settled (`docs/canonical/12` §2.1): the source is the `dane.gov.pl` dataset *"Nazwiska występujące w rejestrze PESEL"*, dataset 1681, published by the Ministry of Digital Affairs. It covers surnames of living people using the current-surname field, omits surnames occurring only once, excludes deceased people, is updated annually, and was updated 2026-01-28. It is national, not regional.
 
@@ -101,20 +113,28 @@ Consequence if unresolved: historical evidence can be discovered but not lawfull
 
 ## D-004 — Current regional surname map availability
 
-**Status:** BLOCKS the current-geography capability indefinitely. NON-BLOCKING for the paid MVP critical path.
-**Owner:** project owner (data licensing).
+**Status:** Source *existence* now VERIFIED (see below). Adoption decision, framing, and all implementation remain BLOCKED/future scope. NON-BLOCKING for the paid MVP critical path.
+**Owner:** project owner (data licensing + framing decision).
+
+### Update — current regional resource identified (project-owner-supplied, via TASK-002)
+
+While verifying the national PESEL production resources for D-001, the project owner identified a current, official, dated regional resource pair on the same `dane.gov.pl` dataset 1681: male resource `1148786`, female resource `1148790`, both dated `2026-01-20` (same reference date as the national pair). Full detail: `docs/sources/pesel.md`.
+
+**This verifies that a current, lawful, official regional PESEL resource exists** — the specific fact `docs/canonical/10` §5.2 flagged as unestablished. This is a narrower finding than "D-004 is resolved": it answers *whether a current source exists*, not *whether/how Name Atlas should use it*. The "Preferred" path below is accordingly closer than it was, but the decision below — and everything about actually building a map — is still open, and **no map, regional claim, or regional ingestion logic was built or is authorised by this finding.**
+
+**Hard semantic restriction, established by the project owner and binding on any future use of this resource:** the regional dimension is *województwo zameldowania na pobyt stały* — voivodeship of **permanent registered residence** (a legal registration record) for the current-surname holder. It must never be presented as: surname origin, ancestry, birthplace, historical distribution, or (without qualification) necessarily current physical residence — registered domicile and actual current residence can differ. Any future claim built on this resource must state that exact scope, not a looser gloss.
 
 No lawful, genuinely current regional surname dataset is established (`docs/canonical/10` §5.2). The open PESEL surname dataset is national.
 
 Decision required — one of:
 
-- **Preferred** — licence a lawful dataset with appropriately current counts at voivodeship/powiat or equivalent level;
+- **Preferred** — licence a lawful dataset with appropriately current counts at voivodeship/powiat or equivalent level. **A candidate now exists** (resources `1148786`/`1148790` above) — the remaining decision is whether registered-domicile geography, framed with the restriction above, is an acceptable basis for a "current regional distribution" product feature, and on what licence terms (resource-level licence not yet independently confirmed — assumed to inherit the dataset-level CC0 1.0 unless resource metadata states otherwise, which has not been checked).
 - **Fallback A** — use an older regional dataset, labelled with its actual snapshot date (e.g. "regional distribution in the 2014 PESEL snapshot"), clearly marked as not current;
 - **Fallback B** — ship without modern regional distribution, keeping current national count → rarity → origin/meaning → historical evidence.
 
-**Forbidden regardless of decision:** distributing a current national total across regions using old proportions and presenting the result as current fact. Current national count, current regional distribution, older regional distribution and historical occurrence map are four distinct things and must never be collapsed.
+**Forbidden regardless of decision:** distributing a current national total across regions using old proportions and presenting the result as current fact. Current national count, current regional distribution, older regional distribution and historical occurrence map are four distinct things and must never be collapsed. Presenting registered-domicile geography as surname origin, ancestry, birthplace, historical distribution, or unqualified current physical residence is equally forbidden (see restriction above).
 
-Until this is resolved, the current map stays conditional and the product ships without it.
+Until the adoption/framing decision above is made, the current map stays conditional, no map is built, and the product ships without it. TASK-002 and every task before M2's current-geography capability must not implement any regional-distribution logic on the strength of this finding alone.
 
 ---
 
