@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-18 — TASK-001 implementation session
+**Last updated:** 2026-09-18 — TASK-002 planning session
 
 ## Current state
 
@@ -11,10 +11,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Repository control plane | created (prior session) |
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
+| **TASK-002 — PESEL source spike** | **specified, not implemented** — `tasks/002-pesel-source-spike.md` |
 | Application source code | exists — foundation only, no domain logic (verified below) |
 | Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | **TASK-002 is not yet specified.** Per AGENTS.md §8 and TASK-001 §9, this session stops here. Only the control-plane session may add a new detailed task. |
+| Next approved task | TASK-002 is specified and ready for a fresh implementation session. That session needs real outbound access to `dane.gov.pl` — see note below; this planning session did not have it. |
 
 ## What TASK-001 built
 
@@ -119,7 +120,14 @@ This substitutes for, but does not replace, an actual `pnpm test:integration` ru
 | D-002 | Onomastics rights/source strategy unresolved. | meaning/etymology capability, M2+ |
 | D-003 | Polona per-surface rights (metadata / OCR / image) unresolved. | M3 |
 | D-004 | No lawful current regional surname dataset established. | current-geography capability; not on the paid-MVP critical path |
+| — | `dane.gov.pl` (the PESEL source domain) was unreachable from this planning session's environment — `EGRESS_BLOCKED` on the dataset landing page. TASK-002's own file records this as an explicit environment dependency for whichever session implements it. | TASK-002 implementation (not this planning task) |
+
+## TASK-002 planning session (this update)
+
+`tasks/002-pesel-source-spike.md` created per `docs/canonical/23` SPIKE-01. No code was written; no canonical document was touched (byte-identical, verified again). The task requires the implementing session to establish 20 specific facts about the real PESEL resource from the live source, or explicitly record each as unresolved — never guessed (`AGENTS.md` §9). It commits no fixture, no schema, no validator itself; those are TASK-002's implementation output, not this planning session's.
+
+A live check of `https://dane.gov.pl/pl/dataset/1681,nazwis` was attempted while writing the task, purely to confirm the URL already recorded in `docs/canonical/12` §2.1 was still reachable — it returned `EGRESS_BLOCKED` from this session's network policy. No dataset facts were re-derived or guessed to compensate; the task file states this as a precondition the implementing session must check first, and to stop and report rather than substitute canonical-corpus knowledge for fresh verification if it recurs.
 
 ## Next action
 
-TASK-001 is implemented and verified to the extent possible in this session (all commands green except the Testcontainers-specific run, which is blocked by this sandbox's network policy rather than by the code). Per TASK-001 §9 and AGENTS.md §8: **STOP.** Do not begin TASK-002. The control-plane session, not this one, is responsible for writing `tasks/002-*.md`.
+TASK-001 remains implemented and verified as recorded above. TASK-002 is now specified and ready for a fresh implementation session with real outbound access to `dane.gov.pl`. Per AGENTS.md §8: **STOP.** This session does not implement TASK-002, and does not write `tasks/003-*.md` or `tasks/004-*.md`.
