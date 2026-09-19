@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-003 implemented and verified (exact surname resolver + identity core migration)
+**Last updated:** 2026-09-19 — `CURRENT_DISTRIBUTION` truth-chain planning preflight: not actionable, no task file written (see the section before *Next action*). Previous: TASK-003 implemented and verified.
 
 ## Current state
 
@@ -16,7 +16,10 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | None yet. TASK-004 (PESEL ingestion) is the natural next task but has no task file and was not started (AGENTS.md §8). |
+| **TASK-004 — PESEL surname ingestion** | **SPECIFIED, NOT IMPLEMENTED.** Scope authority `tasks/004-pesel-surname-ingestion.md` (commit `c32b20e`); an earlier second draft `tasks/004-pesel-ingestion-source-rights.md` is committed with its false "DONE" status corrected and is not the authority (commit `a528773`). No migration `0003`, no `sources`/`rights_profiles`/`source_records`/`distribution_snapshots`/`distribution_values` table, no importer. Its §14 items U-1, U-2, U-3 await the project owner. |
+| **TASK-005 / TASK-006** | **No task file, no code.** `tasks/005-*.md` and `tasks/006-*.md` do not exist. No `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments` or `citations` table; no truth-chain package. |
+| **`CURRENT_DISTRIBUTION` truth chain (requested as TASK-007)** | **Planning preflight run 2026-09-19 — NOT ACTIONABLE; no `tasks/007-*.md` written.** The approved source is national-only; the regional candidate is unadopted (D-004), carries no administrative code, and its suppression/reconciliation semantics are unverified. Evidence and the proposed prerequisite (a PESEL regional source spike) are in `docs/sources/pesel-regional.md`; D-004 updated. |
+| Next approved task | None yet. TASK-004 is specified and awaits the project owner's answers to its §14 U-1–U-3 and a go-ahead. |
 
 ## What TASK-001 built
 
@@ -307,6 +310,31 @@ Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm
 
 **Not verified in this environment:** the integration suite against the pinned `postgis/postgis:16-3.4@sha256:44126d87…` image itself (registry egress-blocked). Everything else above was run and observed.
 
+## `CURRENT_DISTRIBUTION` truth chain — planning preflight, not actionable (2026-09-19)
+
+A planning session was asked to create the next implementation task, "TASK-007 — CURRENT_DISTRIBUTION Truth Chain", **only if** repository evidence showed an approved production source with surname distribution by geography, and otherwise to document the evidence, name the missing capability, propose the smallest prerequisite and stop. It took the second path. Nothing was implemented.
+
+**Read (targeted, read-only):** `PRODUCT.md`, `ARCHITECTURE.md`, `PLAN.md`, this file, `tasks/003`, both `tasks/004-*` files, `docs/sources/pesel.md`, `fixtures/pesel/source-manifest.json`, `docs/sources/acquisition/2026-09-18/` (README, report, the regional resources' official metadata and the tool's inspection records), `docs/DECISIONS_NEEDED.md`, both ADRs, `docs/contracts/README.md`, `docs/SOURCE_MAP.md`, `docs/CODEMAP.md`, the reviewed plan's TASK-005–008 sections, and the named sections of `docs/canonical/10, 11, 12, 14, 16, 17, 23` located by `grep -n`. `tasks/005-*.md` and `tasks/006-*.md`, which the request listed, **do not exist**.
+
+**Found (facts, each sourced in `docs/sources/pesel-regional.md`):**
+
+- The approved production source (national pair `1148808`/`1148811`, the TASK-004 target) has two columns and no geographic field. The only candidate with geography is the regional pair `1148786`/`1148790` (voivodeship of permanent registered residence, `data_date` 2026-01-20, header `Województwo zameldowania na pobyt stały,Nazwisko aktualne,Liczba`), which D-004 leaves unadopted and TASK-004 §8 excludes.
+- Geographic level available in that candidate: **voivodeship only**, as an uppercase name string with **no administrative code**. The distinct value set is unverified. No `places`, `entity_external_ids`, TERYT data or place connector exists, so canonical geographic identity is not assignable without invention.
+- Suppression per regional cell, presence of zero rows, the regional-sum-versus-national-count relationship and the surname-set overlap are **unverified** — no session has read the regional bytes; only checksums, metadata and the acquisition tool's inspection output are on record.
+- Resource-level licence is unconfirmed (dataset-level CC0 1.0 only; no `RightsProfile` exists for any source).
+- Nothing the chain must build on exists: TASK-004 is specified, not implemented (no migration `0003`, no distribution/source/rights tables — `packages/db/src/generated/db.ts` lists only the identity core); TASK-005 is neither specified nor implemented; `packages/sources` hard-codes the two-column header, so a regional file fails closed today.
+- The canonical representation is fully specified (`CURRENT_DISTRIBUTION` claim, `OFFICIAL_DATASET_FIELD` evidence, surname-scoped `DistributionSnapshot` at `geography_level = REGION` with one `DistributionValue` per `Place`); none of it is implemented.
+- Numbering: the reviewed plan's TASK-006 is "complete current-surname intelligence" and its TASK-007 is "search/profile API"; a distribution task is not numbered in `PLAN.md` or the reviewed plan. The number is the project owner's to assign.
+
+**Files changed (documentation only):**
+
+- `docs/sources/pesel-regional.md` — **new**: the 15-question evidence table, regional resource facts, the ordered gap list, the proposed prerequisite task (PESEL regional source spike) and what this session did not do.
+- `docs/DECISIONS_NEEDED.md` — D-004: status line notes it blocks any `CURRENT_DISTRIBUTION` task; bounded update recording the preflight outcome and the enumerated gate.
+- `docs/CODEMAP.md` — rows for `docs/sources/pesel-regional.md`, `docs/sources/acquisition/2026-09-18/` (previously unlisted) and the two TASK-004 files (previously unlisted).
+- `PROGRESS.md` — this section, the current-state table, *Next action*.
+
+**Not created:** `tasks/007-current-distribution-truth-chain.md`, any other task file, any code, migration, fixture or test. **Not run:** `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:integration`, `pnpm build` — no code changed, and none is reported as passing. Markdown is excluded from `pnpm format:check` by `.prettierignore`. Run: `git status --porcelain` (only the four files above), `git diff --check` (clean), `git status --porcelain docs/canonical docs/library docs/archive docs/reference docs/review prompts` (empty).
+
 ## Next action
 
-TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.
+TASK-001, TASK-002 and TASK-003 are implemented and verified. TASK-004 is specified and not started; its §14 U-1, U-2 and U-3 await the project owner, as does the flagged TASK-003 deviation (the `TemporalExtent` columns omitted from `name_forms`; adding them later is a nullable-column migration). A `CURRENT_DISTRIBUTION` task is blocked by D-004 and by the missing prerequisites enumerated there; the smallest prerequisite — a PESEL regional source spike, evidence and fixtures only — is proposed in `docs/sources/pesel-regional.md` and awaits the project owner's go-ahead and number. Per AGENTS.md §8: **STOP.**
