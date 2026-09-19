@@ -108,6 +108,22 @@ Decision required — one of:
 
 Until the adoption/framing decision above is made, the current map stays conditional, no map is built, and the product ships without it. TASK-002 and every task before M2's current-geography capability must not implement any regional-distribution logic on the strength of this finding alone.
 
+### Findings — `CURRENT_DISTRIBUTION` preflight (2026-09-19). Status and decision unchanged.
+
+A read-only preflight was run for a requested `CURRENT_DISTRIBUTION` truth-chain task. It found the capability **not actionable from current repository evidence** and wrote no task file. Findings only; this does not narrow or widen the decision above. Full record: `docs/sources/pesel-regional.md`.
+
+What the preflight established from committed evidence:
+
+- **The candidate resources carry no geographic identifier.** The geography column holds an uppercase voivodeship *name string*; there is no TERYT code, no ISO 3166-2, no code of any kind. Canonical requires `DistributionValue.place_id` → `Place` with a TERYT external ID (`docs/canonical/11` §6.2, §20.3, §32; `12` §11), and no `places`, `place_names`, `administrative_memberships` or `entity_external_ids` table exists, nor any TERYT connector or ingested TERC data. A voivodeship-name → TERC correspondence must be established from TERYT data and never typed from memory.
+- **Granularity is one level only** — voivodeship. No powiat, no gmina, no locality.
+- **The suppression grain is unverified.** The single-occurrence exclusion is confirmed for the *national* files from their bytes; whether it applies per (surname, voivodeship) cell, and whether any `0` or `1` rows exist regionally, has never been observed. The acquisition tool's own warning on both regional records: "Regional cell suppression and reconciliation with national totals require review."
+- **Reconciliation with national totals is an observation nobody has made**, so no equality invariant between regional sums and national counts may be assumed or specified.
+- **The resource-level licence gap is confirmed negative again**, from the full attribute key set of both regional resource objects: no licence, rights or terms attribute exists at resource level. This is the same gap D-007 tracks for the national pair.
+- **`Liczba` means the same unverified thing regionally as nationally** — the publisher's "liczba wystąpień", occurrences, not stated people (TASK-004 §14 U-4, open). The male/female partition basis is likewise unstated (U-1, open), so the two partitions must never be summed.
+- **No accepted task ingests geographic data.** TASK-004 writes `geography_level = 'NATIONAL'` and `place_id = null` for every row and excludes regional ingestion; the parser hard-codes the two-column national shape, so a three-column regional file fails closed today.
+
+Consequence for sequencing: before any `CURRENT_DISTRIBUTION` task can be specified honestly, the decision above and the resource-level rights question must be answered, the Truth Layer must exist on the branch carrying the work, the regional bytes must be verified by a source spike, and a voivodeship `Place` foundation with TERYT external IDs must exist. Pulling that foundation forward from M3 is itself a sequencing decision for the project owner. `docs/canonical/12` §10 Scenario C and `docs/canonical/23` §24 remain fully supported: the map chapter is marked unavailable, not faked, and does not block the MVP.
+
 ---
 
 ## D-005 — RESOLVED (TASK-001)

@@ -310,3 +310,82 @@ Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm
 ## Next action
 
 TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.
+
+## `CURRENT_DISTRIBUTION` preflight — TASK-008 NOT ACTIONABLE, no task file written (2026-09-19)
+
+A read-only preflight was run for a requested TASK-008 (`CURRENT_DISTRIBUTION` truth chain). It
+found the capability not actionable from current repository evidence and **created no task
+file**, as the request required in that case. No code, migration, fixture, dependency or test
+was touched. Full record: `docs/sources/pesel-regional.md`.
+
+### Verdict, with the evidence
+
+- **No approved production source contains geographic surname distribution.** The approved
+  ingestion target is the national pair `1148808`/`1148811`: two columns
+  (`PESEL_HEADER = "Nazwisko aktualne,Liczba"`, `PESEL_COLUMN_COUNT = 2` in
+  `packages/sources/src/schema.ts`), portal `regions = Polska`.
+- **A current regional candidate exists and is explicitly unadopted.** Resources `1148786`
+  (male) / `1148790` (female) on dataset `1681`, `data_date = 2026-01-20`, header
+  `Województwo zameldowania na pobyt stały,Nazwisko aktualne,Liczba`, voivodeship granularity
+  only. Gated by D-004; resource-level licence unconfirmed; `PRODUCT.md` §10 unchanged.
+- **The candidate carries no geographic identifier** — a voivodeship name string, no TERYT code,
+  no ISO 3166-2. Canonical requires `Place` + `EntityExternalId` (`docs/canonical/11` §6.2,
+  §20.3, §32; `12` §11).
+- **No canonical geography exists to reference.** `packages/db/src/generated/db.ts` lists no
+  `places`, `place_names`, `administrative_memberships` or `entity_external_ids` on any branch
+  (`GeographyColumns`, `GeometryColumns`, `SpatialRefSys` are PostGIS side tables). No TERYT
+  connector; TERC/SIMC exist only in the project owner's archive, not ingested or rights-recorded.
+- **Suppression grain, zero rows, the distinct geography value set and reconciliation with
+  national totals are all unverified** — no session has read the regional bytes in this
+  repository.
+- **TASK-004 does not ingest geographic data**: `geography_level = 'NATIONAL'` and
+  `place_id = null` for every row, regional ingestion explicitly out of scope, and the parser
+  fails closed on the three-column shape.
+
+### Repository state found, and why it matters
+
+The working tree of this branch (`claude/elegant-archimedes-w5ony1`) carries TASK-001–003
+implemented and TASK-004 **specified only**. The task files the request named as preconditions
+are on sibling branches, all forked from `a528773`:
+
+- `origin/claude/sharp-bohr-ld17v3` — TASK-004, TASK-005 (`CURRENT_POPULATION` truth chain,
+  migration `0004`, `packages/truth`) and TASK-006 (read API, first accepted contract)
+  implemented and verified; ADR-0003 and ADR-0004; D-008/D-009/D-010 resolved. Still no
+  geography: every `place_id` null, every snapshot `NATIONAL`.
+- `origin/claude/inspiring-johnson-x88mbo` — an independently produced regional source record
+  with the same verdict, plus `tasks/007-pesel-regional-source-spike.md`, specified and not
+  executed.
+
+So the Truth Layer a distribution chain must extend **does not exist on this branch at all**.
+There is also no task, on any branch, concerning workspace-package build compatibility; number
+007 is taken by the regional spike. The nearest real item is TASK-006's carried-forward note that
+`apps/web` pins `next build --webpack` because Turbopack cannot resolve the workspace packages'
+`.js`-extension specifiers. That is separable work, not a distribution prerequisite, and is not
+specified here.
+
+### Prerequisites, in dependency order
+
+1. D-004 adoption decision (project owner).
+2. Resource-level rights confirmation with the publisher (D-004, D-007; also answers U-4).
+3. TASK-004 implemented on the branch that will carry the work.
+4. TASK-005 Truth Layer implemented on that same branch.
+5. **Smallest next step — a regional source spike:** verify the bytes, the distinct geography
+   value set, the suppression grain, zero rows, the surname-set relation and the observed
+   reconciliation against national counts, and record a TERYT TERC correspondence as evidence.
+   Proposed in `docs/sources/pesel-regional.md`; an equivalent specification already exists on
+   `origin/claude/inspiring-johnson-x88mbo` and should be reconciled rather than forked.
+6. Voivodeship `Place` foundation with TERYT external IDs — currently M3, so pulling it forward
+   is a sequencing decision for the project owner.
+7. Regional ingestion (three-column schema, fail-closed validator, `geography_level = 'REGION'`).
+8. Only then the `CURRENT_DISTRIBUTION` truth chain.
+
+### Verification actually run
+
+No test, typecheck, lint or build was run, because no code changed. This session ran read-only
+inspection over repository files and `git` history only. Changes are documentation: this entry,
+`docs/sources/pesel-regional.md` (new), a findings-only subsection under D-004 in
+`docs/DECISIONS_NEEDED.md`, and one `docs/CODEMAP.md` row. `docs/canonical/`, `docs/library/`,
+`docs/archive/`, `docs/reference/`, `docs/review/` and `prompts/` are untouched.
+
+Per `AGENTS.md` §8: **STOP.** No `tasks/008-*.md` was created, TASK-009 was not begun, and
+nothing was implemented.
