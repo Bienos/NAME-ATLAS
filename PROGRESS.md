@@ -1344,6 +1344,94 @@ Only a code comment and two documentation files changed. No build configuration,
 package manifest, no dependency. `pnpm test` and the integration suite were not re-run and are not
 claimed; nothing touched can affect them, and the full green run earlier this session stands.
 
+## CI fixed: generated-type verification no longer introspects PostGIS schemas (2026-09-19)
+
+Every CI run this repository has ever produced failed, on every branch. The cause was found,
+reproduced locally against a CI-shaped database, and fixed with a one-line change to one script.
+The fix was developed on a parallel branch and is ported here; see the note below.
+
+### The failure
+
+`.github/workflows/ci.yml` step 12, **"Verify generated types are current"**, regenerates
+`packages/db/src/generated/db.ts` against the service database and fails if `git diff --exit-code`
+reports a change. Steps 13 and 14, the integration suite and the build, are `skipped` in
+consequence, so **no CI run has ever executed the integration tests or the build**.
+
+On this branch, CI runs 24, 25, 26, 29, 31, 32, 33, 34 and 37 — all nine — failed at that step. Run
+37 (`a4eb308`) is the most recent: steps 1–11 `success`, step 12 `failure`, steps 13–14 `skipped`.
+
+### Root cause, established by running
+
+The CI service container is `postgis/postgis:16-3.4`, whose image entrypoint script `10_postgis.sh`
+creates **`postgis_topology`, `fuzzystrmatch` and `postgis_tiger_geocoder`** in the template
+databases, not just `postgis`. Those extensions install tables into the `tiger` and `topology`
+schemas. `kysely-codegen` introspects every schema by default, so in CI it emits those tables as
+well as ours. The committed file was generated against a local database that has only `postgis`, so
+the two can never match.
+
+Reproduced locally on two databases built from this branch's four migrations:
+
+| Database | Extensions | Unrestricted codegen | With the fix |
+|---|---|---|---|
+| `na_elegant_ci` | postgis, postgis_topology, fuzzystrmatch, postgis_tiger_geocoder | **54 tables, 600-line diff** against the committed file | **18 tables, byte-identical**, `git status` clean |
+| `na_elegant_plain` | postgis, pg_trgm | 18 tables, byte-identical | 18 tables, byte-identical |
+
+Both repro databases were dropped afterwards.
+
+### The fix
+
+`packages/db/package.json`, `generate-types` gains `--include-pattern="public.*"`:
+
+```
+kysely-codegen --dialect=postgres --url="$DATABASE_URL" --include-pattern="public.*" --out-file=src/generated/db.ts
+```
+
+All application tables live in `public`, so this restricts introspection to what the repository owns
+and makes the generated file independent of which extensions the host database happens to carry. No
+workflow, migration, dependency or generated file changed. `packages/db/src/generated/db.ts` is
+untouched and still matches byte for byte.
+
+### Verification actually run, on this branch with the fix applied
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | PASS |
+| `pnpm db:generate-types` against `na_elegant_ci` | PASS — byte-identical to the committed file, `git status` clean |
+| `pnpm db:generate-types` against `na_elegant_plain` | PASS — byte-identical |
+| `pnpm typecheck` | PASS — 11 packages, 0 errors |
+| `pnpm lint` | PASS — exit 0 |
+| `pnpm format:check` | PASS |
+| `pnpm test` | PASS — **193 unit tests** across 10 packages (admin 1, db 4, domain 7, contracts 26, worker 2, resolver 55, testing 3, sources 58, truth 32, web 5) |
+
+`pnpm build` and the integration suite were not re-run in this worktree and are not claimed here;
+nothing this change touches can affect them, and the full green run recorded earlier in this file
+stands. Whether CI itself goes green is settled by the run on this commit, not by this note.
+
+### Provenance: a parallel branch, now retired
+
+Branch `claude/laughing-mccarthy-12i9h9` is a second implementation line that diverged from the
+shared base `claude/exciting-noether-05np1s` at `a528773` and independently implemented the PESEL
+ingestion and the `CURRENT_POPULATION` truth chain, with 301 unit and 118 integration tests. It
+found and fixed the CI failure first; its run 35 is the first green CI run in this repository's
+history, with the integration tests and the build actually executing.
+
+**On the project owner's decision (2026-09-19), this branch is the line of record and
+`claude/laughing-mccarthy-12i9h9` is retired.** Only the type-generation fix is carried across. The
+two lines' schemas differ (their `0003` differs from this branch's by 109 of 126 lines, and their
+`0004_truth_chain` is not this branch's `0004_truth_layer`), so no other code is portable without a
+deliberate merge task.
+
+Two things from the retired branch are worth porting as separate follow-ups, neither started here:
+
+1. **Completeness-based absence classification.** A classifier that distinguishes `NOT_COVERED` (the
+   partition was never researched or the record is an excerpt) from
+   `BELOW_PUBLICATION_THRESHOLD_OR_ABSENT` (the source covers the partition and the surname is not
+   in it) by comparing the stored `content_hash` against the registry's `official_sha256`. This is
+   the same predicate TASK-009 §-preflight needs for its rank completeness gate.
+2. **Rights-independence tests.** Property and boundary tests asserting that no rights value on any
+   axis can change a confidence verdict or its reason codes, which is `ARCHITECTURE.md` §5–6 and
+   ADR-0001 enforced by test rather than by convention.
+
 ## TASK-009 implemented — `CURRENT_RANK`, the first derived claim (2026-09-19)
 
 Scope authority: `tasks/009-current-rank-truth-chain.md`. D-011 was answered **Option A**, so
