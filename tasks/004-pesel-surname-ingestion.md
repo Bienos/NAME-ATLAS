@@ -1,6 +1,6 @@
 # TASK-004 — Canonical PESEL Surname Dataset Ingestion
 
-- **Status:** NOT STARTED — specification only. Three decisions in §14 need the project owner's answer before implementation begins.
+- **Status:** IN PROGRESS — implementation started 2026-09-19 after the project owner agreed to every proposed resolution in §14 ("Please agree on everything and implement task 004"). The agreed answers are recorded in §14.
 - **Milestone:** M1 (`PLAN.md`: "Tasks: TASK-004 PESEL ingestion + Source/Rights · TASK-005 `CURRENT_POPULATION` truth chain")
 - **Canonical epics:** DAT-001 (Source & Rights Registry) + SRC-001 (PESEL Ingestion) — `docs/canonical/23` §48, master roadmap rows 5 and 7. `PLAN.md` bundles both into this one task; that bundling is `PLAN.md`'s, and this file follows it.
 - **Depends on:** TASK-001 (foundation), TASK-002 (the pinned, verified source), TASK-003 (identity tables and the canonical key function)
@@ -267,6 +267,8 @@ Rules that bind:
 ## 14. Unresolved decisions — answer before implementation
 
 Discovered from repository evidence during this task's preflight. U-1, U-2 and U-3 need the project owner; U-4 to U-7 need a recorded choice from the implementing session.
+
+**Decisions recorded 2026-09-19.** The project owner agreed to every proposed resolution below in one instruction ("Please agree on everything"). U-1, U-2 and U-3: the proposed safe resolutions are **AGREED** as written. U-4: carried forward, unchanged. U-5: option **(a)** — a run with any quarantined row writes nothing and reports the quarantine. U-6: `universe_size` stays null. U-7: resolve in a separate read pass through `resolveSurname` before the write transaction; the `canonical_key` UNIQUE constraint closes the time-of-check/time-of-use gap (a concurrent insert of the same key fails the whole transaction, which is then reported as a typed database failure, never as a partial import). The resolver's read-only guarantee is untouched. The same instruction also acknowledged the TASK-003 `TemporalExtent` omission flagged in `PROGRESS.md` and directed that the stray second draft `tasks/004-pesel-ingestion-source-rights.md` be removed.
 
 **U-1 — What does the male/female split actually partition? (project owner; blocks AC-17's wording)**
 The publisher's own description is "Wykaz nazwisk męskich/żeńskich osób żyjących" — grammatically "a list of male/female surnames of living persons". Whether the partition is by the **bearer's sex** or by the **grammatical gender of the surname form** is not stated anywhere the repository has verified. The two readings imply different `universe_description` text and different downstream legitimacy for any total. **Proposed safe resolution:** record the publisher's own Polish wording verbatim in `universe_description`, state in `coverage_notes` that the partition basis is not disambiguated by the publisher, and forbid summation (AC-17). That lets this task proceed honestly; TASK-005 cannot phrase a `CURRENT_POPULATION` claim without an answer.
