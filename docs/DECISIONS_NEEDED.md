@@ -230,6 +230,50 @@ So the first task that creates an `EvidenceItem` or a `Claim` is forced to resol
 
 ---
 
+## D-010 — `PopulationValueDTO.unit` is fixed as `"PEOPLE"`, but the PESEL unit is unverified
+
+**Status:** BLOCKS TASK-006 (the read contract cannot be written without it). Constrains TASK-005's claim payload in the same way.
+**Owner:** project owner — this is the consumer-facing wording of the product's first factual claim, not an engineering detail.
+
+Discovered during TASK-006 specification preflight (2026-09-19), by reading `docs/canonical/16` against the unresolved source question TASK-004 recorded.
+
+### The collision
+
+`docs/canonical/16` §26 fixes the population DTO's unit as a literal:
+
+```ts
+interface PopulationValueDTO {
+  status: NumericValueStatus;
+  value: number | null;
+  unit: "PEOPLE";
+  scope_label_code: string;
+}
+```
+
+There is no other permitted value. Any response built to this contract therefore asserts that the number is a count **of people**.
+
+`tasks/004-pesel-surname-ingestion.md` §14 **U-4** records that this is exactly what the publisher does not say. The dataset notes describe *"liczba wystąpień"* — the number of **occurrences** of a current-surname value among living persons in the PESEL register. That one occurrence equals one living person is strongly implied and very probably true, but it is **not stated by the publisher**, and nobody has confirmed it. TASK-005's specification consequently forbids its claim payload from describing the count as a number of people until U-4 is answered.
+
+So the canonical API contract and the canonical evidence posture currently disagree about what may be asserted. A read layer built literally to §26 would publish, to end users, a claim the truth layer beneath it is forbidden to make.
+
+### Why it cannot be deferred to the UI
+
+`ARCHITECTURE.md` §6 states the frontend "never derives a fact" and consumes validated presentation objects only. The unit is therefore fixed at the contract boundary, not in the UI. Whatever `unit` the DTO carries *is* the product's assertion.
+
+### Options
+
+- **Option A — answer U-4 with the publisher, then keep `"PEOPLE"`.** The honest fix. If Ministerstwo Cyfryzacji confirms one occurrence = one living person, §26 is correct as written and nothing changes. Cost: external dependency, unknown turnaround.
+- **Option B — widen the unit enum.** Add a second member (e.g. `"SURNAME_OCCURRENCES"`) and carry the publisher's own scope wording in `scope_label_code`. Cost: a deviation from `docs/canonical/16` §26 that must be recorded as an ADR, and a slightly less comfortable label for the UI to render.
+- **Option C — ship `"PEOPLE"` on the strength of the implication.** Cost: the product's very first factual claim asserts something no source states, in the one place `PRODUCT.md` §7 rule 1 promises full traceability. This is precisely the fabrication `AGENTS.md` §9 forbids, and it would be invisible to every downstream reviewer.
+
+### Recommendation (not a decision)
+
+**Option A, with Option B as the fallback if the publisher does not answer within the M2 window.** Option C should not be chosen. The distinction is small in practice and large in principle: the whole differentiator recorded in `PRODUCT.md` §7 is that Name Atlas states only what its sources support.
+
+Until this is answered, TASK-006 can still be built: the read contract is written with the unit as the single point of deferral, and the end-to-end test asserts whatever value the recorded decision names.
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

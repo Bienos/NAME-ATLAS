@@ -25,7 +25,7 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
 | `docs/sources/pesel.md` | TASK-002 PESEL source-verification record — complete for the national production pair; D-001 resolved | active |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (done), `005-current-population-truth-chain.md` (specified, not started) | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (done), `005-current-population-truth-chain.md` (specified, not started), `006-surname-result-read-api.md` (specified, not started) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |

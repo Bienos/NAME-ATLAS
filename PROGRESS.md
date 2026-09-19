@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-005 specified (planning only, no code); TASK-004 implemented and verified (PESEL ingestion: source/rights registry, bulk importer, migration 0003)
+**Last updated:** 2026-09-19 — TASK-005 and TASK-006 specified (planning only, no code); TASK-004 implemented and verified (PESEL ingestion: source/rights registry, bulk importer, migration 0003)
 
 ## Current state
 
@@ -18,7 +18,8 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
 | **TASK-005 — `CURRENT_POPULATION` truth chain** | **SPECIFIED, NOT STARTED.** `tasks/005-current-population-truth-chain.md` is the scope authority. No TASK-005 code, migration or test exists. Blocked on **D-008** and **D-009** (`docs/DECISIONS_NEEDED.md`, both recorded 2026-09-19) before the migration can be written. TASK-004 §14 U-1 and U-4 remain unanswered by the publisher and constrain the claim wording. |
-| Next approved task | None. TASK-005 is specified but not approved for implementation; D-008 and D-009 are unanswered. |
+| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. **Its principal precondition is unmet — TASK-005 is not implemented** — and its own contract is blocked on **D-010** (recorded 2026-09-19). |
+| Next approved task | None. TASK-005 and TASK-006 are specified but not approved for implementation; D-008, D-009 and D-010 are unanswered. |
 
 ## What TASK-001 built
 
@@ -402,13 +403,38 @@ TASK-004 §14 **U-1** (what the male/female split partitions) and **U-4** (the u
 
 **Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-005 code exists.
 
+## TASK-006 specified — planning only, no code written (2026-09-19)
+
+`tasks/006-surname-result-read-api.md` specifies one bounded capability: a caller submits an exact surname query and receives a stable, typed, rights-aware result carrying `CURRENT_POPULATION` and its supporting metadata, produced entirely by the TASK-003 → TASK-005 pipeline. It is the first slice of M2 and adds no second fact, no search, and no UI.
+
+Established by direct inspection during the preflight, not assumed:
+
+- **The API style is settled and is REST.** `docs/canonical/16` §2.1 records "REST — CHOSEN"; §1.2 fixes REST + JSON + OpenAPI-compatible schemas, with GraphQL and WebSockets explicitly excluded from P0. §5 fixes the `/api/v1/` prefix.
+- **The BFF convention already exists in skeleton.** `apps/web` is a Next.js 16 App Router app whose only route handler is `apps/web/src/app/api/health/route.ts`, tested by importing and calling the handler directly. That is the pattern TASK-006 follows. `ARCHITECTURE.md` §6 forbids the handler from resolving, interpreting claims, computing confidence or evaluating rights, so the task puts the query service in a package and keeps the handler thin.
+- **`packages/contracts` is still the intentional stub** exporting only `CONTRACT_PACKAGE_VERSION`, and `docs/contracts/README.md` states no contract is accepted yet, with the first expected at M2. TASK-006's contract is that first accepted contract and must be recorded there in the same change.
+- **Zod is not a direct dependency** of any workspace package, though `docs/canonical/16` §1.3 recommends Zod 4 as the contract source. Adding it needs the one-line justification `AGENTS.md` §6 requires.
+- **The canonical zero-versus-missing representation already exists**: `NumericValueStatus` (`KNOWN`, `SUPPRESSED`, `NOT_AVAILABLE`, `NOT_APPLICABLE`) with an explicit "Never `{"value": 0}` for suppressed values" (`docs/canonical/16` §26), and `RIGHTS_BLOCKED` as a `SectionState` member (§23). The task uses these rather than inventing states.
+- **Exposing the surname UUID as API identity is canonically permitted** (`docs/canonical/16` §18, §21), so the usual "no internal identifiers" rule does not apply to it — but `PublicSurnameIdentity` also requires `canonical_slug` and `canonical_path`, and **no slug exists** anywhere in the schema.
+
+### One contract-versus-evidence collision found and recorded, not resolved
+
+- **D-010** — `docs/canonical/16` §26 fixes the population DTO's unit as the literal `"PEOPLE"`, with no alternative permitted. TASK-004 §14 **U-4** records that the publisher says *"liczba wystąpień"* — occurrences — and never states that one occurrence equals one living person. A response built literally to §26 would assert to end users something TASK-005's claim payload is forbidden to claim, in the one place `PRODUCT.md` §7 rule 1 promises full traceability. Because `ARCHITECTURE.md` §6 forbids the frontend from deriving facts, the unit is fixed at the contract boundary and cannot be deferred to the UI. Three options and a recommendation are recorded; shipping `"PEOPLE"` on the strength of the implication is explicitly not recommended.
+
+### Precondition not met
+
+**TASK-006 cannot begin until TASK-005 is implemented and accepted**, and TASK-005 is itself blocked on D-008 and D-009. The task file states this at the top and forbids the obvious workaround — querying `distribution_values` directly to "get something working" — because that is exactly the second truth chain the task exists to avoid.
+
+**Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-006 code exists.
+
 ## Next action
 
 TASK-001 through TASK-004 are implemented and verified. One flagged deviation still awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions TASK-003 §6.2 named; adding them later is a nullable-column migration.
 
 TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the section below — and **is blocked on four answers**: D-008 and D-009 in `docs/DECISIONS_NEEDED.md` before its migration can be written, and TASK-004 §14 U-1 and U-4 from the publisher before any claim is phrased as a statement about people.
 
-Per AGENTS.md §8: **STOP.** No TASK-005 code was written, TASK-006 was not started, and no `tasks/006-*.md` exists.
+TASK-006 (surname result read API) is now **specified** — see the section below — and is gated behind TASK-005, plus **D-010** on its own contract.
+
+Per AGENTS.md §8: **STOP.** No TASK-005 or TASK-006 code was written, TASK-007 was not started, and no `tasks/007-*.md` exists.
 
 ## TASK-004 specified — planning only, no code written (2026-09-19)
 
