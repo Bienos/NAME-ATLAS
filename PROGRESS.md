@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-005 implemented and verified (CURRENT_POPULATION truth chain, migration 0004); TASK-006 specified, blocked on D-010
+**Last updated:** 2026-09-19 — TASK-005 implemented and verified (CURRENT_POPULATION truth chain, migration 0004); D-010 resolved by ADR-0004, so TASK-006 is specified and unblocked
 
 ## Current state
 
@@ -18,8 +18,8 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
 | **TASK-005 — `CURRENT_POPULATION` truth chain** | **IMPLEMENTED AND VERIFIED.** D-008 and D-009 answered by the project owner and recorded as RESOLVED. Migration `0004_truth_layer` + `packages/truth`. See the TASK-005 section below. |
-| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. Its TASK-005 precondition is now **met**; it remains blocked on **D-010** (the population unit) before its contract can be written. |
-| Next approved task | None. TASK-006 is specified and unblocked except for D-010. |
+| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED, NO LONGER BLOCKED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. Both former blockers are closed: TASK-005 is implemented, and D-010 is resolved by ADR-0004. |
+| Next approved task | None approved. TASK-006 is specified and every precondition is met; it awaits approval to start. |
 
 ## What TASK-001 built
 
@@ -418,7 +418,7 @@ Established by direct inspection during the preflight, not assumed:
 
 ### One contract-versus-evidence collision found and recorded, not resolved
 
-- **D-010** — `docs/canonical/16` §26 fixes the population DTO's unit as the literal `"PEOPLE"`, with no alternative permitted. TASK-004 §14 **U-4** records that the publisher says *"liczba wystąpień"* — occurrences — and never states that one occurrence equals one living person. A response built literally to §26 would assert to end users something TASK-005's claim payload is forbidden to claim, in the one place `PRODUCT.md` §7 rule 1 promises full traceability. Because `ARCHITECTURE.md` §6 forbids the frontend from deriving facts, the unit is fixed at the contract boundary and cannot be deferred to the UI. Three options and a recommendation are recorded; shipping `"PEOPLE"` on the strength of the implication is explicitly not recommended.
+- **D-010** — `docs/canonical/16` §26 fixes the population DTO's unit as the literal `"PEOPLE"`, with no alternative permitted. TASK-004 §14 **U-4** records that the publisher says *"liczba wystąpień"* — occurrences — and never states that one occurrence equals one living person. A response built literally to §26 would assert to end users something TASK-005's claim payload is forbidden to claim, in the one place `PRODUCT.md` §7 rule 1 promises full traceability. Because `ARCHITECTURE.md` §6 forbids the frontend from deriving facts, the unit is fixed at the contract boundary and cannot be deferred to the UI. Three options and a recommendation are recorded; shipping `"PEOPLE"` on the strength of the implication is explicitly not recommended. ***Resolved 2026-09-19 by `docs/adr/0004-population-value-unit.md`*** — Option B: the unit enum is widened and PESEL-derived responses carry `SURNAME_OCCURRENCES`.
 
 ### Precondition not met
 
@@ -455,7 +455,7 @@ Modified: `packages/db/src/migrator.test.ts` and `tests/integration/src/extensio
 ### Design points worth recording
 
 - **One claim per snapshot, never a sum.** A surname in both PESEL resources gets two claims with their own counts and comparability groups. Verified with `NOWAK`: 98,387 and 99,738, reported separately. A test asserts no result field equals their sum.
-- **No `unit` is stored.** The publisher says *"liczba wystąpień"* (occurrences), not people (U-4). The claim payload carries `source_population_scope` with the publisher's verbatim Polish instead. A test asserts the stored payload contains neither `"unit"` nor `"PEOPLE"`. **This is what D-010 must resolve before TASK-006's DTO can assert a unit.**
+- **No `unit` is stored.** The publisher says *"liczba wystąpień"* (occurrences), not people (U-4). The claim payload carries `source_population_scope` with the publisher's verbatim Polish instead. A test asserts the stored payload contains neither `"unit"` nor `"PEOPLE"`. This is what D-010 settled for the presentation boundary — ***resolved 2026-09-19 by ADR-0004***, which gives the DTO `SURNAME_OCCURRENCES`. TASK-005's storage is unaffected: the unit is a contract-boundary concept, not a claim-payload one.
 - **Confidence and rights cannot reach each other.** They are separate modules; neither imports the other, and `ConfidenceInputs` has no field through which a rights value could arrive. An integration test re-derives under a fully permissive rights profile and asserts the confidence is byte-identical while all four surfaces open up. (An earlier version of that test compared against a `PROHIBITED` profile and was **vacuous** — `PROHIBITED` and `UNKNOWN` map to the same decisions. The comparison was corrected to a permissive profile, which is also the harder direction of invariant 2.)
 - **U-5 recorded:** `EXACT` only. `KNOWN_VARIANT` is excluded, because no `NameForm` variant links exist in production data, so a permissive path could not be tested against anything real.
 - **U-7 recorded:** resolution runs as a read pass before the write transaction; the resolver's `READ ONLY` guarantee is untouched.
@@ -497,7 +497,7 @@ The integration suite ran against a **locally installed PostgreSQL 16.13 + PostG
 
 ### Carried forward
 
-- **D-010** — `docs/canonical/16` §26 fixes the population DTO's `unit` as `"PEOPLE"`, which TASK-005 deliberately does not assert. **Blocks TASK-006's contract.**
+- **D-010** — **RESOLVED 2026-09-19** by `docs/adr/0004-population-value-unit.md`: the unit enum is widened and PESEL-derived responses carry `SURNAME_OCCURRENCES`, not `"PEOPLE"`. TASK-006 is unblocked. The underlying source question (U-4) is still open — `"PEOPLE"` stays in the enum as the value PESEL switches to if the publisher confirms it, which is a change of emitted value rather than of schema.
 - **TASK-004 §14 U-1 and U-4** — still unanswered by the publisher. U-1 is contained structurally (separate comparability groups); U-4 is contained by storing no unit.
 - **D-007** — resource-level licence unconfirmed, so `commercial_use = UNKNOWN` keeps paid and SEO surfaces blocked. Observed in the demo output above.
 
@@ -509,7 +509,9 @@ TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the sec
 
 TASK-001 through TASK-005 are implemented and verified. M1's vertical slice is complete: a real surname goes from raw input through exact resolution, ingested PESEL evidence, a typed claim, confidence, citation and rights evaluation to a deterministic developer-facing result.
 
-TASK-006 (surname result read API) is specified and its TASK-005 precondition is now met. It remains blocked on **D-010** — whether the population DTO may assert `unit: "PEOPLE"` when the publisher says *occurrences*. That needs the publisher or an explicit fallback decision, not an engineering choice.
+TASK-006 (surname result read API) is specified and **every precondition is now met**. The project owner adopted D-010's fallback on 2026-09-19 — recorded as ADR-0004 — so the population DTO carries `SURNAME_OCCURRENCES` rather than asserting `"PEOPLE"` on an implication the publisher never stated.
+
+**Four decisions remain open, none of them blocking current work:** D-002 (onomastics rights, blocks M2 meaning), D-003 (Polona rights, blocks M3), D-004 (regional map framing, blocks M2 geography), D-007 (PESEL resource-level licence, blocks M5/M6 paid surfaces). All four need an external party or a commercial judgement, not an engineering decision. D-007's publisher enquiry would also answer TASK-004 §14 U-4 and let the DTO move to `"PEOPLE"`.
 
 Per AGENTS.md §8: **STOP.** No TASK-006 code was written, TASK-007 was not started, and no `tasks/007-*.md` exists.
 

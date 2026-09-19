@@ -1,10 +1,10 @@
 # TASK-006 — Surname Result Read API / Query Contract
 
-- **Status:** NOT STARTED — specification only. **Its principal precondition is not met: TASK-005 is specified but not implemented**, and is itself blocked on D-008 and D-009. TASK-006 cannot begin until TASK-005 is accepted. One further decision, **D-010**, blocks this task's own contract and was recorded during this preflight. See §15.
+- **Status:** NOT STARTED — specification only, and **no longer blocked**. TASK-005 is implemented and verified (migration `0004`, `packages/truth`), and D-010 is resolved by **ADR-0004**. Every precondition is met; §15 now holds implementer choices only.
 - **Milestone:** M2, first slice. `PLAN.md` bundles "shared API contracts" into M2 alongside `pg_trgm` candidate generation, `CURRENT_RANK`, `RARITY_CONTEXT` and the free result UI. This task takes **only** the contract-and-read-path part, for one fact. Everything else in M2 stays out (§8).
-- **Depends on:** TASK-003 (exact resolution) and TASK-004 (PESEL ingestion) — both implemented and verified. **TASK-005 (`CURRENT_POPULATION` truth chain) — specified, not implemented.**
+- **Depends on:** TASK-003 (exact resolution), TASK-004 (PESEL ingestion) and TASK-005 (`CURRENT_POPULATION` truth chain) — all three implemented and verified.
 - **Blocks:** the free result UI, and every later chapter of the surname profile.
-- **Model guidance:** fresh implementation session, after TASK-005 is accepted and §15 is answered.
+- **Model guidance:** fresh implementation session. Ready to start.
 
 ---
 
@@ -44,7 +44,7 @@ Read these; do not restate them in code.
 | ID vs slug; what API identity is | `docs/canonical/16` §18 |
 | Public surname identity DTO | `docs/canonical/16` §21 |
 | Section/chapter state enum (incl. `RIGHTS_BLOCKED`) | `docs/canonical/16` §23 |
-| Population chapter and population value DTO; `NumericValueStatus` | `docs/canonical/16` §25, §26 (**and D-010**) |
+| Population chapter and population value DTO; `NumericValueStatus` | `docs/canonical/16` §25, §26 — **as amended by ADR-0004 for `unit`** |
 | Domain → projection rule | `docs/canonical/16` §34 |
 | Confidence DTO | `docs/canonical/16` §35 |
 | Citation DTO; source summary | `docs/canonical/16` §40, §41 |
@@ -61,7 +61,8 @@ Read these; do not restate them in code.
 | Ingested data and rights posture | `tasks/004-pesel-surname-ingestion.md` §14; `packages/sources/src/registry.ts` |
 | Truth-chain service and result object | `tasks/005-current-population-truth-chain.md` §5, §7 |
 | Stack and database access | `docs/adr/0001-stack.md`, `docs/adr/0002-db-access.md` |
-| Open decisions | `docs/DECISIONS_NEEDED.md` — **D-010 blocks this task**; D-007 constrains its rights output; D-008/D-009 block TASK-005 and therefore this one |
+| Population unit at the contract boundary | **`docs/adr/0004-population-value-unit.md`** (binding; deviates from `docs/canonical/16` §26) |
+| Open decisions | `docs/DECISIONS_NEEDED.md` — D-007 constrains this task's rights output; D-006/D-008/D-009/D-010 are all resolved |
 
 ## 4. Preconditions
 
@@ -69,7 +70,7 @@ Verified against the working tree during this task's preflight (2026-09-19).
 
 1. **TASK-003 accepted.** `@name-atlas/resolver` exports `resolveSurname`, `validateSurnameInput`, `canonicalKey`, `outcomeOf`, `CANONICAL_KEY_VERSION`/`NORMALIZATION_VERSION`, `RESOLUTION_METHOD_VERSION`. `resolveSurname` returns `{kind:"RESOLUTION"}` or `{kind:"LOOKUP_FAILED"}`; `resolution_status` covers `EXACT | KNOWN_VARIANT | MULTIPLE_EXACT | UNKNOWN | REVIEW_REQUIRED` plus validation statuses, and `outcomeOf` projects these to `RESOLVED | UNRESOLVED | INVALID_INPUT`. Lookups run `READ ONLY`.
 2. **TASK-004 accepted.** Migration `0003`; PESEL data ingestible; the rights profile seeded with `commercial_use = UNKNOWN`, `review_status = LEGAL_REVIEW_REQUIRED`, so paid and SEO surfaces are ineligible by `docs/canonical/12` §6.4.
-3. **TASK-005 NOT accepted.** No `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments` or `citations` table exists; migrations stop at `0003`. **This task may not begin until TASK-005 is implemented and verified**, and must not substitute its own population lookup in the meantime (§13).
+3. **TASK-005 accepted** (implemented and verified 2026-09-19). Migration `0004_truth_layer` created `research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments` and `citations`. `@name-atlas/truth` exports `deriveCurrentPopulation`, the `SurnameTruthResult` projection (including per-surface `SurfaceEligibility`), and the confidence and rights rules as separate modules. **This task consumes that service and must not substitute its own population lookup** (§13).
 4. **REST is the chosen style.** `docs/canonical/16` §2.1 "REST — CHOSEN"; §1.2 "REST + JSON + OpenAPI-compatible schemas"; GraphQL and WebSockets explicitly not P0.
 5. **The BFF already exists in skeleton.** `apps/web` is a Next.js 16 App Router app. The one existing route handler is `apps/web/src/app/api/health/route.ts` — a `GET` returning `NextResponse.json(...)`, with a sibling `route.test.ts` importing and calling the handler directly. That is the established convention to follow.
 6. **`packages/contracts` is an intentional stub.** It exports only `CONTRACT_PACKAGE_VERSION`, documented as carrying no product meaning. `docs/contracts/README.md` states "No contract is accepted yet. The first is expected at M2" — this task's contract is that first one, and must be recorded there as an accepted contract document in the same change.
@@ -133,7 +134,7 @@ Each is a behaviour an automated test must demonstrate by running.
 - **AC-09 — Never timeless.** Every returned population value carries its dataset snapshot date and its dataset scope. A response containing a bare number without them is a defect (`ARCHITECTURE.md` §10 invariant 5; `PRODUCT.md` §7 rule 5).
 - **AC-10 — Status, not overloaded null.** The value uses the canonical `NumericValueStatus` (`KNOWN`, `SUPPRESSED`, `NOT_AVAILABLE`, `NOT_APPLICABLE` — `docs/canonical/16` §26). A suppressed or absent value carries `value: null` with the status explaining it. **No path emits `0` for an absent, suppressed or unknown value** — asserted directly (`ARCHITECTURE.md` §10 invariant 4).
 - **AC-11 — Two snapshots stay two.** Where TASK-005 produced a claim per snapshot, the response represents them separately, with their own dates and scopes. Nothing sums, averages or picks between them (`tasks/005-…` AC-21). A test asserts no response field equals the sum of the two counts.
-- **AC-12 — The unit is whatever D-010 records.** The unit is a single point of deferral in the contract. It is not invented at the read layer, and the test asserts the value D-010's recorded decision names (§15).
+- **AC-12 — The unit is `SURNAME_OCCURRENCES`.** Per **ADR-0004**, which resolves D-010: the publisher counts occurrences, not stated people, so the DTO must not assert `"PEOPLE"`. A test asserts the emitted unit is `SURNAME_OCCURRENCES`, and that `"PEOPLE"` appears nowhere in a PESEL-derived response. The contract schema carries a comment pointing at ADR-0004, because this deviates from `docs/canonical/16` §26.
 
 **Confidence, provenance, rights**
 
@@ -300,13 +301,12 @@ Then state a short plan naming the exact files to change, and implement.
 
 ## 15. Unresolved decisions — answer before implementation
 
-**Blocking, and not this task's to solve:**
+**Nothing blocks the start of this task.** Both former blockers are closed:
 
-- **TASK-005 is not implemented**, and is blocked on **D-008** (which canonical document binds the truth-layer schema) and **D-009** (`created_by_run_id` versus the absent `ResearchRun`). TASK-006 has no truth service to call until those are answered and TASK-005 ships. This is the gating item.
+- **TASK-005 is implemented and verified** (2026-09-19): migration `0004_truth_layer`, `packages/truth` with `deriveCurrentPopulation`, and a developer demo (`pnpm demo:surname`). D-008 and D-009 are recorded RESOLVED.
+- **D-010 is resolved by `docs/adr/0004-population-value-unit.md`**: the unit enum is widened and PESEL-derived responses carry `SURNAME_OCCURRENCES`. See AC-12.
 
-**Blocking this task's own contract:**
-
-- **D-010 — the population unit.** `docs/canonical/16` §26 fixes `unit: "PEOPLE"` as a literal with no alternative, but TASK-004 §14 **U-4** records that the publisher says *"liczba wystąpień"* — occurrences — and never states that one occurrence is one living person. A response built literally to §26 would assert, to end users, something the truth layer beneath it is forbidden to claim. Options and a recommendation are in `docs/DECISIONS_NEEDED.md` D-010; the recommendation is to ask the publisher and keep `"PEOPLE"` if confirmed, widening the enum only as a recorded fallback. **Do not resolve this by shipping `"PEOPLE"` on the strength of the implication.** Write the contract with the unit as a single point of deferral and fill it in from the recorded decision.
+**Read before writing the contract:** TASK-005 deliberately stores **no unit** on the claim — the unit is a presentation-boundary concept introduced here, not a claim-payload one. The claim carries `source_population_scope` with the publisher's verbatim Polish, which this layer may surface.
 
 **Implementer choices to make and record during the work:**
 
