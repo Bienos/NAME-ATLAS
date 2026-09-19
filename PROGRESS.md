@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — three parallel branches consolidated onto this one. TASK-001 through TASK-006 implemented and verified (M1 complete, M2 begun). TASK-008 (PESEL regional source spike) specified and attempted; blocked on source supply.
+**Last updated:** 2026-09-19 — three parallel branches consolidated onto this one and the merged tree verified end to end (193 unit tests, 113 integration tests, migrations, build, and the chain through a real HTTP server). TASK-001 through TASK-006 implemented and verified; M1 complete, M2 begun. TASK-008 (PESEL regional source spike) specified and attempted; blocked on source supply.
 
 ## Current state
 
@@ -877,3 +877,128 @@ What was done with it, and why:
 Nothing from the sibling branch was discarded on the merits. Its findings were either already
 present, folded in, or superseded by a later verified fact.
 
+
+## Merged tree verified end to end (2026-09-19)
+
+The three branches were consolidated onto `claude/elegant-archimedes-w5ony1` (two merge commits
+above). No prior session had run anything against the **combined** tree, so the whole suite was run
+here. Every figure below is observed output from this container, not inspection, and every figure
+the sibling branches recorded is independently corroborated.
+
+### Environment
+
+PostgreSQL 16.13 with **PostGIS 3.4.2** was installed locally and a cluster started, so the
+integration suite ran through the `TEST_DATABASE_URL` fallback. The PostGIS version matches what
+D-005 pins. The pinned `postgis/postgis:16-3.4@sha256:44126d87…` **container image was still not
+exercised** — container registries remain egress-blocked. CI runs it.
+
+Recorded because it cost a cycle: the first `apt-get install postgresql-16-postgis-3` **exited 0
+while actually failing**, with two dependency `.deb` files returning 404 against a stale package
+index. `pg_available_extensions` then showed `pg_trgm` but no `postgis`. An `apt-get update`
+followed by a reinstall fixed it. A zero exit status from that wrapper is not evidence the package
+landed; check `pg_available_extensions`.
+
+### Static checks and unit tests
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | **PASS** — lockfile unchanged |
+| `pnpm typecheck` | **PASS** — all 11 packages |
+| `pnpm lint` | **PASS** — zero errors, zero warnings |
+| `pnpm format:check` | **PASS** — "All matched files use Prettier code style!" |
+| `pnpm test` | **PASS** — **193 tests** across 10 packages |
+| `pnpm build` | **PASS** — `apps/web` (webpack builder), `apps/admin`, `apps/worker`; routes `/`, `/_not-found`, `/api/health`, `/api/v1/surname-results` |
+
+Per-package unit counts: `apps/admin` 1, `packages/db` 4, `packages/domain` 7,
+`packages/contracts` 26, `apps/worker` 2, `packages/resolver` 55, `packages/testing` 3,
+`packages/sources` 58, `packages/truth` 32, `apps/web` 5. The total of 193 matches exactly what the
+implementation branch recorded for TASK-006.
+
+### Database
+
+| Command | Result |
+|---|---|
+| `pnpm db:migrate` | **PASS** — `0001_bootstrap_extensions`, `0002_identity_core`, `0003_source_rights_distribution`, `0004_truth_layer` all applied |
+| `pnpm db:migrate` (re-run) | **PASS** — `no pending migrations` |
+| `pnpm db:generate-types` | **PASS** — introspected 18 tables; regenerated file **byte-identical** to the committed one (`cmp`, and `git status` clean) |
+| `pnpm test:integration` | **PASS** — **113 tests** across 5 files, 7.23s |
+
+113 also matches the implementation branch's recorded figure exactly.
+
+### End to end, against real ingested fixture data
+
+Both committed fixtures imported through the production CLI, each pinned by its own SHA-256:
+
+| Run | Observed |
+|---|---|
+| Import male `1148808` | `IMPORTED` — rows read 22, imported 22, quarantined 0, surnames created 22, snapshots 22, values 22 |
+| Import female `1148811` | `IMPORTED` — rows read 23, imported 23, quarantined 0, surnames created 16, **reused 7**, snapshots 23, values 23 |
+
+Resulting state: 2 `source_records`, 38 surnames, 38 name forms, 45 snapshots, 45 values. The 7
+reused surnames reproduce the implementation branch's observation.
+
+`pnpm demo:surname -- "NOWAK"` produced the full chain: two claims, never summed, at **98,387**
+(male, `pesel_2026_national_male`) and **99,738** (female, `pesel_2026_national_female`), both
+`snapshot_date 2026-01-20`, both confidence `VERIFIED` by `pesel_current_population_rule`
+`confidence@1`, both citing *Nazwiska występujące w rejestrze PESEL* / Ministerstwo Cyfryzacji /
+CC0 1.0 with locators `resource:1148808` and `resource:1148811`, and surfaces
+`INTERNAL ALLOWED · FREE CONDITIONAL · PAID BLOCKED · SEO BLOCKED` — the last three all
+`COMMERCIAL_USE_UNRESOLVED`, which is D-007 still open, visible in behaviour.
+
+Identity behaviour: `WIŚNIEWSKI` → `EXACT`, one claim, 53,079. `WISNIEWSKI` → `UNKNOWN`,
+`NO_RESULT (UNRESOLVED)`. `Nieistniejące` → `UNKNOWN`, `NO_RESULT`. No path produced a zero.
+
+Idempotency observed directly: all six truth tables stood at `2/2/2/2/2/2` after the first
+derivation and were **unchanged** after two further runs, the second with a lower-case input.
+
+### Invariants queried against the real database
+
+| Invariant | Observed |
+|---|---|
+| Claims with count 0, null or negative | 0 |
+| Claims missing `snapshot_date` | 0 |
+| Claims with no `SUPPORTS` evidence | 0 |
+| Evidence whose subject differs from its claim's subject | 0 |
+| `distribution_values` with a non-null `place_id` | 0 |
+| Snapshots not `NATIONAL` | 0 |
+| Duplicate `claim_key` among `ACTIVE` claims | 0 |
+
+The last two matter for the distribution work: the merged tree still carries **no geography at
+all**, which is what TASK-008 exists to unblock.
+
+### The HTTP surface, over a real server
+
+`next start` on the production build, against the live database. `GET /api/health` → `{"status":
+"ok"}`. Then `GET /api/v1/surname-results`:
+
+- `surname=NOWAK&surface=FREE` → `200`, `status RESOLVED`, `population.state READY`, two
+  observations with `unit: "SURNAME_OCCURRENCES"` per ADR-0004, each carrying its snapshot date,
+  its verbatim Polish `source_population_scope`, its comparability group, its coverage note
+  (which states the partition is not summable and that absence is `BELOW_PUBLICATION_THRESHOLD_OR_ABSENT`,
+  never a confirmed zero), confidence and a full citation with attribution and terms.
+- `surface=PAID` → `200`, `population.state RIGHTS_BLOCKED`, `reason_code
+  COMMERCIAL_USE_UNRESOLVED`, `observations []`. The serialized body contains neither `98387` nor
+  `99738`, nor the string `PEOPLE`, nor their sum `198125`. The value is **absent**, not sent and
+  flagged.
+- `surname=WISNIEWSKI` → `200`, `status UNRESOLVED`, `surname null`, `population null`. No zero
+  anywhere in the body.
+- `surname=` (empty) → `400`.
+
+**The read path wrote nothing**, measured rather than assumed: a snapshot of eight table counts
+taken before eight HTTP requests (three surfaces, a resolved surname, an unresolved one, a
+diacritic one, an invalid one, a foreign-script one) was identical afterwards —
+`3/3/3/3/3/3/38/45` both times.
+
+### One correction to an earlier claim in this file
+
+An earlier section of this record said `pnpm test` "was not run" during the TASK-008 attempt
+because `node_modules` was absent and installing it "would prove nothing". The install in fact
+works in this container — `registry.npmjs.org` is exempt from the egress policy — and the suite
+runs in seconds. That reasoning was wrong, though the conclusion it defended was not: the TASK-008
+attempt changed only Markdown, so no suite could have been affected. The tests are now run and
+green on the merged tree, which supersedes the point.
+
+### Still not verified here
+
+The pinned PostGIS container image, as above. The regional PESEL bytes, which is TASK-008's
+blocker and unchanged by any of this.
