@@ -280,6 +280,53 @@ This **deviates from `docs/canonical/16` §26**, which fixes the unit as a singl
 
 ---
 
+## D-011 — does a derived claim need `EvidenceDependency`, or do `ClaimEvidence` links suffice?
+
+**Status:** **BLOCKS TASK-009's migration.** NON-BLOCKING for everything already built.
+**Owner:** project owner, on an architecture question, informed by the TASK-009 preflight.
+
+Recorded 2026-09-19 during the TASK-009 (`CURRENT_RANK`) preflight. It is a genuine tension between two canonical documents, so `AGENTS.md` §2 requires it be recorded rather than settled inside a migration.
+
+### The tension
+
+`docs/canonical/14` §30 specifies the lineage a derived statistic must carry:
+
+```text
+DERIVED_STATISTIC EvidenceItem
+↓
+EvidenceDependency
+├── count evidence
+├── denominator/universe evidence
+└── methodology/version
+```
+
+`evidence_dependencies` **does not exist.** TASK-005 deliberately excluded it, quoting `docs/canonical/11` §9.6's own hedge that it is "P1 if `ClaimEvidence` links are sufficient for the first vertical slice" — which was true, because `CURRENT_POPULATION` is source-native and has exactly one input.
+
+`CURRENT_RANK` is the first claim with **more than one kind of input**: the subject surname's own count, and the universe it is ranked within. §30 names `EvidenceDependency` as the mechanism for exactly that. So the hedge's condition ("sufficient for the first vertical slice") has now expired, and the question must be answered before TASK-009's migration is written.
+
+### Options
+
+**Option A — create `evidence_dependencies` now, per `docs/canonical/11` §9.6 and `14` §30.**
+Implements the canonical mechanism as specified. Costs one more table and its integrity rules at a point where exactly one claim type needs it. Gains: every later derived claim (`RARITY_CONTEXT`, `CURRENT_DISTRIBUTION`, `REGIONAL_CONCENTRATION`) inherits a correct lineage model rather than a retrofit, and §30 is satisfied literally with no ADR needed.
+
+**Option B — link both inputs through `ClaimEvidence` and record the deviation in an ADR.**
+Cheapest change: the rank claim gains two `claim_evidence` rows, both `SUPPORTS`, one to the count evidence and one to the universe evidence. Costs: §30 is then not implemented literally, so it needs an ADR the way ADR-0003 and ADR-0004 documented their deviations; and `ClaimEvidence` cannot express *which* input played *which* role, so "the universe evidence" and "the count evidence" become indistinguishable in the data — precisely the distinction §30 asks for.
+
+**Option C — defer by giving the rank a single composite evidence item** that internally names both inputs in its `structured_value`.
+Cheapest of all and the worst: it hides a two-input lineage inside one opaque payload, which makes "why do we believe this rank?" unanswerable by traversal. Recorded only to be rejected.
+
+### Recommendation
+
+**Option A.** The hedge in `docs/canonical/11` §9.6 is conditional and its condition has expired: `ClaimEvidence` links are no longer sufficient, because the roles of the inputs now differ and the model would lose that. Option A is also the only one needing no ADR, since it implements both canonical documents as written. Option B is defensible if the project owner would rather not add a table for one claim type, but it should then be an explicit, ADR-recorded deviation and the ADR should say what is lost.
+
+### Do not
+
+- Do not settle this by choosing a shape in TASK-009's migration file.
+- Do not implement Option C.
+- Do not let a rank claim ship with a lineage that cannot distinguish its count input from its universe input, whichever option is chosen — if Option B is selected, the distinction must be recoverable some other recorded way.
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

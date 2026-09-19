@@ -1201,3 +1201,82 @@ option or resolution changed.
 
 `pnpm test`, `typecheck`, `lint`, `build` and the integration suite were **not run and are not
 claimed**: no code changed, and the previous entry's run of the full suite stands.
+
+## TASK-009 specified — `CURRENT_RANK` truth chain, planning only (2026-09-19)
+
+`tasks/009-current-rank-truth-chain.md` specifies one bounded capability: the repository's **first
+derived claim**. For a surname that resolves exactly and has ingested PESEL evidence, emit a
+`CURRENT_RANK` claim carrying its universe definition, ties policy and algorithm version — and
+refuse to emit anything when the universe is incomplete. Planning only: no code, no schema, no
+migration written. **It is blocked on D-011**, recorded this session.
+
+It takes `CURRENT_RANK` alone. `RARITY_CONTEXT` is deliberately excluded because it needs the
+population denominator TASK-004 left as U-6 with `universe_size` null, and inventing one is
+forbidden. Rank does not depend on the unit of `Liczba` either (U-4), which is part of why it comes
+first.
+
+### The finding that shaped the whole task
+
+**A rank is meaningless unless its universe is complete, and the ingested universe is 0.005% of the
+real one.** Established by querying the live database during the preflight, not assumed:
+
+| | Resource `1148808` | Resource `1148811` |
+|---|---|---|
+| `source_records.content_hash` as stored | `426f44a2…be2448` | `72ff8dfa…feeea8` |
+| Registry `official_sha256` | `ce4238fe…62b62f4` | `c508680d…909f6e6` |
+| Snapshots for that record | **22** | **23** |
+| Registry `official_row_count` | **408,182** | **420,082** |
+
+What is ingested is the committed 22-row and 23-row fixture, so the stored `content_hash` is the
+*fixture's* digest. A naive rank would assert "NOWAK is rank 1 of 22" in the language of a national
+ranking. Worse, it would be **accidentally correct for the top fifteen**, because the fixtures were
+selected as the top fifteen by count plus a tail — so it would survive a casual eyeball and be false
+from rank 16 on. That breaches `PRODUCT.md` §7 rule 1 and `AGENTS.md` §9.
+
+The task therefore makes the **completeness gate**, not the ranking arithmetic, its substance: a
+pure predicate comparing the source record's `content_hash` against the registry's `official_sha256`
+**and** the snapshot count against `official_row_count`, with no bypass, no flag and no environment
+variable. An acceptance criterion requires a test proving the gate refuses over the committed
+fixtures and writes zero rows.
+
+### Other preflight facts, verified not assumed
+
+- **`claim_type` carries exactly one member**, `CURRENT_POPULATION`. Migration `0004`'s own header
+  anticipates this task: later types "arrive by `ALTER TYPE … ADD VALUE` … the same staging
+  migration `0002` used for `entity_type`". So adding `CURRENT_RANK` is the sanctioned pattern and
+  **not** a deviation needing an ADR.
+- **The registry already carries the completeness facts** — `official_sha256`, `official_byte_size`
+  and `official_row_count`, with the comment "NOT the committed fixture's checksum". No new source
+  metadata is needed.
+- **`evidence_scope` includes `SURNAME_LEVEL`**, so §11's scope allow-list is satisfiable.
+- **`evidence_dependencies` does not exist**, which is what D-011 is about.
+- **A rank universe cannot be "a snapshot".** `DistributionSnapshot` is surname-scoped
+  (`ARCHITECTURE.md` §10 invariant 3), so one snapshot holds one surname. `docs/canonical/12` §9.6's
+  "within a specific snapshot" cannot be read literally; the task fixes the universe as the set of
+  snapshots sharing one `source_record_id`, which is one resource version and one comparability
+  group.
+- **There are two rank universes per annual refresh, not one.** Male and female sit in different
+  comparability groups and U-1 forbids summing them, so **no all-Poland rank is derivable from this
+  source at all.** The task forbids the payload implying one.
+
+### D-011 recorded — a genuine canonical tension
+
+**Does a derived claim need `EvidenceDependency`, or do `ClaimEvidence` links suffice?**
+`docs/canonical/14` §30 specifies a derived statistic's lineage as
+`EvidenceItem → EvidenceDependency → {count evidence, universe evidence, methodology/version}`.
+`evidence_dependencies` does not exist, because TASK-005 excluded it on `docs/canonical/11` §9.6's
+own hedge that it is "P1 if `ClaimEvidence` links are sufficient for the first vertical slice".
+
+That hedge's condition has now expired: `CURRENT_POPULATION` had one input, while `CURRENT_RANK` has
+two of **different kinds** — the subject's count and the universe — and `ClaimEvidence` cannot record
+which input played which role. Three options, their costs and a recommendation (Option A, create the
+table, since it needs no ADR and satisfies both canonical documents literally) are in
+`docs/DECISIONS_NEEDED.md`. Per `AGENTS.md` §2 this is recorded rather than settled inside a
+migration.
+
+One implementer choice is left to record during the work: **U-1, the ties policy**, which
+`docs/canonical/12` §9.6 requires be stored but does not fix. Competition ranking is recommended.
+
+**Nothing was verified by running.** This session ran read-only inspection over repository files and
+queries against the local database. No test, typecheck or build was executed, and no TASK-009 code
+exists. `pnpm format:check` passes and the read-only directories are untouched.
