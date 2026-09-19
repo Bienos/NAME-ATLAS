@@ -1,0 +1,127 @@
+{
+  "source": {
+    "id": "pesel_regional_2026_female_1148790",
+    "group": "pesel",
+    "bundle": "polska_pesel_regional",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "1148790",
+    "title": "Nazwiska żeńskie wg województwa zameldowania na pobyt stały - stan na 2026-01-20",
+    "scope": "regional",
+    "sex_partition": "female",
+    "reference_date": "2026-01-20",
+    "source_dates": {
+      "data_date": "2026-01-20",
+      "created": "2026-01-28T13:35:13Z",
+      "modified": "2026-01-28T13:35:13Z",
+      "verified": "2026-01-28T13:35:13Z"
+    },
+    "source_description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL w podziale na województwa, stan na 20.01.2026</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+    "urls": [
+      "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+      "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 17900370,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+      "Geography is voivodeship of permanent registration, not ancestry/origin or necessarily current physical residence. Regional cell suppression and reconciliation with national totals require review."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_regional_2026_female_1148790.official_resource.json",
+    "sha256": "eb68889125bea1e45330b688f6a08efb024b6eb3db613371b076da1323bfc7a3",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+      "retrieved_at": "2026-09-18T17:41:37Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2026-01-20",
+      "created": "2026-01-28T13:35:13Z",
+      "modified": "2026-01-28T13:35:13Z",
+      "verified": "2026-01-28T13:35:13Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_regional/pesel_regional_2026_female_1148790__cd0c100e9205.csv",
+  "bytes": 17900370,
+  "sha256": "cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+    "retrieved_at": "2026-09-18T17:42:32Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Thu, 29 Jan 2026 08:54:44 GMT",
+    "etag": "\"697b2054-1112352\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Województwo zameldowania na pobyt stały",
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 3,
+    "data_row_count": 694553,
+    "sample_rows": [
+      [
+        "DOLNOŚLĄSKIE",
+        "NOWAK",
+        "5757"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "KOWALSKA",
+        "4195"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "WÓJCIK",
+        "3218"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "KOWALCZYK",
+        "3022"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "MAZUR",
+        "2954"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      2
+    ],
+    "schema_fingerprint": "d233cd4a2108a7360a3721604b655c36b02a1125377ec63003b3ed7a216ac6f1",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+    "Geography is voivodeship of permanent registration, not ancestry/origin or necessarily current physical residence. Regional cell suppression and reconciliation with national totals require review."
+  ]
+}

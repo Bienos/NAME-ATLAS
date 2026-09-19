@@ -12,3 +12,8 @@ packages/db/src/generated/
 # docs/archive/, docs/review/ and prompts/ are additionally read-only
 # (AGENTS.md §2) regardless of this rule.
 *.md
+
+# Verbatim captures of external API responses (docs/sources/acquisition/).
+# These are evidence: reformatting them would destroy the property that makes
+# them useful — that they are byte-for-byte what the publisher served.
+docs/sources/acquisition/**/metadata/
