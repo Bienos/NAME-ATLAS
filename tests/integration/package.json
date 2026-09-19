@@ -13,6 +13,7 @@
     "@name-atlas/resolver": "workspace:*",
     "@name-atlas/sources": "workspace:*",
     "@name-atlas/testing": "workspace:*",
+    "@name-atlas/truth": "workspace:*",
     "kysely": "0.29.6"
   }
 }

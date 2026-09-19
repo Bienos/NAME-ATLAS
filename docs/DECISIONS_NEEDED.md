@@ -166,67 +166,39 @@ Because `RightsProfile` is versioned and immutable once applied (`docs/canonical
 
 ---
 
-## D-008 — Does `docs/canonical/14`'s MODEL CHANGE PROPOSAL series bind the truth-layer schema, or does `docs/canonical/11`?
+## D-008 — RESOLVED (TASK-005 implementation, 2026-09-19)
 
-**Status:** BLOCKS TASK-005 (the truth-layer migration cannot be written without it). NON-BLOCKING for TASK-004 and everything already built.
-**Owner:** implementing session may choose, but the choice must be recorded here or as an ADR — it resolves a conflict *between two canonical documents* (`AGENTS.md` §2).
+**Resolution: Option A — `docs/canonical/11` binds. `docs/canonical/14`'s MODEL CHANGE PROPOSALS are not ratified and are not implemented.**
 
-Discovered during TASK-005 specification preflight (2026-09-19) by reading both documents rather than one.
+Decided by the project owner, 2026-09-19. Concretely:
 
-### The conflict
+- `EvidenceType` is `docs/canonical/11` §9.5's 9-member enum; the PESEL value is `OFFICIAL_DATASET_FIELD`, **not** `docs/canonical/14` §4's `OFFICIAL_DATASET_VALUE`.
+- `EvidenceItem` carries §9.5's fields only. No `directness`, `evidence_scope`, `extraction_method`, `extraction_version`, `extraction_confidence`, `independence_group_id` or `source_authority_class` (14-A).
+- `ClaimEvidence.relationship` is `SUPPORTS | CONTRADICTS | CONTEXT` (§10.2). No `QUALIFIES`, `CONTEXTUALISES` or `LEAD_ONLY` (14-D).
+- The `CURRENT_POPULATION` payload uses `docs/canonical/14` §14.1's field naming (`count`, `distribution_snapshot_id`, `country_code`, `snapshot_date`, `source_population_scope`) — the dedicated claim-payload section, and the only one carrying `source_population_scope`.
 
-`docs/canonical/14` §5 states "Prompt 11's `EvidenceItem` remains canonical, with several additions", then presents a **recommended schema** under *MODEL CHANGE PROPOSAL 14-A* that differs materially from `docs/canonical/11` §9.5. The same pattern repeats across the document (14-B … 14-I). Three of these directly affect TASK-005:
+**No ADR is required**, because nothing here deviates from a canonical specification: this selects the ratified schema over a document's own unratified proposals. `docs/canonical/14` §29.1's dataset caveats are carried by its second branch — "SourceRecord scope metadata" — which TASK-004 already persists on `distribution_snapshots.universe_description` and `coverage_notes`.
 
-| # | `docs/canonical/11` (schema) | `docs/canonical/14` (proposal) |
-|---|---|---|
-| **EvidenceType enum** | §9.5: 9 members, incl. `OFFICIAL_DATASET_FIELD` | §4: 19 members, incl. `OFFICIAL_DATASET_VALUE` — a *different name for the same concept* |
-| **EvidenceItem fields** | §9.5: no `directness`, no `extraction_method`/`extraction_version`, `rights_profile_id` absent, `evidence_scope` absent | §5 / 14-A: adds `directness`, `evidence_scope`, `extraction_method`, `extraction_version`, `extraction_confidence`, `independence_group_id`, `source_authority_class`, and makes `rights_profile_id` **required** |
-| **ClaimEvidence relationship** | §10.2: `SUPPORTS`, `CONTRADICTS`, `CONTEXT` | §18 / 14-D: `SUPPORTS`, `CONTRADICTS`, `QUALIFIES`, `CONTEXTUALISES`, `LEAD_ONLY` |
-
-A fourth, smaller conflict is the `CURRENT_POPULATION` payload itself: `docs/canonical/11` §10.1's example uses `{count, dataset_scope, as_of_date, distribution_snapshot_id}`; `docs/canonical/14` §14.1 uses `{count, distribution_snapshot_id, country_code, snapshot_date, source_population_scope}`. Same concepts, different field names.
-
-### Why it cannot be dodged
-
-`docs/canonical/14` §29.1 requires dataset caveats (living-person scope, snapshot date, suppression threshold) to be represented "via `QUALIFIES` evidence **or** SourceRecord scope metadata". The first half of that sentence depends on 14-D having been accepted. The second half does not — and TASK-004 already persists exactly that scope metadata on `distribution_snapshots.coverage_notes` and `universe_description`. So a conservative reading is available, but choosing it is still a decision that must be recorded rather than assumed.
-
-### Options
-
-- **Option A — `docs/canonical/11` binds; proposals are not yet accepted.** Build `EvidenceItem` and `ClaimEvidence` exactly as §9.5/§10.2 specify. Carry dataset caveats via the TASK-004 snapshot metadata, per §29.1's second branch. Smallest complete schema; nothing speculative. Cost: `directness` and `extraction_version` are genuinely useful for auditability and would be added later by a nullable-column migration.
-- **Option B — accept the proposals wholesale.** Build 14-A's richer `EvidenceItem` and 14-D's five-member relationship enum. Cost: implements a document's own *proposals* as though ratified, across a table that later tasks depend on, before anything needs the extra fields — exactly the speculative abstraction `AGENTS.md` §6 forbids.
-- **Option C — accept a named subset.** Take §9.5 as the base and adopt only the proposal fields the MVP truth chain actually exercises (most plausibly `directness` and `extraction_method`/`extraction_version`, which make "why do we believe this" answerable without a `ResearchRun`). Record the subset explicitly here.
-
-### Recommendation (not a decision)
-
-**Option A**, with the payload naming taken from `docs/canonical/14` §14.1 (the dedicated claim-payload section, and the only one carrying `source_population_scope` — the field where the unresolved PESEL unit and partition caveats belong honestly). Option C is a reasonable alternative if the implementing session finds it cannot answer the auditability tests without `directness`.
-
-**Whichever is chosen, record it here with its reasoning before the TASK-005 migration is written.** Do not settle it by picking a shape in the migration file.
+Adding a proposal field later is an additive, nullable-column migration. Do not revisit unless a proposal is actually ratified.
 
 ---
 
-## D-009 — `EvidenceItem.created_by_run_id` and `Claim.created_by_run_id` are required, but `ResearchRun` is scheduled for M3
+## D-009 — RESOLVED (TASK-005 implementation, 2026-09-19)
 
-**Status:** BLOCKS TASK-005 (the columns are NOT NULL; the migration cannot avoid the question). NON-BLOCKING for everything already built.
-**Owner:** implementing session may choose, but the choice must be recorded here or as an ADR.
+**Resolution: Option A — create a minimal synchronous `research_runs` table now.**
 
-Discovered during TASK-005 specification preflight (2026-09-19).
+Decided by the project owner, 2026-09-19.
 
-### The conflict
+`docs/canonical/11` §248 marks `ResearchRun` **P0** and §22.1 gives its schema. `PLAN.md`'s M3 item is the *asynchronous runtime* — `ResearchModuleRun`, the outbox, Redis/Valkey, BullMQ — not the audit record itself. Creating the audit record at M1 therefore reconciles the two rather than deviating from either, and it is what makes `docs/canonical/14` §19's "why does Name Atlas currently believe this?" answerable at all.
 
-`docs/canonical/11` §9.5 and §10.1 both specify `created_by_run_id` as **required, not nullable**, a foreign key to `ResearchRun`. §248 of the same document marks `ResearchRun` **P0**, and §22.1 gives its full 18-field schema.
+Scope of what was built:
 
-`PLAN.md` places `ResearchRun`/`ResearchModuleRun`, the outbox, Redis/Valkey and BullMQ at **M3**, explicitly: "This is the milestone that justifies the asynchronous runtime." TASK-005 is M1.
+- One row per derivation invocation, written synchronously by the derivation service.
+- `run_type = 'BASIC_SURNAME'`, `run_status` and `qa_status` set from the run's real outcome.
+- `prompt_manifest` and `model_manifest` are stored as **empty JSON objects**, because no prompt and no model exist at M1. That emptiness is recorded in `PROGRESS.md` and must not later be read as "no prompt was used but one could have been" — it means the fields were genuinely inapplicable.
+- No queue, no outbox, no module runs, no scheduler. Those remain M3.
 
-So the first task that creates an `EvidenceItem` or a `Claim` is forced to resolve this, and TASK-005 is that task. No `research_runs` table exists today (migrations `0001`–`0003`).
-
-### Options
-
-- **Option A — create a minimal synchronous `research_runs` now.** `ResearchRun` is P0 in the canonical model; the M3 item in `PLAN.md` is the *asynchronous runtime* (queues, outbox, module runs), not the audit record itself. A synchronous derivation run writing one row per invocation satisfies the FK honestly and gives `docs/canonical/14` §19's "why does Name Atlas currently believe this?" a real answer. Cost: TASK-005 grows by one table; several of §22.1's fields (`prompt_manifest`, `model_manifest`) are empty objects at M1 because no LLM exists yet, which must be recorded as genuinely empty rather than filled with plausible values.
-- **Option B — make the column nullable at M1 and tighten later.** Smallest schema now. Cost: a documented deviation from two NOT NULL canonical fields, and every claim created before the tightening has no lineage — which is the one thing `ARCHITECTURE.md` §10 invariant 1 exists to prevent.
-- **Option C — a single fixed "system run" sentinel row.** Satisfies the FK with one table and no per-run bookkeeping. Cost: the audit record becomes decorative; two derivations a month apart are indistinguishable, so it buys the constraint without the property the constraint is for.
-
-### Recommendation (not a decision)
-
-**Option A**, restricted to the fields the M1 chain can populate truthfully, with the unpopulated manifests stored as empty JSON objects and that emptiness stated in `PROGRESS.md` rather than disguised. Option B is acceptable only if the project owner would rather not carry a table until the async runtime lands, and it should then be recorded here as a known lineage gap.
+`EvidenceItem.created_by_run_id` and `Claim.created_by_run_id` are consequently NOT NULL as `docs/canonical/11` specifies, with no lineage gap. **No ADR is required** — nothing deviates from a canonical specification.
 
 ---
 

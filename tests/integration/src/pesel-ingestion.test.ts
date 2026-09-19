@@ -761,20 +761,33 @@ describe("PESEL ingestion against a real PostgreSQL", () => {
       ).toBe("0");
     });
 
-    it("no evidence, claim or confidence table was created by this task (TASK-004 §8)", async () => {
-      const tables = await sql<{ table_name: string }>`
-        SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
-      `.execute(db());
-      const names = tables.rows.map((r) => r.table_name);
-      for (const forbidden of [
+    it("the importer writes no evidence, claim, confidence or citation row (TASK-004 §8)", async () => {
+      // These tables exist from TASK-005's migration 0004, but ingestion must
+      // never populate them: source data and derived product claims stay
+      // separate objects (docs/canonical/11 §13). Asserting emptiness is the
+      // real invariant — asserting the tables are absent stopped being
+      // meaningful once the truth layer landed.
+      for (const table of [
         "evidence_items",
         "claims",
         "claim_evidence",
         "confidence_assessments",
         "citations",
-        "digital_assets",
-        "places",
+        "research_runs",
       ]) {
+        const result = await sql<{ n: string }>`
+          SELECT count(*)::text AS n FROM ${sql.table(table)}
+        `.execute(db());
+        expect(result.rows[0]?.n).toBe("0");
+      }
+    });
+
+    it("creates no table TASK-004 excluded", async () => {
+      const tables = await sql<{ table_name: string }>`
+        SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
+      `.execute(db());
+      const names = tables.rows.map((r) => r.table_name);
+      for (const forbidden of ["digital_assets", "places", "name_form_relations"]) {
         expect(names).not.toContain(forbidden);
       }
     });

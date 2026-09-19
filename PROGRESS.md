@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-005 and TASK-006 specified (planning only, no code); TASK-004 implemented and verified (PESEL ingestion: source/rights registry, bulk importer, migration 0003)
+**Last updated:** 2026-09-19 — TASK-005 implemented and verified (CURRENT_POPULATION truth chain, migration 0004); TASK-006 specified, blocked on D-010
 
 ## Current state
 
@@ -13,13 +13,13 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
 | **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
-| Application source code | `packages/sources` (PESEL CSV schema/parser from TASK-002; source/rights registry, `BULK_DATASET` importer and CLI from TASK-004) and `packages/resolver` (exact resolver, TASK-003). Identity, source/rights and distribution tables exist. No `EvidenceItem`, `Claim`, `ConfidenceAssessment`, `Citation`, `DigitalAsset` or `Place` table — those are TASK-005 and later. |
-| Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`), `0002_identity_core` (three identity tables + `resolvable_name_forms` view) and `0003_source_rights_distribution` (`rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values` + 10 enums). Nothing else. |
+| Application source code | `packages/resolver` (exact resolver, TASK-003), `packages/sources` (PESEL parser from TASK-002; registry, importer and CLI from TASK-004) and `packages/truth` (`CURRENT_POPULATION` truth chain and demo CLI, TASK-005). Identity, source/rights, distribution and truth-layer tables exist. No `DigitalAsset`, `Place`, `EvidenceDependency`, `ResearchModuleRun` or outbox table. |
+| Database migrations | `0001_bootstrap_extensions`, `0002_identity_core`, `0003_source_rights_distribution` and `0004_truth_layer` (`research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` + 10 enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
-| **TASK-005 — `CURRENT_POPULATION` truth chain** | **SPECIFIED, NOT STARTED.** `tasks/005-current-population-truth-chain.md` is the scope authority. No TASK-005 code, migration or test exists. Blocked on **D-008** and **D-009** (`docs/DECISIONS_NEEDED.md`, both recorded 2026-09-19) before the migration can be written. TASK-004 §14 U-1 and U-4 remain unanswered by the publisher and constrain the claim wording. |
-| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. **Its principal precondition is unmet — TASK-005 is not implemented** — and its own contract is blocked on **D-010** (recorded 2026-09-19). |
-| Next approved task | None. TASK-005 and TASK-006 are specified but not approved for implementation; D-008, D-009 and D-010 are unanswered. |
+| **TASK-005 — `CURRENT_POPULATION` truth chain** | **IMPLEMENTED AND VERIFIED.** D-008 and D-009 answered by the project owner and recorded as RESOLVED. Migration `0004_truth_layer` + `packages/truth`. See the TASK-005 section below. |
+| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. Its TASK-005 precondition is now **met**; it remains blocked on **D-010** (the population unit) before its contract can be written. |
+| Next approved task | None. TASK-006 is specified and unblocked except for D-010. |
 
 ## What TASK-001 built
 
@@ -426,15 +426,92 @@ Established by direct inspection during the preflight, not assumed:
 
 **Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-006 code exists.
 
+## TASK-005 implemented — CURRENT_POPULATION truth chain (2026-09-19)
+
+Scope authority: `tasks/005-current-population-truth-chain.md`. Closes M1's vertical slice: a surname that resolves exactly and has ingested PESEL data now yields an evidence-backed claim with confidence, citation and rights metadata, and nothing beyond it.
+
+### Decisions answered before implementation
+
+The project owner answered both blockers on 2026-09-19; both are recorded RESOLVED in `docs/DECISIONS_NEEDED.md`.
+
+- **D-008 → Option A.** `docs/canonical/11` binds; `docs/canonical/14`'s MODEL CHANGE PROPOSALS are not ratified and were not built. `evidence_type` is §9.5's enum (`OFFICIAL_DATASET_FIELD`), `claim_evidence.relationship` is the three-member §10.2 enum, and `EvidenceItem` has no `directness`/`extraction_*` columns. Claim payload naming follows `docs/canonical/14` §14.1. **No ADR was needed** — nothing deviates from a canonical specification.
+- **D-009 → Option A.** A minimal synchronous `research_runs` table was created, so `created_by_run_id` is NOT NULL on `evidence_items` and `claims` exactly as canonical specifies, with no lineage gap. `prompt_manifest` and `model_manifest` are stored as **empty JSON objects** because no prompt and no model exist at M1 — genuinely inapplicable, not merely unrecorded. An integration test asserts they are `{}`.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0004_truth_layer.ts` | 10 enums + 6 tables: `research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` |
+| `packages/truth/src/derive.ts` | The derivation service and its typed invariant error |
+| `packages/truth/src/confidence.ts` | `docs/canonical/14` §29's four provisos as predicates; `evidence_set_hash` |
+| `packages/truth/src/rights.ts` | Surface eligibility from `docs/canonical/12` §6.3/§6.4 |
+| `packages/truth/src/result.ts` | The developer-facing projection types |
+| `packages/truth/bin/surname-profile.ts` | Demo CLI (`pnpm demo:surname -- "NOWAK"`) |
+| `packages/truth/src/*.test.ts` | 32 new unit tests |
+| `tests/integration/src/truth-chain.test.ts` | 31 new integration tests |
+
+Modified: `packages/db/src/migrator.test.ts` and `tests/integration/src/extensions.test.ts` (schema-inventory assertions every schema-adding task updates); `tests/integration/src/pesel-ingestion.test.ts` (one TASK-004 assertion was reframed — it asserted the truth tables did not *exist*, which stopped being meaningful once `0004` created them; it now asserts the importer writes **no rows** into them, which is the real invariant and still holds); `packages/db/src/generated/db.ts` (regenerated); root `package.json` (`demo:surname` alias); `tests/integration/package.json`; `pnpm-lock.yaml` (workspace links only — no dependency added or upgraded).
+
+### Design points worth recording
+
+- **One claim per snapshot, never a sum.** A surname in both PESEL resources gets two claims with their own counts and comparability groups. Verified with `NOWAK`: 98,387 and 99,738, reported separately. A test asserts no result field equals their sum.
+- **No `unit` is stored.** The publisher says *"liczba wystąpień"* (occurrences), not people (U-4). The claim payload carries `source_population_scope` with the publisher's verbatim Polish instead. A test asserts the stored payload contains neither `"unit"` nor `"PEOPLE"`. **This is what D-010 must resolve before TASK-006's DTO can assert a unit.**
+- **Confidence and rights cannot reach each other.** They are separate modules; neither imports the other, and `ConfidenceInputs` has no field through which a rights value could arrive. An integration test re-derives under a fully permissive rights profile and asserts the confidence is byte-identical while all four surfaces open up. (An earlier version of that test compared against a `PROHIBITED` profile and was **vacuous** — `PROHIBITED` and `UNKNOWN` map to the same decisions. The comparison was corrected to a permissive profile, which is also the harder direction of invariant 2.)
+- **U-5 recorded:** `EXACT` only. `KNOWN_VARIANT` is excluded, because no `NameForm` variant links exist in production data, so a permissive path could not be tested against anything real.
+- **U-7 recorded:** resolution runs as a read pass before the write transaction; the resolver's `READ ONLY` guarantee is untouched.
+
+### Verification actually run (2026-09-19)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | **PASS** — 11 of 11 packages |
+| `pnpm lint` | **PASS** — zero errors, zero warnings |
+| `pnpm format:check` | **PASS** |
+| `pnpm test` | **PASS** — **164 tests** (132 before; +32 in `packages/truth`) |
+| `pnpm db:migrate` | **PASS** — `0004_truth_layer` applied; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **PASS** — regenerated file byte-identical to the committed one (`cmp`) |
+| `pnpm test:integration` | **PASS** — **91 tests** (60 before; +31 in `truth-chain.test.ts`), exit code 0 |
+| `pnpm build` | **PASS** |
+| Forbidden-logic grep over new code | Only a comment and the canonical `ALGORITHMIC_SIMILARITY` enum member (a value from `docs/canonical/11` §9.5, no logic) |
+| Module-boundary greps | `confidence.ts` does not import `rights.js`; `rights.ts` does not import `confidence.js`; the CLI contains no SQL; derivation contains no `insertInto`/`updateTable` against any source or identity table |
+| `git status --porcelain` on read-only dirs | Unchanged |
+
+**Regression:** TASK-003 resolver tests (55 unit, 24 integration) and TASK-004 ingestion tests (37 unit, 32 integration) all pass. Two TASK-004 integration assertions were updated as described above; no behaviour changed.
+
+**End-to-end demo against a live database**, after importing both committed fixtures:
+
+```text
+input "NOWAK" → EXACT → 2 claims
+  male   98,387  2026-01-20  pesel_2026_national_male    VERIFIED
+  female 99,738  2026-01-20  pesel_2026_national_female  VERIFIED
+  citation: Nazwiska występujące w rejestrze PESEL · Ministerstwo Cyfryzacji · CC0 1.0
+            resource:1148808 / resource:1148811
+  surfaces: INTERNAL ALLOWED · FREE CONDITIONAL · PAID BLOCKED · SEO BLOCKED
+```
+
+Idempotency observed directly: row counts across all six truth tables were `2/2/2/2/2/2` after the first derivation and unchanged after two further runs (including a case-variant input). `Nieistniejące` → `UNRESOLVED`, no claim, no zero. `WISNIEWSKI` → `UNRESOLVED`; `WIŚNIEWSKI` → `EXACT`, 53,079.
+
+### Not verified in this environment
+
+The integration suite ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL` fallback, as in TASK-001 through TASK-004. The pinned `postgis/postgis:16-3.4@sha256:44126d87…` image was **not** exercised here — container registries remain egress-blocked. CI runs it.
+
+### Carried forward
+
+- **D-010** — `docs/canonical/16` §26 fixes the population DTO's `unit` as `"PEOPLE"`, which TASK-005 deliberately does not assert. **Blocks TASK-006's contract.**
+- **TASK-004 §14 U-1 and U-4** — still unanswered by the publisher. U-1 is contained structurally (separate comparability groups); U-4 is contained by storing no unit.
+- **D-007** — resource-level licence unconfirmed, so `commercial_use = UNKNOWN` keeps paid and SEO surfaces blocked. Observed in the demo output above.
+
 ## Next action
 
 TASK-001 through TASK-004 are implemented and verified. One flagged deviation still awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions TASK-003 §6.2 named; adding them later is a nullable-column migration.
 
 TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the section below — and **is blocked on four answers**: D-008 and D-009 in `docs/DECISIONS_NEEDED.md` before its migration can be written, and TASK-004 §14 U-1 and U-4 from the publisher before any claim is phrased as a statement about people.
 
-TASK-006 (surname result read API) is now **specified** — see the section below — and is gated behind TASK-005, plus **D-010** on its own contract.
+TASK-001 through TASK-005 are implemented and verified. M1's vertical slice is complete: a real surname goes from raw input through exact resolution, ingested PESEL evidence, a typed claim, confidence, citation and rights evaluation to a deterministic developer-facing result.
 
-Per AGENTS.md §8: **STOP.** No TASK-005 or TASK-006 code was written, TASK-007 was not started, and no `tasks/007-*.md` exists.
+TASK-006 (surname result read API) is specified and its TASK-005 precondition is now met. It remains blocked on **D-010** — whether the population DTO may assert `unit: "PEOPLE"` when the publisher says *occurrences*. That needs the publisher or an explicit fallback decision, not an engineering choice.
+
+Per AGENTS.md §8: **STOP.** No TASK-006 code was written, TASK-007 was not started, and no `tasks/007-*.md` exists.
 
 ## TASK-004 specified — planning only, no code written (2026-09-19)
 
