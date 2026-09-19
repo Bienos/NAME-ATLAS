@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-006 implemented and verified (surname result read API; first accepted contract). M1 complete, M2 begun.
+**Last updated:** 2026-09-19 — three parallel branches consolidated onto this one. TASK-001 through TASK-006 implemented and verified (M1 complete, M2 begun). TASK-008 (PESEL regional source spike) specified and attempted; blocked on source supply.
 
 ## Current state
 
@@ -19,7 +19,9 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
 | **TASK-005 — `CURRENT_POPULATION` truth chain** | **IMPLEMENTED AND VERIFIED.** D-008 and D-009 answered by the project owner and recorded as RESOLVED. Migration `0004_truth_layer` + `packages/truth`. See the TASK-005 section below. |
 | **TASK-006 — surname result read API / query contract** | **IMPLEMENTED AND VERIFIED.** `packages/contracts` (Zod schemas), `packages/truth/src/{read,query}.ts`, `GET /api/v1/surname-results`, and the repository's first accepted contract document. See the TASK-006 section below. |
-| Next approved task | None. The rest of M2 (`CURRENT_RANK`, `RARITY_CONTEXT`, `pg_trgm` candidate generation, free result UI) has no task file. |
+| **`CURRENT_DISTRIBUTION` truth chain** | **NOT ACTIONABLE — no task file.** Preflight 2026-09-19: no approved source carries geographic surname distribution; the candidate regional pair is unadopted (D-004), carries no administrative code, and its suppression grain is unverified. `docs/sources/pesel-regional.md`. |
+| **TASK-008 — PESEL regional source spike** | **SPECIFIED; ATTEMPTED AND BLOCKED 2026-09-19.** `tasks/008-pesel-regional-source-spike.md`. The source bytes were not supplied and every candidate host is egress-blocked. 3 of 27 acceptance items verified from committed metadata, 22 recorded `UNRESOLVED`. Resumes when the project owner supplies the two regional CSV files. |
+| Next approved task | None. TASK-008 resumes on source supply. The rest of M2 (`CURRENT_RANK`, `RARITY_CONTEXT`, `pg_trgm` candidate generation, free result UI) has no task file. |
 
 ## What TASK-001 built
 
@@ -844,3 +846,34 @@ unchanged.
 
 **STOP.** Regional ingestion was not begun, no `Place` foundation was built, no
 `CURRENT_DISTRIBUTION` work was started, and no `tasks/009-*.md` was written.
+
+## Sibling branch consolidated — its TASK-007 spike superseded by TASK-008 (2026-09-19)
+
+`origin/claude/inspiring-johnson-x88mbo` was merged into this branch. It had run the same
+`CURRENT_DISTRIBUTION` preflight independently and reached the same verdict — not actionable — and
+had specified the prerequisite spike as `tasks/007-pesel-regional-source-spike.md`.
+
+What was done with it, and why:
+
+- **Its `tasks/007-pesel-regional-source-spike.md` was deleted.** The project owner assigned the
+  number 008 to this spike, and both files said to reconcile into one file on merge rather than
+  keep both. `tasks/008-pesel-regional-source-spike.md` is the surviving scope authority. It is a
+  superset: same goal, inputs and out-of-scope list, plus 27 acceptance items instead of 26, the
+  verified national fixture digests and counts, the fixture-versus-resource checksum distinction,
+  the note that `@name-atlas/sources` must keep failing closed on a three-column file, and the
+  reasoning for why per-surname reconciliation against the committed fixtures is population-valid
+  while the set-level questions are not.
+- **Its parallel narrative of the preflight was not duplicated.** It described the pre-merge state
+  of this branch — "TASK-004 specified, not implemented", "no migration `0003`", "no `005` or `006`
+  file" — all of which stopped being true when the implementation branch was merged. The fuller
+  record above stands, and `docs/sources/pesel-regional.md` carries the evidence.
+- **Its `docs/sources/pesel-regional.md` was reconciled into this branch's copy**, which already
+  covered the same fifteen questions and additionally carries the TASK-008 execution record. Two
+  forward references unique to the sibling version were folded in: `docs/canonical/16` §70 on map
+  layers carrying an explicit `layer_type`, and `17` §34 on the QA corpus requiring each geographic
+  claim to carry a correct label, time scope, source type and coverage caveat.
+- **Its `docs/DECISIONS_NEEDED.md` changes merged cleanly** and are retained.
+
+Nothing from the sibling branch was discarded on the merits. Its findings were either already
+present, folded in, or superseded by a later verified fact.
+

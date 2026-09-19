@@ -1,6 +1,6 @@
 # TASK-004 — Canonical PESEL Surname Dataset Ingestion
 
-- **Status:** **READY TO IMPLEMENT** — specification only, no code written. Every blocking decision is answered: §14 U-1, U-2, U-3 by the project owner on 2026-09-19, and U-8 by **`docs/adr/0003-source-record-granularity.md`** (ADR-0003, which closes D-006). U-4 to U-7 are implementer choices to record during the work. D-007 (resource-level licence) is open but gates M5/M6, not this task.
+- **Status:** **IMPLEMENTED AND VERIFIED 2026-09-19.** Migration `0003_source_rights_distribution`, the `packages/sources` registry and `BULK_DATASET` importer, the `import-pesel` CLI, 37 unit tests and 32 integration tests all exist; the implementer's §14 choices and the observed verification output are recorded in `PROGRESS.md`. Every blocking decision was answered first: §14 U-1, U-2, U-3 by the project owner on 2026-09-19, and U-8 by **`docs/adr/0003-source-record-granularity.md`** (ADR-0003, which closes D-006). U-4 remains open with the publisher and is contained by storing no unit. D-007 (resource-level licence) is open but gates M5/M6, not this task.
 - **Milestone:** M1 (`PLAN.md`: "Tasks: TASK-004 PESEL ingestion + Source/Rights · TASK-005 `CURRENT_POPULATION` truth chain")
 - **Canonical epics:** DAT-001 (Source & Rights Registry) + SRC-001 (PESEL Ingestion) — `docs/canonical/23` §48, master roadmap rows 5 and 7. `PLAN.md` bundles both into this one task; that bundling is `PLAN.md`'s, and this file follows it.
 - **Depends on:** TASK-001 (foundation), TASK-002 (the pinned, verified source), TASK-003 (identity tables and the canonical key function)
@@ -268,6 +268,8 @@ Rules that bind:
 ## 14. Unresolved decisions — answer before implementation
 
 Discovered from repository evidence during this task's preflight. **U-1, U-2, U-3 (project owner) and U-8 (ADR-0003) are all answered as of 2026-09-19 — their answers are recorded in full below and are binding on the implementer. Nothing in this section blocks the start of work.** U-4 to U-7 remain implementer choices to be made and recorded during implementation.
+
+**Decisions recorded 2026-09-19.** The project owner answered U-1, U-2 and U-3 as proposed. U-4 is carried forward unchanged. The implementer's choices, made during the work and recorded in `PROGRESS.md`, were: U-5 option **(a)** — any unresolvable row aborts the whole import and writes nothing; U-6 — `universe_size` stays null; U-7 — resolution runs as a separate read pass through `resolveSurname` before the write transaction, with the `canonical_key` UNIQUE constraint closing the time-of-check/time-of-use gap, so the resolver's read-only guarantee is untouched. The same instruction acknowledged the TASK-003 `TemporalExtent` omission flagged in `PROGRESS.md` and directed that the stray second draft `tasks/004-pesel-ingestion-source-rights.md` be removed, which it has been.
 
 **U-1 — What does the male/female split actually partition? — ANSWERED 2026-09-19 (project owner). Underlying fact remains open.**
 

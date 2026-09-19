@@ -77,7 +77,7 @@ Consequence if unresolved: historical evidence can be discovered but not lawfull
 
 ## D-004 — Current regional surname map availability
 
-**Status:** Source *existence* now VERIFIED (see below). Adoption decision, framing, and all implementation remain BLOCKED/future scope. NON-BLOCKING for the paid MVP critical path.
+**Status:** Source *existence* now VERIFIED (see below). Adoption decision, framing, and all implementation remain BLOCKED/future scope. NON-BLOCKING for the paid MVP critical path. **BLOCKS any `CURRENT_DISTRIBUTION` task** — see the 2026-09-19 preflight update below.
 **Owner:** project owner (data licensing + framing decision).
 
 ### Update — current regional resource identified (project-owner-supplied, via TASK-002)
@@ -93,6 +93,21 @@ The same verification run that closed D-001's residual items also covered the re
 **The licence question below is not closed and got sharper, not softer.** The resource-level metadata returned by `api.dane.gov.pl` for these resources carries **no licence, rights or terms attribute at all** (checked across the full attribute set of both regional and both national resources). Licence is stated only at dataset level. So dataset-level CC0 1.0 remains the only licence statement on record, and "the resource inherits it" remains an assumption this project has not verified — it must be confirmed with the publisher before any regional adoption, not inferred from the absence of a contrary field.
 
 **Nothing about adoption changed.** The regional files were not copied into the repository, not parsed, not fixtured, and no regional logic exists. Observing bytes is not authorisation to use them; the decision below is still the gate.
+
+### Update — `CURRENT_DISTRIBUTION` truth-chain preflight (2026-09-19): not actionable, no task file written
+
+A planning session was asked to specify a `CURRENT_DISTRIBUTION` truth-chain task (requested as "TASK-007") and to first determine from repository evidence whether an approved source contains surname distribution by geography. Full record: `docs/sources/pesel-regional.md`.
+
+**Finding:** the approved production source (national pair `1148808`/`1148811`) contains no geography. The regional pair above is the only candidate, and it cannot support the task yet:
+
+- it carries **no administrative code** — column 1 is an uppercase voivodeship name string (observed: `DOLNOŚLĄSKIE`); the full value set is unverified; the repository has no `places`, no `entity_external_ids`, no TERYT data and no place connector, so canonical geographic identity cannot be assigned without inventing it;
+- **suppression semantics are unverified** — whether the single-occurrence exclusion applies per (surname, voivodeship) cell or nationally is unstated, the minimum `Liczba` was never inspected, and the relationship between regional sums and national counts is unknown; the acquisition tool itself flagged both for review;
+- resource-level licence remains unconfirmed (above);
+- the tables and code the chain must build on do not exist: TASK-004 (`DistributionSnapshot`/`DistributionValue`, `Source`, `RightsProfile`, `SourceRecord`) is specified but not implemented; TASK-005 (`EvidenceItem`/`Claim`/`ConfidenceAssessment`/`Citation`) is neither specified nor implemented.
+
+**Consequently no distribution truth-chain task file was created.** The gate for a distribution capability is now enumerated, in order: (1) the adoption decision below; (2) resource-level rights confirmation; (3) TASK-004 implemented; (4) TASK-005 implemented; (5) a **PESEL regional source spike** (the smallest prerequisite — evidence and fixtures only, TASK-002 pattern; now specified as `tasks/007-pesel-regional-source-spike.md`, not started); (6) a voivodeship `Place` foundation with TERYT external IDs; (7) regional ingestion; (8) the truth chain itself. Steps 5 and 1–2 can proceed in parallel — the spike produces the suppression, reconciliation and value-set facts this decision needs, without adopting anything.
+
+**Not decided here:** adoption, framing, rights posture. The spike was numbered TASK-007 at the project owner's request; the distribution truth chain itself has no number yet. The reviewed plan's own TASK-007 is the search/profile API, and its TASK-006 is complete current-surname intelligence; a distribution task is not numbered anywhere in `PLAN.md` or the reviewed plan (current geography is "Track B — research/license; if unavailable: not blocking").
 
 **Hard semantic restriction, established by the project owner and binding on any future use of this resource:** the regional dimension is *województwo zameldowania na pobyt stały* — voivodeship of **permanent registered residence** (a legal registration record) for the current-surname holder. It must never be presented as: surname origin, ancestry, birthplace, historical distribution, or (without qualification) necessarily current physical residence — registered domicile and actual current residence can differ. Any future claim built on this resource must state that exact scope, not a looser gloss.
 

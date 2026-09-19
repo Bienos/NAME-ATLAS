@@ -34,11 +34,17 @@
   "Environment dependency". Do not start substantive work until they are on disk and
   checksum-verified.
 
-**Numbering note.** On a sibling branch (`origin/claude/inspiring-johnson-x88mbo`) an equivalent
-specification exists as `tasks/007-pesel-regional-source-spike.md`, produced independently on the
-same date. This file is the version on this branch and carries the number the project owner
-assigned. On a merge, reconcile the two into one file rather than keeping both; nothing depends on
-the number.
+**Numbering note.** A sibling branch (`origin/claude/inspiring-johnson-x88mbo`) carried an
+equivalent specification as `tasks/007-pesel-regional-source-spike.md`, produced independently on
+the same date. That branch was merged into this one on 2026-09-19 and its `007` file was
+**deleted**: the project owner assigned the number 008, and both files said to reconcile into one
+rather than keep both. This file is the single surviving scope authority for the spike. It is a
+superset of the `007` version — same goal, inputs and out-of-scope list, plus one more acceptance
+item, the verified national fixture digests and counts, the fixture-versus-resource checksum
+distinction, the requirement that `@name-atlas/sources` keep failing closed on a three-column
+file, and the reasoning in §9 for why per-surname reconciliation against the committed fixtures is
+population-valid while the set-level questions are not. There is deliberately no `tasks/007-*.md`
+on this branch.
 
 ---
 
