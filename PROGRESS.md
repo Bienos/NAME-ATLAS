@@ -447,3 +447,97 @@ and `git` history only. No test, typecheck or build was executed, and no TASK-00
 
 Per `AGENTS.md` §8: **STOP.** Regional ingestion was not begun, no `Place` foundation was built,
 no `tasks/009-*.md` was written, and nothing was implemented.
+
+## TASK-008 execution attempt — BLOCKED on source supply (2026-09-19)
+
+Scope authority: `tasks/008-pesel-regional-source-spike.md`. Its §12 requires the environment
+dependency be checked first and the blocker reported rather than worked around. The check failed.
+Full record with every command and its output: `docs/sources/pesel-regional.md`, section
+"TASK-008 execution attempt".
+
+### The blocker, established by running
+
+- **No source file on disk.** A depth-4 search of `/home/user`, `/root`, `/tmp`, `/mnt`, `/data`
+  and the session scratchpad for `*pesel*`, `*nazwisk*`, `NAME_ATLAS_ALL_DOWNLOADED_DATA*` and
+  `*teryt*`, excluding this repository's docs, fixtures and packages, returned only task files.
+- **Egress is policy-blocked, not broken.** `getent hosts` resolves `api.dane.gov.pl` and
+  `dane.gov.pl` to `185.41.93.178`; `curl` returns `curl: (56) CONNECT tunnel failed, response
+  403`. The agent proxy's status endpoint records
+  `kind: "connect_rejected"`, `detail: "gateway answered 403 to CONNECT (policy denial or upstream
+  failure)"`, `host: "api.dane.gov.pl:443"`.
+- **All four candidate hosts are blocked identically** — `HTTP 000`, CONNECT 403:
+  `api.dane.gov.pl`, `dane.gov.pl`, `api.stat.gov.pl`, `eteryt.stat.gov.pl`. The last two close
+  the GUS TERYT route, and the archive copy of `teryt_terc__1cfbb50ebf97.zip` is not on disk.
+
+This reproduces what D-001 recorded for TASK-002. **To unblock: the project owner supplies the two
+regional CSV files**, whose SHA-256 and byte size are verified against
+`fixtures/pesel/source-manifest.json` before a single row is read.
+
+### Completed anyway — the three acceptance items that do not need the bytes
+
+- **Item 22, committed-metadata half — VERIFIED.** A recursive key scan of both regional resource
+  objects for `licen[cs]|rights|terms|condition|copyright|reuse|attribution|waiver|cc0`, excluding
+  the JSON:API container key, returns **NONE** across all 34 attribute keys of each, nested `files`
+  and `supplements` included. Dataset level carries a bare `license_name = "CC0 1.0"` with
+  `license_chosen = null` and every `license_condition_*` field empty, `false` or `null`. The
+  publisher confirmation D-004 and D-007 require is still not reported, so the item's other half is
+  unresolved and nothing was approved.
+- **Item 20 — VERIFIED**, with three findings new to this repository. Each regional resource offers
+  **three** representations, not one: XLSX native (openness 2), CSV (3) and JSON-LD (4), the last
+  at 722,529,033 B male and 793,494,377 B female, roughly 44 times the CSV. **`special_signs` is
+  `[]` on all four 2026 resources**, national and regional — the portal's in-band vocabulary for
+  marking a suppressed or unavailable cell is declared nowhere, so a suppressed regional cell could
+  only be represented by row absence; this is evidence about the metadata, not the bytes. And
+  `contains_protected_data: false` sits among four sibling `false` classification flags, confirming
+  it is a portal flag and not a legal review.
+- **Item 21 — VERIFIED.** Both publisher descriptions recorded verbatim, with two asymmetries
+  preserved rather than smoothed: the male text says `(bez zgonów)` and the female does not, and the
+  male carries a trailing `<p>\xa0</p>`. TASK-004 §14 **U-1** stays open. No male-plus-female sum
+  and no cross-file comparison appears anywhere in the record.
+
+### One genuine result on the question the spike exists to answer
+
+The dataset `notes` field is the whole of what the publisher says about suppression:
+"Nazwiska z pojedynczą liczbą wystąpień oraz dane dot. osób zmarłych nie zostały uwzględnione w
+zestawieniu." It is written once, at dataset level, for a dataset holding both national and
+regional resources, and speaks of **surnames** excluded from the **compilation**. **It does not
+address the per-(surname, voivodeship) cell grain at all.** So item 18's first half is now
+verified — the publisher's wording cannot settle the per-cell question in either direction — while
+the observed behaviour stays unresolved until the bytes are compared against the national counts.
+Attributing either reading to the publisher would be the fabrication `AGENTS.md` §9 forbids.
+
+Also recorded, since these are never inferred from one another: dataset `created`
+`2019-08-13T07:16:07Z`, `modified` `2024-06-19T13:29:14Z`, `verified` `2026-01-28T13:48:39Z`,
+`update_frequency` `Rocznie`. The dataset's `modified` stamp is **older** than the 2026 resources'
+own timestamps.
+
+### Acceptance-item outcome
+
+Of the 27 items in §8: **3 verified** (20, 21, and the committed-metadata half of 22), **2
+partially verified** (18's publisher-wording half, 19 as a stated rule), **1 done** (27, the record
+itself), and **22 explicitly `UNRESOLVED`** with their reasons — items 1–17 and 23–26, all on
+either missing source bytes or missing TERC data. Item 26 is unresolved by deliberate choice:
+everything the task asks the manifest to carry is bytes-dependent, so the manifest was left
+unedited for the next session to extend once, alongside the real file-level facts.
+
+### Verification actually run
+
+No test, typecheck, lint or build was run, because **no code changed**. `pnpm test` was not run:
+`node_modules` is absent in this container and installing it would prove nothing about a
+documentation-only change. The unit-test baseline stands where TASK-003 left it at 95 tests with 28
+integration tests; nothing in this change can affect it. `.prettierignore` excludes `*.md` and
+`docs/sources/acquisition/**/metadata/`, so `format:check` covers no file touched here.
+`git status --porcelain` on `docs/canonical/`, `docs/library/`, `docs/archive/`,
+`docs/reference/`, `docs/review/` and `prompts/` is empty, and `git diff --check` is clean.
+
+### Not done, and why
+
+No fixture was created or substituted. No TERC code was read or written. The manifest is unchanged
+and its key stays `regional_resources_not_ingested`. `packages/sources` is untouched, so the
+two-column parser still fails closed on a three-column file. No NOT VERIFIED row was promoted on
+the strength of metadata: the regional header row remains the project owner's earlier observation
+and the row counts remain the acquisition tool's. D-004's status, options and adoption gate are
+unchanged.
+
+**STOP.** Regional ingestion was not begun, no `Place` foundation was built, no
+`CURRENT_DISTRIBUTION` work was started, and no `tasks/009-*.md` was written.

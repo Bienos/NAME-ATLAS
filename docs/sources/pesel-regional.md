@@ -1,6 +1,13 @@
 # PESEL regional surname resources — source record and `CURRENT_DISTRIBUTION` preflight
 
-**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN.**
+**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN · SPIKE BLOCKED ON SOURCE
+SUPPLY.**
+
+This document has two dated parts. The **preflight** below records why a `CURRENT_DISTRIBUTION`
+truth chain is not actionable and what would make it so. The **TASK-008 execution attempt** at the
+end records the regional source spike's outcome: blocked, because the source bytes were not
+supplied and cannot be retrieved here, with three metadata-only acceptance items completed and
+every other item marked unresolved with its reason.
 
 This is the read-only preflight record for a requested `CURRENT_DISTRIBUTION` truth-chain task
 (2026-09-19). The preflight found the capability **not actionable from current repository
@@ -248,3 +255,235 @@ nothing the publisher did not state is attributed to the publisher.
 - Did not decide D-004, change its status, or approve any rights posture.
 - `docs/canonical/`, `docs/library/`, `docs/archive/`, `docs/reference/`, `docs/review/` and
   `prompts/` are untouched.
+
+---
+
+# TASK-008 execution attempt — BLOCKED on source bytes (2026-09-19)
+
+Scope authority: `tasks/008-pesel-regional-source-spike.md`. Its §12 requires the environment
+dependency be checked first and the blocker reported rather than worked around. That check failed:
+**the two regional CSV files were not supplied and cannot be retrieved in this environment**, so
+every acceptance item that depends on the bytes is unresolved for the stated reason.
+
+Three items that do **not** depend on the bytes were completed, and they produced new verified
+facts. Nothing was fabricated, no fixture was committed, no manifest entry was changed, and no
+code was touched.
+
+## The blocker, with its actual output
+
+**No source file is on disk.** A search of `/home/user`, `/root`, `/tmp`, `/mnt`, `/data` and the
+session scratchpad to depth 4 for `*pesel*`, `*nazwisk*`, `NAME_ATLAS_ALL_DOWNLOADED_DATA*` and
+`*teryt*`, excluding this repository's own docs, fixtures and packages, returned only task files:
+
+```text
+/home/user/NAME-ATLAS/tasks/004-pesel-surname-ingestion.md
+/home/user/NAME-ATLAS/tasks/002-pesel-source-spike.md
+/home/user/NAME-ATLAS/tasks/004-pesel-ingestion-source-rights.md
+/home/user/NAME-ATLAS/tasks/008-pesel-regional-source-spike.md
+```
+
+**Egress is policy-blocked, not broken.** DNS resolves; the gateway refuses the CONNECT tunnel.
+
+```text
+$ getent hosts api.dane.gov.pl dane.gov.pl
+185.41.93.178   api.dane.gov.pl
+185.41.93.178   dane.gov.pl
+
+$ curl -sS -I --max-time 45 "https://api.dane.gov.pl/resources/1148786,…/csv"
+curl: (56) CONNECT tunnel failed, response 403
+HTTP/1.1 403 Forbidden
+```
+
+The proxy's own status endpoint names the reason:
+
+```json
+"recentRelayFailures": [
+  { "ts": "2026-09-19T16:13:09.936Z",
+    "kind": "connect_rejected",
+    "detail": "gateway answered 403 to CONNECT (policy denial or upstream failure)",
+    "host": "api.dane.gov.pl:443" }
+]
+```
+
+All four hosts the task could use are blocked the same way — `HTTP 000`, CONNECT rejected with
+403: `api.dane.gov.pl`, `dane.gov.pl`, `api.stat.gov.pl` and `eteryt.stat.gov.pl`. The last two
+are the GUS TERYT routes, so the TERC alternative in the task's §3 item 6 is closed too, and the
+archive copy of `teryt_terc__1cfbb50ebf97.zip` is not on disk either.
+
+This reproduces exactly what D-001 recorded for TASK-002: a policy block, not a connectivity
+fault. **Supply remains manual.** To unblock, the project owner supplies
+`nazwiska_męskie…wojewodztwo_zameldowania.csv` and its female counterpart, whose SHA-256 and byte
+size the implementing session verifies against the manifest before reading a single row.
+
+## What was completed — items 20, 21, and the committed-metadata half of 22
+
+All three were established from metadata already committed to this repository, by running checks
+whose output is reproduced here. None of them is a substitute for the bytes.
+
+### Item 22 — the licence position, re-confirmed auditably
+
+A recursive key scan of both regional resource objects for any key matching
+`licen[cs]|rights|terms|condition|copyright|reuse|attribution|waiver|cc0`, excluding the JSON:API
+container key `attributes`:
+
+```text
+male_1148786:   licence/rights/terms keys anywhere in the object: NONE   (34 attribute keys)
+female_1148790: licence/rights/terms keys anywhere in the object: NONE   (34 attribute keys)
+```
+
+The full 34-key list is identical for both resources and contains no rights field of any kind:
+`category, contains_protected_data, created, csv_download_url, csv_file_size, csv_file_url,
+data_date, description, download_url, downloads_count, file_size, file_url, files, format,
+has_dynamic_data, has_high_value_data, has_high_value_data_from_ec_list, has_research_data,
+is_chart_creation_blocked, jsonld_download_url, jsonld_file_size, jsonld_file_url, language, link,
+media_type, modified, openness_score, regions, special_signs, supplements, title, verified,
+views_count, visualization_types`. The scan covered the nested `files` and `supplements` arrays,
+not just the top level.
+
+At **dataset** level the licence fields are, verbatim:
+
+| Field | Value |
+|---|---|
+| `license_name` | `CC0 1.0` |
+| `license_chosen` | `null` |
+| `license_description` | `''` |
+| `license_condition_custom_description` | `''` |
+| `license_condition_db_or_copyrighted` | `''` |
+| `license_condition_default_cc40` | `false` |
+| `license_condition_original` | `null` |
+| `license_condition_personal_data` | `null` |
+| `license_condition_timestamp` | `null` |
+| `current_condition_descriptions` | `{}` |
+
+So the dataset carries a bare `CC0 1.0` label with every condition field empty or unset, and the
+resources carry no licence statement at all. **This sharpens the gap rather than closing it:** the
+absence of a contrary field is still not a grant, and the publisher confirmation D-004 and D-007
+require has not been reported. `UNRESOLVED — publisher confirmation not reported by the project
+owner.`
+
+### Item 20 — resource metadata restated, with facts not previously recorded
+
+| | Male `1148786` | Female `1148790` |
+|---|---|---|
+| `data_date` | `2026-01-20` | `2026-01-20` |
+| `created` = `modified` = `verified` | `2026-01-28T13:32:49Z` | `2026-01-28T13:35:13Z` |
+| Native `format` / `file_size` | `xlsx`, 12,159,696 B | `xlsx`, 13,158,936 B |
+| `csv_file_size` | 16,615,897 B | 17,900,370 B |
+| `jsonld_file_size` | **722,529,033 B** | **793,494,377 B** |
+| `formats` offered, with per-file openness score | xlsx 2 · csv 3 · jsonld 4 | xlsx 2 · csv 3 · jsonld 4 |
+| `media_type` / `language` / `openness_score` | `file` / `pl` / `4` | `file` / `pl` / `4` |
+| `category` | `Społeczeństwo` | `Społeczeństwo` |
+| `regions` | `Polska`, `region_id` `85633723` | identical |
+| `contains_protected_data` | `false` | `false` |
+| `has_dynamic_data` · `has_high_value_data` · `has_high_value_data_from_ec_list` · `has_research_data` | all `false` | all `false` |
+| `is_chart_creation_blocked` | `false` | `false` |
+| `visualization_types` | `['table']` | `['table']` |
+| **`special_signs`** | **`[]`** | **`[]`** |
+| `supplements` | `[]` | `[]` |
+
+Three findings here are new to this repository's record:
+
+1. **Each resource offers three formats, not one.** The pinned CSV is the middle openness tier; a
+   JSON-LD representation also exists and is roughly 44 times the CSV's size. A later ingestion
+   task must keep pinning the CSV bytes it actually parses, and must not treat the three
+   representations as interchangeable without re-verification — the same caution D-001 recorded
+   when it found the CSV to be a portal conversion of an XLSX upload.
+2. **`special_signs` is empty on all four 2026 resources**, national and regional alike. The
+   portal supports declaring special signs, the vocabulary a publisher would use to mark a
+   suppressed, unavailable or not-applicable cell in band. Both regional resources declare none.
+   This is evidence about the metadata, **not** about the bytes: it means no declared in-band
+   marker exists for a suppressed cell, so a suppressed regional cell would have to be represented
+   by row absence or not at all. It does not establish what the bytes contain.
+3. **`contains_protected_data: false` sits alongside four other `false` flags** that are
+   plainly portal classification fields. It remains a portal flag and not a legal review.
+
+### Item 21 — the sex partition, verbatim and uninterpreted
+
+Publisher descriptions, exactly as the portal serves them:
+
+- Male `1148786`: `<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne)
+  występujących w rejestrze PESEL (bez zgonów) w podziale na województwa, stan na 20.01.2026</p>`
+  followed by a second paragraph containing only a non-breaking space, `<p>\xa0</p>`.
+- Female `1148790`: `<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne)
+  występujących w rejestrze PESEL w podziale na województwa, stan na 20.01.2026</p>`
+
+Two asymmetries are recorded and not smoothed over: the male description says `(bez zgonów)`,
+without deaths, and the female one does not; and the male description carries a trailing empty
+paragraph the female one lacks. Both are HTML-level artefacts of the publisher's own text. Whether
+the partition is by bearer's sex or by grammatical gender of the surname form is still not stated
+anywhere — TASK-004 §14 **U-1** remains open. This record contains no male-plus-female sum and no
+cross-file comparison.
+
+### The publisher's suppression wording, quoted in full
+
+The dataset-level `notes` field, verbatim:
+
+> Wykaz nazwisk osób żyjących występujących w rejestrze PESEL. Przedmiotowe dane zostały
+> opracowane na podstawie informacji zgromadzonych w rejestrze PESEL według pola nazwisko
+> aktualne. Nazwiska z pojedynczą liczbą wystąpień oraz dane dot. osób zmarłych nie zostały
+> uwzględnione w zestawieniu.
+
+This is the whole of what the publisher says about suppression, and it yields a genuine result for
+item 18's first half. The rule is stated about **`nazwiska`** — surnames — being excluded from
+**`zestawieniu`**, the compilation. It is written once, at dataset level, for a dataset that
+contains both national and regional resources. **The publisher's text does not address the
+per-cell grain at all.** So "does the single-occurrence exclusion apply per (surname, voivodeship)
+cell?" cannot be answered from the publisher's wording in either direction, and attributing either
+reading to the publisher would be the fabrication `AGENTS.md` §9 forbids. Only the bytes, compared
+against the national counts per the task's §9, can settle it.
+
+Recorded alongside, because the project forbids inferring these from one another: dataset
+`created` is `2019-08-13T07:16:07Z`, `modified` is `2024-06-19T13:29:14Z`, `verified` is
+`2026-01-28T13:48:39Z`, `update_frequency` is `Rocznie` (yearly). The dataset's `modified` stamp is
+**older** than the 2026 resources' own timestamps, which is one more reason these date concepts
+stay separate fields.
+
+## Acceptance-item status
+
+Every item of `tasks/008-pesel-regional-source-spike.md` §8, with its outcome.
+
+| # | Item | Outcome |
+|---|---|---|
+| 1 | Checksums and sizes verified before reading | `UNRESOLVED — files not supplied; nothing on disk to checksum.` |
+| 2 | Encoding and BOM from the bytes | `UNRESOLVED — bytes unavailable.` |
+| 3 | Delimiter, quoting, newline, trailing terminator | `UNRESOLVED — bytes unavailable.` |
+| 4 | Exact header row as bytes | `UNRESOLVED — bytes unavailable.` The manifest's `observed_header_row` comes from the project owner's earlier run and was **not** re-verified here. |
+| 5 | Column count on every row | `UNRESOLVED — bytes unavailable.` |
+| 6 | Row count vs the tool's 646,052 / 694,553 | `UNRESOLVED — bytes unavailable.` |
+| 7 | Sort order | `UNRESOLVED — bytes unavailable.` |
+| 8 | Mean and maximum geography rows per surname | `UNRESOLVED — bytes unavailable.` |
+| 9 | Complete distinct geography value list with counts | `UNRESOLVED — bytes unavailable.` |
+| 10 | Every value corresponds to a TERC voivodeship | `UNRESOLVED — depends on items 9 and 24, both unresolved.` |
+| 11 | Case, diacritics, whitespace of the values | `UNRESOLVED — bytes unavailable.` |
+| 12 | `Liczba` type, min, max, zeros, ones, count at minimum | `UNRESOLVED — bytes unavailable.` |
+| 13 | Duplicate (voivodeship, surname) pairs | `UNRESOLVED — bytes unavailable.` |
+| 14 | Surname-column Unicode notes | `UNRESOLVED — bytes unavailable.` |
+| 15 | Surname-set relation to the national resources | `UNRESOLVED — bytes unavailable; full national files also not supplied.` |
+| 16 | Per-surname reconciliation for the committed national fixtures | `UNRESOLVED — regional bytes unavailable.` The national side is ready: both fixtures and their counts are verified and recorded in the task's §3 item 4. |
+| 17 | Population-wide reconciliation distribution | `UNRESOLVED — regional and full national bytes unavailable.` |
+| 18 | Observed suppression behaviour, and the per-cell question | **Publisher wording: VERIFIED** and quoted above — it does not address the cell grain. **Observed behaviour: `UNRESOLVED — bytes unavailable`.** |
+| 19 | Meaning of an absent cell | **VERIFIED as a stated rule:** zero, suppressed, or out of scope, never confirmably zero (`ARCHITECTURE.md` §10 invariant 4). Which applies in a given case stays unobservable until item 18's second half lands. Supported further by `special_signs: []`, which means no declared in-band marker exists. |
+| 20 | Resource metadata restated | **VERIFIED** — table above, with three new findings. |
+| 21 | Sex partition verbatim; no cross-file sum | **VERIFIED** — quoted above, including the two asymmetries. U-1 remains open. |
+| 22 | Licence position | **Committed-metadata half VERIFIED** — resource-level absence re-confirmed by a recursive scan over all 34 keys; dataset-level fields tabulated. **`UNRESOLVED — publisher confirmation not reported by the project owner.`** Nothing approved. |
+| 23 | TERC data identity | `UNRESOLVED — archive copy not on disk and both GUS hosts are egress-blocked (HTTP 000, CONNECT 403).` No TERC code was read, and none was written anywhere. |
+| 24 | Voivodeship TERC correspondence file | `UNRESOLVED — not created; depends on items 9 and 23.` |
+| 25 | Both fixtures, with the byte-identity check | `UNRESOLVED — not created; no source bytes to copy rows from.` No synthetic fixture was substituted. |
+| 26 | Manifest extended | `UNRESOLVED — deliberately not edited.` Everything the task's §7 asks the manifest to carry is bytes-dependent. Verified metadata facts are recorded in this document instead, so the next session can extend the manifest once in a single edit alongside the real file-level facts. |
+| 27 | Record, D-004, `PROGRESS.md`, `CODEMAP.md` | **DONE for this attempt.** Every unresolved item above carries its reason; D-004 has a dated findings update; `PROGRESS.md` records the attempt. `docs/canonical/` and the other read-only directories are untouched. |
+
+## What this attempt did not do
+
+- Did not read, download, parse or fixture either regional resource, because neither is available.
+- Did not read a TERC code from anywhere, and did not write one.
+- Did not commit a fixture, and did not substitute a synthetic one.
+- Did not edit `fixtures/pesel/source-manifest.json`; the key stays
+  `regional_resources_not_ingested`.
+- Did not promote any NOT VERIFIED row to verified on the strength of metadata. The header row,
+  the row counts and the sample rows remain the project owner's earlier run and the acquisition
+  tool's observation respectively.
+- Did not touch `packages/sources`; the two-column parser still fails closed on a three-column
+  file, which is the correct behaviour.
+- Did not change D-004's status, its options or its adoption gate, and approved no rights posture.
+- Did not begin regional ingestion, a `Place` foundation, or any `CURRENT_DISTRIBUTION` work, and
+  wrote no `tasks/009-*.md`.

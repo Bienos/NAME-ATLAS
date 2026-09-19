@@ -1,6 +1,14 @@
 # TASK-008 — PESEL regional source spike
 
-- **Status:** NOT STARTED — specification only. No code, no schema, no database.
+- **Status:** **ATTEMPTED 2026-09-19 — BLOCKED at the §12 environment gate, not complete.** The
+  two regional CSV files were not supplied and cannot be retrieved here: `api.dane.gov.pl`,
+  `dane.gov.pl`, `api.stat.gov.pl` and `eteryt.stat.gov.pl` are all policy-blocked at the network
+  gateway. Of the 27 items in §8, three were completed from committed metadata (20, 21, and the
+  committed-metadata half of 22), item 18's publisher-wording half was settled, and 22 items are
+  recorded `UNRESOLVED` with their reasons. Outcome and evidence:
+  `docs/sources/pesel-regional.md`, section "TASK-008 execution attempt"; summary in `PROGRESS.md`.
+  **This task resumes, it does not restart:** re-run it once the project owner supplies the bytes,
+  and treat the already-verified items as done. No code, no schema, no database, no fixture.
 - **Created:** 2026-09-19, at the project owner's request, immediately after the
   `CURRENT_DISTRIBUTION` preflight found a distribution truth chain not actionable
   (`docs/sources/pesel-regional.md`). This file is that preflight's first prerequisite, promoted

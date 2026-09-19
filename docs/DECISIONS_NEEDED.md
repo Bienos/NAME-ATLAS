@@ -124,6 +124,19 @@ What the preflight established from committed evidence:
 
 Consequence for sequencing: before any `CURRENT_DISTRIBUTION` task can be specified honestly, the decision above and the resource-level rights question must be answered, the Truth Layer must exist on the branch carrying the work, the regional bytes must be verified by a source spike — now specified as `tasks/008-pesel-regional-source-spike.md`, which informs this decision without deciding it — and a voivodeship `Place` foundation with TERYT external IDs must exist. Pulling that foundation forward from M3 is itself a sequencing decision for the project owner. `docs/canonical/12` §10 Scenario C and `docs/canonical/23` §24 remain fully supported: the map chapter is marked unavailable, not faked, and does not block the MVP.
 
+### Findings — TASK-008 regional source spike, execution attempt BLOCKED (2026-09-19). Status and decision unchanged.
+
+The spike was attempted and stopped at its own environment gate: the two regional CSV files were not supplied, and `api.dane.gov.pl`, `dane.gov.pl`, `api.stat.gov.pl` and `eteryt.stat.gov.pl` are all policy-blocked at the network gateway — DNS resolves to `185.41.93.178`, the CONNECT tunnel is refused with 403. The same block D-001 recorded for TASK-002. Supply remains manual. Full record with the commands and their output: `docs/sources/pesel-regional.md`.
+
+Three acceptance items that do not depend on the bytes were completed, and they add findings here:
+
+- **The resource-level licence gap is now confirmed by an auditable check, not an eyeball.** A recursive key scan of both regional resource objects for `licen[cs]|rights|terms|condition|copyright|reuse|attribution|waiver|cc0`, excluding the JSON:API container key, returns **NONE** across all 34 attribute keys of each, including the nested `files` and `supplements` arrays. At dataset level `license_name` is the bare string `CC0 1.0` while `license_chosen` is `null` and every `license_condition_*` field is empty, `false` or `null`. This sharpens the gap: there is no resource-level grant to inherit and no stated condition set at dataset level either. The publisher confirmation this decision and D-007 require is still not reported.
+- **`special_signs` is empty on all four 2026 resources**, national and regional. The portal supports declaring special signs — the vocabulary for marking a suppressed, unavailable or not-applicable cell in band — and these resources declare none. This is evidence about the metadata, not the bytes: a suppressed regional cell would have to be represented by row absence rather than by any declared marker. It does not establish what the bytes contain.
+- **The publisher's suppression wording does not address the per-cell grain.** The dataset `notes` field says, in full, that "Nazwiska z pojedynczą liczbą wystąpień oraz dane dot. osób zmarłych nie zostały uwzględnione w zestawieniu" — surnames with a single occurrence, and data on deceased persons, were not included in the compilation. It is written once, at dataset level, for a dataset holding both national and regional resources, and says nothing about (surname, voivodeship) cells. So whether the exclusion applies per cell cannot be answered from the publisher's text in either direction; only the bytes, reconciled against the national counts, can settle it. Attributing either reading to the publisher would be fabrication.
+- **Each resource offers three representations** — XLSX native, CSV, and a JSON-LD roughly 44 times the CSV's size. Any future ingestion must keep pinning the bytes it actually parses and must not treat the three as interchangeable.
+
+Nothing was adopted, ingested, fixtured or approved. No TERC code was read or written. The manifest was deliberately left unedited, because everything the spike would add to it is bytes-dependent.
+
 ---
 
 ## D-005 — RESOLVED (TASK-001)

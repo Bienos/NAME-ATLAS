@@ -25,9 +25,9 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
 | `docs/sources/pesel.md` | TASK-002 PESEL source-verification record — complete for the national production pair; D-001 resolved | active |
-| `docs/sources/pesel-regional.md` | Regional PESEL resources (`1148786`/`1148790`) and the `CURRENT_DISTRIBUTION` preflight verdict: not adopted, not ingested, not actionable; the ordered prerequisites and the proposed source spike. No regional data is in the repository. | active |
+| `docs/sources/pesel-regional.md` | Regional PESEL resources (`1148786`/`1148790`): the `CURRENT_DISTRIBUTION` preflight verdict — not adopted, not ingested, not actionable — the ordered prerequisites, and the TASK-008 spike's blocked execution record with its per-item outcomes. No regional data is in the repository. | active |
 | `docs/sources/acquisition/2026-09-18/` | The project owner's acquisition run — genuine `api.dane.gov.pl` resource metadata, per-resource tool records, checksums and report. Evidence of what an external tool observed; no raw source data. | reference, read-only in practice |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (specified), `008-pesel-regional-source-spike.md` (specified) | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (specified), `008-pesel-regional-source-spike.md` (specified; attempted 2026-09-19, blocked on source supply) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
