@@ -3,10 +3,14 @@
 **Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN.**
 
 This is the read-only preflight record for a requested `CURRENT_DISTRIBUTION` truth-chain task
-(TASK-008, 2026-09-19). The preflight found the capability **not actionable from current
-repository evidence**, so no distribution truth-chain task file was created. This file records
-what the repository actually knows about the *regional* PESEL resources, what is missing, and
-the ordered prerequisites that would make a distribution task specifiable without guessing.
+(2026-09-19). The preflight found the capability **not actionable from current repository
+evidence**, so no distribution truth-chain task file was created. The number 008 was
+subsequently assigned, at the project owner's request, to the prerequisite source spike this
+record proposes: `tasks/008-pesel-regional-source-spike.md`.
+
+This file records what the repository actually knows about the *regional* PESEL resources, what
+is missing, and the ordered prerequisites that would make a distribution task specifiable
+without guessing.
 
 Ownership boundaries, unchanged by this file:
 
@@ -62,9 +66,10 @@ today.**
    presence of zero rows, the distinct geography value set, and the relationship between
    regional sums and national counts have never been observed from the bytes.
 
-Writing TASK-008 today would require inventing geographic identity, guessing suppression
-semantics, and stating a reconciliation invariant nobody has observed — each forbidden by
-`ARCHITECTURE.md` §10 and `AGENTS.md` §9, and each explicitly forbidden by the request itself.
+Writing a distribution truth chain today would require inventing geographic identity, guessing
+suppression semantics, and stating a reconciliation invariant nobody has observed — each
+forbidden by `ARCHITECTURE.md` §10 and `AGENTS.md` §9, and each explicitly forbidden by the
+request itself.
 
 ## Repository state as found (2026-09-19)
 
@@ -158,7 +163,7 @@ Items 1 and 2 are decisions, not engineering. Nothing below them substitutes for
    derivation service. A distribution chain must extend this, never fork it.
 5. **Regional source facts** — items 5, 9, 10 of the findings table plus the reconciliation
    relationship, verified from the bytes and recorded with a real fixture. **This is the
-   smallest prerequisite; it is proposed below.**
+   smallest prerequisite, now specified as `tasks/008-pesel-regional-source-spike.md`.**
 6. **Voivodeship `Place` foundation** — `places` plus `entity_external_ids` carrying TERYT TERC
    codes, and whatever subset of `place_names`/`administrative_memberships` the mapping needs,
    populated from TERYT data with recorded provenance, so `DistributionValue.place_id` has
@@ -172,13 +177,15 @@ Items 1 and 2 are decisions, not engineering. Nothing below them substitutes for
    identity, suppression, missing-versus-zero and reconciliation can only be written honestly
    once items 5 and 6 exist.
 
-## Proposed smallest prerequisite — regional source spike (proposal only)
+## Smallest prerequisite — regional source spike, now specified as TASK-008
 
-**No task file was created for this.** `AGENTS.md` §8 requires this session to stop after its
-own task, and `origin/claude/inspiring-johnson-x88mbo` already carries an equivalent
-specification at `tasks/007-pesel-regional-source-spike.md`. That file should be reconciled and
-reused rather than forked; this section records the shape the work must take so the proposal
-stands on its own if that branch is discarded.
+**Specified at `tasks/008-pesel-regional-source-spike.md`** (created 2026-09-19 at the project
+owner's request, later in the same session as this record). That file is the scope authority; the
+summary below is retained as its origin and is not maintained separately.
+
+A sibling branch, `origin/claude/inspiring-johnson-x88mbo`, carries an equivalent specification
+numbered 007, produced independently on the same date. On a merge, reconcile the two into one file
+rather than keeping both. Nothing depends on the number.
 
 **Goal.** Establish from the actual bytes, with a small real fixture, exactly what the two
 regional resources contain — so D-004 can be decided on facts and a later ingestion task can be
@@ -229,8 +236,10 @@ nothing the publisher did not state is attributed to the publisher.
 
 ## What this session did not do
 
-- Did not create `tasks/008-current-distribution-truth-chain.md`, and did not create a task file
-  of any other number.
+- Did not create `tasks/008-current-distribution-truth-chain.md` or any other distribution
+  truth-chain task file. Later in the same session, at the project owner's request, the
+  prerequisite spike was specified as `tasks/008-pesel-regional-source-spike.md` — the spike, not
+  the distribution chain.
 - Did not download, read, parse or fixture either regional resource.
 - Did not verify the voivodeship value set, suppression grain, zero rows or reconciliation —
   every such row above is marked NOT VERIFIED.

@@ -387,5 +387,63 @@ inspection over repository files and `git` history only. Changes are documentati
 `docs/DECISIONS_NEEDED.md`, and one `docs/CODEMAP.md` row. `docs/canonical/`, `docs/library/`,
 `docs/archive/`, `docs/reference/`, `docs/review/` and `prompts/` are untouched.
 
-Per `AGENTS.md` §8: **STOP.** No `tasks/008-*.md` was created, TASK-009 was not begun, and
-nothing was implemented.
+No `tasks/008-*.md` was created by the preflight itself, TASK-009 was not begun, and nothing was
+implemented.
+
+## TASK-008 specified — PESEL regional source spike, planning only (2026-09-19)
+
+Created later in the same session, at the project owner's request, as the preflight's first
+prerequisite: `tasks/008-pesel-regional-source-spike.md`. It is the regional source spike, **not**
+a distribution truth chain. Planning only — no code, no schema, no database, no fixture yet.
+
+One bounded outcome: establish from the actual bytes of resources `1148786` and `1148790`, and
+with a small real fixture, exactly what they contain — the distinct geography value set, the
+suppression grain, whether zero rows exist, the surname-set relation to the national resources,
+the observed reconciliation between regional sums and national counts, and a TERYT TERC
+correspondence recorded as evidence. It adopts nothing, ingests nothing and decides nothing;
+D-004 stays with the project owner.
+
+The task pattern is TASK-002 applied to the regional pair, and it mirrors that record's
+"File-level facts" structure. It depends on TASK-002 alone and is independent of TASK-003 through
+TASK-006, because it writes no application code and touches no database.
+
+Established by direct inspection while writing it, not assumed:
+
+- **The national baseline is exact and already committed.** Manifest: `1148808` checksum
+  `ce4238fe…62f4`, 5,293,415 B, 408,182 data rows; `1148811` checksum `c508680d…f6e6`,
+  5,592,881 B, 420,082 data rows; `file_structure` records the verified two-column shape, CRLF
+  throughout with a trailing terminator, no BOM, descending sort by `Liczba`, and no row with
+  `Liczba ≤ 1`.
+- **The committed national fixtures carry real full-resource counts**, so per-surname
+  reconciliation for the surnames they contain is population-valid without the full national
+  files. Verified directly: the male fixture has 22 data rows, SHA-256 `426f44a2…2448`, with
+  `NOWAK,98387`, `WIŚNIEWSKI,53079`, `NGUYỄN,3730`, `MÜLLER,1462`, and the artefact rows
+  `DOG̈AN,5`, `W/SILASSIE,3`, `A/GADIR,2`. The female fixture has 23 data rows, SHA-256
+  `72ff8dfa…eea8`, with `NOWAK,99738`, `WIŚNIEWSKA,54177`, `NGUYỄN,2132`, `MÜLLER,1874`,
+  `SCHA̋FER,4`, `W/RUFAEL,2`, and `SCHIED ,2` retaining its real trailing space. Both files end
+  `0d 0a`. A fixture's own checksum is not the resource's, and the task keeps the two separate.
+- **The TERC data identity is recorded but the file is not here.**
+  `teryt_terc__1cfbb50ebf97.zip`, SHA-256 `1cfbb50e…2768`, 132,136 B per `SHA256SUMS.txt`; it
+  lives in the project owner's archive. `teryt_wmrodz` failed with `HTML_ERROR_PAGE_NOT_DATA`, so
+  the task tells the implementing session not to expect it.
+- **The acquisition tool's regional inspection is labelled as an external observation**, not a
+  Name Atlas fact: 3 columns, 646,052 male / 694,553 female data rows, strict-UTF-8 compatible,
+  null BOM, and five sample rows per file. The task requires each to be confirmed or corrected
+  from the bytes.
+- **The unit-test baseline on this branch is 95 tests across 9 packages, with 28 integration
+  tests.** Since the spike changes no code, `pnpm test` must still report 95. The task states
+  explicitly that `typecheck`, `lint`, `build` and `test:integration` are not required and must
+  not be reported as run, and that `format:check` covers no file the task writes because
+  `.prettierignore` excludes `*.md` and the acquisition metadata, and a `.csv` fixture is not a
+  Prettier target.
+
+**Numbering.** The project owner assigned 008. An equivalent specification exists on
+`origin/claude/inspiring-johnson-x88mbo` as `tasks/007-pesel-regional-source-spike.md`, produced
+independently on the same date; both files say to reconcile into one on merge rather than keep
+both.
+
+**Nothing was verified by running.** This session ran read-only inspection over repository files
+and `git` history only. No test, typecheck or build was executed, and no TASK-008 code exists.
+
+Per `AGENTS.md` §8: **STOP.** Regional ingestion was not begun, no `Place` foundation was built,
+no `tasks/009-*.md` was written, and nothing was implemented.
