@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-004 implemented and verified (PESEL ingestion: source/rights registry, bulk importer, migration 0003)
+**Last updated:** 2026-09-19 — TASK-005 specified (planning only, no code); TASK-004 implemented and verified (PESEL ingestion: source/rights registry, bulk importer, migration 0003)
 
 ## Current state
 
@@ -17,7 +17,8 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`), `0002_identity_core` (three identity tables + `resolvable_name_forms` view) and `0003_source_rights_distribution` (`rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values` + 10 enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
-| Next approved task | None. TASK-005 (`CURRENT_POPULATION` truth chain) is the natural next task; it has no task file and was not started (AGENTS.md §8). It is blocked on §14 U-1 and U-4 — see below. |
+| **TASK-005 — `CURRENT_POPULATION` truth chain** | **SPECIFIED, NOT STARTED.** `tasks/005-current-population-truth-chain.md` is the scope authority. No TASK-005 code, migration or test exists. Blocked on **D-008** and **D-009** (`docs/DECISIONS_NEEDED.md`, both recorded 2026-09-19) before the migration can be written. TASK-004 §14 U-1 and U-4 remain unanswered by the publisher and constrain the claim wording. |
+| Next approved task | None. TASK-005 is specified but not approved for implementation; D-008 and D-009 are unanswered. |
 
 ## What TASK-001 built
 
@@ -378,13 +379,36 @@ The integration suite ran against a **locally installed PostgreSQL 16.13 + PostG
 - **TASK-004 §14 U-4** — the unit of `Liczba` (occurrences vs. living people) is not stated by the publisher. **Blocks TASK-005's `CURRENT_POPULATION` claim.**
 - **U-3** — raw source bytes are still not stored anywhere; `raw_text_ref` is null by design. Reproduction depends on the project owner retaining the acquisition archive. Object storage remains an infrastructure obligation.
 
+## TASK-005 specified — planning only, no code written (2026-09-19)
+
+`tasks/005-current-population-truth-chain.md` specifies one bounded capability: for a surname that resolves exactly and has applicable ingested PESEL data, produce a `CURRENT_POPULATION` claim with evidence, confidence, citation and rights metadata, plus a developer-facing result object. It closes M1's vertical slice and produces no rank, rarity, API or UI.
+
+Established by direct inspection during the preflight, not assumed:
+
+- **No truth-layer table exists.** There is no `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` or `research_runs` table; migrations stop at `0003`. `packages/contracts` is still the intentional stub exporting only `CONTRACT_PACKAGE_VERSION`.
+- **The chain TASK-005 must extend already reaches rights.** From a `distribution_values` row, a single join chain reaches `distribution_snapshots → source_records → sources → rights_profiles`; TASK-004's suite exercises it. TASK-005 extends this chain rather than building a second one.
+- **A surname can carry two snapshots.** TASK-004's verified run observed 7 surnames present in both the male and female fixtures, in different `comparability_group` values (`NOWAK` at 98,387 and 99,738). The task therefore specifies **one claim per snapshot and no summation**, which follows from `docs/canonical/11` §6.1 plus the unanswered U-1 rather than from a new rule.
+
+### Two canonical contradictions found and recorded, not resolved
+
+Both were discovered by reading `docs/canonical/11` and `docs/canonical/14` against each other, and both block the TASK-005 migration. Per `AGENTS.md` §2 they are recorded rather than settled in code.
+
+- **D-008** — `docs/canonical/14` presents a series of MODEL CHANGE PROPOSALS (14-A, 14-D and others) that conflict with `docs/canonical/11`'s schema on the `EvidenceType` enum (`OFFICIAL_DATASET_FIELD` vs `OFFICIAL_DATASET_VALUE` — one concept, two names), the `EvidenceItem` field set, the `ClaimEvidence` relationship enum, and the `CURRENT_POPULATION` payload field names (§10.1 vs §14.1). Which binds is undecided; three options and a recommendation are recorded.
+- **D-009** — `EvidenceItem.created_by_run_id` and `Claim.created_by_run_id` are both required and not nullable, referencing `ResearchRun`, which `docs/canonical/11` marks **P0** while `PLAN.md` schedules the research runtime at **M3**. No `research_runs` table exists. TASK-005 is the first task forced to resolve it; three options and a recommendation are recorded.
+
+### Carried forward, unchanged
+
+TASK-004 §14 **U-1** (what the male/female split partitions) and **U-4** (the unit of `Liczba`) remain unanswered by the publisher. The task specifies how to proceed honestly without them — one claim per snapshot, never summed; the publisher's universe wording carried verbatim; no claim describing a count as a number of *people* — and instructs the implementing session to stop and report rather than choose a unit if that proves impossible. **D-007** (resource-level licence) stays open and constrains TASK-005's rights output without being its to close.
+
+**Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-005 code exists.
+
 ## Next action
 
 TASK-001 through TASK-004 are implemented and verified. One flagged deviation still awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions TASK-003 §6.2 named; adding them later is a nullable-column migration.
 
-TASK-005 (`CURRENT_POPULATION` truth chain) is the natural next task and **is blocked**: it cannot phrase a claim without answers to TASK-004 §14 U-1 (what the male/female split partitions) and U-4 (the unit of `Liczba`). Both need the publisher, not an engineering decision.
+TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the section below — and **is blocked on four answers**: D-008 and D-009 in `docs/DECISIONS_NEEDED.md` before its migration can be written, and TASK-004 §14 U-1 and U-4 from the publisher before any claim is phrased as a statement about people.
 
-Per AGENTS.md §8: **STOP.** TASK-005 was not started and no `tasks/005-*.md` exists.
+Per AGENTS.md §8: **STOP.** No TASK-005 code was written, TASK-006 was not started, and no `tasks/006-*.md` exists.
 
 ## TASK-004 specified — planning only, no code written (2026-09-19)
 
