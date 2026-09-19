@@ -152,6 +152,24 @@ Three acceptance items that do not depend on the bytes were completed, and they 
 
 Nothing was adopted, ingested, fixtured or approved. No TERC code was read or written. The manifest was deliberately left unedited, because everything the spike would add to it is bytes-dependent.
 
+### Findings — TASK-008 EXECUTED, regional bytes verified (2026-09-19). Status and decision still unchanged.
+
+The project owner supplied both regional CSV files and both full national files. Each was checksum-verified against `fixtures/pesel/source-manifest.json` before any row was read. 23 of the spike's 27 acceptance items are now verified from the bytes. Full record, with every command and figure: `docs/sources/pesel-regional.md`, section "TASK-008 executed". Nothing was ingested, no `RightsProfile` exists, and this decision's status, options and adoption gate are untouched.
+
+**Two findings materially change what an adoption decision is choosing between.**
+
+**1. Suppression is per cell — previously unresolved, now settled from the bytes.** `Liczba` never falls below 2 and no row carries 0 or 1, in either file. The publisher's single-occurrence exclusion therefore applies to each (surname, voivodeship) cell, not only to the national count. About a fifth of all rows — 19.7% male, 21.6% female — sit exactly at that boundary of 2. Consequently **53.8% of national male surnames and 50.8% of female have no regional row at all**, and a surname with over a thousand bearers nationally can still be entirely absent. An absent cell means zero, or one suppressed bearer, or a bearer with no voivodeship value; never a confirmed zero.
+
+**2. The 16 voivodeship values do not account for the national totals, and per-cell suppression cannot explain the gap.** Male: 21,197,537 nationally against 16,590,111 across all cells, leaving **4,607,426 bearers (21.74%) in no voivodeship row**. Female: 4,263,939 (19.78%). Suppression caps out at 684,961 and 676,743 respectively. The decisive proof: all 3,106 male and 3,561 female surnames present in **all 16** voivodeships — where suppression can hide nothing at all — are still short, by 971,775 and 849,705 bearers, a median of 10.2% and 8.1% of their national counts. `NOWAK` has a row in every voivodeship and is short by 11,418.
+
+**A second mechanism exists and the publisher does not state what it is.** Candidates consistent with the field's own name, *voivodeship of permanent registered residence*: bearers with no permanent registration in Poland, bearers registered abroad, or a further undocumented exclusion. `UNRESOLVED`; none may be asserted.
+
+**The gap is systematically biased**, which is what makes it a decision input rather than a footnote. Coverage rises from 78.6% for surnames with 2–9 male bearers to 89.3% above 10,000, and individual surnames diverge far more sharply: `MELNYK` 6,442 national against a regional sum of 210, `KOVALCHUK` 5,382 against 66, `SHEVCHENKO` 5,217 against 69, `BOIKO` 4,616 against 56, `NGUYỄN` 3,730 against 169 — against `NOWAK` at 86,969 of 98,387. Any regional surface built on this resource understates every region, unevenly, and most severely for surnames of recent-migration origin. That sharpens the binding restriction already recorded above: for some surnames this dimension describes only a small minority of their bearers, so even a correctly labelled "registered domicile" map would mislead unless the residual is shown alongside it.
+
+**The only reconciliation invariant the source supports** is `regional sum ≤ national count`, which holds for every surname with zero exceptions in either file. Equality holds for roughly a quarter of surnames and must never be asserted or enforced.
+
+**Still blocking, both on one missing input.** The geography column carries no administrative code of any kind, so a voivodeship-name to TERYT TERC correspondence could not be established: the TERC archive file was not supplied and `api.stat.gov.pl` and `eteryt.stat.gov.pl` are egress-blocked. No TERC code was read or written. A voivodeship `Place` foundation therefore remains unspecifiable, and the resource-level licence confirmation is still not reported.
+
 ---
 
 ## D-005 — RESOLVED (TASK-001)

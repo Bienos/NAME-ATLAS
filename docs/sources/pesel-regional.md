@@ -1,13 +1,24 @@
 # PESEL regional surname resources — source record and `CURRENT_DISTRIBUTION` preflight
 
-**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN · SPIKE BLOCKED ON SOURCE
-SUPPLY.**
+**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN · SPIKE EXECUTED, 2 OF 27
+ITEMS STILL OPEN ON MISSING TERYT DATA.**
 
-This document has two dated parts. The **preflight** below records why a `CURRENT_DISTRIBUTION`
-truth chain is not actionable and what would make it so. The **TASK-008 execution attempt** at the
-end records the regional source spike's outcome: blocked, because the source bytes were not
-supplied and cannot be retrieved here, with three metadata-only acceptance items completed and
-every other item marked unresolved with its reason.
+This document has three dated parts, all 2026-09-19.
+
+1. The **preflight** records why a `CURRENT_DISTRIBUTION` truth chain was not actionable and what
+   would make it so.
+2. The **blocked attempt** records the spike stopping at its environment gate, and the three
+   acceptance items it could settle from committed metadata alone.
+3. The **execution** records the spike completed once the project owner supplied the bytes: 23 of
+   27 acceptance items verified, 2 unresolved on the missing TERYT TERC register and 1 on the
+   publisher's licence confirmation. Read that part for the current facts; where it and the
+   earlier parts disagree, it supersedes them.
+
+**The two results that matter most.** The publisher's single-occurrence exclusion is applied at the
+**(surname, voivodeship) cell** level, confirmed from the bytes. And the 16 voivodeship values do
+**not** account for the national totals: about 21.7% of male and 19.8% of female bearers appear in
+no voivodeship row at all, a gap per-cell suppression provably cannot explain, distributed
+unevenly and most severely against surnames of recent-migration origin.
 
 This is the read-only preflight record for a requested `CURRENT_DISTRIBUTION` truth-chain task
 (2026-09-19). The preflight found the capability **not actionable from current repository
@@ -495,3 +506,311 @@ Every item of `tasks/008-pesel-regional-source-spike.md` §8, with its outcome.
 - Did not change D-004's status, its options or its adoption gate, and approved no rights posture.
 - Did not begin regional ingestion, a `Place` foundation, or any `CURRENT_DISTRIBUTION` work, and
   wrote no `tasks/009-*.md`.
+
+---
+
+# TASK-008 executed — regional bytes verified (2026-09-19)
+
+**The blocker cleared.** The project owner supplied both regional CSV files, and the SHA-256 and
+byte size of each were verified against `fixtures/pesel/source-manifest.json` **before any row was
+read**, as the task's §10 requires:
+
+```text
+male   1148786  sha256 0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51  16,615,897 B  GATE PASSED
+female 1148790  sha256 cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989  17,900,370 B  GATE PASSED
+```
+
+Both full national resources (`1148808`, `1148811`) were supplied too and likewise matched, which
+made the population-level reconciliation in §9 possible rather than fixture-scoped. The 2025
+regional pair was also supplied and was **not read** — out of scope by §5.
+
+This section supersedes the "NOT VERIFIED" rows of the earlier findings table. **Nothing was
+ingested, no `RightsProfile` was created, and D-004's status and adoption gate are unchanged.**
+
+## File-level facts, read from the bytes
+
+| | Male `1148786` | Female `1148790` |
+|---|---|---|
+| Byte size | 16,615,897 | 17,900,370 |
+| SHA-256 | matches the manifest | matches the manifest |
+| Encoding | UTF-8, strictly valid, 0 invalid sequences | same |
+| BOM | absent — first bytes `57 6f 6a` (`Woj`) | absent |
+| Delimiter | `,` | `,` |
+| Quoting | none — no quote character anywhere in the file | none |
+| Newlines | CRLF throughout (646,053 CRLF = LF = CR), trailing CRLF present | CRLF throughout (694,554), trailing CRLF present |
+| Header | `Województwo zameldowania na pobyt stały,Nazwisko aktualne,Liczba` — matches the manifest | identical |
+| Column count | 3 on every row; comma histogram `{2: 646052}` | 3 on every row; `{2: 694553}` |
+| Rows without 3 fields | 0 | 0 |
+| Data rows | **646,052** — matches the acquisition tool exactly | **694,553** — matches exactly |
+| Sort order | grouped by geography value, then descending by `Liczba` within each group | identical |
+| `Liczba` range | **2 – 16,077** | **2 – 16,203** |
+| Rows with `Liczba` 0 | **0** | **0** |
+| Rows with `Liczba` 1 | **0** | **0** |
+| Rows at the minimum of 2 | 126,969 (19.7% of rows) | 149,700 (21.6%) |
+| Rows at 2 / 3 / 4 / 5 | 126,969 / 84,675 / 58,280 / 43,831 | 149,700 / 91,479 / 62,722 / 46,154 |
+| Non-integer counts | 0 | 0 |
+| Duplicate (voivodeship, surname) | **0** | **0** |
+| Distinct surnames | 188,413 | 206,804 |
+| All surnames NFC | yes | yes |
+| Combining-mark surnames | 1 distinct (`GLA̋SSNER`) | 0 |
+| Edge-whitespace surnames | 0 | 0 |
+| Slash surnames | 2 (`A/GADIR`, `W/SILASSIE`) | 1 (`W/RUFAEL`) |
+
+The acquisition tool's row counts and its first sample rows are **confirmed**: the male file's
+first row is `DOLNOŚLĄSKIE,NOWAK,5548` and the female's is `DOLNOŚLĄSKIE,NOWAK,5757`, both now
+present verbatim in the committed fixtures.
+
+## The geography column — 16 values, no code, no other category
+
+Both files carry **exactly 16 distinct values and the two sets are identical.** Every value is an
+uppercase Polish voivodeship name with no leading or trailing whitespace. **There is no
+non-voivodeship category** — no "abroad", no "no registered residence", no "unknown". Row counts
+per value, male then female:
+
+| Voivodeship | Male rows | Female rows |
+|---|---:|---:|
+| MAZOWIECKIE | 71,545 | 77,193 |
+| ŚLĄSKIE | 65,012 | 69,596 |
+| DOLNOŚLĄSKIE | 61,045 | 65,384 |
+| POMORSKIE | 49,056 | 52,476 |
+| WIELKOPOLSKIE | 47,753 | 51,134 |
+| ZACHODNIOPOMORSKIE | 44,798 | 47,665 |
+| MAŁOPOLSKIE | 42,693 | 46,856 |
+| KUJAWSKO-POMORSKIE | 36,447 | 39,074 |
+| ŁÓDZKIE | 36,294 | 39,486 |
+| WARMIŃSKO-MAZURSKIE | 33,790 | 35,870 |
+| LUBUSKIE | 31,591 | 33,505 |
+| OPOLSKIE | 29,758 | 31,518 |
+| LUBELSKIE | 29,480 | 31,924 |
+| PODKARPACKIE | 27,646 | 30,402 |
+| PODLASKIE | 19,963 | 21,781 |
+| ŚWIĘTOKRZYSKIE | 19,181 | 20,689 |
+
+Rows per surname: mean 3.43 male / 3.36 female, median 2, max 16. Present in all 16 voivodeships:
+3,106 male, 3,561 female. Present in exactly one: 86,044 male, 99,050 female.
+
+**The values still carry no identifier.** A voivodeship-name to TERYT TERC correspondence remains
+un-established, because no TERC data is available — see the unresolved items below.
+
+## Suppression is applied per cell — item 18 answered
+
+`Liczba` never falls below **2**, and **no row carries 0 or 1**, in either file. The publisher's
+single-occurrence exclusion is therefore applied at the **(surname, voivodeship) cell** level, not
+only to the national count. That is the question the preflight could not settle and the publisher's
+own text still does not address; it is now settled **from the bytes**.
+
+Consequences, stated exactly:
+
+- An absent (surname, voivodeship) cell means **zero bearers, or exactly one bearer whose cell was
+  excluded, or a bearer with no voivodeship value in this resource**. It is never a confirmed zero
+  (`ARCHITECTURE.md` §10 invariant 4).
+- 19.7% of male rows and 21.6% of female rows sit exactly at the suppression boundary of 2, so the
+  boundary is not a rare edge case but a fifth of the data.
+- **53.8% of national male surnames (219,769 of 408,182) and 50.8% of female (213,278 of 420,082)
+  have no regional row at all** — and a surname with as many as 1,077 male or 1,183 female bearers
+  nationally can still be entirely absent regionally.
+
+## Reconciliation — the only supported invariant, and a large residual
+
+Method exactly as §9 requires: byte-identical match on the raw `Nazwisko aktualne` field against
+the **same-sex** national file, no normalisation, no folding, no resolver, never across sexes.
+
+| | Male | Female |
+|---|---:|---:|
+| Regional surnames with no national row | **0** | **0** |
+| Surnames present in both | 188,413 | 206,804 |
+| Regional sum **equals** national | 46,808 | 58,631 |
+| Regional sum **below** national | 141,605 | 148,173 |
+| Regional sum **above** national | **0** | **0** |
+| national − regional: min / median / mean / max | 0 / 3 / 16.41 / 11,418 | 0 / 2 / 13.82 / 10,353 |
+
+**The one source-supported invariant: `regional sum ≤ national count`, for every surname, with
+zero exceptions in either file.** Arithmetic equality holds for only a quarter of surnames and must
+never be asserted or enforced.
+
+### Per-cell suppression cannot explain the shortfall
+
+| | Male | Female |
+|---|---:|---:|
+| National total over all surnames | 21,197,537 | 21,560,302 |
+| Regional total over all cells | 16,590,111 | 17,296,363 |
+| **Residual in no voivodeship row** | **4,607,426 (21.74%)** | **4,263,939 (19.78%)** |
+| Upper bound explainable by per-cell suppression | 684,961 | 676,743 |
+| Bearers **not** explainable that way | 2,406,389 | 2,180,616 |
+
+A surname present in *k* of 16 voivodeships has 16 − *k* absent cells, and per-cell exclusion can
+hide at most one bearer per absent cell. That caps the explainable residual far below what is
+observed. The decisive case: **all 3,106 male and 3,561 female surnames present in all 16
+voivodeships — for which suppression can hide nothing whatsoever — are still short**, by 971,775
+and 849,705 bearers, a median of 10.2% and 8.1% of their national counts. `NOWAK` has a row in
+every voivodeship and is short by 11,418 male and 10,353 female.
+
+**A second mechanism exists. The publisher does not state what it is**, so it stays `UNRESOLVED`.
+Candidates consistent with the field's own name, *voivodeship of permanent registered residence*:
+bearers with no permanent registration in Poland, bearers registered abroad, or a further
+undocumented exclusion. None of these is confirmed and none may be asserted.
+
+### The residual is systematically biased
+
+Coverage, meaning regional sum as a share of national count, rises with how common a surname is:
+
+| National count band | Male coverage | Female coverage |
+|---|---:|---:|
+| 2 – 9 | 78.6% | 79.2% |
+| 10 – 99 | 78.0% | 79.1% |
+| 100 – 999 | 82.3% | 84.1% |
+| 1,000 – 9,999 | 87.2% | 88.3% |
+| 10,000 and above | 89.3% | 91.5% |
+
+Individual surnames diverge far more sharply. Male `MELNYK`: 6,442 national against a regional sum
+of 210. Female `KOVALCHUK`: 5,382 against 66. `SHEVCHENKO`: 5,217 against 69. `BOIKO`: 4,616
+against 56. `NGUYỄN`: 3,730 male against 169, 2,132 female against 147. Against `NOWAK` at 86,969
+of 98,387.
+
+**This is a product-level finding, not a technicality.** Any surface built on these values
+understates every region, understates them unevenly, and understates them most severely for
+surnames of recent-migration origin. It is a material input to D-004 and it sharpens the binding
+restriction already recorded there: this dimension is registered domicile, and for some surnames it
+describes only a small minority of bearers.
+
+## Per-surname reconciliation for every committed national fixture surname — item 16
+
+Male, national count against regional sum, with the number of voivodeship rows:
+
+| Surname | National | Regional sum | Rows | Difference |
+|---|---:|---:|---:|---:|
+| NOWAK | 98,387 | 86,969 | 16 | 11,418 |
+| KOWALSKI | 66,589 | 59,425 | 16 | 7,164 |
+| WIŚNIEWSKI | 53,079 | 47,126 | 16 | 5,953 |
+| WÓJCIK | 47,734 | 43,385 | 16 | 4,349 |
+| KOWALCZYK | 46,994 | 42,937 | 16 | 4,057 |
+| KAMIŃSKI | 45,818 | 40,777 | 16 | 5,041 |
+| LEWANDOWSKI | 44,466 | 39,459 | 16 | 5,007 |
+| ZIELIŃSKI | 43,931 | 38,794 | 16 | 5,137 |
+| WOŹNIAK | 42,550 | 38,577 | 16 | 3,973 |
+| SZYMAŃSKI | 42,412 | 38,004 | 16 | 4,408 |
+| DĄBROWSKI | 41,552 | 36,814 | 16 | 4,738 |
+| KOZŁOWSKI | 36,244 | 32,117 | 16 | 4,127 |
+| MAZUR | 34,576 | 29,514 | 16 | 5,062 |
+| JANKOWSKI | 33,109 | 29,260 | 16 | 3,849 |
+| KWIATKOWSKI | 31,900 | 28,311 | 16 | 3,589 |
+| NGUYỄN | 3,730 | 169 | 9 | 3,561 |
+| MÜLLER | 1,462 | 942 | 16 | 520 |
+| W/SILASSIE | 3 | 3 | 1 | 0 |
+| A/GADIR | 2 | 2 | 1 | 0 |
+| AA | 2 | **absent** | 0 | n/a |
+| AACHARYA | 2 | **absent** | 0 | n/a |
+| DOG̈AN | 5 | **absent** | 0 | n/a |
+
+Female:
+
+| Surname | National | Regional sum | Rows | Difference |
+|---|---:|---:|---:|---:|
+| NOWAK | 99,738 | 89,385 | 16 | 10,353 |
+| KOWALSKA | 67,308 | 61,741 | 16 | 5,567 |
+| WIŚNIEWSKA | 54,177 | 49,645 | 16 | 4,532 |
+| WÓJCIK | 48,568 | 45,049 | 16 | 3,519 |
+| KOWALCZYK | 48,264 | 44,952 | 16 | 3,312 |
+| KAMIŃSKA | 46,723 | 42,746 | 16 | 3,977 |
+| LEWANDOWSKA | 46,268 | 42,094 | 16 | 4,174 |
+| ZIELIŃSKA | 44,578 | 40,655 | 16 | 3,923 |
+| SZYMAŃSKA | 43,451 | 39,969 | 16 | 3,482 |
+| DĄBROWSKA | 43,316 | 39,351 | 16 | 3,965 |
+| WOŹNIAK | 43,066 | 39,964 | 16 | 3,102 |
+| KOZŁOWSKA | 36,866 | 33,712 | 16 | 3,154 |
+| MAZUR | 35,206 | 30,542 | 16 | 4,664 |
+| JANKOWSKA | 33,836 | 30,958 | 16 | 2,878 |
+| KWIATKOWSKA | 32,953 | 30,161 | 16 | 2,792 |
+| NGUYỄN | 2,132 | 147 | 7 | 1,985 |
+| MÜLLER | 1,874 | 1,276 | 16 | 598 |
+| AABARI | 2 | 2 | 1 | 0 |
+| W/RUFAEL | 2 | 2 | 1 | 0 |
+| AABEL | 2 | **absent** | 0 | n/a |
+| AABID | 2 | **absent** | 0 | n/a |
+| SCHA̋FER | 4 | **absent** | 0 | n/a |
+| SCHIED␠ | 2 | **absent** | 0 | n/a |
+
+Note the female national fixture's `SCHIED ` row, with its real trailing space, has no regional
+counterpart, and no regional surname in either file carries edge whitespace. Whether the artefact
+is absent from the regional extract or was cleaned upstream is not stated by the publisher and is
+not inferable from the bytes.
+
+## The fixtures
+
+Committed at `fixtures/pesel/regional-male-2026-01-20.csv` (40 data rows, SHA-256
+`3f38f91f65f986fc502979b6c23397b4921e7754ab8627f0fd86ca0c213978b0`, 1,204 B) and
+`regional-female-2026-01-20.csv` (38 data rows, SHA-256
+`3eddbc5ff5dc3762ad30f1d92e29d9e432aab7af390acae2cb172b70f0d651bb`, 1,135 B). Each carries the
+real header and the source's CRLF convention including the trailing terminator. **A fixture's
+digest is its own, never the resource's.**
+
+Selection method, applied mechanically and verified:
+
+1. **Every** row for `NOWAK`, present in both national fixtures — all 16 voivodeships, so the
+   fixture alone supports the per-surname reconciliation check. The fixture's `NOWAK` rows sum to
+   **86,969** male and **89,385** female, which equals the full-file regional sum and is **not**
+   equal to the national fixture values of 98,387 and 99,738. That inequality is a finding, not a
+   defect.
+2. **Every** row for the Polish-diacritic surname in the same-sex national fixture: `WIŚNIEWSKI`
+   male, `WIŚNIEWSKA` female, 16 rows each.
+3. The first three rows in file order at the minimum observed `Liczba` of 2.
+4. The first row for each foreign-script or extended-Latin surname also present in the same-sex
+   national fixture: `NGUYỄN`, `MÜLLER`.
+5. One row per Unicode artefact category actually observed: `GLA̋SSNER` (combining mark, male only),
+   `A/GADIR` and `W/SILASSIE` (male slash), `W/RUFAEL` (female slash). No edge-whitespace row
+   exists regionally, so none is included.
+6. Coverage of **every** one of the 16 geography values, asserted programmatically before writing.
+
+Every fixture data row was checked to appear byte-identically in its checksum-verified source file.
+No row was retyped, trimmed or normalised, and nothing was synthesised.
+
+**Rights basis for committing them:** dataset-level CC0 1.0, the same basis on which the national
+fixtures were committed. The project owner reported no contrary publisher statement. This is not an
+adoption of the resource and creates no `RightsProfile`.
+
+## Acceptance-item status after execution
+
+| # | Item | Outcome |
+|---|---|---|
+| 1 | Checksums and sizes verified before reading | **VERIFIED** — both gates passed, before any row was read |
+| 2 | Encoding and BOM | **VERIFIED** — strict UTF-8, 0 invalid sequences, no BOM |
+| 3 | Delimiter, quoting, newline, terminator | **VERIFIED** — comma, no quote character, CRLF only, trailing CRLF |
+| 4 | Exact header row | **VERIFIED** — matches the manifest byte for byte |
+| 5 | Column count on every row | **VERIFIED** — 3 everywhere, 0 malformed |
+| 6 | Row count vs the tool's figures | **VERIFIED** — 646,052 / 694,553, exact match |
+| 7 | Sort order | **VERIFIED** — grouped by geography, descending `Liczba` within each |
+| 8 | Rows per surname | **VERIFIED** — mean 3.43 / 3.36, median 2, max 16 |
+| 9 | Complete geography value list with counts | **VERIFIED** — 16 values, identical sets, table above |
+| 10 | Every value a current TERC voivodeship | **UNRESOLVED — no TERC data available** (item 23). All 16 are voivodeship names by inspection; no code was read, so no correspondence is asserted |
+| 11 | Case, diacritics, whitespace of values | **VERIFIED** — uppercase, Polish diacritics, no edge whitespace |
+| 12 | `Liczba` type, min, max, zeros, ones | **VERIFIED** — integer, 2–16,077 / 2–16,203, zero 0s, zero 1s |
+| 13 | Duplicate (voivodeship, surname) pairs | **VERIFIED** — 0 in both files |
+| 14 | Surname-column Unicode notes | **VERIFIED** — all NFC; combining, slash and whitespace counts above |
+| 15 | Surname-set relation | **VERIFIED** — 0 regional orphans; 219,769 / 213,278 national surnames absent regionally |
+| 16 | Per-surname reconciliation for the fixture surnames | **VERIFIED** — both tables above |
+| 17 | Population-wide reconciliation distribution | **VERIFIED** — full national files supplied; counts, quartiles and the residual above |
+| 18 | Observed suppression behaviour and the per-cell question | **VERIFIED from the bytes** — per-cell exclusion confirmed, minimum 2, no 0s or 1s. The publisher's own text still does not state the grain, and that remains recorded |
+| 19 | Meaning of an absent cell | **VERIFIED** — zero, or one suppressed, or no voivodeship value; never a confirmed zero |
+| 20 | Resource metadata restated | **VERIFIED** earlier in this document |
+| 21 | Sex partition verbatim, no cross-file sum | **VERIFIED** — quoted earlier; no sum and no cross-sex comparison anywhere |
+| 22 | Licence position | **Committed-metadata half VERIFIED.** `UNRESOLVED — publisher confirmation not reported.` Nothing approved |
+| 23 | TERC data identity | **UNRESOLVED — the TERC archive file was not supplied and both GUS hosts are egress-blocked.** No code was read or written |
+| 24 | Voivodeship TERC correspondence file | **UNRESOLVED — not created; depends on item 23** |
+| 25 | Fixtures with the byte-identity check | **VERIFIED** — 40 and 38 real rows, all 16 values covered, every row byte-identical to source, `NOWAK` sums reported |
+| 26 | Manifest extended | **VERIFIED** — `verified_from_bytes` per resource plus a reconciliation block; key stays `regional_resources_not_ingested`; parses as JSON |
+| 27 | Record, D-004, `PROGRESS.md`, `CODEMAP.md` | **DONE** |
+
+**Two items remain open, both on the same missing input:** the TERYT TERC register, for items 23
+and 24, and the publisher's licence confirmation, for the other half of item 22. Neither blocks the
+facts above; both block a `Place` foundation and any adoption decision.
+
+## What this execution did not do
+
+- Did not ingest anything. No `Source`, `SourceRecord`, `RightsProfile`, `DistributionSnapshot` or
+  `DistributionValue` row was written, and `packages/sources` is untouched, so the two-column
+  parser still fails closed on these three-column files.
+- Did not read the 2025 regional pair, although it was supplied.
+- Did not compare the male and female files with each other, and recorded no cross-sex sum.
+- Did not read or write a single TERC code.
+- Did not decide D-004, change its status or options, or approve any rights posture.
+- Did not assert what the residual is. The arithmetic is stated; the cause is `UNRESOLVED`.

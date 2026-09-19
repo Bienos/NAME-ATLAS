@@ -468,7 +468,7 @@ Modified: `packages/db/src/migrator.test.ts` and `tests/integration/src/extensio
 |---|---|
 | `pnpm typecheck` | **PASS** — 11 of 11 packages |
 | `pnpm lint` | **PASS** — zero errors, zero warnings |
-| `pnpm format:check` | **PASS** |
+| `pnpm format:check` | **PASS**, after Prettier reformatted the manifest. The first run **failed** on `fixtures/pesel/source-manifest.json` because this session wrote it with Python's JSON serialiser; `npx prettier --write` on that one file fixed it and the values were re-checked unchanged afterwards. |
 | `pnpm test` | **PASS** — **164 tests** (132 before; +32 in `packages/truth`) |
 | `pnpm db:migrate` | **PASS** — `0004_truth_layer` applied; re-run reports `no pending migrations` |
 | `pnpm db:generate-types` | **PASS** — regenerated file byte-identical to the committed one (`cmp`) |
@@ -1002,3 +1002,134 @@ green on the merged tree, which supersedes the point.
 
 The pinned PostGIS container image, as above. The regional PESEL bytes, which is TASK-008's
 blocker and unchanged by any of this.
+
+## TASK-008 executed — regional PESEL bytes verified (2026-09-19)
+
+Scope authority: `tasks/008-pesel-regional-source-spike.md`. The project owner supplied the source
+bytes, which was the blocker, and the spike ran. **23 of 27 acceptance items are verified from the
+bytes; 4 remain open on two missing inputs.** Full record with every figure:
+`docs/sources/pesel-regional.md`, section "TASK-008 executed". Findings are in D-004, whose status
+and adoption gate are unchanged.
+
+**Nothing was ingested.** No `Source`, `SourceRecord`, `RightsProfile`, `DistributionSnapshot` or
+`DistributionValue` row was written, no `Place` exists, and `packages/sources` is untouched, so the
+two-column parser still fails closed on these three-column files.
+
+### The gate, passed before any row was read
+
+Both regional files matched the manifest exactly: male `1148786` at
+`0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51` and 16,615,897 B, female
+`1148790` at `cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989` and 17,900,370 B.
+Both **full national** files were supplied and matched too, which made the reconciliation
+population-wide rather than fixture-scoped. The 2025 regional pair was supplied and deliberately
+**not read** — out of scope by §5.
+
+### File-level facts, from the bytes
+
+Both files: strict UTF-8 with zero invalid sequences, no BOM (first bytes `57 6f 6a`), comma
+delimiter, **no quote character anywhere**, CRLF throughout with a trailing terminator, the header
+byte-identical to the manifest's recorded value, exactly 3 fields on every row, zero malformed
+rows, zero non-integer counts, and **zero duplicate (voivodeship, surname) pairs**. Sorted by
+geography value, then descending by `Liczba` within each group.
+
+Row counts **match the acquisition tool exactly**: 646,052 male and 694,553 female. So do its first
+sample rows, `DOLNOŚLĄSKIE,NOWAK,5548` and `DOLNOŚLĄSKIE,NOWAK,5757`, now in the fixtures verbatim.
+
+Distinct surnames: 188,413 male, 206,804 female. All values NFC. One combining-mark surname in the
+male file (`GLA̋SSNER`), none in the female; slash surnames in both; **no edge-whitespace surname in
+either**, unlike the national female file's real `SCHIED ` artefact.
+
+### Geography: 16 values, no code, no other category
+
+Both files carry **exactly the same 16 values**, every one an uppercase Polish voivodeship name with
+no edge whitespace, and **no non-voivodeship category at all** — no "abroad", no "no registered
+residence", no "unknown". Largest by rows: MAZOWIECKIE 71,545 male / 77,193 female; smallest:
+ŚWIĘTOKRZYSKIE 19,181 / 20,689. Rows per surname: mean 3.43 / 3.36, median 2, max 16; present in
+all 16 voivodeships 3,106 / 3,561; present in exactly one 86,044 / 99,050.
+
+### Suppression is per cell — the question the preflight could not answer
+
+`Liczba` never falls below **2** and **no row carries 0 or 1**, in either file. The publisher's
+single-occurrence exclusion is therefore applied at the **(surname, voivodeship) cell** level, not
+only to the national count. 19.7% of male rows and 21.6% of female rows sit exactly at that
+boundary. Consequently **53.8% of national male surnames (219,769 of 408,182) and 50.8% of female
+(213,278 of 420,082) have no regional row at all**, and a surname with 1,077 male or 1,183 female
+bearers nationally can still be entirely absent regionally. An absent cell means zero, or one
+suppressed bearer, or a bearer with no voivodeship value — never a confirmed zero.
+
+The publisher's own text still does not state the grain; this is observed, and recorded as observed.
+
+### Reconciliation: one supported invariant, and a residual suppression cannot explain
+
+Matching was byte-identical on the raw surname field against the **same-sex** national file, with
+no normalisation, no folding, no resolver, and never across sexes.
+
+**The only source-supported invariant: `regional sum ≤ national count`, for every surname, zero
+exceptions** — 0 of 188,413 male and 0 of 206,804 female exceeded it. Equality holds for 46,808 and
+58,631 surnames respectively, roughly a quarter, so equality must never be asserted or enforced.
+Zero regional surnames lack a national row.
+
+| | Male | Female |
+|---|---:|---:|
+| National total over all surnames | 21,197,537 | 21,560,302 |
+| Regional total over all cells | 16,590,111 | 17,296,363 |
+| **Residual in no voivodeship row** | **4,607,426 (21.74%)** | **4,263,939 (19.78%)** |
+| Upper bound explainable by per-cell suppression | 684,961 | 676,743 |
+
+The bound follows from arithmetic: a surname in *k* of 16 voivodeships has 16 − *k* absent cells and
+per-cell exclusion hides at most one bearer each. **The decisive case: all 3,106 male and 3,561
+female surnames present in all 16 voivodeships, where suppression can hide nothing whatsoever, are
+still short** — by 971,775 and 849,705 bearers, a median of 10.2% and 8.1% of national. `NOWAK` has
+a row in every voivodeship and is short by 11,418 male, 10,353 female.
+
+**A second mechanism exists and the publisher does not state what it is.** Recorded `UNRESOLVED`,
+with candidates consistent with the field's own name (no permanent registration in Poland,
+registration abroad, or a further undocumented exclusion) named as candidates only. Nothing asserted.
+
+The residual is **systematically biased**: coverage rises from 78.6% for male surnames of 2–9
+bearers to 89.3% above 10,000, and individual surnames diverge far more — `MELNYK` 6,442 national
+against a regional sum of 210, `KOVALCHUK` 5,382 against 66, `SHEVCHENKO` 5,217 against 69, `BOIKO`
+4,616 against 56, `NGUYỄN` 3,730 against 169, against `NOWAK` at 86,969 of 98,387. Any regional
+surface built on this resource understates every region, unevenly, and worst for surnames of
+recent-migration origin. That is a decision input for D-004, not a footnote.
+
+### Deliverables committed
+
+- `fixtures/pesel/regional-male-2026-01-20.csv` — 40 real rows, SHA-256 `3f38f91f…78b0`, 1,204 B.
+- `fixtures/pesel/regional-female-2026-01-20.csv` — 38 real rows, SHA-256 `3eddbc5f…51bb`, 1,135 B.
+- `fixtures/pesel/source-manifest.json` — each regional entry gains a `verified_from_bytes` block,
+  plus a new `regional_reconciliation_against_national_2026` block. The key stays
+  `regional_resources_not_ingested`, and the dataset, national-resource and `file_structure` blocks
+  are **byte-identical to before**, checked by comparison.
+
+Both fixtures carry the real header and CRLF convention, cover **all 16** geography values (asserted
+before writing), and every data row was verified to appear byte-identically in its checksum-verified
+source. The fixtures' `NOWAK` rows sum to 86,969 and 89,385 — equal to the full-file regional sums
+and **not** equal to the national fixture values of 98,387 and 99,738, which is the finding, not a
+defect. A fixture's digest is its own and is never the resource's.
+
+### Still open, and on what
+
+- **Items 23 and 24, and item 10 which depends on them: the TERYT TERC correspondence.** The
+  geography column carries no administrative code of any kind, the TERC archive file was not
+  supplied, and `api.stat.gov.pl` and `eteryt.stat.gov.pl` are egress-blocked. **No TERC code was
+  read or written anywhere.** A voivodeship `Place` foundation stays unspecifiable until this
+  closes; supplying `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip` closes it.
+- **Half of item 22: the publisher's resource-level licence confirmation**, which is not this task's
+  to close. D-004 and D-007 still hold it.
+
+### Verification actually run
+
+| Command | Result |
+|---|---|
+| `sha256sum` and `stat` on both regional and both national files, before reading rows | **PASS** — all four match the manifest |
+| `python3 -c "import json; json.load(...)"` on the manifest | **PASS** — parses; national blocks unchanged |
+| Fixture row byte-identity against the checksum-verified sources | **PASS** — every row of both fixtures |
+| Geography coverage assertion before writing each fixture | **PASS** — all 16 values in both |
+| `pnpm test` | **PASS** — **193 tests**, unchanged; this task altered no code |
+| `pnpm format:check` | **PASS** |
+| `git status --porcelain` on the read-only directories | **PASS** — empty |
+| `git diff --check` | **PASS** |
+
+`pnpm typecheck`, `pnpm lint`, `pnpm build` and `pnpm test:integration` were **not run and are not
+claimed**: no code changed. The two new fixtures are `.csv`, which Prettier does not target.
