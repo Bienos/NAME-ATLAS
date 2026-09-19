@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — `CURRENT_DISTRIBUTION` truth-chain planning preflight: not actionable, no task file written (see the section before *Next action*). Previous: TASK-003 implemented and verified.
+**Last updated:** 2026-09-19 — TASK-007 (PESEL regional source spike) specified, not started; earlier the same day, the `CURRENT_DISTRIBUTION` truth-chain preflight found that task not actionable (see the two sections before *Next action*). Previous: TASK-003 implemented and verified.
 
 ## Current state
 
@@ -18,8 +18,9 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — PESEL surname ingestion** | **SPECIFIED, NOT IMPLEMENTED.** Scope authority `tasks/004-pesel-surname-ingestion.md` (commit `c32b20e`); an earlier second draft `tasks/004-pesel-ingestion-source-rights.md` is committed with its false "DONE" status corrected and is not the authority (commit `a528773`). No migration `0003`, no `sources`/`rights_profiles`/`source_records`/`distribution_snapshots`/`distribution_values` table, no importer. Its §14 items U-1, U-2, U-3 await the project owner. |
 | **TASK-005 / TASK-006** | **No task file, no code.** `tasks/005-*.md` and `tasks/006-*.md` do not exist. No `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments` or `citations` table; no truth-chain package. |
-| **`CURRENT_DISTRIBUTION` truth chain (requested as TASK-007)** | **Planning preflight run 2026-09-19 — NOT ACTIONABLE; no `tasks/007-*.md` written.** The approved source is national-only; the regional candidate is unadopted (D-004), carries no administrative code, and its suppression/reconciliation semantics are unverified. Evidence and the proposed prerequisite (a PESEL regional source spike) are in `docs/sources/pesel-regional.md`; D-004 updated. |
-| Next approved task | None yet. TASK-004 is specified and awaits the project owner's answers to its §14 U-1–U-3 and a go-ahead. |
+| **`CURRENT_DISTRIBUTION` truth chain (requested as TASK-007)** | **Planning preflight run 2026-09-19 — NOT ACTIONABLE; no distribution truth-chain task file written.** The approved source is national-only; the regional candidate is unadopted (D-004), carries no administrative code, and its suppression/reconciliation semantics are unverified. Evidence and the proposed prerequisite (a PESEL regional source spike) are in `docs/sources/pesel-regional.md`; D-004 updated. |
+| **TASK-007 — PESEL regional source spike** | **SPECIFIED, NOT STARTED.** `tasks/007-pesel-regional-source-spike.md`, created 2026-09-19 at the project owner's request as the prerequisite of any distribution task. Evidence and fixtures only, TASK-002 pattern; no code. Requires the project owner to supply the regional bytes (egress-blocked environment). Independent of TASK-004/005. |
+| Next approved task | TASK-004 (specified; awaits the project owner's answers to its §14 U-1–U-3) and TASK-007 (specified; awaits the source bytes) are both open. Neither is started. |
 
 ## What TASK-001 built
 
@@ -335,6 +336,18 @@ A planning session was asked to create the next implementation task, "TASK-007 �
 
 **Not created:** `tasks/007-current-distribution-truth-chain.md`, any other task file, any code, migration, fixture or test. **Not run:** `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:integration`, `pnpm build` — no code changed, and none is reported as passing. Markdown is excluded from `pnpm format:check` by `.prettierignore`. Run: `git status --porcelain` (only the four files above), `git diff --check` (clean), `git status --porcelain docs/canonical docs/library docs/archive docs/reference docs/review prompts` (empty).
 
+## TASK-007 specified — PESEL regional source spike, planning only (2026-09-19)
+
+At the project owner's request, following the preflight above, `tasks/007-pesel-regional-source-spike.md` was written. Planning only: no application code, migration, fixture, manifest change or test.
+
+**What it specifies:** the TASK-002 pattern applied to regional resources `1148786`/`1148790` — checksum-verified bytes, file-level facts, the complete geography value set, the count column's minimum and any `0`/`1` rows, Unicode notes, a byte-identical reconciliation of per-surname regional sums against the same-sex national resource (with an explicit per-surname table for every committed national fixture surname), the observed suppression behaviour stated as observation, the rights position as reported by the project owner, an evidence-only TERYT TERC correspondence for the observed voivodeship strings (codes read from TERC data, never typed), real verbatim fixtures, and the manifest extended under its existing `regional_resources_not_ingested` key. Twenty-six acceptance items, each answerable only as a verified fact with its command and output or `UNRESOLVED — <reason>`.
+
+**What it excludes:** ingestion, any validator or `packages/sources` change, `Place`/external-ID tables, TERYT connector, any claim, any map, deciding D-004, approving rights, cross-sex comparison, earlier years, downloading.
+
+**Number:** 007 was the number the project owner had used for the distribution truth chain; that chain is blocked (preflight above), the spike is its first prerequisite, and the owner asked for the spike file. Nothing depends on the number.
+
+**Files changed (documentation only):** `tasks/007-pesel-regional-source-spike.md` (new); pointer updates in `docs/sources/pesel-regional.md`, `docs/DECISIONS_NEEDED.md` (D-004 step 5), `docs/CODEMAP.md` (`tasks/` row), and this file. **Not run:** any `pnpm` command — no code changed. Run: `git status --porcelain`, `git diff --check`, `git status --porcelain` on the read-only directories (empty).
+
 ## Next action
 
-TASK-001, TASK-002 and TASK-003 are implemented and verified. TASK-004 is specified and not started; its §14 U-1, U-2 and U-3 await the project owner, as does the flagged TASK-003 deviation (the `TemporalExtent` columns omitted from `name_forms`; adding them later is a nullable-column migration). A `CURRENT_DISTRIBUTION` task is blocked by D-004 and by the missing prerequisites enumerated there; the smallest prerequisite — a PESEL regional source spike, evidence and fixtures only — is proposed in `docs/sources/pesel-regional.md` and awaits the project owner's go-ahead and number. Per AGENTS.md §8: **STOP.**
+TASK-001, TASK-002 and TASK-003 are implemented and verified. Two tasks are specified and not started: TASK-004 (its §14 U-1, U-2 and U-3 await the project owner) and TASK-007 (awaits the regional source bytes from the project owner; independent of TASK-004). The flagged TASK-003 deviation (the `TemporalExtent` columns omitted from `name_forms`; a nullable-column migration later) still awaits acknowledgement. A `CURRENT_DISTRIBUTION` task remains blocked by D-004 and the prerequisites enumerated there. Per AGENTS.md §8: **STOP.**

@@ -1,6 +1,6 @@
 # PESEL regional surname resources — evidence record (CURRENT_DISTRIBUTION preflight, 2026-09-19)
 
-**Status: NOT ADOPTED · NOT INGESTED · NOT A TASK.** This is the read-only preflight record for a requested `CURRENT_DISTRIBUTION` truth-chain task. The preflight found the task **not actionable** from current repository evidence, so **no `tasks/007-*.md` was written**. This record documents why, what is missing, and the smallest prerequisite that closes the gap honestly.
+**Status: NOT ADOPTED · NOT INGESTED.** This is the read-only preflight record for a requested `CURRENT_DISTRIBUTION` truth-chain task. The preflight found the task **not actionable** from current repository evidence, so **no distribution truth-chain task file was written**. This record documents why, what is missing, and the smallest prerequisite that closes the gap honestly — since specified, at the project owner's request, as `tasks/007-pesel-regional-source-spike.md`.
 
 The authoritative decision record remains D-004 in `docs/DECISIONS_NEEDED.md`. The authoritative record of the *national* PESEL source remains `docs/sources/pesel.md`. This file adds only what is known about the *regional* resources and what a distribution task would need.
 
@@ -75,7 +75,7 @@ In dependency order. Items 1–2 are decisions, not engineering; nothing below t
 
 ## Proposed smallest prerequisite task — PESEL regional source spike
 
-**Not created as a task file.** The repository specifies one task at a time and TASK-004 is specified but unimplemented; the number and the go-ahead are the project owner's. The proposal is recorded here so it can be lifted into `tasks/` verbatim when approved.
+**Now specified as `tasks/007-pesel-regional-source-spike.md`** (created 2026-09-19 at the project owner's request, later in the same session as this record). That file is the scope authority; the proposal below is retained as its origin and is not updated separately.
 
 **Goal.** Establish, from the actual bytes and with a small real fixture, exactly what the two regional resources contain — so that D-004 can be decided on facts and a later ingestion task can be specified without guessing. The pattern is TASK-002 (`tasks/002-pesel-source-spike.md`), applied to `1148786`/`1148790`.
 
@@ -100,7 +100,7 @@ In dependency order. Items 1–2 are decisions, not engineering; nothing below t
 
 ## What this session did not do
 
-- Did not create `tasks/007-current-distribution-truth-chain.md`, and did not create any other task file.
+- Did not create `tasks/007-current-distribution-truth-chain.md`. (Later in the same session, at the project owner's request, `tasks/007-pesel-regional-source-spike.md` was created — the prerequisite spike, not the distribution chain.)
 - Did not download, read, parse or fixture the regional resources.
 - Did not verify the voivodeship value set, suppression semantics or reconciliation — every such row above is marked NOT VERIFIED.
 - Did not change any code, migration, fixture, dependency or test. `docs/canonical/` and the other read-only directories are untouched.
