@@ -12,6 +12,7 @@
     "demo:surname": "tsx bin/surname-profile.ts"
   },
   "dependencies": {
+    "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
     "@name-atlas/domain": "workspace:*",
     "@name-atlas/resolver": "workspace:*",

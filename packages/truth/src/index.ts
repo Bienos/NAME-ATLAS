@@ -12,6 +12,10 @@ export {
   TruthInvariantError,
 } from "./derive.js";
 export type { DeriveOptions } from "./derive.js";
+export { readCurrentPopulation } from "./read.js";
+export type { PersistedCurrentPopulation } from "./read.js";
+export { querySurnameResult } from "./query.js";
+export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
 export { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 export type {
   ConfidenceInputs,

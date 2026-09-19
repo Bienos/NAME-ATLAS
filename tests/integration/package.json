@@ -8,6 +8,7 @@
     "test:integration": "vitest run"
   },
   "dependencies": {
+    "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
     "@name-atlas/domain": "workspace:*",
     "@name-atlas/resolver": "workspace:*",

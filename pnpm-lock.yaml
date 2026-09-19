@@ -66,6 +66,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@name-atlas/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@name-atlas/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@name-atlas/truth':
+        specifier: workspace:*
+        version: link:../../packages/truth
       next:
         specifier: 16.3.5
         version: 16.3.5(@babel/core@7.29.7)(@types/node@22.20.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
@@ -89,7 +98,11 @@ importers:
         specifier: workspace:*
         version: link:../../packages/domain
 
-  packages/contracts: {}
+  packages/contracts:
+    dependencies:
+      zod:
+        specifier: 4.6.5
+        version: 4.6.5
 
   packages/db:
     dependencies:
@@ -164,6 +177,9 @@ importers:
 
   packages/truth:
     dependencies:
+      '@name-atlas/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../db
@@ -182,6 +198,9 @@ importers:
 
   tests/integration:
     dependencies:
+      '@name-atlas/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../../packages/db

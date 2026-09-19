@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-005 implemented and verified (CURRENT_POPULATION truth chain, migration 0004); D-010 resolved by ADR-0004, so TASK-006 is specified and unblocked
+**Last updated:** 2026-09-19 — TASK-006 implemented and verified (surname result read API; first accepted contract). M1 complete, M2 begun.
 
 ## Current state
 
@@ -13,13 +13,13 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
 | **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
-| Application source code | `packages/resolver` (exact resolver, TASK-003), `packages/sources` (PESEL parser from TASK-002; registry, importer and CLI from TASK-004) and `packages/truth` (`CURRENT_POPULATION` truth chain and demo CLI, TASK-005). Identity, source/rights, distribution and truth-layer tables exist. No `DigitalAsset`, `Place`, `EvidenceDependency`, `ResearchModuleRun` or outbox table. |
+| Application source code | `packages/resolver` (TASK-003), `packages/sources` (TASK-002/004), `packages/truth` (truth chain TASK-005; read path TASK-006), `packages/contracts` (TASK-006 API schemas), and one route handler in `apps/web`. Identity, source/rights, distribution and truth-layer tables exist. No `DigitalAsset`, `Place`, `EvidenceDependency`, `ResearchModuleRun` or outbox table. |
 | Database migrations | `0001_bootstrap_extensions`, `0002_identity_core`, `0003_source_rights_distribution` and `0004_truth_layer` (`research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` + 10 enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
 | **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
 | **TASK-005 — `CURRENT_POPULATION` truth chain** | **IMPLEMENTED AND VERIFIED.** D-008 and D-009 answered by the project owner and recorded as RESOLVED. Migration `0004_truth_layer` + `packages/truth`. See the TASK-005 section below. |
-| **TASK-006 — surname result read API / query contract** | **SPECIFIED, NOT STARTED, NO LONGER BLOCKED.** `tasks/006-surname-result-read-api.md` is the scope authority. No TASK-006 code exists. Both former blockers are closed: TASK-005 is implemented, and D-010 is resolved by ADR-0004. |
-| Next approved task | None approved. TASK-006 is specified and every precondition is met; it awaits approval to start. |
+| **TASK-006 — surname result read API / query contract** | **IMPLEMENTED AND VERIFIED.** `packages/contracts` (Zod schemas), `packages/truth/src/{read,query}.ts`, `GET /api/v1/surname-results`, and the repository's first accepted contract document. See the TASK-006 section below. |
+| Next approved task | None. The rest of M2 (`CURRENT_RANK`, `RARITY_CONTEXT`, `pg_trgm` candidate generation, free result UI) has no task file. |
 
 ## What TASK-001 built
 
@@ -501,6 +501,66 @@ The integration suite ran against a **locally installed PostgreSQL 16.13 + PostG
 - **TASK-004 §14 U-1 and U-4** — still unanswered by the publisher. U-1 is contained structurally (separate comparability groups); U-4 is contained by storing no unit.
 - **D-007** — resource-level licence unconfirmed, so `commercial_use = UNKNOWN` keeps paid and SEO surfaces blocked. Observed in the demo output above.
 
+## TASK-006 implemented — surname result read API (2026-09-19)
+
+Scope authority: `tasks/006-surname-result-read-api.md`. One bounded capability: an exact surname query returns a stable, typed, rights-aware result carrying `CURRENT_POPULATION`, produced entirely by the TASK-003 → TASK-005 pipeline. First slice of M2.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/contracts/src/surname-result.ts` | Zod 4 schemas + inferred types: request, response, error envelope |
+| `packages/truth/src/read.ts` | **Read-only** lookup of already-derived claims |
+| `packages/truth/src/query.ts` | The application query service |
+| `apps/web/src/app/api/v1/surname-results/route.ts` | Thin BFF handler — no SQL, no business logic |
+| `docs/contracts/surname-result.md` | **The repository's first accepted contract** |
+| tests | 25 contract, 4 route-shape, 22 integration |
+
+Modified: `packages/contracts/package.json` (adds `zod@4.6.5`), `apps/web/{package.json,next.config.ts}`, `tests/integration/{package.json,tsconfig.json}`, both index files, `pnpm-lock.yaml` (workspace links + zod; nothing upgraded). **No migration.**
+
+### Implementer choices recorded (TASK-006 §15)
+
+- **U-1 → extend `packages/truth`.** One fewer package; the truth service already exposed a clean result object.
+- **U-2 → omit `canonical_slug`/`canonical_path`.** No slug exists, and Polish slug transliteration is a real decision that must not be confused with the identity-bearing diacritics of `ARCHITECTURE.md` §10 invariant 8. This slice ships no browser route or SEO surface to consume them. Recorded as a deviation in the contract document.
+- **U-3 → read-only path, confirmed necessary.** `deriveCurrentPopulation` performs six inserts, so a read must not reach it. `read.ts` exists for exactly this; a test asserts no import of or call to derivation from the read path, and an integration test asserts all fourteen tables are unchanged across a batch of reads including miss and error paths.
+- **U-4 → `400` for invalid input**, successful states for valid-but-unresolved.
+- **Surface handling:** `ALLOWED` and `CONDITIONAL` surface the values; `BLOCKED` omits them from the payload entirely rather than sending them flagged (`docs/canonical/16` §55).
+
+### Two things worth recording
+
+**One deviation, in the contract document.** The unit is `SURNAME_OCCURRENCES` per ADR-0004, not `docs/canonical/16` §26's literal `"PEOPLE"`. A test asserts `"PEOPLE"` appears nowhere in a PESEL-derived response.
+
+**The build needed fixing, and the fix is a workaround.** `apps/web` previously had no workspace dependencies. Once it consumed them, `next build` failed on ten unresolved imports: the packages are consumed as TypeScript source and use `.js`-extension specifiers (the repo's NodeNext convention), which **Turbopack cannot resolve and has no option to**. The webpack builder can, via `resolve.extensionAlias`, so `apps/web` now pins `--webpack` for `dev` and `build`, with the reason in `next.config.ts`. **This should be revisited**: the cleaner long-term fix is compiling the workspace packages to `dist`, which is a repo-wide change and was not TASK-006's to make.
+
+### Verification actually run (2026-09-19)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | **PASS** — 11 packages |
+| `pnpm lint` | **PASS** |
+| `pnpm format:check` | **PASS** |
+| `pnpm test` | **PASS** — **193 tests** (164 before; +25 contract, +4 route-shape) |
+| `pnpm test:integration` | **PASS** — **113 tests** (91 before; +22), including 3 through the real route handler |
+| `pnpm build` | **PASS** (webpack builder — see above) |
+| `pnpm db:migrate` | **PASS** — `no pending migrations`; this task adds none |
+| `pnpm db:generate-types` | **PASS** — byte-identical (`cmp`) |
+| Boundary greps | Route handler holds no SQL and no resolver import; read path contains no `insertInto`/`updateTable`/`deleteFrom`; derivation is neither imported nor called from the read path |
+| `git status --porcelain` on read-only dirs | Unchanged |
+
+**Regression:** TASK-003, TASK-004 and TASK-005 suites all pass unchanged. No existing test was modified.
+
+**Read-path behaviour observed** (integration, over genuinely ingested and derived fixture data): a surname in both PESEL resources returns two observations in different comparability groups with no total anywhere in the payload; `WIŚNIEWSKI` resolves while `WISNIEWSKI` returns `UNRESOLVED`; a resolved surname with no derived evidence returns `UNAVAILABLE`/`NO_APPLICABLE_EVIDENCE` and no zero; the `PAID` surface returns `RIGHTS_BLOCKED` with the value absent from the serialized body; confidence is identical across surfaces while surface decisions differ; the persisted assessment `rationale` never appears in a response.
+
+### Not verified in this environment
+
+Integration tests ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL` fallback, as in every task so far. The pinned container image was not exercised here — registries remain egress-blocked. CI runs it.
+
+### Carried forward
+
+- **Turbopack/`--webpack`** — a build workaround, not a decision. Compiling workspace packages to `dist` would remove it.
+- **Caching is `no-store`.** `docs/canonical/16` §84/§87's ETag and cache-by-version policy belongs to whichever task first needs it.
+- **D-007** still gates paid surfaces, which is why `PAID` is `BLOCKED` in every observed response. **U-4** (the source unit) still open; ADR-0004 makes the contract honest about it rather than answering it.
+
 ## Next action
 
 TASK-001 through TASK-004 are implemented and verified. One flagged deviation still awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions TASK-003 §6.2 named; adding them later is a nullable-column migration.
@@ -509,7 +569,9 @@ TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the sec
 
 TASK-001 through TASK-005 are implemented and verified. M1's vertical slice is complete: a real surname goes from raw input through exact resolution, ingested PESEL evidence, a typed claim, confidence, citation and rights evaluation to a deterministic developer-facing result.
 
-TASK-006 (surname result read API) is specified and **every precondition is now met**. The project owner adopted D-010's fallback on 2026-09-19 — recorded as ADR-0004 — so the population DTO carries `SURNAME_OCCURRENCES` rather than asserting `"PEOPLE"` on an implication the publisher never stated.
+TASK-001 through TASK-006 are implemented and verified. M1 is complete and M2 has begun: a caller can now query an exact surname over HTTP and receive a rights-aware, evidence-backed `CURRENT_POPULATION` result with its snapshot date, confidence and citation.
+
+The rest of M2 has no task file yet: `CURRENT_RANK` and `RARITY_CONTEXT` (the first derived claims — note `RARITY_CONTEXT` needs the denominator TASK-004 left as U-6 with `universe_size` null), `pg_trgm` candidate generation with tier-safe ranking, gender forms, the free result UI, a read-only inspector, and logging/tracing.
 
 **Four decisions remain open, none of them blocking current work:** D-002 (onomastics rights, blocks M2 meaning), D-003 (Polona rights, blocks M3), D-004 (regional map framing, blocks M2 geography), D-007 (PESEL resource-level licence, blocks M5/M6 paid surfaces). All four need an external party or a commercial judgement, not an engineering decision. D-007's publisher enquiry would also answer TASK-004 §14 U-4 and let the DTO move to `"PEOPLE"`.
 
