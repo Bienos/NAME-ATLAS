@@ -22,31 +22,90 @@ import type { Pool } from "pg";
 export const POSTGRES_TEST_IMAGE =
   "postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5";
 
+/**
+ * Environment variable naming an already-running PostgreSQL server to use
+ * instead of starting a container. When set, each `startTestDatabase()`
+ * call creates a fresh, uniquely named database on that server and drops
+ * it on `stop()`, so tests still begin from an empty schema.
+ *
+ * This is the substitute path TASK-003 §10 anticipates for an environment
+ * that cannot pull the pinned image (as the implementing sessions could
+ * not — container registries were network-egress-blocked). CI leaves it
+ * unset and runs the pinned container. A substitute server must itself
+ * provide `postgis` and `pg_trgm`; the bootstrap migration asserts that.
+ */
+export const TEST_DATABASE_URL_ENV = "TEST_DATABASE_URL";
+
 export interface TestDatabase {
-  readonly container: StartedPostgreSqlContainer;
+  /** The Testcontainers handle; `null` when an external server is in use. */
+  readonly container: StartedPostgreSqlContainer | null;
+  /** Connection string for the (fresh) test database. */
+  readonly connectionUri: string;
   readonly pool: Pool;
   readonly db: Kysely<DB>;
-  /** Stops the pool and the container. Always call this in test teardown. */
+  /** Stops the pool and the container (or drops the external database). Always call this in test teardown. */
   stop(): Promise<void>;
 }
 
 /**
- * Starts a fresh PostgreSQL+PostGIS container and returns a ready
+ * Starts a fresh PostgreSQL+PostGIS database and returns a ready
  * connection. Does not run migrations — call {@link migrateTestDatabase}
  * afterwards for tests that need the schema in place.
  */
 export async function startTestDatabase(): Promise<TestDatabase> {
+  const externalServer = process.env[TEST_DATABASE_URL_ENV];
+  if (externalServer && externalServer.trim() !== "") {
+    return startExternalTestDatabase(externalServer);
+  }
+
   const container = await new PostgreSqlContainer(POSTGRES_TEST_IMAGE).start();
-  const pool = createPool({ databaseUrl: container.getConnectionUri() });
+  const connectionUri = container.getConnectionUri();
+  const pool = createPool({ databaseUrl: connectionUri });
   const db = createDb(pool);
 
   return {
     container,
+    connectionUri,
     pool,
     db,
     async stop() {
       await db.destroy();
       await container.stop();
+    },
+  };
+}
+
+/** Creates a uniquely named empty database on an external server (see {@link TEST_DATABASE_URL_ENV}). */
+async function startExternalTestDatabase(serverUri: string): Promise<TestDatabase> {
+  const databaseName = `name_atlas_test_${Date.now().toString(36)}_${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+  // Only [a-z0-9_] by construction, so the identifier is safe to interpolate.
+  if (!/^[a-z0-9_]+$/u.test(databaseName)) {
+    throw new Error(`refusing unsafe test database name: ${databaseName}`);
+  }
+
+  const admin = createPool({ databaseUrl: serverUri });
+  await admin.query(`CREATE DATABASE "${databaseName}"`);
+
+  const url = new URL(serverUri);
+  url.pathname = `/${databaseName}`;
+  const connectionUri = url.toString();
+  const pool = createPool({ databaseUrl: connectionUri });
+  const db = createDb(pool);
+
+  return {
+    container: null,
+    connectionUri,
+    pool,
+    db,
+    async stop() {
+      await db.destroy();
+      // FORCE (PostgreSQL 13+) terminates any connection a test left open —
+      // e.g. a deliberately abandoned pool — so a throwaway database never
+      // leaks because of one.
+      await admin.query(`DROP DATABASE IF EXISTS "${databaseName}" WITH (FORCE)`);
+      await admin.end();
     },
   };
 }

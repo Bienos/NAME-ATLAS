@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
     "@name-atlas/testing": "workspace:*",
     "kysely": "0.29.6"
   }

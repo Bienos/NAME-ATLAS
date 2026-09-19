@@ -1,0 +1,19 @@
+{
+  "name": "@name-atlas/resolver",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/domain": "workspace:*",
+    "kysely": "0.29.6"
+  }
+}

@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-002's two residual source items closed; no code change
+**Last updated:** 2026-09-19 — TASK-003 implemented and verified (exact surname resolver + identity core migration)
 
 ## Current state
 
@@ -12,11 +12,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Specification corpus | present and unmodified — `docs/canonical/10–23` verified byte-identical (SHA-256 of directory listing unchanged) |
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
-| **TASK-003 — exact surname resolver** | **SPECIFIED, NOT IMPLEMENTED.** `tasks/003-exact-surname-resolver.md` created this session. Contains one contract decision (the minimal identity migration — task file §6.2) flagged for approval before an implementation session starts. |
-| Application source code | unchanged since TASK-002 — `packages/sources` (PESEL CSV schema/parser) exists; no canonical domain table, no `packages/resolver`, no identity tables. |
-| Database migrations | one bootstrap migration only (`postgis` + `pg_trgm`); no domain tables |
+| **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
+| Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
+| Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | TASK-003 is specified and awaiting approval of §6.2's contract decision. Once approved, a fresh implementation session follows `tasks/003-exact-surname-resolver.md`. |
+| Next approved task | None yet. TASK-004 (PESEL ingestion) is the natural next task but has no task file and was not started (AGENTS.md §8). |
 
 ## What TASK-001 built
 
@@ -269,6 +269,44 @@ Files changed (documentation and metadata only — no application code, no test,
 
 **Not run:** `pnpm build` and `pnpm test:integration`. No application code, dependency or migration changed in this session, and `test:integration` still requires Docker images that remain egress-blocked (see the TASK-001 section above). Neither is reported as passing.
 
+## TASK-003 implemented — exact surname resolver (this session)
+
+§6.2 of `tasks/003-exact-surname-resolver.md` (the minimal identity migration) was approved by the project owner before implementation began. Implemented exactly that scope. One reconciliation recorded up front: the project owner's implementation prompt named `RESOLVED / UNRESOLVED / INVALID_INPUT` outcomes while the task file uses the canonical `ResolutionStatus` enum and states the tri-state is a superseded simplification; the prompt itself defers to canonical field names and existing repository types. So `resolution_status` (canonical) is the primary field, and `outcome` is a pure, documented projection of it (`EXACT`/`KNOWN_VARIANT` → `RESOLVED`; `MULTIPLE_EXACT`/`UNKNOWN`/`REVIEW_REQUIRED` → `UNRESOLVED`; `EMPTY`/`EXCEEDS_OPERATIONAL_LIMIT`/`MALFORMED_CONTROL_CHARACTERS` → `INVALID_INPUT`). One model, both contracts.
+
+**Built:**
+
+- `packages/db/migrations/0002_identity_core.ts` — enums (`entity_type` narrowed to `SURNAME`/`NAME_FORM`, `evidence_scope`, `privacy_class`, `entity_status`, `surname_status`, `name_form_type`, `attestation_status`), tables `knowledge_entities`, `surnames` (`canonical_key` **UNIQUE** — T0 is unique by construction), `name_forms`, and view `resolvable_name_forms` encoding the §6.1 eligibility rule (`surname_id IS NOT NULL AND form_type IN ('CANONICAL','MODERN_VARIANT') AND attestation_status IN ('ATTESTED','DERIVED')`) so the lookup path structurally cannot see an ineligible row. **Not created:** `name_form_relations`, `entity_external_ids`, `sources`, `rights_profiles`, `research_runs`. **Columns omitted, each with its reason in the migration header:** `name_forms.geographic_scope_place_id` and `created_by_run_id` (target tables do not exist — as §6.2 says), and additionally `name_forms.valid_from_*/valid_to_*` — the flattened `TemporalExtent` (docs/canonical/11 §15.1: 8 columns + 3 enums), nullable and optional, which §6.2 did not name; this task performs no temporal logic, so creating it would be speculative abstraction (AGENTS.md §6). **This third omission is a deviation from §6.2's literal wording and is flagged here for the project owner.**
+- `packages/db/src/generated/db.ts` — regenerated from the migrated database.
+- `packages/resolver` (`@name-atlas/resolver`, deps: `@name-atlas/db`, `@name-atlas/domain`, `kysely` — no new third-party dependency): `normalize.ts` (`canonical_key_v1`: NFC → full case fold → separator mapping → trim → collapse; diacritics/particles/order preserved; Polish §6.1 fold table present, retrieval-only, **not called by matching** — asserted by test), `script.ts` (`\p{Script}`/`\p{Script_Extensions}` detection; Common/Inherited never count; Latin+Cyrillic/Greek flagged confusable), `validation.ts` (five outcomes; short/multi-word/hyphen/apostrophe inputs are VALID; tab/newline are control characters, not whitespace), `resolution.ts`, `lookup.ts` (`resolveSurname`: invalid input never touches the DB; valid input runs T0 then T1 inside one PostgreSQL `READ ONLY` transaction with the handle narrowed to `selectFrom` only; >1 distinct surname → `MULTIPLE_EXACT`, no selection; any DB error → typed `LOOKUP_FAILED`, never `UNKNOWN`), `version.ts` (`exact_resolver_v1`, `canonical_key_v1`, fixed strings — never derived from the runtime). Test-only `seedTestSurname`/`seedTestNameForm`/`countIdentityRows` under the separate `@name-atlas/resolver/testing` entry.
+- Full case folding is implemented per code point as lower→upper→lower over ICU data (Node has no case-fold API; simple lowercasing misses `ß`→`ss`, which docs/canonical/13 §5.5 rules out), with one explicit exception (`ı` U+0131 stays itself, matching the default non-Turkic profile). **Not diffed against CaseFolding.txt** — unicode.org was egress-blocked. Verified empirically instead: idempotent and NFC/NFD-equivalent for every code point ≤ U+2FFFF and 400,000 random multi-code-point strings; the identity-relevant behaviour is pinned by tests.
+- `packages/testing/src/postgres-container.ts` — `TEST_DATABASE_URL` fallback: creates a fresh uniquely-named database on an external server per `startTestDatabase()` and drops it (`WITH (FORCE)`) on `stop()`. CI is unchanged (env unset → pinned Testcontainers image). `TestDatabase` gained `connectionUri`; `container` is `null` on the fallback path.
+- `tests/integration/src/resolver.test.ts` — §8 items 13–19 plus AC-specific cases, against real PostgreSQL. **Every seeded record is synthetic**; Polish spellings are realistic strings only.
+- Two TASK-001 assertions that were true only while a single migration existed were tightened rather than deleted: `packages/db/src/migrator.test.ts` now asserts the exact ordered migration list; `tests/integration/src/extensions.test.ts` now asserts the exact table/view set (and that `canonical_key` is UNIQUE) instead of "no domain table".
+
+**Defects found and fixed by running the tests, not by inspection:** (1) script detection tested Latin before Inherited, so a combining diaeresis on a Cyrillic base was classified Latin and flagged a mixed script — fixed by testing `Script=Common/Inherited` first; (2) `String.prototype.trim()` strips tabs/newlines, letting a control character pass as "empty" — replaced by a spaces-only trim so validation sees it; (3) Kysely's `destroy()` is a no-op on a never-initialised driver, so the first "dead connection" simulation was not dead — the test now initialises, destroys, and proves the instance rejects a query before using it; (4) an abandoned pool left a throwaway test database undroppable — `DROP DATABASE … WITH (FORCE)`.
+
+**Tooling note for future sessions:** the file-write tool used in this session converts `\uXXXX` escape sequences in written content into literal characters. Invisible/bidi/confusable code points therefore landed literally in source and had to be re-escaped programmatically (139 code points across 7 files). Source files were verified afterwards: on code lines, the only remaining non-ASCII characters are Latin-script letters.
+
+## Verification run for TASK-003 (2026-09-19)
+
+Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm test:integration` ran against a locally installed PostgreSQL 16.13 + PostGIS 3.4.2 via the `TEST_DATABASE_URL` fallback — the substitute TASK-003 §10 prescribes. It did **not** run against the pinned container image in this environment; CI will.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | Failed as expected on first run (new workspace member); lockfile updated by `pnpm install --offline` — diff is only the `packages/resolver` importer block (workspace links + `kysely@0.29.6`, already in the lockfile). Nothing downloaded, no dependency upgraded. |
+| `pnpm typecheck` | Passed — 10 of 10 packages with a `typecheck` script. |
+| `pnpm lint` | Passed — zero errors, zero warnings (after re-escaping literal invisible characters flagged by `no-irregular-whitespace`). |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — **95 tests** across 9 packages: 40 pre-existing + 55 new in `packages/resolver` (normalisation, validation, script detection, 6 fast-check properties, import-boundary). |
+| `pnpm db:migrate` (local dev DB) | Passed — `0001_bootstrap_extensions: applied`, `0002_identity_core: applied`; re-run reports `no pending migrations`. |
+| `pnpm db:generate-types` | Passed — regenerated file is byte-identical to the committed one (checked with `cmp`). |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13/PostGIS 3.4.2) | Passed — **28 tests** (3 in `extensions.test.ts`, 25 in `resolver.test.ts`), including the 40-run async property; zero throwaway databases left behind. |
+| `pnpm build` | Passed — `apps/web`, `apps/admin` compiled, `apps/worker` built. |
+| Forbidden-logic grep (`pg_trgm`, `similarity`, `levenshtein`, `soundex`, `metaphone`, `unaccent`, `transliterat`, `phonetic`, `fuzzy`, `gender`, `pesel`, `llm`) over new code | Only comment/test-title matches asserting absence, plus the canonical `name_form_type` enum member `'TRANSLITERATION'` (a value from docs/canonical/11 §4.3, no logic). |
+| `git status` on `docs/canonical/`, `library/`, `archive/`, `reference/`, `review/`, `prompts/` | Unchanged. |
+
+**Not verified in this environment:** the integration suite against the pinned `postgis/postgis:16-3.4@sha256:44126d87…` image itself (registry egress-blocked). Everything else above was run and observed.
+
 ## Next action
 
-TASK-001 and TASK-002 are implemented and verified, and TASK-002 now has no residual items. TASK-003 is specified and **awaiting approval of §6.2** (the minimal identity migration scope) before an implementation session starts. Per AGENTS.md §8: **STOP.** This session did not implement TASK-003, did not touch application code, and did not write `tasks/004-*.md`.
+TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.

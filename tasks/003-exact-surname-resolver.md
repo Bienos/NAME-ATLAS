@@ -1,6 +1,6 @@
 # TASK-003 — Exact surname resolver
 
-- **Status:** NOT STARTED — awaiting approval of the contract decision in §6 before implementation begins
+- **Status:** DONE — implemented and verified 2026-09-19 (see `PROGRESS.md`); §6.2 approved by the project owner before implementation
 - **Milestone:** M0 (`PLAN.md`: "Tasks: TASK-001 project foundation · TASK-002 PESEL source spike · TASK-003 exact surname resolver")
 - **Depends on:** TASK-001 (project foundation) only
 - **Independent of:** TASK-002 (PESEL source spike). The resolver never reads PESEL data; see §2.

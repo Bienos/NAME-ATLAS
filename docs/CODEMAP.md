@@ -4,7 +4,9 @@ Where things live. Updated by whichever task changes the repository structure (`
 
 **TASK-001 status:** implemented. The monorepo foundation exists — pnpm workspace, three apps, four packages, one integration-test package, CI, migration mechanism. No domain logic anywhere in it (verified in PROGRESS.md).
 
-**TASK-002 status:** implemented. The official PESEL national surname resources are pinned, understood and fixtured — real fixture files, a machine-readable source manifest, and a fail-closed schema validator package. D-001 resolved (`docs/DECISIONS_NEEDED.md`). No canonical domain table, no importer, no resolver (verified in PROGRESS.md).
+**TASK-002 status:** implemented. The official PESEL national surname resources are pinned, understood and fixtured — real fixture files, a machine-readable source manifest, and a fail-closed schema validator package. D-001 resolved (`docs/DECISIONS_NEEDED.md`). No importer (verified in PROGRESS.md).
+
+**TASK-003 status:** implemented. The exact surname resolver exists (`packages/resolver`) over the minimal identity core — migration `0002_identity_core` creates `knowledge_entities`, `surnames`, `name_forms` and the `resolvable_name_forms` eligibility view, nothing else. Exact T0/T1 matching only; read-only; fails closed on ambiguity. No fuzzy, phonetic, transliteration, diacritic-fold or gender-form logic anywhere; no importer, no `Claim`, no `Source` (verified in PROGRESS.md).
 
 ## Current — exists now
 
@@ -23,7 +25,7 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
 | `docs/sources/pesel.md` | TASK-002 PESEL source-verification record — complete for the national production pair; D-001 resolved | active |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done) | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
@@ -34,11 +36,12 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `apps/worker` | Node entry point (`runWorker()`). Logs a structured startup line with a correlation ID and exits. No queue, no Redis, no BullMQ (ADR-0001) — those arrive at M3. | stable (TASK-001 skeleton, buildable, no queue) |
 | `packages/domain` | `uuidv7()`/`isUuidV7()` (via the `uuid` package) and `createCorrelationId()`. Nothing domain-specific yet — no `Surname`, no `Claim`. | stable (TASK-001 skeleton) |
 | `packages/contracts` | Empty but buildable. One placeholder export/test. Filled at M2 (`docs/contracts/README.md`). | stable (TASK-001 skeleton) |
-| `packages/db` | `pg` pool, Kysely instance, `Migrator`/`FileMigrationProvider` (ADR-0002), one bootstrap migration (`postgis` + `pg_trgm`), `kysely-codegen` wiring, generated `DB` type. **No canonical domain tables** — those are TASK-004/TASK-005. | stable (TASK-001 mechanism only) |
-| `packages/testing` | Testcontainers Postgres harness pinned to `postgis/postgis:16-3.4@sha256:44126d87…` (resolves D-005), frozen-clock helper. | stable (TASK-001) |
+| `packages/db` | `pg` pool, Kysely instance, `Migrator`/`FileMigrationProvider` (ADR-0002), `kysely-codegen` wiring, generated `DB` type. Migrations: `0001_bootstrap_extensions` (`postgis` + `pg_trgm`, TASK-001) and `0002_identity_core` (`knowledge_entities`, `surnames`, `name_forms`, view `resolvable_name_forms` — TASK-003 §6.2; the rest of Migration Group A arrives with the task that first needs it). | stable (TASK-001 mechanism; TASK-003 identity core) |
+| `packages/testing` | Testcontainers Postgres harness pinned to `postgis/postgis:16-3.4@sha256:44126d87…` (resolves D-005), frozen-clock helper. `TEST_DATABASE_URL` fallback (TASK-003): when set, a fresh uniquely-named database is created on that server instead of starting a container — the substitute path for environments that cannot pull the image; CI leaves it unset. | stable (TASK-001; fallback TASK-003) |
 | `packages/sources` | `@name-atlas/sources`: schema description + fail-closed parser/validator for the PESEL national CSV shape confirmed in TASK-002. No database, no domain types, no importer — parses raw source bytes into `{ surname, count }` rows only. Source connectors and the rights registry (`docs/canonical/12`) are not built yet — that is TASK-004's addition to this same path. | stable (TASK-002 subset); connectors/rights registry pending (TASK-004) |
+| `packages/resolver` | `@name-atlas/resolver` (TASK-003): `normalize.ts` (`canonical_key_v1`: NFC → full case fold → separator map → trim/collapse; Polish fold table present but retrieval-only and unused by matching), `script.ts` (Unicode `Script_Extensions` detection, no dependency), `validation.ts` (`VALID`/`EMPTY`/`EXCEEDS_OPERATIONAL_LIMIT`/`MALFORMED_CONTROL_CHARACTERS`/`MIXED_SCRIPT_REVIEW`), `resolution.ts` (canonical `ResolutionStatus` subset + derived `RESOLVED`/`UNRESOLVED`/`INVALID_INPUT` projection), `lookup.ts` (`resolveSurname`: SELECT-only inside a `READ ONLY` transaction, T0 then T1, ambiguity → `MULTIPLE_EXACT`, DB failure → typed `LOOKUP_FAILED`), `version.ts`. Test-only seeding under the separate `@name-atlas/resolver/testing` entry, never reachable from the lookup path (enforced by `import-boundary.test.ts`). | stable (TASK-003) |
 | `fixtures/pesel/` | Real PESEL fixtures: `national-male-2026-01-20.csv` (22 rows), `national-female-2026-01-20.csv` (23 rows), `source-manifest.json` (machine-readable resource metadata). Every row verbatim from the official source; selection method documented in `docs/sources/pesel.md`. | stable (TASK-002) |
-| `tests/integration` | Testcontainers-backed test: starts the pinned image, runs the bootstrap migration, asserts `postgis`/`pg_trgm` are enabled and that no domain table exists. | stable (TASK-001) |
+| `tests/integration` | Real-PostgreSQL tests: `extensions.test.ts` (migrations apply from empty, `postgis`/`pg_trgm` enabled, the schema is exactly the identity core and nothing else, `canonical_key` is UNIQUE) and `resolver.test.ts` (TASK-003 §8 items 13–19 — T0/T1 hits, ineligible forms invisible, `MULTIPLE_EXACT` fails closed, unknown creates nothing, zero writes across the suite, DB failure ≠ `UNKNOWN`). All seeded records synthetic. | stable (TASK-001; TASK-003) |
 
 ## Planned — does not exist yet
 
@@ -46,7 +49,6 @@ The shape comes from `docs/canonical/23` §7; the task that creates each area is
 
 | Path | Purpose | Created by |
 |---|---|---|
-| `packages/resolver` | Surname resolution engine | TASK-003 |
 | `packages/evidence`, `packages/claims`, `packages/confidence` | Trust chain | TASK-005 |
 | `packages/places` | Place identity and resolution | M3 |
 | `packages/runtime` | Research run orchestration | M3 |

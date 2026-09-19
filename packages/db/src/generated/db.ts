@@ -3,6 +3,28 @@
  * Please do not edit it manually.
  */
 
+import type { ColumnType } from "kysely";
+
+export type AttestationStatus = "ATTESTED" | "DERIVED" | "DISPUTED" | "GENERATED_CANDIDATE";
+
+export type EntityStatus = "ACTIVE" | "MERGED" | "RETRACTED" | "SUPERSEDED";
+
+export type EntityType = "NAME_FORM" | "SURNAME";
+
+export type EvidenceScope = "FAMILY_LEVEL" | "PERSON_LEVEL" | "SHARED" | "SURNAME_LEVEL";
+
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
+
+export type NameFormType = "CANONICAL" | "HISTORICAL_ATTESTED" | "LINGUISTIC_NORMALISATION" | "MIGRATION_ADAPTATION" | "MODERN_VARIANT" | "SEARCH_CANDIDATE" | "TRANSLITERATION";
+
+export type PrivacyClass = "INTERNAL" | "PUBLIC" | "SENSITIVE_FAMILY" | "USER_PRIVATE";
+
+export type SurnameStatus = "ACTIVE" | "AMBIGUOUS" | "DEPRECATED" | "MERGED";
+
+export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
 export interface GeographyColumns {
   coord_dimension: number | null;
   f_geography_column: string | null;
@@ -23,6 +45,44 @@ export interface GeometryColumns {
   type: string | null;
 }
 
+export interface KnowledgeEntities {
+  created_at: Generated<Timestamp>;
+  entity_id: string;
+  entity_type: EntityType;
+  lifecycle_status: EntityStatus;
+  privacy_class: PrivacyClass;
+  scope: EvidenceScope;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface NameForms {
+  attestation_status: AttestationStatus;
+  created_at: Generated<Timestamp>;
+  form: string;
+  form_type: NameFormType;
+  language_code: string | null;
+  name_form_id: string;
+  normalization_version: string;
+  script: string;
+  search_key: string;
+  surname_id: string | null;
+  unicode_nfc: string;
+}
+
+export interface ResolvableNameForms {
+  attestation_status: AttestationStatus | null;
+  created_at: Timestamp | null;
+  form: string | null;
+  form_type: NameFormType | null;
+  language_code: string | null;
+  name_form_id: string | null;
+  normalization_version: string | null;
+  script: string | null;
+  search_key: string | null;
+  surname_id: string | null;
+  unicode_nfc: string | null;
+}
+
 export interface SpatialRefSys {
   auth_name: string | null;
   auth_srid: number | null;
@@ -31,8 +91,25 @@ export interface SpatialRefSys {
   srtext: string | null;
 }
 
+export interface Surnames {
+  canonical_display: string;
+  canonical_key: string;
+  canonical_key_version: string;
+  created_at: Generated<Timestamp>;
+  entity_status: SurnameStatus;
+  merged_into_surname_id: string | null;
+  primary_locale: string | null;
+  primary_script: string;
+  surname_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface DB {
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;
+  knowledge_entities: KnowledgeEntities;
+  name_forms: NameForms;
+  resolvable_name_forms: ResolvableNameForms;
   spatial_ref_sys: SpatialRefSys;
+  surnames: Surnames;
 }

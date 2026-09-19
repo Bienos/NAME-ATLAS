@@ -45,39 +45,53 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     expect(result.rows.map((row) => row.extname)).toEqual(["pg_trgm", "postgis"]);
   });
 
-  it("records the bootstrap migration as applied exactly once", async () => {
+  it("records every migration as applied exactly once, in order", async () => {
     const migrator = createMigrator(requireDatabase().db);
     const migrations = await migrator.getMigrations();
 
-    expect(migrations).toHaveLength(1);
-    expect(migrations[0]?.name).toBe("0001_bootstrap_extensions");
-    expect(migrations[0]?.executedAt).toBeInstanceOf(Date);
+    expect(migrations.map((m) => m.name)).toEqual([
+      "0001_bootstrap_extensions",
+      "0002_identity_core",
+    ]);
+    for (const migration of migrations) {
+      expect(migration.executedAt).toBeInstanceOf(Date);
+    }
   });
 
-  it("creates no domain table (TASK-001 is foundation-only)", async () => {
-    // Excludes Kysely's own migration bookkeeping tables and the tables
-    // PostGIS itself creates in `public` (geography_columns,
-    // geometry_columns, spatial_ref_sys) — verified against a real
-    // migrated database that these are the only five tables the bootstrap
-    // migration produces. Anything beyond that set is an accidental
-    // domain table and TASK-001 must not create one.
-    const knownNonDomainTables = [
-      "kysely_migration",
-      "kysely_migration_lock",
-      "geography_columns",
-      "geometry_columns",
-      "spatial_ref_sys",
+  it("creates exactly the identity core and nothing else (TASK-001 + TASK-003 §6.2)", async () => {
+    // Kysely's own bookkeeping, the tables PostGIS itself creates in
+    // `public`, and TASK-003's three identity tables plus its one view.
+    // Anything beyond this set is an accidental table — in particular
+    // nothing from TASK-003 §5's excluded list (name_form_relations,
+    // sources, rights_profiles, research_runs, …) may appear here until
+    // the task that owns it adds it.
+    const expected = [
+      { table_name: "geography_columns", table_type: "VIEW" },
+      { table_name: "geometry_columns", table_type: "VIEW" },
+      { table_name: "knowledge_entities", table_type: "BASE TABLE" },
+      { table_name: "kysely_migration", table_type: "BASE TABLE" },
+      { table_name: "kysely_migration_lock", table_type: "BASE TABLE" },
+      { table_name: "name_forms", table_type: "BASE TABLE" },
+      { table_name: "resolvable_name_forms", table_type: "VIEW" },
+      { table_name: "spatial_ref_sys", table_type: "BASE TABLE" },
+      { table_name: "surnames", table_type: "BASE TABLE" },
     ];
 
-    const result = await sql<{ table_name: string }>`
-      SELECT table_name FROM information_schema.tables
+    const result = await sql<{ table_name: string; table_type: string }>`
+      SELECT table_name, table_type FROM information_schema.tables
       WHERE table_schema = 'public'
+      ORDER BY table_name
     `.execute(requireDatabase().db);
 
-    const unexpectedTables = result.rows
-      .map((row) => row.table_name)
-      .filter((name) => !knownNonDomainTables.includes(name));
+    expect(result.rows).toEqual(expected);
+  });
 
-    expect(unexpectedTables).toEqual([]);
+  it("makes T0 unique by construction: surnames.canonical_key carries a UNIQUE constraint", async () => {
+    const result = await sql<{ conname: string; contype: string }>`
+      SELECT conname, contype FROM pg_constraint
+      WHERE conrelid = 'surnames'::regclass AND contype = 'u'
+    `.execute(requireDatabase().db);
+
+    expect(result.rows.map((row) => row.conname)).toEqual(["surnames_canonical_key_key"]);
   });
 });
