@@ -1133,3 +1133,71 @@ defect. A fixture's digest is its own and is never the resource's.
 
 `pnpm typecheck`, `pnpm lint`, `pnpm build` and `pnpm test:integration` were **not run and are not
 claimed**: no code changed. The two new fixtures are `.csv`, which Prettier does not target.
+
+## Foundation re-verified and an annual-series record added (2026-09-19)
+
+Two loose ends closed while the project owner's supplied files were still on disk. Documentation
+only: no code, migration, dependency or test changed, and nothing was ingested.
+
+### The 2026 national facts re-verified against the full bytes
+
+TASK-002 established the national file-level facts from bytes the project owner supplied at the
+time; no later session had re-checked them. With the full resources on disk, **every fact recorded
+in `docs/sources/pesel.md` and D-001 for resources `1148808` and `1148811` was independently
+confirmed**: checksum, byte size, strict UTF-8 with no BOM, comma delimiter, no quote character,
+CRLF with trailing terminator, exact header, 408,182 and 420,082 data rows, two fields on every row
+with zero malformed, `Liczba` ranges of 2–98,387 and 2–99,738, zero rows at 0 or 1, descending sort
+across the whole file, no duplicate surnames, all values NFC — and the **exact** recorded artefact
+counts: 7 combining-mark rows male and 5 female, plus the single `SCHIED ` edge-whitespace row in
+the female file. Nothing recorded was found wrong.
+
+**The fixture-provenance claim is now proven rather than argued.** All 22 male and 23 female
+committed fixture rows appear byte-identically in their full source files, and their headers match.
+That is the premise TASK-008 §9 relied on when it argued per-surname reconciliation against the
+fixtures is population-valid: the fixture counts are full-resource counts, not subtotals. It was an
+argument before; it is an observation now.
+
+### `docs/sources/pesel-annual-series.md` — new
+
+Identity and shape facts for all 20 distinct files supplied: national 2019 through 2026 and
+regional 2025 and 2026. **All 20 digests appear in the archive's committed `SHA256SUMS.txt`**, so
+every file is an authentic archive copy. Deliberately not a year-over-year comparison: no count is
+compared across years, no trend computed, no claim derived, nothing adopted or ingested.
+
+Two findings make an annual refresh unsafe to assume, which is why the record exists:
+
+- **The 2019 pair uses a different schema.** Its header is `nazwisko,liczba`; from 2020 onward it is
+  `Nazwisko aktualne,Liczba`. The field is named `nazwisko`, **not** `nazwisko aktualne`. The
+  project rests on the current-surname field, and the 2019 resources do not say they carry it.
+  Whether the data is the same and only the label changed is not stated by the publisher and not
+  inferable from the bytes. The committed parser was confirmed to reject the 2019 file with a typed
+  `PeselSchemaError` naming both headers, which is correct and must not be relaxed.
+- **Two resource ids carry byte-identical files.** National `35279` (labelled 2021 female) and
+  `38772` (labelled 2022 female) share SHA-256 `9af26480ed30…62e0`, 4,141,803 bytes and 311,240
+  rows, with `cmp` reporting no difference. The archive's `SHA256SUMS.txt` already listed the digest
+  twice; both files confirm it. At least one year label is wrong, or the content was published twice,
+  or the acquisition run fetched one resource for both — undecidable from the bytes, and unsafe to
+  build a series on. The 2021 and 2022 male files differ normally, so the anomaly is confined to the
+  female pair.
+
+The record also notes that resource ids are not sequential by year and that the male id is sometimes
+lower than the same year's female id, so **a resource id must never be derived from a year**, and it
+lists what a refresh session must re-verify rather than assume.
+
+D-001's "do not revisit unless" clause gains a pointer to it. **D-001 stays RESOLVED**; no status,
+option or resolution changed.
+
+### Verification actually run
+
+| Command | Result |
+|---|---|
+| Re-verification of both 2026 national files against every recorded fact | **PASS** — all facts confirmed, artefact counts exact |
+| Fixture row byte-identity against the full national sources | **PASS** — 22/22 and 23/23, headers identical |
+| Digest match for all 20 supplied files against `SHA256SUMS.txt` | **PASS** — 20/20 |
+| `cmp` on the two same-digest files | **confirmed byte-identical** |
+| `pnpm format:check` | **PASS** |
+| `git status --porcelain` on the read-only directories | **PASS** — empty |
+| `git diff --check` | **PASS** |
+
+`pnpm test`, `typecheck`, `lint`, `build` and the integration suite were **not run and are not
+claimed**: no code changed, and the previous entry's run of the full suite stands.

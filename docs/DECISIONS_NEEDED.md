@@ -35,6 +35,8 @@ The rarity/`1-in-X` denominator question from this decision's original scope (be
 
 Do not revisit unless the 2026 resources are superseded by a new annual snapshot (a routine, expected refresh — repeat this verification for the new resource, do not assume it matches this record) or a resource-level fact recorded above is found to be wrong on closer inspection.
 
+**Before any refresh, read `docs/sources/pesel-annual-series.md`** (added 2026-09-19). Every file-level fact recorded above for the 2026 national pair was independently re-verified against the full source bytes on that date and holds exactly, including the combining-mark counts and the `SCHIED ` whitespace artefact, and both committed fixtures were confirmed to be verbatim excerpts carrying full-resource counts. That record also carries two findings that make a refresh unsafe to assume: the 2019 resources use the header `nazwisko,liczba`, whose field is `nazwisko` and not `nazwisko aktualne`, so a pre-2020 resource may not carry the current-surname field at all; and national resources `35279` (labelled 2021 female) and `38772` (labelled 2022 female) are byte-identical, so a publisher resource id and a year label cannot be inferred from one another.
+
 ---
 
 ## D-002 — Onomastics rights and source strategy
