@@ -327,6 +327,53 @@ Cheapest of all and the worst: it hides a two-input lineage inside one opaque pa
 
 ---
 
+## D-012 — the workspace-package build baseline: keep `--webpack`, compile to `dist`, or drop the `.js` extensions?
+
+**Status:** **NON-BLOCKING.** The build is green today; this is developer ergonomics and portability, not a defect. It is recorded because TASK-006 carried it forward as "a build workaround, not a decision" and because this session established facts that change the options.
+**Owner:** project owner, on a repository-convention question.
+
+Recorded 2026-09-19. The project owner's original framing called this "workspace package build compatibility"; no task ever existed for it.
+
+### The situation
+
+Every workspace package exports raw TypeScript — `exports: {".": "./src/index.ts"}` — and its internal imports carry explicit `.js` extensions. `apps/web` therefore pins `next dev --webpack` and `next build --webpack`, with `next.config.ts` supplying `resolve.extensionAlias` so the bundler applies TypeScript's rule that a `.js` specifier may be satisfied by a `.ts` file.
+
+### What this session established by running, not by reading
+
+1. **Turbopack genuinely cannot resolve these specifiers.** `next build --turbopack` fails with `module-not-found` across `packages/truth/src/index.ts` and `packages/db/src/index.ts`. TASK-006's note is accurate, not stale.
+2. **There is no Turbopack configuration that fixes it.** Next 16.3.5 offers `turbopack.resolveAlias` and `turbopack.resolveExtensions`. The first maps bare module specifiers, not relative paths; the second supplies extensions for *extensionless* imports. An explicit `./derive.js` request is neither case.
+3. **A bare `next build` now fails with a guard**, not a resolution error: Next 16 refuses to build when a `webpack` config is present and no `turbopack` config is, and suggests passing a flag explicitly or setting `turbopack: {}`. The repo's scripts pass `--webpack`, so the normal path is unaffected, but anyone running `next dev` bare gets a confusing error.
+4. **The stated reason for the `.js` extensions does not hold.** `next.config.ts` calls them "the NodeNext convention the rest of the repo uses so `tsx`, Node and vitest can run them directly". `tsconfig.base.json` sets **`moduleResolution: "Bundler"`**, under which TypeScript does not require explicit extensions at all. The comment has been corrected to state this; the convention may still be *wanted*, but not for the reason recorded.
+5. **Blast radius of changing the convention: 138 import statements across 50 files**, in all seven packages and all three apps.
+6. **Nothing runs the emitted worker output.** `apps/worker` has `build: tsc -p tsconfig.json` and `start: tsx src/index.ts`, so `dist/` is produced and never executed. It matters anyway — see Option B's cost.
+
+### Options
+
+**Option A — compile the packages to `dist`.** Each package gains a build script and points `exports` at `./dist/index.js` with `types` at `./dist/index.d.ts`, ideally with a `development` export condition still pointing at `src` so the test and `tsx` loops keep working against source. Fixes Turbopack, keeps the emitted output runnable by plain Node, and is the prerequisite if a package is ever published. Costs: a topological build step before any app build (pnpm's `-r run` already orders topologically, so no orchestrator is needed — `docs/canonical/23` §7 keeps Turborepo optional); and real care so tests and CLIs do not silently run against a stale `dist`. This is what TASK-006 called "the cleaner long-term fix".
+
+**Option B — drop the `.js` extensions and let Turbopack resolve extensionless imports.** Cheapest to execute: 138 mechanical edits, fully verifiable by the existing 193 unit and 113 integration tests. Legal under `moduleResolution: Bundler`. **Cost, and it is a real one:** the emitted JavaScript would then carry extensionless relative imports, which plain Node cannot resolve under `type: module`. Today `apps/worker`'s `dist` is Node-runnable; after this it would not be, so `pnpm build` would produce output that cannot run. That trades a portability property away for bundler convenience.
+
+**Option C — keep `--webpack`, and revisit on a defined trigger.** Nothing is broken. `--webpack` is a supported, explicit Next flag. Costs: the dev loop forgoes Turbopack's speed, and the bare-command guard in finding 3 is a papercut.
+
+### Recommendation
+
+**Option C for now, Option A when a trigger fires.** Nothing is broken, both alternatives give something real away, and M2 still has product capability pending — `AGENTS.md` §6's "no unrelated refactors" and "smallest complete version" both point at leaving a working build alone. Option B is explicitly **not** recommended: it is the cheapest to type and the only one that makes a currently-valid property invalid.
+
+Revisit when any of these becomes true:
+
+- Turbopack gains extension aliasing, which reduces this to deleting the `webpack` block;
+- a workspace package needs to be published or consumed outside the monorepo, which requires Option A regardless;
+- the dev-loop speed becomes a real complaint rather than a theoretical one;
+- a second app starts consuming the packages, which doubles the cost of the workaround.
+
+### Do not
+
+- Do not adopt Option B on the grounds that it is the smallest diff.
+- Do not add `turbopack: {}` to silence the guard in finding 3: that makes Turbopack the default builder, and finding 1 shows the build then fails.
+- Do not remove the `webpack` block or the `--webpack` flags while the packages export raw TypeScript.
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

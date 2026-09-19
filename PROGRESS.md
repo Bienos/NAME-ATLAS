@@ -1280,3 +1280,66 @@ One implementer choice is left to record during the work: **U-1, the ties policy
 **Nothing was verified by running.** This session ran read-only inspection over repository files and
 queries against the local database. No test, typecheck or build was executed, and no TASK-009 code
 exists. `pnpm format:check` passes and the read-only directories are untouched.
+
+## Build baseline investigated; D-012 recorded (2026-09-19)
+
+The project owner's original framing named "workspace package build compatibility" as a
+precondition; no task ever existed for it, and TASK-006 carried the `--webpack` pin forward as "a
+build workaround, not a decision". This session investigated it **by running**, recorded the
+options as D-012, and **changed no build configuration**, because the choice is the project owner's
+and nothing is broken.
+
+### Established by running, not by reading
+
+1. **Turbopack genuinely cannot resolve the packages.** `next build --turbopack` fails
+   `module-not-found` across `packages/truth/src/index.ts` and `packages/db/src/index.ts`.
+   TASK-006's note is accurate, not stale.
+2. **No Turbopack configuration fixes it.** Next 16.3.5 offers `turbopack.resolveAlias`, which maps
+   bare module specifiers, and `turbopack.resolveExtensions`, which supplies extensions for
+   *extensionless* imports. An explicit `./derive.js` request is neither case.
+3. **A bare `next build` now fails on a guard, not on resolution.** Next 16 refuses to build when a
+   `webpack` config is present and no `turbopack` config is. The scripts always pass `--webpack`, so
+   only someone running the bare command is affected. Adding `turbopack: {}` would silence the guard
+   and make Turbopack the default builder, at which point finding 1 applies — so it must not be done.
+4. **The repo's stated reason for the `.js` extensions was wrong.** `next.config.ts` called them
+   "the NodeNext convention the rest of the repo uses". `tsconfig.base.json` sets
+   **`moduleResolution: "Bundler"`**, under which TypeScript does not require explicit extensions at
+   all. The real value of the convention is that emitted JavaScript stays runnable by plain Node
+   under `type: module`. **The comment has been corrected in place**, with the correction dated and
+   the empirical findings and a pointer to D-012 added. No behaviour changed.
+5. **Blast radius of changing the convention: 138 import statements across 50 files**, spanning all
+   seven packages and all three apps.
+6. **Nothing currently runs the emitted worker output.** `apps/worker` has `build: tsc` and
+   `start: tsx src/index.ts`, so `dist/` is produced and never executed. It still matters: today
+   that output *is* Node-runnable, and one of D-012's options would make it not.
+
+### D-012 — recorded, not decided
+
+Three options with costs and a recommendation. **Option A** compiles the packages to `dist`, which
+fixes Turbopack and keeps emitted output portable, at the cost of a topological build step and care
+that tests do not run against a stale build. **Option B** drops the `.js` extensions, which is the
+smallest diff and is legal under `Bundler` resolution, but makes emitted JavaScript unrunnable by
+plain Node — it is explicitly **not** recommended, being the cheapest to type and the only one that
+invalidates a property that currently holds. **Option C** keeps `--webpack` and revisits on a
+defined trigger.
+
+**Recommended: C now, A when a trigger fires** — nothing is broken, `--webpack` is a supported
+explicit flag, both alternatives give something real away, and M2 still has product capability
+pending, so `AGENTS.md` §6's "no unrelated refactors" applies. The triggers are named in D-012:
+Turbopack gaining extension aliasing, a package needing to be published, dev-loop speed becoming a
+real complaint, or a second app consuming the packages.
+
+### Verification actually run
+
+| Command | Result |
+|---|---|
+| `next build --turbopack` in `apps/web` | **FAILS** as expected — `module-not-found`; this is the finding, not a regression |
+| `next build` bare in `apps/web` | **FAILS** on the Next 16 webpack/turbopack guard — finding 3 |
+| `pnpm typecheck` | **PASS** — all packages |
+| `pnpm lint` | **PASS** |
+| `pnpm format:check` | **PASS** |
+| `pnpm build` | **PASS** — the documented `--webpack` path still builds all three apps and all four routes |
+
+Only a code comment and two documentation files changed. No build configuration, no script, no
+package manifest, no dependency. `pnpm test` and the integration suite were not re-run and are not
+claimed; nothing touched can affect them, and the full green run earlier this session stands.

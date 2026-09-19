@@ -3,9 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /**
    * The workspace packages are consumed as TypeScript source — each exports
-   * `./src/index.ts` — and their internal imports carry `.js` extensions,
-   * the NodeNext convention the rest of the repo uses so `tsx`, Node and
-   * vitest can run them directly (TASK-001).
+   * `./src/index.ts` — and their internal imports carry explicit `.js`
+   * extensions, which keeps emitted JavaScript runnable by plain Node under
+   * `type: module`. Note that `tsconfig.base.json` sets
+   * `moduleResolution: "Bundler"`, under which TypeScript does not *require*
+   * those extensions; the convention is about portability of emitted output,
+   * not about satisfying the type checker. (An earlier version of this
+   * comment attributed it to NodeNext resolution, which the repo does not
+   * use. Corrected 2026-09-19.)
    *
    * `transpilePackages` makes Next compile them with its own pipeline, and
    * `extensionAlias` teaches the bundler TypeScript's rule that a `.js`
@@ -13,10 +18,21 @@ const nextConfig: NextConfig = {
    * internal import inside those packages fails to resolve.
    *
    * `extensionAlias` is a webpack option and Turbopack has no equivalent, so
-   * `dev` and `build` pass `--webpack` (see package.json). Revisit when
-   * either Turbopack gains extension aliasing or the workspace packages are
-   * compiled to `dist` — the second is the cleaner long-term fix and is a
-   * repo-wide change, not TASK-006's to make.
+   * `dev` and `build` pass `--webpack` (see package.json). Verified by running
+   * on 2026-09-19: `next build --turbopack` fails `module-not-found` across
+   * `packages/truth` and `packages/db`, and neither `turbopack.resolveAlias`
+   * (bare specifiers only) nor `turbopack.resolveExtensions` (extensionless
+   * imports only) addresses an explicit `./x.js` request.
+   *
+   * Because a `webpack` key is present and no `turbopack` key is, Next 16
+   * refuses a *bare* `next build` with a guard error and asks for an explicit
+   * flag. The scripts always pass `--webpack`, so this only bites someone
+   * running the bare command. Do not add `turbopack: {}` to silence it: that
+   * makes Turbopack the default builder and the build then fails as above.
+   *
+   * The options and a recommendation are recorded as **D-012** in
+   * `docs/DECISIONS_NEEDED.md`. Do not change this block without that
+   * decision.
    *
    * Build configuration only: no domain logic, no rewrites.
    */
