@@ -19,7 +19,7 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/archive/` | Large combined copy | read-only, not routinely read |
 | `docs/reference/` | Method reference (PDF) | read-only |
 | `docs/review/` | Duplicate of the reviewed implementation plan | read-only |
-| `docs/adr/` | Accepted decisions — `0001-stack.md`, `0002-db-access.md` | active |
+| `docs/adr/` | Accepted decisions — `0001-stack.md`, `0002-db-access.md`, `0003-source-record-granularity.md` | active |
 | `docs/contracts/` | API/data contract documents | active, empty of contracts |
 | `docs/SOURCE_MAP.md` | Corpus classification and ownership | active |
 | `docs/CODEMAP.md` | This file | active |

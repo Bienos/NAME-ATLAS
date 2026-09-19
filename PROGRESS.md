@@ -16,7 +16,7 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| **TASK-004 — canonical PESEL surname dataset ingestion** | **SPECIFIED, NOT STARTED.** `tasks/004-pesel-surname-ingestion.md` is the scope authority. No TASK-004 code, migration, importer or test exists. §14 U-1, U-2 and U-3 were **answered by the project owner 2026-09-19** (recorded in the task file). **One blocker remains:** U-8 / `docs/DECISIONS_NEEDED.md` D-006 — a contradiction between two canonical documents that must be recorded before the migration is written. |
+| **TASK-004 — canonical PESEL surname dataset ingestion** | **SPECIFIED AND READY TO IMPLEMENT — no code written.** `tasks/004-pesel-surname-ingestion.md` is the scope authority. No TASK-004 code, migration, importer or test exists. All blocking decisions are closed: §14 U-1, U-2, U-3 (project owner, 2026-09-19) and U-8 (ADR-0003, closing D-006). U-4 to U-7 are implementer choices to record during the work. |
 | Next approved task | None. TASK-004 is specified but not approved for implementation; the §14 decisions are unanswered. |
 
 ## What TASK-001 built
@@ -327,7 +327,7 @@ Observed state, verified against the working tree this session and not assumed:
 
 **Nothing was verified by running.** No command was executed this session beyond read-only inspection (`git`, `grep`, `sed`, `python3` over repository files). Dependencies are not installed in this environment (`node_modules` absent), so `pnpm test`, `pnpm typecheck` and the integration suite were **not** run — the 95 unit / 28 integration counts cited in the task file's §13 are carried forward from the TASK-003 verification run recorded above, not re-observed.
 
-**Blocked pending a recorded decision:** U-8 / D-006 only. U-4 to U-7 are implementer choices to be recorded during implementation.
+**No decision now blocks the start of TASK-004.** U-4 to U-7 are implementer choices to be recorded during implementation.
 
 ## TASK-004 §14 U-1, U-2, U-3 answered by the project owner (2026-09-19)
 
@@ -340,3 +340,13 @@ Answered on the project owner's instruction ("answer U-1, U-2 and U-3 so TASK-00
 **Verified before writing these answers, not assumed:** the `RightsProfile` field list and the `RightsPermission` / `CachePermission` / `RightsReviewStatus` enum members (`docs/canonical/11` §9.4); the `DistributionSnapshot` field list including `comparability_group` and its stated meaning (§6.1); the hard gates in `docs/canonical/12` §6.4; and the publisher's verbatim resource titles and descriptions, read from the captured metadata under `docs/sources/acquisition/2026-09-18/metadata/`. The same check reconfirmed that resource-level metadata carries no licence attribute.
 
 **Still not run:** no test, typecheck or build was executed in this session; dependencies are not installed here.
+
+## TASK-004 U-8 closed by ADR-0003 (2026-09-19)
+
+The contradiction recorded as D-006 was put to the project owner with three options and their costs, and resolved: **one `SourceRecord` per resource version**, `external_record_id` kept as the publisher's bare resource id (`1148808`), `record_type = API_OBJECT`, `raw_payload` holding the resource-metadata object, and the uniqueness key relaxed to `(source_id, external_record_id, content_hash)`.
+
+- Written up as `docs/adr/0003-source-record-granularity.md` (Accepted), including the two rejected alternatives — encoding a version discriminator into `external_record_id`, and row granularity (~828k records per full import) — and the conditions for revisiting.
+- This is a **deliberate deviation** from `docs/canonical/11`'s `UNIQUE source_records(source_id, external_record_id)` index line, which cannot coexist with the supersession requirement in `docs/canonical/12` §9.3 and `ARCHITECTURE.md` §10 invariant 6. Per `AGENTS.md` §2 the contradiction was superseded by an ADR rather than settled in code; the migration must carry a comment pointing at it.
+- D-006 is marked RESOLVED in `docs/DECISIONS_NEEDED.md`, pointing at the ADR. `tasks/004-pesel-surname-ingestion.md` AC-06, AC-22 and §9 invariant 7 are now written in concrete, testable form.
+
+`docs/canonical/` remains untouched — the deviation lives in the ADR, not in the read-only corpus.

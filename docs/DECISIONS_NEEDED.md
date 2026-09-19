@@ -124,43 +124,13 @@ No further action needed. Do not revisit unless the pinned digest is deliberatel
 
 ---
 
-## D-006 — `SourceRecord` granularity for a bulk dataset, and the `source_records` UNIQUE index
+## D-006 — RESOLVED (TASK-004 specification, 2026-09-19)
 
-**Status:** BLOCKS TASK-004 (the migration cannot be written without it). NON-BLOCKING for M0.
-**Owner:** implementing session may choose, but the choice must be recorded here or as an ADR — it resolves a contradiction *between two canonical documents*, which `AGENTS.md` §2 forbids resolving silently in code.
+**Resolution:** one `SourceRecord` per **resource version**; `external_record_id` stays the publisher's bare resource id; the uniqueness key becomes `(source_id, external_record_id, content_hash)`. Recorded in full, with the rejected alternatives and their costs, in **`docs/adr/0003-source-record-granularity.md`**.
 
-Discovered during TASK-004 specification review (2026-09-19), by reading both canonical documents rather than only one.
+The decision resolves a genuine contradiction between two canonical documents — `docs/canonical/12` §3.1/§9.2 (version-scoped `BULK_DATASET` import) versus `docs/canonical/11` §37.2's row-scoped worked example — and deliberately deviates from `docs/canonical/11`'s `UNIQUE source_records(source_id, external_record_id)` index line, which cannot coexist with the annual-refresh supersession requirement in `docs/canonical/12` §9.3 and `ARCHITECTURE.md` §10 invariant 6. ADR-0003 is the authority; the migration must carry a comment pointing at it.
 
-### The contradiction
-
-Two canonical documents point in different directions on what one `SourceRecord` represents for a bulk dataset like PESEL:
-
-- **`docs/canonical/12` §3.1 (`BULK_DATASET`) and §9.2 — resource-version scoped.** The pattern is `DOWNLOAD VERSION → checksum → raw object storage → staging validation → canonical import → atomic snapshot activation`, and §9.2 is titled "versioned full-snapshot import". Checksumming and versioning are operations on a file, not on a row. `SourceRecord.raw_payload` is additionally specified as "size-limited" (`docs/canonical/11` §9.2 line 638), which argues against 408,182 of them per resource.
-- **`docs/canonical/11` §37.2 worked example — row scoped.** It shows `SourceRecord SR1` with `external_record_id: row/resource identifier` and `raw_payload: {surname: "[SURNAME]", count: 2481}`. That payload is a single CSV row. The field gloss itself says "row/resource", i.e. the canonical model does not commit.
-
-### Why it is not a free choice
-
-`docs/canonical/11` (index specification, line 1938) mandates:
-
-```text
-UNIQUE source_records(source_id, external_record_id) WHERE external_record_id IS NOT NULL
-```
-
-Under **resource-version** granularity, `external_record_id` would naturally be the resource id (`1148808`). Two versions of that resource — which is exactly what TASK-004's supersession requirement produces when the publisher reissues the file — would then collide on this index. The supersession model (`SourceRecord` never rewritten; a new row carries `supersedes_source_record_id`; `docs/canonical/11` §9.2 line 645, `docs/canonical/12` §9.3 "do not update old rows in place") therefore cannot coexist with this index unless something changes.
-
-Under **row** granularity, the index is satisfiable (one record per row identifier) but `raw_payload`'s "size-limited" note and the `BULK_DATASET` checksum/version pattern fit badly, and every re-issue of the resource multiplies rows by ~408k.
-
-### Options
-
-- **Option A — resource-version granularity, version inside the key.** `external_record_id` = resource id + version discriminator (e.g. `1148808@<sha256-prefix>`), `record_type = API_OBJECT`, `raw_payload` = the resource metadata object. Satisfies the canonical UNIQUE index literally, keeps supersession, keeps payloads small. Cost: `external_record_id` is no longer the source's own bare identifier, which weakens `docs/canonical/11` §9.2's gloss ("Native source identifier").
-- **Option B — resource-version granularity, index relaxed.** `external_record_id` = `1148808`; the UNIQUE index becomes `(source_id, external_record_id, content_hash)` or is made partial on `record_status = 'ACTIVE'`. Keeps the native identifier honest. Cost: a deliberate, documented deviation from a canonical index specification — which is precisely what this register exists to record.
-- **Option C — row granularity.** Follows §37.2's example literally. Cost: ~828k `SourceRecord` rows for the two national resources, a checksum with nothing file-shaped to attach to, and no natural place for the resource-version semantics the `BULK_DATASET` pattern requires.
-
-### Recommendation (not a decision)
-
-**Option B**, with the deviation recorded here and the canonical index treated as written for the row-granular reading that §37.2 illustrates. It preserves both the native identifier and the immutable-supersession invariant (`ARCHITECTURE.md` §10 invariant 6), and it keeps `raw_payload` within its stated size discipline. Option A is an acceptable alternative and needs no deviation. Option C should not be chosen without a specific reason, but it is the one reading that the canonical corpus illustrates by example, so it is recorded rather than dismissed.
-
-**Whichever is chosen, record it here with its reasoning before the TASK-004 migration is written.** Do not resolve it by picking one silently in the migration file.
+No further action needed. Do not revisit except on the two conditions ADR-0003 names.
 
 ---
 
