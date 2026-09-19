@@ -153,6 +153,98 @@ No further action needed. Do not revisit unless the pinned digest is deliberatel
 
 ---
 
+## D-006 — RESOLVED (TASK-004 specification, 2026-09-19)
+
+**Resolution:** one `SourceRecord` per **resource version**; `external_record_id` stays the publisher's bare resource id; the uniqueness key becomes `(source_id, external_record_id, content_hash)`. Recorded in full, with the rejected alternatives and their costs, in **`docs/adr/0003-source-record-granularity.md`**.
+
+The decision resolves a genuine contradiction between two canonical documents — `docs/canonical/12` §3.1/§9.2 (version-scoped `BULK_DATASET` import) versus `docs/canonical/11` §37.2's row-scoped worked example — and deliberately deviates from `docs/canonical/11`'s `UNIQUE source_records(source_id, external_record_id)` index line, which cannot coexist with the annual-refresh supersession requirement in `docs/canonical/12` §9.3 and `ARCHITECTURE.md` §10 invariant 6. ADR-0003 is the authority; the migration must carry a comment pointing at it.
+
+No further action needed. Do not revisit except on the two conditions ADR-0003 names.
+
+---
+
+## D-007 — PESEL resource-level licence confirmation (gates paid surfaces, not ingestion)
+
+**Status:** NON-BLOCKING for TASK-004 and M1. **BLOCKS M5/M6** — no PESEL-derived evidence may enter a paid report until this is closed.
+**Owner:** project owner (publisher contact + legal review).
+
+Split out of TASK-004 §14 U-2 when the project owner answered that item on 2026-09-19. U-2 settled *what posture to seed now*; it deliberately did **not** settle the underlying licence question, which is this entry.
+
+### The gap
+
+Licence is stated by the publisher at **dataset** level only: dataset `1681` carries `license_name = "CC0 1.0"`, read from the portal's own dataset metadata. The **resource**-level metadata returned by `api.dane.gov.pl` carries **no licence, rights or terms attribute at all** — checked across the full attribute set of all four 2026 resources (both national, both regional) and recorded in `fixtures/pesel/source-manifest.json` under `licence_provenance`. The same gap is noted from the regional angle in D-004.
+
+"The resource inherits the dataset licence" is therefore an assumption this project has not verified. It is very probably correct — an open-government portal publishing a dataset under CC0 does not usually intend its resources to be differently licensed — but *probably correct* is not the standard for a term that a paid product would rely on.
+
+### Current posture (already in effect, TASK-004 §14 U-2)
+
+The seeded PESEL `RightsProfile` carries `commercial_use = UNKNOWN`, `redistribution = UNKNOWN` and `review_status = LEGAL_REVIEW_REQUIRED`. By `docs/canonical/12` §6.4 this sets `evidence.paid_surface_eligible = false` automatically, so the gate is already closed in code rather than by memory. Ingestion, internal use and the free surface are unaffected — the only hard gate on ingestion is `automated_access == PROHIBITED`, which is not met.
+
+### What closing this requires
+
+1. Confirmation from Ministerstwo Cyfryzacji, or from a portal term that binds resources to their dataset's licence, that resources `1148808` and `1148811` are covered by the dataset's CC0 1.0 dedication.
+2. A read of dane.gov.pl's own terms of use — not yet done, and also the residual behind `automated_access = ALLOWED` in the same profile.
+3. A legal review of commercial reuse, at which point `review_status` may move off `LEGAL_REVIEW_REQUIRED` and `commercial_use` / `redistribution` off `UNKNOWN`.
+
+Because `RightsProfile` is versioned and immutable once applied (`docs/canonical/11` §9.4), closing this creates a **new** profile rather than editing the seeded one.
+
+### Do not
+
+- Do not set `commercial_use = ALLOWED` on the strength of the dataset-level statement alone. That is precisely the inference this entry exists to prevent.
+- Do not treat the absence of a resource-level licence field as permission. Absence of a contrary field is not a grant — the same reasoning D-004 already records.
+
+---
+
+## D-008 — RESOLVED (TASK-005 implementation, 2026-09-19)
+
+**Resolution: Option A — `docs/canonical/11` binds. `docs/canonical/14`'s MODEL CHANGE PROPOSALS are not ratified and are not implemented.**
+
+Decided by the project owner, 2026-09-19. Concretely:
+
+- `EvidenceType` is `docs/canonical/11` §9.5's 9-member enum; the PESEL value is `OFFICIAL_DATASET_FIELD`, **not** `docs/canonical/14` §4's `OFFICIAL_DATASET_VALUE`.
+- `EvidenceItem` carries §9.5's fields only. No `directness`, `evidence_scope`, `extraction_method`, `extraction_version`, `extraction_confidence`, `independence_group_id` or `source_authority_class` (14-A).
+- `ClaimEvidence.relationship` is `SUPPORTS | CONTRADICTS | CONTEXT` (§10.2). No `QUALIFIES`, `CONTEXTUALISES` or `LEAD_ONLY` (14-D).
+- The `CURRENT_POPULATION` payload uses `docs/canonical/14` §14.1's field naming (`count`, `distribution_snapshot_id`, `country_code`, `snapshot_date`, `source_population_scope`) — the dedicated claim-payload section, and the only one carrying `source_population_scope`.
+
+**No ADR is required**, because nothing here deviates from a canonical specification: this selects the ratified schema over a document's own unratified proposals. `docs/canonical/14` §29.1's dataset caveats are carried by its second branch — "SourceRecord scope metadata" — which TASK-004 already persists on `distribution_snapshots.universe_description` and `coverage_notes`.
+
+Adding a proposal field later is an additive, nullable-column migration. Do not revisit unless a proposal is actually ratified.
+
+---
+
+## D-009 — RESOLVED (TASK-005 implementation, 2026-09-19)
+
+**Resolution: Option A — create a minimal synchronous `research_runs` table now.**
+
+Decided by the project owner, 2026-09-19.
+
+`docs/canonical/11` §248 marks `ResearchRun` **P0** and §22.1 gives its schema. `PLAN.md`'s M3 item is the *asynchronous runtime* — `ResearchModuleRun`, the outbox, Redis/Valkey, BullMQ — not the audit record itself. Creating the audit record at M1 therefore reconciles the two rather than deviating from either, and it is what makes `docs/canonical/14` §19's "why does Name Atlas currently believe this?" answerable at all.
+
+Scope of what was built:
+
+- One row per derivation invocation, written synchronously by the derivation service.
+- `run_type = 'BASIC_SURNAME'`, `run_status` and `qa_status` set from the run's real outcome.
+- `prompt_manifest` and `model_manifest` are stored as **empty JSON objects**, because no prompt and no model exist at M1. That emptiness is recorded in `PROGRESS.md` and must not later be read as "no prompt was used but one could have been" — it means the fields were genuinely inapplicable.
+- No queue, no outbox, no module runs, no scheduler. Those remain M3.
+
+`EvidenceItem.created_by_run_id` and `Claim.created_by_run_id` are consequently NOT NULL as `docs/canonical/11` specifies, with no lineage gap. **No ADR is required** — nothing deviates from a canonical specification.
+
+---
+
+## D-010 — RESOLVED (2026-09-19)
+
+**Resolution: Option B — widen the unit enum. PESEL-derived `CURRENT_POPULATION` responses carry `SURNAME_OCCURRENCES`, not `"PEOPLE"`.**
+
+Decided by the project owner, 2026-09-19. Recorded in full, with the rejected alternatives and the conditions for revisiting, in **`docs/adr/0004-population-value-unit.md`**.
+
+This **deviates from `docs/canonical/16` §26**, which fixes the unit as a single-member literal `"PEOPLE"`. The deviation exists because the publisher describes *"liczba wystąpień"* — occurrences — and never states that one occurrence is one living person (TASK-004 §14 **U-4**, still open). Since `ARCHITECTURE.md` §6 forbids the frontend from deriving facts, the unit is fixed at the contract boundary, so a response built literally to §26 would publish an assertion the truth layer beneath it is forbidden to make.
+
+`"PEOPLE"` remains in the enum, unused. It is what PESEL switches to if U-4 is answered affirmatively — a change of emitted value, not of schema. The contract schema must carry a comment pointing at ADR-0004.
+
+`tasks/006-surname-result-read-api.md` is unblocked by this. **D-007 remains open** and the publisher enquiry is still worth sending: it is the route to answering U-4, and to opening the paid surface.
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

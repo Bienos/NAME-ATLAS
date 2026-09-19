@@ -52,27 +52,43 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     expect(migrations.map((m) => m.name)).toEqual([
       "0001_bootstrap_extensions",
       "0002_identity_core",
+      "0003_source_rights_distribution",
+      "0004_truth_layer",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
     }
   });
 
-  it("creates exactly the identity core and nothing else (TASK-001 + TASK-003 §6.2)", async () => {
+  it("creates exactly the identity, source/rights/distribution and truth-layer tables, and nothing else", async () => {
     // Kysely's own bookkeeping, the tables PostGIS itself creates in
-    // `public`, and TASK-003's three identity tables plus its one view.
-    // Anything beyond this set is an accidental table — in particular
-    // nothing from TASK-003 §5's excluded list (name_form_relations,
-    // sources, rights_profiles, research_runs, …) may appear here until
-    // the task that owns it adds it.
+    // `public`, TASK-003's three identity tables plus its one view,
+    // TASK-004's five source/rights/distribution tables, and TASK-005's six
+    // truth-layer tables.
+    //
+    // Anything beyond this set is an accidental table. In particular
+    // nothing from TASK-005 §8's excluded list — digital_assets, places,
+    // name_form_relations, evidence_dependencies, research_module_runs,
+    // runtime_outbox — may appear here until the task that owns it adds it.
     const expected = [
+      { table_name: "citations", table_type: "BASE TABLE" },
+      { table_name: "claim_evidence", table_type: "BASE TABLE" },
+      { table_name: "claims", table_type: "BASE TABLE" },
+      { table_name: "confidence_assessments", table_type: "BASE TABLE" },
+      { table_name: "distribution_snapshots", table_type: "BASE TABLE" },
+      { table_name: "distribution_values", table_type: "BASE TABLE" },
+      { table_name: "evidence_items", table_type: "BASE TABLE" },
       { table_name: "geography_columns", table_type: "VIEW" },
       { table_name: "geometry_columns", table_type: "VIEW" },
       { table_name: "knowledge_entities", table_type: "BASE TABLE" },
       { table_name: "kysely_migration", table_type: "BASE TABLE" },
       { table_name: "kysely_migration_lock", table_type: "BASE TABLE" },
       { table_name: "name_forms", table_type: "BASE TABLE" },
+      { table_name: "research_runs", table_type: "BASE TABLE" },
       { table_name: "resolvable_name_forms", table_type: "VIEW" },
+      { table_name: "rights_profiles", table_type: "BASE TABLE" },
+      { table_name: "source_records", table_type: "BASE TABLE" },
+      { table_name: "sources", table_type: "BASE TABLE" },
       { table_name: "spatial_ref_sys", table_type: "BASE TABLE" },
       { table_name: "surnames", table_type: "BASE TABLE" },
     ];

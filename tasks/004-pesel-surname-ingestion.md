@@ -1,6 +1,6 @@
 # TASK-004 — Canonical PESEL Surname Dataset Ingestion
 
-- **Status:** NOT STARTED — specification only. Three decisions in §14 need the project owner's answer before implementation begins.
+- **Status:** **READY TO IMPLEMENT** — specification only, no code written. Every blocking decision is answered: §14 U-1, U-2, U-3 by the project owner on 2026-09-19, and U-8 by **`docs/adr/0003-source-record-granularity.md`** (ADR-0003, which closes D-006). U-4 to U-7 are implementer choices to record during the work. D-007 (resource-level licence) is open but gates M5/M6, not this task.
 - **Milestone:** M1 (`PLAN.md`: "Tasks: TASK-004 PESEL ingestion + Source/Rights · TASK-005 `CURRENT_POPULATION` truth chain")
 - **Canonical epics:** DAT-001 (Source & Rights Registry) + SRC-001 (PESEL Ingestion) — `docs/canonical/23` §48, master roadmap rows 5 and 7. `PLAN.md` bundles both into this one task; that bundling is `PLAN.md`'s, and this file follows it.
 - **Depends on:** TASK-001 (foundation), TASK-002 (the pinned, verified source), TASK-003 (identity tables and the canonical key function)
@@ -57,6 +57,7 @@ Read these; do not copy them into code as restated prose.
 | Product promises and non-goals | `PRODUCT.md` §3, §7, §8 |
 | The verified source record | `docs/sources/pesel.md`; `fixtures/pesel/source-manifest.json`; `docs/sources/acquisition/2026-09-18/` |
 | Stack and database access | `docs/adr/0001-stack.md`, `docs/adr/0002-db-access.md` |
+| **`SourceRecord` granularity and the `source_records` uniqueness key** | **`docs/adr/0003-source-record-granularity.md`** (binding; supersedes `docs/canonical/11`'s index line for this case) |
 | Open decisions | `docs/DECISIONS_NEEDED.md` (D-001 resolved; D-004 open and untouched by this task) |
 
 ## 4. Preconditions
@@ -68,7 +69,7 @@ All verified in the repository, not assumed:
 3. **Identity tables exist and are empty of production data.** `knowledge_entities`, `surnames` (`canonical_key` UNIQUE), `name_forms`, and the `resolvable_name_forms` eligibility view — migration `0002_identity_core` (TASK-003).
 4. **One canonical key function exists.** `@name-atlas/resolver` exports `canonicalKey` (`canonical_key_v1`), `NORMALIZATION_VERSION`, `detectScripts` and `resolveSurname`. The importer must use these, never a second algorithm.
 5. **No `sources`, `rights_profiles`, `source_records`, `distribution_snapshots` or `distribution_values` table exists.** This task creates them.
-6. **No object storage exists.** `ops/` is not created; `docs/canonical/23` §6.3's EU object storage is not provisioned. Raw source files are deliberately not committed (`AGENTS.md` §6). See §14 U-3.
+6. **No object storage exists.** `ops/` is not created; `docs/canonical/23` §6.3's EU object storage is not provisioned. Raw source files are deliberately not committed (`AGENTS.md` §6). The deviation this forces is **accepted and specified** in §14 U-3.
 7. **Acquisition is manual and out of process.** `dane.gov.pl` and `api.dane.gov.pl` were network-egress-blocked in every session that has worked this repository. The importer takes bytes that are already on disk. It does not download.
 
 ## 5. What the canonical documents actually establish about this source
@@ -80,10 +81,10 @@ Recorded here so the implementer does not re-derive it, and so that what is *not
 | 1 | Approved dataset | **VERIFIED** — dane.gov.pl dataset `1681`, national resources `1148808` (male) / `1148811` (female), `data_date = 2026-01-20`. `docs/canonical/12` §2.1 marks the dataset VERIFIED and §8.1 lists it as CORE launch infrastructure; `docs/sources/pesel.md` pins the exact resources. |
 | 2 | Authoritative source | **VERIFIED** — `api.dane.gov.pl`. CSV endpoint, direct media URL and resource-metadata endpoint recorded verbatim per resource in `fixtures/pesel/source-manifest.json`. |
 | 3 | Downloadable representation | **VERIFIED** — the resources are natively **XLSX**; the CSV Name Atlas pins is a portal-generated conversion served from the official `csv_download_url`. Both representations are official; they are not the same bytes. This task ingests the **CSV**, pinned by checksum, because that is the representation TASK-002 verified byte-for-byte and `packages/sources` validates. |
-| 4 | Licensing / reuse | **VERIFIED at dataset level, UNRESOLVED at resource level** — dataset `license_name = "CC0 1.0"`, read from the portal's own dataset metadata. Resource-level metadata carries **no licence, rights or terms attribute at all** across all four 2026 resources (checked; recorded in `fixtures/pesel/source-manifest.json` `licence_provenance` and in D-004). Resource inheritance of CC0 is therefore an assumption this project has not verified. See §14 U-2. |
+| 4 | Licensing / reuse | **VERIFIED at dataset level, UNRESOLVED at resource level — posture answered in §14 U-2 (2026-09-19); the underlying resource-level licence question is carried as D-007** — dataset `license_name = "CC0 1.0"`, read from the portal's own dataset metadata. Resource-level metadata carries **no licence, rights or terms attribute at all** across all four 2026 resources (checked; recorded in `fixtures/pesel/source-manifest.json` `licence_provenance` and in D-004). Resource inheritance of CC0 is therefore an assumption this project has not verified. See §14 U-2. |
 | 5 | Date / period semantics | **VERIFIED** — four distinct concepts, never inferred from one another: `data_date` `2026-01-20` (the PESEL reference date — what the data describes); `created`/`modified`/`verified` `2026-01-28T13:47:34Z` (male) / `13:48:39Z` (female) (portal metadata timestamps, eight days later); `retrieved_at` `2026-09-18` (when the bytes were fetched). Update frequency: yearly. |
 | 6 | Fields present in the source | **VERIFIED** — exactly two columns: `Nazwisko aktualne` (non-empty string, preserved verbatim including a real trailing space, standalone combining marks, embedded `/`, `'`, `-`, `.`, `()`, and non-Latin scripts) and `Liczba` (positive integer, observed 2–99,738, no separators, no decimals). |
-| 7 | Sex / gender dimension | **PRESENT, SEMANTICS UNRESOLVED** — two separate resources, titled *Nazwiska męskie* / *Nazwiska żeńskie*, described as "Wykaz nazwisk męskich/żeńskich osób żyjących (wg pola nazwisko aktualne)". Whether this partitions by the **bearer's sex** or by the **grammatical gender of the surname form** is not stated by the publisher. `docs/canonical/12` §9.4 instructs preserving "sex/category if resource separates it" — so preserve it verbatim as a source-provided field and do not interpret it. See §14 U-1. |
+| 7 | Sex / gender dimension | **PRESENT, SEMANTICS STILL UNRESOLVED — handling answered in §14 U-1 (2026-09-19); the fact itself is still open and blocks TASK-005** — two separate resources, titled *Nazwiska męskie* / *Nazwiska żeńskie*, described as "Wykaz nazwisk męskich/żeńskich osób żyjących (wg pola nazwisko aktualne)". Whether this partitions by the **bearer's sex** or by the **grammatical gender of the surname form** is not stated by the publisher. `docs/canonical/12` §9.4 instructs preserving "sex/category if resource separates it" — so preserve it verbatim as a source-provided field and do not interpret it. See §14 U-1. |
 | 8 | Geography dimension | **VERIFIED — national only.** Resource `regions` is `[{name: "Polska"}]`. Regional voivodeship resources (`1148786`, `1148790`) exist and are checksum-recorded, but are gated by D-004 and are **out of scope**. Per `docs/canonical/12` §9.8 the connector must declare `regional_distribution = false`. |
 | 9 | Unit of `Liczba` | **UNRESOLVED** — the dataset notes say "liczba wystąpień" (number of occurrences) of a current-surname value among living persons in PESEL. That one occurrence equals one living person is strongly implied but **not explicitly stated** by the publisher. This does **not** block this task, which stores the raw count and a verbatim universe description and makes no claim. It **does** block TASK-005's `CURRENT_POPULATION` claim. See §14 U-4. |
 | 10 | Encoding / delimiter / schema | **VERIFIED** — UTF-8, no BOM; comma delimiter; no quoting anywhere (no field contains a comma or a quote); CRLF throughout with a trailing CRLF after the last row; header byte-identical in both files; descending by `Liczba`. Already enforced fail-closed by `packages/sources`. |
@@ -95,7 +96,7 @@ Recorded here so the implementer does not re-derive it, and so that what is *not
 
 1. **Migration `0003_source_rights_distribution`** creating exactly `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`, plus the enums those tables need. (`rights_profiles` and `sources` complete Migration Group A; the other three are the first half of Group B — `docs/canonical/23` §9.1, §9.2.)
 2. **A source registry entry**, as configuration/data rather than scattered constants (`docs/canonical/12` §5): the PESEL `Source` (`source_key = pl_pesel_surnames`) and its `RightsProfile`, seeded idempotently, every field traceable to `fixtures/pesel/source-manifest.json` or to a canonical document.
-3. **A `BULK_DATASET` PESEL importer** (`docs/canonical/12` §3.1, §9.2) over bytes already on disk: verify checksum → decode → parse fail-closed → upsert `SourceRecord` → resolve-or-create identity → write one `DistributionSnapshot` per (surname, resource) and one national `DistributionValue` per snapshot — atomically per resource.
+3. **A `BULK_DATASET` PESEL importer** (`docs/canonical/12` §3.1, §9.2) over bytes already on disk: verify checksum → decode → parse fail-closed → upsert `SourceRecord` → resolve-or-create identity → write one `DistributionSnapshot` per (surname, resource) and one national `DistributionValue` per snapshot — atomically per resource. **One `SourceRecord` per resource version, per ADR-0003** — not one per CSV row.
 4. **Identity population** through the TASK-003 resolver: one `Surname` and one `NameForm` per distinct canonical key, created only from an exact attested source string, with explicit, non-guessing handling of every non-`EXACT` resolver outcome (§7 AC-11, AC-12).
 5. **The sex/category dimension preserved verbatim** on the snapshot, uninterpreted (§5 row 7).
 6. **Idempotent re-ingestion** and immutable supersession of a changed resource version.
@@ -118,10 +119,10 @@ Each is a behaviour an automated test must demonstrate by running, not by inspec
 
 **Source identity, provenance and rights**
 
-- **AC-06 — Source dataset identity, version and date.** The `SourceRecord` carries the resource's `external_record_id`, its official `source_url`, its resource-metadata object as `raw_payload`, the verified SHA-256 as `content_hash`, and `retrieved_at`. The `DistributionSnapshot` carries `as_of_date = 2026-01-20` (the PESEL reference date) and `dataset_version` identifying the resource version — never the portal timestamp, and never `retrieved_at`.
+- **AC-06 — Source dataset identity, version and date.** Exactly one `SourceRecord` is written per imported resource version (ADR-0003) — a test asserts the count is 1, not the row count. It carries `external_record_id` = the publisher's bare resource id, `record_type = API_OBJECT`, its official `source_url`, its resource-metadata object as `raw_payload`, the verified SHA-256 as `content_hash`, and `retrieved_at`. The `DistributionSnapshot` carries `as_of_date = 2026-01-20` (the PESEL reference date) and `dataset_version` identifying the resource version — never the portal timestamp, and never `retrieved_at`.
 - **AC-07 — Provenance is complete before any distribution row exists.** A `DistributionSnapshot` cannot be written without a `source_id` and a `source_record_id` that already exist. Enforced by NOT NULL foreign keys, not by convention.
-- **AC-08 — Rights gate.** The importer refuses to run when the effective `RightsProfile` has `automated_access = PROHIBITED` or `review_status = BLOCKED`, and writes nothing (`docs/canonical/12` §6.4, `ARCHITECTURE.md` §10 invariant 13). `RightsProfile` fields are seeded from recorded evidence only; anything not evidenced is `UNKNOWN`, never an optimistic default.
-- **AC-09 — Attribution and terms are recorded, not inferred.** `attribution_required`, `attribution_text`, `rights_url` and `terms_version` come from `fixtures/pesel/source-manifest.json` or are `null`/`false` with the gap visible. The dataset-level-only provenance of the CC0 statement is recorded in `notes`.
+- **AC-08 — Rights gate.** The importer refuses to run when the effective `RightsProfile` has `automated_access = PROHIBITED` or `review_status = BLOCKED`, and writes nothing (`docs/canonical/12` §6.4, `ARCHITECTURE.md` §10 invariant 13). `RightsProfile` fields are seeded from recorded evidence only; anything not evidenced is `UNKNOWN`, never an optimistic default. **The exact seed values are fixed by §14 U-2 — seed that table field for field.** A test must assert that the seeded profile has `commercial_use = UNKNOWN` and `review_status = LEGAL_REVIEW_REQUIRED`, and that neither value stops the import.
+- **AC-09 — Attribution and terms are recorded, not inferred.** `attribution_required`, `attribution_text`, `rights_url` and `terms_version` are seeded exactly as §14 U-2 specifies, traceable to `fixtures/pesel/source-manifest.json`. The dataset-level-only provenance of the CC0 statement, and the fact that resource-level metadata carries no licence attribute at all, are both recorded in `notes` (§14 U-2). No field is upgraded from `UNKNOWN` on optimism.
 
 **Identity and resolution**
 
@@ -135,7 +136,7 @@ Each is a behaviour an automated test must demonstrate by running, not by inspec
 - **AC-14 — Surname-scoped snapshots.** Every `DistributionSnapshot` has a non-null `surname_id`. There is no dataset-global snapshot (`ARCHITECTURE.md` §10 invariant 3).
 - **AC-15 — National values only.** Every `DistributionValue` has `place_id = null` and belongs to a snapshot whose `geography_level = NATIONAL`. `surname_share`, `population_rate`, `rank` and `derivation_version` are null — this task stores, it does not derive (`docs/canonical/11` §6.2 "Stored vs derived").
 - **AC-16 — Suppression and absence are not zero.** Only rows present in the file produce a `DistributionValue`. No zero-count row exists anywhere, and no value below the source's confirmed minimum of 2 exists. Nothing infers a count for a surname missing from a resource (`ARCHITECTURE.md` §10 invariant 4).
-- **AC-17 — The sex/category dimension is preserved and uninterpreted.** The partition is recorded verbatim on the snapshot (`universe_description` and `methodology_key`), quoting the resource's own title and description. The two resources' counts are never merged, summed or compared, and no total is computed (§5 row 7, §14 U-1).
+- **AC-17 — The sex/category dimension is preserved and uninterpreted.** The partition is recorded exactly as §14 U-1 specifies: `universe_description` holds the publisher's verbatim Polish text, `methodology_key` names the resource without asserting a basis, `coverage_notes` states that the publisher does not disambiguate the partition, and the two partitions carry **different `comparability_group` values** so that `docs/canonical/11` §6.1's comparability rule mechanically forbids summing or comparing them. A test asserts the two groups differ and that no code path sums the two resources' counts (§5 row 7).
 
 **Repeatability and failure**
 
@@ -143,7 +144,7 @@ Each is a behaviour an automated test must demonstrate by running, not by inspec
 - **AC-19 — Duplicate handling.** A surname string appearing in both resources produces **one** `Surname` (guaranteed by the `canonical_key` UNIQUE constraint) and **two separate snapshots**. Two source rows differing only in case produce one `Surname`. A source file containing the same canonical key twice is a schema violation and fails the import closed.
 - **AC-20 — Malformed row handling.** Any row violating the confirmed schema aborts the whole import through `PeselSchemaError`; there is no partial import and no "skip the bad row" path. A checksum mismatch aborts before parsing begins.
 - **AC-21 — Transaction and failure behaviour.** One transaction per resource. Either the `SourceRecord`, every identity row, every snapshot and every value land, or none do — asserted by forcing a failure mid-import and observing all eight tables unchanged.
-- **AC-22 — Immutable payloads and supersession.** An existing `SourceRecord` is never rewritten. Different bytes for the same `external_record_id` create a **new** `SourceRecord` whose `supersedes_source_record_id` points at the previous one, which is marked `UPDATED` (`ARCHITECTURE.md` §10 invariant 6; `docs/canonical/12` §9.3).
+- **AC-22 — Immutable payloads and supersession.** An existing `SourceRecord` is never rewritten. Different bytes for the same resource create a **new** `SourceRecord` sharing the same `external_record_id` (the publisher's bare resource id, per ADR-0003) and differing in `content_hash`; its `supersedes_source_record_id` points at the previous record, which is marked `record_status = 'UPDATED'` (`ARCHITECTURE.md` §10 invariant 6; `docs/canonical/12` §9.3). A test asserts the first record's every other column is byte-identical before and after.
 - **AC-23 — Row and count reconciliation.** The importer returns and the CLI prints: rows read, rows imported, surnames created, surnames reused, rows quarantined by reason, snapshots written, values written. `rows read = rows imported + rows quarantined` is asserted, and `rows imported` equals the number of `DistributionValue` rows the run created.
 - **AC-24 — Auditability.** From any `DistributionValue` a single query reaches its snapshot, its `SourceRecord` (with checksum, URL and retrieval time), its `Source` and its `RightsProfile`. An integration test performs that traversal rather than asserting the columns exist.
 - **AC-25 — No fabricated data.** Every stored value is either copied from the source bytes, derived by a named versioned function from them, read from the recorded resource metadata, or `null`. No count, date, denominator, licence term, rank or identifier is invented. `universe_size` is null (§14 U-6).
@@ -177,7 +178,7 @@ Testable statements that must hold after any sequence of imports. These restate 
 4. `distribution_values.surname_share`, `population_rate`, `rank` and `derivation_version` are null for every row this task writes.
 5. `surnames.canonical_key` is unique; `canonicalKey(canonical_display) = canonical_key` for every row.
 6. Every `name_forms.search_key` equals `canonicalKey(form)`, and every `normalization_version` equals the resolver's `NORMALIZATION_VERSION`.
-7. Every `source_records.content_hash` is a 64-character lowercase hex SHA-256, unique per `(source_id, external_record_id, content_hash)`.
+7. Every `source_records.content_hash` is a 64-character lowercase hex SHA-256, and `UNIQUE source_records(source_id, external_record_id, content_hash) WHERE external_record_id IS NOT NULL` holds. This is a **deliberate, recorded deviation** from `docs/canonical/11`'s index line (`UNIQUE (source_id, external_record_id)`), which cannot coexist with the supersession requirement — see ADR-0003. The migration must carry a comment pointing at that ADR.
 8. A `source_record` is never updated after insert except to set `record_status = 'UPDATED'` when superseded, and `supersedes_source_record_id` forms no cycle.
 9. `distribution_snapshots.as_of_date` is the source's `data_date` and is never equal to the record's `retrieved_at` date by construction.
 10. Exactly one `DistributionValue` exists per `DistributionSnapshot` in this task's data (the national aggregate).
@@ -266,16 +267,56 @@ Rules that bind:
 
 ## 14. Unresolved decisions — answer before implementation
 
-Discovered from repository evidence during this task's preflight. U-1, U-2 and U-3 need the project owner; U-4 to U-7 need a recorded choice from the implementing session.
+Discovered from repository evidence during this task's preflight. **U-1, U-2, U-3 (project owner) and U-8 (ADR-0003) are all answered as of 2026-09-19 — their answers are recorded in full below and are binding on the implementer. Nothing in this section blocks the start of work.** U-4 to U-7 remain implementer choices to be made and recorded during implementation.
 
-**U-1 — What does the male/female split actually partition? (project owner; blocks AC-17's wording)**
-The publisher's own description is "Wykaz nazwisk męskich/żeńskich osób żyjących" — grammatically "a list of male/female surnames of living persons". Whether the partition is by the **bearer's sex** or by the **grammatical gender of the surname form** is not stated anywhere the repository has verified. The two readings imply different `universe_description` text and different downstream legitimacy for any total. **Proposed safe resolution:** record the publisher's own Polish wording verbatim in `universe_description`, state in `coverage_notes` that the partition basis is not disambiguated by the publisher, and forbid summation (AC-17). That lets this task proceed honestly; TASK-005 cannot phrase a `CURRENT_POPULATION` claim without an answer.
+**U-1 — What does the male/female split actually partition? — ANSWERED 2026-09-19 (project owner). Underlying fact remains open.**
 
-**U-2 — Resource-level licence and who approves the `RightsProfile`. (project owner; blocks AC-08/AC-09)**
-Dataset-level `license_name = "CC0 1.0"` is verified. Resource-level metadata carries no licence field at all. Nobody has performed a legal review. `review_status` is a *review* field, so "APPROVED" would be a false statement of fact. **Proposed safe resolution:** seed `review_status = LEGAL_REVIEW_REQUIRED` with the CC0 provenance in `notes`; set `automated_access = ALLOWED` and `commercial_use = ALLOWED` on the strength of the dataset-level CC0 dedication; leave `redistribution`, `database_rights` and `local_cache` at their evidenced values. Ingestion then proceeds (the §6.4 hard gates do not fire) while paid-surface eligibility stays blocked until a human review — which is exactly what `ARCHITECTURE.md` §10 invariant 13 requires, since internal ingestion is not a production surface. **This needs the project owner's explicit agreement, because it is a legal posture, not an engineering choice.**
+**Decision: do not decide it. Carry the publisher's own words and make summation structurally impossible.** The implementer must:
 
-**U-3 — Raw source bytes are not stored anywhere. (project owner; deviation from `docs/canonical/12` §9.2)**
-The canonical ingestion strategy says "store raw file + metadata". No object storage exists, `ops/` is not created, and `AGENTS.md` §6 forbids committing raw files. The importer can therefore identify the bytes only by checksum, URL and resource-metadata payload — it cannot preserve them. **Proposed safe resolution:** record the deviation explicitly in `PROGRESS.md` and in `SourceRecord.raw_text_ref` (left null with a documented reason), and treat "raw object storage" as an M0-infrastructure obligation (INF-001) rather than something this task fakes. Acknowledge or overrule.
+- set `universe_description` to the publisher's own text, verbatim and untranslated — male: `Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026`; female: the same with `żeńskich`. (The captured metadata wraps this in a single `<p>` element; strip only that wrapper and record that you did. Do not paraphrase, translate, gloss or summarise the Polish.)
+- set `methodology_key` to a key that names the resource without interpreting it — `pesel_current_surname_national_2026_male_resource` / `…_female_resource`. **Forbidden:** any key asserting a basis, e.g. `by_bearer_sex`, `by_grammatical_gender`, `male_persons`.
+- set `comparability_group` to a **different value per partition** (`pesel_2026_national_male` / `pesel_2026_national_female`). `docs/canonical/11` §6.1 defines this field as the gate on quantitative comparison — separate groups mean the two partitions may not be summed or compared without explicit extra justification, which is exactly the protection this open question needs. This is the enforcement mechanism for AC-17, not a comment.
+- set `coverage_notes` to state plainly that the publisher does not disambiguate whether the partition is by the bearer's sex or by the grammatical gender of the surname form, and that the two resources are therefore not summable.
+
+**What this answer does not do:** it does not establish what the split means. That fact is still unknown and still requires the publisher. **It remains a precondition of TASK-005**, alongside U-4 — no `CURRENT_POPULATION` claim may be phrased in terms of "men"/"women" or "people" on this evidence until both are answered. TASK-004 is unblocked because TASK-004 makes no claim.
+
+**U-2 — Resource-level licence and the `RightsProfile`. — ANSWERED 2026-09-19 (project owner). Legal review still not performed; paid surfaces stay gated.**
+
+**Decision: seed the profile from recorded evidence only, and leave the commercial gate closed.** Every field below is required and NOT NULL (`docs/canonical/11` §9.4); these are the values to seed, and each is traceable to evidence or is honestly `UNKNOWN`:
+
+| Field | Value | Basis |
+|---|---|---|
+| `terms_version` | `CC0 1.0` | dataset-level `license_name`, read from the portal's own dataset metadata |
+| `terms_hash` | `null` | terms text not retained |
+| `checked_at` | `2026-09-19` | this decision — a recorded rights posture, **not** a legal review |
+| `metadata_rights` | `ALLOWED` | resource metadata is published openly by the portal |
+| `image_rights` | `UNKNOWN` | no image exists for a CSV resource; nothing evidenced |
+| `transcription_rights` | `UNKNOWN` | not applicable; nothing evidenced |
+| `database_rights` | `ALLOWED` | CC0 1.0 expressly waives sui generis database rights |
+| `automated_access` | `ALLOWED` | the publisher operates a public, documented JSON:API (`api.dane.gov.pl/1.4/…`) as the declared access route, with per-resource machine download endpoints recorded in `fixtures/pesel/source-manifest.json`. **Residual:** the portal's own terms of use have not been read. TASK-004 performs no automated retrieval, so nothing in this task relies on this value. |
+| `commercial_use` | **`UNKNOWN`** | dataset-level CC0 would permit it, but **resource-level inheritance of the dataset licence is unverified** — resource metadata carries no licence attribute at all. `UNKNOWN` is the honest state. |
+| `redistribution` | **`UNKNOWN`** | same gap, same reasoning |
+| `local_cache` | `ALLOWED` | required for any local ingestion; consistent with an open-data portal and dataset-level CC0 |
+| `attribution_required` | `false` | CC0 1.0 requires none |
+| `attribution_text` | `Dane pochodzą z rejestru PESEL, Ministerstwo Cyfryzacji, dane.gov.pl (CC0 1.0)` | courtesy credit, recorded although not required |
+| `source_owner` | `Ministerstwo Cyfryzacji` | verified, institution `333` |
+| `rights_url` | the dataset URL in `fixtures/pesel/source-manifest.json` (`official_dataset_url`) — the only page where the licence is actually stated | verified |
+| `contact_required` | `false` | nothing evidences a contact requirement |
+| `review_status` | **`LEGAL_REVIEW_REQUIRED`** | nobody has performed a legal review. `APPROVED` would be a false statement of fact. |
+| `valid_from` | `2026-09-19` | |
+| `valid_to` | `null` | no expiry evidenced |
+| `notes` | must record: licence is stated at **dataset** level only; resource-level metadata carries no licence, rights or terms attribute across all four 2026 resources; resource inheritance of CC0 is an unverified assumption; this profile is a recorded posture by the project owner, not a legal review | |
+
+**Why this unblocks TASK-004 and still protects the business.** The only hard gate that stops ingestion is `automated_access == PROHIBITED` (`docs/canonical/12` §6.4) — not met, so the importer runs. `review_status = LEGAL_REVIEW_REQUIRED` is not `BLOCKED`, so AC-08's refusal does not fire. Meanwhile `commercial_use = UNKNOWN` makes `evidence.paid_surface_eligible = false` automatically, by the same §6.4 gate, so nothing on this source can reach a paid report until somebody confirms the resource licence. That confirmation is a real open decision and is now recorded as **D-007** in `docs/DECISIONS_NEEDED.md`; it blocks M5/M6, not TASK-004.
+
+**U-3 — Raw source bytes are not stored anywhere. — ANSWERED 2026-09-19 (project owner). Deviation accepted and recorded.**
+
+**Decision: accept the deviation from `docs/canonical/12` §9.2 ("store raw file + metadata") for this task, and do not fake it.** Concretely:
+
+- `SourceRecord.raw_text_ref` is `null`, with the reason recorded in the record's own notes and in `PROGRESS.md` — not left silently empty.
+- The bytes are identified by `content_hash` (the verified SHA-256), `source_url` (the official endpoint) and `raw_payload` (the publisher's own resource-metadata object). That triple is what makes the import reproducible without object storage.
+- **Condition of this answer:** the project owner retains the acquired bytes outside the repository (the 2026-09-18 acquisition archive, checksums recorded in `docs/sources/acquisition/2026-09-18/SHA256SUMS.txt`). The deviation is only survivable because the bytes exist somewhere and are checksum-pinned. If they are lost, the import becomes unreproducible and that is a finding to raise, not to work around.
+- Raw object storage remains an **M0-infrastructure obligation carried forward**, not something TASK-004 invents. Do not create `ops/`, do not provision storage, and do not commit raw files (`AGENTS.md` §6).
 
 **U-4 — The unit of `Liczba`.** Not explicitly stated by the publisher (§5 row 9). Does not block this task, which stores the raw integer and a verbatim universe description. **Must be resolved before TASK-005** phrases any statement about "how many living people". Record it as carried forward, do not close it here.
 
@@ -284,6 +325,12 @@ The canonical ingestion strategy says "store raw file + metadata". No object sto
 **U-6 — `universe_size` denominator.** Left null. The PESEL living-population denominator is not verified, and `docs/canonical/11` §6.1 stores it "only if methodologically valid". This is the open rarity-denominator question already recorded in `docs/sources/pesel.md` and D-001. Do not invent one.
 
 **U-7 — Resolver-inside-transaction mechanics.** `resolveSurname` runs its queries inside a PostgreSQL `READ ONLY` transaction. Calling it from within a read-write import transaction needs a decision: resolve in a separate read pass before the write transaction (simpler, with a time-of-check/time-of-use gap that the `canonical_key` UNIQUE constraint closes safely), or perform the lookup inside the import transaction using `canonicalKey` plus a direct `SELECT`. Either is acceptable; **it must not be resolved by relaxing the resolver's read-only guarantee.** Record the choice.
+
+**U-8 — What one `SourceRecord` represents, and the `source_records` UNIQUE index. — ANSWERED 2026-09-19 by ADR-0003.**
+
+Resolved in favour of **resource-version granularity with the uniqueness key relaxed to `(source_id, external_record_id, content_hash)`**. `external_record_id` stays the publisher's bare resource id; `record_type = API_OBJECT`; `raw_payload` holds the resource-metadata object, not a data row. Individual CSV rows are not `SourceRecord`s — a row's evidential content reaches the model as a `DistributionValue` under its snapshot.
+
+This deliberately deviates from `docs/canonical/11`'s index line, because that line cannot coexist with the annual-refresh supersession requirement (`docs/canonical/12` §9.3, `ARCHITECTURE.md` §10 invariant 6). The full reasoning, the two rejected alternatives and the conditions for revisiting are in **`docs/adr/0003-source-record-granularity.md`**, which supersedes the canonical index line for this case and closes D-006. **The migration must carry a comment pointing at that ADR.** Implement AC-06, AC-22 and §9 invariant 7 as now written.
 
 ## 15. Preflight
 
@@ -340,7 +387,7 @@ Before declaring the task complete, inspect the entire diff file by file and con
 
 - `docs/CODEMAP.md` — update only if the stable module structure changed (it will: new migration, new importer module, new CLI entry point).
 - `PROGRESS.md` — facts only: TASK-004 status, files and modules introduced, migration applied, verification actually run with PASS/FAIL, the §14 answers as recorded decisions, and any unresolved blocker still open. No session diary.
-- `docs/DECISIONS_NEEDED.md` — add an entry only if a genuine project-level blocker was discovered. U-1, U-2 and U-3 become entries there if the project owner defers them rather than answering.
+- `docs/DECISIONS_NEEDED.md` — U-1, U-2, U-3 (§14) and D-006/U-8 (ADR-0003) are all closed and need no entry. D-007 (resource-level PESEL licence confirmation) stays open and is **not** this task's to close. Add a new entry only if a further genuine project-level blocker is discovered.\n- `docs/adr/` — ADR-0003 is binding on this task's migration. Do not amend it; if implementation shows it to be wrong, that is a finding to raise, not an edit to make.
 - Carry U-4 forward explicitly as a precondition of TASK-005.
 
 ## 19. Definition of done

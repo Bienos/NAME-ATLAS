@@ -7,23 +7,182 @@ import type { ColumnType } from "kysely";
 
 export type AttestationStatus = "ATTESTED" | "DERIVED" | "DISPUTED" | "GENERATED_CANDIDATE";
 
+export type CachePermission = "ALLOWED" | "LIMITED" | "PROHIBITED" | "UNKNOWN";
+
+export type ClaimEvidenceRelationship = "CONTEXT" | "CONTRADICTS" | "SUPPORTS";
+
+export type ClaimLifecycleStatus = "ACTIVE" | "REJECTED" | "RETRACTED" | "SUPERSEDED";
+
+export type ClaimType = "CURRENT_POPULATION";
+
+export type ConfidenceStatus = "CONFLICTING" | "INSUFFICIENT_DATA" | "LIKELY" | "POSSIBLE" | "UNCONFIRMED" | "VERIFIED";
+
 export type EntityStatus = "ACTIVE" | "MERGED" | "RETRACTED" | "SUPERSEDED";
 
 export type EntityType = "NAME_FORM" | "SURNAME";
 
+export type EpistemicType = "FACT" | "HYPOTHESIS" | "INTERPRETATION" | "UNKNOWN";
+
 export type EvidenceScope = "FAMILY_LEVEL" | "PERSON_LEVEL" | "SHARED" | "SURNAME_LEVEL";
+
+export type EvidenceType = "ALGORITHMIC_SIMILARITY" | "AUTHORITATIVE_INDEX" | "DERIVED_STATISTIC" | "OFFICIAL_DATASET_FIELD" | "OTHER" | "PRIMARY_RECORD" | "SCHOLARLY_SOURCE" | "SECONDARY_HISTORICAL_SOURCE" | "USER_PROVIDED";
+
+export type EvidenceVerificationStatus = "MACHINE_EXTRACTED" | "REJECTED" | "REVIEWED" | "SUSPECT" | "VERIFIED";
 
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
 
+export type GeographyLevel = "DISTRICT" | "LOCALITY" | "MIXED" | "MUNICIPALITY" | "NATIONAL" | "REGION";
+
+export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
+
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type NameFormType = "CANONICAL" | "HISTORICAL_ATTESTED" | "LINGUISTIC_NORMALISATION" | "MIGRATION_ADAPTATION" | "MODERN_VARIANT" | "SEARCH_CANDIDATE" | "TRANSLITERATION";
 
+export type Numeric = ColumnType<string, number | string, number | string>;
+
 export type PrivacyClass = "INTERNAL" | "PUBLIC" | "SENSITIVE_FAMILY" | "USER_PRIVATE";
+
+export type QaStatus = "FAIL" | "NOT_RUN" | "PASS" | "REVIEW_REQUIRED";
+
+export type ResearchRunStatus = "COMPLETE" | "FAILED" | "PARTIAL" | "PENDING" | "REVIEW_REQUIRED" | "RUNNING";
+
+export type ResearchRunType = "BASIC_SURNAME" | "PREMIUM_SURNAME" | "QA" | "REPROCESS";
+
+export type ReviewStatus = "AUTO" | "HUMAN_APPROVED" | "HUMAN_REJECTED" | "PENDING";
+
+export type RightsPermission = "ALLOWED" | "CONDITIONAL" | "PROHIBITED" | "UNKNOWN";
+
+export type RightsReviewStatus = "APPROVED" | "BLOCKED" | "CONDITIONAL" | "EXPIRED" | "LEGAL_REVIEW_REQUIRED";
+
+export type SourceGranularity = "DOCUMENT" | "MIXED" | "PERSON" | "PLACE" | "SURNAME";
+
+export type SourceProductionStatus = "APPROVED" | "BLOCKED" | "DEPRECATED" | "LEGAL_REVIEW_REQUIRED" | "PARTNERSHIP_REQUIRED";
+
+export type SourceRecordStatus = "ACTIVE" | "INACCESSIBLE" | "UPDATED" | "WITHDRAWN";
+
+export type SourceRecordType = "API_OBJECT" | "ARTICLE" | "BOOK_ITEM" | "DATA_ROW" | "DOCUMENT" | "INDEX_ENTRY" | "OTHER" | "PAGE";
+
+export type SourceReliabilityTier = "A_PRIMARY_OFFICIAL" | "B_AUTHORITATIVE_INDEX" | "C_SCHOLARLY_SECONDARY" | "D_TERTIARY_LEAD";
+
+export type SourceType = "ACADEMIC" | "ARCHIVE" | "COMMERCIAL_DATABASE" | "COMMUNITY_INDEX" | "DICTIONARY" | "DIGITAL_LIBRARY" | "OFFICIAL_DATASET" | "OTHER" | "PUBLICATION";
 
 export type SurnameStatus = "ACTIVE" | "AMBIGUOUS" | "DEPRECATED" | "MERGED";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export interface Citations {
+  accessed_at: Timestamp | null;
+  citation_id: string;
+  claim_id: string;
+  created_at: Generated<Timestamp>;
+  publication_date: string | null;
+  publisher: string | null;
+  rights_profile_id: string;
+  source_id: string;
+  source_record_id: string | null;
+  supporting_locator: string | null;
+  title: string;
+  url_or_reference: string;
+}
+
+export interface ClaimEvidence {
+  claim_id: string;
+  created_at: Generated<Timestamp>;
+  evidence_item_id: string;
+  notes: string | null;
+  reason_code: string | null;
+  relationship: ClaimEvidenceRelationship;
+}
+
+export interface Claims {
+  claim_id: string;
+  claim_key: string;
+  claim_status: ClaimLifecycleStatus;
+  claim_type: ClaimType;
+  created_at: Generated<Timestamp>;
+  created_by_run_id: string;
+  epistemic_type: EpistemicType;
+  method_version: string;
+  object_entity_id: string | null;
+  scope: EvidenceScope;
+  statement_key: string | null;
+  structured_value: Json;
+  subject_entity_id: string;
+  supersedes_claim_id: string | null;
+}
+
+export interface ConfidenceAssessments {
+  assessed_at: Timestamp;
+  assessment_method: string;
+  assessment_version: string;
+  claim_id: string;
+  confidence_assessment_id: string;
+  created_at: Generated<Timestamp>;
+  evidence_set_hash: string;
+  human_review_required: boolean;
+  rationale: string;
+  review_status: ReviewStatus;
+  status: ConfidenceStatus;
+}
+
+export interface DistributionSnapshots {
+  as_of_date: Timestamp | null;
+  comparability_group: string | null;
+  coverage_notes: string | null;
+  created_at: Generated<Timestamp>;
+  dataset_version: string | null;
+  distribution_snapshot_id: string;
+  geography_level: GeographyLevel;
+  methodology_key: string;
+  source_id: string;
+  source_record_id: string;
+  surname_id: string;
+  surname_total_count: Int8 | null;
+  universe_description: string;
+  universe_size: Int8 | null;
+}
+
+export interface DistributionValues {
+  count: Int8 | null;
+  created_at: Generated<Timestamp>;
+  derivation_version: string | null;
+  distribution_snapshot_id: string;
+  distribution_value_id: string;
+  place_id: string | null;
+  population_denominator: Int8 | null;
+  population_rate: Numeric | null;
+  rank: number | null;
+  source_geography_key: string | null;
+  surname_share: Numeric | null;
+}
+
+export interface EvidenceItems {
+  created_at: Generated<Timestamp>;
+  created_by_run_id: string;
+  derivation_method: string | null;
+  derivation_version: string | null;
+  evidence_item_id: string;
+  evidence_type: EvidenceType;
+  raw_excerpt: string | null;
+  source_record_id: string | null;
+  structured_value: Json;
+  subject_entity_id: string | null;
+  supporting_locator: string | null;
+  verification_status: EvidenceVerificationStatus;
+}
 
 export interface GeographyColumns {
   coord_dimension: number | null;
@@ -69,6 +228,26 @@ export interface NameForms {
   unicode_nfc: string;
 }
 
+export interface ResearchRuns {
+  completed_at: Timestamp | null;
+  connector_manifest: Json;
+  created_at: Generated<Timestamp>;
+  error_summary: Json | null;
+  input_schema_version: string;
+  model_manifest: Json;
+  normalization_version: string;
+  prompt_manifest: Json;
+  qa_status: QaStatus;
+  raw_input: Json;
+  research_run_id: string;
+  rights_snapshot_hash: string | null;
+  run_status: ResearchRunStatus;
+  run_type: ResearchRunType;
+  started_at: Timestamp;
+  surname_id: string | null;
+  workflow_version: string;
+}
+
 export interface ResolvableNameForms {
   attestation_status: AttestationStatus | null;
   created_at: Timestamp | null;
@@ -81,6 +260,69 @@ export interface ResolvableNameForms {
   search_key: string | null;
   surname_id: string | null;
   unicode_nfc: string | null;
+}
+
+export interface RightsProfiles {
+  attribution_required: boolean;
+  attribution_text: string | null;
+  automated_access: RightsPermission;
+  checked_at: Timestamp;
+  commercial_use: RightsPermission;
+  contact_required: boolean;
+  created_at: Generated<Timestamp>;
+  database_rights: RightsPermission;
+  image_rights: RightsPermission;
+  local_cache: CachePermission;
+  metadata_rights: RightsPermission;
+  notes: string | null;
+  redistribution: RightsPermission;
+  review_status: RightsReviewStatus;
+  rights_profile_id: string;
+  rights_url: string | null;
+  source_owner: string | null;
+  terms_hash: string | null;
+  terms_version: string | null;
+  transcription_rights: RightsPermission;
+  valid_from: Timestamp | null;
+  valid_to: Timestamp | null;
+}
+
+export interface SourceRecords {
+  content_hash: string;
+  created_at: Generated<Timestamp>;
+  external_parent_id: string | null;
+  external_record_id: string | null;
+  raw_payload: Json | null;
+  raw_text_ref: string | null;
+  record_status: SourceRecordStatus;
+  record_type: SourceRecordType;
+  retrieved_at: Timestamp;
+  rights_profile_id: string | null;
+  source_id: string;
+  source_modified_at: Timestamp | null;
+  source_record_id: string;
+  source_url: string | null;
+  supersedes_source_record_id: string | null;
+}
+
+export interface Sources {
+  authority_tier: SourceReliabilityTier;
+  created_at: Generated<Timestamp>;
+  default_rights_profile_id: string;
+  geographic_scope: string[];
+  granularity: SourceGranularity;
+  homepage_or_reference_url: string | null;
+  methodology_notes: string | null;
+  name: string;
+  parent_source_id: string | null;
+  production_status: SourceProductionStatus;
+  publisher: string | null;
+  source_id: string;
+  source_key: string;
+  source_type: SourceType;
+  temporal_from: Timestamp | null;
+  temporal_to: Timestamp | null;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface SpatialRefSys {
@@ -105,11 +347,22 @@ export interface Surnames {
 }
 
 export interface DB {
+  citations: Citations;
+  claim_evidence: ClaimEvidence;
+  claims: Claims;
+  confidence_assessments: ConfidenceAssessments;
+  distribution_snapshots: DistributionSnapshots;
+  distribution_values: DistributionValues;
+  evidence_items: EvidenceItems;
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;
   knowledge_entities: KnowledgeEntities;
   name_forms: NameForms;
+  research_runs: ResearchRuns;
   resolvable_name_forms: ResolvableNameForms;
+  rights_profiles: RightsProfiles;
+  source_records: SourceRecords;
+  sources: Sources;
   spatial_ref_sys: SpatialRefSys;
   surnames: Surnames;
 }

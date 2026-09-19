@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-003 implemented and verified (exact surname resolver + identity core migration)
+**Last updated:** 2026-09-19 — TASK-006 implemented and verified (surname result read API; first accepted contract). M1 complete, M2 begun.
 
 ## Current state
 
@@ -13,10 +13,13 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
 | **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
-| Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
-| Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
+| Application source code | `packages/resolver` (TASK-003), `packages/sources` (TASK-002/004), `packages/truth` (truth chain TASK-005; read path TASK-006), `packages/contracts` (TASK-006 API schemas), and one route handler in `apps/web`. Identity, source/rights, distribution and truth-layer tables exist. No `DigitalAsset`, `Place`, `EvidenceDependency`, `ResearchModuleRun` or outbox table. |
+| Database migrations | `0001_bootstrap_extensions`, `0002_identity_core`, `0003_source_rights_distribution` and `0004_truth_layer` (`research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` + 10 enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | None yet. TASK-004 (PESEL ingestion) is the natural next task but has no task file and was not started (AGENTS.md §8). |
+| **TASK-004 — canonical PESEL surname dataset ingestion** | **IMPLEMENTED AND VERIFIED.** Migration `0003_source_rights_distribution` + `packages/sources` registry/importer/CLI. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
+| **TASK-005 — `CURRENT_POPULATION` truth chain** | **IMPLEMENTED AND VERIFIED.** D-008 and D-009 answered by the project owner and recorded as RESOLVED. Migration `0004_truth_layer` + `packages/truth`. See the TASK-005 section below. |
+| **TASK-006 — surname result read API / query contract** | **IMPLEMENTED AND VERIFIED.** `packages/contracts` (Zod schemas), `packages/truth/src/{read,query}.ts`, `GET /api/v1/surname-results`, and the repository's first accepted contract document. See the TASK-006 section below. |
+| Next approved task | None. The rest of M2 (`CURRENT_RANK`, `RARITY_CONTEXT`, `pg_trgm` candidate generation, free result UI) has no task file. |
 
 ## What TASK-001 built
 
@@ -307,9 +310,309 @@ Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm
 
 **Not verified in this environment:** the integration suite against the pinned `postgis/postgis:16-3.4@sha256:44126d87…` image itself (registry egress-blocked). Everything else above was run and observed.
 
+## TASK-004 implemented — PESEL surname dataset ingestion (2026-09-19)
+
+Scope authority: `tasks/004-pesel-surname-ingestion.md`. One bounded capability: the pinned official PESEL national surname resources can be ingested deterministically, idempotently and with full provenance, stopping before any claim, confidence or citation.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0003_source_rights_distribution.ts` | 10 enums + 5 tables: `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values` |
+| `packages/sources/src/registry.ts` | PESEL `Source` + `RightsProfile` + the two approved resource descriptors, as data |
+| `packages/sources/src/importer.ts` | The `BULK_DATASET` importer and the rights gate |
+| `packages/sources/src/import-result.ts` | Typed outcomes and the reconciliation report |
+| `packages/sources/bin/import-pesel.ts` | CLI (`pnpm --filter @name-atlas/sources run import-pesel`) |
+| `packages/sources/src/{registry,importer}.test.ts` | 37 new unit tests |
+| `tests/integration/src/pesel-ingestion.test.ts` | 32 new integration tests against real PostgreSQL |
+
+Modified: `packages/db/src/migrator.test.ts` and `tests/integration/src/extensions.test.ts` (both are schema-inventory assertions that every schema-adding task must update), `packages/db/src/generated/db.ts` (regenerated), `packages/sources/{package.json,tsconfig.json,src/index.ts}`, `tests/integration/package.json`, `pnpm-lock.yaml` (workspace links only — no dependency added or upgraded; `kysely@0.29.6` already in use elsewhere).
+
+### Implementer choices recorded (TASK-004 §14)
+
+- **U-5 → option (a).** Any unresolvable row aborts the whole import and writes nothing. Fail closed.
+- **U-6 → `universe_size` null.** The PESEL living-population denominator is not verified; inventing one is forbidden.
+- **U-7 → separate read pass.** Resolution runs through `resolveSurname` *before* the write transaction, so its `READ ONLY` guarantee is never relaxed. The time-of-check/time-of-use gap is closed by the `surnames.canonical_key` UNIQUE constraint, which turns a concurrent creation into a rollback rather than a duplicate identity.
+
+### Two documented deviations
+
+1. **`source_records` uniqueness** is `(source_id, external_record_id, content_hash)`, not `docs/canonical/11`'s `(source_id, external_record_id)`. Per **ADR-0003**; the migration carries a comment pointing there. Without it, supersession of a reissued annual resource is unrepresentable.
+2. **`distribution_values.place_id` carries no foreign key**, because `places` does not exist until M3. Null for every row this task writes.
+
+### Verification actually run (2026-09-19)
+
+Commands were run in this session; results are the observed output, not inspection.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | **PASS** |
+| `pnpm typecheck` | **PASS** — 10 of 10 packages |
+| `pnpm lint` | **PASS** — zero errors, zero warnings |
+| `pnpm format:check` | **PASS** (after running Prettier on the 4 new/changed files) |
+| `pnpm test` | **PASS** — **132 tests** across 9 packages (95 before; +37 in `packages/sources`) |
+| `pnpm db:migrate` | **PASS** — `0001`, `0002`, `0003` applied; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **PASS** — regenerated file byte-identical to the committed one (`cmp`) |
+| `pnpm test:integration` | **PASS** — **60 tests** (was 28): 4 `extensions`, 24 `resolver`, 32 `pesel-ingestion` |
+| `pnpm build` | **PASS** — `apps/web`, `apps/admin`, `apps/worker` |
+| Forbidden-logic grep over new code (`pg_trgm`, `similarity`, `levenshtein`, `soundex`, `metaphone`, `unaccent`, `transliterat`, `phonetic`, `fuzzy`, `polishDiacriticFold`, `etymolog`, `genealog`, `heraldr`, `claim`, `evidence`, `confidence`) | Only prose, comments and test titles asserting absence. No such logic exists. |
+| `git status --porcelain` on `docs/canonical/`, `library/`, `archive/`, `reference/`, `review/`, `prompts/` | Unchanged |
+
+**End-to-end CLI run against the real committed fixtures** (not only the test harness), against a live PostgreSQL:
+
+| Run | Observed |
+|---|---|
+| Import male `1148808` | `IMPORTED` — rows read 22, imported 22, quarantined 0, surnames created 22, snapshots 22, values 22 |
+| Re-run, identical bytes | `ALREADY IMPORTED` — nothing written |
+| Import female `1148811` | `IMPORTED` — rows read 23, imported 23, quarantined 0, surnames created 16, **reused 7**, snapshots 23, values 23 |
+
+Resulting database state, queried directly: 1 source, 1 rights profile, **2 source records** (one per resource version, not per row), 38 surnames, 38 name forms, 45 snapshots, 45 values; `0` rows with a count below 2, `0` with a non-null `place_id`, `0` with any derived field populated.
+
+Real-value spot checks: `WIŚNIEWSKI` → key `wiśniewski` (**not** `wisniewski` — diacritics are identity-bearing), `NOWAK` 98,387 male / 99,738 female (matching the ranges recorded in `docs/sources/pesel.md`), `NGUYỄN`, `W/SILASSIE`, `SCHIED ` stored at length 7 with its real trailing space, and `DOG̈AN` / `SCHA̋FER` retaining their standalone combining marks.
+
+### Not verified in this environment
+
+The integration suite ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL` fallback, as in TASK-001/002/003. The pinned `postgis/postgis:16-3.4@sha256:44126d87…` container image was **not** exercised here — container registries remain egress-blocked. CI runs it.
+
+### Carried forward
+
+- **D-007** (`docs/DECISIONS_NEEDED.md`) — resource-level PESEL licence unconfirmed. The seeded profile carries `commercial_use = UNKNOWN` and `review_status = LEGAL_REVIEW_REQUIRED`, so `docs/canonical/12` §6.4 keeps `paid_surface_eligible = false` in the database. Blocks M5/M6, not ingestion.
+- **TASK-004 §14 U-1** — what the male/female split partitions is still unknown. Handled by carrying the publisher's verbatim wording and putting the two partitions in **different `comparability_group` values**, so summing them is structurally forbidden. **Blocks TASK-005's claim wording.**
+- **TASK-004 §14 U-4** — the unit of `Liczba` (occurrences vs. living people) is not stated by the publisher. **Blocks TASK-005's `CURRENT_POPULATION` claim.**
+- **U-3** — raw source bytes are still not stored anywhere; `raw_text_ref` is null by design. Reproduction depends on the project owner retaining the acquisition archive. Object storage remains an infrastructure obligation.
+
+## TASK-005 specified — planning only, no code written (2026-09-19)
+
+`tasks/005-current-population-truth-chain.md` specifies one bounded capability: for a surname that resolves exactly and has applicable ingested PESEL data, produce a `CURRENT_POPULATION` claim with evidence, confidence, citation and rights metadata, plus a developer-facing result object. It closes M1's vertical slice and produces no rank, rarity, API or UI.
+
+Established by direct inspection during the preflight, not assumed:
+
+- **No truth-layer table exists.** There is no `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` or `research_runs` table; migrations stop at `0003`. `packages/contracts` is still the intentional stub exporting only `CONTRACT_PACKAGE_VERSION`.
+- **The chain TASK-005 must extend already reaches rights.** From a `distribution_values` row, a single join chain reaches `distribution_snapshots → source_records → sources → rights_profiles`; TASK-004's suite exercises it. TASK-005 extends this chain rather than building a second one.
+- **A surname can carry two snapshots.** TASK-004's verified run observed 7 surnames present in both the male and female fixtures, in different `comparability_group` values (`NOWAK` at 98,387 and 99,738). The task therefore specifies **one claim per snapshot and no summation**, which follows from `docs/canonical/11` §6.1 plus the unanswered U-1 rather than from a new rule.
+
+### Two canonical contradictions found and recorded, not resolved
+
+Both were discovered by reading `docs/canonical/11` and `docs/canonical/14` against each other, and both block the TASK-005 migration. Per `AGENTS.md` §2 they are recorded rather than settled in code.
+
+- **D-008** — `docs/canonical/14` presents a series of MODEL CHANGE PROPOSALS (14-A, 14-D and others) that conflict with `docs/canonical/11`'s schema on the `EvidenceType` enum (`OFFICIAL_DATASET_FIELD` vs `OFFICIAL_DATASET_VALUE` — one concept, two names), the `EvidenceItem` field set, the `ClaimEvidence` relationship enum, and the `CURRENT_POPULATION` payload field names (§10.1 vs §14.1). Which binds is undecided; three options and a recommendation are recorded.
+- **D-009** — `EvidenceItem.created_by_run_id` and `Claim.created_by_run_id` are both required and not nullable, referencing `ResearchRun`, which `docs/canonical/11` marks **P0** while `PLAN.md` schedules the research runtime at **M3**. No `research_runs` table exists. TASK-005 is the first task forced to resolve it; three options and a recommendation are recorded.
+
+### Carried forward, unchanged
+
+TASK-004 §14 **U-1** (what the male/female split partitions) and **U-4** (the unit of `Liczba`) remain unanswered by the publisher. The task specifies how to proceed honestly without them — one claim per snapshot, never summed; the publisher's universe wording carried verbatim; no claim describing a count as a number of *people* — and instructs the implementing session to stop and report rather than choose a unit if that proves impossible. **D-007** (resource-level licence) stays open and constrains TASK-005's rights output without being its to close.
+
+**Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-005 code exists.
+
+## TASK-006 specified — planning only, no code written (2026-09-19)
+
+`tasks/006-surname-result-read-api.md` specifies one bounded capability: a caller submits an exact surname query and receives a stable, typed, rights-aware result carrying `CURRENT_POPULATION` and its supporting metadata, produced entirely by the TASK-003 → TASK-005 pipeline. It is the first slice of M2 and adds no second fact, no search, and no UI.
+
+Established by direct inspection during the preflight, not assumed:
+
+- **The API style is settled and is REST.** `docs/canonical/16` §2.1 records "REST — CHOSEN"; §1.2 fixes REST + JSON + OpenAPI-compatible schemas, with GraphQL and WebSockets explicitly excluded from P0. §5 fixes the `/api/v1/` prefix.
+- **The BFF convention already exists in skeleton.** `apps/web` is a Next.js 16 App Router app whose only route handler is `apps/web/src/app/api/health/route.ts`, tested by importing and calling the handler directly. That is the pattern TASK-006 follows. `ARCHITECTURE.md` §6 forbids the handler from resolving, interpreting claims, computing confidence or evaluating rights, so the task puts the query service in a package and keeps the handler thin.
+- **`packages/contracts` is still the intentional stub** exporting only `CONTRACT_PACKAGE_VERSION`, and `docs/contracts/README.md` states no contract is accepted yet, with the first expected at M2. TASK-006's contract is that first accepted contract and must be recorded there in the same change.
+- **Zod is not a direct dependency** of any workspace package, though `docs/canonical/16` §1.3 recommends Zod 4 as the contract source. Adding it needs the one-line justification `AGENTS.md` §6 requires.
+- **The canonical zero-versus-missing representation already exists**: `NumericValueStatus` (`KNOWN`, `SUPPRESSED`, `NOT_AVAILABLE`, `NOT_APPLICABLE`) with an explicit "Never `{"value": 0}` for suppressed values" (`docs/canonical/16` §26), and `RIGHTS_BLOCKED` as a `SectionState` member (§23). The task uses these rather than inventing states.
+- **Exposing the surname UUID as API identity is canonically permitted** (`docs/canonical/16` §18, §21), so the usual "no internal identifiers" rule does not apply to it — but `PublicSurnameIdentity` also requires `canonical_slug` and `canonical_path`, and **no slug exists** anywhere in the schema.
+
+### One contract-versus-evidence collision found and recorded, not resolved
+
+- **D-010** — `docs/canonical/16` §26 fixes the population DTO's unit as the literal `"PEOPLE"`, with no alternative permitted. TASK-004 §14 **U-4** records that the publisher says *"liczba wystąpień"* — occurrences — and never states that one occurrence equals one living person. A response built literally to §26 would assert to end users something TASK-005's claim payload is forbidden to claim, in the one place `PRODUCT.md` §7 rule 1 promises full traceability. Because `ARCHITECTURE.md` §6 forbids the frontend from deriving facts, the unit is fixed at the contract boundary and cannot be deferred to the UI. Three options and a recommendation are recorded; shipping `"PEOPLE"` on the strength of the implication is explicitly not recommended. ***Resolved 2026-09-19 by `docs/adr/0004-population-value-unit.md`*** — Option B: the unit enum is widened and PESEL-derived responses carry `SURNAME_OCCURRENCES`.
+
+### Precondition not met
+
+**TASK-006 cannot begin until TASK-005 is implemented and accepted**, and TASK-005 is itself blocked on D-008 and D-009. The task file states this at the top and forbids the obvious workaround — querying `distribution_values` directly to "get something working" — because that is exactly the second truth chain the task exists to avoid.
+
+**Nothing was verified by running.** This session ran only read-only inspection over repository files. No test, typecheck or build was executed, and no TASK-006 code exists.
+
+## TASK-005 implemented — CURRENT_POPULATION truth chain (2026-09-19)
+
+Scope authority: `tasks/005-current-population-truth-chain.md`. Closes M1's vertical slice: a surname that resolves exactly and has ingested PESEL data now yields an evidence-backed claim with confidence, citation and rights metadata, and nothing beyond it.
+
+### Decisions answered before implementation
+
+The project owner answered both blockers on 2026-09-19; both are recorded RESOLVED in `docs/DECISIONS_NEEDED.md`.
+
+- **D-008 → Option A.** `docs/canonical/11` binds; `docs/canonical/14`'s MODEL CHANGE PROPOSALS are not ratified and were not built. `evidence_type` is §9.5's enum (`OFFICIAL_DATASET_FIELD`), `claim_evidence.relationship` is the three-member §10.2 enum, and `EvidenceItem` has no `directness`/`extraction_*` columns. Claim payload naming follows `docs/canonical/14` §14.1. **No ADR was needed** — nothing deviates from a canonical specification.
+- **D-009 → Option A.** A minimal synchronous `research_runs` table was created, so `created_by_run_id` is NOT NULL on `evidence_items` and `claims` exactly as canonical specifies, with no lineage gap. `prompt_manifest` and `model_manifest` are stored as **empty JSON objects** because no prompt and no model exist at M1 — genuinely inapplicable, not merely unrecorded. An integration test asserts they are `{}`.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0004_truth_layer.ts` | 10 enums + 6 tables: `research_runs`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations` |
+| `packages/truth/src/derive.ts` | The derivation service and its typed invariant error |
+| `packages/truth/src/confidence.ts` | `docs/canonical/14` §29's four provisos as predicates; `evidence_set_hash` |
+| `packages/truth/src/rights.ts` | Surface eligibility from `docs/canonical/12` §6.3/§6.4 |
+| `packages/truth/src/result.ts` | The developer-facing projection types |
+| `packages/truth/bin/surname-profile.ts` | Demo CLI (`pnpm demo:surname -- "NOWAK"`) |
+| `packages/truth/src/*.test.ts` | 32 new unit tests |
+| `tests/integration/src/truth-chain.test.ts` | 31 new integration tests |
+
+Modified: `packages/db/src/migrator.test.ts` and `tests/integration/src/extensions.test.ts` (schema-inventory assertions every schema-adding task updates); `tests/integration/src/pesel-ingestion.test.ts` (one TASK-004 assertion was reframed — it asserted the truth tables did not *exist*, which stopped being meaningful once `0004` created them; it now asserts the importer writes **no rows** into them, which is the real invariant and still holds); `packages/db/src/generated/db.ts` (regenerated); root `package.json` (`demo:surname` alias); `tests/integration/package.json`; `pnpm-lock.yaml` (workspace links only — no dependency added or upgraded).
+
+### Design points worth recording
+
+- **One claim per snapshot, never a sum.** A surname in both PESEL resources gets two claims with their own counts and comparability groups. Verified with `NOWAK`: 98,387 and 99,738, reported separately. A test asserts no result field equals their sum.
+- **No `unit` is stored.** The publisher says *"liczba wystąpień"* (occurrences), not people (U-4). The claim payload carries `source_population_scope` with the publisher's verbatim Polish instead. A test asserts the stored payload contains neither `"unit"` nor `"PEOPLE"`. This is what D-010 settled for the presentation boundary — ***resolved 2026-09-19 by ADR-0004***, which gives the DTO `SURNAME_OCCURRENCES`. TASK-005's storage is unaffected: the unit is a contract-boundary concept, not a claim-payload one.
+- **Confidence and rights cannot reach each other.** They are separate modules; neither imports the other, and `ConfidenceInputs` has no field through which a rights value could arrive. An integration test re-derives under a fully permissive rights profile and asserts the confidence is byte-identical while all four surfaces open up. (An earlier version of that test compared against a `PROHIBITED` profile and was **vacuous** — `PROHIBITED` and `UNKNOWN` map to the same decisions. The comparison was corrected to a permissive profile, which is also the harder direction of invariant 2.)
+- **U-5 recorded:** `EXACT` only. `KNOWN_VARIANT` is excluded, because no `NameForm` variant links exist in production data, so a permissive path could not be tested against anything real.
+- **U-7 recorded:** resolution runs as a read pass before the write transaction; the resolver's `READ ONLY` guarantee is untouched.
+
+### Verification actually run (2026-09-19)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | **PASS** — 11 of 11 packages |
+| `pnpm lint` | **PASS** — zero errors, zero warnings |
+| `pnpm format:check` | **PASS** |
+| `pnpm test` | **PASS** — **164 tests** (132 before; +32 in `packages/truth`) |
+| `pnpm db:migrate` | **PASS** — `0004_truth_layer` applied; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **PASS** — regenerated file byte-identical to the committed one (`cmp`) |
+| `pnpm test:integration` | **PASS** — **91 tests** (60 before; +31 in `truth-chain.test.ts`), exit code 0 |
+| `pnpm build` | **PASS** |
+| Forbidden-logic grep over new code | Only a comment and the canonical `ALGORITHMIC_SIMILARITY` enum member (a value from `docs/canonical/11` §9.5, no logic) |
+| Module-boundary greps | `confidence.ts` does not import `rights.js`; `rights.ts` does not import `confidence.js`; the CLI contains no SQL; derivation contains no `insertInto`/`updateTable` against any source or identity table |
+| `git status --porcelain` on read-only dirs | Unchanged |
+
+**Regression:** TASK-003 resolver tests (55 unit, 24 integration) and TASK-004 ingestion tests (37 unit, 32 integration) all pass. Two TASK-004 integration assertions were updated as described above; no behaviour changed.
+
+**End-to-end demo against a live database**, after importing both committed fixtures:
+
+```text
+input "NOWAK" → EXACT → 2 claims
+  male   98,387  2026-01-20  pesel_2026_national_male    VERIFIED
+  female 99,738  2026-01-20  pesel_2026_national_female  VERIFIED
+  citation: Nazwiska występujące w rejestrze PESEL · Ministerstwo Cyfryzacji · CC0 1.0
+            resource:1148808 / resource:1148811
+  surfaces: INTERNAL ALLOWED · FREE CONDITIONAL · PAID BLOCKED · SEO BLOCKED
+```
+
+Idempotency observed directly: row counts across all six truth tables were `2/2/2/2/2/2` after the first derivation and unchanged after two further runs (including a case-variant input). `Nieistniejące` → `UNRESOLVED`, no claim, no zero. `WISNIEWSKI` → `UNRESOLVED`; `WIŚNIEWSKI` → `EXACT`, 53,079.
+
+### Not verified in this environment
+
+The integration suite ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL` fallback, as in TASK-001 through TASK-004. The pinned `postgis/postgis:16-3.4@sha256:44126d87…` image was **not** exercised here — container registries remain egress-blocked. CI runs it.
+
+### Carried forward
+
+- **D-010** — **RESOLVED 2026-09-19** by `docs/adr/0004-population-value-unit.md`: the unit enum is widened and PESEL-derived responses carry `SURNAME_OCCURRENCES`, not `"PEOPLE"`. TASK-006 is unblocked. The underlying source question (U-4) is still open — `"PEOPLE"` stays in the enum as the value PESEL switches to if the publisher confirms it, which is a change of emitted value rather than of schema.
+- **TASK-004 §14 U-1 and U-4** — still unanswered by the publisher. U-1 is contained structurally (separate comparability groups); U-4 is contained by storing no unit.
+- **D-007** — resource-level licence unconfirmed, so `commercial_use = UNKNOWN` keeps paid and SEO surfaces blocked. Observed in the demo output above.
+
+## TASK-006 implemented — surname result read API (2026-09-19)
+
+Scope authority: `tasks/006-surname-result-read-api.md`. One bounded capability: an exact surname query returns a stable, typed, rights-aware result carrying `CURRENT_POPULATION`, produced entirely by the TASK-003 → TASK-005 pipeline. First slice of M2.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/contracts/src/surname-result.ts` | Zod 4 schemas + inferred types: request, response, error envelope |
+| `packages/truth/src/read.ts` | **Read-only** lookup of already-derived claims |
+| `packages/truth/src/query.ts` | The application query service |
+| `apps/web/src/app/api/v1/surname-results/route.ts` | Thin BFF handler — no SQL, no business logic |
+| `docs/contracts/surname-result.md` | **The repository's first accepted contract** |
+| tests | 25 contract, 4 route-shape, 22 integration |
+
+Modified: `packages/contracts/package.json` (adds `zod@4.6.5`), `apps/web/{package.json,next.config.ts}`, `tests/integration/{package.json,tsconfig.json}`, both index files, `pnpm-lock.yaml` (workspace links + zod; nothing upgraded). **No migration.**
+
+### Implementer choices recorded (TASK-006 §15)
+
+- **U-1 → extend `packages/truth`.** One fewer package; the truth service already exposed a clean result object.
+- **U-2 → omit `canonical_slug`/`canonical_path`.** No slug exists, and Polish slug transliteration is a real decision that must not be confused with the identity-bearing diacritics of `ARCHITECTURE.md` §10 invariant 8. This slice ships no browser route or SEO surface to consume them. Recorded as a deviation in the contract document.
+- **U-3 → read-only path, confirmed necessary.** `deriveCurrentPopulation` performs six inserts, so a read must not reach it. `read.ts` exists for exactly this; a test asserts no import of or call to derivation from the read path, and an integration test asserts all fourteen tables are unchanged across a batch of reads including miss and error paths.
+- **U-4 → `400` for invalid input**, successful states for valid-but-unresolved.
+- **Surface handling:** `ALLOWED` and `CONDITIONAL` surface the values; `BLOCKED` omits them from the payload entirely rather than sending them flagged (`docs/canonical/16` §55).
+
+### Two things worth recording
+
+**One deviation, in the contract document.** The unit is `SURNAME_OCCURRENCES` per ADR-0004, not `docs/canonical/16` §26's literal `"PEOPLE"`. A test asserts `"PEOPLE"` appears nowhere in a PESEL-derived response.
+
+**The build needed fixing, and the fix is a workaround.** `apps/web` previously had no workspace dependencies. Once it consumed them, `next build` failed on ten unresolved imports: the packages are consumed as TypeScript source and use `.js`-extension specifiers (the repo's NodeNext convention), which **Turbopack cannot resolve and has no option to**. The webpack builder can, via `resolve.extensionAlias`, so `apps/web` now pins `--webpack` for `dev` and `build`, with the reason in `next.config.ts`. **This should be revisited**: the cleaner long-term fix is compiling the workspace packages to `dist`, which is a repo-wide change and was not TASK-006's to make.
+
+### Verification actually run (2026-09-19)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | **PASS** — 11 packages |
+| `pnpm lint` | **PASS** |
+| `pnpm format:check` | **PASS** |
+| `pnpm test` | **PASS** — **193 tests** (164 before; +25 contract, +4 route-shape) |
+| `pnpm test:integration` | **PASS** — **113 tests** (91 before; +22), including 3 through the real route handler |
+| `pnpm build` | **PASS** (webpack builder — see above) |
+| `pnpm db:migrate` | **PASS** — `no pending migrations`; this task adds none |
+| `pnpm db:generate-types` | **PASS** — byte-identical (`cmp`) |
+| Boundary greps | Route handler holds no SQL and no resolver import; read path contains no `insertInto`/`updateTable`/`deleteFrom`; derivation is neither imported nor called from the read path |
+| `git status --porcelain` on read-only dirs | Unchanged |
+
+**Regression:** TASK-003, TASK-004 and TASK-005 suites all pass unchanged. No existing test was modified.
+
+**Read-path behaviour observed** (integration, over genuinely ingested and derived fixture data): a surname in both PESEL resources returns two observations in different comparability groups with no total anywhere in the payload; `WIŚNIEWSKI` resolves while `WISNIEWSKI` returns `UNRESOLVED`; a resolved surname with no derived evidence returns `UNAVAILABLE`/`NO_APPLICABLE_EVIDENCE` and no zero; the `PAID` surface returns `RIGHTS_BLOCKED` with the value absent from the serialized body; confidence is identical across surfaces while surface decisions differ; the persisted assessment `rationale` never appears in a response.
+
+### Not verified in this environment
+
+Integration tests ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL` fallback, as in every task so far. The pinned container image was not exercised here — registries remain egress-blocked. CI runs it.
+
+### Carried forward
+
+- **Turbopack/`--webpack`** — a build workaround, not a decision. Compiling workspace packages to `dist` would remove it.
+- **Caching is `no-store`.** `docs/canonical/16` §84/§87's ETag and cache-by-version policy belongs to whichever task first needs it.
+- **D-007** still gates paid surfaces, which is why `PAID` is `BLOCKED` in every observed response. **U-4** (the source unit) still open; ADR-0004 makes the contract honest about it rather than answering it.
+
 ## Next action
 
-TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.
+TASK-001 through TASK-004 are implemented and verified. One flagged deviation still awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions TASK-003 §6.2 named; adding them later is a nullable-column migration.
+
+TASK-005 (`CURRENT_POPULATION` truth chain) is now **specified** — see the section below — and **is blocked on four answers**: D-008 and D-009 in `docs/DECISIONS_NEEDED.md` before its migration can be written, and TASK-004 §14 U-1 and U-4 from the publisher before any claim is phrased as a statement about people.
+
+TASK-001 through TASK-005 are implemented and verified. M1's vertical slice is complete: a real surname goes from raw input through exact resolution, ingested PESEL evidence, a typed claim, confidence, citation and rights evaluation to a deterministic developer-facing result.
+
+TASK-001 through TASK-006 are implemented and verified. M1 is complete and M2 has begun: a caller can now query an exact surname over HTTP and receive a rights-aware, evidence-backed `CURRENT_POPULATION` result with its snapshot date, confidence and citation.
+
+The rest of M2 has no task file yet: `CURRENT_RANK` and `RARITY_CONTEXT` (the first derived claims — note `RARITY_CONTEXT` needs the denominator TASK-004 left as U-6 with `universe_size` null), `pg_trgm` candidate generation with tier-safe ranking, gender forms, the free result UI, a read-only inspector, and logging/tracing.
+
+**Four decisions remain open, none of them blocking current work:** D-002 (onomastics rights, blocks M2 meaning), D-003 (Polona rights, blocks M3), D-004 (regional map framing, blocks M2 geography), D-007 (PESEL resource-level licence, blocks M5/M6 paid surfaces). All four need an external party or a commercial judgement, not an engineering decision. D-007's publisher enquiry would also answer TASK-004 §14 U-4 and let the DTO move to `"PEOPLE"`.
+
+Per AGENTS.md §8: **STOP.** No TASK-006 code was written, TASK-007 was not started, and no `tasks/007-*.md` exists.
+
+## TASK-004 specified — planning only, no code written (2026-09-19)
+
+`tasks/004-pesel-surname-ingestion.md` specifies one bounded capability: deterministic, idempotent, provenance-carrying ingestion of the pinned official PESEL national surname resources into the canonical data layer, stopping before any claim, confidence or citation (those are TASK-005).
+
+Observed state, verified against the working tree this session and not assumed:
+
+- **No TASK-004 code exists.** No importer, no source registry, no migration `0003`, no `sources`/`rights_profiles`/`source_records`/`distribution_snapshots`/`distribution_values` table. `packages/sources` still contains only TASK-002's schema/decoder/parser.
+- **The spec's stated preconditions were re-verified**, not taken on trust: `@name-atlas/sources` exports `decodePeselBytes`, `parsePeselFile`, `PeselSchemaError`, `PESEL_MIN_VALID_COUNT = 2`; `@name-atlas/resolver` exports `canonicalKey`, `NORMALIZATION_VERSION` (= `CANONICAL_KEY_VERSION` = `canonical_key_v1`), `resolveSurname`, `detectScripts`; resolver outcomes are `EXACT | KNOWN_VARIANT | MULTIPLE_EXACT | UNKNOWN | REVIEW_REQUIRED` plus a separate `LOOKUP_FAILED` kind; `resolveSurname` runs under `setAccessMode("read only")`; migration `0002_identity_core` creates `knowledge_entities`, `surnames` (`canonical_key` UNIQUE), `name_forms` and the `resolvable_name_forms` view; `fixtures/pesel/source-manifest.json` carries the dataset, national-pair and `regional_resources_not_ingested` records the spec cites. No claim in the task file was found unsupported.
+- **A duplicate draft was removed.** `tasks/004-pesel-ingestion-source-rights.md` (an earlier, narrower second draft that labelled itself non-authoritative) was deleted so that `tasks/` holds exactly one TASK-004 scope authority, per AGENTS.md §3. It remains in git history at commit `a528773`. Its one substantive contribution not already present in the authority — the `SourceRecord` granularity decision — was **not** carried over as a decision, because it turned out not to be a decision this project may make silently (next item).
+- **A contradiction between two canonical documents was found and recorded, not resolved.** `docs/canonical/12` §3.1/§9.2 specifies a resource-version-scoped `BULK_DATASET` import, while `docs/canonical/11` §37.2's worked example is row-scoped, and `docs/canonical/11`'s index specification mandates `UNIQUE source_records(source_id, external_record_id) WHERE external_record_id IS NOT NULL` — which the resource-version reading collides with as soon as supersession creates a second version. Recorded as **D-006** in `docs/DECISIONS_NEEDED.md` and as §14 U-8 in the task file. The earlier draft of the task file had asserted a different uniqueness key (`(source_id, external_record_id, content_hash)`) with no flag; that silent deviation is now marked as such.
+
+**Nothing was verified by running.** No command was executed this session beyond read-only inspection (`git`, `grep`, `sed`, `python3` over repository files). Dependencies are not installed in this environment (`node_modules` absent), so `pnpm test`, `pnpm typecheck` and the integration suite were **not** run — the 95 unit / 28 integration counts cited in the task file's §13 are carried forward from the TASK-003 verification run recorded above, not re-observed.
+
+**No decision now blocks the start of TASK-004.** U-4 to U-7 are implementer choices to be recorded during implementation.
+
+## TASK-004 §14 U-1, U-2, U-3 answered by the project owner (2026-09-19)
+
+Answered on the project owner's instruction ("answer U-1, U-2 and U-3 so TASK-004 can start"). Full text of each answer is in `tasks/004-pesel-surname-ingestion.md` §14; the decisions are binding on the implementer. Summary of what was decided and — equally important — what was **not**:
+
+- **U-1 (male/female split).** Decided: do not decide the semantics. Carry the publisher's verbatim Polish `universe_description`, use a `methodology_key` that names the resource without asserting a basis, state the ambiguity in `coverage_notes`, and give the two partitions **different `comparability_group` values** so `docs/canonical/11` §6.1's comparability rule mechanically forbids summing them. **Not decided:** what the split actually means. That fact is still unknown, still requires the publisher, and remains a precondition of TASK-005 alongside U-4.
+- **U-2 (resource-level licence / `RightsProfile`).** Decided: a full field-by-field seed, every value traceable to evidence or honestly `UNKNOWN`, verified against the real field list and enum members in `docs/canonical/11` §9.4. Key values: `automated_access = ALLOWED`, `commercial_use = UNKNOWN`, `redistribution = UNKNOWN`, `review_status = LEGAL_REVIEW_REQUIRED`, `attribution_required = false`, `terms_version = CC0 1.0`. This unblocks ingestion (the only hard gate is `automated_access == PROHIBITED`) while `commercial_use = UNKNOWN` keeps `evidence.paid_surface_eligible = false` by `docs/canonical/12` §6.4. **Not decided:** whether the resources actually inherit the dataset's CC0 dedication. No legal review was performed and none is claimed. Carried forward as **D-007**, which blocks M5/M6.
+- **U-3 (raw bytes not stored).** Decided: accept the deviation from `docs/canonical/12` §9.2 and record it rather than fake it — `raw_text_ref` null with a stated reason, bytes identified by `content_hash` + `source_url` + `raw_payload`, object storage carried forward as an M0-infrastructure obligation. **Condition:** the project owner retains the acquired bytes outside the repository (checksums in `docs/sources/acquisition/2026-09-18/SHA256SUMS.txt`); if those are lost the import becomes unreproducible and that is a finding to raise.
+
+**Verified before writing these answers, not assumed:** the `RightsProfile` field list and the `RightsPermission` / `CachePermission` / `RightsReviewStatus` enum members (`docs/canonical/11` §9.4); the `DistributionSnapshot` field list including `comparability_group` and its stated meaning (§6.1); the hard gates in `docs/canonical/12` §6.4; and the publisher's verbatim resource titles and descriptions, read from the captured metadata under `docs/sources/acquisition/2026-09-18/metadata/`. The same check reconfirmed that resource-level metadata carries no licence attribute.
+
+**Still not run:** no test, typecheck or build was executed in this session; dependencies are not installed here.
+
+## TASK-004 U-8 closed by ADR-0003 (2026-09-19)
+
+The contradiction recorded as D-006 was put to the project owner with three options and their costs, and resolved: **one `SourceRecord` per resource version**, `external_record_id` kept as the publisher's bare resource id (`1148808`), `record_type = API_OBJECT`, `raw_payload` holding the resource-metadata object, and the uniqueness key relaxed to `(source_id, external_record_id, content_hash)`.
+
+- Written up as `docs/adr/0003-source-record-granularity.md` (Accepted), including the two rejected alternatives — encoding a version discriminator into `external_record_id`, and row granularity (~828k records per full import) — and the conditions for revisiting.
+- This is a **deliberate deviation** from `docs/canonical/11`'s `UNIQUE source_records(source_id, external_record_id)` index line, which cannot coexist with the supersession requirement in `docs/canonical/12` §9.3 and `ARCHITECTURE.md` §10 invariant 6. Per `AGENTS.md` §2 the contradiction was superseded by an ADR rather than settled in code; the migration must carry a comment pointing at it.
+- D-006 is marked RESOLVED in `docs/DECISIONS_NEEDED.md`, pointing at the ADR. `tasks/004-pesel-surname-ingestion.md` AC-06, AC-22 and §9 invariant 7 are now written in concrete, testable form.
+
+`docs/canonical/` remains untouched — the deviation lives in the ADR, not in the read-only corpus.
 
 ## `CURRENT_DISTRIBUTION` preflight — TASK-008 NOT ACTIONABLE, no task file written (2026-09-19)
 

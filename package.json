@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "Name Atlas monorepo — control plane in AGENTS.md, ARCHITECTURE.md, docs/adr/",
+  "description": "Name Atlas monorepo \u2014 control plane in AGENTS.md, ARCHITECTURE.md, docs/adr/",
   "engines": {
     "node": ">=22.12.0 <23"
   },
@@ -17,7 +17,8 @@
     "test": "pnpm -r --if-present run test",
     "test:integration": "pnpm --filter @name-atlas/integration-tests run test:integration",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
-    "db:generate-types": "pnpm --filter @name-atlas/db run generate-types"
+    "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
+    "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
