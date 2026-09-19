@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-003 implemented and verified (exact surname resolver + identity core migration)
+**Last updated:** 2026-09-19 — TASK-004 specified (planning only, no code); TASK-003 implemented and verified (exact surname resolver + identity core migration)
 
 ## Current state
 
@@ -16,7 +16,8 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | None yet. TASK-004 (PESEL ingestion) is the natural next task but has no task file and was not started (AGENTS.md §8). |
+| **TASK-004 — canonical PESEL surname dataset ingestion** | **SPECIFIED, NOT STARTED.** `tasks/004-pesel-surname-ingestion.md` is the scope authority. No TASK-004 code, migration, importer or test exists. Four decisions block implementation: §14 U-1, U-2, U-3 (project owner) and U-8 (`docs/DECISIONS_NEEDED.md` D-006, a contradiction between two canonical documents). |
+| Next approved task | None. TASK-004 is specified but not approved for implementation; the §14 decisions are unanswered. |
 
 ## What TASK-001 built
 
@@ -309,4 +310,21 @@ Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm
 
 ## Next action
 
-TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.
+TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration.
+
+TASK-004 is now **specified** — see the section below. Per AGENTS.md §8: **STOP.** No TASK-004 code was written and no `tasks/005-*.md` exists.
+
+## TASK-004 specified — planning only, no code written (2026-09-19)
+
+`tasks/004-pesel-surname-ingestion.md` specifies one bounded capability: deterministic, idempotent, provenance-carrying ingestion of the pinned official PESEL national surname resources into the canonical data layer, stopping before any claim, confidence or citation (those are TASK-005).
+
+Observed state, verified against the working tree this session and not assumed:
+
+- **No TASK-004 code exists.** No importer, no source registry, no migration `0003`, no `sources`/`rights_profiles`/`source_records`/`distribution_snapshots`/`distribution_values` table. `packages/sources` still contains only TASK-002's schema/decoder/parser.
+- **The spec's stated preconditions were re-verified**, not taken on trust: `@name-atlas/sources` exports `decodePeselBytes`, `parsePeselFile`, `PeselSchemaError`, `PESEL_MIN_VALID_COUNT = 2`; `@name-atlas/resolver` exports `canonicalKey`, `NORMALIZATION_VERSION` (= `CANONICAL_KEY_VERSION` = `canonical_key_v1`), `resolveSurname`, `detectScripts`; resolver outcomes are `EXACT | KNOWN_VARIANT | MULTIPLE_EXACT | UNKNOWN | REVIEW_REQUIRED` plus a separate `LOOKUP_FAILED` kind; `resolveSurname` runs under `setAccessMode("read only")`; migration `0002_identity_core` creates `knowledge_entities`, `surnames` (`canonical_key` UNIQUE), `name_forms` and the `resolvable_name_forms` view; `fixtures/pesel/source-manifest.json` carries the dataset, national-pair and `regional_resources_not_ingested` records the spec cites. No claim in the task file was found unsupported.
+- **A duplicate draft was removed.** `tasks/004-pesel-ingestion-source-rights.md` (an earlier, narrower second draft that labelled itself non-authoritative) was deleted so that `tasks/` holds exactly one TASK-004 scope authority, per AGENTS.md §3. It remains in git history at commit `a528773`. Its one substantive contribution not already present in the authority — the `SourceRecord` granularity decision — was **not** carried over as a decision, because it turned out not to be a decision this project may make silently (next item).
+- **A contradiction between two canonical documents was found and recorded, not resolved.** `docs/canonical/12` §3.1/§9.2 specifies a resource-version-scoped `BULK_DATASET` import, while `docs/canonical/11` §37.2's worked example is row-scoped, and `docs/canonical/11`'s index specification mandates `UNIQUE source_records(source_id, external_record_id) WHERE external_record_id IS NOT NULL` — which the resource-version reading collides with as soon as supersession creates a second version. Recorded as **D-006** in `docs/DECISIONS_NEEDED.md` and as §14 U-8 in the task file. The earlier draft of the task file had asserted a different uniqueness key (`(source_id, external_record_id, content_hash)`) with no flag; that silent deviation is now marked as such.
+
+**Nothing was verified by running.** No command was executed this session beyond read-only inspection (`git`, `grep`, `sed`, `python3` over repository files). Dependencies are not installed in this environment (`node_modules` absent), so `pnpm test`, `pnpm typecheck` and the integration suite were **not** run — the 95 unit / 28 integration counts cited in the task file's §13 are carried forward from the TASK-003 verification run recorded above, not re-observed.
+
+**Blocked pending the project owner:** §14 U-1 (what the male/female split partitions), U-2 (resource-level licence and who approves the `RightsProfile`), U-3 (raw source bytes have nowhere to be stored). **Blocked pending a recorded decision:** U-8/D-006. U-4 to U-7 are implementer choices to be recorded during implementation.
