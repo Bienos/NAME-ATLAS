@@ -125,7 +125,20 @@ importers:
         specifier: 0.29.6
         version: 0.29.6
 
-  packages/sources: {}
+  packages/sources:
+    dependencies:
+      '@name-atlas/db':
+        specifier: workspace:*
+        version: link:../db
+      '@name-atlas/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@name-atlas/resolver':
+        specifier: workspace:*
+        version: link:../resolver
+      kysely:
+        specifier: 0.29.6
+        version: 0.29.6
 
   packages/testing:
     dependencies:
@@ -154,9 +167,15 @@ importers:
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@name-atlas/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       '@name-atlas/resolver':
         specifier: workspace:*
         version: link:../../packages/resolver
+      '@name-atlas/sources':
+        specifier: workspace:*
+        version: link:../../packages/sources
       '@name-atlas/testing':
         specifier: workspace:*
         version: link:../../packages/testing
