@@ -13,7 +13,7 @@ export type ClaimEvidenceRelationship = "CONTEXT" | "CONTRADICTS" | "SUPPORTS";
 
 export type ClaimLifecycleStatus = "ACTIVE" | "REJECTED" | "RETRACTED" | "SUPERSEDED";
 
-export type ClaimType = "CURRENT_POPULATION";
+export type ClaimType = "CURRENT_POPULATION" | "CURRENT_RANK";
 
 export type ConfidenceStatus = "CONFLICTING" | "INSUFFICIENT_DATA" | "LIKELY" | "POSSIBLE" | "UNCONFIRMED" | "VERIFIED";
 
@@ -22,6 +22,8 @@ export type EntityStatus = "ACTIVE" | "MERGED" | "RETRACTED" | "SUPERSEDED";
 export type EntityType = "NAME_FORM" | "SURNAME";
 
 export type EpistemicType = "FACT" | "HYPOTHESIS" | "INTERPRETATION" | "UNKNOWN";
+
+export type EvidenceDependencyRole = "COUNT" | "UNIVERSE";
 
 export type EvidenceScope = "FAMILY_LEVEL" | "PERSON_LEVEL" | "SHARED" | "SURNAME_LEVEL";
 
@@ -167,6 +169,14 @@ export interface DistributionValues {
   rank: number | null;
   source_geography_key: string | null;
   surname_share: Numeric | null;
+}
+
+export interface EvidenceDependencies {
+  created_at: Generated<Timestamp>;
+  dependency_role: EvidenceDependencyRole;
+  depends_on_evidence_item_id: string;
+  derived_evidence_item_id: string;
+  evidence_dependency_id: string;
 }
 
 export interface EvidenceItems {
@@ -353,6 +363,7 @@ export interface DB {
   confidence_assessments: ConfidenceAssessments;
   distribution_snapshots: DistributionSnapshots;
   distribution_values: DistributionValues;
+  evidence_dependencies: EvidenceDependencies;
   evidence_items: EvidenceItems;
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;

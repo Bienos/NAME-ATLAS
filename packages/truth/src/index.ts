@@ -16,9 +16,19 @@ export { readCurrentPopulation } from "./read.js";
 export type { PersistedCurrentPopulation } from "./read.js";
 export { querySurnameResult } from "./query.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
-export { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
+export { deriveCurrentRank, currentRankClaimKey } from "./rank.js";
+export type { DeriveRankOptions } from "./rank.js";
+export { assessUniverseCompleteness } from "./completeness.js";
+export type { CompletenessInputs, CompletenessVerdict, IncompleteReason } from "./completeness.js";
+export {
+  assessCurrentPopulation,
+  assessDerivedStatistic,
+  evidenceSetHash,
+  isValidCombination,
+} from "./confidence.js";
 export type {
   ConfidenceInputs,
+  DerivedConfidenceInputs,
   ConfidenceStatus,
   ConfidenceVerdict,
   EpistemicType,
@@ -30,10 +40,20 @@ export type {
   CitationProjection,
   ConfidenceProjection,
   CurrentPopulationClaimResult,
+  CurrentRankClaimResult,
+  NoRankReason,
   NoResultReason,
+  RankUniverse,
+  SurnameRankResult,
   SurnameTruthResult,
 } from "./result.js";
 export {
+  CURRENT_RANK_METHOD_VERSION,
+  CURRENT_RANK_PAYLOAD_VERSION,
+  RANK_CONFIDENCE_ASSESSMENT_METHOD,
+  RANK_CONFIDENCE_ASSESSMENT_VERSION,
+  RANK_TIES_POLICY,
+  RANK_UNIVERSE_KIND,
   CONFIDENCE_ASSESSMENT_METHOD,
   CONFIDENCE_ASSESSMENT_VERSION,
   CURRENT_POPULATION_METHOD_VERSION,

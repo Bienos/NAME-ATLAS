@@ -280,50 +280,77 @@ This **deviates from `docs/canonical/16` §26**, which fixes the unit as a singl
 
 ---
 
-## D-011 — does a derived claim need `EvidenceDependency`, or do `ClaimEvidence` links suffice?
+## D-011 — RESOLVED (TASK-009 implementation, 2026-09-19)
 
-**Status:** **BLOCKS TASK-009's migration.** NON-BLOCKING for everything already built.
-**Owner:** project owner, on an architecture question, informed by the TASK-009 preflight.
+**Resolution: Option A — create `evidence_dependencies` now.** The derived-statistic lineage that `docs/canonical/14` §30 specifies is implemented as specified.
 
-Recorded 2026-09-19 during the TASK-009 (`CURRENT_RANK`) preflight. It is a genuine tension between two canonical documents, so `AGENTS.md` §2 requires it be recorded rather than settled inside a migration.
+Decided by the project owner, 2026-09-19. Concretely:
 
-### The tension
+- Migration `0005_current_rank` creates `evidence_dependencies` per `docs/canonical/11` §9.6, as a link from a derived `EvidenceItem` to each upstream `EvidenceItem` it depends on.
+- The link carries a **role**, `evidence_dependency_role`, so the two inputs `docs/canonical/14` §30 names are distinguishable in the data rather than merely both present: `COUNT` for the subject surname's own value and `UNIVERSE` for the evidence establishing the ranked set. That distinction is the whole reason `ClaimEvidence` alone was insufficient. The enum is staged like the others in `0002` and `0004`: further roles arrive by `ALTER TYPE … ADD VALUE` when a later derived claim needs them (`DENOMINATOR` is the obvious next one, for `RARITY_CONTEXT`).
+- `claim_type` gains `CURRENT_RANK` by `ALTER TYPE … ADD VALUE`, the pattern migration `0004`'s own header named.
 
-`docs/canonical/14` §30 specifies the lineage a derived statistic must carry:
+**No ADR is required**, because nothing deviates from a canonical specification: this implements `docs/canonical/11` §9.6 and `docs/canonical/14` §30 as written. §9.6's "This can be P1 if `ClaimEvidence` links are sufficient for the first vertical slice" was a conditional deferral, and the condition expired when a claim with two differently-roled inputs arrived.
+
+**Verified while implementing, and worth recording:** PostgreSQL 16 permits `ALTER TYPE … ADD VALUE` inside a transaction alongside a `CREATE TABLE` referencing that type, but **using** the new value in the same transaction fails with `unsafe use of new value`. Migrations run in a transaction, so a future migration must never add an enum value and insert a row carrying it in one step. Tested directly rather than assumed.
+
+Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option C (one opaque composite evidence item) were rejected. Option C would have made "why do we believe this rank?" unanswerable by traversal.
+
+---
+
+## D-013 — `canonical_key_v1` merges 171 distinct real surnames: full case folding maps `ẞ` to `ss`
+
+**Status:** **BLOCKS INGESTING THE FULL PRODUCTION RESOURCE, and therefore blocks every capability that needs it** — `CURRENT_RANK`'s passing path, `RARITY_CONTEXT`, and any production surface. NON-BLOCKING for what is already built, which runs on the committed fixtures.
+**Owner:** project owner, on a canonical-identity question. This one is not a preference: the current behaviour makes the real data uningestible.
+
+Discovered 2026-09-19 while attempting the first full import, in order to demonstrate TASK-009's completeness gate letting a complete universe through. **The import fails and writes nothing**, which is TASK-004 U-5's fail-closed behaviour working correctly:
 
 ```text
-DERIVED_STATISTIC EvidenceItem
-↓
-EvidenceDependency
-├── count evidence
-├── denominator/universe evidence
-└── methodology/version
+[import] FAILED (DUPLICATE_CANONICAL_KEY): two rows share canonical key "weiss": "WEISS" and "WEIẞ"
 ```
 
-`evidence_dependencies` **does not exist.** TASK-005 deliberately excluded it, quoting `docs/canonical/11` §9.6's own hedge that it is "P1 if `ClaimEvidence` links are sufficient for the first vertical slice" — which was true, because `CURRENT_POPULATION` is source-native and has exactly one input.
+### The cause, and it is singular
 
-`CURRENT_RANK` is the first claim with **more than one kind of input**: the subject surname's own count, and the universe it is ranked within. §30 names `EvidenceDependency` as the mechanism for exactly that. So the hedge's condition ("sufficient for the first vertical slice") has now expired, and the question must be answered before TASK-009's migration is written.
+`canonical_key_v1` applies Unicode **full** case folding. Full folding maps `ẞ` (U+1E9E, LATIN CAPITAL LETTER SHARP S) to the two characters `ss`. So `WEIẞ` and `WEISS` both fold to `weiss`, as do `GROẞ`/`GROSS`, `GAUẞ`/`GAUSS`, `FUẞ`/`FUSS` and `BERGSTRÄẞER`/`BERGSTRÄSSER`. Confirmed against the real `canonicalKey` export, not a reimplementation.
+
+Measured over both full official resources:
+
+| | Male `1148808` | Female `1148811` |
+|---|---:|---:|
+| Distinct source surnames | 408,182 | 420,082 |
+| Distinct canonical keys | 408,130 | 419,963 |
+| **Colliding keys** | **52** | **119** |
+| Surnames that would be lost to a merge | 52 | 119 |
+
+**171 collisions in total, and every single one has this one cause.** Zero collisions arise from anything else — no diacritic, no whitespace, no script issue. The identity model is otherwise sound across 828,264 real surnames, which is a strong result; this is one specific, fixable defect.
+
+### Why merging them would be wrong
+
+These are distinct surnames in the register with distinct counts. `ARCHITECTURE.md` §10 invariant 8 says Polish diacritics are identity-bearing and "`Łuczak` and `Luczak` are never merged automatically". The same principle governs `GROẞ` and `GROSS`: a German-origin surname spelled with the sharp S is not the surname spelled with a double S, and the publisher lists them separately. The resolver refusing to merge them is correct. The consequence — that the resource cannot be ingested at all — is what needs a decision.
 
 ### Options
 
-**Option A — create `evidence_dependencies` now, per `docs/canonical/11` §9.6 and `14` §30.**
-Implements the canonical mechanism as specified. Costs one more table and its integrity rules at a point where exactly one claim type needs it. Gains: every later derived claim (`RARITY_CONTEXT`, `CURRENT_DISTRIBUTION`, `REGIONAL_CONCENTRATION`) inherits a correct lineage model rather than a retrofit, and §30 is satisfied literally with no ADR needed.
+**Option A — use simple case mapping instead of full folding for the canonical key.** `ẞ` (U+1E9E) lowercases to `ß` (U+00DF), which is not `ss`, so `GROẞ → groß` and `GROSS → gross` stay distinct. Verified: all 171 collisions separate under simple folding. This is a change to `packages/resolver/src/normalize.ts` and therefore a **new key version**, `canonical_key_v2`, with re-keying of any persisted `surnames.canonical_key`. Cost: a user typing `GROSS` will not reach `GROẞ` by exact match. That is correct behaviour for an *identity* tier and is precisely what the fuzzy tiers exist for — `docs/canonical/13` T2 onward — so the cost lands where the architecture already expects to absorb it. Recommended.
 
-**Option B — link both inputs through `ClaimEvidence` and record the deviation in an ADR.**
-Cheapest change: the rank claim gains two `claim_evidence` rows, both `SUPPORTS`, one to the count evidence and one to the universe evidence. Costs: §30 is then not implemented literally, so it needs an ADR the way ADR-0003 and ADR-0004 documented their deviations; and `ClaimEvidence` cannot express *which* input played *which* role, so "the universe evidence" and "the count evidence" become indistinguishable in the data — precisely the distinction §30 asks for.
+**Option B — keep full folding and treat each collision as a review-required ambiguity.** Faithful to the current design and requires no code change, but the full resource stays uningestible until 171 surnames are adjudicated by hand, and every annual refresh brings more. Not viable as the answer, though it is what happens today if nothing is decided.
 
-**Option C — defer by giving the rank a single composite evidence item** that internally names both inputs in its `structured_value`.
-Cheapest of all and the worst: it hides a two-input lineage inside one opaque payload, which makes "why do we believe this rank?" unanswerable by traversal. Recorded only to be rejected.
+**Option C — keep full folding and disambiguate the key with a suffix.** Preserves distinctness while keeping the fold, at the cost of a canonical key that is no longer a pure function of the surname text. Rejected: it makes the key unexplainable, and `docs/canonical/11` §20.1's dedupe story depends on the key being derivable.
 
 ### Recommendation
 
-**Option A.** The hedge in `docs/canonical/11` §9.6 is conditional and its condition has expired: `ClaimEvidence` links are no longer sufficient, because the roles of the inputs now differ and the model would lose that. Option A is also the only one needing no ADR, since it implements both canonical documents as written. Option B is defensible if the project owner would rather not add a table for one claim type, but it should then be an explicit, ADR-recorded deviation and the ADR should say what is lost.
+**Option A.** It is the only option that makes the real data ingestible while keeping distinct surnames distinct, it moves a burden onto the tier designed for it, and it is a contained change: one normalisation step, a key version bump, and a re-key. The 171 affected surnames are all of one linguistic pattern, so the change is testable against a known list rather than against a guess.
 
 ### Do not
 
-- Do not settle this by choosing a shape in TASK-009's migration file.
-- Do not implement Option C.
-- Do not let a rank claim ship with a lineage that cannot distinguish its count input from its universe input, whichever option is chosen — if Option B is selected, the distinction must be recoverable some other recorded way.
+- Do not merge the pairs. That is the automatic merge invariant 8 forbids, and it would silently destroy 171 real surnames and their counts.
+- Do not relax the importer's `DUPLICATE_CANONICAL_KEY` failure to skip or quarantine the colliding rows. Failing closed is what surfaced this at all.
+- Do not change `canonical_key_v1` in place. The key is versioned precisely so a change of meaning is visible; this needs `v2` and an ADR, since it alters accepted TASK-003 behaviour.
+
+### What is blocked until this is answered
+
+- The full official resource cannot be imported, so no production-scale data exists.
+- `CURRENT_RANK`'s **passing** path cannot be demonstrated. Its completeness gate is fully verified on the refusing path, and the gate is behaving exactly as designed: it refuses precisely because no complete universe can currently be created.
+- `RARITY_CONTEXT` inherits the block, since it needs a real denominator.
 
 ---
 

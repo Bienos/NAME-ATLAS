@@ -9,7 +9,8 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "demo:surname": "tsx bin/surname-profile.ts"
+    "demo:surname": "tsx bin/surname-profile.ts",
+    "demo:surname-rank": "tsx bin/surname-rank.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",

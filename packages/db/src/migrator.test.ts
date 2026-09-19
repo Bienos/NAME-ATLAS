@@ -13,6 +13,7 @@ describe("MIGRATIONS_DIR", () => {
       "0002_identity_core.ts", // TASK-003
       "0003_source_rights_distribution.ts", // TASK-004
       "0004_truth_layer.ts", // TASK-005
+      "0005_current_rank.ts", // TASK-009
     ]);
   });
 });

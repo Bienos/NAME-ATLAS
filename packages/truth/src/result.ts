@@ -110,3 +110,91 @@ export type SurnameTruthResult =
       /** Machine-readable detail. Never a stack trace or SQL. */
       readonly message: string;
     };
+
+/** Why a rank query produced no claim. `INCOMPLETE_UNIVERSE` is the new one. */
+export type NoRankReason =
+  | NoResultReason
+  /**
+   * The surname resolved and has evidence, but the set it would be ranked
+   * within is not the complete resource version. Reported, never approximated
+   * (TASK-009 §2).
+   */
+  | "INCOMPLETE_UNIVERSE";
+
+/** The universe a rank was computed within, carried so the rank is readable. */
+export interface RankUniverse {
+  /** What kind of set this is — currently one resource version's national values. */
+  readonly kind: string;
+  /** How many surnames it contains. */
+  readonly size: number;
+  /** The source record the set comes from. */
+  readonly source_record_id: string;
+  /** The publisher's resource id for that record. */
+  readonly external_record_id: string | null;
+  /**
+   * Snapshots in different comparability groups may not be compared
+   * (`docs/canonical/11` §6.1), which is why each group is its own universe.
+   */
+  readonly comparability_group: string | null;
+}
+
+/**
+ * One `CURRENT_RANK` claim — one per resource version, never one per surname.
+ *
+ * There is deliberately no "overall" or "national" rank field. The male and
+ * female PESEL resources sit in different comparability groups and TASK-004
+ * §14 U-1 forbids summing them, so **no all-Poland rank is derivable from
+ * this source**. A field implying one would be the fabrication `AGENTS.md` §9
+ * forbids.
+ */
+export interface CurrentRankClaimResult {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly rank: number;
+  readonly universe: RankUniverse;
+  /** The count the rank was computed from, carried for auditability. */
+  readonly count: number;
+  /** How tied counts were handled, because a rank without this is ambiguous. */
+  readonly ties_policy: string;
+  /** The versioned algorithm that produced the rank. */
+  readonly algorithm_version: string;
+  /** The source's own reference date — never the retrieval date. */
+  readonly snapshot_date: string;
+  readonly country_code: string;
+  /** The publisher's verbatim universe description. Not translated. */
+  readonly source_population_scope: string;
+  readonly coverage_notes: string | null;
+  readonly method_version: string;
+  readonly confidence: ConfidenceProjection;
+  readonly citation: CitationProjection;
+}
+
+export type SurnameRankResult =
+  | {
+      readonly kind: "RESULT";
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity;
+      /** One entry per complete resource version. Never merged. */
+      readonly current_rank: readonly CurrentRankClaimResult[];
+      readonly surface_eligibility: readonly SurfaceEligibility[];
+    }
+  | {
+      readonly kind: "NO_RESULT";
+      readonly reason: NoRankReason;
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity | null;
+      /** Machine-readable detail. Never a stack trace or SQL. */
+      readonly message: string;
+      /**
+       * Present when the reason is `INCOMPLETE_UNIVERSE`: what the registry
+       * expected against what is actually persisted, so the gap is reportable
+       * rather than merely asserted.
+       */
+      readonly incomplete_universes?: readonly {
+        readonly source_record_id: string;
+        readonly external_record_id: string | null;
+        readonly reason: string;
+        readonly expected_row_count: number | null;
+        readonly actual_row_count: number;
+      }[];
+    };

@@ -120,3 +120,83 @@ export function evidenceSetHash(evidenceItemIds: readonly string[]): string {
   const canonical = [...evidenceItemIds].sort().join("\n");
   return createHash("sha256").update(canonical, "utf8").digest("hex");
 }
+
+/**
+ * The confidence rule for a **derived** statistic (`docs/canonical/14` §30).
+ *
+ * §30 frames a derived statistic as "a FACT about a deterministic
+ * calculation, not a source-native fact". So the provisos differ from §29's:
+ * what matters is whether the calculation was deterministic, whether its
+ * inputs were complete, and whether those inputs were themselves trustworthy.
+ * A perfectly reproducible computation over a partial universe is worse than
+ * useless, which is why input completeness is a proviso and not an assumption.
+ *
+ * Like {@link assessCurrentPopulation}, this receives no rights input and
+ * there is nowhere to pass one (`ARCHITECTURE.md` §10 invariant 2).
+ */
+export interface DerivedConfidenceInputs {
+  /** The computation is deterministic and carries an algorithm version. */
+  readonly computationReproducible: boolean;
+  /** The universe the statistic was computed over passed the completeness gate. */
+  readonly inputsComplete: boolean;
+  /** Every upstream evidence item is itself VERIFIED. */
+  readonly upstreamEvidenceVerified: boolean;
+  /** No competing ACTIVE claim for the same proposition. */
+  readonly noMaterialConflict: boolean;
+}
+
+export function assessDerivedStatistic(inputs: DerivedConfidenceInputs): ConfidenceVerdict {
+  const epistemic_type: EpistemicType = "FACT";
+
+  if (!inputs.noMaterialConflict) {
+    return {
+      status: "CONFLICTING",
+      epistemic_type,
+      rationale:
+        "A competing active claim exists for this derived statistic; the value is not settled " +
+        "(docs/canonical/14 §30).",
+      human_review_required: true,
+    };
+  }
+
+  // Incompleteness is reported separately and fails closed before this rule
+  // is ever reached, so a false here means a caller bypassed the gate. Say so
+  // rather than quietly downgrading, because the downgrade would publish a
+  // number computed over a partial universe.
+  if (!inputs.inputsComplete) {
+    return {
+      status: "INSUFFICIENT_DATA",
+      epistemic_type,
+      rationale:
+        "The universe this statistic was computed over is not complete, so the statistic is " +
+        "not about the population it appears to describe (docs/canonical/14 §30).",
+      human_review_required: true,
+    };
+  }
+
+  const missing: string[] = [];
+  if (!inputs.computationReproducible) missing.push("reproducible computation");
+  if (!inputs.upstreamEvidenceVerified) missing.push("verified upstream evidence");
+
+  if (missing.length > 0) {
+    return {
+      status: "UNCONFIRMED",
+      epistemic_type,
+      rationale:
+        "A derived statistic is only as good as its calculation and its inputs; missing: " +
+        `${missing.join(", ")}. The value is recorded but not confirmed (docs/canonical/14 §30).`,
+      human_review_required: true,
+    };
+  }
+
+  return {
+    status: "VERIFIED",
+    epistemic_type,
+    rationale:
+      "Deterministic calculation carrying its algorithm version, computed over a universe " +
+      "verified complete against the source registry's official checksum and row count, from " +
+      "upstream evidence that is itself verified, with no competing active claim " +
+      "(docs/canonical/14 §30).",
+    human_review_required: false,
+  };
+}

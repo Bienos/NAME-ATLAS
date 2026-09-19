@@ -669,10 +669,17 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
         SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
       `.execute(db());
       const names = tables.rows.map((r) => r.table_name);
+      // `evidence_dependencies` was on this list until TASK-009. It is not a
+      // TASK-005 table and TASK-005 still creates none of the lineage rows;
+      // D-011 resolved that a derived claim needs the lineage
+      // docs/canonical/14 §30 specifies, because a rank has two
+      // differently-roled inputs, so migration 0005 owns the table. The
+      // invariant this test protects — TASK-005 built no more than its own
+      // slice — is unchanged, and `tests/integration/src/current-rank.test.ts`
+      // asserts the table's shape.
       for (const forbidden of [
         "places",
         "digital_assets",
-        "evidence_dependencies",
         "research_module_runs",
         "runtime_outbox",
         "surface_eligibility_assessments",

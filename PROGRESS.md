@@ -1343,3 +1343,134 @@ real complaint, or a second app consuming the packages.
 Only a code comment and two documentation files changed. No build configuration, no script, no
 package manifest, no dependency. `pnpm test` and the integration suite were not re-run and are not
 claimed; nothing touched can affect them, and the full green run earlier this session stands.
+
+## TASK-009 implemented — `CURRENT_RANK`, the first derived claim (2026-09-19)
+
+Scope authority: `tasks/009-current-rank-truth-chain.md`. D-011 was answered **Option A**, so
+`evidence_dependencies` exists and the lineage `docs/canonical/14` §30 specifies is implemented as
+specified. **The completeness gate is implemented and verified. The gate's passing path is blocked
+by D-013, discovered while trying to demonstrate it** — see below; the gate is refusing for exactly
+the right reason.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0005_current_rank.ts` | `ALTER TYPE claim_type ADD VALUE 'CURRENT_RANK'`, plus `evidence_dependencies` and `evidence_dependency_role` |
+| `packages/truth/src/completeness.ts` | The universe gate — pure, conjunctive, fail-closed, no bypass |
+| `packages/truth/src/rank.ts` | Rank derivation with `EvidenceDependency` lineage |
+| `packages/truth/src/confidence.ts` | `assessDerivedStatistic` added, for `docs/canonical/14` §30 |
+| `packages/truth/src/result.ts` | `SurnameRankResult`, `CurrentRankClaimResult`, `RankUniverse` |
+| `packages/truth/bin/surname-rank.ts` | CLI (`pnpm demo:surname-rank`) |
+| `packages/truth/src/{completeness,rank}.test.ts` | 23 new unit tests |
+| `tests/integration/src/current-rank.test.ts` | 18 new integration tests |
+
+Modified: `packages/truth/src/{version,index}.ts`; `packages/db/src/generated/db.ts` (regenerated,
+19 tables); root and truth `package.json` (the CLI alias); and the two schema-inventory assertions
+every schema-adding task updates — `packages/db/src/migrator.test.ts` and
+`tests/integration/src/extensions.test.ts`. **No dependency added or upgraded.**
+
+### Design points worth recording
+
+- **The gate is the substance, not the arithmetic.** It compares the source record's `content_hash`
+  against the registry's `official_sha256` **and** the persisted snapshot count against
+  `official_row_count`. Conjunctive on purpose: the checksum alone would pass a truncated copy of
+  the right file, and the count alone would pass a same-sized different file. An unknown resource is
+  `UNKNOWN_RESOURCE` — undecidable is not the same as complete, and neither permits a rank.
+- **No bypass exists**, and a test asserts it: passing a fully permissive `rightsOverride` still
+  refuses. Rights and completeness are unrelated axes.
+- **A rank universe is a resource version, not a snapshot.** `DistributionSnapshot` is
+  surname-scoped, so the ranked set is every snapshot sharing a `source_record_id`. The claim key is
+  therefore `CURRENT_RANK|surname|source_record`.
+- **There is no all-Poland rank, and the result type has no field for one.** The sex partitions are
+  different comparability groups and U-1 forbids summing them.
+- **Competition ranking** (1, 2, 2, 4), recorded on every claim because `docs/canonical/12` §9.6
+  requires a ties policy be stored. Computed by the database as "one plus the number of strictly
+  greater counts", so the result cannot depend on row order and a 408,182-row universe costs one
+  aggregate rather than a full sort.
+- **The rank reuses TASK-005's count evidence rather than duplicating the observation**, and fails
+  closed with `MISSING_UPSTREAM_COUNT_EVIDENCE` if `CURRENT_POPULATION` has not been derived — a
+  derived statistic may not invent its own input.
+- **`distribution_values.rank` stays null.** A rank is a claim, not a column
+  (`ARCHITECTURE.md` §10 invariant 10), asserted by a test.
+- **A PostgreSQL constraint, tested not assumed:** `ALTER TYPE … ADD VALUE` works inside a migration
+  transaction alongside a `CREATE TABLE` referencing the type, but *using* the new value in that
+  transaction fails with `unsafe use of new value`. A future migration must never add an enum value
+  and seed a row carrying it in one step. Recorded in the migration header and in D-011.
+
+### D-013 — the finding that blocks the passing path
+
+Demonstrating the gate letting a complete universe through requires importing a full official
+resource. **That import fails, and writes nothing:**
+
+```text
+[import] FAILED (DUPLICATE_CANONICAL_KEY): two rows share canonical key "weiss": "WEISS" and "WEIẞ"
+```
+
+`canonical_key_v1` applies Unicode **full** case folding, which maps `ẞ` (U+1E9E) to `ss`. So
+`WEIẞ` and `WEISS` both key to `weiss`. Measured across both full resources: **52 colliding keys in
+the male file and 119 in the female, 171 in total, and every single one has this one cause.** Zero
+arise from diacritics, whitespace or script. Confirmed against the real `canonicalKey` export rather
+than a reimplementation; simple case mapping (`ẞ → ß`) separates all 171.
+
+These are distinct surnames with distinct counts, so merging them is the automatic merge
+`ARCHITECTURE.md` §10 invariant 8 forbids. The importer refusing is **correct**. The consequence —
+that no production-scale data can be ingested at all — is what needs the project owner's decision,
+recorded as **D-013** with three options and a recommendation (Option A: simple case mapping,
+`canonical_key_v2`, with an ADR since it changes accepted TASK-003 behaviour).
+
+**The identity model is otherwise sound across 828,264 real surnames**, which is the other half of
+this finding.
+
+### Verification actually run (2026-09-19)
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | **PASS** |
+| `pnpm typecheck` | **PASS** — all packages |
+| `pnpm lint` | **PASS** — zero errors, zero warnings |
+| `pnpm format:check` | **PASS**, after Prettier on two new files |
+| `pnpm test` | **PASS** — **216 tests** (193 before; +23) |
+| `pnpm db:migrate` | **PASS** — `0005_current_rank` applied; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **PASS** — 19 tables introspected; `EvidenceDependencies` present |
+| `pnpm test:integration` | **PASS** — **130 tests** (113 before; +18, minus one reframed) |
+| `pnpm build` | **PASS** — all three apps |
+
+**Three assertions failed first and were fixed, which is worth recording rather than smoothing
+over.** Two were the schema-inventory assertions a schema-adding task is expected to update. The
+third was **my own test passing vacuously**: the self-dependency constraint test inserted from an
+empty `evidence_items`, affected zero rows and therefore proved nothing. It now derives the
+population chain first, asserts evidence exists, and then expects the constraint to reject.
+
+**One TASK-005 assertion was reframed.** Its forbidden-table list named `evidence_dependencies`;
+migration `0005` legitimately creates it per D-011. TASK-005 still creates no lineage row, so the
+invariant that test protects is unchanged, and the comment explains the change — the same treatment
+TASK-005 gave a TASK-004 assertion.
+
+**End-to-end CLI, against real ingested fixture data:**
+
+```text
+[rank] input              "NOWAK"
+[rank] resolution status  EXACT
+[rank] result             NO_RESULT (INCOMPLETE_UNIVERSE)
+[rank] detail             no resource version backing this surname is a complete universe …
+[rank]   resource 1148808  reason CONTENT_HASH_MISMATCH  rows expected 408182  rows persisted 22
+[rank]   resource 1148811  reason CONTENT_HASH_MISMATCH  rows expected 420082  rows persisted 23
+```
+
+Exit code 1, and zero rows written to any truth-layer table. That is the gate working.
+
+### Not verified in this environment
+
+The integration suite ran against locally installed PostgreSQL 16.13 with PostGIS 3.4.2 via the
+`TEST_DATABASE_URL` fallback; the pinned container image was not exercised, as registries remain
+egress-blocked. **And the gate's passing path was not demonstrated**, because D-013 makes a
+complete import impossible. It is not claimed as verified.
+
+### Carried forward
+
+- **D-013** — blocks the full import, so it blocks `CURRENT_RANK`'s passing path, `RARITY_CONTEXT`,
+  and any production surface. The highest-priority open decision.
+- **D-007** — resource-level licence, still keeping paid and SEO ineligible.
+- **TASK-004 §14 U-1 and U-4** — unanswered by the publisher; U-1 is why there is no all-Poland rank.
+- **U-6** — `universe_size` null, which is why `RARITY_CONTEXT` was excluded from this task.

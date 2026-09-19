@@ -54,22 +54,25 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0002_identity_core",
       "0003_source_rights_distribution",
       "0004_truth_layer",
+      "0005_current_rank",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
     }
   });
 
-  it("creates exactly the identity, source/rights/distribution and truth-layer tables, and nothing else", async () => {
+  it("creates exactly the identity, source/rights/distribution, truth-layer and lineage tables, and nothing else", async () => {
     // Kysely's own bookkeeping, the tables PostGIS itself creates in
     // `public`, TASK-003's three identity tables plus its one view,
     // TASK-004's five source/rights/distribution tables, and TASK-005's six
     // truth-layer tables.
     //
-    // Anything beyond this set is an accidental table. In particular
-    // nothing from TASK-005 §8's excluded list — digital_assets, places,
-    // name_form_relations, evidence_dependencies, research_module_runs,
-    // runtime_outbox — may appear here until the task that owns it adds it.
+    // Anything beyond this set is an accidental table. TASK-009 added
+    // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
+    // that a derived claim needs the lineage docs/canonical/14 §30 specifies,
+    // because a rank has two differently-roled inputs. Still excluded, and
+    // still owned by a later task — digital_assets, places,
+    // name_form_relations, research_module_runs, runtime_outbox.
     const expected = [
       { table_name: "citations", table_type: "BASE TABLE" },
       { table_name: "claim_evidence", table_type: "BASE TABLE" },
@@ -77,6 +80,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "confidence_assessments", table_type: "BASE TABLE" },
       { table_name: "distribution_snapshots", table_type: "BASE TABLE" },
       { table_name: "distribution_values", table_type: "BASE TABLE" },
+      { table_name: "evidence_dependencies", table_type: "BASE TABLE" },
       { table_name: "evidence_items", table_type: "BASE TABLE" },
       { table_name: "geography_columns", table_type: "VIEW" },
       { table_name: "geometry_columns", table_type: "VIEW" },
