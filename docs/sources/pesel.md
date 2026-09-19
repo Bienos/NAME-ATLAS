@@ -38,24 +38,24 @@ Following directly from the verified suppression rule (item 14) and `docs/canoni
 
 ## Resource-level facts — VERIFIED: current national production resources (source: project owner, manual retrieval from `/resources?per_page=100` on dataset 1681)
 
-Retrieved via the resource listing endpoint (this session still cannot reach it directly — see "Next required evidence" below; the project owner supplied the response).
+Retrieved via the resource listing endpoint. No session working this task could reach `api.dane.gov.pl` directly — it was network-egress-blocked throughout — so the project owner performed the retrieval and supplied the response.
 
-Per the project owner's explicit instruction, `data_date`, `created`, `modified`, `verified` and `retrieved_at` are distinct metadata fields and are **not** inferred from one another. Only `data_date` has a stated value below; the other four field names are known to exist on a resource object from this same API family, but no value for any of them (dataset- or resource-level) has been relayed to this session. They are recorded as "not yet supplied", not assumed equal to `data_date` or to each other.
+Per the project owner's explicit instruction, `data_date`, `created`, `modified`, `verified` and `retrieved_at` are distinct metadata fields and are **not** inferred from one another. At the time of this section only `data_date` had a stated value; the other four were recorded as "not yet supplied" rather than assumed. **All four were subsequently supplied and verified** — see "Update — both residual items closed" below for the actual values.
 
 | | Male | Female |
 |---|---|---|
 | Resource ID | `1148808` | `1148811` |
 | Title | *Nazwiska męskie - stan na 2026-01-20* | *Nazwiska żeńskie - stan na 2026-01-20* |
 | `data_date` | `2026-01-20` | `2026-01-20` |
-| `created` | not yet supplied | not yet supplied |
-| `modified` | not yet supplied | not yet supplied |
-| `verified` | not yet supplied | not yet supplied |
-| `retrieved_at` | not yet supplied | not yet supplied |
+| `created` | `2026-01-28T13:47:34Z` (verified later — see below) | `2026-01-28T13:48:39Z` (verified later — see below) |
+| `modified` | `2026-01-28T13:47:34Z` | `2026-01-28T13:48:39Z` |
+| `verified` | `2026-01-28T13:47:34Z` | `2026-01-28T13:48:39Z` |
+| `retrieved_at` | `2026-09-18T17:40:00Z` | `2026-09-18T17:39:46Z` |
 | Formats offered | XLSX, CSV, JSON-LD | XLSX, CSV, JSON-LD |
 
 These two resources are recorded as the current 2026 national production pair (male/female separate resources, per item 4) for the same `data_date`. **Do not fall back to a 2025 or earlier resource** — noted per the project owner's explicit instruction, in case a future session is tempted to substitute an older resource for convenience.
 
-`data_date` (`2026-01-20`) is treated as the **resource reference date** (item 6) — it is the resource's own stated date, distinct from any dataset-level portal-update timestamp. Item 7 (the portal/dataset "updated" date) remains unresolved: no value for `verified`/`modified`/`created` has been supplied at either the dataset or the resource level, so it cannot yet be compared against item 6. **Do not assume item 7 equals item 6** — that is exactly the conflation TASK-002 exists to prevent (`docs/canonical/12` §2.1, D-001).
+`data_date` (`2026-01-20`) is the **resource reference date** (item 6) — the resource's own stated date, distinct from the portal-update timestamp. Item 7 (the portal "updated" date) is now also **verified** as `2026-01-28` — eight days later, confirming the two are genuinely different fields and must never be conflated (`docs/canonical/12` §2.1, D-001). See "Update — both residual items closed" below.
 
 ## Resource-level facts — VERIFIED: current regional resources (same retrieval)
 
@@ -146,10 +146,47 @@ Tested (`packages/sources/src/*.test.ts`, 21 tests, all passing) against:
 
 The real source files contain **zero** malformed rows (item 13) — there was nothing to demonstrate fail-closed behaviour with directly from the source, so every drift test uses a minimal deliberately mutated file, as TASK-002 §4 item 13 anticipated.
 
+## Update — both residual items closed, and the bytes independently corroborated (2026-09-19)
+
+The project owner supplied an acquisition archive (`NAME_ATLAS_ALL_DOWNLOADED_DATA.zip`, generated `2026-09-18T17:44:29Z`, 138,623,907 bytes, `sha256 555bc4da551058746a181dc16acaa66e28f39bd98e8ef3c405ff89270a9fb6ea`), split into six parts for upload and reassembled in-session. This session verified all 46 of its data files against the archive's own `SHA256SUMS.txt` — **46/46 OK, zero mismatches** — and then cross-checked it against this record.
+
+**Independent corroboration of the national pair.** The archive downloaded both 2026 national resources from the official endpoint on its own run, and its checksums are byte-identical to the ones recorded above from the separately-supplied files:
+
+```text
+ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4   male   1148808   5,293,415 B
+c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6   female 1148811   5,592,881 B
+```
+
+Two independent acquisition paths, the same bytes. The archive's recorded `final_url` filenames (`2_-_nazwiska_męskie-osoby_żyjące.csv`, `2_-_nazwiska_żeńskie-osoby_żyjące.csv`) also match the filenames of the files supplied earlier.
+
+**Item 3 — exact download/API identifier: RESOLVED.** The archive captured genuine `api.dane.gov.pl` JSON:API responses (`meta`/`data`/`jsonapi`/`links`), stored under `metadata/`, giving the literal endpoints. Both rows below are attribute values read verbatim from that response (`csv_download_url` and `csv_file_url`); this session observed no HTTP redirect, having never reached the host:
+
+| | Male `1148808` | Female `1148811` |
+|---|---|---|
+| CSV download endpoint | `https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/csv` | `https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/csv` |
+| Direct media file URL (`csv_file_url`) | `…/media/resources/20260128/2_-_nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv` | `…/media/resources/20260128/2_-_nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.csv` |
+| Resource metadata endpoint | `https://api.dane.gov.pl/1.4/resources/1148808,nazwiska-meskie-stan-na-2026-01-20` | `https://api.dane.gov.pl/1.4/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20` |
+
+**Item 7 — portal timestamps, distinct from the reference date: RESOLVED.** The official resource metadata supplies all four dates, and they are genuinely different values, which is exactly the distinction this record insisted on keeping:
+
+| Field | Male `1148808` | Female `1148811` | What it means |
+|---|---|---|---|
+| `data_date` | `2026-01-20` | `2026-01-20` | PESEL reference date — what the data describes |
+| `created` | `2026-01-28T13:47:34Z` | `2026-01-28T13:48:39Z` | portal metadata timestamp |
+| `modified` | `2026-01-28T13:47:34Z` | `2026-01-28T13:48:39Z` | portal metadata timestamp |
+| `verified` | `2026-01-28T13:47:34Z` | `2026-01-28T13:48:39Z` | portal metadata timestamp |
+| `retrieved_at` | `2026-09-18T17:40:00Z` | `2026-09-18T17:39:46Z` | when the project owner fetched the bytes |
+
+The portal date (`2026-01-28`) matches what `docs/canonical/12` §2.1 recorded as the dataset's update date, and is eight days later than the reference date (`2026-01-20`). **Four distinct concepts; none is inferred from another.**
+
+**New provenance fact — the CSV is a conversion, not the native upload.** Both resources declare `format: xlsx` natively (`file_size` 7,621,712 male / 7,972,934 female). The CSV this record verified is served by the portal's own `csv_download_url` conversion endpoint — official, but a derived representation of the publisher's XLSX. **TASK-004 must decide deliberately which representation it ingests** and record that choice; the two are not the same bytes and a conversion step is a place where a source can change shape without the publisher changing anything.
+
+Regional resources (`1148786`, `1148790`) now also have confirmed checksums, endpoints and a real observed header row (`Województwo zameldowania na pobyt stały,Nazwisko aktualne,Liczba`) recorded in `fixtures/pesel/source-manifest.json`. They remain **not downloaded into the repository, not parsed, not ingested** — D-004's decision is untouched by this.
+
+The archive additionally contains PESEL national data for 2019–2025, regional for 2025, and non-Polish sources (US Census, France INSEE, Belgium, GeoNames, TERYT, Morfeusz). **None of it is ingested, validated, or rights-reviewed**, and multi-country coverage is an explicit MVP non-goal (`PRODUCT.md` §8 item 9). Earlier annual snapshots are not trend data: comparable methodology across years is unproven, and the archive's own report says so.
+
 ## D-001 status
 
-**RESOLVED** for TASK-002's mandate (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 have either a verified answer, sourced above, or are explicitly carried forward as a narrow, non-blocking residual note — none was guessed:
+**RESOLVED** (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 now have a verified answer sourced above — including items 3 and 7, which were previously carried forward as residuals and are closed by the evidence in the section above. Nothing was guessed.
 
-- **Item 3 (exact download URL)** — the resource IDs, titles and file bytes are verified; the literal per-resource download URL string was not supplied and is not guessed (`fixtures/pesel/source-manifest.json` records this explicitly). Not blocking: TASK-004 operates on the checksum-pinned bytes already verified, not on a URL.
-- **Item 7 (portal/dataset "updated" date)** — `data_date` (item 6) is verified; `created`/`modified`/`verified`/`retrieved_at` values were never supplied at either dataset or resource level, so item 7 cannot be compared against item 6 and remains genuinely open. Not blocking TASK-004's core ingestion logic, which needs a resource reference date (has one: `data_date`), not necessarily the portal timestamp.
-- The **rarity/`1-in-X` denominator** question in D-001's original "what is not settled" list is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and was never part of TASK-002 §8's 20 items — it remains open for whichever task designs `RARITY_CONTEXT`, not for this record.
+One item from D-001's original "what is not settled" list remains open by design: the **rarity/`1-in-X` denominator** question is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and was never part of TASK-002 §8's 20 items. It belongs to whichever task designs `RARITY_CONTEXT`.
