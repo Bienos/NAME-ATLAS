@@ -25,6 +25,8 @@ import type { DB } from "@name-atlas/db";
 import type {
   DistributionEntry,
   DistributionSection,
+  Suggestion,
+  SuggestionsSection,
   PopulationObservation,
   PopulationSection,
   SurfaceEligibilityDto,
@@ -33,7 +35,7 @@ import type {
   RaritySection,
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
-import { resolveSurname } from "@name-atlas/resolver";
+import { resolveSurname, suggestSurnames } from "@name-atlas/resolver";
 import { readCurrentDistribution, readCurrentPopulation, readRarityContext } from "./read.js";
 import type {
   PersistedCurrentDistribution,
@@ -94,6 +96,68 @@ function emptyRarity(
   surface: SurfaceEligibilityDto,
 ): RaritySection {
   return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+/**
+ * The suggestions section for an input that did not resolve (TASK-016).
+ *
+ * Runs only for `UNKNOWN`. A `REVIEW_REQUIRED` input — mixed script with a
+ * confusable — gets none: `docs/canonical/13` §33.4 names mixed-script identity
+ * as a case never to auto-resolve, and offering Latin neighbours for an input
+ * carrying a Cyrillic lookalike would be worse than offering nothing.
+ *
+ * A retrieval failure degrades to `UNAVAILABLE` rather than failing the
+ * request. An unresolved answer is still a correct answer when the trigram
+ * index is unreachable; turning it into a 503 would be a worse lie than saying
+ * no suggestion is available.
+ */
+async function suggestionsFor(
+  db: Kysely<DB>,
+  rawInput: string,
+  resolutionStatus: string,
+): Promise<SuggestionsSection> {
+  if (resolutionStatus === "REVIEW_REQUIRED") {
+    return emptySuggestions("MIXED_SCRIPT_REVIEW");
+  }
+  if (resolutionStatus === "MULTIPLE_EXACT") {
+    return emptySuggestions("MULTIPLE_EXACT_MATCHES");
+  }
+  if (resolutionStatus !== "UNKNOWN") {
+    return emptySuggestions("NOT_APPLICABLE");
+  }
+
+  const found = await suggestSurnames(db, rawInput);
+  if (found.kind === "LOOKUP_FAILED") {
+    return emptySuggestions("SUGGESTIONS_UNAVAILABLE");
+  }
+  if (found.kind === "NO_SUGGESTIONS") {
+    return emptySuggestions(found.reason);
+  }
+  return {
+    state: "READY",
+    outcome: found.outcome,
+    decision_mode: found.decision_mode,
+    reason_code: null,
+    suggestions: found.candidates.map((candidate): Suggestion => ({
+      surname: {
+        id: candidate.candidate_surname_id,
+        display_name: candidate.candidate_canonical_display,
+        script: candidate.candidate_primary_script,
+      },
+      match_type: "FUZZY_CANDIDATE",
+      explanation_codes: [...candidate.explanation_codes],
+    })),
+  };
+}
+
+function emptySuggestions(reasonCode: string): SuggestionsSection {
+  return {
+    state: "UNAVAILABLE",
+    outcome: null,
+    decision_mode: null,
+    reason_code: reasonCode,
+    suggestions: [],
+  };
 }
 
 function emptyDistribution(
@@ -257,6 +321,7 @@ export async function querySurnameResult(
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: await suggestionsFor(db, rawInput, status),
       },
     };
   }
@@ -274,6 +339,7 @@ export async function querySurnameResult(
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: await suggestionsFor(db, rawInput, status),
       },
     };
   }
@@ -312,6 +378,7 @@ export async function querySurnameResult(
         population: emptySection("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
         rarity: emptyRarity("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
         distribution: emptyDistribution("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
+        suggestions: null,
       },
     };
   }
@@ -336,6 +403,7 @@ export async function querySurnameResult(
         population: emptySection("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         rarity: emptyRarity("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         distribution: emptyDistribution("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
+        suggestions: null,
       },
     };
   }
@@ -379,6 +447,9 @@ export async function querySurnameResult(
               surface: eligibility,
             }
           : emptyDistribution("UNAVAILABLE", "NO_COMPLETE_REGIONAL_UNIVERSE", eligibility),
+      // An exact surname wins outright, so there is nothing to suggest
+      // (docs/canonical/13 §32.3).
+      suggestions: null,
     },
   };
 }

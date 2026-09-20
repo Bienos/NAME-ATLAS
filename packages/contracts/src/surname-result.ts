@@ -8,7 +8,7 @@
  *
  * Scope grew one fact at a time and still carries no field whose only purpose
  * is a later task (`AGENTS.md` §6). TASK-006 added `population`, TASK-014
- * `rarity` and TASK-012 `distribution`; there is still no chapter framework, no
+ * `rarity`, TASK-012 `distribution` and TASK-016 `suggestions`; there is still no chapter framework, no
  * pagination and no placeholder for a fact that has no truth chain behind it.
  *
  * ── One recorded deviation ──────────────────────────────────────────────
@@ -24,7 +24,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.2";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.3";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -310,6 +310,66 @@ export const publicSurnameIdentitySchema = z.object({
 });
 
 /**
+ * One surname the input might have meant (TASK-016, over TASK-015's retrieval).
+ *
+ * Identity, a match type and localisable explanation codes. Deliberately **no**
+ * similarity, edit distance or rank score: `docs/canonical/16` §35 keeps
+ * internal scores off the wire, and `docs/canonical/13` §24 is explicit that
+ * those are diagnostic retrieval features and "not historical confidence". A
+ * number here would invite a surface to render "91% match", which is a claim
+ * this project does not make.
+ */
+export const suggestionSchema = z.object({
+  surname: publicSurnameIdentitySchema,
+  /** `docs/canonical/13` §31's `ResolutionMatchType`, narrowed to what exists. */
+  match_type: z.literal("FUZZY_CANDIDATE"),
+  /** e.g. `ADJACENT_TRANSPOSITION`, `EDIT_DISTANCE_1`. Localised downstream. */
+  explanation_codes: z.array(z.string().min(1)).min(1),
+});
+
+/**
+ * The suggestions section (`docs/canonical/13` §32.2, §32.4, §32.5).
+ *
+ * `decision_mode` is always `USER_CONFIRM` when suggestions are present. §32.2
+ * is explicit — "Do not silently replace input" — and §33.4 forbids
+ * auto-resolving on a fuzzy relation at any score. The refinements below make
+ * that a schema rule rather than a convention: a payload claiming `AUTO`, or
+ * claiming one outcome while carrying a different number of candidates, fails
+ * validation instead of reaching a surface.
+ */
+export const suggestionsSectionSchema = z
+  .object({
+    state: z.enum(["READY", "UNAVAILABLE"]),
+    /**
+     * `SUGGESTION_REQUIRED` for a single candidate, `MULTIPLE_CANDIDATES` for
+     * several. Null when the section is not READY.
+     */
+    outcome: z.enum(["SUGGESTION_REQUIRED", "MULTIPLE_CANDIDATES"]).nullable(),
+    /** Never `AUTO`. Null when there is nothing to confirm. */
+    decision_mode: z.literal("USER_CONFIRM").nullable(),
+    /** Why there are none: INPUT_TOO_SHORT, NO_CANDIDATE_ABOVE_THRESHOLD, … */
+    reason_code: z.string().min(1).nullable(),
+    suggestions: z.array(suggestionSchema),
+  })
+  .refine((s) => (s.state === "READY" ? s.suggestions.length > 0 : s.suggestions.length === 0), {
+    message: "suggestions are present exactly when state is READY",
+  })
+  .refine((s) => (s.state === "READY") === (s.outcome !== null), {
+    message: "outcome is present exactly when state is READY",
+  })
+  .refine((s) => (s.state === "READY") === (s.decision_mode !== null), {
+    message: "decision_mode is present exactly when state is READY",
+  })
+  .refine(
+    (s) =>
+      s.outcome === null || (s.outcome === "SUGGESTION_REQUIRED") === (s.suggestions.length === 1),
+    {
+      message:
+        "SUGGESTION_REQUIRED carries exactly one suggestion; MULTIPLE_CANDIDATES carries more",
+    },
+  );
+
+/**
  * Top-level resolution outcome.
  *
  * `UNRESOLVED` and `AMBIGUOUS` are **successful** responses, not errors
@@ -329,6 +389,16 @@ export const surnameResultResponseSchema = z
     rarity: raritySectionSchema.nullable(),
     /** Added in 1.2 (TASK-012). Present exactly when RESOLVED, like the rest. */
     distribution: distributionSectionSchema.nullable(),
+    /**
+     * Added in 1.3 (TASK-016). Present exactly when `status` is **not**
+     * `RESOLVED`: a resolved query needs no suggestion (an exact surname wins,
+     * docs/canonical/13 §32.3), and both other outcomes are "we did not give
+     * you a surname", where a client needs to know whether anything is on
+     * offer and, if not, why. An `AMBIGUOUS` outcome always carries
+     * `UNAVAILABLE` — several *exact* matches, or a mixed-script input that
+     * §33.4 forbids resolving — and the reason code says which.
+     */
+    suggestions: suggestionsSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -341,6 +411,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.distribution !== null : r.distribution === null), {
     message: "distribution section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status !== "RESOLVED") === (r.suggestions !== null), {
+    message: "suggestions are present exactly when status is not RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -382,6 +455,8 @@ export type PlaceStat = z.infer<typeof placeStatSchema>;
 export type DistributionCoverageState = z.infer<typeof distributionCoverageStateSchema>;
 export type DistributionEntry = z.infer<typeof distributionEntrySchema>;
 export type DistributionSection = z.infer<typeof distributionSectionSchema>;
+export type Suggestion = z.infer<typeof suggestionSchema>;
+export type SuggestionsSection = z.infer<typeof suggestionsSectionSchema>;
 export type PublicSurnameIdentity = z.infer<typeof publicSurnameIdentitySchema>;
 export type ResultStatus = z.infer<typeof resultStatusSchema>;
 export type SurnameResultResponse = z.infer<typeof surnameResultResponseSchema>;

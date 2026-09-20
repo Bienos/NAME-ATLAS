@@ -512,50 +512,19 @@ Revisit when any of these becomes true:
 
 ---
 
-## D-015 — the low-coverage threshold for a published distribution (NON-BLOCKING NOW)
+## D-015 — RESOLVED (2026-09-20)
 
-**Status:** implemented at the recommended value, awaiting the project owner's confirmation. Nothing
-is blocked; a different value is a one-constant change.
+**Resolution:** the low-coverage threshold for a published distribution is **0.50**, confirmed by the project owner. A distribution built on fewer than half of a surname's bearers is not a distribution of that surname.
 
-### The situation
+The value lives in one place, `DISTRIBUTION_LOW_COVERAGE_THRESHOLD` (`packages/truth/src/version.ts`), and every claim stores the threshold it was judged against as `low_coverage_threshold`, so a stored claim states its own basis and a later change is visible rather than retroactive. Changing it means changing the constant and re-deriving; nothing else moves.
 
-TASK-012 publishes a surname's per-voivodeship counts and each region's share of the **covered
-set** — the surname's own regional sum. It never divides by the national count, because the
-regional resources place only 78.3% (male) and 80.2% (female) of the national totals and the
-shortfall is biased by surname size (78.0% for surnames with 10–99 bearers against 89.3% above
-10,000; TASK-008).
+Observed effect over 310 derived claims: 276 `READY`, 34 `LOW_COVERAGE`, 0 `COVERAGE_UNKNOWN`. `NOWAK` (0.884 male, 0.896 female) is `READY`; `MELNYK` (0.033 both) is `LOW_COVERAGE`, which is the case the state exists for — 210 placed bearers of 6,442 registered must never be rendered as where the surname is found.
 
-That protects the shares, but it leaves a presentational risk. `MELNYK` male has 6,442 registered
-bearers nationally and 210 placed in a voivodeship: 3.3%. Its 14 regions are real, and their shares
-of those 210 are exact, but rendered as a map they would look like a distribution of the surname,
-which they are not.
+Three rules stand and are not revisitable by moving the number:
 
-So each claim carries a state: `READY` at or above a threshold, `LOW_COVERAGE` below it, and
-`COVERAGE_UNKNOWN` where no complete national counterpart exists to measure coverage against. A
-surface must present the latter two as "of the N bearers with a registered voivodeship", never as
-where the surname is found.
-
-### The decision
-
-**What value should the threshold take?**
-
-Implemented at **0.50**, on the reasoning that a distribution built on fewer than half a surname's
-bearers is not a distribution of that surname. Observed effect over 310 derived claims: 276 `READY`,
-34 `LOW_COVERAGE`, 0 `COVERAGE_UNKNOWN`. `NOWAK` (0.884, 0.896) is `READY`; `MELNYK` (0.033, 0.033)
-is `LOW_COVERAGE`.
-
-The value lives only in `DISTRIBUTION_LOW_COVERAGE_THRESHOLD`
-(`packages/truth/src/version.ts`), is recorded on every claim as `low_coverage_threshold` so a
-stored claim states the threshold it was judged against, and is asserted at the boundary in
-`packages/truth/src/distribution.test.ts`. Changing it means changing the constant and re-deriving.
-
-### Do not
-
-- Do not remove the state and let a surface decide. The whole point is that the judgement is made
-  once, with the data, and travels with the figures.
-- Do not treat low coverage as low confidence. The counts are exactly what the source says; the
-  scope is what differs (`ARCHITECTURE.md` §10 invariant 2).
-- Do not raise coverage by dividing regional counts by national ones anywhere, under any name.
+- low coverage never lowers confidence, because the counts are exactly what the source says and only the scope differs (`ARCHITECTURE.md` §10 invariant 2);
+- `COVERAGE_UNKNOWN` is presented exactly as `LOW_COVERAGE`, because not knowing what share of the bearers a set of cells represents is not a licence to present it as the whole;
+- a regional count is never divided by a national count in any field under any name.
 
 ---
 

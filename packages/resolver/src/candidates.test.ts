@@ -23,6 +23,7 @@ function candidate(
     generated_form: form,
     candidate_surname_id: "00000000-0000-0000-0000-000000000000",
     candidate_canonical_display: form,
+    candidate_primary_script: "Latn",
     method: "FUZZY",
     method_version: "resolver_fuzzy_v1",
     tier: FUZZY_TIER,

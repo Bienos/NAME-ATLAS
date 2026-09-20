@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   SURNAME_RESULT_SCHEMA_VERSION,
   apiErrorResponseSchema,
+  suggestionsSectionSchema,
   distributionEntrySchema,
   distributionSectionSchema,
   populationObservationSchema,
@@ -27,6 +28,15 @@ const VALID_CITATION = {
   url: "https://api.dane.gov.pl/resources/1148808/csv",
   attribution: null,
   terms: "CC0 1.0",
+};
+
+/** An empty suggestions section, which every non-RESOLVED response carries. */
+const NO_SUGGESTIONS = {
+  state: "UNAVAILABLE" as const,
+  outcome: null,
+  decision_mode: null,
+  reason_code: "NO_CANDIDATE_ABOVE_THRESHOLD",
+  suggestions: [],
 };
 
 const VALID_OBSERVATION = {
@@ -202,6 +212,7 @@ describe("top-level response", () => {
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: null,
       }).success,
     ).toBe(false);
   });
@@ -215,6 +226,7 @@ describe("top-level response", () => {
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: NO_SUGGESTIONS,
       }).success,
     ).toBe(false);
   });
@@ -228,6 +240,7 @@ describe("top-level response", () => {
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: NO_SUGGESTIONS,
       }).success,
     ).toBe(true);
   });
@@ -246,6 +259,7 @@ describe("top-level response", () => {
         },
         rarity: null,
         distribution: null,
+        suggestions: null,
       }).success,
     ).toBe(false);
   });
@@ -259,6 +273,7 @@ describe("top-level response", () => {
         population: null,
         rarity: null,
         distribution: null,
+        suggestions: NO_SUGGESTIONS,
       }).success,
     ).toBe(false);
   });
@@ -428,6 +443,145 @@ describe("distribution section (docs/canonical/16 §28)", () => {
         entries: [],
         reason_code: null,
         surface: SURFACE,
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("suggestions section (docs/canonical/13 §32.2, §33.4, TASK-016)", () => {
+  const one = {
+    surname: {
+      id: "01a0b9e3-34f3-7633-a239-2b8596dfc088",
+      display_name: "CICHOWSKI",
+      script: "Latn",
+    },
+    match_type: "FUZZY_CANDIDATE" as const,
+    explanation_codes: ["ADJACENT_TRANSPOSITION", "EDIT_DISTANCE_1"],
+  };
+  const two = {
+    ...one,
+    surname: {
+      ...one.surname,
+      id: "01a0b9e3-34f3-7633-a239-2b8596dfc089",
+      display_name: "CICHOSKI",
+    },
+    explanation_codes: ["EDIT_DISTANCE_1"],
+  };
+
+  it("accepts one candidate as SUGGESTION_REQUIRED and several as MULTIPLE_CANDIDATES", () => {
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "SUGGESTION_REQUIRED",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [one],
+      }).success,
+    ).toBe(true);
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "MULTIPLE_CANDIDATES",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [one, two],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("rejects an outcome that disagrees with how many candidates it carries", () => {
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "SUGGESTION_REQUIRED",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [one, two],
+      }).success,
+    ).toBe(false);
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "MULTIPLE_CANDIDATES",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [one],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("cannot express an auto-applied suggestion — §32.2 forbids replacing input silently", () => {
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "SUGGESTION_REQUIRED",
+        decision_mode: "AUTO",
+        reason_code: null,
+        suggestions: [one],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("forbids candidates when UNAVAILABLE and requires them when READY", () => {
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "UNAVAILABLE",
+        outcome: null,
+        decision_mode: null,
+        reason_code: "INPUT_TOO_SHORT",
+        suggestions: [],
+      }).success,
+    ).toBe(true);
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "UNAVAILABLE",
+        outcome: null,
+        decision_mode: null,
+        reason_code: "INPUT_TOO_SHORT",
+        suggestions: [one],
+      }).success,
+    ).toBe(false);
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "SUGGESTION_REQUIRED",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("carries no similarity, distance or score field", () => {
+    const parsed = suggestionsSectionSchema.parse({
+      state: "READY",
+      outcome: "SUGGESTION_REQUIRED",
+      decision_mode: "USER_CONFIRM",
+      reason_code: null,
+      suggestions: [one],
+    });
+    const keys = Object.keys(parsed.suggestions[0] ?? {});
+    for (const forbidden of [
+      "trigram_similarity",
+      "similarity",
+      "edit_distance",
+      "retrieval_rank_score",
+      "score",
+      "confidence",
+    ]) {
+      expect(keys).not.toContain(forbidden);
+    }
+    expect(keys.sort()).toEqual(["explanation_codes", "match_type", "surname"]);
+  });
+
+  it("requires at least one explanation code — every candidate explains itself", () => {
+    expect(
+      suggestionsSectionSchema.safeParse({
+        state: "READY",
+        outcome: "SUGGESTION_REQUIRED",
+        decision_mode: "USER_CONFIRM",
+        reason_code: null,
+        suggestions: [{ ...one, explanation_codes: [] }],
       }).success,
     ).toBe(false);
   });

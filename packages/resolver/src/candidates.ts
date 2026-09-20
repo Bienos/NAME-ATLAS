@@ -145,6 +145,13 @@ export interface SearchCandidate {
   readonly generated_form: string;
   readonly candidate_surname_id: string;
   readonly candidate_canonical_display: string;
+  /**
+   * The candidate's stored `primary_script`. Carried because a consumer must
+   * not have to assume it: the hard-contradiction filter guarantees it equals
+   * the input's script, but a payload that hardcoded `Latn` would be wrong the
+   * first time someone searched in Cyrillic.
+   */
+  readonly candidate_primary_script: string;
   readonly method: "FUZZY";
   readonly method_version: string;
   readonly tier: typeof FUZZY_TIER;
@@ -402,6 +409,7 @@ export async function suggestSurnames(
           generated_form: row.canonical_display,
           candidate_surname_id: row.surname_id,
           candidate_canonical_display: row.canonical_display,
+          candidate_primary_script: row.primary_script,
           method: "FUZZY",
           method_version: FUZZY_METHOD_VERSION,
           tier: FUZZY_TIER,

@@ -2493,3 +2493,96 @@ input and asserts nothing is written.
 
 The search API endpoint and the free result UI. The truth layer and the retrieval layer are both
 done; nothing in either is blocked on a decision.
+
+## TASK-016 implemented — suggestions on the read API, schema 1.3 (2026-09-20)
+
+Scope authority: `tasks/016-surname-suggestions-api.md`. The retrieval TASK-015 built was unreachable
+from outside the repository; the endpoint answered `UNRESOLVED` and stopped. It now carries the
+candidates.
+
+**D-015 was also decided and is now closed.** The distribution low-coverage threshold is **0.50**,
+confirmed by the project owner. Every claim already stores the threshold it was judged against, so
+the decision is recorded in the data and not only in a constant.
+
+### What exists now
+
+- Contract schema **1.3**: `suggestionSchema` and `suggestionsSectionSchema`, plus a `suggestions`
+  section on the response, required and nullable, **present exactly when `status` is not
+  `RESOLVED`** — the inverse of every fact section's rule, and the first section in this contract to
+  work that way.
+- `querySurnameResult` calls `suggestSurnames` when the resolver returned `UNKNOWN`.
+- The route handler is **unchanged**. It was already thin enough that a new section needed no work
+  there, which is the property `ARCHITECTURE.md` §6 was after.
+
+### Three things the schema now makes impossible rather than merely discouraged
+
+1. **An auto-applied suggestion.** `decision_mode` is the literal `USER_CONFIRM` whenever candidates
+   are present, so a payload claiming `AUTO` fails validation. `docs/canonical/13` §32.2 is explicit
+   — "Do not silently replace input" — and §33.4 forbids auto-resolving a fuzzy relation at any
+   score.
+2. **A similarity, distance or score on the wire.** A suggestion is an identity, a match type and
+   explanation codes. An integration test walks every key of the serialized response and asserts the
+   absence of `trigram_similarity`, `edit_distance`, `retrieval_rank_score`, `score`, `probability`
+   and `transposition_detected`. `docs/canonical/16` §35 keeps internal scores off the boundary, and
+   a number here would invite a surface to render "91% match".
+3. **An outcome that disagrees with its own contents.** `SUGGESTION_REQUIRED` carries exactly one
+   candidate and `MULTIPLE_CANDIDATES` more than one, enforced by refinement.
+
+### Two decisions taken from the contract's own precedents rather than invented
+
+**The suggestions section carries no `surface` decision.** Every fact section has one; the `surname`
+identity object never has. A suggestion is a canonical surname string and its id, which is identity,
+not a fact, so it follows the identity precedent. Gating it would have been the inconsistency.
+Recorded in `docs/contracts/surname-result.md` with the condition that would reopen it: a source
+whose rights restrict even naming its surnames.
+
+**The top-level `status` enum does not gain `SUGGESTION_REQUIRED`.** `docs/canonical/13` §32.2 names
+that outcome for a typo while §32.5 keeps `UNRESOLVED` "with spelling suggestion if any" for an
+unknown surname. Separating those means asserting an input *is* a typo, and TASK-015 measured
+first-place accuracy at roughly four in five — not enough to make that claim at the top level. The
+distinction is carried inside the section, where the resolver computes it.
+
+### Mixed script gets nothing, deliberately
+
+An input carrying a Cyrillic lookalike resolves `AMBIGUOUS` as before, and its suggestions section is
+`UNAVAILABLE` with `reason_code: MIXED_SCRIPT_REVIEW`. `docs/canonical/13` §33.4 names mixed-script
+identity as a case never to auto-resolve; offering Latin neighbours for it would be worse than
+offering nothing. This is the only place that signal can reach a client, and it is why the section is
+present for `AMBIGUOUS` and not only for `UNRESOLVED`.
+
+### Observed behaviour
+
+| Input | `status` | Section | Detail |
+|---|---|---|---|
+| `KOWALSKY` (exact) | `RESOLVED` | `null` | an exact surname wins outright |
+| `CICHWOSKI` | `UNRESOLVED` | `READY` | `MULTIPLE_CANDIDATES`, `CICHOWSKI` first with `ADJACENT_TRANSPOSITION` |
+| `ZAWADKZI` | `UNRESOLVED` | `READY` | `SUGGESTION_REQUIRED`, one candidate, `USER_CONFIRM` |
+| `NOWK` | `UNRESOLVED` | `UNAVAILABLE` | `INPUT_TOO_SHORT`, empty list |
+| Latin/Cyrillic mix | `AMBIGUOUS` | `UNAVAILABLE` | `MIXED_SCRIPT_REVIEW`, empty list |
+
+Dropping the trigram index does not break the answer: PostgreSQL falls back to a sequential scan, so
+the suggestions are still correct, only slower. A test asserts that rather than assuming it.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 11 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 317 unit tests
+                                 (resolver 102, sources 74, truth 77, contracts 42, db 4,
+                                  domain 7, testing 3, web 5, worker 2, admin 1)
+pnpm test:integration         → passed, 203 tests across 14 files, exit 0
+pnpm build                    → passed, 3 apps
+```
+
+Two pinned schema-version assertions in existing suites were updated from 1.2 to 1.3; the rules those
+tests assert are unchanged by this section.
+
+### What M2 still lacks
+
+**Only the consumer UI.** `apps/web` serves two API routes and a placeholder homepage that still says
+"Foundation build". Everything a result page needs now exists behind the contract: four facts with
+confidence, source and date, the rights decision per surface, the honest low-data states, the
+suggestions for a miss, and the accepted English and Polish sentences for every figure recorded in
+`docs/contracts/surname-result.md`. No decision blocks it.

@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1) and TASK-012 (`distribution`, 1.2), both 2026-09-20
-- **Schema version:** `1.2` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20
+- **Schema version:** `1.3` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.1",
+  "schema_version": "1.3",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -109,6 +109,33 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
         "citation": { "…": "as above", "terms": "CC0 1.0" }
       }
     ]
+  },
+  "suggestions": null           // non-null only when status is not RESOLVED; added in 1.3
+}
+```
+
+For an input that did not resolve, the fact sections are null and `suggestions` carries the answer:
+
+```jsonc
+{
+  "schema_version": "1.3",
+  "status": "UNRESOLVED",
+  "surname": null,
+  "population": null,
+  "rarity": null,
+  "distribution": null,
+  "suggestions": {
+    "state": "READY",                    // | "UNAVAILABLE"
+    "outcome": "MULTIPLE_CANDIDATES",    // | "SUGGESTION_REQUIRED"; null unless READY
+    "decision_mode": "USER_CONFIRM",     // never "AUTO"; null unless READY
+    "reason_code": null,                 // INPUT_TOO_SHORT | NO_CANDIDATE_ABOVE_THRESHOLD |
+                                         // MIXED_SCRIPT_REVIEW | MULTIPLE_EXACT_MATCHES |
+                                         // SUGGESTIONS_UNAVAILABLE
+    "suggestions": [
+      { "surname": { "id": "…", "display_name": "CICHOWSKI", "script": "Latn" },
+        "match_type": "FUZZY_CANDIDATE",
+        "explanation_codes": ["ADJACENT_TRANSPOSITION", "EDIT_DISTANCE_1"] }
+    ]
   }
 }
 ```
@@ -127,7 +154,10 @@ These are schema constraints, not conventions — a violating payload fails vali
 8. **A distribution's `covered_count` equals the sum of its `regions[].count`.** The denominator of every share is the sum of its own numerators, and a payload where it is not fails validation rather than reaching a surface.
 9. **No field expresses a share of the national count.** Added in 1.2. The 16 voivodeships hold 78.3% (male) and 80.2% (female) of the national totals and the shortfall is biased by surname size, so such a share would misstate exactly the surnames it describes worst (TASK-012 §2). `coverage_ratio` is the only figure relating the two, and `coverage_basis` says in words what it is.
 10. **`coverage_state` is present and agrees with the entry's own `coverage_ratio` and `low_coverage_threshold`.** `COVERAGE_UNKNOWN` exactly when the ratio is null; `READY` exactly when the ratio meets the threshold. A consumer never has to recompute whether a figure may be called a distribution.
-11. **`regions` is never empty and never zero-filled.** A voivodeship the publisher did not list for a surname has no entry at all (`docs/canonical/16` §28's prohibition on fabricated empty map features; `ARCHITECTURE.md` §10 invariant 4).
+11. **A suggestion carries no similarity, distance or score.** Added in 1.3. `docs/canonical/16` §35 keeps internal scores off the wire and `docs/canonical/13` §24 calls these diagnostic retrieval features, "not historical confidence". A suggestion is an identity, a match type and localisable explanation codes; a number would invite a surface to render "91% match", which is a claim this project does not make.
+12. **A suggestion can never be expressed as auto-applied.** `decision_mode` is the literal `USER_CONFIRM` whenever suggestions are present, so a payload claiming `AUTO` fails validation (`docs/canonical/13` §32.2: "Do not silently replace input"; §33.4 forbids auto-resolving a fuzzy relation at any score).
+13. **`outcome` and the number of candidates must agree.** `SUGGESTION_REQUIRED` carries exactly one; `MULTIPLE_CANDIDATES` carries more. A mismatch fails validation rather than reaching a surface.
+14. **`regions` is never empty and never zero-filled.** A voivodeship the publisher did not list for a surname has no entry at all (`docs/canonical/16` §28's prohibition on fabricated empty map features; `ARCHITECTURE.md` §10 invariant 4).
 
 ## Accepted rendering of a rarity entry
 
@@ -172,6 +202,8 @@ and a below-threshold entry says so **before** any figure:
   - EN: `{count} people were registered with the surname {surname} ({sex}) in the PESEL register on {date}.` — e.g. *98,387 people were registered with the surname Nowak (male) in the PESEL register on 20 January 2026.*
   - PL: `{count} osób było zarejestrowanych z nazwiskiem {surname} ({sex}) w rejestrze PESEL na dzień {date}.` — e.g. *98 387 osób było zarejestrowanych z nazwiskiem Nowak (mężczyźni) w rejestrze PESEL na dzień 20 stycznia 2026 r.* Polish uses a space as the thousands separator, `mężczyźni` / `kobiety` for `{sex}`, and the genitive month form in the date.
   - `{date}` is the observation's `snapshot_date` (the PESEL reference date, `2026-01-20`), never the portal timestamp and never the retrieval time. `{sex}` comes from the observation's comparability group. The two sexes are two sentences; they are never summed.
+- **The suggestions section carries no `surface` decision, deliberately.** Every fact section (`population`, `rarity`, `distribution`) carries one; the `surname` identity object never has. A suggestion is a canonical surname string and its id — identity, not a fact — so it follows the identity precedent rather than the fact one. Gating it would be the inconsistency, not leaving it ungated. Recorded here so the next reader does not have to re-derive it; if a source is ever ingested whose rights restrict even naming its surnames, this decision is the one to revisit.
+- **The top-level `status` enum does not gain `SUGGESTION_REQUIRED`.** `docs/canonical/13` §32.2 names that outcome for a typo and §32.5 keeps `UNRESOLVED` "with spelling suggestion if any" for an unknown surname. Telling those apart means asserting that an input *is* a typo, and TASK-015 measured first-place accuracy at roughly four in five — not enough to make that claim at the top level. The distinction §32.2 draws is carried inside the section instead, where the resolver computes it.
 - **`docs/canonical/16` §28 references `PlaceStatDTO` but never defines its fields.** §28 specifies the geography chapter in terms of a `PlaceStatDTO` and a `MapLayerDTO` without giving either a field list anywhere in the document. TASK-012 therefore defines `PlaceStatDTO` here, as the smallest shape the chapter needs: `{place_id, terc_code, display_name, count, share_of_covered}`. `MapLayerDTO` is **not** defined and not emitted: no place in the schema carries a centroid (TASK-011 left `places.centroid` null because the TERC register has no geometry), and §28 explicitly forbids returning fabricated empty map features. A later task that acquires real geometry may add it; doing so is additive.
 - **`canonical_slug` / `canonical_path` are omitted** from the identity object that `docs/canonical/16` §21 defines. No slug exists in the schema, slug transliteration for Polish surnames is a real decision that must not be confused with the identity-bearing diacritics of `ARCHITECTURE.md` §10 invariant 8, and this slice ships no browser route or SEO surface to consume them. Adding them later is additive (TASK-006 §15 U-2).
 
@@ -179,10 +211,12 @@ and a below-threshold entry says so **before** any figure:
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
 
+**1.2 → 1.3 (2026-09-20, TASK-016).** Adds the `suggestions` section, required and nullable, present exactly when `status` is **not** `RESOLVED` — the mirror of the fact sections' rule. A consumer written against 1.2 is unaffected; a producer must now supply it. The section is how TASK-015's retrieval becomes reachable from outside the repository, and it is the first section whose presence rule is the inverse of `population`'s.
+
 **1.1 → 1.2 (2026-09-20, TASK-012).** Adds the `distribution` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule `population` and `rarity` follow. A consumer written against 1.1 is unaffected; a *producer* must now supply it, which is why the version moved. The section is `UNAVAILABLE` with `reason_code = NO_COMPLETE_REGIONAL_UNIVERSE` until a complete regional resource version is ingested, and its entries carry `coverage_state` so a surface never has to decide for itself whether a figure may be presented as a distribution.
 
 **1.0 → 1.1 (2026-09-20, TASK-014).** Adds the `rarity` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule `population` follows. A consumer written against 1.0 is unaffected (it ignores the field); a *producer* must now supply it, which is why the version moved rather than the field being slipped in silently. `unit` also begins emitting `PEOPLE` in 1.1; the enum is unchanged, so that part is not breaking.
 
 ## Not covered
 
-Search, autocomplete, resolution confirmation, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT` and `CURRENT_DISTRIBUTION`. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.
+Autocomplete, prefix search, a caller-settable similarity threshold, confirming a suggestion as a resolution, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT` and `CURRENT_DISTRIBUTION`. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.

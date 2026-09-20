@@ -1,8 +1,7 @@
 # TASK-012 — `CURRENT_DISTRIBUTION` truth chain (registered-domicile, voivodeship)
 
 - **Status:** IMPLEMENTED 2026-09-20. All eight acceptance criteria met; see `PROGRESS.md`. §3's
-  threshold was implemented at the recommended 0.50 and is recorded as **D-015** for the project
-  owner's confirmation; it is a one-constant change. Two refinements were made during
+  threshold is **0.50**, confirmed by the project owner (D-015, resolved 2026-09-20). Two refinements were made during
   implementation, both recorded in `PROGRESS.md`: a third read state `COVERAGE_UNKNOWN` for a
   complete regional resource whose national counterpart is not complete, and AC-3's share-sum
   tolerance widened to the per-entry rounding the shares actually carry (up to 1e-9 per entry;
@@ -64,10 +63,11 @@ about a real surname, and it would fall hardest on recent-migration surnames.
   threshold, `LOW_COVERAGE` when it is below. `LOW_COVERAGE` still returns the entries — the data is
   real — but a surface must present it as "of the N bearers with a registered voivodeship", never as
   the surname's distribution. A test asserts the state flips at the threshold.
-- **The one open decision: the threshold.** Recommended **0.50** — a distribution built on fewer
-  than half the bearers is not a distribution of the surname. 0.50 keeps `NOWAK` (0.884) `READY`
-  and makes `MELNYK` (0.033) `LOW_COVERAGE`. The project owner may set it anywhere; the value lives
-  in one named constant with its rationale, and nothing else changes.
+- **The threshold is 0.50** (D-015, decided by the project owner 2026-09-20) — a distribution built
+  on fewer than half the bearers is not a distribution of the surname. It keeps `NOWAK` (0.884)
+  `READY` and makes `MELNYK` (0.033) `LOW_COVERAGE`. The value lives in one named constant with its
+  rationale, every claim stores the threshold it was judged against, and changing it changes nothing
+  else.
 
 ## 4. In scope
 
