@@ -1,19 +1,17 @@
 # TASK-008 — PESEL regional source spike
 
-- **Status:** **EXECUTED 2026-09-19; TERC CORRESPONDENCE ADDED 2026-09-20 — 25 of 27 acceptance
-  items VERIFIED, 1 partly (item 23), 1 not this task's to close (item 22).** The project owner
-  supplied both regional CSV files and both full national files on 2026-09-19, each
-  checksum-verified against the manifest before any row was read; and the TERYT TERC and SIMC
-  registers on 2026-09-20 as the extracted official files. Items 10 and 24 are closed: all 16
-  geography values match a TERC voivodeship name by exact code-point equality, recorded in
-  `fixtures/teryt/voivodeship-terc-correspondence.json` with every code read from the register.
-  Item 23 is partly closed: the supplied files' identity is recorded in full, but the archive zip
-  `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip` was not supplied, so its digest could not be
-  matched and no source URL is on record — supplying the zip closes it. Item 22 (the publisher's
-  licence confirmation) is not this task's to close. Outcome and every figure:
-  `docs/sources/pesel-regional.md`, parts 3 and 4; summary in `PROGRESS.md`; findings in D-004.
-  **Nothing was ingested, no `RightsProfile` was created, no `Place` exists, and D-004's status and
-  adoption gate are unchanged.**
+- **Status:** **EXECUTED — 26 of 27 acceptance items VERIFIED from the bytes. One open, and it
+  is not this task's to close.** The project owner supplied both regional CSV files and both full
+  national files on 2026-09-19, then the TERYT TERC register on 2026-09-20; each was
+  checksum-verified before any row was read. Items 23, 24 and 10 closed on 2026-09-20 from the
+  TERC data: all 16 observed geography values map to a current TERC voivodeship code by exact
+  string equality, none unmapped. The remaining open item is half of item 22, the publisher's
+  licence confirmation, which belongs to D-007. Outcome and every figure:
+  `docs/sources/pesel-regional.md`, sections "TASK-008 executed" and "TERYT TERC correspondence";
+  summary in `PROGRESS.md`; findings in D-004. Deliverables committed: both regional fixtures, the
+  extended manifest and `fixtures/teryt/voivodeship-terc-correspondence.json`. **Nothing was
+  ingested, no `RightsProfile` was created, no `Place` or administrative table exists, and D-004's
+  status and adoption gate are unchanged.**
 - **Created:** 2026-09-19, at the project owner's request, immediately after the
   `CURRENT_DISTRIBUTION` preflight found a distribution truth chain not actionable
   (`docs/sources/pesel-regional.md`). This file is that preflight's first prerequisite, promoted

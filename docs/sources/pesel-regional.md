@@ -1,9 +1,9 @@
 # PESEL regional surname resources — source record and `CURRENT_DISTRIBUTION` preflight
 
-**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN · SPIKE EXECUTED; THE TERC
-CORRESPONDENCE NOW EXISTS (2026-09-20), WITH ONE PROVENANCE ITEM STILL OPEN ON THE ARCHIVE ZIP.**
+**Status: NOT ADOPTED · NOT INGESTED · NO DISTRIBUTION TASK WRITTEN · SPIKE EXECUTED, 2 OF 27
+ITEMS STILL OPEN ON MISSING TERYT DATA.**
 
-This document has four dated parts: three from 2026-09-19 and a fourth from 2026-09-20.
+This document has three dated parts, all 2026-09-19.
 
 1. The **preflight** records why a `CURRENT_DISTRIBUTION` truth chain was not actionable and what
    would make it so.
@@ -11,10 +11,8 @@ This document has four dated parts: three from 2026-09-19 and a fourth from 2026
    acceptance items it could settle from committed metadata alone.
 3. The **execution** records the spike completed once the project owner supplied the bytes: 23 of
    27 acceptance items verified, 2 unresolved on the missing TERYT TERC register and 1 on the
-   publisher's licence confirmation.
-4. The **TERC correspondence** records items 10 and 24 closed and item 23 partly closed once the
-   project owner supplied the TERYT TERC and SIMC files on 2026-09-20. Read parts 3 and 4 for the
-   current facts; where they and the earlier parts disagree, the later part supersedes.
+   publisher's licence confirmation. Read that part for the current facts; where it and the
+   earlier parts disagree, it supersedes them.
 
 **The two results that matter most.** The publisher's single-occurrence exclusion is applied at the
 **(surname, voivodeship) cell** level, confirmed from the bytes. And the 16 voivodeship values do
@@ -817,71 +815,120 @@ facts above; both block a `Place` foundation and any adoption decision.
 - Did not decide D-004, change its status or options, or approve any rights posture.
 - Did not assert what the residual is. The arithmetic is stated; the cause is `UNRESOLVED`.
 
----
+## TERYT TERC correspondence (2026-09-20)
 
-## Part 4 — TERC correspondence established (2026-09-20)
+Closes TASK-008 acceptance items 23, 24 and the dependent item 10, which had been open since
+2026-09-19 for one reason only: the TERC register was not on disk and both GUS hosts are
+egress-blocked. The project owner supplied it on 2026-09-20. Nothing else about this record
+changes, and nothing here adopts, ingests or authorises the regional resource — D-004 is still the
+gate.
 
-The project owner supplied the TERYT TERC and SIMC registers as the **extracted** official files
-(`TERC_Urzedowy_2026-09-18.csv`/`.xml`, `SIMC_Urzedowy_2026-09-18.csv`/`.xml`), not as the
-acquisition archive's zips. Everything below was read from those bytes.
+### Item 23 — TERC data identity
 
-### TERC identity, from the bytes
+| Fact | Value |
+|---|---|
+| Archive member | `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip` |
+| Zip SHA-256 | `1cfbb50ebf97dfc797aca94331029983bc7f1e752dff94c973026437ba7d2768` |
+| Zip byte size | 132,136 |
+| Matches committed `SHA256SUMS.txt` | **yes**, so this is an authentic archive copy, not a re-save |
+| File used | `TERC_Urzedowy_2026-09-18.csv` |
+| File SHA-256 | `557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4` |
+| File byte size | 205,660 |
+| Encoding / terminator / delimiter | UTF-8 **with BOM** / CRLF / `;` |
+| Header | `WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA` |
+| Data rows | 4,360 |
+| Voivodeship-level rows | 16, selected by `POW`, `GMI` and `RODZ` all empty |
+| Register reference date | **`2026-01-01`**, from the `STAN_NA` field, identical on all 16 rows |
+| Source URL as actually used | **none** — no URL was fetched |
 
-| Fact | TERC CSV | TERC XML |
-|---|---|---|
-| Byte size | 205,660 | 960,750 |
-| SHA-256 | `557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4` | `84d4419a4e3018eb0de40298ed9c839fe3f39b33ffec197cb025a00dae02da0a` |
-| Encoding / terminator | UTF-8 with BOM, CRLF, `;`-delimited | UTF-8, CRLF |
-| Header / catalog | `WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA` | `<catalog name="TERC" type="ALL" date="2026-01-01">` |
-| Data rows | 4,360 | 4,360 — **identical to the CSV row by row, in order** |
-| `STAN_NA` | `2026-01-01` on every row | same |
-| Voivodeship rows (`POW`, `GMI`, `RODZ` blank) | **16**, all `NAZWA_DOD = województwo` | same |
+**The GUS page was not reached.** `api.stat.gov.pl` and `eteryt.stat.gov.pl` were tested from the
+implementing environment on 2026-09-20 and the gateway answered 403 to CONNECT, the same
+policy block recorded on 2026-09-19. The rights basis is therefore **quoted, not re-verified**,
+from `docs/canonical/12` §2.1:
 
-SIMC was supplied alongside and is recorded for identity only (CSV 5,566,752 B, XML 28,588,307 B,
-101,865 rows in each, `STAN_NA = 2026-01-01`, digests in the correspondence file). Nothing from it
-was used.
+> GUS states that TERYT ws1 is available to public and commercial entities and that the
+> service/data are free of charge. It exposes TERC, SIMC, ULIC and related registries.
 
-### The correspondence — item 24
+The canonical corpus records that as VERIFIED. This session neither confirms nor disputes it.
 
-`fixtures/teryt/voivodeship-terc-correspondence.json`. Method: **exact code-point equality** between
-each observed geography value and the `NAZWA` of the 16 voivodeship rows — no case folding, no
-whitespace change, no normalisation, both sides verified NFC beforehand.
+The raw TERC file is **not committed** (`AGENTS.md` §6). Only the derived correspondence is.
 
-**16 observed, 16 mapped, 0 unmapped.** `DOLNOŚLĄSKIE → 02`, `KUJAWSKO-POMORSKIE → 04`,
-`LUBELSKIE → 06`, `LUBUSKIE → 08`, `ŁÓDZKIE → 10`, `MAŁOPOLSKIE → 12`, `MAZOWIECKIE → 14`,
-`OPOLSKIE → 16`, `PODKARPACKIE → 18`, `PODLASKIE → 20`, `POMORSKIE → 22`, `ŚLĄSKIE → 24`,
-`ŚWIĘTOKRZYSKIE → 26`, `WARMIŃSKO-MAZURSKIE → 28`, `WIELKOPOLSKIE → 30`, `ZACHODNIOPOMORSKIE → 32`.
-Every code was read from the file; none was typed.
+**`teryt_simc` was also supplied and was not used.** SIMC is the register of localities; this
+item needs voivodeship level only, so reading it would have been outside the task's scope. It is
+not committed either.
 
-### Provenance — item 23, partly closed
+### Items 24 and 10 — the correspondence
 
-The task's gate for this file was "checksum-verified against the archive zip, or freshly obtained
-from GUS with its URL recorded". Neither condition holds as written, and the project owner directed
-the work to proceed on the supplied files:
+`fixtures/teryt/voivodeship-terc-correspondence.json`.
 
-- **Archive digest match: NOT VERIFIED.** The archive lists
-  `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip` (SHA-256 `1cfbb50e…2768`, 132,136 B). The zip
-  was not supplied; the digests above are of its extracted files. Supplying the zip closes this in
-  one line.
-- **Source URL as used: not recorded.** The acquisition report logs `teryt_terc | DOWNLOADED |
-  132136` without a URL, and both GUS hosts were egress-blocked in every session, so no session
-  fetched the file itself.
-- **Rights statement** quoted from `docs/canonical/12` §2.1: "GUS states that TERYT ws1 is available
-  to public and commercial entities and that the service/data are free of charge." The GUS page was
-  not reached by this project.
+| Count | Value |
+|---|---:|
+| Observed geography values | 16 |
+| Mapped to a current TERC voivodeship | **16** |
+| Unmapped | **0** |
+| TERC voivodeship rows in the register | 16 |
+| Value set identical across the male and female files | yes |
 
-What *is* established: the files are the official GUS export shape (names, header, catalog
-attributes), the CSV and XML agree row for row, the register's reference date is `2026-01-01`, and
-the correspondence is byte-exact. What is not: that these bytes are the archive's bytes.
+**Comparison method: exact string equality.** The observed value is compared byte-for-byte with
+the TERC `NAZWA` field. No case change, no diacritic folding, no whitespace collapse and no
+Unicode normalisation is applied to either side.
 
-### Acceptance-item status after part 4
+**No normalisation was needed, and none is claimed.** Both sides were checked and every string is
+already NFC, and every observed value is already identical to its TERC name including case and
+diacritics. A normalisation step here would have been unfalsifiable: it could not have changed any
+outcome. Recording "matched after case folding" would therefore have overstated what was done.
 
-| # | Item | Status |
-|---|---|---|
-| 10 | Every value a current TERC voivodeship | **VERIFIED** — 16 of 16, exact match, codes read from the register |
-| 23 | TERC data identity | **PARTLY VERIFIED** — supplied-file identity recorded in full; archive-zip digest match and source URL outstanding |
-| 24 | Voivodeship TERC correspondence file | **VERIFIED** — created, 16 mapped, 0 unmapped, method and provenance inside |
-| 22 | Licence position | unchanged — publisher confirmation still not reported |
+| Observed value | TERC code |
+|---|---|
+| `DOLNOŚLĄSKIE` | `02` |
+| `KUJAWSKO-POMORSKIE` | `04` |
+| `LUBELSKIE` | `06` |
+| `LUBUSKIE` | `08` |
+| `ŁÓDZKIE` | `10` |
+| `MAŁOPOLSKIE` | `12` |
+| `MAZOWIECKIE` | `14` |
+| `OPOLSKIE` | `16` |
+| `PODKARPACKIE` | `18` |
+| `PODLASKIE` | `20` |
+| `POMORSKIE` | `22` |
+| `ŚLĄSKIE` | `24` |
+| `ŚWIĘTOKRZYSKIE` | `26` |
+| `WARMIŃSKO-MAZURSKIE` | `28` |
+| `WIELKOPOLSKIE` | `30` |
+| `ZACHODNIOPOMORSKIE` | `32` |
 
-Everything else in part 3's table stands. **Still nothing ingested; no `Place`, no table, no
-connector; D-004 unchanged.**
+**Item 10 answered:** every observed value corresponds to a current TERYT TERC voivodeship. There
+is no value without a counterpart, so the "recorded verbatim and uninterpreted" clause for
+unmapped values has nothing to record.
+
+Codes were read from the TERC data, never typed from memory. The observed values were read from
+the committed regional fixtures, which this record already establishes as verbatim rows of the
+checksum-verified sources, and whose 16 distinct values are the complete set of the full
+resources.
+
+### What this does and does not unblock
+
+It removes the **geographic identifier** objection that the `CURRENT_DISTRIBUTION` preflight
+raised: the resource's voivodeship strings now have documented official codes, so a later task
+could build a `Place` foundation without inventing one.
+
+It removes nothing else. The two findings that actually decide whether a regional surface is
+honest are untouched: per-cell suppression leaves over half of national surnames with no regional
+row, and roughly 21% of bearers appear in no voivodeship row at all for a reason the publisher
+does not state. The resource-level licence is still unconfirmed (D-007). And the binding semantic
+restriction stands — this dimension is voivodeship of **permanent registered residence**, never
+origin, ancestry, birthplace, historical distribution, or unqualified current residence.
+
+### Addendum — independent cross-check from the extracted files (2026-09-20)
+
+A second session received the same register as the **extracted** official files rather than the
+zip, and checked them before the two records were merged. Everything it found agrees with the
+section above and adds three facts:
+
+- **The extracted `TERC_Urzedowy_2026-09-18.csv` has SHA-256 `557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4`** — the same digest the correspondence file records for the member of the checksum-verified zip. So the extracted copy and the archive copy are one and the same bytes.
+- **The XML twin agrees with the CSV row for row.** `TERC_Urzedowy_2026-09-18.xml` (960,750 B, SHA-256 `84d4419a4e3018eb0de40298ed9c839fe3f39b33ffec197cb025a00dae02da0a`, `<catalog name="TERC" type="ALL" date="2026-01-01">`) holds 4,360 rows identical to the CSV's 4,360 in order, field for field.
+- **SIMC identity, for the future `Place` task:** `SIMC_Urzedowy_2026-09-18.csv` (5,566,752 B, SHA-256 `316c6446da15f53fef77ae3f28bda60f9c0300120c217eaa4431e1661a018c5a`, header `WOJ;POW;GMI;RODZ_GMI;RM;MZ;NAZWA;SYM;SYMPOD;STAN_NA`, 101,865 rows, `STAN_NA = 2026-01-01`) and its XML (28,588,307 B, SHA-256 `6e4e9aeed6caf4876c977cb0e28b7a5ec76d883c581ea215ee9a6b69c2929c06`, 101,865 rows). Nothing from SIMC was used.
+
+The second session's own correspondence file mapped the same 16 values to the same 16 codes by the
+same exact comparison and was discarded in favour of the one above, which carries the zip-level
+provenance.

@@ -154,12 +154,6 @@ Three acceptance items that do not depend on the bytes were completed, and they 
 
 Nothing was adopted, ingested, fixtured or approved. No TERC code was read or written. The manifest was deliberately left unedited, because everything the spike would add to it is bytes-dependent.
 
-### Findings — TERC correspondence established (2026-09-20). Status and decision still unchanged.
-
-- **All 16 geography values map to a current TERYT TERC voivodeship by exact code-point equality**, read from the official `TERC_Urzedowy_2026-09-18` register (`STAN_NA = 2026-01-01`, 4,360 rows, CSV and XML identical row for row). Recorded in `fixtures/teryt/voivodeship-terc-correspondence.json`: 16 observed, 16 mapped, 0 unmapped, no normalisation needed. The "name → TERC" prerequisite the preflight named is met, as evidence.
-- **One provenance item stays open:** the register arrived as extracted files, not as the archive's zip, so the archive digest `1cfbb50e…2768` is not matched and no source URL is recorded. The correspondence file states this in its own `archive_identity` block.
-- **Nothing changes for the decision.** No `Place`, table or connector exists; the "Preferred" path's remaining question — whether registered-domicile geography, framed with the ~21% residual, is an acceptable basis for a product feature, and on what licence terms — is exactly as before. What has changed is that the geographic-identity groundwork is no longer a blocker once that answer comes.
-
 ### Findings — TASK-008 EXECUTED, regional bytes verified (2026-09-19). Status and decision still unchanged.
 
 The project owner supplied both regional CSV files and both full national files. Each was checksum-verified against `fixtures/pesel/source-manifest.json` before any row was read. 23 of the spike's 27 acceptance items are now verified from the bytes. Full record, with every command and figure: `docs/sources/pesel-regional.md`, section "TASK-008 executed". Nothing was ingested, no `RightsProfile` exists, and this decision's status, options and adoption gate are untouched.
@@ -177,6 +171,40 @@ The project owner supplied both regional CSV files and both full national files.
 **The only reconciliation invariant the source supports** is `regional sum ≤ national count`, which holds for every surname with zero exceptions in either file. Equality holds for roughly a quarter of surnames and must never be asserted or enforced.
 
 **Still blocking, both on one missing input.** The geography column carries no administrative code of any kind, so a voivodeship-name to TERYT TERC correspondence could not be established: the TERC archive file was not supplied and `api.stat.gov.pl` and `eteryt.stat.gov.pl` are egress-blocked. No TERC code was read or written. A voivodeship `Place` foundation therefore remains unspecifiable, and the resource-level licence confirmation is still not reported.
+
+---
+
+### Findings — TERYT TERC correspondence established (2026-09-20). Status and decision unchanged.
+
+The project owner supplied the TERC register on 2026-09-20, closing TASK-008's items 23, 24 and 10.
+Full record: `docs/sources/pesel-regional.md`, section "TERYT TERC correspondence". The file is
+`fixtures/teryt/voivodeship-terc-correspondence.json`.
+
+**All 16 observed geography values map to a current TERC voivodeship code; none is unmapped.** The
+comparison is exact string equality, byte for byte against the TERC `NAZWA` field. No normalisation
+was applied and none is claimed: both sides are already NFC and every value already matches its
+TERC name including case and diacritics, so a folding step could not have changed any outcome. The
+register's reference date is `2026-01-01`, ten days before the PESEL resources' own `2026-01-20`.
+
+The TERC zip's SHA-256 equals the value already committed in the acquisition archive's
+`SHA256SUMS.txt`, so it is an authentic archive copy. The GUS hosts remain egress-blocked and were
+not reached, so `docs/canonical/12` §2.1's rights statement is quoted rather than re-verified. No
+raw TERYT file is committed.
+
+**What this changes for this decision: one objection, and only one.** The
+`CURRENT_DISTRIBUTION` preflight recorded that the regional candidate "carries no geographic
+identifier at all: a voivodeship name string, no TERYT code, no ISO 3166-2, while canonical
+requires Place plus a TERYT external ID". That objection is now answered — the codes exist, are
+official, and are documented. A later task could build a voivodeship `Place` foundation without
+inventing anything.
+
+**What this does not change.** No `Place`, table, migration or connector was created, and none is
+authorised. The two findings that decide whether a regional surface is honest are untouched:
+per-cell suppression leaves 53.8% of national male and 50.8% of female surnames with no regional
+row, and 21.74% of male and 19.78% of female bearers appear in no voivodeship row for a reason the
+publisher does not state. The resource-level licence is still unconfirmed (D-007). The binding
+semantic restriction on registered-domicile geography is unchanged. **This decision's status,
+options and adoption gate are exactly as they were.**
 
 ---
 

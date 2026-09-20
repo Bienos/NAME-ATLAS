@@ -1782,45 +1782,53 @@ lineage `docs/canonical/14` §30 requires.
   should not.
 - The male resource's rank claims are real, so the first production-scale read surface is now
   possible for male surnames — a task, not a change to slip into this one.
+## TASK-008 closed out: TERYT TERC correspondence established (2026-09-20)
 
-## TASK-008 items 10 and 24 closed, 23 partly — the TERC correspondence exists (2026-09-20)
+The project owner supplied the TERYT TERC register, the input TASK-008 had been waiting on since
+2026-09-19. Items 23, 24 and the dependent item 10 are now verified, taking the spike from 23 of 27
+acceptance items to **26 of 27**. The one remaining open item is half of item 22, the publisher's
+licence confirmation, which belongs to D-007 and is not this task's to close.
 
-The project owner supplied the TERYT TERC and SIMC registers as the **extracted** official files
-(`TERC_Urzedowy_2026-09-18.csv`/`.xml`, `SIMC_Urzedowy_2026-09-18.csv`/`.xml`), not the acquisition
-archive's zips, and directed the correspondence to be written from them. Evidence only; no code.
-
-### What was read from the bytes
+**All 16 observed geography values map to a current TERC voivodeship code. None is unmapped.**
 
 | Fact | Value |
 |---|---|
-| TERC CSV | 205,660 B, UTF-8 with BOM, CRLF, `;`, header `WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA`, 4,360 rows, SHA-256 `557edb28…85d4` |
-| TERC XML | 960,750 B, `<catalog name="TERC" type="ALL" date="2026-01-01">`, 4,360 rows, **identical to the CSV row by row** |
-| Register reference date | `STAN_NA = 2026-01-01` on every row |
-| Voivodeship rows | 16 (`POW`/`GMI`/`RODZ` blank, `NAZWA_DOD = województwo`) |
-| SIMC | 101,865 rows in CSV and XML alike, `STAN_NA = 2026-01-01`; identity recorded, nothing used |
+| Comparison method | exact string equality, byte for byte against the TERC `NAZWA` field |
+| Normalisation applied | **none**, and none claimed — both sides are already NFC and every value already matches including case and diacritics, so a folding step could not have changed any outcome |
+| Register reference date | `2026-01-01` (field `STAN_NA`), ten days before the PESEL resources' `2026-01-20` |
+| TERC zip SHA-256 | `1cfbb50e…2768`, equal to the value already committed in the acquisition archive's `SHA256SUMS.txt`, so an authentic archive copy |
+| File read | `TERC_Urzedowy_2026-09-18.csv`, 205,660 B, UTF-8 with BOM, CRLF, `;` delimited, 4,360 data rows, 16 voivodeship-level |
+| GUS page reached | **no** — `api.stat.gov.pl` and `eteryt.stat.gov.pl` both answered 403 at CONNECT when tested on 2026-09-20 |
 
-### The correspondence
+Because the GUS page could not be reached, `docs/canonical/12` §2.1's rights statement is **quoted,
+not re-verified**. No raw TERYT file is committed (`AGENTS.md` §6); only the derived correspondence
+is, at `fixtures/teryt/voivodeship-terc-correspondence.json`. `teryt_simc` was supplied alongside
+and deliberately **not read** — SIMC is the locality register and this item needs voivodeship level
+only.
 
-`fixtures/teryt/voivodeship-terc-correspondence.json`: **16 observed geography values, 16 mapped,
-0 unmapped**, by exact code-point equality against the 16 voivodeship `NAZWA` values — no case
-folding, no normalisation, both sides verified NFC first. Every code was read from the register;
-none was typed. The file carries the method, the result, both TERC files' identity, and its own
-provenance gap.
+### What it unblocks, and what it does not
 
-### The provenance gap, stated rather than papered over
+It answers exactly one of the `CURRENT_DISTRIBUTION` preflight's objections: that the regional
+candidate "carries no geographic identifier at all". The codes now exist, are official and are
+documented, so a later task could build a voivodeship `Place` foundation without inventing one.
 
-TASK-008's gate for this file was an archive-zip digest match or a recorded GUS URL. Neither holds:
-the zip `teryt_terc__1cfbb50ebf97.zip` was not supplied, only its contents, and the acquisition
-report logs the TERYT downloads without URLs. Item 23 is therefore **partly** verified — the
-supplied files' identity in full, the archive match outstanding. Supplying the zip closes it.
+It changes nothing else. No `Place`, table, migration or connector was created and none is
+authorised. The two findings that decide whether a regional surface is honest are untouched:
+per-cell suppression leaves over half of national surnames with no regional row, and about 21% of
+bearers appear in no voivodeship row for a reason the publisher does not state. The resource-level
+licence is still unconfirmed. **D-004's status, options and adoption gate are exactly as they
+were.**
 
-### Verification run
+### Also observed while working on the line of record
 
-| Command | Result |
-|---|---|
-| `python3 -c "json.load(...)"` on the correspondence file | valid JSON |
-| `pnpm test` | **Passed** — 235 unit tests; no code changed, run to prove it |
-| `pnpm format:check` | **Passed** |
+A parallel session implemented D-013 independently and the two were merged at `fae6237`. The merged
+`simpleCaseFold` is the better of the two: it applies the `CaseFolding.txt` simple-fold variants,
+such as final sigma to sigma, on top of per-code-point lowercasing, and it keeps the original code
+point where lowercasing would expand it. The resolver's suite passes at **74 tests** on the merged
+tree. The ADR is `docs/adr/0005-canonical-key-simple-case-folding.md`.
 
-TASK-008 stands at 25 of 27 verified, item 23 partly, item 22 (publisher licence) not this task's.
-**Nothing ingested; no `Place`, no table, no connector; D-004 unchanged.**
+**Merged from a parallel session (2026-09-20):** the same correspondence was produced independently
+from the extracted TERC files and discarded in favour of the zip-verified record above; the
+mappings were identical (16/16). Its three extra facts — the extracted CSV's digest equals the
+zip member's, the XML twin is identical row for row, and the SIMC files' identities — are recorded
+as an addendum in `docs/sources/pesel-regional.md`.
