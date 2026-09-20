@@ -2586,3 +2586,119 @@ tests assert are unchanged by this section.
 confidence, source and date, the rights decision per surface, the honest low-data states, the
 suggestions for a miss, and the accepted English and Polish sentences for every figure recorded in
 `docs/contracts/surname-result.md`. No decision blocks it.
+
+## TASK-017 implemented — the free surname result page; M2's journey is complete (2026-09-20)
+
+Scope authority: `tasks/017-free-surname-result-page.md`. `apps/web` served a placeholder reading
+"Foundation build" until now. A person can enter a surname in a browser and get a sourced, dated,
+caveated answer, or honest suggestions, or an honest nothing.
+
+### What exists now
+
+- `apps/web/src/app/page.tsx` — a server component, **no client bundle**. The build reports the route
+  as dynamic and server-rendered on demand; nothing ships to the browser but HTML and one stylesheet.
+- `apps/web/src/lib/messages.ts` — the accepted Polish and English sentences, verbatim from
+  `docs/contracts/surname-result.md`, plus the formatting.
+- `apps/web/src/lib/result-view.tsx` — the presentation, split from the page so it can be rendered in
+  a test.
+- `apps/web/src/app/globals.css` — one stylesheet, no framework, no dependency, mobile first, both
+  themes.
+- **Polish and English**, `?lang=pl` (default) and `?lang=en`. Both renderings were already accepted
+  by the project owner, so shipping one would have left half a contract unimplemented.
+
+### The rule the page is built on
+
+**It renders validated claims and derives nothing.** It calls `querySurnameResult`, parses with
+`surnameResultResponseSchema`, and renders from the parsed value; a payload that fails validation
+renders an error and no figures, because a payload violating its own contract is a bug and must not
+reach a reader.
+
+That one rule settles the rest. The page never sums the two partitions, never rounds, never divides a
+regional count by a national one, never decides whether a distribution is presentable, and never
+renders a withheld value — a `RIGHTS_BLOCKED` section carries no values in the payload at all, so
+there is nothing to hide with CSS.
+
+### Verified against rendered markup, not against intent
+
+`result-view.tsx` was split out precisely so `renderToStaticMarkup` could assert these, and each
+fixture is parsed by the contract first, so a payload that could not legally arrive cannot prove the
+page behaves:
+
+| Rule | How it is asserted |
+|---|---|
+| No total across partitions | The sum 198,125 appears in neither notation, in either language |
+| A count is exact | No "about", "approximately" or "estimated" near a count |
+| A rarity figure is hedged | "About 1 in 215" / "Około 1 na 215" required |
+| Coverage warning precedes figures | Its index in the markup is lower than the first region's |
+| Never a location claim | "lives in", "comes from", "originates", "mieszka", "pochodzi" all absent |
+| Rights-blocked shows nothing | No figure, and no `display:none`, `hidden` or `aria-hidden` |
+| Suggestions are offered, not applied | Links only; no `selected`, `checked`, `autofocus` or meta refresh |
+| No score reaches a reader | No probability, similarity, trigram or edit-distance anywhere |
+| Every state has words | Six states render six distinct bodies, in both languages |
+
+### Two bugs the work surfaced, both fixed
+
+1. **A doubled full stop in Polish.** The Polish date form ends in `r.` and the sentence template
+   appended its own period, producing `2026 r..`. A unit test comparing against the accepted sentence
+   caught it; sentences now terminate through one helper.
+2. **A crash on missing configuration.** `loadDbConfig()` throws when `DATABASE_URL` is absent, and it
+   sat *outside* the page's `try`, so a misconfigured deployment returned HTTP 500 instead of the
+   honest unavailable state. Found by starting the server without the variable. Configuration and
+   connection are now inside the try, with the reason logged and nothing about it rendered.
+
+### One presentation decision corrected in review
+
+The first version printed a suggestion's raw explanation codes to the reader —
+`ADJACENT_TRANSPOSITION · EDIT_DISTANCE_1 · TRIGRAM_MODERATE`. Two things wrong: the contract calls
+them *localisable* codes and the page is the downstream that localises them, and `TRIGRAM_MODERATE`
+is a similarity band, which is a score in words. They now render as "dwie litery przestawione, różni
+się jedną literą", the trigram codes are not rendered at all, and an unknown code is omitted rather
+than printed.
+
+### Observed against the real register
+
+| Query | Rendered |
+|---|---|
+| `NOWAK` | two counts, both rarity figures, the distribution table, the "never summed" note |
+| `MELNYK` (`lang=en`) | two counts; rarity unavailable with its reason; distribution warning **first**, then 210 placed of 6,442 |
+| `CICHWOSKI` | "Czy chodziło Ci o:" with `CICHOWSKI` first, reason in words |
+| `NOWK` | no suggestions, "Zapytanie jest za krótkie…" |
+| Latin/Cyrillic mix | "This query needs narrowing" and no candidate |
+
+### A finding the page exposed, recorded as D-018
+
+Searching `NOWAK` rendered its count **twice** per partition. The page is correct; the data has two
+source records for each publisher resource — one from the committed fixture import, one from the full
+import — and `CURRENT_POPULATION` derived a claim from each. Nothing supersedes the earlier one, and
+`claims.supersedes_claim_id` is unused. This is not a test-database quirk: a production re-import of
+the same annual resource would double every observation. **D-018** records it with a recommendation
+(supersede on import) and the rule that no presentation layer may deduplicate, because which claim is
+true is not a rendering question.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 11 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 366 unit tests (web 54, resolver 102, sources 74,
+                                 truth 77, contracts 42, db 4, domain 7, testing 3, worker 2, admin 1)
+pnpm test:integration         → passed, 203 tests across 14 files, exit 0
+pnpm build                    → passed; / is ƒ (dynamic, server-rendered on demand)
+next start + real register    → the five journeys tabled above, by eye, in both languages
+```
+
+`apps/web/vitest.config.ts` now names the JSX transform, because `tsconfig.json` sets
+`jsx: "preserve"` for Next's own build and Vitest does its own.
+
+### Where this leaves M2
+
+The milestone's exit journey exists: search → resolution → current result → confidence, source and
+date → honest low-data state. Four facts, a retrieval tier behind the suggestions, one validated
+contract, and a page that renders them without deriving anything.
+
+What M2's description still names and this repository does not have: the **read-only internal
+inspector** (`apps/admin` is one page), and a **structured logging and tracing baseline** — the page
+and the route handler log to `console.error` with a request id, which is not an observability
+baseline. Neither blocks the journey; both are what an internal alpha would want before it is
+watched by anyone other than its author.

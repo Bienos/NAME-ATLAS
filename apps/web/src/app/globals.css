@@ -1,0 +1,267 @@
+/*
+ * The free result page's only stylesheet (TASK-017).
+ *
+ * No framework and no dependency. Mobile first, because PRODUCT.md §2's primary
+ * user arrives "from search or social, on mobile". Both themes through
+ * prefers-color-scheme. Legibility over decoration: this page's job is to make a
+ * sourced number and its caveat equally easy to read, so nothing here styles a
+ * caveat as small print.
+ */
+
+:root {
+  --ink: #16181d;
+  --ink-soft: #4a4f5a;
+  --paper: #fdfdfc;
+  --card: #ffffff;
+  --rule: #e3e4e8;
+  --accent: #1f4d7a;
+  --warn-ink: #6a3a00;
+  --warn-bg: #fff6e6;
+  --warn-rule: #e0b878;
+  --radius: 10px;
+  --measure: 34rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e8e9ec;
+    --ink-soft: #a5abb8;
+    --paper: #14161a;
+    --card: #1b1e24;
+    --rule: #2e323b;
+    --accent: #8fb8de;
+    --warn-ink: #f5d9a8;
+    --warn-bg: #2e2416;
+    --warn-rule: #6b5024;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 1.25rem 1rem 3rem;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    1rem/1.6 system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+}
+
+a {
+  color: var(--accent);
+}
+
+/* --- header ------------------------------------------------------------ */
+
+.masthead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.masthead h1 {
+  font-size: 1.35rem;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  margin: 0 0 1.5rem;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+/* --- search ----------------------------------------------------------- */
+
+.search {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.search label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.search button {
+  flex: 0 0 auto;
+  padding: 0.7rem 1.1rem;
+  font-size: 1rem;
+  color: var(--paper);
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* --- result ----------------------------------------------------------- */
+
+.surname {
+  font-size: 1.6rem;
+  margin: 0 0 1.5rem;
+  word-break: break-word;
+}
+
+section {
+  margin: 0 0 1.75rem;
+  padding: 1rem 1.1rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+section h3 {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 0 0 0.75rem;
+  font-weight: 600;
+}
+
+.fact {
+  margin: 0 0 1rem;
+}
+
+.fact:last-child {
+  margin-bottom: 0;
+}
+
+.fact p {
+  margin: 0 0 0.4rem;
+}
+
+/* A caveat is body text, never small print. */
+.warning {
+  margin: 0 0 0.9rem;
+  padding: 0.7rem 0.85rem;
+  color: var(--warn-ink);
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-rule);
+  border-left-width: 4px;
+  border-radius: 6px;
+}
+
+.note,
+.absent {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.provenance {
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.provenance li {
+  margin: 0.15rem 0;
+}
+
+/* --- regions ---------------------------------------------------------- */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+caption {
+  text-align: left;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  padding-bottom: 0.5rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.4rem 0.5rem 0.4rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.95rem;
+}
+
+th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+td:nth-child(2),
+td:nth-child(3),
+th:nth-child(2),
+th:nth-child(3) {
+  text-align: right;
+}
+
+/* --- suggestions and states ------------------------------------------- */
+
+.suggestions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.suggestions li {
+  margin: 0.4rem 0;
+}
+
+.suggestions a {
+  display: inline-block;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-decoration: none;
+  font-size: 1.05rem;
+}
+
+.codes {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+
+footer {
+  max-width: var(--measure);
+  margin: 2.5rem auto 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
