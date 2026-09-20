@@ -9,8 +9,7 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "import-pesel": "tsx bin/import-pesel.ts",
-    "rekey-keys": "tsx bin/rekey-keys.ts"
+    "import-pesel": "tsx bin/import-pesel.ts"
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",

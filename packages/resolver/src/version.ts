@@ -19,16 +19,16 @@
  */
 
 /**
- * Version of the canonical identity key pipeline (docs/canonical/13 §5.2,
- * as amended by ADR-0005).
+ * Version of the canonical identity key pipeline (docs/canonical/13 §5.2, as
+ * amended by ADR-0005).
  *
- * `v2` differs from `v1` in one step: the fold is Unicode **simple** case
- * folding, not full folding. Keys are identical for every input without a
- * multi-character folding, which is every surname in the register bar the
- * 171 spelled with ẞ or ß. A row written under `v1` therefore still holds a
- * key that is usually — but not always — the `v2` key, which is why
- * `pnpm db:rekey-keys` recomputes it from the display form rather than
- * assuming.
+ * `canonical_key_v2` replaced v1's Unicode full case folding with simple case
+ * folding, because full folding expands `ẞ` to `ss` and collided 171 distinct
+ * surnames in the production resource (D-013). Keys are identical between the
+ * versions for every input without a code point the two treat differently, so
+ * a v1 row usually — but not always — already holds its v2 key. Migration
+ * `0006_canonical_key_v2` recomputes every one of them from the stored display
+ * text rather than assuming.
  */
 export const CANONICAL_KEY_VERSION = "canonical_key_v2";
 
@@ -51,6 +51,10 @@ export const SCRIPT_PROFILE_VERSION = "script_profile_v1";
  * Version of the whole resolution method: validation, normalisation, script
  * policy and the T0/T1 matching tiers taken together. This is what a
  * `SurnameResolution` records.
+ *
+ * Bumped to v2 with {@link CANONICAL_KEY_VERSION}: normalisation is part of
+ * the method, so a resolution stored under v1 was produced by different rules
+ * and must not claim to be replayable under these ones.
  */
 export const RESOLUTION_METHOD_VERSION = "exact_resolver_v2";
 

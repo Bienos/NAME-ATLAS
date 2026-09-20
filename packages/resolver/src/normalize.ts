@@ -7,6 +7,18 @@
  */
 
 /**
+ * Code points that Unicode default *full* case folding leaves alone but
+ * that `toUpperCase()` would change, so folding them through the uppercase
+ * round trip would merge two distinct letters.
+ *
+ * U+0131 LATIN SMALL LETTER DOTLESS I has only a Turkic-conditional (`T`)
+ * entry in CaseFolding.txt, so under the default profile it folds to
+ * itself. `"ı".toUpperCase()` is `"I"`, which would then lowercase to `"i"`
+ * and silently merge Turkish `ı` with Latin `i`.
+ */
+const CASE_FOLD_EXCEPTIONS = new Map<string, string>([["\u0131", "\u0131"]]);
+
+/**
  * Letterform variants that Unicode **simple** case folding maps to their
  * canonical letter (CaseFolding.txt status `C`) but that `toLowerCase()`
  * leaves alone, because they are already lowercase.
@@ -120,6 +132,43 @@ export function toNfc(value: string): string {
 }
 
 /**
+ * Unicode full case folding, applied per code point.
+ *
+ * **No longer the canonical identity fold.** `canonicalKey` used this up to
+ * `canonical_key_v1` and moved to {@link simpleCaseFold} at
+ * `canonical_key_v2`, because full folding expands `ẞ` to `ss` and so merges
+ * distinct surnames (`WEIẞ` with `WEISS`). See ADR-0005 and D-013. It is kept
+ * exported and tested because the v1 keys it produced are what migration
+ * `0006_canonical_key_v2` rewrites, and because the regression test uses it to
+ * show the collisions were real rather than theoretical.
+ *
+ * Node has no direct case-folding API. `toLowerCase()` alone is simple
+ * folding and misses the multi-character foldings (`ß` → `ss`, `ﬁ` → `fi`),
+ * which §5.5 explicitly rules out as the only mechanism. Lowercasing, then
+ * uppercasing, then lowercasing again reproduces full folding through ICU's
+ * own data: the middle uppercase expands the multi-character cases, and the
+ * leading lowercase makes the sequence idempotent (`ẞ` → `ß` → `SS` → `ss`,
+ * where a bare upper-then-lower would stop at `ß`).
+ *
+ * Applied per code point because CaseFolding.txt is itself a per-code-point
+ * mapping, so this cannot introduce a context-sensitive surprise.
+ *
+ * Not diffed against CaseFolding.txt directly: unicode.org was
+ * network-egress-blocked in the implementing session. It was instead
+ * verified empirically — idempotent and NFC/NFD-equivalent across every
+ * code point up to U+2FFFF and 400,000 random multi-code-point strings —
+ * and `normalize.test.ts` pins the behaviour that matters for identity.
+ */
+export function fullCaseFold(value: string): string {
+  let folded = "";
+  for (const codePoint of value) {
+    const exception = CASE_FOLD_EXCEPTIONS.get(codePoint);
+    folded += exception ?? codePoint.toLowerCase().toUpperCase().toLowerCase();
+  }
+  return folded;
+}
+
+/**
  * Unicode **simple** case folding, applied per code point (ADR-0005).
  *
  * Simple folding is one code point in, one code point out. It never expands
@@ -185,14 +234,18 @@ export function collapseWhitespace(value: string): string {
 }
 
 /**
- * `canonical_key_v2` (docs/canonical/13 §5.2 as amended by ADR-0005):
+ * `canonical_key_v2` (docs/canonical/13 §5.2, amended by ADR-0005):
  *
  *   NFC → simple case fold → separator mapping → trim → collapse spaces
  *
  * Diacritics, particles and token order are preserved — `ŁUCZAK` becomes
- * `łuczak`, never `luczak`. The one difference from `canonical_key_v1` is
- * the fold: simple rather than full, so `GROẞ` no longer collides with
- * `GROSS`.
+ * `łuczak`, never `luczak`.
+ *
+ * The one difference from `canonical_key_v1` is the case step: v1 applied
+ * Unicode *full* folding, which expands a letter into several and so merged
+ * `WEIẞ` into `WEISS`. Everything else — the order of the steps, NFC at both
+ * ends, the separator table — is unchanged, so every key containing no code
+ * point the two treat differently is byte-identical between the versions.
  */
 export function canonicalKey(value: string): string {
   return toNfc(collapseWhitespace(mapSeparators(simpleCaseFold(toNfc(value)))));

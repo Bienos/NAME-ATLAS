@@ -38,7 +38,3 @@ export type {
   QuarantinedRow,
   ReconciliationReport,
 } from "./import-result.js";
-
-// --- ADR-0005: canonical_key_v2 re-key ----------------------------------
-export { rekeyCanonicalKeys } from "./rekey.js";
-export type { KeyCollision, RekeyOptions, RekeyOutcome, RekeyReport } from "./rekey.js";

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   canonicalKey,
   collapseWhitespace,
+  fullCaseFold,
   mapSeparators,
   polishDiacriticFold,
   simpleCaseFold,
@@ -32,6 +33,33 @@ describe("toNfc", () => {
     // precomposed code point, so NFC must preserve the two-code-point form.
     const withMark = "DOG\u0308AN";
     expect(toNfc(withMark)).toBe(withMark);
+  });
+});
+
+describe("fullCaseFold (superseded by simpleCaseFold at canonical_key_v2)", () => {
+  it("performs full (multi-character) folding - which is exactly why v2 left it", () => {
+    expect(fullCaseFold("\u00df")).toBe("ss");
+    expect(fullCaseFold("\u1e9e")).toBe("ss"); // capital sharp s
+    expect(fullCaseFold("\ufb01")).toBe("fi");
+    expect(fullCaseFold("\u03c2")).toBe("\u03c3"); // final sigma
+  });
+
+  it("folds the full Polish alphabet to lowercase, diacritics intact", () => {
+    expect(fullCaseFold("\u0104\u0106\u0118\u0141\u0143\u00d3\u015a\u0179\u017b")).toBe(
+      "\u0105\u0107\u0119\u0142\u0144\u00f3\u015b\u017a\u017c",
+    );
+  });
+
+  it("does not merge Turkish dotless \u0131 with Latin i (default, non-Turkic profile)", () => {
+    expect(fullCaseFold("\u0131")).toBe("\u0131");
+    expect(fullCaseFold("i")).toBe("i");
+  });
+
+  it("is idempotent on the tricky multi-character cases", () => {
+    for (const input of ["\u1e9e", "\u00df", "\ufb01", "\u01c5", "\u0149", "\u03a3"]) {
+      const once = fullCaseFold(input);
+      expect(fullCaseFold(once)).toBe(once);
+    }
   });
 });
 
@@ -71,6 +99,18 @@ describe("simpleCaseFold (ADR-0005)", () => {
     expect(simpleCaseFold("\u0130")).not.toBe("i");
   });
 
+  it("is context-free: sigma does not become final sigma at the end of a word", () => {
+    // Lowercasing the whole string would end it in \u03c2; per code point it
+    // cannot, and the variant table maps a \u03c2 that was written that way.
+    expect(simpleCaseFold("\u03a3")).toBe("\u03c3");
+    expect(
+      simpleCaseFold("\u039f\u0394\u03a5\u03a3\u03a3\u0395\u03a5\u03a3").endsWith("\u03c3"),
+    ).toBe(true);
+    expect(simpleCaseFold("\u039f\u0394\u03a5\u03a3\u03a3\u0395\u03a5\u03a3")).toBe(
+      simpleCaseFold("\u039f\u03b4\u03c5\u03c3\u03c3\u03b5\u03c5\u03c2"),
+    );
+  });
+
   it("is idempotent on the tricky cases", () => {
     for (const input of [
       "\u1e9e",
@@ -84,6 +124,41 @@ describe("simpleCaseFold (ADR-0005)", () => {
     ]) {
       const once = simpleCaseFold(input);
       expect(simpleCaseFold(once)).toBe(once);
+    }
+  });
+});
+
+describe("D-013 regression: sharp-s surnames keep separate identities", () => {
+  // Every pair below is two distinct surnames in the PESEL register with
+  // distinct counts. Under canonical_key_v1's full folding both members of
+  // each pair produced one key, which made the full resource uningestible.
+  // Spellings only - no count, no claim. See ADR-0005.
+  const PAIRS: readonly (readonly [string, string])[] = [
+    ["WEIẞ", "WEISS"],
+    ["GROẞ", "GROSS"],
+    ["GAUẞ", "GAUSS"],
+    ["FUẞ", "FUSS"],
+    ["BERGSTRÄẞER", "BERGSTRÄSSER"],
+  ];
+
+  it.each(PAIRS)("%s and %s do not share a canonical key", (sharp, doubled) => {
+    expect(canonicalKey(sharp)).not.toBe(canonicalKey(doubled));
+  });
+
+  it("the sharp-s key keeps the sharp s rather than expanding it", () => {
+    expect(canonicalKey("WEIẞ")).toBe("weiß");
+    expect(canonicalKey("WEISS")).toBe("weiss");
+  });
+
+  it("uppercase and lowercase of the same sharp-s surname still agree", () => {
+    // Separating ẞ from SS must not also separate a surname from itself.
+    expect(canonicalKey("WEIẞ")).toBe(canonicalKey("Weiß"));
+    expect(canonicalKey("GROẞ")).toBe(canonicalKey("groß"));
+  });
+
+  it("canonical_key_v1 would have merged them - the defect is real, not theoretical", () => {
+    for (const [sharp, doubled] of PAIRS) {
+      expect(fullCaseFold(sharp)).toBe(fullCaseFold(doubled));
     }
   });
 });

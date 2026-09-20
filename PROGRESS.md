@@ -1565,63 +1565,80 @@ complete import impossible. It is not claimed as verified.
 
 ## D-013 resolved — `canonical_key_v2` folds simply (2026-09-20)
 
-Decision authority: the project owner chose **Option A** on D-013. Scope authority:
-`docs/adr/0005-canonical-key-simple-case-folding.md`, written in this session and the record of what
-deviates from canon. No task file exists for this work; it is a decision resolution, not a task.
+The project owner chose **Option A** for D-013 and **Option C** for D-012 on 2026-09-20. D-012 is a
+decision to change nothing and no code moved for it. D-013 is implemented, and the record below is
+the merge of **two sessions that implemented it independently** on this branch — the branch carried
+both. Where they differed, the stronger part won, and the redundant one was removed rather than left
+to rot:
 
-**What was blocked and now is not:** the full official PESEL resources could not be imported at all.
-`canonical_key_v1` applied Unicode **full** case folding, which maps `ẞ` to `ss`, so `WEIẞ` and
-`WEISS` shared one key and the importer refused the file — correctly, per TASK-004 U-5.
+- the **migration** came from the other session, and is the better mechanism than the CLI this
+  session first wrote: automatic at the version boundary, replayable, and reversible. The CLI
+  (`packages/sources/src/rekey.ts`, `bin/rekey-keys.ts`, `pnpm db:rekey-keys`) was deleted, because
+  two mechanisms for one job is what `AGENTS.md` §6 rules out.
+- the **fold** came from this session. The other implementation folded by per-code-point
+  `toLowerCase()`, which is not simple case folding: it leaves final sigma `ς` alone, so a Greek
+  surname written in ordinary case would not have matched the same surname in capitals. The
+  22-entry letterform-variant table and the exhaustive property tests are what close that.
+- the **ADR** was written twice, under two filenames. They are now one file,
+  `docs/adr/0005-canonical-key-simple-case-folding.md`; the other was deleted.
+
+### What the defect was
+
+`canonical_key_v1` applied Unicode **full** case folding, which expands one letter into several: `ẞ`
+folds to `ss`. So `WEIẞ` and `WEISS` produced one identity key, `surnames.canonical_key` is UNIQUE,
+and the importer refused the whole production resource with `DUPLICATE_CANONICAL_KEY` — correctly,
+per TASK-004 U-5.
 
 ### What changed
 
-| Path | What changed |
+| File | Change |
 |---|---|
-| `packages/resolver/src/normalize.ts` | `fullCaseFold` → `simpleCaseFold`; a 22-entry letterform-variant table replaces the one dotless-i exception; `canonicalKey` folds simply |
+| `packages/resolver/src/normalize.ts` | `simpleCaseFold` added and used by `canonicalKey`, with a 22-entry letterform-variant table and no expansions; `fullCaseFold` kept, exported and tested, no longer the identity fold |
 | `packages/resolver/src/version.ts` | `CANONICAL_KEY_VERSION`/`NORMALIZATION_VERSION` → `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` → `exact_resolver_v2` |
-| `packages/resolver/src/index.ts` | exports `simpleCaseFold` in place of `fullCaseFold` |
-| `packages/sources/src/rekey.ts` | **new** — recomputes persisted keys from stored display forms; fail-closed on collision, idempotent, `--dry-run` |
-| `packages/sources/bin/rekey-keys.ts` | **new** — `pnpm db:rekey-keys` |
-| `docs/adr/0005-canonical-key-simple-case-folding.md` | **new** — the decision, its measurements and its consequences |
-| `packages/resolver/src/normalize{,.property}.test.ts` | the fold's unit tests rewritten; three exhaustive properties added |
-| `tests/integration/src/rekey.test.ts` | **new** — 7 tests over a real PostgreSQL |
+| `packages/db/migrations/0006_canonical_key_v2.ts` | **new** — data-only re-key of `surnames.canonical_key` and `name_forms.search_key`, with a frozen copy of the pipeline and a `down()` that refuses rather than merges |
+| `docs/adr/0005-canonical-key-simple-case-folding.md` | **new** — the decision, its measurements, and what it deviates from |
+| `packages/resolver/src/normalize.test.ts` | the fold's unit tests rewritten; the D-013 pair regression added |
+| `packages/resolver/src/normalize.property.test.ts` | three exhaustive properties added (P5–P7) |
+| `tests/integration/src/canonical-key-v2.test.ts` | **new** — six tests against real PostgreSQL |
 
 Also: `tests/integration/src/resolver.test.ts` (two hard-coded version strings), `resolution.ts` (a
-doc comment), `docs/CODEMAP.md`, `docs/DECISIONS_NEEDED.md` (D-013 → RESOLVED),
+doc comment), the two schema-inventory assertions every migration-adding change updates
+(`packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts`),
+`docs/CODEMAP.md`, `docs/DECISIONS_NEEDED.md` (D-013 → RESOLVED) and
 `tasks/003-exact-surname-resolver.md` (an **Amended by** line — the task stays as accepted, with a
-pointer), and the two `package.json` files carrying the new script. **No dependency added or
-upgraded. No migration added** — nothing about the schema changed.
+pointer). **No dependency added or upgraded.**
 
 ### Design points worth recording
 
-- **Simple folding is not simple lowercasing, and the difference is not academic.** `toLowerCase()`
-  leaves final sigma `ς` alone, so `ΣΟΦΟΣ` and `Σοφος` would have taken different keys and the key
-  would not have been caseless. Twenty-two letterform variants need an explicit mapping for this
-  reason: final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, `ẛ`, the micro
-  sign and ypogegrammeni.
-- **The table was derived, not transcribed.** unicode.org is egress-blocked here, so CaseFolding.txt
-  could not be read. ECMAScript specifies that a `u`-mode case-insensitive `RegExp` canonicalises
-  with simple case folding, so `/^X$/iu` is an oracle for "do these two code points share a fold
-  class". The property tests re-derive the relation from that oracle over **every** code point and
-  assert both directions: the fold never joins what Unicode separates (the D-013 defect) and never
-  separates what Unicode joins (caselessness). A sample would have been the wrong instrument — the
-  whole point of D-013 is that the defect lived in one code point nobody sampled.
-- **`toLowerCase()`'s one expansion is discarded.** U+0130 `İ` lowercases to `i` + U+0307. Simple
+- **Simple folding is not simple lowercasing, and the difference is not academic.** Applying
+  `toLowerCase` per code point removes its *context* sensitivity — per code point, `Σ` is always
+  `σ` — but a surname written in ordinary Greek case carries `ς` in final position, and
+  `toLowerCase` leaves that alone. Twenty-two letterform variants therefore need an explicit
+  mapping: final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, `ẛ`, the
+  micro sign and ypogegrammeni. Without them `ΣΟΦΟΣ` and `Σοφος` take different keys.
+- **The table was derived, not transcribed.** unicode.org is egress-blocked here, so
+  CaseFolding.txt could not be read. ECMAScript specifies that a `u`-mode case-insensitive `RegExp`
+  canonicalises with simple case folding, so `/^X$/iu` is an oracle for "do these two code points
+  share a fold class". The property tests re-derive the relation from that oracle over **every** code
+  point and assert both directions: the fold never joins what Unicode separates (the D-013 defect)
+  and never separates what Unicode joins (caselessness). A sample would have been the wrong
+  instrument — the whole point of D-013 is that the defect lived in one code point nobody sampled.
+- **`toLowerCase`'s one expansion is discarded.** U+0130 `İ` lowercases to `i` + U+0307. Simple
   folding has no expansions and Unicode gives U+0130 no simple-fold entry, so the code point stands.
-- **`v1` was not changed in place.** The version constant exists so a change of meaning is visible.
-- **The re-key is not a migration, and could not be.** `packages/db` does not depend on
-  `@name-atlas/resolver`, and reimplementing the fold in SQL is the duplication TASK-004 AC-10
-  forbids. It recomputes from the display form rather than rewriting `ss` → `ß` by pattern, because
-  a v1 key cannot be inverted: `gross` could have come from `GROSS` or from `GROẞ`.
-- **A stale row looks healthy.** `v1` and `v2` keys are identical for every surname without a
-  multi-character folding, which is why the fixture database's 38 rows re-keyed to **zero** changed
-  keys and 38 version stamps. That is the expected result, and the reason the tool recomputes
-  everything rather than looking for rows that appear wrong.
+- **`v1` was not changed in place**, and `fullCaseFold` stays exported: it produced the keys the
+  migration rewrites, and the regression test uses it to show the collisions were real.
+- **The migration carries a frozen copy of the pipeline rather than importing the resolver.** A
+  migration must mean the same thing when replayed after v3 exists; `migrator.test.ts` pins that the
+  copy agrees with the live function today.
+- **It recomputes rather than pattern-matching, and that is not fussiness.** A v1 key cannot be
+  inverted — `gross` could have come from `GROSS` or from `GROẞ` — and a stale row is dangerous
+  precisely because it looks healthy: v1 and v2 keys are identical for every surname without an
+  affected code point, so an un-migrated database resolves correctly until it meets one of the 171.
 
-### Measured, not asserted
+### Measured with the real export, not asserted
 
-Re-run against the two full official resources using the **real** `canonicalKey` export under
-`canonical_key_v2`, through the real `decodePeselBytes`/`parsePeselFile` path:
+Over the two full official resources, through the real `decodePeselBytes`/`parsePeselFile` path and
+the real `canonicalKey` under `canonical_key_v2`:
 
 | Resource | Source rows | Distinct keys | Collisions | Surnames containing `ẞ` or `ß` |
 |---|---:|---:|---:|---:|
@@ -1632,28 +1649,43 @@ Under `canonical_key_v1` the same two files produced 408,130 and 419,963 keys �
 collisions, 171 in total. Every one is now separated, and no new collision appeared anywhere across
 828,264 real surnames.
 
-### Verification run (2026-09-20)
+### Verification run (2026-09-20, after the merge of the two implementations)
 
 | Command | Result |
 |---|---|
 | `pnpm typecheck` | **Passed** — all ten workspace projects |
 | `pnpm lint` | **Passed** — no findings |
 | `pnpm format:check` | **Passed** |
-| `pnpm test` | **Passed** — 222 unit tests (resolver 61, up from 55) |
-| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13/PostGIS 3.4.2) | **Passed** — 137 tests (130 before, 7 new in `rekey.test.ts`) |
-| `pnpm build` | **Passed** — `apps/web` builds, four routes |
-| `pnpm db:migrate` | `no pending migrations` — this change adds none |
-| `pnpm db:rekey-keys --dry-run` | 38 surnames / 38 name forms scanned, 0 re-keyed, 38 stamped, **rolled back** |
-| `pnpm db:rekey-keys` | Same counts, **committed** |
-| `pnpm db:rekey-keys` (second run) | 0 re-keyed, 0 stamped — idempotent |
+| `pnpm test` | **Passed** — **235 unit tests** (resolver 74, was 55) |
+| `pnpm db:migrate` on a fresh database | **Passed** — `0001`–`0006` applied in order; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **Passed** — 19 tables, byte-identical to the committed file (`git status` clean) |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13/PostGIS 3.4.2) | **Passed** — **136 tests** across 7 files |
+| `pnpm build` | **Passed** — all three apps, all four `apps/web` routes |
 
-The integration suite ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the
-`TEST_DATABASE_URL` fallback, as in every task so far. The pinned container image was not exercised
-here — registries remain egress-blocked. CI runs it.
+The integration suite proves the fix where the defect actually bit. Both members of all five named
+pairs store side by side; `WEIẞ` reads back as `weiß` rather than `weiss`; a name form's search key
+follows the same v2 rules; every stored key equals what the live resolver computes from the display
+form, which is what makes the migration's frozen copy trustworthy; and `migrateDown` returns an
+error naming the collision while leaving every row unchanged.
+
+It ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the `TEST_DATABASE_URL`
+fallback, as in every task so far. The pinned container image was not exercised here — registries
+remain egress-blocked. CI runs it.
+
+### Pre-existing flake found while verifying, not fixed
+
+`pnpm test:integration` exits non-zero on roughly a third of runs with one unhandled
+`terminating connection due to administrator command` (PostgreSQL `57P01`), attributed to a
+different test file each time. **This is not caused by the D-013 change**: the same failure
+reproduces on the unmodified tree at 2 of 6 runs, established by stashing the change and re-running.
+It is a teardown race in the shared-server fallback, where one file's forced `DROP DATABASE` kills
+another file's pooled connection. Every test passes on every run; only the process exit code is
+affected. CI uses a per-run service container and has not shown it. Left alone as out of scope for
+this change.
 
 ### Still open
 
-- **D-004** (regional adoption), **D-007** (resource-level licence), **D-012** (build baseline).
+- **D-004** (regional adoption), **D-007** (resource-level licence).
 - TASK-008 items 10, 23 and 24 still need `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip`.
 - `RARITY_CONTEXT` needs U-6's denominator decision; `distribution_snapshots.universe_size` is null.
 - `ß`≡`ss` as a **retrieval** rule belongs to whichever task builds the fuzzy tiers (ADR-0005).

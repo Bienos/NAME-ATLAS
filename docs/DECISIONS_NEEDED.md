@@ -300,26 +300,41 @@ Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option
 
 ## D-013 — RESOLVED (ADR-0005, 2026-09-20)
 
-**Resolution: Option A — the canonical identity key folds with Unicode *simple* case folding.** Decided by the project owner, 2026-09-20. Full detail, including what it deviates from and why: `docs/adr/0005-canonical-key-simple-case-folding.md`.
+**Resolution: Option A — the canonical identity key folds with Unicode *simple* case folding, as `canonical_key_v2`.** Decided by the project owner, 2026-09-20. Full detail, including the measurement, what it deviates from and what it now owes elsewhere: `docs/adr/0005-canonical-key-simple-case-folding.md`.
 
-What changed, concretely:
+Concretely:
 
-- `packages/resolver/src/normalize.ts` exports `simpleCaseFold` in place of `fullCaseFold`. `ẞ` folds to `ß`, never to `ss`, so `GROẞ` and `GROSS` are two surnames and `GROẞ`/`Groß`/`groß` remain one.
-- `CANONICAL_KEY_VERSION` / `NORMALIZATION_VERSION` → `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` → `exact_resolver_v2`. `canonical_key_v1` was not changed in place.
-- Twenty-two letterform variants (final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, ẛ, the micro sign, ypogegrammeni) are folded explicitly, because `toLowerCase()` leaves them alone where folding does not. Without them the key would not be caseless for Greek.
-- `pnpm db:rekey-keys` (`packages/sources/src/rekey.ts`) recomputes persisted keys from the display forms already stored. Fail-closed on collision, idempotent, `--dry-run` available.
+- `canonicalKey` applies simple case folding **per code point** instead of full folding, so `ẞ` folds to `ß` rather than to `ss` and the sharp-s surnames keep separate identities. Only the case step changed; every key containing no code point the two folds treat differently is byte-identical to its v1 form.
+- Per code point removes the *context* sensitivity of `toLowerCase` (Greek `Σ` becoming final `ς` at the end of a word), and a table of **22 letterform variants** — final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, `ẛ`, the micro sign, ypogegrammeni — does the rest: without it a surname written in ordinary Greek case would not match the same surname in capitals. `toLowerCase`'s one expanding case, U+0130, is discarded so the fold stays 1:1, which is also what Unicode does with it.
+- `CANONICAL_KEY_VERSION` / `NORMALIZATION_VERSION` are `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` is `exact_resolver_v2`. Normalisation is part of the resolution method, so a resolution stored under v1 must not claim replayability under v2's rules. `canonical_key_v1` was not changed in place, and `fullCaseFold` stays exported: it is what produced the v1 keys the migration rewrites, and the regression test uses it to show the defect was real.
+- **Migration `0006_canonical_key_v2`** re-keys `surnames.canonical_key` and `name_forms.search_key` from the stored display text and stamps both version columns. It carries a frozen copy of the pipeline rather than importing the resolver, because a migration must mean the same thing when replayed after a v3 exists; `migrator.test.ts` pins that the copy agrees with the live function today. It recomputes rather than pattern-matching, because a v1 key cannot be inverted — `gross` could have come from `GROSS` or from `GROẞ`.
+- The migration computes and collision-checks every new key before writing one row, and aborts naming both display forms if two collide. `down()` recomputes v1 keys and therefore refuses on any database holding a sharp-s pair — v1 cannot represent that data, and merging two real surnames is what invariant 8 forbids.
 
-**Measured after the change, over both full official resources:** `canonical_key_v2` produces 408,182 and 420,082 distinct keys — **zero collisions**, one key per source surname, across all 828,264 real surnames. Under `v1` there were 171. Proven exhaustively rather than by example: `normalize.property.test.ts` re-derives Unicode's simple-fold relation from the runtime over every code point and asserts the fold neither joins what Unicode separates nor separates what it joins.
+**Measured with the real `canonicalKey` export over both full official resources:** `canonical_key_v2` produces 408,182 and 420,082 distinct keys — **zero collisions**, one key per source surname, across all 828,264 real surnames. Under v1 there were 171, every one the sharp S. Proven exhaustively rather than by example: `normalize.property.test.ts` re-derives Unicode's simple-fold relation from the runtime over every code point and asserts the fold neither joins what Unicode separates nor separates what it joins.
 
-**What this unblocked:** the full official import, `CURRENT_RANK`'s passing path, and `RARITY_CONTEXT`'s prerequisite. See `PROGRESS.md` for what was actually run.
+**What this unblocked:** the full official import, `CURRENT_RANK`'s passing path, and `RARITY_CONTEXT`'s prerequisite. `PROGRESS.md` records what was actually run, including the import.
 
 **One consequence that is now owed elsewhere:** `ß`≡`ss` is a real retrieval expectation for a user typing `GROSS`, and it is deliberately absent from the exact tier. Whichever task builds the fuzzy tiers owes German orthographic equivalence as an explicit versioned rule, the way §6.1 handles Polish diacritics.
 
+Options B (adjudicate the 171 collisions by hand) and C (a suffix-disambiguated key) were rejected; ADR-0005 records why.
+
 ---
 
-## D-012 — the workspace-package build baseline: keep `--webpack`, compile to `dist`, or drop the `.js` extensions?
+## D-012 — RESOLVED (2026-09-20)
 
-**Status:** **NON-BLOCKING.** The build is green today; this is developer ergonomics and portability, not a defect. It is recorded because TASK-006 carried it forward as "a build workaround, not a decision" and because this session established facts that change the options.
+**Resolution: Option C — keep `--webpack`, revisit on a defined trigger.** Decided by the project owner, 2026-09-20, as recommended.
+
+Nothing is built, changed or removed. `--webpack` stays an explicit, supported Next flag, the packages keep exporting raw TypeScript with `.js` specifiers, and the emitted worker output stays runnable by plain Node. **No ADR** is required: nothing deviates from a canonical specification, and `docs/canonical/23` §7 already leaves the build orchestrator optional.
+
+Option B stays rejected on its merits rather than on cost: it is the cheapest to type and the only one that invalidates a property that currently holds. Option A is the agreed destination once any trigger below fires, and is a task at that point, not a refactor slipped into another change.
+
+**Revisit when any of these becomes true** — unchanged from the record below: Turbopack gains extension aliasing; a workspace package needs publishing or consuming outside the monorepo; dev-loop speed becomes a real complaint rather than a theoretical one; or a second app starts consuming the packages.
+
+---
+
+## D-012 (original record) — the workspace-package build baseline: keep `--webpack`, compile to `dist`, or drop the `.js` extensions?
+
+**Status:** RESOLVED above. Kept verbatim because the findings were established by running.
 **Owner:** project owner, on a repository-convention question.
 
 Recorded 2026-09-19. The project owner's original framing called this "workspace package build compatibility"; no task ever existed for it.

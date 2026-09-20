@@ -8,6 +8,7 @@
 export {
   canonicalKey,
   collapseWhitespace,
+  fullCaseFold,
   mapSeparators,
   polishDiacriticFold,
   simpleCaseFold,
