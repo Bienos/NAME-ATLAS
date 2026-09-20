@@ -18,8 +18,19 @@
  * differs fails those tests rather than silently changing identity.
  */
 
-/** Version of the canonical identity key pipeline (docs/canonical/13 §5.2). */
-export const CANONICAL_KEY_VERSION = "canonical_key_v1";
+/**
+ * Version of the canonical identity key pipeline (docs/canonical/13 §5.2,
+ * as amended by ADR-0005).
+ *
+ * `v2` differs from `v1` in one step: the fold is Unicode **simple** case
+ * folding, not full folding. Keys are identical for every input without a
+ * multi-character folding, which is every surname in the register bar the
+ * 171 spelled with ẞ or ß. A row written under `v1` therefore still holds a
+ * key that is usually — but not always — the `v2` key, which is why
+ * `pnpm db:rekey-keys` recomputes it from the display form rather than
+ * assuming.
+ */
+export const CANONICAL_KEY_VERSION = "canonical_key_v2";
 
 /**
  * Version of the deterministic search representation stored in
@@ -41,7 +52,7 @@ export const SCRIPT_PROFILE_VERSION = "script_profile_v1";
  * policy and the T0/T1 matching tiers taken together. This is what a
  * `SurnameResolution` records.
  */
-export const RESOLUTION_METHOD_VERSION = "exact_resolver_v1";
+export const RESOLUTION_METHOD_VERSION = "exact_resolver_v2";
 
 export interface UnicodeRuntime {
   readonly node: string;

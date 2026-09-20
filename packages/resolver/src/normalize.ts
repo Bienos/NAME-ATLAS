@@ -7,16 +7,52 @@
  */
 
 /**
- * Code points that Unicode default *full* case folding leaves alone but
- * that `toUpperCase()` would change, so folding them through the uppercase
- * round trip would merge two distinct letters.
+ * Letterform variants that Unicode **simple** case folding maps to their
+ * canonical letter (CaseFolding.txt status `C`) but that `toLowerCase()`
+ * leaves alone, because they are already lowercase.
  *
- * U+0131 LATIN SMALL LETTER DOTLESS I has only a Turkic-conditional (`T`)
- * entry in CaseFolding.txt, so under the default profile it folds to
- * itself. `"ı".toUpperCase()` is `"I"`, which would then lowercase to `"i"`
- * and silently merge Turkish `ı` with Latin `i`.
+ * Without this table the key would not be caseless for them, and the case
+ * that matters in a name is Greek: lowercasing a word-final capital sigma
+ * yields ς, not σ, so ΣΟΦΟΣ and Σοφος would take different keys.
+ *
+ * Twenty-two entries, derived from the runtime's own folding data rather
+ * than transcribed by hand — unicode.org is network-egress-blocked here, so
+ * CaseFolding.txt could not be read. ECMAScript specifies that a `u`-mode
+ * case-insensitive `RegExp` canonicalises with simple case folding (scf),
+ * which makes `/^X$/iu` an oracle for whether two code points share a
+ * simple-fold class. `normalize.property.test.ts` re-derives this table from
+ * that oracle across every code point, so a table that drifts from the
+ * runtime fails the suite instead of silently changing identity.
+ *
+ * U+0131 LATIN SMALL LETTER DOTLESS I is deliberately absent: its only
+ * CaseFolding.txt entry is Turkic-conditional (`T`), so under the default
+ * profile it folds to itself and stays distinct from Latin `i`. Simple
+ * folding reaches that outcome without the uppercase round trip v1 needed.
  */
-const CASE_FOLD_EXCEPTIONS = new Map<string, string>([["\u0131", "\u0131"]]);
+const SIMPLE_FOLD_VARIANTS = new Map<string, string>([
+  ["\u00b5", "\u03bc"], // MICRO SIGN → μ
+  ["\u017f", "\u0073"], // LATIN SMALL LETTER LONG S → s
+  ["\u0345", "\u03b9"], // COMBINING GREEK YPOGEGRAMMENI → ι
+  ["\u03c2", "\u03c3"], // GREEK SMALL LETTER FINAL SIGMA → σ
+  ["\u03d0", "\u03b2"], // GREEK BETA SYMBOL → β
+  ["\u03d1", "\u03b8"], // GREEK THETA SYMBOL → θ
+  ["\u03d5", "\u03c6"], // GREEK PHI SYMBOL → φ
+  ["\u03d6", "\u03c0"], // GREEK PI SYMBOL → π
+  ["\u03f0", "\u03ba"], // GREEK KAPPA SYMBOL → κ
+  ["\u03f1", "\u03c1"], // GREEK RHO SYMBOL → ρ
+  ["\u03f5", "\u03b5"], // GREEK LUNATE EPSILON SYMBOL → ε
+  ["\u1c80", "\u0432"], // CYRILLIC SMALL LETTER ROUNDED VE → в
+  ["\u1c81", "\u0434"], // CYRILLIC SMALL LETTER LONG-LEGGED DE → д
+  ["\u1c82", "\u043e"], // CYRILLIC SMALL LETTER NARROW O → о
+  ["\u1c83", "\u0441"], // CYRILLIC SMALL LETTER WIDE ES → с
+  ["\u1c84", "\u0442"], // CYRILLIC SMALL LETTER TALL TE → т
+  ["\u1c85", "\u0442"], // CYRILLIC SMALL LETTER THREE-LEGGED TE → т
+  ["\u1c86", "\u044a"], // CYRILLIC SMALL LETTER TALL HARD SIGN → ъ
+  ["\u1c87", "\u0463"], // CYRILLIC SMALL LETTER TALL YAT → ѣ
+  ["\u1c88", "\ua64b"], // CYRILLIC SMALL LETTER UNBLENDED UK → ꙋ
+  ["\u1e9b", "\u1e61"], // LATIN SMALL LETTER LONG S WITH DOT ABOVE → ṡ
+  ["\u1fbe", "\u03b9"], // GREEK PROSGEGRAMMENI → ι
+]);
 
 /**
  * Typographic dash variants mapped to ASCII `-` in the key only
@@ -84,30 +120,38 @@ export function toNfc(value: string): string {
 }
 
 /**
- * Unicode full case folding, applied per code point.
+ * Unicode **simple** case folding, applied per code point (ADR-0005).
  *
- * Node has no direct case-folding API. `toLowerCase()` alone is simple
- * folding and misses the multi-character foldings (`ß` → `ss`, `ﬁ` → `fi`),
- * which §5.5 explicitly rules out as the only mechanism. Lowercasing, then
- * uppercasing, then lowercasing again reproduces full folding through ICU's
- * own data: the middle uppercase expands the multi-character cases, and the
- * leading lowercase makes the sequence idempotent (`ẞ` → `ß` → `SS` → `ss`,
- * where a bare upper-then-lower would stop at `ß`).
+ * Simple folding is one code point in, one code point out. It never expands
+ * a letter into several, so ẞ LATIN CAPITAL LETTER SHARP S folds to ß
+ * and never to `ss`: `GROẞ` and `GROSS` stay two distinct surnames, which
+ * is what the register says they are. Full folding merges them, and that
+ * merge made the official resource uningestible — see ADR-0005 for the
+ * measurement and for why the cost lands on the retrieval tiers instead.
  *
- * Applied per code point because CaseFolding.txt is itself a per-code-point
- * mapping, so this cannot introduce a context-sensitive surprise.
+ * `toLowerCase()` supplies the mapping, with two corrections. Its
+ * per-code-point result can expand (U+0130 İ becomes `i` + U+0307), and
+ * simple folding has no expansions, so a multi-code-point result is
+ * discarded and the code point stands — which is also what Unicode does
+ * with U+0130, since it has no simple-fold entry at all. And lowercasing
+ * leaves the letterform variants of {@link SIMPLE_FOLD_VARIANTS} alone,
+ * where folding does not.
  *
- * Not diffed against CaseFolding.txt directly: unicode.org was
- * network-egress-blocked in the implementing session. It was instead
- * verified empirically — idempotent and NFC/NFD-equivalent across every
- * code point up to U+2FFFF and 400,000 random multi-code-point strings —
- * and `normalize.test.ts` pins the behaviour that matters for identity.
+ * Verified against the runtime's own simple-fold data in
+ * `normalize.property.test.ts`: over every code point, this function never
+ * joins two code points that Unicode folds apart, and never separates two
+ * it folds together.
  */
-export function fullCaseFold(value: string): string {
+export function simpleCaseFold(value: string): string {
   let folded = "";
   for (const codePoint of value) {
-    const exception = CASE_FOLD_EXCEPTIONS.get(codePoint);
-    folded += exception ?? codePoint.toLowerCase().toUpperCase().toLowerCase();
+    const variant = SIMPLE_FOLD_VARIANTS.get(codePoint);
+    if (variant !== undefined) {
+      folded += variant;
+      continue;
+    }
+    const lower = codePoint.toLowerCase();
+    folded += [...lower].length === 1 ? lower : codePoint;
   }
   return folded;
 }
@@ -141,16 +185,17 @@ export function collapseWhitespace(value: string): string {
 }
 
 /**
- * `canonical_key_v1` (docs/canonical/13 §5.2), in the order the canonical
- * text specifies:
+ * `canonical_key_v2` (docs/canonical/13 §5.2 as amended by ADR-0005):
  *
- *   NFC → full case fold → separator mapping → trim → collapse spaces
+ *   NFC → simple case fold → separator mapping → trim → collapse spaces
  *
  * Diacritics, particles and token order are preserved — `ŁUCZAK` becomes
- * `łuczak`, never `luczak`.
+ * `łuczak`, never `luczak`. The one difference from `canonical_key_v1` is
+ * the fold: simple rather than full, so `GROẞ` no longer collides with
+ * `GROSS`.
  */
 export function canonicalKey(value: string): string {
-  return toNfc(collapseWhitespace(mapSeparators(fullCaseFold(toNfc(value)))));
+  return toNfc(collapseWhitespace(mapSeparators(simpleCaseFold(toNfc(value)))));
 }
 
 /**

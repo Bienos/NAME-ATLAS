@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   canonicalKey,
   collapseWhitespace,
-  fullCaseFold,
   mapSeparators,
   polishDiacriticFold,
+  simpleCaseFold,
   toNfc,
 } from "./normalize.js";
 import { unicodeRuntime } from "./version.js";
@@ -35,28 +35,55 @@ describe("toNfc", () => {
   });
 });
 
-describe("fullCaseFold", () => {
+describe("simpleCaseFold (ADR-0005)", () => {
   it("folds the full Polish alphabet to lowercase, diacritics intact", () => {
-    expect(fullCaseFold("ĄĆĘŁŃÓŚŹŻ")).toBe("ąćęłńóśźż");
-    expect(fullCaseFold("ąćęłńóśźż")).toBe("ąćęłńóśźż");
+    expect(simpleCaseFold("\u0104\u0106\u0118\u0141\u0143\u00d3\u015a\u0179\u017b")).toBe(
+      "\u0105\u0107\u0119\u0142\u0144\u00f3\u015b\u017a\u017c",
+    );
+    expect(simpleCaseFold("\u0105\u0107\u0119\u0142\u0144\u00f3\u015b\u017a\u017c")).toBe(
+      "\u0105\u0107\u0119\u0142\u0144\u00f3\u015b\u017a\u017c",
+    );
   });
 
-  it("performs full (multi-character) folding, not simple lowercasing", () => {
-    expect(fullCaseFold("ß")).toBe("ss");
-    expect(fullCaseFold("ẞ")).toBe("ss"); // capital sharp s
-    expect(fullCaseFold("ﬁ")).toBe("fi");
-    expect(fullCaseFold("\u03c2")).toBe("\u03c3"); // final sigma
+  it("never expands one letter into two - the sharp S folds to \u00df, not ss (D-013)", () => {
+    expect(simpleCaseFold("\u00df")).toBe("\u00df");
+    expect(simpleCaseFold("\u1e9e")).toBe("\u00df"); // capital sharp s
+    expect(simpleCaseFold("GRO\u1e9e")).not.toBe(simpleCaseFold("GROSS"));
+    expect(simpleCaseFold("\ufb01")).toBe("\ufb01"); // ligature fi is not fi
+  });
+
+  it("folds letterform variants to their canonical letter, so the key stays caseless", () => {
+    // Lowercasing a word-final capital sigma gives \u03c2; folding gives \u03c3.
+    expect(simpleCaseFold("\u03a3\u039f\u03a6\u039f\u03a3")).toBe(
+      simpleCaseFold("\u03a3\u03bf\u03c6\u03bf\u03c2"),
+    );
+    expect(simpleCaseFold("\u03c2")).toBe("\u03c3");
+    expect(simpleCaseFold("\u017f")).toBe("s"); // long s
   });
 
   it("does not merge Turkish dotless \u0131 with Latin i (default, non-Turkic profile)", () => {
-    expect(fullCaseFold("\u0131")).toBe("\u0131");
-    expect(fullCaseFold("i")).toBe("i");
+    expect(simpleCaseFold("\u0131")).toBe("\u0131");
+    expect(simpleCaseFold("i")).toBe("i");
   });
 
-  it("is idempotent on the tricky multi-character cases", () => {
-    for (const input of ["ẞ", "ß", "ﬁ", "ǅ", "ŉ", "\u03a3"]) {
-      const once = fullCaseFold(input);
-      expect(fullCaseFold(once)).toBe(once);
+  it("leaves U+0130 alone rather than expanding it to i + combining dot", () => {
+    expect(simpleCaseFold("\u0130")).toBe("\u0130");
+    expect(simpleCaseFold("\u0130")).not.toBe("i");
+  });
+
+  it("is idempotent on the tricky cases", () => {
+    for (const input of [
+      "\u1e9e",
+      "\u00df",
+      "\ufb01",
+      "\u01c5",
+      "\u0149",
+      "\u03a3",
+      "\u03c2",
+      "\u0130",
+    ]) {
+      const once = simpleCaseFold(input);
+      expect(simpleCaseFold(once)).toBe(once);
     }
   });
 });
@@ -97,7 +124,7 @@ describe("collapseWhitespace", () => {
   });
 });
 
-describe("canonicalKey (canonical_key_v1)", () => {
+describe("canonicalKey (canonical_key_v2)", () => {
   it("item 1: NFC-equivalent inputs produce the same key", () => {
     expect(canonicalKey(GORSKI_PRECOMPOSED)).toBe(canonicalKey(GORSKI_DECOMPOSED));
     expect(canonicalKey(GORSKI_DECOMPOSED)).toBe("górski");
@@ -150,6 +177,15 @@ describe("canonicalKey (canonical_key_v1)", () => {
       const once = canonicalKey(input);
       expect(canonicalKey(once)).toBe(once);
     }
+  });
+
+  it("keeps GRO\u1e9e and GROSS distinct - the collision that blocked the real import (D-013)", () => {
+    expect(canonicalKey("GRO\u1e9e")).toBe("gro\u00df");
+    expect(canonicalKey("GROSS")).toBe("gross");
+    expect(canonicalKey("WEI\u1e9e")).not.toBe(canonicalKey("WEISS"));
+    expect(canonicalKey("BERGSTR\u00c4\u1e9eER")).not.toBe(canonicalKey("BERGSTR\u00c4SSER"));
+    // and the pair that IS the same surname in two cases still shares a key
+    expect(canonicalKey("GRO\u1e9e")).toBe(canonicalKey("gro\u00df"));
   });
 
   it("output is always NFC", () => {

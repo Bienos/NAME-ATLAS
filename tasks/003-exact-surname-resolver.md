@@ -6,6 +6,7 @@
 - **Independent of:** TASK-002 (PESEL source spike). The resolver never reads PESEL data; see §2.
 - **Blocks:** TASK-004 (PESEL ingestion populates `NameForm` rows on top of this task's tables) and TASK-005 (the truth chain attaches `Claim`s to a resolved `Surname`)
 - **Canonical epic:** RES-001 (`docs/canonical/23` §48, master roadmap row 6: "RES-001 Resolver v1 | DB-001, QA-001 | L | CRITICAL | safe PL identity")
+- **Amended by:** ADR-0005 (2026-09-20) — the canonical key now folds with Unicode **simple** case folding, not full folding, and is `canonical_key_v2`. §5's identity rules are otherwise unchanged. Everything this task accepted still holds except that one step; the ADR records why.
 - **Model guidance:** fresh implementation session once §6 is approved
 
 ## 1. Goal

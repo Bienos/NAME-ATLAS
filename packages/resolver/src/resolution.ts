@@ -52,7 +52,7 @@ export interface SurnameResolution {
   readonly raw_input: string;
   /** NFC form of the raw input (docs/canonical/11 §4.5). */
   readonly unicode_nfc: string;
-  /** The `canonical_key_v1` lookup representation the tiers matched on. */
+  /** The `canonical_key_v2` lookup representation the tiers matched on. */
   readonly canonical_key: string;
   readonly canonical_key_version: string;
   readonly validation_status: InputValidationStatus;

@@ -8,9 +8,9 @@
 export {
   canonicalKey,
   collapseWhitespace,
-  fullCaseFold,
   mapSeparators,
   polishDiacriticFold,
+  simpleCaseFold,
   toNfc,
 } from "./normalize.js";
 export { detectScripts } from "./script.js";

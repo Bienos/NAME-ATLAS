@@ -298,59 +298,22 @@ Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option
 
 ---
 
-## D-013 — `canonical_key_v1` merges 171 distinct real surnames: full case folding maps `ẞ` to `ss`
+## D-013 — RESOLVED (ADR-0005, 2026-09-20)
 
-**Status:** **BLOCKS INGESTING THE FULL PRODUCTION RESOURCE, and therefore blocks every capability that needs it** — `CURRENT_RANK`'s passing path, `RARITY_CONTEXT`, and any production surface. NON-BLOCKING for what is already built, which runs on the committed fixtures.
-**Owner:** project owner, on a canonical-identity question. This one is not a preference: the current behaviour makes the real data uningestible.
+**Resolution: Option A — the canonical identity key folds with Unicode *simple* case folding.** Decided by the project owner, 2026-09-20. Full detail, including what it deviates from and why: `docs/adr/0005-canonical-key-simple-case-folding.md`.
 
-Discovered 2026-09-19 while attempting the first full import, in order to demonstrate TASK-009's completeness gate letting a complete universe through. **The import fails and writes nothing**, which is TASK-004 U-5's fail-closed behaviour working correctly:
+What changed, concretely:
 
-```text
-[import] FAILED (DUPLICATE_CANONICAL_KEY): two rows share canonical key "weiss": "WEISS" and "WEIẞ"
-```
+- `packages/resolver/src/normalize.ts` exports `simpleCaseFold` in place of `fullCaseFold`. `ẞ` folds to `ß`, never to `ss`, so `GROẞ` and `GROSS` are two surnames and `GROẞ`/`Groß`/`groß` remain one.
+- `CANONICAL_KEY_VERSION` / `NORMALIZATION_VERSION` → `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` → `exact_resolver_v2`. `canonical_key_v1` was not changed in place.
+- Twenty-two letterform variants (final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, ẛ, the micro sign, ypogegrammeni) are folded explicitly, because `toLowerCase()` leaves them alone where folding does not. Without them the key would not be caseless for Greek.
+- `pnpm db:rekey-keys` (`packages/sources/src/rekey.ts`) recomputes persisted keys from the display forms already stored. Fail-closed on collision, idempotent, `--dry-run` available.
 
-### The cause, and it is singular
+**Measured after the change, over both full official resources:** `canonical_key_v2` produces 408,182 and 420,082 distinct keys — **zero collisions**, one key per source surname, across all 828,264 real surnames. Under `v1` there were 171. Proven exhaustively rather than by example: `normalize.property.test.ts` re-derives Unicode's simple-fold relation from the runtime over every code point and asserts the fold neither joins what Unicode separates nor separates what it joins.
 
-`canonical_key_v1` applies Unicode **full** case folding. Full folding maps `ẞ` (U+1E9E, LATIN CAPITAL LETTER SHARP S) to the two characters `ss`. So `WEIẞ` and `WEISS` both fold to `weiss`, as do `GROẞ`/`GROSS`, `GAUẞ`/`GAUSS`, `FUẞ`/`FUSS` and `BERGSTRÄẞER`/`BERGSTRÄSSER`. Confirmed against the real `canonicalKey` export, not a reimplementation.
+**What this unblocked:** the full official import, `CURRENT_RANK`'s passing path, and `RARITY_CONTEXT`'s prerequisite. See `PROGRESS.md` for what was actually run.
 
-Measured over both full official resources:
-
-| | Male `1148808` | Female `1148811` |
-|---|---:|---:|
-| Distinct source surnames | 408,182 | 420,082 |
-| Distinct canonical keys | 408,130 | 419,963 |
-| **Colliding keys** | **52** | **119** |
-| Surnames that would be lost to a merge | 52 | 119 |
-
-**171 collisions in total, and every single one has this one cause.** Zero collisions arise from anything else — no diacritic, no whitespace, no script issue. The identity model is otherwise sound across 828,264 real surnames, which is a strong result; this is one specific, fixable defect.
-
-### Why merging them would be wrong
-
-These are distinct surnames in the register with distinct counts. `ARCHITECTURE.md` §10 invariant 8 says Polish diacritics are identity-bearing and "`Łuczak` and `Luczak` are never merged automatically". The same principle governs `GROẞ` and `GROSS`: a German-origin surname spelled with the sharp S is not the surname spelled with a double S, and the publisher lists them separately. The resolver refusing to merge them is correct. The consequence — that the resource cannot be ingested at all — is what needs a decision.
-
-### Options
-
-**Option A — use simple case mapping instead of full folding for the canonical key.** `ẞ` (U+1E9E) lowercases to `ß` (U+00DF), which is not `ss`, so `GROẞ → groß` and `GROSS → gross` stay distinct. Verified: all 171 collisions separate under simple folding. This is a change to `packages/resolver/src/normalize.ts` and therefore a **new key version**, `canonical_key_v2`, with re-keying of any persisted `surnames.canonical_key`. Cost: a user typing `GROSS` will not reach `GROẞ` by exact match. That is correct behaviour for an *identity* tier and is precisely what the fuzzy tiers exist for — `docs/canonical/13` T2 onward — so the cost lands where the architecture already expects to absorb it. Recommended.
-
-**Option B — keep full folding and treat each collision as a review-required ambiguity.** Faithful to the current design and requires no code change, but the full resource stays uningestible until 171 surnames are adjudicated by hand, and every annual refresh brings more. Not viable as the answer, though it is what happens today if nothing is decided.
-
-**Option C — keep full folding and disambiguate the key with a suffix.** Preserves distinctness while keeping the fold, at the cost of a canonical key that is no longer a pure function of the surname text. Rejected: it makes the key unexplainable, and `docs/canonical/11` §20.1's dedupe story depends on the key being derivable.
-
-### Recommendation
-
-**Option A.** It is the only option that makes the real data ingestible while keeping distinct surnames distinct, it moves a burden onto the tier designed for it, and it is a contained change: one normalisation step, a key version bump, and a re-key. The 171 affected surnames are all of one linguistic pattern, so the change is testable against a known list rather than against a guess.
-
-### Do not
-
-- Do not merge the pairs. That is the automatic merge invariant 8 forbids, and it would silently destroy 171 real surnames and their counts.
-- Do not relax the importer's `DUPLICATE_CANONICAL_KEY` failure to skip or quarantine the colliding rows. Failing closed is what surfaced this at all.
-- Do not change `canonical_key_v1` in place. The key is versioned precisely so a change of meaning is visible; this needs `v2` and an ADR, since it alters accepted TASK-003 behaviour.
-
-### What is blocked until this is answered
-
-- The full official resource cannot be imported, so no production-scale data exists.
-- `CURRENT_RANK`'s **passing** path cannot be demonstrated. Its completeness gate is fully verified on the refusing path, and the gate is behaving exactly as designed: it refuses precisely because no complete universe can currently be created.
-- `RARITY_CONTEXT` inherits the block, since it needs a real denominator.
+**One consequence that is now owed elsewhere:** `ß`≡`ss` is a real retrieval expectation for a user typing `GROSS`, and it is deliberately absent from the exact tier. Whichever task builds the fuzzy tiers owes German orthographic equivalence as an explicit versioned rule, the way §6.1 handles Polish diacritics.
 
 ---
 

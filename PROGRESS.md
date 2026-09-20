@@ -1562,3 +1562,98 @@ complete import impossible. It is not claimed as verified.
 - **D-007** — resource-level licence, still keeping paid and SEO ineligible.
 - **TASK-004 §14 U-1 and U-4** — unanswered by the publisher; U-1 is why there is no all-Poland rank.
 - **U-6** — `universe_size` null, which is why `RARITY_CONTEXT` was excluded from this task.
+
+## D-013 resolved — `canonical_key_v2` folds simply (2026-09-20)
+
+Decision authority: the project owner chose **Option A** on D-013. Scope authority:
+`docs/adr/0005-canonical-key-simple-case-folding.md`, written in this session and the record of what
+deviates from canon. No task file exists for this work; it is a decision resolution, not a task.
+
+**What was blocked and now is not:** the full official PESEL resources could not be imported at all.
+`canonical_key_v1` applied Unicode **full** case folding, which maps `ẞ` to `ss`, so `WEIẞ` and
+`WEISS` shared one key and the importer refused the file — correctly, per TASK-004 U-5.
+
+### What changed
+
+| Path | What changed |
+|---|---|
+| `packages/resolver/src/normalize.ts` | `fullCaseFold` → `simpleCaseFold`; a 22-entry letterform-variant table replaces the one dotless-i exception; `canonicalKey` folds simply |
+| `packages/resolver/src/version.ts` | `CANONICAL_KEY_VERSION`/`NORMALIZATION_VERSION` → `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` → `exact_resolver_v2` |
+| `packages/resolver/src/index.ts` | exports `simpleCaseFold` in place of `fullCaseFold` |
+| `packages/sources/src/rekey.ts` | **new** — recomputes persisted keys from stored display forms; fail-closed on collision, idempotent, `--dry-run` |
+| `packages/sources/bin/rekey-keys.ts` | **new** — `pnpm db:rekey-keys` |
+| `docs/adr/0005-canonical-key-simple-case-folding.md` | **new** — the decision, its measurements and its consequences |
+| `packages/resolver/src/normalize{,.property}.test.ts` | the fold's unit tests rewritten; three exhaustive properties added |
+| `tests/integration/src/rekey.test.ts` | **new** — 7 tests over a real PostgreSQL |
+
+Also: `tests/integration/src/resolver.test.ts` (two hard-coded version strings), `resolution.ts` (a
+doc comment), `docs/CODEMAP.md`, `docs/DECISIONS_NEEDED.md` (D-013 → RESOLVED),
+`tasks/003-exact-surname-resolver.md` (an **Amended by** line — the task stays as accepted, with a
+pointer), and the two `package.json` files carrying the new script. **No dependency added or
+upgraded. No migration added** — nothing about the schema changed.
+
+### Design points worth recording
+
+- **Simple folding is not simple lowercasing, and the difference is not academic.** `toLowerCase()`
+  leaves final sigma `ς` alone, so `ΣΟΦΟΣ` and `Σοφος` would have taken different keys and the key
+  would not have been caseless. Twenty-two letterform variants need an explicit mapping for this
+  reason: final sigma, long s, the Greek symbol letters, nine Cyrillic historic forms, `ẛ`, the micro
+  sign and ypogegrammeni.
+- **The table was derived, not transcribed.** unicode.org is egress-blocked here, so CaseFolding.txt
+  could not be read. ECMAScript specifies that a `u`-mode case-insensitive `RegExp` canonicalises
+  with simple case folding, so `/^X$/iu` is an oracle for "do these two code points share a fold
+  class". The property tests re-derive the relation from that oracle over **every** code point and
+  assert both directions: the fold never joins what Unicode separates (the D-013 defect) and never
+  separates what Unicode joins (caselessness). A sample would have been the wrong instrument — the
+  whole point of D-013 is that the defect lived in one code point nobody sampled.
+- **`toLowerCase()`'s one expansion is discarded.** U+0130 `İ` lowercases to `i` + U+0307. Simple
+  folding has no expansions and Unicode gives U+0130 no simple-fold entry, so the code point stands.
+- **`v1` was not changed in place.** The version constant exists so a change of meaning is visible.
+- **The re-key is not a migration, and could not be.** `packages/db` does not depend on
+  `@name-atlas/resolver`, and reimplementing the fold in SQL is the duplication TASK-004 AC-10
+  forbids. It recomputes from the display form rather than rewriting `ss` → `ß` by pattern, because
+  a v1 key cannot be inverted: `gross` could have come from `GROSS` or from `GROẞ`.
+- **A stale row looks healthy.** `v1` and `v2` keys are identical for every surname without a
+  multi-character folding, which is why the fixture database's 38 rows re-keyed to **zero** changed
+  keys and 38 version stamps. That is the expected result, and the reason the tool recomputes
+  everything rather than looking for rows that appear wrong.
+
+### Measured, not asserted
+
+Re-run against the two full official resources using the **real** `canonicalKey` export under
+`canonical_key_v2`, through the real `decodePeselBytes`/`parsePeselFile` path:
+
+| Resource | Source rows | Distinct keys | Collisions | Surnames containing `ẞ` or `ß` |
+|---|---:|---:|---:|---:|
+| `1148808` male | 408,182 | 408,182 | **0** | 86 |
+| `1148811` female | 420,082 | 420,082 | **0** | 203 |
+
+Under `canonical_key_v1` the same two files produced 408,130 and 419,963 keys — 52 and 119
+collisions, 171 in total. Every one is now separated, and no new collision appeared anywhere across
+828,264 real surnames.
+
+### Verification run (2026-09-20)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | **Passed** — all ten workspace projects |
+| `pnpm lint` | **Passed** — no findings |
+| `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — 222 unit tests (resolver 61, up from 55) |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13/PostGIS 3.4.2) | **Passed** — 137 tests (130 before, 7 new in `rekey.test.ts`) |
+| `pnpm build` | **Passed** — `apps/web` builds, four routes |
+| `pnpm db:migrate` | `no pending migrations` — this change adds none |
+| `pnpm db:rekey-keys --dry-run` | 38 surnames / 38 name forms scanned, 0 re-keyed, 38 stamped, **rolled back** |
+| `pnpm db:rekey-keys` | Same counts, **committed** |
+| `pnpm db:rekey-keys` (second run) | 0 re-keyed, 0 stamped — idempotent |
+
+The integration suite ran against a **locally installed PostgreSQL 16.13 + PostGIS 3.4.2** via the
+`TEST_DATABASE_URL` fallback, as in every task so far. The pinned container image was not exercised
+here — registries remain egress-blocked. CI runs it.
+
+### Still open
+
+- **D-004** (regional adoption), **D-007** (resource-level licence), **D-012** (build baseline).
+- TASK-008 items 10, 23 and 24 still need `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip`.
+- `RARITY_CONTEXT` needs U-6's denominator decision; `distribution_snapshots.universe_size` is null.
+- `ß`≡`ss` as a **retrieval** rule belongs to whichever task builds the fuzzy tiers (ADR-0005).

@@ -1,6 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { canonicalKey, polishDiacriticFold, toNfc } from "./normalize.js";
+import { canonicalKey, polishDiacriticFold, simpleCaseFold, toNfc } from "./normalize.js";
 import { DEFAULT_MAX_INPUT_CODE_POINTS, validateSurnameInput } from "./validation.js";
 
 /**
@@ -106,5 +106,105 @@ describe("normalisation properties", () => {
       }),
       { numRuns: 200 },
     );
+  });
+});
+
+/**
+ * ADR-0005 — the fold is Unicode **simple** case folding, and this is what
+ * proves it, exhaustively rather than by example.
+ *
+ * ECMAScript canonicalises a `u`-mode case-insensitive `RegExp` with simple
+ * case folding (scf), so `/^X$/iu` answers “do X and Y share a simple-fold
+ * class?” from the runtime's own Unicode data. Two directions matter, and
+ * the identity model needs both:
+ *
+ * - **Never join what Unicode folds apart.** This is the D-013 defect: full
+ *   folding put `GROẞ` and `GROSS` in one class and made 171 real
+ *   surnames uningestible.
+ * - **Never separate what Unicode folds together.** Otherwise the key is not
+ *   caseless — `ΣΟΦΟΣ` would not match `Σοφος`, whose final sigma is
+ *   the same letter.
+ *
+ * Exhaustive over every code point (~8s). A sample would not do: the whole
+ * point of D-013 is that the defect lived in one code point nobody sampled.
+ */
+function everyCodePoint(): readonly string[] {
+  const all: string[] = [];
+  for (let value = 0; value <= 0x10ffff; value += 1) {
+    if (value >= 0xd800 && value <= 0xdfff) continue; // lone surrogates
+    all.push(String.fromCodePoint(value));
+  }
+  return all;
+}
+
+/** `/^X$/iu` with X escaped: true when the runtime folds the two together. */
+function shareSimpleFoldClass(a: string, b: string): boolean {
+  return new RegExp(`^${a.replace(/[\\^$.*+?()[\]{}|]/gu, "\\$&")}$`, "iu").test(b);
+}
+
+/** Every code point reachable from `value` by simple upper/lower mapping. */
+function caseNeighbours(value: string): readonly string[] {
+  const seen = new Set([value]);
+  const pending = [value];
+  while (pending.length > 0) {
+    const current = pending.pop() as string;
+    for (const mapped of [current.toLowerCase(), current.toUpperCase()]) {
+      if ([...mapped].length !== 1 || seen.has(mapped)) continue;
+      seen.add(mapped);
+      pending.push(mapped);
+    }
+  }
+  return [...seen];
+}
+
+describe("simpleCaseFold agrees with the runtime's simple-fold classes (ADR-0005)", () => {
+  const all = everyCodePoint();
+
+  it("P5 never joins two code points that Unicode folds apart", () => {
+    const byFold = new Map<string, string[]>();
+    for (const codePoint of all) {
+      const fold = simpleCaseFold(codePoint);
+      const group = byFold.get(fold);
+      if (group === undefined) byFold.set(fold, [codePoint]);
+      else group.push(codePoint);
+    }
+    const joined: string[] = [];
+    for (const group of byFold.values()) {
+      if (group.length < 2) continue;
+      const [first, ...rest] = group as [string, ...string[]];
+      for (const other of rest) {
+        if (!shareSimpleFoldClass(first, other)) {
+          joined.push(
+            `U+${first.codePointAt(0)?.toString(16)} + U+${other.codePointAt(0)?.toString(16)}`,
+          );
+        }
+      }
+    }
+    expect(joined).toEqual([]);
+  });
+
+  it("P6 never separates two code points that Unicode folds together", () => {
+    const separated: string[] = [];
+    for (const codePoint of all) {
+      for (const neighbour of caseNeighbours(codePoint)) {
+        if (neighbour === codePoint) continue;
+        if (
+          shareSimpleFoldClass(codePoint, neighbour) &&
+          simpleCaseFold(neighbour) !== simpleCaseFold(codePoint)
+        ) {
+          separated.push(
+            `U+${codePoint.codePointAt(0)?.toString(16)} | U+${neighbour.codePointAt(0)?.toString(16)}`,
+          );
+        }
+      }
+    }
+    expect(separated).toEqual([]);
+  });
+
+  it("P7 the sharp S stays apart from SS, which is the whole of D-013", () => {
+    expect(shareSimpleFoldClass("\u1e9e", "ss")).toBe(false);
+    expect(shareSimpleFoldClass("\u1e9e", "\u00df")).toBe(true);
+    expect(canonicalKey("GRO\u1e9e")).not.toBe(canonicalKey("GROSS"));
+    expect(canonicalKey("GRO\u1e9e")).toBe(canonicalKey("Gro\u00df"));
   });
 });
