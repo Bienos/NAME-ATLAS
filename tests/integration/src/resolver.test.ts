@@ -203,8 +203,8 @@ describe("exact surname resolver against a real PostgreSQL", () => {
     it("resolves Łuczak with its diacritic, and reports the versions it used", async () => {
       const resolution = await resolveOrFail("ŁUCZAK");
       expect(resolution.resolved_surname_id).toBe(luczak);
-      expect(resolution.resolution_method_version).toBe("exact_resolver_v1");
-      expect(resolution.canonical_key_version).toBe("canonical_key_v1");
+      expect(resolution.resolution_method_version).toBe("exact_resolver_v2");
+      expect(resolution.canonical_key_version).toBe("canonical_key_v2");
     });
 
     it("T0 outranks T1: a canonical match wins even when an eligible form points elsewhere", async () => {
@@ -334,7 +334,7 @@ describe("exact surname resolver against a real PostgreSQL", () => {
         expect(outcome.raw_input).toBe("Kowalski");
         expect(outcome.canonical_key).toBe("kowalski");
         expect(outcome.stage).toBe("TRANSACTION");
-        expect(outcome.resolution_method_version).toBe("exact_resolver_v1");
+        expect(outcome.resolution_method_version).toBe("exact_resolver_v2");
         expect(typeof outcome.message).toBe("string");
       }
     });

@@ -18,8 +18,16 @@
  * differs fails those tests rather than silently changing identity.
  */
 
-/** Version of the canonical identity key pipeline (docs/canonical/13 §5.2). */
-export const CANONICAL_KEY_VERSION = "canonical_key_v1";
+/**
+ * Version of the canonical identity key pipeline (docs/canonical/13 §5.2, as
+ * amended by ADR-0005).
+ *
+ * `canonical_key_v2` replaced v1's Unicode full case folding with simple case
+ * mapping, because full folding expands `ẞ` to `ss` and collided 171 distinct
+ * surnames in the production resource (D-013). Rows keyed under v1 are
+ * rewritten by migration `0006_canonical_key_v2`.
+ */
+export const CANONICAL_KEY_VERSION = "canonical_key_v2";
 
 /**
  * Version of the deterministic search representation stored in
@@ -40,8 +48,12 @@ export const SCRIPT_PROFILE_VERSION = "script_profile_v1";
  * Version of the whole resolution method: validation, normalisation, script
  * policy and the T0/T1 matching tiers taken together. This is what a
  * `SurnameResolution` records.
+ *
+ * Bumped to v2 with {@link CANONICAL_KEY_VERSION}: normalisation is part of
+ * the method, so a resolution stored under v1 was produced by different rules
+ * and must not claim to be replayable under these ones.
  */
-export const RESOLUTION_METHOD_VERSION = "exact_resolver_v1";
+export const RESOLUTION_METHOD_VERSION = "exact_resolver_v2";
 
 export interface UnicodeRuntime {
   readonly node: string;

@@ -1562,3 +1562,75 @@ complete import impossible. It is not claimed as verified.
 - **D-007** — resource-level licence, still keeping paid and SEO ineligible.
 - **TASK-004 §14 U-1 and U-4** — unanswered by the publisher; U-1 is why there is no all-Poland rank.
 - **U-6** — `universe_size` null, which is why `RARITY_CONTEXT` was excluded from this task.
+
+## D-013 resolved: `canonical_key_v2` uses simple case mapping (2026-09-20)
+
+The project owner chose **Option A** for D-013 and **Option C** for D-012 on 2026-09-20. D-013 is
+implemented and verified; D-012 is a decision to change nothing and no code moved for it.
+
+### What changed
+
+`canonical_key_v1` applied Unicode **full** case folding, which expands one letter into several:
+`ẞ` folds to `ss`. So `WEIẞ` and `WEISS` produced one identity key, `surnames.canonical_key` is
+UNIQUE, and the importer refused the whole production resource with `DUPLICATE_CANONICAL_KEY`.
+
+The key now uses **simple** case mapping, applied per code point, as `canonical_key_v2`. Only the
+case step changed — the order of the steps, the NFC at both ends and the separator tables are
+untouched — so every key containing no expanding code point is byte-identical to its v1 form. On a
+database holding only Polish surnames, no key changes at all.
+
+| File | Change |
+|---|---|
+| `packages/resolver/src/normalize.ts` | `simpleCaseFold` added and used by `canonicalKey`; `fullCaseFold` kept, exported and tested, no longer the identity fold |
+| `packages/resolver/src/version.ts` | `CANONICAL_KEY_VERSION` → `canonical_key_v2`; `RESOLUTION_METHOD_VERSION` → `exact_resolver_v2` |
+| `packages/db/migrations/0006_canonical_key_v2.ts` | new — data-only re-key of `surnames.canonical_key` and `name_forms.search_key`, with a frozen copy of the pipeline |
+| `docs/adr/0005-canonical-key-simple-case-mapping.md` | new — supersedes the v1 case step, records the deviation from `docs/canonical/13` §5.5 |
+| `tests/integration/src/canonical-key-v2.test.ts` | new — six tests against real PostgreSQL |
+
+The resolution method version bumped because normalisation is part of the method. A resolution
+stored under v1 was produced by different rules and must not claim replayability under these.
+
+The migration carries its own frozen copy of the pipeline rather than importing the resolver. A
+migration must mean the same thing when replayed after a v3 exists, and `canonicalKey` is versioned
+precisely because it is expected to change again. It computes and collision-checks every new key
+before writing one row. Its `down()` recomputes v1 keys and therefore **refuses** on any database
+holding a sharp-s pair, which is correct: v1 cannot represent that data, and merging two real
+surnames is what `ARCHITECTURE.md` §10 invariant 8 forbids.
+
+### Verification actually run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | PASS — 11 packages, 0 errors |
+| `pnpm lint` | PASS — exit 0 |
+| `pnpm format:check` | PASS |
+| `pnpm test` | PASS — **229 unit tests** across 10 packages (resolver 68, was 55) |
+| `pnpm db:migrate` on a fresh database | PASS — `0001`–`0006` applied; re-run reports no pending migrations |
+| `pnpm db:generate-types` | PASS — 19 tables, byte-identical to the committed file, `git status` clean |
+| `pnpm test:integration` | PASS — **136 tests** across 7 files, including the 6 new ones |
+| `pnpm build` | PASS — all three apps, all four routes |
+
+The integration suite proves the fix where the defect actually bit. Both members of all five named
+pairs store side by side; `WEIẞ` reads back as `weiß` rather than `weiss`; a name form's search key
+follows the same v2 rules; every stored key equals what the live resolver computes from the display
+form, which is what makes the migration's frozen copy trustworthy; and `migrateDown` returns an
+error naming the collision while leaving every row unchanged.
+
+### Not verified, and not claimed
+
+**The full official resource has not been imported.** The source files are not present in this
+environment, so D-013's 171-collision measurement was carried over from the session that made it
+and was **not** reproduced here. What is proven is the mechanism and the five named pairs. The next
+session with the bytes on disk should run the import and record what happens — that is the step
+that closes out `CURRENT_RANK`'s passing path and unblocks `RARITY_CONTEXT`.
+
+### Pre-existing flake found while verifying, not fixed
+
+`pnpm test:integration` exits non-zero on roughly a third of runs with one unhandled
+`terminating connection due to administrator command` (PostgreSQL `57P01`), attributed to a
+different test file each time. **This is not caused by the D-013 change**: the same failure
+reproduces on the unmodified tree at 2 of 6 runs, established by stashing the change and re-running.
+It is a teardown race in the shared-server fallback, where one file's forced `DROP DATABASE` kills
+another file's pooled connection. Every test passes on every run; only the process exit code is
+affected. CI uses a per-run service container and has not shown it. Left alone as out of scope for
+this change.

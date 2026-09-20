@@ -86,6 +86,14 @@ export function toNfc(value: string): string {
 /**
  * Unicode full case folding, applied per code point.
  *
+ * **No longer the canonical identity fold.** `canonicalKey` used this up to
+ * `canonical_key_v1` and moved to {@link simpleCaseFold} at
+ * `canonical_key_v2`, because full folding expands `ẞ` to `ss` and so merges
+ * distinct surnames (`WEIẞ` with `WEISS`). See ADR-0005 and D-013. It is kept
+ * exported and tested because the v1 keys it produced are what migration
+ * `0006_canonical_key_v2` rewrites, and because the regression test uses it to
+ * show the collisions were real rather than theoretical.
+ *
  * Node has no direct case-folding API. `toLowerCase()` alone is simple
  * folding and misses the multi-character foldings (`ß` → `ss`, `ﬁ` → `fi`),
  * which §5.5 explicitly rules out as the only mechanism. Lowercasing, then
@@ -108,6 +116,38 @@ export function fullCaseFold(value: string): string {
   for (const codePoint of value) {
     const exception = CASE_FOLD_EXCEPTIONS.get(codePoint);
     folded += exception ?? codePoint.toLowerCase().toUpperCase().toLowerCase();
+  }
+  return folded;
+}
+
+/**
+ * Unicode *simple* case mapping, applied per code point — the identity fold
+ * from `canonical_key_v2` onward (ADR-0005, D-013).
+ *
+ * Simple mapping never expands one letter into several, so `ẞ` (U+1E9E) maps
+ * to `ß` (U+00DF) rather than to `ss`, and `WEIẞ` and `WEISS` keep separate
+ * keys. That is what makes the full PESEL resource ingestible: full folding
+ * collided 171 distinct registered surnames, every one of them on this single
+ * cause.
+ *
+ * Applied per code point deliberately. `String.prototype.toLowerCase` on a
+ * whole string is context-sensitive — Greek `Σ` lowercases to final `ς` at the
+ * end of a word — and a key that depends on a letter's neighbours is not a
+ * deterministic function of the letter. Per code point, `Σ` is always `σ`.
+ *
+ * {@link CASE_FOLD_EXCEPTIONS} is not consulted and is not needed here: it
+ * guards the uppercase round trip inside {@link fullCaseFold}, and dotless `ı`
+ * is already lowercase, so simple mapping leaves it alone by construction.
+ * `normalize.test.ts` pins that rather than trusting it.
+ *
+ * The cost is that `GROSS` no longer reaches `GROẞ` by exact match. That is
+ * correct for an identity tier: a spelling variant is the business of the
+ * retrieval tiers (docs/canonical/13 T2 onward), not of the key.
+ */
+export function simpleCaseFold(value: string): string {
+  let folded = "";
+  for (const codePoint of value) {
+    folded += codePoint.toLowerCase();
   }
   return folded;
 }
@@ -141,16 +181,22 @@ export function collapseWhitespace(value: string): string {
 }
 
 /**
- * `canonical_key_v1` (docs/canonical/13 §5.2), in the order the canonical
- * text specifies:
+ * `canonical_key_v2` (docs/canonical/13 §5.2, amended by ADR-0005):
  *
- *   NFC → full case fold → separator mapping → trim → collapse spaces
+ *   NFC → simple case mapping → separator mapping → trim → collapse spaces
  *
  * Diacritics, particles and token order are preserved — `ŁUCZAK` becomes
  * `łuczak`, never `luczak`.
+ *
+ * The one difference from `canonical_key_v1` is the case step: v1 applied
+ * Unicode *full* folding, which expands a letter into several and so merged
+ * `WEIẞ` into `WEISS`. v2 uses simple mapping, which is 1:1 for every letter
+ * this corpus contains. Everything else — the order of the steps, NFC at both
+ * ends, the separator table — is unchanged, so every key that does not contain
+ * an expanding code point is byte-identical between the two versions.
  */
 export function canonicalKey(value: string): string {
-  return toNfc(collapseWhitespace(mapSeparators(fullCaseFold(toNfc(value)))));
+  return toNfc(collapseWhitespace(mapSeparators(simpleCaseFold(toNfc(value)))));
 }
 
 /**

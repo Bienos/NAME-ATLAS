@@ -298,9 +298,29 @@ Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option
 
 ---
 
-## D-013 — `canonical_key_v1` merges 171 distinct real surnames: full case folding maps `ẞ` to `ss`
+## D-013 — RESOLVED (2026-09-20)
 
-**Status:** **BLOCKS INGESTING THE FULL PRODUCTION RESOURCE, and therefore blocks every capability that needs it** — `CURRENT_RANK`'s passing path, `RARITY_CONTEXT`, and any production surface. NON-BLOCKING for what is already built, which runs on the committed fixtures.
+**Resolution: Option A — simple case mapping, as `canonical_key_v2`.** Decided by the project owner, 2026-09-20. Recorded as **ADR-0005**, which supersedes the case step of `canonical_key_v1` and states the deviation from `docs/canonical/13` §5.5.
+
+Concretely:
+
+- `canonicalKey` now applies Unicode **simple** case mapping per code point instead of full folding, so `ẞ` maps to `ß` rather than to `ss` and the sharp-s surnames keep separate identities. Only the case step changed; every key without an expanding code point is byte-identical to its v1 form.
+- `CANONICAL_KEY_VERSION` is `canonical_key_v2` and `RESOLUTION_METHOD_VERSION` is `exact_resolver_v2`. Normalisation is part of the resolution method, so a resolution stored under v1 must not claim replayability under v2's rules.
+- Migration `0006_canonical_key_v2` re-keys `surnames.canonical_key` and `name_forms.search_key` from the stored display text and stamps both version columns. It carries a frozen copy of the pipeline rather than importing the resolver, because a migration must mean the same thing when replayed after a v3 exists.
+- The migration computes and collision-checks every new key before writing one row, and aborts naming both display forms if two collide. `down()` recomputes v1 keys and therefore refuses on any database holding a sharp-s pair — v1 cannot represent that data, and merging two real surnames is what invariant 8 forbids.
+- The fold is applied per code point, never to a whole string, because `toLowerCase` is context-sensitive: Greek `Σ` becomes final `ς` at the end of a word, and a key that depends on a letter's neighbours is not a function of the letter.
+
+**Verified by running:** the resolver's 68 unit tests including a regression suite over all five named pairs; an integration suite against real PostgreSQL that stores both members of every pair, reads `weiß` back for `WEIẞ`, proves every stored key equals what the live resolver computes, and proves `migrateDown` refuses and changes nothing; all six migrations applying to a fresh database and reporting no pending work on re-run; generated types byte-identical; typecheck, lint, format and build clean.
+
+**Not verified, and not claimed:** that the full official resource now imports cleanly. The source files were not present in the environment where this was implemented, so the 171-collision measurement is carried over from the session that made it and was not reproduced. The next session with the bytes on disk should run the import and record the result.
+
+Options B (adjudicate 171 collisions by hand) and C (suffix-disambiguated key) were rejected; ADR-0005 records why.
+
+---
+
+## D-013 (original record) — `canonical_key_v1` merges 171 distinct real surnames: full case folding maps `ẞ` to `ss`
+
+**Status:** RESOLVED above. Kept verbatim because the measurement is the evidence.
 **Owner:** project owner, on a canonical-identity question. This one is not a preference: the current behaviour makes the real data uningestible.
 
 Discovered 2026-09-19 while attempting the first full import, in order to demonstrate TASK-009's completeness gate letting a complete universe through. **The import fails and writes nothing**, which is TASK-004 U-5's fail-closed behaviour working correctly:
@@ -354,9 +374,21 @@ These are distinct surnames in the register with distinct counts. `ARCHITECTURE.
 
 ---
 
-## D-012 — the workspace-package build baseline: keep `--webpack`, compile to `dist`, or drop the `.js` extensions?
+## D-012 — RESOLVED (2026-09-20)
 
-**Status:** **NON-BLOCKING.** The build is green today; this is developer ergonomics and portability, not a defect. It is recorded because TASK-006 carried it forward as "a build workaround, not a decision" and because this session established facts that change the options.
+**Resolution: Option C — keep `--webpack`, revisit on a defined trigger.** Decided by the project owner, 2026-09-20, as recommended.
+
+Nothing is built, changed or removed. `--webpack` stays an explicit, supported Next flag, the packages keep exporting raw TypeScript with `.js` specifiers, and the emitted worker output stays runnable by plain Node. **No ADR** is required: nothing deviates from a canonical specification, and `docs/canonical/23` §7 already leaves the build orchestrator optional.
+
+Option B stays rejected on its merits rather than on cost: it is the cheapest to type and the only one that invalidates a property that currently holds. Option A is the agreed destination once any trigger below fires, and is a task at that point, not a refactor slipped into another change.
+
+**Revisit when any of these becomes true** — unchanged from the record below: Turbopack gains extension aliasing; a workspace package needs publishing or consuming outside the monorepo; dev-loop speed becomes a real complaint rather than a theoretical one; or a second app starts consuming the packages.
+
+---
+
+## D-012 (original record) — the workspace-package build baseline: keep `--webpack`, compile to `dist`, or drop the `.js` extensions?
+
+**Status:** RESOLVED above. Kept verbatim because the findings were established by running.
 **Owner:** project owner, on a repository-convention question.
 
 Recorded 2026-09-19. The project owner's original framing called this "workspace package build compatibility"; no task ever existed for it.

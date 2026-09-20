@@ -9,6 +9,7 @@ export {
   canonicalKey,
   collapseWhitespace,
   fullCaseFold,
+  simpleCaseFold,
   mapSeparators,
   polishDiacriticFold,
   toNfc,
