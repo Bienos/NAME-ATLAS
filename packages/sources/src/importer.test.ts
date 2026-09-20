@@ -54,12 +54,19 @@ describe("rights hard gate (AC-08)", () => {
     );
   });
 
-  it("allows the real PESEL profile through: UNKNOWN commercial use and LEGAL_REVIEW_REQUIRED are not ingestion gates", () => {
-    // This is the whole point of TASK-004 §14 U-2: the paid-surface gate is
-    // closed while the ingestion gate stays open.
-    expect(PESEL_RIGHTS_PROFILE.commercial_use).toBe("UNKNOWN");
-    expect(PESEL_RIGHTS_PROFILE.review_status).toBe("LEGAL_REVIEW_REQUIRED");
+  it("allows the real PESEL profile through, and would have even before D-007 was decided", () => {
+    // The ingestion gate is automated access and an outright BLOCKED review;
+    // commercial use was never an ingestion gate (TASK-004 §14 U-2). Both the
+    // earlier UNKNOWN posture and the decided ALLOWED one pass it.
     expect(rightsRefusal(PESEL_RIGHTS_PROFILE)).toBeNull();
+    expect(
+      rightsRefusal({
+        ...PESEL_RIGHTS_PROFILE,
+        commercial_use: "UNKNOWN",
+        redistribution: "UNKNOWN",
+        review_status: "LEGAL_REVIEW_REQUIRED",
+      }),
+    ).toBeNull();
   });
 
   it("refuses before the database is touched", async () => {

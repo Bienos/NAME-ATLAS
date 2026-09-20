@@ -1,6 +1,6 @@
 # ADR-0004 — `PopulationValueDTO.unit` admits `SURNAME_OCCURRENCES`
 
-- **Status:** Accepted
+- **Status:** Accepted; **amended 2026-09-20** — PESEL now emits `PEOPLE` (see the amendment at the end)
 - **Date:** 2026-09-19
 - **Deciders:** project owner + TASK-005 implementation session
 - **Depends on:** ADR-0002 (PostgreSQL access and query layer)
@@ -75,3 +75,21 @@ Everything else in §26 is unchanged: `NumericValueStatus`, the nullable `value`
 - `docs/canonical/16` §26 is itself revised, at which point this ADR should be reconciled with it rather than silently kept.
 
 A preference for matching the canonical literal exactly, at the cost of asserting a unit no source states, is **not** a reason to revisit this.
+
+## Amendment (2026-09-20) — U-4 decided by the project owner; PESEL emits `PEOPLE`
+
+The "do not revisit unless" clause above anticipated U-4 being answered by the publisher. It was
+instead **decided by the project owner on 2026-09-20, on the field's definition**: the resource
+counts *nazwisko aktualne* — the current surname — and every living person in the PESEL register
+has exactly one, so one occurrence among living persons is one person by construction. The only
+residual is duplicate person records, which is a data-quality matter, not a definitional one.
+
+Concretely, and exactly as this ADR said it would be done: **one emitted value changed** —
+`packages/truth/src/query.ts` now emits `"PEOPLE"` for PESEL-derived values. The enum is unchanged;
+`"SURNAME_OCCURRENCES"` remains available for a source whose counted field is not one-per-person.
+The stored claim payloads are unaffected: they carry the publisher's verbatim scope, no unit.
+
+The number is presented as a count with its scope, never as an estimate — the accepted sentence
+templates in English and Polish are recorded in `docs/contracts/surname-result.md`. A publisher
+confirmation, if one is ever obtained, is recorded here and changes nothing unless it contradicts
+this reading.

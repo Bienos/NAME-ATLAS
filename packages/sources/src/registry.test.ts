@@ -81,17 +81,18 @@ describe("PESEL rights profile (TASK-004 §14 U-2)", () => {
     expect(PESEL_RIGHTS_PROFILE.terms_version).toBe(manifest.dataset.licence);
   });
 
-  it("leaves commercial use and redistribution UNKNOWN, closing the paid-surface gate", () => {
-    // Dataset-level CC0 would permit both, but resource-level metadata
-    // carries no licence attribute at all, so inheritance is unverified.
-    // docs/canonical/12 §6.4 turns UNKNOWN into paid_surface_eligible=false.
-    expect(PESEL_RIGHTS_PROFILE.commercial_use).toBe("UNKNOWN");
-    expect(PESEL_RIGHTS_PROFILE.redistribution).toBe("UNKNOWN");
+  it("records the D-007 decision: commercial use and redistribution ALLOWED under CC0 1.0", () => {
+    // Decided by the project owner on 2026-09-20: rely on the dataset-level
+    // CC0 1.0 declaration and the statutory re-use right. CC0 permits both
+    // without condition. A judgement, recorded as one — see notes below.
+    expect(PESEL_RIGHTS_PROFILE.commercial_use).toBe("ALLOWED");
+    expect(PESEL_RIGHTS_PROFILE.redistribution).toBe("ALLOWED");
   });
 
-  it("does not claim a legal review that nobody performed", () => {
-    expect(PESEL_RIGHTS_PROFILE.review_status).toBe("LEGAL_REVIEW_REQUIRED");
-    expect(PESEL_RIGHTS_PROFILE.review_status).not.toBe("APPROVED");
+  it("is APPROVED by the project owner's decision, not by a legal review it claims to have had", () => {
+    expect(PESEL_RIGHTS_PROFILE.review_status).toBe("APPROVED");
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/project owner's judgement/u);
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/not a publisher confirmation/u);
   });
 
   it("leaves unevidenced dimensions UNKNOWN rather than optimistically ALLOWED", () => {
@@ -100,11 +101,13 @@ describe("PESEL rights profile (TASK-004 §14 U-2)", () => {
     expect(PESEL_RIGHTS_PROFILE.transcription_rights).toBe("UNKNOWN");
   });
 
-  it("records the dataset-level-only provenance of the CC0 statement in notes (AC-09)", () => {
-    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/DATASET level only/u);
-    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/unverified assumption/u);
-    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/NOT a legal review/u);
-    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/D-007/u);
+  it("records the dataset-level provenance of the CC0 statement and the decision in notes (AC-09)", () => {
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/DATASET level/u);
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/resource-level metadata carries no licence/u);
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(
+      /D-007 resolved by the project owner on 2026-09-20/u,
+    );
+    expect(PESEL_RIGHTS_PROFILE.notes).toMatch(/statutory right/u);
   });
 
   it("requires no attribution under CC0, but records the courtesy credit anyway", () => {

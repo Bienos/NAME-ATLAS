@@ -38,12 +38,16 @@ import type { Surface } from "./rights.js";
 /**
  * The unit PESEL-derived values carry.
  *
- * `SURNAME_OCCURRENCES`, not `"PEOPLE"` — the publisher describes
- * *"liczba wystąpień"* and never states that one occurrence is one living
- * person (TASK-004 §14 U-4). ADR-0004 records the decision and the
- * deviation from `docs/canonical/16` §26 it entails.
+ * `PEOPLE`, since 2026-09-20 (ADR-0004 as amended; TASK-004 §14 U-4 decided
+ * by the project owner). The publisher's word is *"liczba wystąpień"*, but
+ * the field counted is *nazwisko aktualne* — the current surname — and
+ * every living person in PESEL has exactly one, so an occurrence among
+ * living persons is one person by construction. The residual is duplicate
+ * person records, a data-quality matter, not a definitional one.
+ * `SURNAME_OCCURRENCES` stays in the contract's enum for a source whose
+ * field is not one-per-person.
  */
-const PESEL_POPULATION_UNIT = "SURNAME_OCCURRENCES" as const;
+const PESEL_POPULATION_UNIT = "PEOPLE" as const;
 
 /** Frontend-localised code for the publisher's universe. */
 const PESEL_SCOPE_LABEL_CODE = "PESEL_CURRENT_SURNAME";

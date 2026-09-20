@@ -249,8 +249,8 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
     expect(row?.content_hash).toMatch(/^[0-9a-f]{64}$/u);
     expect(row?.source_key).toBe("pl_pesel_surnames");
     // The rights posture is reachable and unchanged by the truth chain.
-    expect(row?.review_status).toBe("LEGAL_REVIEW_REQUIRED");
-    expect(row?.commercial_use).toBe("UNKNOWN");
+    expect(row?.review_status).toBe("APPROVED"); // D-007, decided 2026-09-20
+    expect(row?.commercial_use).toBe("ALLOWED"); // D-007, decided 2026-09-20
   });
 
   it("is idempotent: re-derivation writes nothing (AC-09)", async () => {
@@ -449,38 +449,37 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
     );
     expect(decisions).toEqual({
       INTERNAL: "ALLOWED",
-      FREE: "CONDITIONAL",
-      PAID: "BLOCKED",
-      SEO: "BLOCKED",
+      FREE: "ALLOWED",
+      PAID: "ALLOWED",
+      SEO: "ALLOWED",
     });
 
-    // Re-derive under a fully PERMISSIVE rights posture. This is the harder
-    // direction of ARCHITECTURE.md §10 invariant 2: a permissive licence must
-    // not RAISE confidence, just as a restrictive one must not lower it.
-    // (A "PROHIBITED" override would have been a vacuous comparison — it maps
-    // to the same decisions as the seeded UNKNOWN profile.)
-    const permissive = await deriveCurrentPopulation(db(), surnameInMaleOnly(), {
+    // Re-derive under a RESTRICTIVE rights posture. Since D-007 the seeded
+    // profile is permissive, so the non-vacuous direction of
+    // ARCHITECTURE.md §10 invariant 2 is now this one: a prohibition must
+    // not LOWER confidence, just as a permissive licence must not raise it.
+    const restrictive = await deriveCurrentPopulation(db(), surnameInMaleOnly(), {
       rightsOverride: {
         automated_access: "ALLOWED",
-        commercial_use: "ALLOWED",
-        redistribution: "ALLOWED",
+        commercial_use: "PROHIBITED",
+        redistribution: "PROHIBITED",
         metadata_rights: "ALLOWED",
-        review_status: "APPROVED",
+        review_status: "CONDITIONAL",
       },
     });
-    if (permissive.kind !== "RESULT") throw new Error("expected a result");
+    if (restrictive.kind !== "RESULT") throw new Error("expected a result");
 
-    expect(permissive.current_population[0]?.confidence).toEqual(
+    expect(restrictive.current_population[0]?.confidence).toEqual(
       normal.current_population[0]?.confidence,
     );
-    // ...while every surface opens up, proving the comparison is not vacuous.
-    expect(permissive.surface_eligibility.map((e) => e.decision)).toEqual([
+    // ...while the surfaces close, proving the comparison is not vacuous.
+    expect(restrictive.surface_eligibility.map((e) => e.decision)).toEqual([
       "ALLOWED",
-      "ALLOWED",
-      "ALLOWED",
-      "ALLOWED",
+      "CONDITIONAL",
+      "BLOCKED",
+      "BLOCKED",
     ]);
-    expect(permissive.surface_eligibility).not.toEqual(normal.surface_eligibility);
+    expect(restrictive.surface_eligibility).not.toEqual(normal.surface_eligibility);
   });
 
   it("fails closed on a violated source invariant rather than publishing a number", async () => {

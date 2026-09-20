@@ -585,8 +585,8 @@ describe("PESEL ingestion against a real PostgreSQL", () => {
     expect(row?.source_key).toBe("pl_pesel_surnames");
     expect(row?.terms_version).toBe("CC0 1.0");
     // The paid-surface gate is closed in the database, not just in a doc.
-    expect(row?.review_status).toBe("LEGAL_REVIEW_REQUIRED");
-    expect(row?.commercial_use).toBe("UNKNOWN");
+    expect(row?.review_status).toBe("APPROVED"); // D-007, decided 2026-09-20
+    expect(row?.commercial_use).toBe("ALLOWED"); // D-007, decided 2026-09-20
   });
 
   it("refuses to import when rights forbid it, writing nothing (AC-08)", async () => {

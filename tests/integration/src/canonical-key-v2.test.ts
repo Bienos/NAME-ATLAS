@@ -124,13 +124,15 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
       SELECT canonical_key, canonical_key_version FROM surnames ORDER BY canonical_key
     `.execute(db);
 
-    // `0007_script_flags` sits above `0006` and reverts cleanly (it only
-    // drops two columns). The refusal under test is `0006`'s, so step past
-    // `0007` first, then ask for the next step down.
+    // `0008` and `0007` sit above `0006` and revert cleanly (a data update
+    // and two dropped columns). The refusal under test is `0006`'s, so step
+    // past both first, then ask for the next step down.
     const migrator = createMigrator(db);
-    const stepPast0007 = await migrator.migrateDown();
-    expect(stepPast0007.error).toBeUndefined();
-    expect(stepPast0007.results?.map((r) => r.migrationName)).toEqual(["0007_script_flags"]);
+    for (const expected of ["0008_pesel_rights_decision", "0007_script_flags"]) {
+      const step = await migrator.migrateDown();
+      expect(step.error).toBeUndefined();
+      expect(step.results?.map((r) => r.migrationName)).toEqual([expected]);
+    }
 
     const result = await migrator.migrateDown();
     expect(result.error).toBeInstanceOf(Error);

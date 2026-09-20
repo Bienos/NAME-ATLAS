@@ -63,7 +63,7 @@ export interface RightsProfileSeed {
 export const PESEL_RIGHTS_PROFILE: RightsProfileSeed = {
   terms_version: "CC0 1.0",
   terms_hash: null,
-  checked_at: "2026-09-19T00:00:00Z",
+  checked_at: "2026-09-20T00:00:00Z",
   metadata_rights: "ALLOWED",
   // No image or transcription exists for a CSV resource, and nothing
   // evidences a permission either way. UNKNOWN, not ALLOWED.
@@ -72,12 +72,17 @@ export const PESEL_RIGHTS_PROFILE: RightsProfileSeed = {
   // CC0 1.0 expressly waives sui generis database rights.
   database_rights: "ALLOWED",
   // The publisher operates a public, documented JSON:API as the declared
-  // access route. Residual: the portal's own terms of use have not been
-  // read (D-007). This task performs no automated retrieval regardless.
+  // access route. This task performs no automated retrieval regardless.
   automated_access: "ALLOWED",
-  commercial_use: "UNKNOWN",
-  redistribution: "UNKNOWN",
+  // D-007, decided by the project owner on 2026-09-20: rely on the
+  // dataset-level CC0 1.0 declaration and the statutory right to re-use
+  // public sector information. CC0 permits commercial use and
+  // redistribution without condition. A judgement, recorded as one.
+  commercial_use: "ALLOWED",
+  redistribution: "ALLOWED",
   local_cache: "ALLOWED",
+  // CC0 requires no attribution. The product attributes anyway: every
+  // published fact traces to its source and date (PRODUCT.md §7).
   attribution_required: false,
   attribution_text:
     "Dane pochodzą z rejestru PESEL, Ministerstwo Cyfryzacji, dane.gov.pl (CC0 1.0)",
@@ -85,16 +90,17 @@ export const PESEL_RIGHTS_PROFILE: RightsProfileSeed = {
   rights_url:
     "https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
   contact_required: false,
-  review_status: "LEGAL_REVIEW_REQUIRED",
-  valid_from: "2026-09-19",
+  review_status: "APPROVED",
+  valid_from: "2026-09-20",
   valid_to: null,
   notes:
-    "Licence is stated at DATASET level only (license_name = 'CC0 1.0', dataset 1681). " +
-    "Resource-level metadata carries no licence, rights or terms attribute across all four " +
-    "2026 resources (checked; fixtures/pesel/source-manifest.json licence_provenance). " +
-    "Resource inheritance of CC0 is an unverified assumption. This profile is a recorded " +
-    "posture by the project owner (TASK-004 §14 U-2, 2026-09-19), NOT a legal review. " +
-    "Confirmation is tracked as D-007 in docs/DECISIONS_NEEDED.md and gates M5/M6.",
+    "Licence is stated at DATASET level (license_name = 'CC0 1.0', dataset 1681); resource-level " +
+    "metadata carries no licence attribute. D-007 resolved by the project owner on 2026-09-20: " +
+    "rely on the dataset-level CC0 1.0 declaration — dane.gov.pl attaches licences at dataset " +
+    "level, resources being files within a dataset — together with the statutory right to " +
+    "re-use public sector information (ustawa o otwartych danych). This is the project owner's " +
+    "judgement, recorded as such, not a publisher confirmation; a confirmation, if obtained, " +
+    "would be recorded here and would change nothing unless it contradicted this posture.",
 };
 
 export interface SourceSeed {

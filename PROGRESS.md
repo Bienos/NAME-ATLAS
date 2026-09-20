@@ -1996,3 +1996,51 @@ the old path this morning, a fresh database imported with the new path just now:
 Environment note, not a repository fact: the local PostgreSQL was killed twice today between
 commands, without a log entry and with memory idle — the container reaps it when a shell goes idle.
 Restarted each time; nothing in the data was affected.
+
+## D-007, U-4 and U-6 decided — the paid-surface gate opens, the unit is people (2026-09-20)
+
+Three judgements by the project owner, recorded as judgements. D-007 and U-4 are implemented here;
+U-6 is specified as `tasks/014-rarity-context-truth-chain.md` and not implemented.
+
+### What changed
+
+| Path | Change |
+|---|---|
+| `packages/sources/src/registry.ts` | `PESEL_RIGHTS_PROFILE`: `commercial_use` and `redistribution` `ALLOWED`, `review_status` `APPROVED`, `checked_at`/`valid_from` 2026-09-20, `notes` carrying the basis (dataset-level CC0 1.0 + statutory re-use right; "the project owner's judgement … not a publisher confirmation") |
+| `packages/db/migrations/0008_pesel_rights_decision.ts` | **new**, data only — brings a populated database's stored profile to the seeded values (`ensureRegistry` seeds only when the Source is absent); `down()` restores the earlier posture |
+| `packages/truth/src/query.ts` | `PESEL_POPULATION_UNIT` → `"PEOPLE"` — the one-value switch ADR-0004 said U-4 would be |
+| `docs/contracts/surname-result.md` | unit deviation rewritten; the accepted EN and PL sentence templates for `PESEL_CURRENT_SURNAME` recorded |
+| `docs/adr/0004-population-value-unit.md` | amendment of 2026-09-20 |
+| `docs/DECISIONS_NEEDED.md` | D-007 → RESOLVED, with U-4 and U-6 recorded beside it |
+
+Tests that pinned the earlier posture were rewritten to pin the decided one, not deleted: three in
+`registry.test.ts`, one in `importer.test.ts`, the two rights traversals (`pesel-ingestion`,
+`truth-chain`), the surface and unit assertions in `surname-result-api.test.ts`, and the
+confidence-invariance tests, which now flip to a **restrictive** override (`PROHIBITED`) so the
+"confidence never moves while surfaces do" comparison stays non-vacuous under a permissive profile.
+The read API took no rights override — the two "rights-blocked" tests tighten the stored profile
+for their own scope and restore it, which is the real path. `canonical-key-v2`'s `migrateDown`
+refusal test now steps past `0008` and `0007` before reaching `0006`.
+
+### Effect, observed
+
+Every PESEL claim's surface eligibility is now `INTERNAL / FREE / PAID / SEO` all `ALLOWED`
+(`RIGHTS_PERMIT_FREE_SURFACE`, `COMMERCIAL_USE_ALLOWED`, `REDISTRIBUTION_ALLOWED`). The dev
+database's stored profile reads `ALLOWED | ALLOWED | APPROVED | 2026-09-20` after migration.
+PESEL values carry `unit: "PEOPLE"` with `scope_label_code: "PESEL_CURRENT_SURNAME"`.
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — 235 unit tests |
+| `pnpm test:integration` | **Passed** — **149 tests** across 9 files |
+| `pnpm db:migrate` on a fresh database | **Passed** — `0001`–`0008`; re-run reports no pending migrations |
+| `pnpm db:migrate` on the populated dev database | `0008_pesel_rights_decision: applied`; profile row verified as above |
+| `pnpm db:generate-types` | **Passed** — byte-identical (no schema change) |
+| `pnpm build` | **Passed** |
+
+One defect caught by the suite on the way: the migration's first draft joined on
+`sources.rights_profile_id`, which does not exist (`default_rights_profile_id` does); every
+integration file's `beforeAll` failed on it, which is how it was found before it could ship.

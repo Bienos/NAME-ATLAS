@@ -177,13 +177,15 @@ describe("surname result read API against a real PostgreSQL", () => {
     expect(parsed.success).toBe(true);
   });
 
-  it("carries the unit ADR-0004 fixes, never asserting PEOPLE", async () => {
+  it("carries the unit PEOPLE since U-4 was decided (ADR-0004 as amended), with its scope code", async () => {
     await seedRealData();
     const outcome = await querySurnameResult(db(), surnameInMaleOnly());
     if (outcome.kind !== "OK") throw new Error("expected OK");
 
-    expect(outcome.response.population?.observations[0]?.value.unit).toBe("SURNAME_OCCURRENCES");
-    expect(JSON.stringify(outcome.response)).not.toContain("PEOPLE");
+    const value = outcome.response.population?.observations[0]?.value;
+    expect(value?.unit).toBe("PEOPLE");
+    // The scope is what makes "people" honest: the frontend renders it.
+    expect(value?.scope_label_code).toBe("PESEL_CURRENT_SURNAME");
   });
 
   it("returns two observations for a surname in both resources, and no total", async () => {
@@ -250,47 +252,80 @@ describe("surname result read API against a real PostgreSQL", () => {
     expect(JSON.stringify(outcome.response)).not.toContain('"value":0');
   });
 
+  /**
+   * Since D-007 the seeded PESEL profile permits every surface, so a blocked
+   * surface has to be produced: the stored profile is tightened for the
+   * duration of one test and restored after. The API takes no override —
+   * rights are read from the database, which is exactly what this exercises.
+   */
+  async function withProhibitedCommercialUse<T>(run: () => Promise<T>): Promise<T> {
+    await sql`
+      UPDATE rights_profiles SET commercial_use = 'PROHIBITED'
+      WHERE rights_profile_id = (SELECT default_rights_profile_id FROM sources WHERE source_key = 'pl_pesel_surnames')
+    `.execute(db());
+    try {
+      return await run();
+    } finally {
+      await sql`
+        UPDATE rights_profiles SET commercial_use = 'ALLOWED'
+        WHERE rights_profile_id = (SELECT default_rights_profile_id FROM sources WHERE source_key = 'pl_pesel_surnames')
+      `.execute(db());
+    }
+  }
+
   it("omits values entirely when the surface is rights-blocked", async () => {
     await seedRealData();
-    // The seeded PESEL profile has commercial_use = UNKNOWN, so the PAID
-    // surface is blocked by docs/canonical/12 §6.4.
-    const outcome = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "PAID" });
-    if (outcome.kind !== "OK") throw new Error("expected OK");
+    await withProhibitedCommercialUse(async () => {
+      // commercial_use = PROHIBITED blocks PAID by docs/canonical/12 §6.4.
+      const outcome = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "PAID" });
+      if (outcome.kind !== "OK") throw new Error("expected OK");
 
-    expect(outcome.response.population?.state).toBe("RIGHTS_BLOCKED");
-    expect(outcome.response.population?.observations).toHaveLength(0);
-    expect(outcome.response.population?.surface.decision).toBe("BLOCKED");
+      expect(outcome.response.population?.state).toBe("RIGHTS_BLOCKED");
+      expect(outcome.response.population?.observations).toHaveLength(0);
+      expect(outcome.response.population?.surface.decision).toBe("BLOCKED");
 
-    // The value is not in the payload at all — not sent and flagged hidden.
-    const known = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "INTERNAL" });
-    if (known.kind !== "OK") throw new Error("expected OK");
-    const value = known.response.population?.observations[0]?.value.value;
-    expect(value).toBeGreaterThan(0);
-    expect(JSON.stringify(outcome.response)).not.toContain(String(value));
+      // The value is not in the payload at all — not sent and flagged hidden.
+      const known = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "INTERNAL" });
+      if (known.kind !== "OK") throw new Error("expected OK");
+      const value = known.response.population?.observations[0]?.value.value;
+      expect(value).toBeGreaterThan(0);
+      expect(JSON.stringify(outcome.response)).not.toContain(String(value));
+    });
   });
 
-  it("surfaces values on FREE with the conditional decision carried", async () => {
+  it("serves PAID under the decided profile (D-007): the paid-surface gate is open", async () => {
+    await seedRealData();
+    const outcome = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "PAID" });
+    if (outcome.kind !== "OK") throw new Error("expected OK");
+    expect(outcome.response.population?.state).toBe("READY");
+    expect(outcome.response.population?.surface.decision).toBe("ALLOWED");
+    expect(outcome.response.population?.surface.reason_code).toBe("COMMERCIAL_USE_ALLOWED");
+  });
+
+  it("surfaces values on FREE with the decision carried — ALLOWED since D-007", async () => {
     await seedRealData();
     const outcome = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "FREE" });
     if (outcome.kind !== "OK") throw new Error("expected OK");
     expect(outcome.response.population?.state).toBe("READY");
-    expect(outcome.response.population?.surface.decision).toBe("CONDITIONAL");
-    expect(outcome.response.population?.surface.reason_code).toBe("COMMERCIAL_USE_UNRESOLVED");
+    expect(outcome.response.population?.surface.decision).toBe("ALLOWED");
+    expect(outcome.response.population?.surface.reason_code).toBe("RIGHTS_PERMIT_FREE_SURFACE");
   });
 
   it("keeps confidence identical across surfaces — rights never touch it", async () => {
     await seedRealData();
-    const free = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "FREE" });
-    const internal = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "INTERNAL" });
-    if (free.kind !== "OK" || internal.kind !== "OK") throw new Error("expected OK");
+    await withProhibitedCommercialUse(async () => {
+      const free = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "FREE" });
+      const internal = await querySurnameResult(db(), surnameInMaleOnly(), { surface: "INTERNAL" });
+      if (free.kind !== "OK" || internal.kind !== "OK") throw new Error("expected OK");
 
-    expect(free.response.population?.observations[0]?.confidence).toEqual(
-      internal.response.population?.observations[0]?.confidence,
-    );
-    // ...while the surface decisions genuinely differ, so this is not vacuous.
-    expect(free.response.population?.surface.decision).not.toBe(
-      internal.response.population?.surface.decision,
-    );
+      expect(free.response.population?.observations[0]?.confidence).toEqual(
+        internal.response.population?.observations[0]?.confidence,
+      );
+      // ...while the surface decisions genuinely differ, so this is not vacuous.
+      expect(free.response.population?.surface.decision).not.toBe(
+        internal.response.population?.surface.decision,
+      );
+    });
   });
 
   it("projects confidence from the persisted assessment, without its rationale", async () => {
@@ -424,7 +459,7 @@ describe("surname result read API against a real PostgreSQL", () => {
       if (!parsed.success) return;
       expect(parsed.data.status).toBe("RESOLVED");
       expect(parsed.data.population?.state).toBe("READY");
-      expect(parsed.data.population?.observations[0]?.value.unit).toBe("SURNAME_OCCURRENCES");
+      expect(parsed.data.population?.observations[0]?.value.unit).toBe("PEOPLE");
     });
 
     it("returns 400 with the error envelope for invalid input", async () => {

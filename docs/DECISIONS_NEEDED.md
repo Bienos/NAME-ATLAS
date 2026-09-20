@@ -245,7 +245,21 @@ No further action needed. Do not revisit except on the two conditions ADR-0003 n
 
 ---
 
-## D-007 — PESEL resource-level licence confirmation (gates paid surfaces, not ingestion)
+## D-007 — RESOLVED (2026-09-20), together with TASK-004 §14 U-4 and U-6
+
+Three decisions the project owner took on 2026-09-20, each a judgement recorded as one, none a publisher confirmation. Together they make the publisher enquiry optional rather than necessary: it would replace judgement with confirmation, and blocks nothing.
+
+**D-007 — licence: rely on the dataset-level CC0 1.0 declaration and the statutory re-use right.** CC0 1.0 Universal is a waiver of all copyright and database rights to the fullest extent the law allows; it permits copying, modification, redistribution and commercial use without permission or attribution. dane.gov.pl declares it once, at dataset level (`license_name`), and attaches licences at dataset level by design — a resource is a file within a dataset; Polish open-data law adds a statutory right to re-use public sector information, commercially included. The remaining gap (no resource-level licence field; `license_chosen` null) is accepted. Implemented: `PESEL_RIGHTS_PROFILE` in `packages/sources/src/registry.ts` now records `commercial_use = ALLOWED`, `redistribution = ALLOWED`, `review_status = APPROVED`, with the basis in `notes`; migration `0008_pesel_rights_decision` brings a populated database's stored profile to the same values. Effect: every PESEL claim's surface eligibility is now `INTERNAL / FREE / PAID / SEO` all `ALLOWED`; the paid-surface gate is open. Attribution stays in the profile because the product attributes everything it publishes (PRODUCT.md §7), not because CC0 requires it.
+
+**U-4 — unit: `PEOPLE`, on the field's definition.** Recorded as the 2026-09-20 amendment to ADR-0004; the accepted English and Polish sentence templates are in `docs/contracts/surname-result.md`. "Estimated" was considered and rejected: the number is an exact count of records with a defined universe, and the honest form is the count with its scope.
+
+**U-6 — denominator: rarity is stated over the published universe.** The denominator for `RARITY_CONTEXT` is the sum of the published counts of the same resource — 21,197,537 for the male register at 2026-01-20 — which is exact and derivable, and every rarity statement is labelled "of people counted in the register", never "of Poles". The register's true living-person total stays unknown (single-bearer surnames are excluded from publication; the register holds emigrants), and `distribution_snapshots.universe_size` stays null. Specified as `tasks/014-rarity-context-truth-chain.md`.
+
+The original record is kept below because its analysis of the gap is what the decision was taken against.
+
+---
+
+## D-007 (original record) — PESEL resource-level licence confirmation (gates paid surfaces, not ingestion)
 
 **Status:** NON-BLOCKING for TASK-004 and M1. **BLOCKS M5/M6** — no PESEL-derived evidence may enter a paid report until this is closed.
 **Owner:** project owner (publisher contact + legal review).
