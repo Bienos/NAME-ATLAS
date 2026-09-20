@@ -370,6 +370,27 @@ Container registries remain network-egress-blocked, as in TASK-001/002/003, so t
 
 **Not verified in this environment:** the integration suite against the pinned container image (registry egress-blocked); the importer against a full 408,182-row resource (bytes not in the repository); and the CI workflow end to end. Everything else above was run and observed.
 
+## TASK-004 follow-up — duplicate task file resolved (2026-09-20)
+
+The project owner instructed this session to deal with the second TASK-004 file ("ok zrob"). Two files for one task breaks `AGENTS.md` §3, and merging a superseded 148-line draft into the 380-line scope authority that already covers it would duplicate truth, which `AGENTS.md` §1 forbids. So the draft was compared section by section against the authority file and the implementation, its one unique contribution was adopted, and it was then deleted.
+
+**`tasks/004-pesel-ingestion-source-rights.md` deleted.** Everything it specified is covered: its §5.2 (importer creates `Surname` **and** `NameForm`), §5.3 (one `Surname`, two snapshots for a string in both resources), §5.4 (`universe_size` null), §5.5 (no male + female total), its nine §6 behaviours and its sixteen §7 acceptance tests all match what the authority file requires and what the implementation does and tests.
+
+**One real defect it caught, now fixed.** Its §5.1 argued `SourceRecord.record_type = API_OBJECT`; the implementation had `DATA_ROW`. `API_OBJECT` is correct: this importer creates one record per resource **file version**, not one per CSV row (`docs/canonical/12` §3.1's `BULK_DATASET` pattern is version-scoped), and the concrete retrieved object the record preserves is the publisher's own `api.dane.gov.pl` resource object held verbatim in `raw_payload`. Neither the authority task file nor any canonical document prescribes the value, so this was an open engineering choice decided wrongly the first time. Changed in `packages/sources/src/pesel/import.ts` with the reasoning in a comment, asserted in `tests/integration/src/pesel-import.test.ts`, and recorded in the authority task file's §7.
+
+No migration change was needed — `source_record_type` already carries `API_OBJECT`, being the canonical enum from `docs/canonical/11` §9.2.
+
+### Verification re-run after this change (2026-09-20)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | Passed — 10 of 10 packages. |
+| `pnpm lint` | Passed — zero errors, zero warnings. |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 160 tests, unchanged. |
+| `pnpm test:integration` | Passed — 54 tests, including the `API_OBJECT` assertion, against local PostgreSQL 16.13 / PostGIS 3.4.2 via the `TEST_DATABASE_URL` fallback. |
+| `pnpm build` | Passed. |
+
 ## Next action
 
 TASK-001, TASK-002, TASK-003 and TASK-004 are implemented and verified. Per `AGENTS.md` §8: **STOP.** This session did not start TASK-005 and did not write `tasks/005-*.md`.
@@ -379,6 +400,5 @@ Open for the project owner, none of it work this session may do:
 1. **D-006 — the unit of `Liczba`** (`docs/DECISIONS_NEEDED.md`). Blocks TASK-005's `CURRENT_POPULATION` claim. Needs a statement from the publisher, not inference from the data.
 2. **The rarity/`1-in-X` denominator** remains open, as D-001 records. `universe_size` is null everywhere and no denominator was invented.
 3. **The `TemporalExtent` omission from TASK-003** still awaits acknowledgement: `name_forms` has no `valid_from_*`/`valid_to_*` columns. Adding them later is a nullable-column migration. TASK-004 performs no temporal logic and did not need them.
-4. **Two task files exist for TASK-004.** `tasks/004-pesel-surname-ingestion.md` is the scope authority and is what this session implemented. `tasks/004-pesel-ingestion-source-rights.md` is an earlier draft, kept for comparison; a prior session flagged that it should be deleted or merged by whoever owns that decision. This session left it untouched rather than deciding for the owner.
-5. **Raw object storage (INF-001)** is still missing, which is why `SourceRecord.raw_text_ref` is null. Recorded as a deviation from `docs/canonical/12` §9.2, acknowledged under §14 U-3.
-6. **D-002, D-003 and D-004** are unchanged by this task. No regional resource was downloaded, parsed or ingested, and no map or regional logic exists.
+4. **Raw object storage (INF-001)** is still missing, which is why `SourceRecord.raw_text_ref` is null. Recorded as a deviation from `docs/canonical/12` §9.2, acknowledged under §14 U-3.
+5. **D-002, D-003 and D-004** are unchanged by this task. No regional resource was downloaded, parsed or ingested, and no map or regional logic exists.

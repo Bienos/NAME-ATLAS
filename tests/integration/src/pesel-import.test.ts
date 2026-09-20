@@ -234,7 +234,9 @@ describe("importing the genuine male fixture", () => {
 
     expect(record.external_record_id).toBe(resource.resource_id);
     expect(record.external_parent_id).toBe("1681");
-    expect(record.record_type).toBe("DATA_ROW");
+    // One record per resource file version, whose retained payload is the
+    // publisher's API object — not one record per CSV row.
+    expect(record.record_type).toBe("API_OBJECT");
     expect(record.source_url).toBe(resource.csv_download_url);
     // The EXCERPT's checksum, because that is what was imported.
     expect(record.content_hash).toBe(sha256Hex(fixtureBytes("national_male")));

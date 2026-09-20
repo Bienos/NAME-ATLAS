@@ -373,7 +373,14 @@ async function writeImport(
       source_id: sourceId,
       external_record_id: resource.resource_id,
       external_parent_id: PESEL_SOURCE_REGISTRY.dataset_id,
-      record_type: "DATA_ROW",
+      // API_OBJECT, not DATA_ROW. One record per resource FILE VERSION, not
+      // one per CSV row (408,182 of them), and the concrete retrieved object
+      // this record preserves is the publisher's own api.dane.gov.pl resource
+      // object, held verbatim in raw_payload below. `DATA_ROW` would describe
+      // a granularity this importer deliberately does not use
+      // (docs/canonical/11 §9.2; docs/canonical/12 §3.1's BULK_DATASET
+      // pattern is version-scoped).
+      record_type: "API_OBJECT",
       source_url: resource.csv_download_url,
       raw_payload: input.resourceMetadata,
       // No object storage exists, so the bytes themselves cannot be
