@@ -4,10 +4,18 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./pesel": "./src/pesel/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "import-pesel": "tsx bin/import-pesel.ts"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/domain": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
+    "kysely": "0.29.6"
   }
 }

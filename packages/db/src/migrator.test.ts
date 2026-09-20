@@ -11,6 +11,7 @@ describe("MIGRATIONS_DIR", () => {
     expect(files).toEqual([
       "0001_bootstrap_extensions.ts", // TASK-001
       "0002_identity_core.ts", // TASK-003
+      "0003_source_rights_distribution.ts", // TASK-004
     ]);
   });
 });
