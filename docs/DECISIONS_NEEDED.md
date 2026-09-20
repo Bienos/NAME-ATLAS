@@ -174,6 +174,40 @@ The project owner supplied both regional CSV files and both full national files.
 
 ---
 
+### Findings — TERYT TERC correspondence established (2026-09-20). Status and decision unchanged.
+
+The project owner supplied the TERC register on 2026-09-20, closing TASK-008's items 23, 24 and 10.
+Full record: `docs/sources/pesel-regional.md`, section "TERYT TERC correspondence". The file is
+`fixtures/teryt/voivodeship-terc-correspondence.json`.
+
+**All 16 observed geography values map to a current TERC voivodeship code; none is unmapped.** The
+comparison is exact string equality, byte for byte against the TERC `NAZWA` field. No normalisation
+was applied and none is claimed: both sides are already NFC and every value already matches its
+TERC name including case and diacritics, so a folding step could not have changed any outcome. The
+register's reference date is `2026-01-01`, ten days before the PESEL resources' own `2026-01-20`.
+
+The TERC zip's SHA-256 equals the value already committed in the acquisition archive's
+`SHA256SUMS.txt`, so it is an authentic archive copy. The GUS hosts remain egress-blocked and were
+not reached, so `docs/canonical/12` §2.1's rights statement is quoted rather than re-verified. No
+raw TERYT file is committed.
+
+**What this changes for this decision: one objection, and only one.** The
+`CURRENT_DISTRIBUTION` preflight recorded that the regional candidate "carries no geographic
+identifier at all: a voivodeship name string, no TERYT code, no ISO 3166-2, while canonical
+requires Place plus a TERYT external ID". That objection is now answered — the codes exist, are
+official, and are documented. A later task could build a voivodeship `Place` foundation without
+inventing anything.
+
+**What this does not change.** No `Place`, table, migration or connector was created, and none is
+authorised. The two findings that decide whether a regional surface is honest are untouched:
+per-cell suppression leaves 53.8% of national male and 50.8% of female surnames with no regional
+row, and 21.74% of male and 19.78% of female bearers appear in no voivodeship row for a reason the
+publisher does not state. The resource-level licence is still unconfirmed (D-007). The binding
+semantic restriction on registered-domicile geography is unchanged. **This decision's status,
+options and adoption gate are exactly as they were.**
+
+---
+
 ## D-005 — RESOLVED (TASK-001)
 
 **Resolution:** pin `postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5` everywhere PostgreSQL is needed — local development, CI and Testcontainers.

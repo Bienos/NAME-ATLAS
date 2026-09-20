@@ -1782,3 +1782,47 @@ lineage `docs/canonical/14` §30 requires.
   should not.
 - The male resource's rank claims are real, so the first production-scale read surface is now
   possible for male surnames — a task, not a change to slip into this one.
+## TASK-008 closed out: TERYT TERC correspondence established (2026-09-20)
+
+The project owner supplied the TERYT TERC register, the input TASK-008 had been waiting on since
+2026-09-19. Items 23, 24 and the dependent item 10 are now verified, taking the spike from 23 of 27
+acceptance items to **26 of 27**. The one remaining open item is half of item 22, the publisher's
+licence confirmation, which belongs to D-007 and is not this task's to close.
+
+**All 16 observed geography values map to a current TERC voivodeship code. None is unmapped.**
+
+| Fact | Value |
+|---|---|
+| Comparison method | exact string equality, byte for byte against the TERC `NAZWA` field |
+| Normalisation applied | **none**, and none claimed — both sides are already NFC and every value already matches including case and diacritics, so a folding step could not have changed any outcome |
+| Register reference date | `2026-01-01` (field `STAN_NA`), ten days before the PESEL resources' `2026-01-20` |
+| TERC zip SHA-256 | `1cfbb50e…2768`, equal to the value already committed in the acquisition archive's `SHA256SUMS.txt`, so an authentic archive copy |
+| File read | `TERC_Urzedowy_2026-09-18.csv`, 205,660 B, UTF-8 with BOM, CRLF, `;` delimited, 4,360 data rows, 16 voivodeship-level |
+| GUS page reached | **no** — `api.stat.gov.pl` and `eteryt.stat.gov.pl` both answered 403 at CONNECT when tested on 2026-09-20 |
+
+Because the GUS page could not be reached, `docs/canonical/12` §2.1's rights statement is **quoted,
+not re-verified**. No raw TERYT file is committed (`AGENTS.md` §6); only the derived correspondence
+is, at `fixtures/teryt/voivodeship-terc-correspondence.json`. `teryt_simc` was supplied alongside
+and deliberately **not read** — SIMC is the locality register and this item needs voivodeship level
+only.
+
+### What it unblocks, and what it does not
+
+It answers exactly one of the `CURRENT_DISTRIBUTION` preflight's objections: that the regional
+candidate "carries no geographic identifier at all". The codes now exist, are official and are
+documented, so a later task could build a voivodeship `Place` foundation without inventing one.
+
+It changes nothing else. No `Place`, table, migration or connector was created and none is
+authorised. The two findings that decide whether a regional surface is honest are untouched:
+per-cell suppression leaves over half of national surnames with no regional row, and about 21% of
+bearers appear in no voivodeship row for a reason the publisher does not state. The resource-level
+licence is still unconfirmed. **D-004's status, options and adoption gate are exactly as they
+were.**
+
+### Also observed while working on the line of record
+
+A parallel session implemented D-013 independently and the two were merged at `fae6237`. The merged
+`simpleCaseFold` is the better of the two: it applies the `CaseFolding.txt` simple-fold variants,
+such as final sigma to sigma, on top of per-code-point lowercasing, and it keeps the original code
+point where lowercasing would expand it. The resolver's suite passes at **74 tests** on the merged
+tree. The ADR is `docs/adr/0005-canonical-key-simple-case-folding.md`.

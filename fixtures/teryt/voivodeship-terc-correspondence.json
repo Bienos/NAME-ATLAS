@@ -1,0 +1,183 @@
+{
+  "key": "voivodeship_terc_correspondence_evidence_only",
+  "purpose": "TASK-008 §4 item 8 — a documented, checked correspondence between the geography strings observed in the PESEL regional resources and official TERYT TERC voivodeship codes. Evidence only. No Place, no table, no connector, no ingestion, and no adoption of the regional resource: D-004 remains open and this file does not advance it.",
+  "not_authorised_by_this_file": [
+    "creating any places/administrative-unit table",
+    "ingesting the regional resources",
+    "building a map or any regional claim",
+    "presenting registered-domicile geography as origin, ancestry, birthplace or current residence"
+  ],
+  "comparison_method": {
+    "method": "EXACT_STRING_EQUALITY",
+    "description": "The observed value is compared byte-for-byte with the TERC NAZWA field. No case change, no diacritic folding, no whitespace normalisation and no Unicode normalisation is applied to either side.",
+    "why_no_normalisation_was_needed": "Both sides were checked and are already NFC, and every observed value is already identical to its TERC name including case and diacritics. A normalisation step would have been unfalsifiable here: it could not change any outcome, so it is not applied and not claimed.",
+    "nfc_check": {
+      "observed_values_not_already_nfc": [],
+      "terc_names_not_already_nfc": []
+    }
+  },
+  "counts": {
+    "observed_values": 16,
+    "mapped": 16,
+    "unmapped": 0,
+    "terc_voivodeship_rows_in_register": 16,
+    "value_sets_identical_across_both_files": true
+  },
+  "terc_source": {
+    "archive_member": "raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip",
+    "archive_zip_sha256": "1cfbb50ebf97dfc797aca94331029983bc7f1e752dff94c973026437ba7d2768",
+    "archive_zip_byte_size": 132136,
+    "archive_zip_sha256_matches_committed_sha256sums": true,
+    "file_used": "TERC_Urzedowy_2026-09-18.csv",
+    "file_used_sha256": "557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4",
+    "file_used_byte_size": 205660,
+    "file_used_encoding": "UTF-8 with BOM",
+    "file_used_line_terminator": "CRLF",
+    "file_used_delimiter": ";",
+    "file_used_header": ["WOJ", "POW", "GMI", "RODZ", "NAZWA", "NAZWA_DOD", "STAN_NA"],
+    "register_reference_date": "2026-01-01",
+    "register_reference_date_field": "STAN_NA",
+    "voivodeship_row_selector": "POW, GMI and RODZ all empty",
+    "retrieved_how": "Supplied by the project owner on 2026-09-20 from their 2026-09-18 acquisition archive. The zip's SHA-256 equals the value committed in docs/sources/acquisition/2026-09-18/SHA256SUMS.txt, so this is an authentic archive copy rather than a re-save.",
+    "source_url_as_used": "None. No URL was fetched for this file. api.stat.gov.pl and eteryt.stat.gov.pl are egress-blocked from the implementing environment (gateway answered 403 to CONNECT), so the GUS page was NOT reached and nothing about it is re-verified here.",
+    "raw_file_not_committed": "AGENTS.md §6 — neither the archive nor any TERYT raw file is committed. Only this derived correspondence is."
+  },
+  "rights_basis": {
+    "quoted_from": "docs/canonical/12 §2.1, 'TERYT — VERIFIED'",
+    "quote": "GUS states that TERYT ws1 is available to public and commercial entities and that the service/data are free of charge. It exposes TERC, SIMC, ULIC and related registries.",
+    "official_page_recorded_in_canonical": "https://api.stat.gov.pl/Home/TerytApi?lang=en",
+    "gus_page_reached_by_this_session": false,
+    "note": "Quoted, not re-verified. The canonical corpus records this statement as VERIFIED; this session could not reach the GUS page and therefore neither confirms nor disputes it."
+  },
+  "observed_values_provenance": "Read from the committed regional fixtures, which TASK-008 established as verbatim rows of the checksum-verified source files. The complete distinct value set of the full resources is 16 per docs/sources/pesel-regional.md; the fixtures were selected to cover all 16, and all 16 are present here.",
+  "correspondence": [
+    {
+      "observed_geography_value": "DOLNOŚLĄSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "02",
+      "terc_name": "DOLNOŚLĄSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "KUJAWSKO-POMORSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "04",
+      "terc_name": "KUJAWSKO-POMORSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "LUBELSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "06",
+      "terc_name": "LUBELSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "LUBUSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "08",
+      "terc_name": "LUBUSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "MAZOWIECKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "14",
+      "terc_name": "MAZOWIECKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "MAŁOPOLSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "12",
+      "terc_name": "MAŁOPOLSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "OPOLSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "16",
+      "terc_name": "OPOLSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "PODKARPACKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "18",
+      "terc_name": "PODKARPACKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "PODLASKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "20",
+      "terc_name": "PODLASKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "POMORSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "22",
+      "terc_name": "POMORSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "WARMIŃSKO-MAZURSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "28",
+      "terc_name": "WARMIŃSKO-MAZURSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "WIELKOPOLSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "30",
+      "terc_name": "WIELKOPOLSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "ZACHODNIOPOMORSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "32",
+      "terc_name": "ZACHODNIOPOMORSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "ŁÓDZKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "10",
+      "terc_name": "ŁÓDZKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "ŚLĄSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "24",
+      "terc_name": "ŚLĄSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    },
+    {
+      "observed_geography_value": "ŚWIĘTOKRZYSKIE",
+      "observed_in": ["female", "male"],
+      "terc_code": "26",
+      "terc_name": "ŚWIĘTOKRZYSKIE",
+      "terc_name_dod": "województwo",
+      "match": "EXACT_STRING_EQUALITY"
+    }
+  ]
+}

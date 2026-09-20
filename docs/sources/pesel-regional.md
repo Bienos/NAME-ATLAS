@@ -814,3 +814,107 @@ facts above; both block a `Place` foundation and any adoption decision.
 - Did not read or write a single TERC code.
 - Did not decide D-004, change its status or options, or approve any rights posture.
 - Did not assert what the residual is. The arithmetic is stated; the cause is `UNRESOLVED`.
+
+## TERYT TERC correspondence (2026-09-20)
+
+Closes TASK-008 acceptance items 23, 24 and the dependent item 10, which had been open since
+2026-09-19 for one reason only: the TERC register was not on disk and both GUS hosts are
+egress-blocked. The project owner supplied it on 2026-09-20. Nothing else about this record
+changes, and nothing here adopts, ingests or authorises the regional resource — D-004 is still the
+gate.
+
+### Item 23 — TERC data identity
+
+| Fact | Value |
+|---|---|
+| Archive member | `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip` |
+| Zip SHA-256 | `1cfbb50ebf97dfc797aca94331029983bc7f1e752dff94c973026437ba7d2768` |
+| Zip byte size | 132,136 |
+| Matches committed `SHA256SUMS.txt` | **yes**, so this is an authentic archive copy, not a re-save |
+| File used | `TERC_Urzedowy_2026-09-18.csv` |
+| File SHA-256 | `557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4` |
+| File byte size | 205,660 |
+| Encoding / terminator / delimiter | UTF-8 **with BOM** / CRLF / `;` |
+| Header | `WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA` |
+| Data rows | 4,360 |
+| Voivodeship-level rows | 16, selected by `POW`, `GMI` and `RODZ` all empty |
+| Register reference date | **`2026-01-01`**, from the `STAN_NA` field, identical on all 16 rows |
+| Source URL as actually used | **none** — no URL was fetched |
+
+**The GUS page was not reached.** `api.stat.gov.pl` and `eteryt.stat.gov.pl` were tested from the
+implementing environment on 2026-09-20 and the gateway answered 403 to CONNECT, the same
+policy block recorded on 2026-09-19. The rights basis is therefore **quoted, not re-verified**,
+from `docs/canonical/12` §2.1:
+
+> GUS states that TERYT ws1 is available to public and commercial entities and that the
+> service/data are free of charge. It exposes TERC, SIMC, ULIC and related registries.
+
+The canonical corpus records that as VERIFIED. This session neither confirms nor disputes it.
+
+The raw TERC file is **not committed** (`AGENTS.md` §6). Only the derived correspondence is.
+
+**`teryt_simc` was also supplied and was not used.** SIMC is the register of localities; this
+item needs voivodeship level only, so reading it would have been outside the task's scope. It is
+not committed either.
+
+### Items 24 and 10 — the correspondence
+
+`fixtures/teryt/voivodeship-terc-correspondence.json`.
+
+| Count | Value |
+|---|---:|
+| Observed geography values | 16 |
+| Mapped to a current TERC voivodeship | **16** |
+| Unmapped | **0** |
+| TERC voivodeship rows in the register | 16 |
+| Value set identical across the male and female files | yes |
+
+**Comparison method: exact string equality.** The observed value is compared byte-for-byte with
+the TERC `NAZWA` field. No case change, no diacritic folding, no whitespace collapse and no
+Unicode normalisation is applied to either side.
+
+**No normalisation was needed, and none is claimed.** Both sides were checked and every string is
+already NFC, and every observed value is already identical to its TERC name including case and
+diacritics. A normalisation step here would have been unfalsifiable: it could not have changed any
+outcome. Recording "matched after case folding" would therefore have overstated what was done.
+
+| Observed value | TERC code |
+|---|---|
+| `DOLNOŚLĄSKIE` | `02` |
+| `KUJAWSKO-POMORSKIE` | `04` |
+| `LUBELSKIE` | `06` |
+| `LUBUSKIE` | `08` |
+| `ŁÓDZKIE` | `10` |
+| `MAŁOPOLSKIE` | `12` |
+| `MAZOWIECKIE` | `14` |
+| `OPOLSKIE` | `16` |
+| `PODKARPACKIE` | `18` |
+| `PODLASKIE` | `20` |
+| `POMORSKIE` | `22` |
+| `ŚLĄSKIE` | `24` |
+| `ŚWIĘTOKRZYSKIE` | `26` |
+| `WARMIŃSKO-MAZURSKIE` | `28` |
+| `WIELKOPOLSKIE` | `30` |
+| `ZACHODNIOPOMORSKIE` | `32` |
+
+**Item 10 answered:** every observed value corresponds to a current TERYT TERC voivodeship. There
+is no value without a counterpart, so the "recorded verbatim and uninterpreted" clause for
+unmapped values has nothing to record.
+
+Codes were read from the TERC data, never typed from memory. The observed values were read from
+the committed regional fixtures, which this record already establishes as verbatim rows of the
+checksum-verified sources, and whose 16 distinct values are the complete set of the full
+resources.
+
+### What this does and does not unblock
+
+It removes the **geographic identifier** objection that the `CURRENT_DISTRIBUTION` preflight
+raised: the resource's voivodeship strings now have documented official codes, so a later task
+could build a `Place` foundation without inventing one.
+
+It removes nothing else. The two findings that actually decide whether a regional surface is
+honest are untouched: per-cell suppression leaves over half of national surnames with no regional
+row, and roughly 21% of bearers appear in no voivodeship row at all for a reason the publisher
+does not state. The resource-level licence is still unconfirmed (D-007). And the binding semantic
+restriction stands — this dimension is voivodeship of **permanent registered residence**, never
+origin, ancestry, birthplace, historical distribution, or unqualified current residence.
