@@ -15,6 +15,7 @@ describe("MIGRATIONS_DIR", () => {
       "0004_truth_layer.ts", // TASK-005
       "0005_current_rank.ts", // TASK-009
       "0006_canonical_key_v2.ts", // D-013 / ADR-0005
+      "0007_script_flags.ts", // TASK-010 / D-014
     ]);
   });
 });

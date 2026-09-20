@@ -33,6 +33,7 @@ export { importPeselResource, rightsRefusal, sha256Hex } from "./importer.js";
 export type { ImportPeselOptions } from "./importer.js";
 export { assertReconciles, emptyReport, tallyReasons } from "./import-result.js";
 export type {
+  FlaggedRow,
   ImportFailureReason,
   ImportOutcome,
   QuarantinedRow,

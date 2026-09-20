@@ -68,6 +68,10 @@ function printReport(report: ReconciliationReport): void {
   console.log(`[import] surnames reused     ${report.surnamesReused}`);
   console.log(`[import] snapshots written   ${report.snapshotsWritten}`);
   console.log(`[import] values written      ${report.valuesWritten}`);
+  console.log(`[import] mixed-script rows   ${report.mixedScriptRows.length} (imported, flagged)`);
+  for (const row of report.mixedScriptRows) {
+    console.log(`[import]   line ${row.line}: ${row.surname} — MIXED_SCRIPT_REVIEW persisted`);
+  }
 }
 
 async function main(): Promise<void> {

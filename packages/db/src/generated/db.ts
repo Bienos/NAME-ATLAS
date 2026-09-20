@@ -350,8 +350,10 @@ export interface Surnames {
   created_at: Generated<Timestamp>;
   entity_status: SurnameStatus;
   merged_into_surname_id: string | null;
+  mixed_script: Generated<boolean>;
   primary_locale: string | null;
   primary_script: string;
+  script_confusable_flag: Generated<boolean>;
   surname_id: string;
   updated_at: Generated<Timestamp>;
 }

@@ -1832,3 +1832,56 @@ from the extracted TERC files and discarded in favour of the zip-verified record
 mappings were identical (16/16). Its three extra facts — the extracted CSV's digest equals the
 zip member's, the XML twin is identical row for row, and the SIMC files' identities — are recorded
 as an addendum in `docs/sources/pesel-regional.md`.
+
+## TASK-010 implemented — mixed-script rows in bulk ingestion; D-004 and D-014 resolved (2026-09-20)
+
+Scope authority: `tasks/010-mixed-script-rows-in-bulk-ingestion.md`. The project owner resolved
+**D-014 as Option C** and **D-004 as Preferred** on 2026-09-20. D-014 is implemented here; D-004 is
+specified as `tasks/011-voivodeship-places-and-regional-ingestion.md` and **not** implemented.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/resolver/src/lookup.ts` | `ResolveOptions.mixedScript: "REVIEW" \| "RESOLVE_FLAGGED"`; the default is unchanged, the option lets a `MIXED_SCRIPT_REVIEW` input reach the T0/T1 lookup with the finding attached |
+| `packages/db/migrations/0007_script_flags.ts` | `surnames.mixed_script`, `surnames.script_confusable_flag`, `CHECK (NOT script_confusable_flag OR mixed_script)` |
+| `packages/sources/src/importer.ts` | resolves with `RESOLVE_FLAGGED`; a flagged row's identity is created with the flags as detected; reported under `mixedScriptRows`; `MULTIPLE_EXACT` and every other finding still abort (U-5(a)) |
+| `packages/sources/src/import-result.ts` | `FlaggedRow`, `ReconciliationReport.mixedScriptRows` |
+| `packages/sources/bin/import-pesel.ts` | prints the flagged rows |
+| `tests/integration/src/mixed-script-ingestion.test.ts` | 7 tests: AC-1 to AC-5, the check constraint, idempotence |
+| `tasks/011-voivodeship-places-and-regional-ingestion.md` | **specification only** for D-004 |
+
+Modified: `packages/db/src/generated/db.ts` (two columns), the migration inventories in
+`migrator.test.ts` and `extensions.test.ts`, `canonical-key-v2.test.ts` (its `migrateDown` refusal
+test now steps past `0007` first, then restores), `docs/DECISIONS_NEEDED.md`, `docs/CODEMAP.md`,
+`tasks/004-pesel-surname-ingestion.md` (an **Amended by** line for U-5). **No dependency added.**
+
+### Why no ADR
+
+`docs/canonical/13` §10.4 says of Latin + Cyrillic lookalikes: *"review/security flag. Do not
+reject automatically; historical/OCR text can genuinely contain mixed scripts."* Option C is that
+sentence implemented for bulk ingestion. What rejected before was TASK-004's implementer choice
+U-5(a), narrowed once for this finding and no other. Nothing is mapped, folded or merged: `HODŽIЌ`
+is stored as `HODŽIЌ`, key `hodžiќ`, U+040C intact, and a user typing it still gets
+`REVIEW_REQUIRED` on the query path.
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — 235 unit tests |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13/PostGIS 3.4.2) | **Passed** — **143 tests** across 8 files (136 before, 7 new) |
+| `pnpm db:migrate` on a fresh database | **Passed** — `0001`–`0007` applied in order; re-run reports `no pending migrations` |
+| `pnpm db:generate-types` | **Passed** — exactly two lines added, `mixed_script` and `script_confusable_flag`; committed |
+| `pnpm db:migrate` on the populated dev database | `0007_script_flags: applied`; 0 of 408,192 existing surnames flagged, as the migration header predicts |
+| `pnpm build` | **Passed** — all three apps |
+
+The pinned container image was not exercised here — registries remain egress-blocked. CI runs it.
+
+### The real female import — AC-8
+
+Launched against resource `1148811` (official bytes, checksum-matched) at 12:47 on 2026-09-20 and
+**still running when this section was committed**. Its outcome — rows imported, the two flagged
+rows, and `CURRENT_RANK` for a female surname over the 420,082-row universe — is recorded in the
+next section, not here. Until that section exists, AC-8 is **not verified**.

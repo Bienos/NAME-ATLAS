@@ -22,6 +22,11 @@
  *         import aborts and writes nothing. In a two-column official file a
  *         quarantine almost certainly means we have misunderstood the
  *         source, and "fail closed" is the standing posture.
+ *         Narrowed once, by TASK-010 (D-014, Option C): a row whose ONLY
+ *         finding is `MIXED_SCRIPT_REVIEW` is imported with that finding
+ *         persisted on the surname, per docs/canonical/13 §10.4 ("do not
+ *         reject automatically"). Nothing is mapped or merged; the bytes
+ *         are stored verbatim and the flag travels with them.
  *   U-7 → resolution runs as a separate read pass BEFORE the write
  *         transaction, so `resolveSurname`'s READ ONLY guarantee is never
  *         relaxed. The resulting time-of-check/time-of-use gap is closed
@@ -48,7 +53,12 @@ import type { PeselSourceRow } from "./schema.js";
 import { PESEL_RIGHTS_PROFILE, PESEL_SOURCE, PESEL_SOURCE_KEY } from "./registry.js";
 import type { PeselResourceDescriptor, RightsProfileSeed } from "./registry.js";
 import { assertReconciles, emptyReport, tallyReasons } from "./import-result.js";
-import type { ImportOutcome, QuarantinedRow, ReconciliationReport } from "./import-result.js";
+import type {
+  FlaggedRow,
+  ImportOutcome,
+  QuarantinedRow,
+  ReconciliationReport,
+} from "./import-result.js";
 
 export interface ImportPeselOptions {
   /** The approved, checksum-pinned resource this file claims to be. */
@@ -145,7 +155,8 @@ async function createIdentity(trx: Transaction<DB>, sourceString: string): Promi
   const nameFormId = uuidv7();
   const display = toNfc(sourceString);
   const key = canonicalKey(sourceString);
-  const script = detectScripts(display).primary_script;
+  const detection = detectScripts(display);
+  const script = detection.primary_script;
 
   await trx
     .insertInto("knowledge_entities")
@@ -178,6 +189,10 @@ async function createIdentity(trx: Transaction<DB>, sourceString: string): Promi
       primary_locale: null,
       entity_status: "ACTIVE",
       merged_into_surname_id: null,
+      // The §10.4 review/security flag, written exactly as detected
+      // (TASK-010). False for every single-script row.
+      mixed_script: detection.mixed_script,
+      script_confusable_flag: detection.script_confusable_flag,
     })
     .execute();
 
@@ -343,8 +358,12 @@ export async function importPeselResource(
   //    resolver (U-7). No writes happen here.
   const identities = new Map<string, ResolvedIdentity>();
   const quarantined: QuarantinedRow[] = [];
+  const mixedScriptRows: FlaggedRow[] = [];
   for (const entry of distinct) {
-    const outcome = await resolveSurname(db, entry.surname);
+    // An authoritative register's own row is evidence of what the register
+    // says, so a mixed-script value is resolved on its exact key and its
+    // finding is carried along, not refused (TASK-010, canonical 13 §10.4).
+    const outcome = await resolveSurname(db, entry.surname, { mixedScript: "RESOLVE_FLAGGED" });
     if (outcome.kind === "LOOKUP_FAILED") {
       // Infrastructure failure, never "this surname is unknown".
       return {
@@ -357,6 +376,12 @@ export async function importPeselResource(
       };
     }
     const status = outcome.resolution.resolution_status;
+    if (outcome.resolution.validation_status === "MIXED_SCRIPT_REVIEW") {
+      // Recorded once per distinct value, at its first line — the same
+      // grain as a quarantine — so the report says exactly which rows
+      // carry the flag.
+      mixedScriptRows.push({ line: entry.firstLine, surname: entry.surname });
+    }
     if (status === "EXACT" || status === "KNOWN_VARIANT") {
       identities.set(entry.key, {
         surnameId: outcome.resolution.resolved_surname_id,
@@ -538,6 +563,7 @@ export async function importPeselResource(
         surnamesReused,
         snapshotsWritten,
         valuesWritten,
+        mixedScriptRows,
       };
       assertReconciles(report);
 

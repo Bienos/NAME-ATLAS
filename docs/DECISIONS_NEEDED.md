@@ -77,7 +77,20 @@ Consequence if unresolved: historical evidence can be discovered but not lawfull
 
 ---
 
-## D-004 — Current regional surname map availability
+## D-004 — RESOLVED (2026-09-20)
+
+**Resolution: Preferred — adopt the current official regional pair `1148786` / `1148790` as a *registered-domicile* regional distribution, voivodeship only, with the residual stated on every claim.** Decided by the project owner, 2026-09-20. Specified as `tasks/011-voivodeship-places-and-regional-ingestion.md` (storage: the voivodeship `Place` foundation and the regional importer), to be followed by TASK-012 (the `CURRENT_DISTRIBUTION` truth chain). Not implemented yet.
+
+What the decision settles, and what it does not:
+
+- **Settled:** the source is adopted; the `Place` foundation's voivodeship subset moves from M3 into M2; the hard semantic restriction below is binding on every snapshot and every claim — *województwo zameldowania na pobyt stały* is permanent registered residence, never origin, ancestry, birthplace, historical distribution or unqualified current residence; the ~21.7 % / 19.8 % residual TASK-008 measured is carried verbatim as coverage, never explained away and never redistributed.
+- **Not settled:** the resource-level licence (D-007, which gates paid surfaces, not ingestion — the same position as the national pair); the cause of the residual (`UNRESOLVED` until the publisher answers); anything below voivodeship level.
+
+The original record is kept below because its findings — the semantic restriction, the preflight, the spike's measurements — are the evidence the decision rests on.
+
+---
+
+## D-004 (original record) — Current regional surname map availability
 
 **Status:** Source *existence* now VERIFIED (see below). Adoption decision, framing, and all implementation remain BLOCKED/future scope. NON-BLOCKING for the paid MVP critical path. **BLOCKS any `CURRENT_DISTRIBUTION` task** — see the 2026-09-19 preflight update below.
 **Owner:** project owner (data licensing + framing decision).
@@ -332,9 +345,25 @@ Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option
 
 ---
 
-## D-014 — two official rows mix Latin and Cyrillic letters, so the female resource cannot be imported
+## D-014 — RESOLVED (TASK-010, 2026-09-20)
 
-**Status:** **BLOCKS INGESTING THE FEMALE NATIONAL RESOURCE `1148811`, and therefore every female-side capability** — female `CURRENT_POPULATION` at production scale, female `CURRENT_RANK`, and any surface that needs both sexes. NON-BLOCKING for the male resource `1148808`, which is imported in full and whose rank claims work.
+**Resolution: Option C — a mixed-script row in an authoritative register creates its own identity, with the finding persisted.** Decided by the project owner, 2026-09-20. Implemented as `tasks/010-mixed-script-rows-in-bulk-ingestion.md`; what was run is in `PROGRESS.md`.
+
+**No ADR**, because nothing deviates from canon: `docs/canonical/13` §10.4 says of Latin + Cyrillic lookalikes *"review/security flag. Do not reject automatically; historical/OCR text can genuinely contain mixed scripts."* What rejected was TASK-004's implementer choice U-5(a), now narrowed for this one finding and no other.
+
+Concretely:
+
+- `resolveSurname(db, input, { mixedScript: "RESOLVE_FLAGGED" })` lets a `MIXED_SCRIPT_REVIEW` input reach the T0/T1 lookup on its exact key; the resolution carries the real match status **and** the finding. The default is unchanged — the query path still returns `REVIEW_REQUIRED` and never touches the database for such input.
+- Migration `0007_script_flags` adds `surnames.mixed_script` and `surnames.script_confusable_flag` (`CHECK (NOT script_confusable_flag OR mixed_script)`), written exactly as detected. Default `false` is a fact for every existing row: the importer refused mixed-script rows until now.
+- The importer resolves with `RESOLVE_FLAGGED`, creates a flagged row's identity with the flags, reports it under `mixedScriptRows` (line and verbatim surname), and still aborts the run on `MULTIPLE_EXACT` or any other finding. Nothing is mapped, folded or merged; `HODŽIЌ` is stored as `HODŽIЌ`, key `hodžiќ`.
+
+Options A (quarantine and import the rest — leaves the universe permanently incomplete, so the rank still refuses) and B (per-row human adjudication — the more principled answer, needing a mechanism that does not exist) were not chosen; the original record below explains each.
+
+---
+
+## D-014 (original record) — two official rows mix Latin and Cyrillic letters, so the female resource cannot be imported
+
+**Status:** RESOLVED above. Kept verbatim because the code-point evidence and the option analysis are the record.
 **Owner:** project owner, on a resolver-policy question with a source-data cause.
 
 Found 2026-09-20 by running the full import after D-013 was resolved. The male resource imported cleanly — 408,182 of 408,182 rows, zero quarantined. The female import **failed and wrote nothing**, which is TASK-004 U-5 option (a) working as specified:

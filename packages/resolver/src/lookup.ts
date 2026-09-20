@@ -33,7 +33,26 @@ import { CANONICAL_KEY_VERSION, RESOLUTION_METHOD_VERSION } from "./version.js";
 /** The only database capability the lookup path is allowed to hold. */
 type ReadOnlyQueries = Pick<Transaction<DB>, "selectFrom">;
 
-export type ResolveOptions = ValidationOptions;
+/**
+ * What a `MIXED_SCRIPT_REVIEW` input does (docs/canonical/13 §10.4; TASK-010).
+ *
+ * - `"REVIEW"` (default): the input never reaches the database and resolves
+ *   `REVIEW_REQUIRED`. The query path. A user typing a Latin word with one
+ *   Cyrillic lookalike gets a review outcome, never a silent match.
+ * - `"RESOLVE_FLAGGED"`: the lookup runs on the exact canonical key and the
+ *   resolution carries the real match status **and** the finding
+ *   (`validation_status`, `mixed_script`, `script_confusable_flag`,
+ *   `user_confirmation_required`). For bulk ingestion of an authoritative
+ *   register, whose own row is evidence of what the register says: §10.4
+ *   asks for a flag, not a rejection.
+ *
+ * Every other validation failure short-circuits regardless of this option.
+ */
+export type MixedScriptPolicy = "REVIEW" | "RESOLVE_FLAGGED";
+
+export interface ResolveOptions extends ValidationOptions {
+  readonly mixedScript?: MixedScriptPolicy;
+}
 
 interface ResolutionSeed {
   readonly rawInput: string;
@@ -76,7 +95,13 @@ function buildResolution(seed: ResolutionSeed, match: MatchResult): SurnameResol
     matched_name_form_id: match.matched_name_form_id,
     matched_form: match.matched_form,
     resolution_method_version: RESOLUTION_METHOD_VERSION,
-    user_confirmation_required: status === "MULTIPLE_EXACT" || status === "REVIEW_REQUIRED",
+    // A flagged input that matched is still a review matter for a person;
+    // the flag travels with the resolution rather than being lost in the
+    // match status (TASK-010).
+    user_confirmation_required:
+      status === "MULTIPLE_EXACT" ||
+      status === "REVIEW_REQUIRED" ||
+      seed.validation.status === "MIXED_SCRIPT_REVIEW",
     detected_scripts: seed.validation.detected_scripts,
     primary_script: seed.validation.primary_script,
     mixed_script: seed.validation.mixed_script,
@@ -218,7 +243,9 @@ export async function resolveSurname(
     validation,
   };
 
-  if (validation.status !== "VALID") {
+  const proceedFlagged =
+    validation.status === "MIXED_SCRIPT_REVIEW" && options.mixedScript === "RESOLVE_FLAGGED";
+  if (validation.status !== "VALID" && !proceedFlagged) {
     return {
       kind: "RESOLUTION",
       resolution: buildResolution(seed, {

@@ -17,6 +17,18 @@ export interface QuarantinedRow {
 }
 
 /**
+ * A row imported WITH a review finding rather than refused (TASK-010,
+ * docs/canonical/13 §10.4). Stored verbatim; the finding is persisted on the
+ * surname as `mixed_script` / `script_confusable_flag`.
+ */
+export interface FlaggedRow {
+  /** 1-based line number in the source file, header included. */
+  readonly line: number;
+  /** The source surname string, exactly as read. */
+  readonly surname: string;
+}
+
+/**
  * What an import actually did, in numbers that must reconcile.
  *
  * `rowsRead === rowsImported + rowsQuarantined` is asserted by the importer
@@ -32,6 +44,11 @@ export interface ReconciliationReport {
   readonly surnamesReused: number;
   readonly snapshotsWritten: number;
   readonly valuesWritten: number;
+  /**
+   * Rows imported with a `MIXED_SCRIPT_REVIEW` finding. Counted inside
+   * `rowsImported`, never inside `rowsQuarantined`: they are stored.
+   */
+  readonly mixedScriptRows: readonly FlaggedRow[];
 }
 
 export type ImportFailureReason =
@@ -86,6 +103,7 @@ export function emptyReport(resourceId: string): ReconciliationReport {
     surnamesReused: 0,
     snapshotsWritten: 0,
     valuesWritten: 0,
+    mixedScriptRows: [],
   };
 }
 
