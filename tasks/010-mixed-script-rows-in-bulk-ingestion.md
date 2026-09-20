@@ -1,7 +1,9 @@
 # TASK-010 — Mixed-script rows in official bulk ingestion (D-014, Option C)
 
-- **Status:** IMPLEMENTED 2026-09-20; AC-1–AC-7 verified in tests and on a fresh database. AC-8 (the
-  real female import and a female rank) is recorded in `PROGRESS.md` when the run completes.
+- **Status:** IMPLEMENTED AND VERIFIED 2026-09-20, all eight acceptance criteria. AC-8 for real: the
+  female resource imported 420,082 of 420,082 rows with the two flagged rows stored verbatim, and
+  `CURRENT_RANK` produces `NOWAK` rank 1 of 420,082 (female) beside rank 1 of 408,182 (male). The
+  national pair is complete. Evidence: `PROGRESS.md`.
 - **Created:** 2026-09-20, at the project owner's direction, resolving D-014 as **Option C**.
 - **Milestone:** M2 (`PLAN.md`: complete current-surname intelligence). Closes the female half of
   the national pair, without which no both-sex surface can exist.

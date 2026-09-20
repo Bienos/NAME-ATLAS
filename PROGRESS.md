@@ -1885,3 +1885,68 @@ Launched against resource `1148811` (official bytes, checksum-matched) at 12:47 
 **still running when this section was committed**. Its outcome — rows imported, the two flagged
 rows, and `CURRENT_RANK` for a female surname over the 420,082-row universe — is recorded in the
 next section, not here. Until that section exists, AC-8 is **not verified**.
+
+## The national pair is complete — female resource imported, both-sex `CURRENT_RANK` (2026-09-20)
+
+TASK-010's AC-8, run for real against the official female bytes (checksum-matched):
+
+```text
+[import] IMPORTED source_record 01a0bede-cfd7-77a2-84a0-2c91db7faa47
+[import] superseded          01a0bbe8-b28f-765e-84f6-e00731ce15df
+[import] resource            1148811
+[import] rows read           420082
+[import] rows imported       420082
+[import] rows quarantined    0
+[import] surnames created    190284
+[import] surnames reused     229798
+[import] snapshots written   420082
+[import] values written      420082
+[import] mixed-script rows   2 (imported, flagged)
+[import]   line 338202: HODŽIЌ — MIXED_SCRIPT_REVIEW persisted
+[import]   line 420083: ЌATOVIЌ — MIXED_SCRIPT_REVIEW persisted
+```
+
+Ten minutes and forty-two seconds, one transaction. 229,798 surnames were reused because the same
+string occurs in both sex partitions — the identity is shared, the counts are not, and nothing was
+summed. The fixture-derived female source record was superseded, not rewritten.
+
+### Observed in the database afterwards
+
+| Fact | Value |
+|---|---|
+| Surnames | 598,476, of which **2** carry `mixed_script = true` and `script_confusable_flag = true`, both `primary_script = Latn`, both stored with U+040C intact (`HODŽIЌ` → key `hodžiќ`) |
+| Complete universes | `1148808`: 408,182 snapshots on the checksum-matched record; `1148811`: 420,082 on the checksum-matched record |
+| `distribution_values` | 828,309 rows; `rank`, `surname_share`, `population_denominator` null on every one |
+
+### `CURRENT_RANK` for both sexes
+
+`pnpm demo:surname "NOWAK"` then `pnpm demo:surname-rank "NOWAK"`:
+
+| Universe | Count | Rank | Confidence |
+|---|---:|---:|---|
+| `1148808`, `pesel_2026_national_male` | 98,387 | **1 of 408,182** | `VERIFIED` |
+| `1148811`, `pesel_2026_national_female` | 99,738 | **1 of 420,082** | `VERIFIED` |
+
+Two claims, each within one resource version; the CLI states that there is no all-Poland rank
+because the sex partitions may not be combined (U-1).
+
+### The query path is unchanged, checked
+
+`pnpm demo:surname-rank "HODŽIЌ"` → `resolution status REVIEW_REQUIRED`, `NO_RESULT (AMBIGUOUS)`. The
+row is stored and counted in the universe; typing it still reaches nobody without review. That is
+§5.6 and §10.4 both satisfied at once.
+
+### One observation for the read layer, not acted on
+
+`pnpm demo:surname "NOWAK"` lists **four** `CURRENT_POPULATION` claims: two on the current source
+records and two on the superseded fixture-derived records from earlier sessions. Claims are
+immutable and the superseded records still exist, so this is correct storage; whether a read
+projection should surface claims on superseded records is a TASK-006 read-path question, recorded
+here and not changed.
+
+### Where this leaves the product
+
+Both national resources are complete universes. `CURRENT_POPULATION` and `CURRENT_RANK` exist for
+either sex over real data. Still open: `RARITY_CONTEXT` (U-6's denominator — the sum of counts is
+a lower bound, not a universe), D-007 (licence, gating paid surfaces), TASK-011 (regional storage,
+specified), and the read-layer observation above.
