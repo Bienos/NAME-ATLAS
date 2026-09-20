@@ -12,12 +12,14 @@ export {
   TruthInvariantError,
 } from "./derive.js";
 export type { DeriveOptions } from "./derive.js";
-export { readCurrentPopulation } from "./read.js";
-export type { PersistedCurrentPopulation } from "./read.js";
+export { readCurrentPopulation, readRarityContext } from "./read.js";
+export type { PersistedCurrentPopulation, PersistedRarityContext } from "./read.js";
 export { querySurnameResult } from "./query.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
 export { deriveCurrentRank, currentRankClaimKey } from "./rank.js";
 export type { DeriveRankOptions } from "./rank.js";
+export { deriveRarityContext, rarityContextClaimKey, oneInX, shareOf } from "./rarity.js";
+export type { DeriveRarityOptions } from "./rarity.js";
 export { assessUniverseCompleteness } from "./completeness.js";
 export type { CompletenessInputs, CompletenessVerdict, IncompleteReason } from "./completeness.js";
 export {
@@ -44,7 +46,9 @@ export type {
   NoRankReason,
   NoResultReason,
   RankUniverse,
+  RarityContextClaimResult,
   SurnameRankResult,
+  SurnameRarityResult,
   SurnameTruthResult,
 } from "./result.js";
 export {
@@ -54,6 +58,14 @@ export {
   RANK_CONFIDENCE_ASSESSMENT_VERSION,
   RANK_TIES_POLICY,
   RANK_UNIVERSE_KIND,
+  RARITY_CONTEXT_METHOD_VERSION,
+  RARITY_CONTEXT_PAYLOAD_VERSION,
+  RARITY_DENOMINATOR_KIND,
+  RARITY_DENOMINATOR_METHOD,
+  RARITY_DENOMINATOR_VERSION,
+  RARITY_METHODOLOGY_CODE,
+  RARITY_ROUNDING,
+  RARITY_UNIVERSE_LABEL_CODE,
   CONFIDENCE_ASSESSMENT_METHOD,
   CONFIDENCE_ASSESSMENT_VERSION,
   CURRENT_POPULATION_METHOD_VERSION,

@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -41,13 +41,13 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
   "population": {                 // null unless RESOLVED
     "state": "READY",             // | "UNAVAILABLE" | "RIGHTS_BLOCKED"
     "reason_code": null,
-    "surface": { "surface": "FREE", "decision": "CONDITIONAL", "reason_code": "…" },
+    "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" },
     "observations": [
       {
         "value": {
           "status": "KNOWN",
           "value": 98387,
-          "unit": "SURNAME_OCCURRENCES",
+          "unit": "PEOPLE",
           "scope_label_code": "PESEL_CURRENT_SURNAME"
         },
         "snapshot_date": "2026-01-20",
@@ -59,6 +59,28 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
         "citation": { "id": "…", "title": "…", "publisher": "…", "publication_date": "2026-01-20",
                       "source_type": "OFFICIAL_DATASET", "locator": "resource:1148808",
                       "url": "…", "attribution": null, "terms": "CC0 1.0" }
+      }
+    ]
+  },
+  "rarity": {                     // null unless RESOLVED; added in 1.1
+    "state": "READY",             // | "UNAVAILABLE" | "RIGHTS_BLOCKED"
+    "reason_code": null,          // "NO_COMPLETE_UNIVERSE" when a count exists but no complete universe does
+    "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" },
+    "entries": [
+      {
+        "primary": { "metric": "ONE_IN_X", "value": 215 },
+        "supporting": [{ "metric": "RANK", "value": 1 }],
+        "methodology_code": "PESEL_PUBLISHED_UNIVERSE_SUM_V1",
+        "universe_label_code": "PESEL_PUBLISHED_UNIVERSE",
+        "numerator": 98387,
+        "denominator": 21197537,
+        "share": 0.004641435,
+        "scope_label_code": "PESEL_CURRENT_SURNAME",
+        "snapshot_date": "2026-01-20",
+        "country_code": "PL",
+        "comparability_group": "pesel_2026_national_male",
+        "confidence": { "status": "VERIFIED", "methodology_code": "derived_statistic_rule@derived_confidence@1" },
+        "citation": { "…": "as above", "terms": "CC0 1.0" }
       }
     ]
   }
@@ -77,6 +99,21 @@ These are schema constraints, not conventions — a violating payload fails vali
 6. **Confidence carries status and method only.** The assessment's `rationale` is internal (`docs/canonical/11` §10.3) and has no field to travel in. No probability is transmitted (`docs/canonical/16` §35).
 7. **Confidence and rights are independent.** The same surname on two surfaces returns identical `confidence` and different `surface` decisions (`ARCHITECTURE.md` §10 invariant 2).
 
+## Accepted rendering of a rarity entry
+
+Decided with U-6 (2026-09-20). `ONE_IN_X` is a **rounded** figure, so "about" is correct here and
+only here; the population count is exact and never says "about". What X is a share of is the
+*published universe* — the sum of one resource's published counts — and the label says so:
+
+- EN: `About 1 in {x} people counted in the PESEL register ({sex}) bore the surname {surname} on {date}.`
+  — e.g. *About 1 in 215 people counted in the PESEL register (male) bore the surname Nowak on 20 January 2026.*
+- PL: `Około 1 na {x} osób ujętych w rejestrze PESEL ({sex}) nosiło nazwisko {surname} na dzień {date}.`
+  — e.g. *Około 1 na 215 osób ujętych w rejestrze PESEL (mężczyźni) nosiło nazwisko Nowak na dzień 20 stycznia 2026 r.*
+- **Never** "of Poles", "in Poland", or any unqualified population: the denominator excludes
+  single-bearer surnames and includes registered emigrants, so it is not a national population.
+- The two sexes are two entries and two sentences. Nothing sums them; no combined figure exists in
+  the payload.
+
 ## Recorded deviations
 
 - **`unit` is a two-member enum, and PESEL now emits `PEOPLE`.** `docs/canonical/16` §26 fixes the unit as the single literal `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widened it to `"PEOPLE" | "SURNAME_OCCURRENCES"` while TASK-004 §14 U-4 was open. On 2026-09-20 the project owner decided U-4 on the field's definition — the counted field is *nazwisko aktualne*, of which every living person in PESEL has exactly one, so an occurrence among living persons is one person — and PESEL-derived values emit `"PEOPLE"` since then (ADR-0004, amendment of 2026-09-20). `"SURNAME_OCCURRENCES"` stays in the enum for a source whose counted field is not one-per-person. Not a breaking change: the enum is unchanged, only the emitted value.
@@ -89,6 +126,8 @@ These are schema constraints, not conventions — a violating payload fails vali
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.0 → 1.1 (2026-09-20, TASK-014).** Adds the `rarity` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule `population` follows. A consumer written against 1.0 is unaffected (it ignores the field); a *producer* must now supply it, which is why the version moved rather than the field being slipped in silently. `unit` also begins emitting `PEOPLE` in 1.1; the enum is unchanged, so that part is not breaking.
 
 ## Not covered
 

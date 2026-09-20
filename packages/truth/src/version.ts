@@ -58,3 +58,28 @@ export const RANK_TIES_POLICY = "COMPETITION";
 
 /** The universe a rank is computed within. Recorded on the claim payload. */
 export const RANK_UNIVERSE_KIND = "SOURCE_RECORD_NATIONAL_VALUES";
+
+/** The `RARITY_CONTEXT` derivation method (TASK-014). */
+export const RARITY_CONTEXT_METHOD_VERSION = "rarity_context@1";
+
+/** Shape version of the `RARITY_CONTEXT` claim payload. */
+export const RARITY_CONTEXT_PAYLOAD_VERSION = "rarity_context_payload@1";
+
+/**
+ * The denominator's derivation: the sum of every published count on one
+ * complete resource version (U-6, decided 2026-09-20). Not the register's
+ * living-person total, which is unknown, and never GUS resident population,
+ * which is a different universe.
+ */
+export const RARITY_DENOMINATOR_METHOD = "published_universe_sum";
+export const RARITY_DENOMINATOR_VERSION = "published_universe_sum@1";
+export const RARITY_DENOMINATOR_KIND = "PUBLISHED_UNIVERSE_SUM";
+
+/** Frontend-localised code for what the denominator is a share of. */
+export const RARITY_UNIVERSE_LABEL_CODE = "PESEL_PUBLISHED_UNIVERSE";
+
+/** `one_in_x` is `denominator / count` rounded half up to an integer. */
+export const RARITY_ROUNDING = "ROUND_HALF_UP";
+
+/** The public methodology code canonical/16 §27's RarityDTO carries. */
+export const RARITY_METHODOLOGY_CODE = "PESEL_PUBLISHED_UNIVERSE_SUM_V1";

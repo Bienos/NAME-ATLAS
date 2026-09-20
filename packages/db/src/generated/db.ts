@@ -13,7 +13,7 @@ export type ClaimEvidenceRelationship = "CONTEXT" | "CONTRADICTS" | "SUPPORTS";
 
 export type ClaimLifecycleStatus = "ACTIVE" | "REJECTED" | "RETRACTED" | "SUPERSEDED";
 
-export type ClaimType = "CURRENT_POPULATION" | "CURRENT_RANK";
+export type ClaimType = "CURRENT_POPULATION" | "CURRENT_RANK" | "RARITY_CONTEXT";
 
 export type ConfidenceStatus = "CONFLICTING" | "INSUFFICIENT_DATA" | "LIKELY" | "POSSIBLE" | "UNCONFIRMED" | "VERIFIED";
 
@@ -23,7 +23,7 @@ export type EntityType = "NAME_FORM" | "SURNAME";
 
 export type EpistemicType = "FACT" | "HYPOTHESIS" | "INTERPRETATION" | "UNKNOWN";
 
-export type EvidenceDependencyRole = "COUNT" | "UNIVERSE";
+export type EvidenceDependencyRole = "COUNT" | "DENOMINATOR" | "UNIVERSE";
 
 export type EvidenceScope = "FAMILY_LEVEL" | "PERSON_LEVEL" | "SHARED" | "SURNAME_LEVEL";
 

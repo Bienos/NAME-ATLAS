@@ -22,7 +22,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.0";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.1";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -134,6 +134,54 @@ export const populationSectionSchema = z
   });
 
 /**
+ * `docs/canonical/16` §27's `RarityDTO`, one entry per complete resource
+ * version (TASK-014). `ONE_IN_X` is the primary metric; the rank in the same
+ * universe is supporting when a `CURRENT_RANK` claim exists. Structured
+ * metrics only — never an arbitrary "87/100", never a percentile this
+ * slice has no method for, never an adjective.
+ *
+ * `universe_label_code` is what X is a share of: the *published universe*,
+ * the sum of the published counts of one resource (U-6). A frontend renders
+ * it as "of people counted in the register" / "osób ujętych w rejestrze",
+ * never "of Poles".
+ */
+export const rarityMetricSchema = z.object({
+  metric: z.enum(["ONE_IN_X", "RANK", "PERCENTILE"]),
+  value: z.number().int().positive(),
+});
+
+export const rarityEntrySchema = z.object({
+  primary: rarityMetricSchema,
+  supporting: z.array(rarityMetricSchema),
+  methodology_code: z.string().min(1),
+  universe_label_code: z.string().min(1),
+  /** The count behind X, with the same unit and scope as the population value. */
+  numerator: z.number().int().positive(),
+  /** The published-universe sum behind X. */
+  denominator: z.number().int().positive(),
+  /** `numerator / denominator`, nine places. */
+  share: z.number().positive().max(1),
+  scope_label_code: z.string().min(1),
+  snapshot_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+  country_code: z.string().min(2),
+  comparability_group: z.string().min(1).nullable(),
+  confidence: confidenceSchema,
+  citation: citationSchema,
+});
+
+export const raritySectionSchema = z
+  .object({
+    state: populationStateSchema,
+    /** Empty unless `state` is `READY`. */
+    entries: z.array(rarityEntrySchema),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine((s) => (s.state === "READY" ? s.entries.length > 0 : s.entries.length === 0), {
+    message: "entries are present exactly when state is READY",
+  });
+
+/**
  * `docs/canonical/16` §21, minus `canonical_slug`/`canonical_path`.
  *
  * Those are omitted deliberately (TASK-006 §15 U-2): no slug exists in the
@@ -167,12 +215,17 @@ export const surnameResultResponseSchema = z
     status: resultStatusSchema,
     surname: publicSurnameIdentitySchema.nullable(),
     population: populationSectionSchema.nullable(),
+    /** Added in 1.1 (TASK-014). Present exactly when RESOLVED, like population. */
+    rarity: raritySectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
   })
   .refine((r) => (r.status === "RESOLVED" ? r.population !== null : r.population === null), {
     message: "population section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.rarity !== null : r.rarity === null), {
+    message: "rarity section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -207,6 +260,9 @@ export type SurfaceEligibilityDto = z.infer<typeof surfaceEligibilitySchema>;
 export type PopulationObservation = z.infer<typeof populationObservationSchema>;
 export type PopulationState = z.infer<typeof populationStateSchema>;
 export type PopulationSection = z.infer<typeof populationSectionSchema>;
+export type RarityMetric = z.infer<typeof rarityMetricSchema>;
+export type RarityEntry = z.infer<typeof rarityEntrySchema>;
+export type RaritySection = z.infer<typeof raritySectionSchema>;
 export type PublicSurnameIdentity = z.infer<typeof publicSurnameIdentitySchema>;
 export type ResultStatus = z.infer<typeof resultStatusSchema>;
 export type SurnameResultResponse = z.infer<typeof surnameResultResponseSchema>;

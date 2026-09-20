@@ -27,13 +27,16 @@ import type {
   PopulationSection,
   SurfaceEligibilityDto,
   SurnameResultResponse,
+  RarityEntry,
+  RaritySection,
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname } from "@name-atlas/resolver";
-import { readCurrentPopulation } from "./read.js";
-import type { PersistedCurrentPopulation } from "./read.js";
+import { readCurrentPopulation, readRarityContext } from "./read.js";
+import type { PersistedCurrentPopulation, PersistedRarityContext } from "./read.js";
 import { evaluateSurface } from "./rights.js";
 import type { Surface } from "./rights.js";
+import { RARITY_METHODOLOGY_CODE } from "./version.js";
 
 /**
  * The unit PESEL-derived values carry.
@@ -77,6 +80,47 @@ function emptySection(
   surface: SurfaceEligibilityDto,
 ): PopulationSection {
   return { state, observations: [], reason_code: reasonCode, surface };
+}
+
+function emptyRarity(
+  state: "UNAVAILABLE" | "RIGHTS_BLOCKED",
+  reasonCode: string,
+  surface: SurfaceEligibilityDto,
+): RaritySection {
+  return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+/** Projects one persisted rarity claim into canonical/16 §27's shape (TASK-014). */
+function toRarityEntry(claim: PersistedRarityContext): RarityEntry {
+  return {
+    primary: { metric: "ONE_IN_X", value: claim.one_in_x },
+    supporting:
+      claim.supporting_rank === null ? [] : [{ metric: "RANK", value: claim.supporting_rank }],
+    methodology_code: RARITY_METHODOLOGY_CODE,
+    universe_label_code: claim.universe_label_code,
+    numerator: claim.numerator,
+    denominator: claim.denominator,
+    share: claim.share,
+    scope_label_code: PESEL_SCOPE_LABEL_CODE,
+    snapshot_date: claim.snapshot_date,
+    country_code: claim.country_code,
+    comparability_group: claim.comparability_group,
+    confidence: {
+      status: claim.confidence_status as RarityEntry["confidence"]["status"],
+      methodology_code: `${claim.assessment_method}@${claim.assessment_version}`,
+    },
+    citation: {
+      id: claim.citation_id,
+      title: claim.citation_title,
+      publisher: claim.citation_publisher,
+      publication_date: claim.citation_publication_date,
+      source_type: claim.source_type,
+      locator: claim.citation_locator,
+      url: claim.citation_url,
+      attribution: claim.attribution_text,
+      terms: claim.terms_version,
+    },
+  };
 }
 
 /** Projects one persisted claim into the public observation shape. */
@@ -151,6 +195,7 @@ export async function querySurnameResult(
         status: "AMBIGUOUS",
         surname: null,
         population: null,
+        rarity: null,
       },
     };
   }
@@ -166,12 +211,14 @@ export async function querySurnameResult(
         status: "UNRESOLVED",
         surname: null,
         population: null,
+        rarity: null,
       },
     };
   }
 
   const surnameId = resolution.resolved_surname_id;
   const claims = await readCurrentPopulation(db, surnameId);
+  const rarityClaims = await readRarityContext(db, surnameId);
 
   const identity = {
     id: surnameId,
@@ -200,6 +247,7 @@ export async function querySurnameResult(
         status: "RESOLVED",
         surname: identity,
         population: emptySection("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
+        rarity: emptyRarity("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
       },
     };
   }
@@ -222,6 +270,7 @@ export async function querySurnameResult(
         status: "RESOLVED",
         surname: identity,
         population: emptySection("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
+        rarity: emptyRarity("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
       },
     };
   }
@@ -240,6 +289,18 @@ export async function querySurnameResult(
         reason_code: null,
         surface: eligibility,
       },
+      // Rarity needs a complete universe as well as a count, so it can be
+      // absent where population is present. Absence is stated, never a
+      // figure invented.
+      rarity:
+        rarityClaims.length > 0
+          ? {
+              state: "READY",
+              entries: rarityClaims.map(toRarityEntry),
+              reason_code: null,
+              surface: eligibility,
+            }
+          : emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", eligibility),
     },
   };
 }

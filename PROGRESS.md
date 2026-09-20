@@ -2044,3 +2044,70 @@ PESEL values carry `unit: "PEOPLE"` with `scope_label_code: "PESEL_CURRENT_SURNA
 One defect caught by the suite on the way: the migration's first draft joined on
 `sources.rights_profile_id`, which does not exist (`default_rights_profile_id` does); every
 integration file's `beforeAll` failed on it, which is how it was found before it could ship.
+
+## TASK-014 implemented — `RARITY_CONTEXT`, about one in X over the published universe (2026-09-20)
+
+Scope authority: `tasks/014-rarity-context-truth-chain.md`. U-6 was decided by the project owner on
+2026-09-20: the denominator is the **published universe** — the sum of one resource's published
+counts — labelled as such. M2's last capability.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0009_rarity_context.ts` | `RARITY_CONTEXT` on `claim_type`, `DENOMINATOR` on `evidence_dependency_role` (the role `0005` anticipated) |
+| `packages/truth/src/universe.ts` | **new** — the resolution-and-gate plumbing `rank.ts` and `rarity.ts` now share, extracted rather than copied, so there is one completeness gate and a universe that fails it fails for both claims identically |
+| `packages/truth/src/rarity.ts` | the chain: denominator evidence → derived evidence → claim → confidence → citation, with `COUNT` / `DENOMINATOR` / `UNIVERSE` lineage; `oneInX` and `shareOf` are pure and exported |
+| `packages/truth/src/read.ts` | `readRarityContext` — read-only, mirrors `readCurrentPopulation` |
+| `packages/contracts/src/surname-result.ts` | schema **1.1**: a `rarity` section carrying canonical/16 §27's `RarityDTO` |
+| `packages/truth/bin/surname-rarity.ts` | `pnpm demo:surname-rarity` |
+| `packages/truth/src/rarity.test.ts` | 10 unit tests on the two pure rules |
+| `tests/integration/src/rarity-context.test.ts` | 11 tests: refusal, auditability, no bypass, idempotence, `universe_size` still null, the API's own answer |
+
+### The real figures, and they were checked against SQL rather than against the code
+
+`pnpm demo:surname-rarity "NOWAK"` over the fully imported national pair:
+
+| Universe | Count | Denominator | About 1 in | Share | Supporting rank |
+|---|---:|---:|---:|---:|---|
+| `1148808` male | 98,387 | 21,197,537 | **215** | 0.004641435 | 1 of 408,182 |
+| `1148811` female | 99,738 | 21,560,302 | **216** | 0.004626002 | 1 of 420,082 |
+
+Recomputed in SQL — `SUM(count)` per source record and `round(total / numerator)` — and both the
+denominators and both values of X matched the stored claims exactly. Lineage: two `COUNT`, two
+`DENOMINATOR`, two `UNIVERSE` dependency rows, one set per claim. `distribution_snapshots.universe_size`
+is still null on every row, which is the point: the register's living-person total remains unknown.
+
+The API serves it at schema `1.1`, validating against the published contract, on `FREE`
+(`RIGHTS_PERMIT_FREE_SURFACE`) and on `PAID` (`COMMERCIAL_USE_ALLOWED`) alike now that D-007 is
+decided. The combined male+female sum (42,757,839) appears **nowhere** in any payload or claim —
+asserted, not assumed.
+
+### Two honesty properties worth stating
+
+- **"About" is used here and only here.** X is rounded (`ROUND_HALF_UP`, named on every claim), so
+  the rendering says "about 1 in 215". The population count is exact and never says "about".
+- **The label is part of the claim, not the frontend's discretion.** Every entry carries
+  `universe_label_code = PESEL_PUBLISHED_UNIVERSE`, rendered "of people counted in the register" /
+  "osób ujętych w rejestrze". A unit test asserts none of the codes contains "POLAND" or "POLES",
+  because the denominator excludes single-bearer surnames and includes registered emigrants.
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — **245 unit tests** (truth 65, contracts 26) |
+| `pnpm test:integration` | **Passed** — **160 tests** across 10 files, exit 0 |
+| `pnpm db:migrate` on a fresh database | **Passed** — `0001`–`0009`; re-run reports no pending migrations |
+| `pnpm db:generate-types` | **Passed** — two lines changed, `ClaimType` and `EvidenceDependencyRole`; committed |
+| `pnpm build` | **Passed** |
+
+One correction on the way: the first draft of `rarity.test.ts` asserted a share of `0.004641893`,
+which was my arithmetic error, not the code's — the true value is `0.004641435`. The literal was
+corrected, not the implementation.
+
+### What M2 still lacks
+
+`CURRENT_DISTRIBUTION` (TASK-011 specified, then TASK-012), the fuzzy retrieval tiers, and the
+consumer UI. Nothing in the truth layer is now blocked on a decision.

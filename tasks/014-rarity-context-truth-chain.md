@@ -1,6 +1,7 @@
 # TASK-014 — `RARITY_CONTEXT` truth chain over the published universe (U-6)
 
-- **Status:** SPECIFIED 2026-09-20, not implemented.
+- **Status:** IMPLEMENTED AND VERIFIED 2026-09-20, all eight acceptance criteria, including AC-7 on
+  the real imported data (`NOWAK`: about 1 in 215 male, 1 in 216 female). Evidence: `PROGRESS.md`.
 - **Created:** 2026-09-20, at the project owner's direction, resolving TASK-004 §14 **U-6**: the
   rarity denominator is the **published universe** — the sum of the published counts of the same
   resource — labelled as such, never "of Poles".

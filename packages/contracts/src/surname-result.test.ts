@@ -198,6 +198,7 @@ describe("top-level response", () => {
         status: "RESOLVED",
         surname: null,
         population: null,
+        rarity: null,
       }).success,
     ).toBe(false);
   });
@@ -209,6 +210,7 @@ describe("top-level response", () => {
         status: "UNRESOLVED",
         surname: identity,
         population: null,
+        rarity: null,
       }).success,
     ).toBe(false);
   });
@@ -220,6 +222,7 @@ describe("top-level response", () => {
         status: "UNRESOLVED",
         surname: null,
         population: null,
+        rarity: null,
       }).success,
     ).toBe(true);
   });
@@ -236,6 +239,7 @@ describe("top-level response", () => {
           reason_code: null,
           surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "X" },
         },
+        rarity: null,
       }).success,
     ).toBe(false);
   });
@@ -247,6 +251,7 @@ describe("top-level response", () => {
         status: "UNRESOLVED",
         surname: null,
         population: null,
+        rarity: null,
       }).success,
     ).toBe(false);
   });

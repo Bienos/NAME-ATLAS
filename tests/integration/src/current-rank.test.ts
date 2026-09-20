@@ -352,7 +352,7 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
       SELECT enumlabel FROM pg_enum e JOIN pg_type t ON t.oid = e.enumtypid
       WHERE t.typname = 'evidence_dependency_role' ORDER BY e.enumsortorder
     `.execute(db());
-    expect(roles.rows.map((r) => r.enumlabel)).toEqual(["COUNT", "UNIVERSE"]);
+    expect(roles.rows.map((r) => r.enumlabel)).toEqual(["COUNT", "UNIVERSE", "DENOMINATOR"]); // DENOMINATOR: 0009
   });
 
   it("added CURRENT_RANK to claim_type without disturbing CURRENT_POPULATION", async () => {
@@ -360,7 +360,11 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
       SELECT enumlabel FROM pg_enum e JOIN pg_type t ON t.oid = e.enumtypid
       WHERE t.typname = 'claim_type' ORDER BY e.enumsortorder
     `.execute(db());
-    expect(values.rows.map((r) => r.enumlabel)).toEqual(["CURRENT_POPULATION", "CURRENT_RANK"]);
+    expect(values.rows.map((r) => r.enumlabel)).toEqual([
+      "CURRENT_POPULATION",
+      "CURRENT_RANK",
+      "RARITY_CONTEXT", // 0009
+    ]);
   });
 
   it("forbids a self-dependency in the lineage table", async () => {

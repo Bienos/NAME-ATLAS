@@ -19,7 +19,8 @@
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
-    "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank"
+    "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
+    "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

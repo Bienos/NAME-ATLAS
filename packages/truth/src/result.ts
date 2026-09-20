@@ -198,3 +198,60 @@ export type SurnameRankResult =
         readonly actual_row_count: number;
       }[];
     };
+
+/**
+ * One `RARITY_CONTEXT` claim — one per complete resource version, never one
+ * per surname, for the same reason as the rank: the sex partitions are
+ * different universes and may not be combined.
+ */
+export interface RarityContextClaimResult {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  /** `denominator / count`, rounded half up. "About 1 in X". */
+  readonly one_in_x: number;
+  /** The surname's count in this universe. */
+  readonly numerator: number;
+  /** The sum of every published count in this universe. */
+  readonly denominator: number;
+  /** What the denominator is: always the published-universe sum here. */
+  readonly denominator_kind: string;
+  /** Frontend-localised code for what X is a share of. */
+  readonly universe_label_code: string;
+  /** `count / denominator`, to nine places. */
+  readonly share: number;
+  readonly rounding: string;
+  readonly universe: RankUniverse;
+  /** The rank in the same universe, when a `CURRENT_RANK` claim exists. */
+  readonly supporting_rank: number | null;
+  readonly snapshot_date: string;
+  readonly country_code: string;
+  readonly source_population_scope: string;
+  readonly coverage_notes: string | null;
+  readonly method_version: string;
+  readonly confidence: ConfidenceProjection;
+  readonly citation: CitationProjection;
+}
+
+export type SurnameRarityResult =
+  | {
+      readonly kind: "RESULT";
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity;
+      /** One entry per complete resource version. Never merged. */
+      readonly rarity_context: readonly RarityContextClaimResult[];
+      readonly surface_eligibility: readonly SurfaceEligibility[];
+    }
+  | {
+      readonly kind: "NO_RESULT";
+      readonly reason: NoRankReason;
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity | null;
+      readonly message: string;
+      readonly incomplete_universes?: readonly {
+        readonly source_record_id: string;
+        readonly external_record_id: string | null;
+        readonly reason: string;
+        readonly expected_row_count: number | null;
+        readonly actual_row_count: number;
+      }[];
+    };
