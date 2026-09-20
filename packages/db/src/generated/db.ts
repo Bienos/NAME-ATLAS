@@ -19,7 +19,7 @@ export type ConfidenceStatus = "CONFLICTING" | "INSUFFICIENT_DATA" | "LIKELY" | 
 
 export type EntityStatus = "ACTIVE" | "MERGED" | "RETRACTED" | "SUPERSEDED";
 
-export type EntityType = "NAME_FORM" | "SURNAME";
+export type EntityType = "NAME_FORM" | "PLACE" | "SURNAME";
 
 export type EpistemicType = "FACT" | "HYPOTHESIS" | "INTERPRETATION" | "UNKNOWN";
 
@@ -55,6 +55,12 @@ export type NameFormType = "CANONICAL" | "HISTORICAL_ATTESTED" | "LINGUISTIC_NOR
 
 export type Numeric = ColumnType<string, number | string, number | string>;
 
+export type PlaceNameType = "CURRENT" | "ENDONYM" | "EXONYM" | "HISTORICAL" | "OFFICIAL" | "OTHER" | "PARISH_FORM" | "TRANSCRIPTION";
+
+export type PlaceStatus = "ACTIVE" | "DISPUTED" | "HISTORICAL_ONLY" | "MERGED";
+
+export type PlaceType = "CITY" | "COUNTRY" | "COUNTY_DISTRICT" | "HISTORICAL_TERRITORY" | "MUNICIPALITY" | "OTHER" | "PARISH" | "PROVINCE_STATE" | "REGION" | "VILLAGE";
+
 export type PrivacyClass = "INTERNAL" | "PUBLIC" | "SENSITIVE_FAMILY" | "USER_PRIVATE";
 
 export type QaStatus = "FAIL" | "NOT_RUN" | "PASS" | "REVIEW_REQUIRED";
@@ -80,6 +86,8 @@ export type SourceRecordType = "API_OBJECT" | "ARTICLE" | "BOOK_ITEM" | "DATA_RO
 export type SourceReliabilityTier = "A_PRIMARY_OFFICIAL" | "B_AUTHORITATIVE_INDEX" | "C_SCHOLARLY_SECONDARY" | "D_TERTIARY_LEAD";
 
 export type SourceType = "ACADEMIC" | "ARCHIVE" | "COMMERCIAL_DATABASE" | "COMMUNITY_INDEX" | "DICTIONARY" | "DIGITAL_LIBRARY" | "OFFICIAL_DATASET" | "OTHER" | "PUBLICATION";
+
+export type SpatialPrecision = "APPROXIMATE" | "COUNTRY" | "EXACT_POINT" | "LOCALITY" | "MUNICIPALITY" | "REGION" | "UNKNOWN";
 
 export type SurnameStatus = "ACTIVE" | "AMBIGUOUS" | "DEPRECATED" | "MERGED";
 
@@ -171,6 +179,17 @@ export interface DistributionValues {
   surname_share: Numeric | null;
 }
 
+export interface EntityExternalIds {
+  created_at: Generated<Timestamp>;
+  entity_external_id: string;
+  entity_id: string;
+  external_id: string;
+  external_url: string | null;
+  provider_key: string;
+  valid_from: Timestamp | null;
+  valid_to: Timestamp | null;
+}
+
 export interface EvidenceDependencies {
   created_at: Generated<Timestamp>;
   dependency_role: EvidenceDependencyRole;
@@ -236,6 +255,30 @@ export interface NameForms {
   search_key: string;
   surname_id: string | null;
   unicode_nfc: string;
+}
+
+export interface PlaceNames {
+  created_at: Generated<Timestamp>;
+  language_code: string | null;
+  name: string;
+  name_type: PlaceNameType;
+  normalized_name: string;
+  place_id: string;
+  place_name_id: string;
+  script: string;
+  source_record_id: string | null;
+}
+
+export interface Places {
+  centroid: string | null;
+  created_at: Generated<Timestamp>;
+  current_country_code: string | null;
+  current_display_name: string;
+  entity_status: PlaceStatus;
+  place_id: string;
+  place_type: PlaceType;
+  spatial_precision: SpatialPrecision;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface ResearchRuns {
@@ -365,12 +408,15 @@ export interface DB {
   confidence_assessments: ConfidenceAssessments;
   distribution_snapshots: DistributionSnapshots;
   distribution_values: DistributionValues;
+  entity_external_ids: EntityExternalIds;
   evidence_dependencies: EvidenceDependencies;
   evidence_items: EvidenceItems;
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;
   knowledge_entities: KnowledgeEntities;
   name_forms: NameForms;
+  place_names: PlaceNames;
+  places: Places;
   research_runs: ResearchRuns;
   resolvable_name_forms: ResolvableNameForms;
   rights_profiles: RightsProfiles;

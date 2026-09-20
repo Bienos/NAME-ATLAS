@@ -676,8 +676,11 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
       // invariant this test protects — TASK-005 built no more than its own
       // slice — is unchanged, and `tests/integration/src/current-rank.test.ts`
       // asserts the table's shape.
+      // `places` left this list at TASK-011, which owns the voivodeship Place
+      // foundation. What TASK-005 must still not do is touch it: the assertion
+      // below checks the table is empty and no value carries a place, which is
+      // the property that actually mattered.
       for (const forbidden of [
-        "places",
         "digital_assets",
         "research_module_runs",
         "runtime_outbox",
@@ -685,6 +688,12 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
       ]) {
         expect(names).not.toContain(forbidden);
       }
+
+      const geographic = await sql<{ places: string; placed_values: string }>`
+        SELECT (SELECT count(*)::text FROM places)                                  AS places,
+               (SELECT count(*)::text FROM distribution_values WHERE place_id IS NOT NULL) AS placed_values
+      `.execute(db());
+      expect(geographic.rows[0]).toEqual({ places: "0", placed_values: "0" });
     });
   });
 });

@@ -125,10 +125,12 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     `.execute(db);
 
     // `0009`, `0008` and `0007` sit above `0006` and revert cleanly (two enum
-    // additions that cannot be removed, a data update, two dropped columns). The refusal under test is `0006`'s, so step
-    // past both first, then ask for the next step down.
+    // place tables, two enum additions that cannot be removed, a data update
+    // and two dropped columns). The refusal under test is `0006`'s, so step
+    // past all of them first, then ask for the next step down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0010_places_core",
       "0009_rarity_context",
       "0008_pesel_rights_decision",
       "0007_script_flags",

@@ -2111,3 +2111,104 @@ corrected, not the implementation.
 
 `CURRENT_DISTRIBUTION` (TASK-011 specified, then TASK-012), the fuzzy retrieval tiers, and the
 consumer UI. Nothing in the truth layer is now blocked on a decision.
+
+## TASK-011 implemented — the voivodeship `Place` foundation and regional ingestion (2026-09-20)
+
+Scope authority: `tasks/011-voivodeship-places-and-regional-ingestion.md`. D-004 was resolved
+"Preferred" on 2026-09-20. **Storage only: no claim, no share, no rank, no "most common in".**
+`CURRENT_DISTRIBUTION` is TASK-012 and may not begin until these figures exist — they now do.
+
+### What exists now
+
+| Path | What it is |
+|---|---|
+| `packages/db/migrations/0010_places_core.ts` | `places`, `place_names`, `entity_external_ids` and four enums; `PLACE` on `entity_type`. Voivodeship scope only |
+| `packages/sources/src/regional-schema.ts` | the three-column shape and the **closed** 16-value voivodeship set |
+| `packages/sources/src/regional-parser.ts` | fail-closed: a 17th value, a wrong column count, a count below 2, an LF ending each refuse the file |
+| `packages/sources/src/voivodeships.ts` | seeds the 16 `REGION` places from `fixtures/teryt/voivodeship-terc-correspondence.json`, idempotently |
+| `packages/sources/src/regional-importer.ts` | one surname-scoped `REGION` snapshot per surname, one value per (surname, voivodeship) cell with `place_id` |
+| `packages/sources/bin/import-pesel-regional.ts` | `pnpm --filter @name-atlas/sources run import-pesel-regional` |
+| `packages/sources/src/regional-parser.test.ts` | 14 unit tests |
+| `tests/integration/src/regional-ingestion.test.ts` | 14 integration tests |
+
+The regional importer **shares** the national importer's internals — `ensureRegistry`,
+`identityRows`, `insertChunked`, `rightsRefusal`, `sha256Hex` — rather than copying them. The
+registry gained the two regional descriptors with their official checksums and row counts, and
+`findPeselResource` now finds them: the D-004 gate that made them unapproved is lifted, and the
+test that pinned it was moved deliberately.
+
+### Two constraints the database now enforces rather than trusts
+
+- **`UNIQUE (provider_key, external_id)`** on `entity_external_ids`: TERYT `14` names exactly one
+  place, forever. A second claimant is rejected by the database, and a test proves it.
+- **A region may not carry a precise point** (`docs/canonical/11` §5.1). `centroid` is null on all
+  16 and a CHECK admits one only at `EXACT_POINT` or `LOCALITY` precision. TERC carries no
+  geometry, so null is the honest value; a test proves an attempted point is refused.
+
+### The real import — AC-7
+
+| Resource | Rows | Values | Places | Surnames reused | Regional sum | vs national | Time |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `1148786` male | 646,052 | 646,052 | 16 | 188,413 | 16,590,111 | **78.3%** of 21,197,537 | 42s |
+| `1148790` female | 694,553 | 694,553 | 16 | 206,804 | 17,296,363 | **80.2%** of 21,560,302 | 46s |
+
+Zero quarantined, zero surnames created (every regional surname already existed nationally), zero
+with no national row. `ЌATOVIЌ` appears in the female regional file too and was stored flagged, as
+TASK-010 decided. 1.34 million rows in 88 seconds, which is TASK-013's batching earning its place:
+on the per-row path this would have taken roughly an hour.
+
+**The residuals are exactly TASK-008's: 21.7% and 19.8%.** So is every per-surname figure, now
+reproduced through a different code path (importer plus SQL, against the spike's own analysis):
+
+| | Male `1148786` | Female `1148790` |
+|---|---:|---:|
+| Surnames with regional rows | 188,413 | 206,804 |
+| Regional sum **exceeding** the national count | **0** | **0** |
+| Regional sum **equal** to the national count | 46,808 | 58,631 |
+| Surnames with no national row | **0** | **0** |
+
+TASK-008 recorded 188,413 / 46,808 / 0 and 206,804 / 58,631 / 0. The one supported invariant —
+`regional sum ≤ national count`, with zero exceptions — holds across 395,217 surnames.
+
+### Invariants checked over the 1,340,605 regional values
+
+| Invariant | Observed |
+|---|---|
+| Every regional value references a place and keeps the publisher's string | 0 rows with a null `place_id` or `source_geography_key` |
+| Nothing derived (§10.10) | 0 rows with `rank`, `surname_share`, `population_denominator`, `population_rate` or `derivation_version` |
+| `universe_size` unknown for the regional universe too | null on all `REGION` snapshots |
+| One snapshot per (surname, resource) | 0 duplicates |
+| No zero rows | none; an absent cell is simply absent |
+
+### The national chains are untouched (AC-8)
+
+After 1.34 million regional rows landed, `NOWAK` reads exactly as before: counts 98,387 and 99,738,
+ranks **1 of 408,182** and **1 of 420,082**, rarity **1 in 215** and **1 in 216** over the national
+sums. The population read path selects on `geography_level`, so a regional row cannot be read as a
+national one — asserted in the integration suite as well as observed here.
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — **261 unit tests** (sources 74, up from 60) |
+| `pnpm test:integration` | **Passed** — **174 tests** across 11 files, exit 0 |
+| `pnpm db:migrate` on a fresh database | **Passed** — `0001`–`0010`; re-run reports no pending migrations |
+| `pnpm db:generate-types` | **Passed** — 22 tables; committed |
+| `pnpm build` | **Passed** |
+
+Four schema-inventory assertions moved, as every schema-adding task's do: the table list in
+`extensions.test.ts`, the `migrateDown` step list in `canonical-key-v2.test.ts`, and the two
+"forbidden table" lists that named `places`. The last two were **reframed rather than deleted** —
+what they protect is that a *national* import and the TASK-005 derivation build nothing geographic,
+so they now assert `places` is empty and no value carries a `place_id`, which is the property that
+actually mattered.
+
+### What TASK-012 may now assume, and what it may not
+
+It may assume: 16 `REGION` places with TERYT ids, `REGION` snapshots per surname, one value per
+cell with a `place_id`, and the reconciliation figures above. It may **not** assume that a regional
+sum equals a national count, that the residual is explained, or that a region may be compared with
+another sex's region. And the binding framing stands: this is *permanent registered residence*,
+never origin, ancestry, birthplace or unqualified current residence.

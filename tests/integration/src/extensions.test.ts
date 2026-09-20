@@ -59,6 +59,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0007_script_flags",
       "0008_pesel_rights_decision",
       "0009_rarity_context",
+      "0010_places_core",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -70,6 +71,10 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // `public`, TASK-003's three identity tables plus its one view,
     // TASK-004's five source/rights/distribution tables, and TASK-005's six
     // truth-layer tables.
+    //
+    // TASK-011 added `places`, `place_names` and `entity_external_ids`: the
+    // voivodeship Place foundation D-004's adoption required, pulled forward
+    // from M3 for exactly that reason and no wider.
     //
     // Anything beyond this set is an accidental table. TASK-009 added
     // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
@@ -84,6 +89,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "confidence_assessments", table_type: "BASE TABLE" },
       { table_name: "distribution_snapshots", table_type: "BASE TABLE" },
       { table_name: "distribution_values", table_type: "BASE TABLE" },
+      { table_name: "entity_external_ids", table_type: "BASE TABLE" },
       { table_name: "evidence_dependencies", table_type: "BASE TABLE" },
       { table_name: "evidence_items", table_type: "BASE TABLE" },
       { table_name: "geography_columns", table_type: "VIEW" },
@@ -92,6 +98,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "kysely_migration", table_type: "BASE TABLE" },
       { table_name: "kysely_migration_lock", table_type: "BASE TABLE" },
       { table_name: "name_forms", table_type: "BASE TABLE" },
+      { table_name: "place_names", table_type: "BASE TABLE" },
+      { table_name: "places", table_type: "BASE TABLE" },
       { table_name: "research_runs", table_type: "BASE TABLE" },
       { table_name: "resolvable_name_forms", table_type: "VIEW" },
       { table_name: "rights_profiles", table_type: "BASE TABLE" },

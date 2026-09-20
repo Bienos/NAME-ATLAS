@@ -165,7 +165,7 @@ export const PESEL_SOURCE: SourceSeed = {
  * or comparing the two resources. That is the enforcement for AC-17.
  */
 export interface PeselResourceDescriptor {
-  readonly role: "national_male" | "national_female";
+  readonly role: "national_male" | "national_female" | "regional_male" | "regional_female";
   /** The publisher's own resource id; `external_record_id` (ADR-0003). */
   readonly resource_id: string;
   readonly resource_title: string;
@@ -238,6 +238,72 @@ export const PESEL_NATIONAL_FEMALE_2026: PeselResourceDescriptor = {
 };
 
 /** The approved national production pair, in a stable order. */
+const REGIONAL_SCOPE_RESTRICTION =
+  "The geography is *wojew\u00f3dztwo zameldowania na pobyt sta\u0142y* \u2014 the voivodeship of PERMANENT " +
+  "REGISTERED RESIDENCE, a legal registration record. It is never surname origin, ancestry, " +
+  "birthplace, historical distribution, or \u2014 without qualification \u2014 current physical residence " +
+  "(D-004, binding). Suppression is applied per (surname, voivodeship) cell: an absent cell is " +
+  "zero, suppressed or out of scope, never a confirmed zero. The 16 voivodeship values do NOT " +
+  "account for the national totals \u2014 about 21.7% of male and 19.8% of female bearers appear in no " +
+  "voivodeship row at all, a gap per-cell suppression provably cannot explain and which is " +
+  "systematically biased toward recent-migration surnames (TASK-008). A regional count is " +
+  "therefore a count within the covered set, never a share of the national count, and the two " +
+  "sex partitions are never summed (U-1).";
+
+/**
+ * Regional resource `1148786` — male, by voivodeship of permanent registered
+ * residence. Adopted by D-004 (Preferred, 2026-09-20); ingested by TASK-011.
+ */
+export const PESEL_REGIONAL_MALE_2026: PeselResourceDescriptor = {
+  role: "regional_male",
+  resource_id: "1148786",
+  resource_title:
+    "Nazwiska m\u0119skie wg wojew\u00f3dztwa zameldowania na pobyt sta\u0142y - stan na 2026-01-20",
+  data_date: "2026-01-20",
+  portal_modified_at: "2026-01-28T13:32:49Z",
+  retrieved_at: "2026-09-18T17:43:16Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+  official_sha256: "0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51",
+  official_byte_size: 16_615_897,
+  official_row_count: 646_052,
+  universe_description:
+    "Wykaz nazwisk m\u0119skich os\u00f3b \u017cyj\u0105cych (wg pola nazwisko aktualne) wyst\u0119puj\u0105cych w rejestrze PESEL (bez zgon\u00f3w) w podziale na wojew\u00f3dztwa, stan na 20.01.2026",
+  methodology_key: "pesel_current_surname_regional_2026_male_resource",
+  comparability_group: "pesel_2026_regional_male",
+  coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+};
+
+/** Regional resource `1148790` — female, same basis. */
+export const PESEL_REGIONAL_FEMALE_2026: PeselResourceDescriptor = {
+  role: "regional_female",
+  resource_id: "1148790",
+  resource_title:
+    "Nazwiska \u017ce\u0144skie wg wojew\u00f3dztwa zameldowania na pobyt sta\u0142y - stan na 2026-01-20",
+  data_date: "2026-01-20",
+  portal_modified_at: "2026-01-28T13:35:13Z",
+  retrieved_at: "2026-09-18T17:42:32Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20",
+  official_sha256: "cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989",
+  official_byte_size: 17_900_370,
+  official_row_count: 694_553,
+  universe_description:
+    "Wykaz nazwisk \u017ce\u0144skich os\u00f3b \u017cyj\u0105cych (wg pola nazwisko aktualne) wyst\u0119puj\u0105cych w rejestrze PESEL w podziale na wojew\u00f3dztwa, stan na 20.01.2026",
+  methodology_key: "pesel_current_surname_regional_2026_female_resource",
+  comparability_group: "pesel_2026_regional_female",
+  coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+};
+
+export const PESEL_REGIONAL_RESOURCES_2026 = [
+  PESEL_REGIONAL_MALE_2026,
+  PESEL_REGIONAL_FEMALE_2026,
+] as const;
+
 export const PESEL_NATIONAL_RESOURCES_2026: readonly PeselResourceDescriptor[] = [
   PESEL_NATIONAL_MALE_2026,
   PESEL_NATIONAL_FEMALE_2026,
@@ -245,5 +311,7 @@ export const PESEL_NATIONAL_RESOURCES_2026: readonly PeselResourceDescriptor[] =
 
 /** Looks up an approved resource descriptor by the publisher's resource id. */
 export function findPeselResource(resourceId: string): PeselResourceDescriptor | undefined {
-  return PESEL_NATIONAL_RESOURCES_2026.find((r) => r.resource_id === resourceId);
+  return [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026].find(
+    (r) => r.resource_id === resourceId,
+  );
 }

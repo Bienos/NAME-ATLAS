@@ -9,7 +9,8 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
-    "import-pesel": "tsx bin/import-pesel.ts"
+    "import-pesel": "tsx bin/import-pesel.ts",
+    "import-pesel-regional": "tsx bin/import-pesel-regional.ts"
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",

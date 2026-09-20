@@ -10,6 +10,9 @@ import {
   PESEL_RIGHTS_PROFILE,
   PESEL_SOURCE,
   PESEL_SOURCE_KEY,
+  PESEL_REGIONAL_MALE_2026,
+  PESEL_REGIONAL_FEMALE_2026,
+  PESEL_REGIONAL_RESOURCES_2026,
 } from "./registry.js";
 
 /**
@@ -183,8 +186,47 @@ describe("approved resource descriptors", () => {
 
   it("finds an approved resource by id and refuses an unknown one", () => {
     expect(findPeselResource("1148808")).toBe(PESEL_NATIONAL_MALE_2026);
-    // The regional resources exist but are gated by D-004 and not approved here.
-    expect(findPeselResource("1148786")).toBeUndefined();
+    // The regional pair was gated by D-004 until 2026-09-20, when the project
+    // owner adopted it (Preferred). It is approved now, so the registry finds
+    // it — with its scope restriction carried in `coverage_notes`, which is
+    // where the adoption's condition actually lives.
+    expect(findPeselResource("1148786")).toBe(PESEL_REGIONAL_MALE_2026);
+    expect(findPeselResource("1148790")).toBe(PESEL_REGIONAL_FEMALE_2026);
     expect(findPeselResource("nonsense")).toBeUndefined();
+  });
+
+  it("carries the registered-residence restriction on every regional descriptor (D-004)", () => {
+    for (const resource of PESEL_REGIONAL_RESOURCES_2026) {
+      expect(resource.coverage_notes).toMatch(/PERMANENT\s+REGISTERED RESIDENCE/u);
+      expect(resource.coverage_notes).toMatch(/never surname origin/u);
+      // The residual is part of the record, not a footnote someone may drop.
+      expect(resource.coverage_notes).toMatch(/21\.7%/u);
+      expect(resource.coverage_notes).toMatch(/19\.8%/u);
+      // Each partition is its own comparability group, so §6.1 forbids summing.
+      expect(resource.comparability_group).toMatch(/^pesel_2026_regional_(male|female)$/u);
+    }
+    expect(PESEL_REGIONAL_MALE_2026.comparability_group).not.toBe(
+      PESEL_REGIONAL_FEMALE_2026.comparability_group,
+    );
+    // And a regional group is never a national one.
+    expect(PESEL_REGIONAL_MALE_2026.comparability_group).not.toBe(
+      PESEL_NATIONAL_MALE_2026.comparability_group,
+    );
+  });
+
+  it("pins the regional resources' official checksums and row counts", () => {
+    expect(PESEL_REGIONAL_MALE_2026.official_sha256).toBe(
+      "0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51",
+    );
+    expect(PESEL_REGIONAL_MALE_2026.official_row_count).toBe(646_052);
+    expect(PESEL_REGIONAL_FEMALE_2026.official_sha256).toBe(
+      "cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989",
+    );
+    expect(PESEL_REGIONAL_FEMALE_2026.official_row_count).toBe(694_553);
+    // The reference date is the PESEL date, never the portal timestamp.
+    for (const resource of PESEL_REGIONAL_RESOURCES_2026) {
+      expect(resource.data_date).toBe("2026-01-20");
+      expect(resource.portal_modified_at).not.toBe(resource.data_date);
+    }
   });
 });

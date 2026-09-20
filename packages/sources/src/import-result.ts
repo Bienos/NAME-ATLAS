@@ -136,3 +136,93 @@ export function assertReconciles(report: ReconciliationReport): void {
     );
   }
 }
+
+/**
+ * What a regional import did (TASK-011). A separate shape from
+ * {@link ReconciliationReport} on purpose: the facts differ, and a widened
+ * national report would invite reading a regional figure as a national one.
+ *
+ * `rowsRead === rowsImported + rowsQuarantined` still holds. `valuesWritten`
+ * counts (surname, voivodeship) cells; `snapshotsWritten` counts surnames,
+ * since a `DistributionSnapshot` is surname-scoped.
+ */
+export interface RegionalReconciliationReport {
+  readonly resourceId: string;
+  readonly rowsRead: number;
+  readonly rowsImported: number;
+  readonly rowsQuarantined: number;
+  readonly quarantinedByReason: Readonly<Record<string, number>>;
+  readonly surnamesCreated: number;
+  readonly surnamesReused: number;
+  readonly snapshotsWritten: number;
+  readonly valuesWritten: number;
+  /** Distinct voivodeship places referenced. 16 for a complete resource. */
+  readonly placesReferenced: number;
+  readonly mixedScriptRows: readonly FlaggedRow[];
+  /**
+   * The sum of every count in this resource, **reported, never asserted as
+   * equal to anything**. TASK-008 established the one supported invariant:
+   * a surname's regional sum is at most its national count, with a large
+   * residual the voivodeships do not account for.
+   */
+  readonly regionalCountSum: number;
+  /** Surnames present regionally with no national row. TASK-008 observed 0. */
+  readonly surnamesWithoutNationalRow: number;
+}
+
+export type RegionalImportOutcome =
+  | {
+      readonly kind: "IMPORTED";
+      readonly sourceRecordId: string;
+      readonly supersededSourceRecordId: string | null;
+      readonly report: RegionalReconciliationReport;
+    }
+  | {
+      readonly kind: "ALREADY_IMPORTED";
+      readonly sourceRecordId: string;
+      readonly report: RegionalReconciliationReport;
+    }
+  | {
+      readonly kind: "FAILED";
+      readonly reason: ImportFailureReason;
+      readonly message: string;
+      readonly quarantined: readonly QuarantinedRow[];
+      readonly report: RegionalReconciliationReport | null;
+      readonly cause?: unknown;
+    };
+
+/** An empty regional report, used when a run fails before counting. */
+export function emptyRegionalReport(resourceId: string): RegionalReconciliationReport {
+  return {
+    resourceId,
+    rowsRead: 0,
+    rowsImported: 0,
+    rowsQuarantined: 0,
+    quarantinedByReason: {},
+    surnamesCreated: 0,
+    surnamesReused: 0,
+    snapshotsWritten: 0,
+    valuesWritten: 0,
+    placesReferenced: 0,
+    mixedScriptRows: [],
+    regionalCountSum: 0,
+    surnamesWithoutNationalRow: 0,
+  };
+}
+
+/** The same arithmetic guard as {@link assertReconciles}, for a regional run. */
+export function assertRegionalReconciles(report: RegionalReconciliationReport): void {
+  if (report.rowsRead !== report.rowsImported + report.rowsQuarantined) {
+    throw new Error(
+      `regional reconciliation failed for ${report.resourceId}: rowsRead ${report.rowsRead} !== ` +
+        `rowsImported ${report.rowsImported} + rowsQuarantined ${report.rowsQuarantined}`,
+    );
+  }
+  if (report.rowsImported > 0 && report.valuesWritten !== report.rowsImported) {
+    throw new Error(
+      `regional reconciliation failed for ${report.resourceId}: valuesWritten ` +
+        `${report.valuesWritten} !== rowsImported ${report.rowsImported}; every imported row is ` +
+        "exactly one (surname, voivodeship) value",
+    );
+  }
+}

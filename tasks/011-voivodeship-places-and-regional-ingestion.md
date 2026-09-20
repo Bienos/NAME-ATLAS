@@ -1,6 +1,11 @@
 # TASK-011 — Voivodeship `Place` foundation and PESEL regional ingestion (D-004, Preferred)
 
-- **Status:** SPECIFIED 2026-09-20, not implemented. Implementation is its own session.
+- **Status:** IMPLEMENTED 2026-09-20. AC-1 to AC-6 and AC-8 verified in tests; AC-7 (the full
+  official import) is recorded in `PROGRESS.md`.
+- **Correction to this spec, made while implementing:** it named migration `0008_places_core`. By
+  the time the work ran, `0008` and `0009` were taken (D-007's rights decision and TASK-014's
+  `RARITY_CONTEXT`), so the migration is **`0010_places_core`**. Nothing else about §3 item 1
+  changed.
 - **Created:** 2026-09-20, at the project owner's direction, resolving D-004 as **Preferred**:
   adopt the current official regional pair `1148786` / `1148790` as a *registered-domicile*
   regional distribution.

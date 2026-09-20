@@ -782,14 +782,27 @@ describe("PESEL ingestion against a real PostgreSQL", () => {
       }
     });
 
-    it("creates no table TASK-004 excluded", async () => {
+    it("creates no table TASK-004 excluded, and writes no row in a later task's tables", async () => {
       const tables = await sql<{ table_name: string }>`
         SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'
       `.execute(db());
       const names = tables.rows.map((r) => r.table_name);
-      for (const forbidden of ["digital_assets", "places", "name_form_relations"]) {
+      for (const forbidden of ["digital_assets", "name_form_relations"]) {
         expect(names).not.toContain(forbidden);
       }
+
+      // `places` was on that list until TASK-011, which created the
+      // voivodeship Place foundation (D-004 "Preferred"). The invariant this
+      // test protects is that a NATIONAL import builds nothing geographic:
+      // the table may exist, but this import leaves it empty and every
+      // national value's `place_id` stays null (docs/canonical/11 §6.2).
+      expect(names).toContain("places");
+      const geographic = await sql<{ places: string; ids: string; placed_values: string }>`
+        SELECT (SELECT count(*)::text FROM places)                                  AS places,
+               (SELECT count(*)::text FROM entity_external_ids)                     AS ids,
+               (SELECT count(*)::text FROM distribution_values WHERE place_id IS NOT NULL) AS placed_values
+      `.execute(db());
+      expect(geographic.rows[0]).toEqual({ places: "0", ids: "0", placed_values: "0" });
     });
   });
 });

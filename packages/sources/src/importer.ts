@@ -151,9 +151,9 @@ function collectDistinct(rows: readonly PeselSourceRow[]): {
  * slash and a non-Latin script all survive verbatim (AC-05).
  */
 /** Rows of at most this many per INSERT (TASK-013). */
-const INSERT_CHUNK = 1_000;
+export const INSERT_CHUNK = 1_000;
 
-async function insertChunked<T extends keyof DB>(
+export async function insertChunked<T extends keyof DB>(
   trx: Transaction<DB>,
   table: T,
   rows: readonly Parameters<ReturnType<Transaction<DB>["insertInto"]>["values"]>[0][],
@@ -166,7 +166,7 @@ async function insertChunked<T extends keyof DB>(
   }
 }
 
-interface IdentityRows {
+export interface IdentityRows {
   readonly surnameId: string;
   readonly entities: readonly Insertable<DB["knowledge_entities"]>[];
   readonly surname: Insertable<DB["surnames"]>;
@@ -179,7 +179,7 @@ interface IdentityRows {
  * caller (TASK-013). Nothing about the rows changed with batching — the
  * display is NFC only, the key is the resolver's, the flags are as detected.
  */
-function identityRows(sourceString: string): IdentityRows {
+export function identityRows(sourceString: string): IdentityRows {
   const surnameId = uuidv7();
   const nameFormId = uuidv7();
   const display = toNfc(sourceString);
@@ -236,7 +236,10 @@ function identityRows(sourceString: string): IdentityRows {
 }
 
 /** Ensures the PESEL Source and its RightsProfile exist. Idempotent. */
-async function ensureRegistry(trx: Transaction<DB>, profile: RightsProfileSeed): Promise<string> {
+export async function ensureRegistry(
+  trx: Transaction<DB>,
+  profile: RightsProfileSeed,
+): Promise<string> {
   const existing = await trx
     .selectFrom("sources")
     .select(["source_id"])
