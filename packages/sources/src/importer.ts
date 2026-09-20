@@ -35,13 +35,13 @@
  *         import back, rather than producing a duplicate identity.
  */
 import { createHash } from "node:crypto";
-import type { Kysely, Transaction } from "kysely";
+import type { Insertable, Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
 import {
   canonicalKey,
   detectScripts,
-  resolveSurname,
+  resolveSurnamesBulk,
   toNfc,
   CANONICAL_KEY_VERSION,
   NORMALIZATION_VERSION,
@@ -150,17 +150,45 @@ function collectDistinct(rows: readonly PeselSourceRow[]): {
  * (NFC only) — a trailing space, a standalone combining mark, an embedded
  * slash and a non-Latin script all survive verbatim (AC-05).
  */
-async function createIdentity(trx: Transaction<DB>, sourceString: string): Promise<string> {
+/** Rows of at most this many per INSERT (TASK-013). */
+const INSERT_CHUNK = 1_000;
+
+async function insertChunked<T extends keyof DB>(
+  trx: Transaction<DB>,
+  table: T,
+  rows: readonly Parameters<ReturnType<Transaction<DB>["insertInto"]>["values"]>[0][],
+): Promise<void> {
+  for (let i = 0; i < rows.length; i += INSERT_CHUNK) {
+    await trx
+      .insertInto(table)
+      .values(rows.slice(i, i + INSERT_CHUNK) as never)
+      .execute();
+  }
+}
+
+interface IdentityRows {
+  readonly surnameId: string;
+  readonly entities: readonly Insertable<DB["knowledge_entities"]>[];
+  readonly surname: Insertable<DB["surnames"]>;
+  readonly nameForm: Insertable<DB["name_forms"]>;
+}
+
+/**
+ * The rows for a brand-new identity: a Surname, its one CANONICAL NameForm
+ * and their two knowledge entities. Built here, inserted in chunks by the
+ * caller (TASK-013). Nothing about the rows changed with batching — the
+ * display is NFC only, the key is the resolver's, the flags are as detected.
+ */
+function identityRows(sourceString: string): IdentityRows {
   const surnameId = uuidv7();
   const nameFormId = uuidv7();
   const display = toNfc(sourceString);
   const key = canonicalKey(sourceString);
   const detection = detectScripts(display);
   const script = detection.primary_script;
-
-  await trx
-    .insertInto("knowledge_entities")
-    .values([
+  return {
+    surnameId,
+    entities: [
       {
         entity_id: surnameId,
         entity_type: "SURNAME",
@@ -175,12 +203,8 @@ async function createIdentity(trx: Transaction<DB>, sourceString: string): Promi
         privacy_class: "PUBLIC",
         lifecycle_status: "ACTIVE",
       },
-    ])
-    .execute();
-
-  await trx
-    .insertInto("surnames")
-    .values({
+    ],
+    surname: {
       surname_id: surnameId,
       canonical_display: display,
       canonical_key: key,
@@ -193,12 +217,8 @@ async function createIdentity(trx: Transaction<DB>, sourceString: string): Promi
       // (TASK-010). False for every single-script row.
       mixed_script: detection.mixed_script,
       script_confusable_flag: detection.script_confusable_flag,
-    })
-    .execute();
-
-  await trx
-    .insertInto("name_forms")
-    .values({
+    },
+    nameForm: {
       name_form_id: nameFormId,
       surname_id: surnameId,
       form: display,
@@ -211,10 +231,8 @@ async function createIdentity(trx: Transaction<DB>, sourceString: string): Promi
       // spelling. Nothing here is generated (AC-11, AC-13).
       form_type: "CANONICAL",
       attestation_status: "ATTESTED",
-    })
-    .execute();
-
-  return surnameId;
+    },
+  };
 }
 
 /** Ensures the PESEL Source and its RightsProfile exist. Idempotent. */
@@ -359,11 +377,22 @@ export async function importPeselResource(
   const identities = new Map<string, ResolvedIdentity>();
   const quarantined: QuarantinedRow[] = [];
   const mixedScriptRows: FlaggedRow[] = [];
-  for (const entry of distinct) {
-    // An authoritative register's own row is evidence of what the register
-    // says, so a mixed-script value is resolved on its exact key and its
-    // finding is carried along, not refused (TASK-010, canonical 13 §10.4).
-    const outcome = await resolveSurname(db, entry.surname, { mixedScript: "RESOLVE_FLAGGED" });
+  // One READ ONLY transaction for every distinct string (TASK-013), through
+  // the resolver's own bulk entry point — the same validation, keying and
+  // T0/T1 classification as `resolveSurname`, fetched in lists.
+  // An authoritative register's own row is evidence of what the register
+  // says, so a mixed-script value is resolved on its exact key and its
+  // finding is carried along, not refused (TASK-010, canonical 13 §10.4).
+  const outcomes = await resolveSurnamesBulk(
+    db,
+    distinct.map((entry) => entry.surname),
+    { mixedScript: "RESOLVE_FLAGGED" },
+  );
+  for (const [index, entry] of distinct.entries()) {
+    const outcome = outcomes[index];
+    if (outcome === undefined) {
+      throw new Error(`bulk resolution returned no outcome for line ${entry.firstLine}`);
+    }
     if (outcome.kind === "LOOKUP_FAILED") {
       // Infrastructure failure, never "this surname is unknown".
       return {
@@ -484,6 +513,9 @@ export async function importPeselResource(
       let surnamesCreated = 0;
       let surnamesReused = 0;
       const surnameIdByKey = new Map<string, string>();
+      const newEntities: Insertable<DB["knowledge_entities"]>[] = [];
+      const newSurnames: Insertable<DB["surnames"]>[] = [];
+      const newForms: Insertable<DB["name_forms"]>[] = [];
       for (const entry of distinct) {
         const identity = identities.get(entry.key);
         if (identity?.surnameId) {
@@ -491,15 +523,27 @@ export async function importPeselResource(
           surnamesReused += 1;
           continue;
         }
-        surnameIdByKey.set(entry.key, await createIdentity(trx, entry.surname));
+        const built = identityRows(entry.surname);
+        surnameIdByKey.set(entry.key, built.surnameId);
+        newEntities.push(...built.entities);
+        newSurnames.push(built.surname);
+        newForms.push(built.nameForm);
         surnamesCreated += 1;
       }
+      // Parents before children, each table in chunks, all in this one
+      // transaction. A canonical-key collision with a concurrent writer
+      // still fails the whole resource here (U-7).
+      await insertChunked(trx, "knowledge_entities", newEntities);
+      await insertChunked(trx, "surnames", newSurnames);
+      await insertChunked(trx, "name_forms", newForms);
 
       // Distribution: one surname-scoped snapshot per row, and exactly one
       // national value per snapshot (place_id null). Every derived column
       // stays null — this task stores, it does not derive.
-      let snapshotsWritten = 0;
-      let valuesWritten = 0;
+      // Buffered per table and inserted in chunks (TASK-013); one snapshot
+      // and one value per row, exactly as before.
+      const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
+      const newValues: Insertable<DB["distribution_values"]>[] = [];
       for (const row of rows) {
         const key = canonicalKey(row.surname);
         const surnameId = surnameIdByKey.get(key);
@@ -507,51 +551,46 @@ export async function importPeselResource(
           throw new Error(`no identity resolved for canonical key ${JSON.stringify(key)}`);
         }
         const snapshotId = uuidv7();
-        await trx
-          .insertInto("distribution_snapshots")
-          .values({
-            distribution_snapshot_id: snapshotId,
-            surname_id: surnameId,
-            source_id: sourceId,
-            source_record_id: sourceRecordId,
-            // The PESEL reference date — never the portal timestamp and
-            // never retrieved_at.
-            as_of_date: resource.data_date,
-            dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
-            geography_level: "NATIONAL",
-            universe_description: resource.universe_description,
-            // Denominator not verified; storing one would be invention
-            // (TASK-004 §14 U-6).
-            universe_size: null,
-            // The national count lives in the single DistributionValue
-            // below. Writing it here too would give one source fact two
-            // places to drift apart.
-            surname_total_count: null,
-            methodology_key: resource.methodology_key,
-            comparability_group: resource.comparability_group,
-            coverage_notes: resource.coverage_notes,
-          })
-          .execute();
-        snapshotsWritten += 1;
-
-        await trx
-          .insertInto("distribution_values")
-          .values({
-            distribution_value_id: uuidv7(),
-            distribution_snapshot_id: snapshotId,
-            // National aggregate (docs/canonical/11 §6.2).
-            place_id: null,
-            source_geography_key: null,
-            count: BigInt(row.count),
-            population_denominator: null,
-            surname_share: null,
-            population_rate: null,
-            rank: null,
-            derivation_version: null,
-          })
-          .execute();
-        valuesWritten += 1;
+        newSnapshots.push({
+          distribution_snapshot_id: snapshotId,
+          surname_id: surnameId,
+          source_id: sourceId,
+          source_record_id: sourceRecordId,
+          // The PESEL reference date — never the portal timestamp and
+          // never retrieved_at.
+          as_of_date: resource.data_date,
+          dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
+          geography_level: "NATIONAL",
+          universe_description: resource.universe_description,
+          // Denominator not verified; storing one would be invention
+          // (TASK-004 §14 U-6).
+          universe_size: null,
+          // The national count lives in the single DistributionValue
+          // below. Writing it here too would give one source fact two
+          // places to drift apart.
+          surname_total_count: null,
+          methodology_key: resource.methodology_key,
+          comparability_group: resource.comparability_group,
+          coverage_notes: resource.coverage_notes,
+        });
+        newValues.push({
+          distribution_value_id: uuidv7(),
+          distribution_snapshot_id: snapshotId,
+          // National aggregate (docs/canonical/11 §6.2).
+          place_id: null,
+          source_geography_key: null,
+          count: BigInt(row.count),
+          population_denominator: null,
+          surname_share: null,
+          population_rate: null,
+          rank: null,
+          derivation_version: null,
+        });
       }
+      await insertChunked(trx, "distribution_snapshots", newSnapshots);
+      await insertChunked(trx, "distribution_values", newValues);
+      const snapshotsWritten = newSnapshots.length;
+      const valuesWritten = newValues.length;
 
       const report: ReconciliationReport = {
         resourceId: resource.resource_id,

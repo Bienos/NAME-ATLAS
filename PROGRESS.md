@@ -1950,3 +1950,49 @@ Both national resources are complete universes. `CURRENT_POPULATION` and `CURREN
 either sex over real data. Still open: `RARITY_CONTEXT` (U-6's denominator — the sum of counts is
 a lower bound, not a universe), D-007 (licence, gating paid surfaces), TASK-011 (regional storage,
 specified), and the read-layer observation above.
+
+## TASK-013 implemented — importer throughput, ~20×, byte-identical output (2026-09-20)
+
+Scope authority: `tasks/013-importer-throughput.md`. Done ahead of TASK-011 so its 1.3 million
+regional rows do not take an hour.
+
+### What changed
+
+| Path | Change |
+|---|---|
+| `packages/resolver/src/lookup.ts` | T0/T1 classification extracted into pure functions (`classifyCanonical`, `classifyForms`, `knownVariant`) that both paths call; `resolveSurnamesBulk` added — one `READ ONLY` transaction, `IN (…)` lists of at most 5,000 keys, one outcome per input in input order, `LOOKUP_FAILED` for every pending input on a database failure |
+| `packages/sources/src/importer.ts` | read pass: one `resolveSurnamesBulk` call with `RESOLVE_FLAGGED`; write pass: rows buffered per table and inserted in chunks of 1,000 (`identityRows` builds what `createIdentity` used to insert one at a time). Still one transaction, still U-7 via the UNIQUE constraint, still U-5(a) |
+| `tests/integration/src/bulk-resolution.test.ts` | 5 tests — input-by-input equality with `resolveSurname` over EXACT, KNOWN_VARIANT, MULTIPLE_EXACT, UNKNOWN, mixed-script under both policies, EMPTY, control characters, the limit, duplicates; the empty batch; the all-invalid batch; a dead handle |
+
+`resolveSurname`'s signature and behaviour are unchanged; the API never calls the bulk path.
+
+### Measured
+
+| Run | Before (per-row path, 2026-09-20 morning) | After (this change) |
+|---|---|---|
+| Full male resource `1148808`, 408,182 rows, fresh database | **22m28s** | **1m07s** |
+
+### Same data, proven not assumed (AC-3)
+
+Over the checksum-matched `1148808` source record in each database — the dev database imported with
+the old path this morning, a fresh database imported with the new path just now:
+
+| | Old path (dev) | New path (fresh) |
+|---|---|---|
+| Snapshots | 408,182 | 408,182 |
+| Sum of counts | 21,197,537 | 21,197,537 |
+| Distinct display forms | 408,182 | 408,182 |
+| `md5` over every `(canonical_key, count)` pair in key order | `b44bd17cd9a8f91bc31991930881e3dd` | `b44bd17cd9a8f91bc31991930881e3dd` |
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` / `pnpm lint` / `pnpm format:check` | **Passed** |
+| `pnpm test` | **Passed** — 235 unit tests |
+| `pnpm test:integration` | **Passed** — **148 tests** across 9 files (143 before, 5 new). One run exited non-zero with every test green, which is the documented teardown race in the shared-server fallback; it did not reproduce on the re-run |
+| `pnpm build` | **Passed** |
+
+Environment note, not a repository fact: the local PostgreSQL was killed twice today between
+commands, without a log entry and with memory idle — the container reaps it when a shell goes idle.
+Restarted each time; nothing in the data was affected.

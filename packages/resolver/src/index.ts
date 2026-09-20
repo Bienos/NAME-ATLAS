@@ -27,7 +27,7 @@ export type {
   SurnameResolution,
   SurnameResolutionStatus,
 } from "./resolution.js";
-export { resolveSurname } from "./lookup.js";
+export { resolveSurname, resolveSurnamesBulk } from "./lookup.js";
 export type { MixedScriptPolicy, ResolveOptions } from "./lookup.js";
 export {
   CANONICAL_KEY_VERSION,

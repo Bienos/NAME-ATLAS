@@ -123,21 +123,31 @@ function statusForInvalidInput(validation: InputValidation): SurnameResolutionSt
   }
 }
 
-/** Tier T0: exact canonical key. Unique by the `surnames.canonical_key` constraint. */
-async function matchCanonical(read: ReadOnlyQueries, key: string): Promise<MatchResult | null> {
-  const rows = await read
-    .selectFrom("surnames")
-    .select(["surname_id", "canonical_display"])
-    .where("canonical_key", "=", key)
-    .orderBy("surname_id")
-    .execute();
+interface CanonicalRow {
+  readonly surname_id: string;
+  readonly canonical_display: string;
+}
 
+interface EligibleForm {
+  readonly name_form_id: string;
+  readonly surname_id: string;
+  readonly form: string;
+}
+
+/**
+ * Tier T0 classification over the `surnames` rows sharing one canonical
+ * key. Unique by the `surnames.canonical_key` constraint, so at most one
+ * row is expected; more than one is a broken invariant and fails closed
+ * rather than picking one (TASK-003 §6.1 ambiguity rule).
+ *
+ * Pure: the single lookup and the bulk lookup (TASK-013) both call this on
+ * rows they fetched, so the two paths cannot classify differently.
+ */
+function classifyCanonical(rows: readonly CanonicalRow[]): MatchResult | null {
   if (rows.length === 0) {
     return null;
   }
   if (rows.length > 1) {
-    // Unreachable while the UNIQUE constraint holds. If it ever does not,
-    // fail closed rather than pick one (TASK-003 §6.1 ambiguity rule).
     return {
       ...NO_MATCH,
       resolution_status: "MULTIPLE_EXACT",
@@ -156,39 +166,22 @@ async function matchCanonical(read: ReadOnlyQueries, key: string): Promise<Match
   };
 }
 
-interface EligibleForm {
-  readonly name_form_id: string;
-  readonly surname_id: string;
-  readonly form: string;
-}
-
 /**
- * Tier T1: exact match against an eligible NameForm. Eligibility is not a
- * predicate here — it is the `resolvable_name_forms` view's definition
- * (migration 0002), so an ineligible row is invisible to this query.
+ * Tier T1 classification over the eligible NameForms sharing one search
+ * key. Eligibility is not a predicate here — it is the
+ * `resolvable_name_forms` view's definition (migration 0002), so an
+ * ineligible row never reaches this function.
+ *
+ * Returns the matched form when exactly one surname is named, so the caller
+ * can fetch that surname's display; `null` for no match; `MULTIPLE_EXACT`
+ * when the forms disagree.
  */
-async function matchNameForm(read: ReadOnlyQueries, key: string): Promise<MatchResult> {
-  const rows = await read
-    .selectFrom("resolvable_name_forms")
-    .select(["name_form_id", "surname_id", "form"])
-    .where("search_key", "=", key)
-    .orderBy("name_form_id")
-    .execute();
-
-  // kysely-codegen types every view column as nullable; the view's own
-  // WHERE clause guarantees these are not. Treat a violation as a failure,
-  // never as data.
-  const forms: EligibleForm[] = rows.map((row) => {
-    if (row.name_form_id === null || row.surname_id === null || row.form === null) {
-      throw new Error("resolvable_name_forms returned a row violating its own definition");
-    }
-    return { name_form_id: row.name_form_id, surname_id: row.surname_id, form: row.form };
-  });
-
+function classifyForms(
+  forms: readonly EligibleForm[],
+): { readonly kind: "NONE" } | { readonly kind: "ONE"; readonly form: EligibleForm } | MatchResult {
   if (forms.length === 0) {
-    return NO_MATCH;
+    return { kind: "NONE" };
   }
-
   const distinctSurnameIds = [...new Set(forms.map((form) => form.surname_id))];
   if (distinctSurnameIds.length > 1) {
     return {
@@ -197,28 +190,118 @@ async function matchNameForm(read: ReadOnlyQueries, key: string): Promise<MatchR
       candidate_surname_ids: [...distinctSurnameIds].sort(),
     };
   }
-
   const [matched] = forms;
   if (!matched) {
+    return { kind: "NONE" };
+  }
+  return { kind: "ONE", form: matched };
+}
+
+function knownVariant(form: EligibleForm, surname: CanonicalRow): MatchResult {
+  return {
+    ...NO_MATCH,
+    resolution_status: "KNOWN_VARIANT",
+    resolved_surname_id: surname.surname_id,
+    resolved_canonical_display: surname.canonical_display,
+    matched_name_form_id: form.name_form_id,
+    matched_form: form.form,
+  };
+}
+
+/**
+ * kysely-codegen types every view column as nullable; the view's own WHERE
+ * clause guarantees these are not. A violation is a failure, never data.
+ */
+function eligibleForm(row: {
+  name_form_id: string | null;
+  surname_id: string | null;
+  form: string | null;
+}): EligibleForm {
+  if (row.name_form_id === null || row.surname_id === null || row.form === null) {
+    throw new Error("resolvable_name_forms returned a row violating its own definition");
+  }
+  return { name_form_id: row.name_form_id, surname_id: row.surname_id, form: row.form };
+}
+
+/** Tier T0 for one key. */
+async function matchCanonical(read: ReadOnlyQueries, key: string): Promise<MatchResult | null> {
+  const rows = await read
+    .selectFrom("surnames")
+    .select(["surname_id", "canonical_display"])
+    .where("canonical_key", "=", key)
+    .orderBy("surname_id")
+    .execute();
+  return classifyCanonical(rows);
+}
+
+/** Tier T1 for one key. */
+async function matchNameForm(read: ReadOnlyQueries, key: string): Promise<MatchResult> {
+  const rows = await read
+    .selectFrom("resolvable_name_forms")
+    .select(["name_form_id", "surname_id", "form"])
+    .where("search_key", "=", key)
+    .orderBy("name_form_id")
+    .execute();
+  const classified = classifyForms(rows.map(eligibleForm));
+  if ("resolution_status" in classified) {
+    return classified;
+  }
+  if (classified.kind === "NONE") {
     return NO_MATCH;
   }
   const surname = await read
     .selectFrom("surnames")
     .select(["surname_id", "canonical_display"])
-    .where("surname_id", "=", matched.surname_id)
+    .where("surname_id", "=", classified.form.surname_id)
     .executeTakeFirst();
   if (!surname) {
     // The view joins on an existing FK; a missing parent is a broken invariant.
-    throw new Error(`name_form ${matched.name_form_id} references missing surname`);
+    throw new Error(`name_form ${classified.form.name_form_id} references missing surname`);
   }
+  return knownVariant(classified.form, surname);
+}
 
+/** Validates and keys an input; shared by the single and bulk paths. */
+function seedFor(rawInput: string, options: ResolveOptions): ResolutionSeed {
   return {
-    resolution_status: "KNOWN_VARIANT",
-    resolved_surname_id: surname.surname_id,
-    resolved_canonical_display: surname.canonical_display,
-    candidate_surname_ids: [],
-    matched_name_form_id: matched.name_form_id,
-    matched_form: matched.form,
+    rawInput,
+    nfc: toNfc(rawInput),
+    key: canonicalKey(rawInput),
+    validation: validateSurnameInput(rawInput, options),
+  };
+}
+
+/** True when the seed must not reach the database (AC-08), per the mixed-script policy. */
+function shortCircuits(seed: ResolutionSeed, options: ResolveOptions): boolean {
+  const proceedFlagged =
+    seed.validation.status === "MIXED_SCRIPT_REVIEW" && options.mixedScript === "RESOLVE_FLAGGED";
+  return seed.validation.status !== "VALID" && !proceedFlagged;
+}
+
+function invalidResolution(seed: ResolutionSeed): SurnameLookupOutcome {
+  return {
+    kind: "RESOLUTION",
+    resolution: buildResolution(seed, {
+      ...NO_MATCH,
+      resolution_status: statusForInvalidInput(seed.validation),
+    }),
+  };
+}
+
+function lookupFailure(
+  seed: ResolutionSeed,
+  stage: LookupStage,
+  cause: unknown,
+): SurnameLookupOutcome {
+  return {
+    kind: "LOOKUP_FAILED",
+    raw_input: seed.rawInput,
+    unicode_nfc: seed.nfc,
+    canonical_key: seed.key,
+    resolution_method_version: RESOLUTION_METHOD_VERSION,
+    stage,
+    message: cause instanceof Error ? cause.message : String(cause),
+    cause,
   };
 }
 
@@ -235,24 +318,9 @@ export async function resolveSurname(
   rawInput: string,
   options: ResolveOptions = {},
 ): Promise<SurnameLookupOutcome> {
-  const validation = validateSurnameInput(rawInput, options);
-  const seed: ResolutionSeed = {
-    rawInput,
-    nfc: toNfc(rawInput),
-    key: canonicalKey(rawInput),
-    validation,
-  };
-
-  const proceedFlagged =
-    validation.status === "MIXED_SCRIPT_REVIEW" && options.mixedScript === "RESOLVE_FLAGGED";
-  if (validation.status !== "VALID" && !proceedFlagged) {
-    return {
-      kind: "RESOLUTION",
-      resolution: buildResolution(seed, {
-        ...NO_MATCH,
-        resolution_status: statusForInvalidInput(validation),
-      }),
-    };
+  const seed = seedFor(rawInput, options);
+  if (shortCircuits(seed, options)) {
+    return invalidResolution(seed);
   }
 
   let stage: LookupStage = "TRANSACTION";
@@ -272,15 +340,150 @@ export async function resolveSurname(
       });
     return { kind: "RESOLUTION", resolution: buildResolution(seed, match) };
   } catch (cause: unknown) {
-    return {
-      kind: "LOOKUP_FAILED",
-      raw_input: seed.rawInput,
-      unicode_nfc: seed.nfc,
-      canonical_key: seed.key,
-      resolution_method_version: RESOLUTION_METHOD_VERSION,
-      stage,
-      message: cause instanceof Error ? cause.message : String(cause),
-      cause,
-    };
+    return lookupFailure(seed, stage, cause);
+  }
+}
+
+/** Largest `IN (…)` list one statement carries in the bulk path. */
+const BULK_CHUNK = 5_000;
+
+function chunked<T>(items: readonly T[]): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += BULK_CHUNK) {
+    chunks.push(items.slice(i, i + BULK_CHUNK));
+  }
+  return chunks;
+}
+
+/**
+ * Resolves many inputs with the same rules as {@link resolveSurname}, in
+ * one `READ ONLY` transaction (TASK-013).
+ *
+ * Exists for bulk ingestion, where 400,000 sequential lookups were the
+ * import's second-largest cost. It is not a second algorithm: validation,
+ * keying, short-circuiting and the T0/T1 classification are the very
+ * functions the single path calls; only the fetch shape differs — keys go
+ * to the database in `IN (…)` lists instead of one at a time. An
+ * integration test asserts input-by-input equality with `resolveSurname`.
+ *
+ * Returns one outcome per input, in input order. Inputs that never reach
+ * the database resolve exactly as they would singly. A database failure
+ * returns `LOOKUP_FAILED` for every input that was still pending — never
+ * `UNKNOWN`. The query path never calls this.
+ */
+export async function resolveSurnamesBulk(
+  db: Kysely<DB>,
+  rawInputs: readonly string[],
+  options: ResolveOptions = {},
+): Promise<readonly SurnameLookupOutcome[]> {
+  const seeds = rawInputs.map((rawInput) => seedFor(rawInput, options));
+  const outcomes: (SurnameLookupOutcome | undefined)[] = seeds.map((seed) =>
+    shortCircuits(seed, options) ? invalidResolution(seed) : undefined,
+  );
+  const pendingKeys = [
+    ...new Set(seeds.filter((_, i) => outcomes[i] === undefined).map((s) => s.key)),
+  ];
+  if (pendingKeys.length === 0) {
+    return outcomes as SurnameLookupOutcome[];
+  }
+
+  let stage: LookupStage = "TRANSACTION";
+  try {
+    const matches = await db
+      .transaction()
+      .setAccessMode("read only")
+      .execute(async (trx) => {
+        const read: ReadOnlyQueries = trx;
+        const byKey = new Map<string, MatchResult>();
+
+        stage = "T0_CANONICAL";
+        const canonicalByKey = new Map<string, CanonicalRow[]>();
+        for (const keys of chunked(pendingKeys)) {
+          const rows = await read
+            .selectFrom("surnames")
+            .select(["surname_id", "canonical_display", "canonical_key"])
+            .where("canonical_key", "in", keys)
+            .orderBy("surname_id")
+            .execute();
+          for (const row of rows) {
+            const bucket = canonicalByKey.get(row.canonical_key) ?? [];
+            bucket.push({ surname_id: row.surname_id, canonical_display: row.canonical_display });
+            canonicalByKey.set(row.canonical_key, bucket);
+          }
+        }
+        const unmatched: string[] = [];
+        for (const key of pendingKeys) {
+          const match = classifyCanonical(canonicalByKey.get(key) ?? []);
+          if (match) {
+            byKey.set(key, match);
+          } else {
+            unmatched.push(key);
+          }
+        }
+
+        stage = "T1_NAME_FORM";
+        const formsByKey = new Map<string, EligibleForm[]>();
+        for (const keys of chunked(unmatched)) {
+          const rows = await read
+            .selectFrom("resolvable_name_forms")
+            .select(["name_form_id", "surname_id", "form", "search_key"])
+            .where("search_key", "in", keys)
+            .orderBy("name_form_id")
+            .execute();
+          for (const row of rows) {
+            if (row.search_key === null) {
+              throw new Error("resolvable_name_forms returned a row violating its own definition");
+            }
+            const bucket = formsByKey.get(row.search_key) ?? [];
+            bucket.push(eligibleForm(row));
+            formsByKey.set(row.search_key, bucket);
+          }
+        }
+        const singles = new Map<string, EligibleForm>();
+        for (const key of unmatched) {
+          const classified = classifyForms(formsByKey.get(key) ?? []);
+          if ("resolution_status" in classified) {
+            byKey.set(key, classified);
+          } else if (classified.kind === "ONE") {
+            singles.set(key, classified.form);
+          } else {
+            byKey.set(key, NO_MATCH);
+          }
+        }
+        const parentIds = [...new Set([...singles.values()].map((form) => form.surname_id))];
+        const parents = new Map<string, CanonicalRow>();
+        for (const ids of chunked(parentIds)) {
+          const rows = await read
+            .selectFrom("surnames")
+            .select(["surname_id", "canonical_display"])
+            .where("surname_id", "in", ids)
+            .execute();
+          for (const row of rows) {
+            parents.set(row.surname_id, row);
+          }
+        }
+        for (const [key, form] of singles) {
+          const surname = parents.get(form.surname_id);
+          if (!surname) {
+            throw new Error(`name_form ${form.name_form_id} references missing surname`);
+          }
+          byKey.set(key, knownVariant(form, surname));
+        }
+        return byKey;
+      });
+
+    return seeds.map((seed, i) => {
+      const settled = outcomes[i];
+      if (settled) {
+        return settled;
+      }
+      const match = matches.get(seed.key);
+      if (!match) {
+        throw new Error(`bulk resolution produced no match for key ${JSON.stringify(seed.key)}`);
+      }
+      return { kind: "RESOLUTION", resolution: buildResolution(seed, match) };
+    });
+  } catch (cause: unknown) {
+    return seeds.map((seed, i) => outcomes[i] ?? lookupFailure(seed, stage, cause));
   }
 }
