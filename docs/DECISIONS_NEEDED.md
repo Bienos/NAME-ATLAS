@@ -559,55 +559,27 @@ stored claim states the threshold it was judged against, and is asserted at the 
 
 ---
 
-## D-016 — the trigram index: GIN, contradicting canonical §23.1's GiST (BLOCKS TASK-015)
+## D-016 — RESOLVED (ADR-0006, 2026-09-20)
 
-**Status:** open. Blocks TASK-015 only in the sense that the implementing session must not resolve it
-in code. Full measurements: `tasks/015-fuzzy-candidate-retrieval.md` §3.
+**Resolution:** GIN (`gin_trgm_ops`) on `surnames.canonical_key`, retrieved with a length-dependent similarity threshold. Full record and measurements: `docs/adr/0006-trigram-index-gin.md`; implemented by `packages/db/migrations/0012_surname_trigram_index.ts`.
 
-`docs/canonical/13` §23.1 names GiST as the P0 trigram index, because GiST supports `<->` distance
-ordering for true top-K. Measured on the real 598,476-surname table, for the query TASK-015 actually
-issues, GIN is smaller and between 9× and 66× faster: 18 MB against 43 MB, and 4.9 ms against 160 ms
-at a 0.4 threshold.
+Measured on the real 598,476-surname table: GIN is 18 MB against GiST's 43 MB, builds in 1.9 s against 6.4 s, and answers a top-25 query in 4.9 ms against 160 ms. GiST's distinguishing capability — unthresholded nearest neighbours via `<->` — is the thing this feature must not use, because a short or unlike input's nearest neighbours are an alphabet walk of real surnames and returning nothing is the correct answer.
 
-GiST's advantage is real but not wanted here: it returns nearest neighbours with no threshold, and
-TASK-015 §2.5 establishes that returning *nothing* for a short noisy input is the correct behaviour.
+The cost is that ranking cannot be done by the database. That cost is zero: TASK-015 measured trigram order putting the intended surname first in 53 of 100 cases where the resolver's rerank got 80, so ordering by trigram distance would have been ordering by the wrong thing.
 
-**The decision:** write an ADR superseding §23.1's recommendation with these measurements and use
-GIN, or keep GiST as canonical says and accept the latency. `AGENTS.md` §2 forbids deciding this
-silently in code either way. **Recommendation: ADR for GIN.**
-
-### Do not
-
-- Do not add both indexes to avoid choosing. Two trigram indexes on one column is 61 MB of write
-  amplification to defer a decision.
-- Do not treat the canonical recommendation as unfalsifiable. §23.1 says "Candidate:" and "Evaluate
-  GIN ... later"; this is that evaluation, done on real data.
+Do not revisit on the strength of `docs/canonical/13` §23.1's wording alone — ADR-0006 exists to answer it. Revisit by rebuilding both indexes on the then-current register and re-running the three figures, or if a path appears that genuinely needs unthresholded top-K on the interactive surface.
 
 ---
 
-## D-017 — what to do about short-input typos, which trigram cannot recover (BLOCKS TASK-015)
+## D-017 — RESOLVED (TASK-015 implementation, 2026-09-20)
 
-**Status:** open. Full measurements: `tasks/015-fuzzy-candidate-retrieval.md` §2.1, §2.2, §4.
+**Resolution:** option (a). Fuzzy suggestions are offered only at and above **six characters**; a shorter input returns `INPUT_TOO_SHORT` with an empty candidate list and a message saying why. The value lives in `MIN_FUZZY_INPUT_LENGTH` (`packages/resolver/src/candidates.ts`) with its measurement; full figures in `PROGRESS.md`.
 
-A single adjacent transposition drops trigram similarity to 0.273 for a 6-character surname and
-0.333 for a 5-character one, against 0.467 for a 10-character one. So the shorter the surname, the
-less recoverable its typos are — and at 4–5 characters the shortlist is indistinguishable from an
-alphabet walk (`NOWK` returns `NOWS`, `NOWY`, `NOWE`, `NOWA`, all real surnames, all at 0.429).
+Measured on the real register over 94 single-edit cases on four-to-five-character surnames: the best any threshold achieved was 30 first-place hits, with the shortlist saturated at the cap for every query and **0 of 25 transpositions recovered at any threshold**. `NOWK` retrieves `NOWS`, `NOWY`, `NOWE` and `NOWA`, all real surnames, all at similarity 0.429. None of that is a correction worth showing, and option (c) — lowering the threshold and accepting the noise — was ruled out for that reason.
 
-Across 34 of the most common surnames given one transposition each, trigram similarity ranked the
-intended surname first in **2 of 34** cases, and a Damerau rerank of a 25-row shortlist in **18 of
-34**. Useful, and not a solved problem.
+Option (b), a second retrieval path for short inputs such as a bounded Levenshtein scan or a deletion-neighbourhood key, remains available as **its own task** if the owner wants it. It needs its own measurement before anyone may claim it works; nothing is blocked while it does not exist.
 
-**The decision:** (a) offer fuzzy suggestions only at and above a minimum input length and return
-`UNRESOLVED` with no suggestion below it; (b) add a second retrieval path for short inputs, as a
-separate task, after its own measurement; or (c) lower the threshold for short inputs and accept the
-noise. **Recommendation: (a) now, (b) later if wanted.**
-
-### Do not
-
-- Do not choose (c). TASK-015 §2.5 shows exactly what the user would be shown.
-- Do not present a half-working "did you mean" as working. Whatever is chosen, the recall figure is
-  recorded as a number (TASK-015 AC-9).
+At six characters and above the feature does work: roughly four in five single-edit typos come back first, and the exact figures per length band are recorded rather than summarised.
 
 ---
 

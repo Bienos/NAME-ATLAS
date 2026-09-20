@@ -1,8 +1,15 @@
 # TASK-015 — fuzzy candidate retrieval (trigram shortlist + edit-distance rerank)
 
-- **Status:** SPECIFIED 2026-09-20, not implemented. Two decisions for the project owner, both
-  recorded below and in `docs/DECISIONS_NEEDED.md`: the index choice (§3, contradicts canonical
-  §23.1) and the honest scope limit on short inputs (§4).
+- **Status:** IMPLEMENTED 2026-09-20. All nine acceptance criteria met; figures in `PROGRESS.md`.
+  Both decisions were answered as recommended: **D-016** GIN (ADR-0006) and **D-017** option (a),
+  a six-character minimum below which nothing is suggested.
+- **One correction made during implementation.** §2.1's figures (2 of 34 and 18 of 34) came from an
+  independent probe at specification time and stand as what was known then. The implementation's own
+  first `damerauLevenshtein` had a bug — it reported `kowalskii` against `kowalski` as distance 0 —
+  and the first sweep ran on it. The bug was caught by a unit test, fixed, covered by property tests
+  over the metric laws, and every threshold and figure was re-measured before being recorded. The
+  corrected, richer measurements are in `PROGRESS.md`; the threshold choices were unchanged by the
+  fix, only the recall numbers.
 - **Created:** 2026-09-20, after TASK-012 completed the current-surname truth vertical.
 - **Milestone:** M2. This is the front door of M2's exit journey — *search* → resolution → result.
 - **Depends on:** TASK-003 (the exact resolver, `canonical_key_v2`, the T0/T1 tiers and

@@ -21,7 +21,9 @@
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
     "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",
-    "demo:surname-distribution": "pnpm --filter @name-atlas/truth run demo:surname-distribution"
+    "demo:surname-distribution": "pnpm --filter @name-atlas/truth run demo:surname-distribution",
+    "demo:surname-candidates": "pnpm --filter @name-atlas/resolver run demo:surname-candidates",
+    "measure:fuzzy-recall": "pnpm --filter @name-atlas/resolver run measure:fuzzy-recall"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

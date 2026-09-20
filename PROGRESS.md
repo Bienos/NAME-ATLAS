@@ -2376,3 +2376,120 @@ blocks nothing); D-002 (onomastics rights) and D-003 (Polona rights) belong to l
 `GEOGRAPHIC_ORIGIN` was explicitly **not** produced here — `docs/canonical/14` §27.3 makes modern
 concentration contextual evidence, not proof of origin — and the binding framing stands: these
 counts are *permanent registered residence*, never location, origin, ancestry or birthplace.
+
+## TASK-015 implemented — fuzzy candidate retrieval, suggestions only (2026-09-20)
+
+Scope authority: `tasks/015-fuzzy-candidate-retrieval.md`. Both open decisions were answered by the
+project owner as recommended: **D-016 GIN** (ADR-0006) and **D-017 option (a)**, a minimum input
+length below which nothing is suggested.
+
+### What exists now
+
+- `0012_surname_trigram_index` — one GIN index on `surnames.canonical_key`. No table, no column.
+- `packages/resolver/src/distance.ts` — Damerau-Levenshtein (unrestricted variant, by code point)
+  and `hasAdjacentTransposition`. Pure.
+- `packages/resolver/src/candidates.ts` — `suggestSurnames`, the length-band threshold table,
+  `compareCandidates`, and the `SearchCandidate` value object. Read-only on the same three grounds
+  as `lookup.ts`.
+- `packages/resolver/bin/measure-fuzzy-recall.ts` (`pnpm measure:fuzzy-recall`) — the committed
+  measurement tool, so recall stays a recorded number.
+- `pnpm demo:surname-candidates`.
+- ADR-0006, recording why the index deviates from `docs/canonical/13` §23.1.
+
+`resolveSurname` is unchanged. Nothing here resolves: the outcome is `SUGGESTION_REQUIRED` or
+`MULTIPLE_CANDIDATES` with decision mode `USER_CONFIRM`, never `AUTO`.
+
+### A real bug, caught by a unit test before it reached the thresholds
+
+The first `damerauLevenshtein` advanced its transposition bookkeeping one step too early and reported
+`kowalskii` against `kowalski` as distance **0**. The first threshold sweep ran on that function, so
+its recall figures were wrong. The fix, a re-measurement and a property test covering the metric
+laws (identity, symmetry, triangle inequality, length bounds, one-edit shapes) all landed before any
+number below was recorded. Every figure here comes from the corrected function.
+
+### AC-9 — the measured recall, recorded rather than claimed
+
+Measured on the ingested register (**598,476 surnames**), 25 real surnames per length band by
+descending national count, four single-edit classes each (transposition, substitution, deletion,
+insertion). Full sweep in the tool; the chosen thresholds are the **tightest that cost no recall**:
+
+| Input length | Threshold | Retrieved in a 25-row shortlist | Reranked first | Trigram first | Transposition class | Mean shortlist |
+|---|---:|---:|---:|---:|---:|---:|
+| 4–5 | *none* | 60/94 | 30/94 | 26/94 | **0/25** | 25.0 (saturated) |
+| 6–8 | 0.25 | 97/100 | **77/100** | 57/100 | 22/25 | 24.9 |
+| 9–11 | 0.40 | 100/100 | **80/100** | 53/100 | 25/25 | 19.8 |
+| 12+ | 0.50 | 100/100 | **87/100** | 66/100 | 25/25 | 7.9 |
+
+So roughly four in five single-edit typos come back first at six characters or more, and about one in
+five does not. That is the honest state of the feature.
+
+### The two rules that carry it, each measured against its own absence
+
+**Reranking beats trigram order.** Compare the "reranked first" and "trigram first" columns above:
+at nine to eleven characters, 80 against 53. Ordering by trigram distance in the database would order
+by the wrong thing, which is why ADR-0006's loss of GiST's `<->` costs nothing.
+
+**Preferring a detected transposition at equal edit distance.** Re-running the same sweep with that
+one comparator step disabled:
+
+| Length | Threshold | First place without | with | Transposition without | with |
+|---|---:|---:|---:|---:|---:|
+| 6–8 | 0.25 | 74/100 | 77/100 | 18/25 | 22/25 |
+| 9–11 | 0.40 | 63/100 | **80/100** | 8/25 | **25/25** |
+| 12+ | 0.50 | 84/100 | 87/100 | 22/25 | 25/25 |
+
+`CICHWOSKI` is the case in one line: one edit from both `CICHOWSKI` (transposed) and `CICHOSKI`
+(deleted), and trigram prefers the wrong one, 0.583 against 0.429. With the rule, `CICHOWSKI` ranks
+first; without it, second.
+
+### D-017 — why short inputs return nothing
+
+At four to five characters the best any threshold achieved was 30 first-place hits of 94, with the
+shortlist saturated at the cap for every query and **0 of 25 transpositions recovered at any
+threshold**. What such an input retrieves is an alphabet walk of real surnames: `NOWK` returns `NOWS`,
+`NOWY`, `NOWE` and `NOWA`, all at similarity 0.429. So `MIN_FUZZY_INPUT_LENGTH` is **6**, and a
+shorter input returns `INPUT_TOO_SHORT` with an empty list and says why.
+
+### Observed on the real register
+
+| Input | Behaviour |
+|---|---|
+| `NOWAK`, `KOWALSKY` | `EXACT` — an exact surname wins outright, and no suggestion is offered |
+| `CICHWOSKI` | 16-row shortlist, 10 candidates, `CICHOWSKI` **first** with `ADJACENT_TRANSPOSITION` |
+| `WISNIEWSKY` | `MULTIPLE_CANDIDATES`, `WISNIEWSKA` and `WISNIEWSKI` both at distance 1 and trigram 0.692, resolved to neither |
+| `NOWK` | no suggestions, `INPUT_TOO_SHORT` |
+
+Query latency for the real 598,476-row table, threshold 0.40, top 25: **7.4 ms**. Index size 18 MB
+against the table's 91 MB.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 11 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 311 unit tests
+                                 (resolver 102, sources 74, truth 77, contracts 36, db 4,
+                                  domain 7, testing 3, web 5, worker 2, admin 1)
+pnpm test:integration         → passed, 193 tests across 13 files, exit 0
+pnpm db:migrate (fresh DB)    → 0001–0012 applied; re-run: no pending migrations
+pnpm db:generate-types        → byte-identical; an index changes no type
+pnpm build                    → passed, 3 apps
+pnpm demo:surname-candidates "CICHWOSKI" / "WISNIEWSKY" / "NOWK" / "KOWALSKY"  → as tabled above
+pnpm demo:surname / -rank / -rarity / -distribution "NOWAK"  → unchanged:
+                                 98,387 · rank 1 of 408,182 · 1 in 215 · 16 regions, 0.884, READY
+```
+
+### What this does not do
+
+No diacritic fold: `similarity('luczak','łuczak')` is 0.400 and `LUCZAK` is itself a real surname
+scoring 1.000, so that candidate needs its own key and its own task. No gender forms, no
+transliteration, no phonetics, no OCR expansion, no language packs. No search endpoint and no UI —
+those consume this. No candidate is persisted as a row (`docs/canonical/13` §18.2), and no fuzzy
+candidate can reach a claim: an integration test drives all four derivations with a fuzzily-matchable
+input and asserts nothing is written.
+
+### What M2 still lacks
+
+The search API endpoint and the free result UI. The truth layer and the retrieval layer are both
+done; nothing in either is blocked on a decision.

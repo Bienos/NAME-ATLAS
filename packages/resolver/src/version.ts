@@ -81,3 +81,23 @@ export function unicodeRuntime(): UnicodeRuntime {
     cldr: process.versions["cldr"],
   };
 }
+
+/**
+ * Version of the fuzzy candidate generator: the trigram retrieval, the
+ * Damerau-Levenshtein rerank and the lexicographic ranking taken together
+ * (docs/canonical/13 §18.1 `method_version`, §20.1; TASK-015).
+ *
+ * Separate from {@link RESOLUTION_METHOD_VERSION} because this path resolves
+ * nothing. A stored suggestion records which generator produced it; an exact
+ * resolution records which resolver produced it, and the two move
+ * independently.
+ */
+export const FUZZY_METHOD_VERSION = "resolver_fuzzy_v1";
+
+/**
+ * Version of the length-dependent similarity threshold table
+ * (docs/canonical/13 §21). Bumped whenever a threshold or a band boundary
+ * moves, because a suggestion produced under different thresholds was produced
+ * by a different rule.
+ */
+export const FUZZY_THRESHOLD_VERSION = "fuzzy_length_thresholds_v1";
