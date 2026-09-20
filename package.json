@@ -17,7 +17,8 @@
     "test": "pnpm -r --if-present run test",
     "test:integration": "pnpm --filter @name-atlas/integration-tests run test:integration",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
-    "db:generate-types": "pnpm --filter @name-atlas/db run generate-types"
+    "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
+    "import:pesel": "pnpm --filter @name-atlas/sources run import-pesel"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

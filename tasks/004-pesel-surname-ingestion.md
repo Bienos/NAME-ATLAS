@@ -1,6 +1,6 @@
 # TASK-004 — Canonical PESEL Surname Dataset Ingestion
 
-- **Status:** NOT STARTED — specification only. Three decisions in §14 need the project owner's answer before implementation begins.
+- **Status:** IMPLEMENTED AND VERIFIED (2026-09-20). §14's U-1, U-2 and U-3 were answered by the project owner ("akceptuję U-1, U-2, U-3 jak zaproponowano"); U-4 to U-7 were decided by the implementing session and are recorded in §7 under "Recorded decisions". Verification actually run is in `PROGRESS.md`.
 - **Milestone:** M1 (`PLAN.md`: "Tasks: TASK-004 PESEL ingestion + Source/Rights · TASK-005 `CURRENT_POPULATION` truth chain")
 - **Canonical epics:** DAT-001 (Source & Rights Registry) + SRC-001 (PESEL Ingestion) — `docs/canonical/23` §48, master roadmap rows 5 and 7. `PLAN.md` bundles both into this one task; that bundling is `PLAN.md`'s, and this file follows it.
 - **Depends on:** TASK-001 (foundation), TASK-002 (the pinned, verified source), TASK-003 (identity tables and the canonical key function)
@@ -148,6 +148,32 @@ Each is a behaviour an automated test must demonstrate by running, not by inspec
 - **AC-24 — Auditability.** From any `DistributionValue` a single query reaches its snapshot, its `SourceRecord` (with checksum, URL and retrieval time), its `Source` and its `RightsProfile`. An integration test performs that traversal rather than asserting the columns exist.
 - **AC-25 — No fabricated data.** Every stored value is either copied from the source bytes, derived by a named versioned function from them, read from the recorded resource metadata, or `null`. No count, date, denominator, licence term, rank or identifier is invented. `universe_size` is null (§14 U-6).
 - **AC-26 — Reproducible verification.** Every command in §12 runs from a clean checkout and is reported with its actual output. The end-to-end proof is that after importing the committed fixture, `resolveSurname` returns `EXACT` for a real fixture surname — the ingested identity is usable by the TASK-003 resolver unchanged, with no adapter.
+
+### Recorded decisions (the §14 answers)
+
+Written here because §14 U-5 says the chosen disposition belongs in §7. Each is a decision, not a restatement of the question.
+
+**U-1 — answered by the project owner: as proposed.** The publisher's own wording is recorded verbatim in `universe_description`; `coverage_notes` states in capitals that the partition basis is not disambiguated by the publisher; summation, merging and comparison across the two partitions are forbidden, and the two resources are placed in different `comparability_group` and `methodology_key` values so no total can be formed by accident. No snapshot carries a `surname_total_count`.
+
+**U-2 — answered by the project owner: as proposed.** `review_status = LEGAL_REVIEW_REQUIRED` with the dataset-level-only CC0 provenance in `notes`; `automated_access` and `commercial_use` `ALLOWED`; `metadata_rights`, `database_rights`, `redistribution` and `local_cache` `ALLOWED` as the direct content of CC0 1.0; `image_rights` and `transcription_rights` `UNKNOWN`, because a two-column CSV has no image or transcription surface and this project holds no evidence about either. `Source.production_status` matches the review status. The hard gate refuses only `automated_access = PROHIBITED` or `review_status = BLOCKED`, so ingestion proceeds while paid-surface eligibility stays blocked until a human review.
+
+**U-3 — acknowledged by the project owner.** `SourceRecord.raw_text_ref` is null with the reason recorded in the importer, and the deviation from `docs/canonical/12` §9.2 ("store raw file + metadata") is recorded in `PROGRESS.md`. The bytes are identified by checksum, URL and resource-metadata payload; they are not preserved, and nothing pretends otherwise. Raw object storage remains an M0 infrastructure obligation (INF-001).
+
+**U-4 — carried forward, not closed.** The unit of `Liczba` is still not stated by the publisher. The importer stores the raw integer and a verbatim universe description and makes no population statement. Recorded as **D-006** in `docs/DECISIONS_NEEDED.md` as a precondition of TASK-005.
+
+**U-5 — decided: option (a), abort the whole import.** Any quarantined row aborts the run; the write transaction never opens, so nothing is written even for rows that would have resolved. The reconciliation report is still returned, with every quarantined row and its reason, and the CLI exits non-zero. Rationale: a quarantine in a two-column official file almost certainly means this project has misread the source, and fail-closed is the standing posture (`ARCHITECTURE.md` §10 invariant 7).
+
+  *One consequence for AC-23, recorded rather than silently resolved.* AC-23's identity `rows read = rows imported + rows quarantined` cannot hold for an aborted run under this disposition: such a run imports nothing, so the rows that were fine are neither imported nor quarantined. The report therefore carries a third term, `rowsRolledBack`, and the invariant asserted everywhere is `rowsRead = rowsImported + rowsQuarantined + rowsRolledBack`, which reduces to AC-23's identity exactly when nothing rolled back — that is, on every committed run. AC-23's second identity (`rows imported` equals the number of `DistributionValue` rows created) holds unconditionally.
+
+**U-6 — decided: `universe_size` is null.** No verified PESEL living-population denominator exists, and `docs/canonical/11` §6.1 stores one only if methodologically valid. Asserted by a query in the integration suite, not only by inspection.
+
+**U-7 — decided: resolve in a separate read pass before the write transaction.** `resolveSurname` is called outside any write transaction, so its `READ ONLY` guarantee is untouched. The time-of-check/time-of-use gap is closed by the database rather than by a lock: `surnames.canonical_key` is UNIQUE, and the write transaction re-reads the keys it is about to create, reusing any that appeared in between. A genuine race ends as a constraint violation that rolls the whole run back, never as a duplicate identity.
+
+**`SourceRecord.record_type` is `API_OBJECT`.** Neither this file nor a canonical document prescribes a value. `DATA_ROW` would describe one record per CSV row; this importer deliberately creates one record per resource FILE VERSION (`docs/canonical/12` §3.1's `BULK_DATASET` pattern is version-scoped), and the concrete retrieved object it preserves is the publisher's own `api.dane.gov.pl` resource object, held verbatim in `raw_payload`. Adopted from the superseded draft `tasks/004-pesel-ingestion-source-rights.md` §5.1, which argued it correctly; the first implementation used `DATA_ROW` and was wrong.
+
+**One further decision the task file did not pose.** `DistributionSnapshot.surname_total_count` is left null. With exactly one national value per snapshot (§9 invariant 10), a snapshot-level total would be a second copy of that value's own count, and duplicating a stored fact in two places invites divergence. The count lives on the `DistributionValue`, where `docs/canonical/11` §6.2 puts it.
+
+**Known limitation, recorded rather than designed around.** The read pass calls `resolveSurname` once per row, each call opening its own `READ ONLY` transaction. That is correct and fast enough for the 22- and 23-row fixtures this task imports, and it was not exercised against a full 408,182-row resource — those bytes are not in the repository (`AGENTS.md` §6). Whichever task first imports a full resource should measure it before assuming the per-row cost is acceptable.
 
 ## 8. Out of scope
 

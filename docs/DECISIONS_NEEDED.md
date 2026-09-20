@@ -124,6 +124,26 @@ No further action needed. Do not revisit unless the pinned digest is deliberatel
 
 ---
 
+## D-006 — Unit of the PESEL `Liczba` column
+
+**Status: BLOCKS TASK-005.** Non-blocking for TASK-004, which is implemented and stores the raw integer without claiming anything about it.
+
+**Question.** Does one occurrence in the PESEL surname resources equal one living person?
+
+**What is verified.** The dataset notes say `liczba wystąpień` — number of occurrences — of a current-surname value among living persons in the PESEL register. The column holds a positive integer, observed range 2 to 99,738, with single occurrences excluded by the publisher (confirmed from the bytes, `docs/sources/pesel.md`).
+
+**What is not verified, and is the whole question.** That one occurrence equals one living person is strongly implied and **nowhere stated by the publisher**. A register may in principle count entries rather than people, and this project has no statement either way.
+
+**Why it blocks TASK-005.** A `CURRENT_POPULATION` claim is a statement about how many living people bear a surname. Phrasing one from a count whose unit is unverified would be exactly the fabrication `AGENTS.md` §9 forbids. The same gap blocks any rarity or `1-in-X` derivation, which additionally needs a compatible denominator (`docs/canonical/12` §9.7) — see D-001's note on the denominator question, which remains open for whichever task designs `RARITY_CONTEXT`.
+
+**What TASK-004 did instead.** Stored the raw `Liczba` integer on `DistributionValue.count`, recorded the publisher's own universe wording verbatim on every snapshot, and stated the gap in `coverage_notes` ("the publisher does not state that one occurrence equals one living person, so this snapshot supports no population statement"). No total, no rate, no share, no rank, and `universe_size` null.
+
+**How to resolve.** A statement from the publisher (dataset documentation, the institution's own methodology note, or a direct enquiry to Ministerstwo Cyfryzacji). Not by inference from the data, and not by assuming the obvious reading because it is obvious. If it cannot be resolved, TASK-005 must phrase its claim in terms the evidence supports — occurrences of a current-surname value in the register at a date — rather than people.
+
+*Raised by TASK-004 as its §14 U-4, carried forward here rather than closed.*
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

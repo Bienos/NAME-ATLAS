@@ -190,3 +190,52 @@ The archive additionally contains PESEL national data for 2019–2025, regional 
 **RESOLVED** (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 now have a verified answer sourced above — including items 3 and 7, which were previously carried forward as residuals and are closed by the evidence in the section above. Nothing was guessed.
 
 One item from D-001's original "what is not settled" list remains open by design: the **rarity/`1-in-X` denominator** question is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and was never part of TASK-002 §8's 20 items. It belongs to whichever task designs `RARITY_CONTEXT`.
+
+---
+
+## Update — TASK-004 ingestion record (2026-09-20)
+
+Added by the session that implemented TASK-004. Source facts only; the ingestion design lives in `tasks/004-pesel-surname-ingestion.md` and the verification in `PROGRESS.md`.
+
+### Which representation is ingested — decided
+
+TASK-004 ingests the **CSV**, pinned by checksum, as the section above required a deliberate choice. Reason: the CSV is the representation TASK-002 verified byte-for-byte and the only one `packages/sources` validates. The importer never accepts XLSX, and it verifies the SHA-256 of the bytes on disk before decoding them, so a silent change in the portal's conversion step is a refusal rather than an import.
+
+### Resource-level metadata carries no licence field — re-verified from the captured responses
+
+Checked again while seeding the rights registry, directly against `docs/sources/acquisition/2026-09-18/metadata/*.official_resource.json`. The full attribute set of both national resources is:
+
+`category, contains_protected_data, created, csv_download_url, csv_file_size, csv_file_url, data_date, description, download_url, downloads_count, file_size, file_url, files, format, has_dynamic_data, has_high_value_data, has_high_value_data_from_ec_list, has_research_data, is_chart_creation_blocked, jsonld_download_url, jsonld_file_size, jsonld_file_url, language, link, media_type, modified, openness_score, regions, special_signs, supplements, title, verified, views_count, visualization_types`
+
+There is **no** `license_name`, `license_link`, `license_condition_*`, rights or terms attribute among them. The CC0 1.0 statement exists only at dataset level. This confirms the `licence_provenance` note in `fixtures/pesel/source-manifest.json` rather than relying on it.
+
+### The publisher's own resource description, verbatim
+
+Read from the captured responses. The API wraps each in `<p>…</p>`; the text itself is:
+
+| Resource | Description |
+|---|---|
+| `1148808` | `Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026` |
+| `1148811` | `Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026` |
+
+Both are stored verbatim on every `DistributionSnapshot` (`universe_description`), with the partition gap stated in `coverage_notes`.
+
+### Observation from the fixture bytes about the male/female partition
+
+**This is an inference from the data, not a statement by the publisher, and it does not close TASK-004 §14 U-1.** It is recorded because it is evidence, and because a future session should not have to rediscover it.
+
+Three surnames whose form does not inflect for gender appear in **both** national resources with **different** counts:
+
+| Surname | Male resource `1148808` | Female resource `1148811` |
+|---|---|---|
+| `NOWAK` | 98,387 | 99,738 |
+| `WÓJCIK` | 47,734 | 48,568 |
+| `KOWALCZYK` | 46,994 | 48,264 |
+
+If the split were by the **grammatical gender of the surname form**, an uninflected form such as `NOWAK` would belong to one partition, or appear in both with the same count. Two different counts for the same uninflected form are consistent with counting **people** in each group, which points at the **bearer's sex** as the partition basis.
+
+What this is not: a confirmation. The publisher states neither reading, the observation rests on three forms in a 22/23-row excerpt, and an alternative explanation this project cannot rule out is some publisher-side assignment rule that is neither purely formal nor purely biographical. The project owner's answer to U-1 stands as recorded: `coverage_notes` states that the basis is not disambiguated, and no total across the two partitions may be computed. Resolving U-1 properly needs a statement from the publisher, not more arithmetic on the data.
+
+### Still open, and now recorded as a numbered decision
+
+The **unit of `Liczba`** — whether one occurrence equals one living person — remains unstated by the publisher. TASK-004 stores the raw integer and makes no population claim. It is now **D-006** in `docs/DECISIONS_NEEDED.md` as a precondition of TASK-005's `CURRENT_POPULATION` claim.

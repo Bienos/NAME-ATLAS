@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-19 — TASK-003 implemented and verified (exact surname resolver + identity core migration)
+**Last updated:** 2026-09-20 — TASK-004 implemented and verified (PESEL ingestion: source/rights registry, immutable source records, surname-scoped national distribution)
 
 ## Current state
 
@@ -13,10 +13,11 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-001 — project foundation** | **implemented and verified** |
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
 | **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
-| Application source code | `packages/sources` (PESEL CSV schema/parser, TASK-002) and `packages/resolver` (exact resolver, TASK-003). Identity tables exist (`knowledge_entities`, `surnames`, `name_forms`); no other canonical domain table, no importer, no `Claim`/`Source`/`RightsProfile`. |
-| Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`) and `0002_identity_core` (three identity tables + `resolvable_name_forms` view). Nothing else. |
+| **TASK-004 — PESEL ingestion + Source/Rights** | **IMPLEMENTED AND VERIFIED.** §14's U-1, U-2 and U-3 answered by the project owner; U-4 to U-7 decided and recorded in the task file's §7. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
+| Application source code | `packages/sources` (PESEL CSV schema/parser from TASK-002, plus the `@name-atlas/sources/pesel` registry + importer from TASK-004) and `packages/resolver` (exact resolver, TASK-003). Tables: the three identity tables, `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`. No `EvidenceItem`, `Claim`, `ConfidenceAssessment`, `Citation`, `DigitalAsset`, `Place` or `ResearchRun` table exists. |
+| Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`), `0002_identity_core` (three identity tables + `resolvable_name_forms` view) and `0003_source_rights_distribution` (five tables + ten enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
-| Next approved task | None yet. TASK-004 (PESEL ingestion) is the natural next task but has no task file and was not started (AGENTS.md §8). |
+| Next approved task | None. TASK-005 (`CURRENT_POPULATION` truth chain) is the natural next task; it has no task file and was not started (AGENTS.md §8). It is blocked on **D-006** (the unit of `Liczba`). |
 
 ## What TASK-001 built
 
@@ -307,6 +308,97 @@ Docker/container registries remain egress-blocked (as in TASK-001/002), so `pnpm
 
 **Not verified in this environment:** the integration suite against the pinned `postgis/postgis:16-3.4@sha256:44126d87…` image itself (registry egress-blocked). Everything else above was run and observed.
 
+## TASK-004 implemented — PESEL surname ingestion (this session, 2026-09-20)
+
+The scope authority was `tasks/004-pesel-surname-ingestion.md`. The project owner answered §14 U-1, U-2 and U-3 before implementation began ("akceptuję U-1, U-2, U-3 jak zaproponowano"); U-4 to U-7 were decided by this session and are recorded in that file's §7 under "Recorded decisions", as U-5 instructed. The task was implemented in the same session that answered the questions, rather than the fresh session `CLAUDE.md` prefers, at the project owner's explicit request.
+
+**Built:**
+
+- `packages/db/migrations/0003_source_rights_distribution.ts` — ten enums (`source_type`, `source_granularity`, `source_reliability_tier`, `source_production_status`, `source_record_type`, `source_record_status`, `rights_permission`, `cache_permission`, `rights_review_status`, `geography_level`) and five tables: `rights_profiles`, `sources` (completing Migration Group A), `source_records`, `distribution_snapshots`, `distribution_values` (the first half of Group B). **Not created:** `digital_assets`, `evidence_items`, `claims`, `claim_evidence`, `confidence_assessments`, `citations`, `places`, `place_names`, `place_geometries`, `administrative_memberships`, `name_form_relations`, `entity_external_ids`, `research_runs`, `research_module_runs`, `runtime_outbox`. Asserted by `extensions.test.ts`, which pins the exact table and view set.
+- **Two deliberate narrowings of the canonical field specification, each with its reason in the migration header.** `distribution_snapshots.source_record_id` is NOT NULL although `docs/canonical/11` §6.1 marks it nullable, because AC-07 requires provenance completeness to be enforced by a foreign key rather than by convention. `distribution_values.place_id` is a plain nullable uuid with no foreign key, because `places` does not exist yet (M3); the FK belongs to whichever task creates that table.
+- **Two invariants deliberately NOT expressed as CHECK constraints**, because each is true of this task's data but false of the schema: a `count >= 2` floor (the PESEL suppression rule is one source's property, and `docs/canonical/11` §6.2 permits a stored zero where coverage supports a true zero) and `geography_level = 'NATIONAL'`. The schema forbids only a negative count. Both are asserted as queries against a real database instead.
+- `packages/sources` gained a second entry, `@name-atlas/sources/pesel`, leaving the TASK-002 parser entry untouched and database-free: `registry.ts` (the `Source` + `RightsProfile` entry as frozen configuration), `rights.ts` (the pure hard gate), `checksum.ts` (content pinning), `mapping.ts` (pure row mapping), `report.ts` (reconciliation), `errors.ts` (`PeselImportError` with seven reason codes), `import.ts` (`importPeselResource` plus the §9 invariant checks the integration suite runs). Dependencies added are all existing workspace packages plus `kysely`, already in the lockfile — **no new third-party dependency, no upgrade**.
+- `packages/sources/bin/import-pesel.ts` — the CLI, wired as `pnpm import:pesel`. Every provenance value is a required explicit argument; it imports bytes already on disk and never downloads.
+- `tests/integration/src/pesel-import.test.ts` — 26 tests covering §11 items 8–20 and the AC-specific cases.
+
+**Decisions recorded, not assumed:**
+
+- `universe_description` quotes the publisher's own title and description verbatim; `coverage_notes` states in capitals that the male/female partition basis is not disambiguated by the publisher. The two resources get different `methodology_key` and `comparability_group` values, and `comparability_group` is scoped to one state date, so neither the two partitions nor two annual editions are ever implied to be comparable. `surname_total_count` is null on every snapshot, so no total across the partitions exists to be mistaken for one.
+- `RightsProfile`: `review_status = LEGAL_REVIEW_REQUIRED` (a statement of fact — no legal review has been performed by anyone), `automated_access`/`commercial_use`/`metadata_rights`/`database_rights`/`redistribution`/`local_cache` `ALLOWED` on the strength of the dataset-level CC0 1.0 dedication, `image_rights`/`transcription_rights` `UNKNOWN` because a two-column CSV has no such surface and this project holds no evidence either way. `attribution_required = false` (CC0 requires none), `attribution_text`/`rights_url`/`terms_hash` null with the gaps stated in `notes`. `checked_at` is the fixed constant `2026-09-19T00:00:00Z`, never `now()`, so the seeded row is deterministic.
+- `dataset_version` is `<resource_id>/<data_date>` (`1148808/2026-01-20`). The publisher issues no version string of its own, so this joins the two identifiers it does issue. It is deliberately neither the portal timestamp nor `retrieved_at`.
+- Quarantine disposition is §14 U-5 option (a): any unresolvable row aborts the whole run, the write transaction never opens, the reconciliation report is still returned with every reason, and the CLI exits non-zero.
+- The resolver is called in a read pass **before** the write transaction (U-7), so its `READ ONLY` guarantee is untouched; the write transaction re-reads the keys it is about to create, and `surnames.canonical_key` UNIQUE closes the race.
+
+**Deviation from the canonical ingestion strategy, acknowledged by the project owner (§14 U-3).** `docs/canonical/12` §9.2 says "store raw file + metadata". No object storage exists, `ops/` is not created, and raw source files are not committed (`AGENTS.md` §6). `SourceRecord.raw_text_ref` is therefore null with the reason recorded in the importer; the bytes are identified by SHA-256, the official URL and the resource-metadata payload, and are not preserved. Raw object storage remains an M0 infrastructure obligation (INF-001).
+
+**Source findings recorded in `docs/sources/pesel.md` this session:**
+
+- Resource-level metadata was re-checked directly against the captured `api.dane.gov.pl` responses: the full attribute set of both national resources contains **no** licence, rights or terms field. The CC0 statement exists only at dataset level. This confirms the manifest's `licence_provenance` rather than relying on it.
+- The representation question the TASK-002 record left to this task is decided: **the CSV is ingested**, checksum-pinned, because it is the representation TASK-002 verified byte-for-byte and the only one `packages/sources` validates. XLSX is never accepted.
+- **An observation about the partition, explicitly labelled an inference and not a resolution of U-1.** `NOWAK`, `WÓJCIK` and `KOWALCZYK` — forms that do not inflect for gender — appear in both national resources with different counts (`NOWAK` 98,387 male / 99,738 female). A split by grammatical gender of the form would put an uninflected form in one partition, or in both with the same count. Two different counts are consistent with counting people, which points at the bearer's sex. It rests on three forms in a 22/23-row excerpt and the publisher states neither reading, so `coverage_notes` still records the basis as not disambiguated.
+
+**`docs/DECISIONS_NEEDED.md` gained D-006** — the unit of `Liczba`, carried forward from §14 U-4 as a precondition of TASK-005's `CURRENT_POPULATION` claim. No entry was added for U-1, U-2 or U-3: the project owner answered them.
+
+**Defects found by running the code, not by inspection:**
+
+1. `pnpm run <script> -- --flag=…` forwards the bare `--` separator into the script's argv, so the first real CLI invocation failed with `unrecognised argument "--"`. The parser now skips it, and the "print usage" condition changed from counting argv entries to counting parsed arguments, because the old test would have treated a lone separator as "no arguments".
+2. Two TASK-003 assertions that were true only while two migrations existed were **tightened rather than deleted**, exactly as TASK-003 did before: `packages/db/src/migrator.test.ts` now lists `0003_source_rights_distribution.ts`, and `tests/integration/src/extensions.test.ts` now pins the full fourteen-entry table/view set and names TASK-004 §8's excluded tables in its comment.
+
+**One tension inside the task file, resolved in the open rather than silently.** AC-23 asserts `rows read = rows imported + rows quarantined`. That identity cannot hold for a run aborted under U-5's answer (a): such a run imports nothing, so rows that were otherwise fine are neither imported nor quarantined. The report therefore carries a third term, `rowsRolledBack`, and the asserted invariant is `rowsRead = rowsImported + rowsQuarantined + rowsRolledBack`, which reduces exactly to AC-23's identity on every committed run. AC-23's second identity (`rows imported` equals the `DistributionValue` rows created) holds unconditionally. Recorded in the task file's §7 as well.
+
+**Known limitation, measured nowhere and therefore stated rather than claimed.** The read pass calls `resolveSurname` once per row, each call opening its own `READ ONLY` transaction. That is fine for the 22- and 23-row fixtures this task imports. It was **not** exercised against a full 408,182-row resource, because those bytes are not in the repository. Whichever task first imports a full resource should measure it rather than assume the per-row cost is acceptable.
+
+## Verification run for TASK-004 (2026-09-20)
+
+Container registries remain network-egress-blocked, as in TASK-001/002/003, so the integration suite ran against a locally installed PostgreSQL 16.13 + PostGIS 3.4.2 through the `TEST_DATABASE_URL` fallback — the substitute TASK-004 §16 prescribes. **The pinned `postgis/postgis:16-3.4@sha256:44126d87…` image itself was not exercised in this environment.** CI, which leaves `TEST_DATABASE_URL` unset, will run it. PostGIS was installed into this session's container from the Ubuntu `postgresql-16-postgis-3` package (3.4.2) before the suite could run at all.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | Passed — "Lockfile is up to date, resolution step is skipped". The lockfile diff is only the new importer block for `packages/sources` (workspace links plus `kysely@0.29.6`, already present) and the `@name-atlas/sources` link added to `tests/integration`. Nothing downloaded, no dependency upgraded. |
+| `pnpm typecheck` | Passed — 10 of 10 packages with a `typecheck` script. |
+| `pnpm lint` | Passed — zero errors, zero warnings. |
+| `pnpm format:check` | Passed, after one `pnpm format` pass over the six newly written files. |
+| `pnpm test` | Passed — **160 tests** across 9 packages: 95 pre-existing plus 65 new in `packages/sources` (`registry.test.ts` 22, `mapping.test.ts` 14, `rights.test.ts` 11, `report.test.ts` 11, `checksum.test.ts` 5, `mapping.property.test.ts` 2). No Docker required. |
+| `pnpm db:migrate` (empty database) | Passed — `0001_bootstrap_extensions: applied`, `0002_identity_core: applied`, `0003_source_rights_distribution: applied`; re-run reports `no pending migrations`. |
+| `pnpm db:generate-types` | Passed — the regenerated file is byte-identical to the committed one (checked with `cmp`). 12 tables introspected. |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13 / PostGIS 3.4.2) | Passed — **54 tests**: `extensions.test.ts` 4, `resolver.test.ts` 24, `pesel-import.test.ts` 26. Zero throwaway databases left behind. |
+| `pnpm build` | Passed — `apps/web`, `apps/admin` (`next build`), `apps/worker` (`tsc`). |
+| `pnpm import:pesel` against a real database, three runs | Passed, and reported honestly: male fixture → `IMPORTED`, 22 rows read / 22 imported / 22 surnames created / 22 snapshots / 22 values, reconciles; the same bytes again → `ALREADY_IMPORTED`, 0 read, 0 written, same `source_record` id; female fixture → `IMPORTED`, 23 rows read, **16 surnames created and 7 reused**, 23 snapshots, 23 values. A deliberately wrong `--expected-sha256` → refused with `checksum_mismatch` before parsing, exit code 1, and `distribution_values` unchanged at 45 rows. |
+| Database state after those runs | 38 surnames, 38 name forms, 45 snapshots, 45 values, 2 source records, 1 source, 1 rights profile. `SCHIED ` stored with its real trailing space while its canonical key collapses to `schied`; `DOG̈AN` stored as 6 code points including the standalone combining mark; `W/SILASSIE`, `A/GADIR`, `NGUYỄN`, `MÜLLER`, `WIŚNIEWSKI` all byte-preserved. |
+| Forbidden-logic grep over the new code (`similarity`, `levenshtein`, `soundex`, `metaphone`, `unaccent`, `transliterat`, `phonetic`, `fuzzy`, `gender`, `llm`, `rarity`, `trend`, plus `rank`/`surname_share`/`claim`/`evidence`/`confidence`) | Ran, four matches in total, every one prose: three comments stating what the importer does **not** do ("no rank, share, rarity, rate or trend", "transliterated or repaired", "gender-inflected") and one sentence of the coverage notes recording that the publisher does not disambiguate grammatical gender. Zero matches for `similarity`, `levenshtein`, `soundex`, `metaphone`, `unaccent`, `phonetic`, `fuzzy` and `llm` anywhere. `rank` and `surname_share` appear only as the canonical nullable columns `docs/canonical/11` §6.2 defines, written as null and asserted null. |
+| `git status --porcelain` on `docs/canonical/`, `docs/library/`, `docs/archive/`, `docs/reference/`, `docs/review/`, `prompts/` | Empty — all untouched. |
+
+**Not verified in this environment:** the integration suite against the pinned container image (registry egress-blocked); the importer against a full 408,182-row resource (bytes not in the repository); and the CI workflow end to end. Everything else above was run and observed.
+
+## TASK-004 follow-up — duplicate task file resolved (2026-09-20)
+
+The project owner instructed this session to deal with the second TASK-004 file ("ok zrob"). Two files for one task breaks `AGENTS.md` §3, and merging a superseded 148-line draft into the 380-line scope authority that already covers it would duplicate truth, which `AGENTS.md` §1 forbids. So the draft was compared section by section against the authority file and the implementation, its one unique contribution was adopted, and it was then deleted.
+
+**`tasks/004-pesel-ingestion-source-rights.md` deleted.** Everything it specified is covered: its §5.2 (importer creates `Surname` **and** `NameForm`), §5.3 (one `Surname`, two snapshots for a string in both resources), §5.4 (`universe_size` null), §5.5 (no male + female total), its nine §6 behaviours and its sixteen §7 acceptance tests all match what the authority file requires and what the implementation does and tests.
+
+**One real defect it caught, now fixed.** Its §5.1 argued `SourceRecord.record_type = API_OBJECT`; the implementation had `DATA_ROW`. `API_OBJECT` is correct: this importer creates one record per resource **file version**, not one per CSV row (`docs/canonical/12` §3.1's `BULK_DATASET` pattern is version-scoped), and the concrete retrieved object the record preserves is the publisher's own `api.dane.gov.pl` resource object held verbatim in `raw_payload`. Neither the authority task file nor any canonical document prescribes the value, so this was an open engineering choice decided wrongly the first time. Changed in `packages/sources/src/pesel/import.ts` with the reasoning in a comment, asserted in `tests/integration/src/pesel-import.test.ts`, and recorded in the authority task file's §7.
+
+No migration change was needed — `source_record_type` already carries `API_OBJECT`, being the canonical enum from `docs/canonical/11` §9.2.
+
+### Verification re-run after this change (2026-09-20)
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | Passed — 10 of 10 packages. |
+| `pnpm lint` | Passed — zero errors, zero warnings. |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 160 tests, unchanged. |
+| `pnpm test:integration` | Passed — 54 tests, including the `API_OBJECT` assertion, against local PostgreSQL 16.13 / PostGIS 3.4.2 via the `TEST_DATABASE_URL` fallback. |
+| `pnpm build` | Passed. |
+
 ## Next action
 
-TASK-001, TASK-002 and TASK-003 are implemented and verified. One flagged deviation awaits the project owner's acknowledgement: the `TemporalExtent` columns on `name_forms` were omitted alongside the two omissions §6.2 named (reasoning above); adding them later is a nullable-column migration. Per AGENTS.md §8: **STOP.** This session did not start TASK-004 and did not write `tasks/004-*.md`.
+TASK-001, TASK-002, TASK-003 and TASK-004 are implemented and verified. Per `AGENTS.md` §8: **STOP.** This session did not start TASK-005 and did not write `tasks/005-*.md`.
+
+Open for the project owner, none of it work this session may do:
+
+1. **D-006 — the unit of `Liczba`** (`docs/DECISIONS_NEEDED.md`). Blocks TASK-005's `CURRENT_POPULATION` claim. Needs a statement from the publisher, not inference from the data.
+2. **The rarity/`1-in-X` denominator** remains open, as D-001 records. `universe_size` is null everywhere and no denominator was invented.
+3. **The `TemporalExtent` omission from TASK-003** still awaits acknowledgement: `name_forms` has no `valid_from_*`/`valid_to_*` columns. Adding them later is a nullable-column migration. TASK-004 performs no temporal logic and did not need them.
+4. **Raw object storage (INF-001)** is still missing, which is why `SourceRecord.raw_text_ref` is null. Recorded as a deviation from `docs/canonical/12` §9.2, acknowledged under §14 U-3.
+5. **D-002, D-003 and D-004** are unchanged by this task. No regional resource was downloaded, parsed or ingested, and no map or regional logic exists.
