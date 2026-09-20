@@ -63,6 +63,14 @@ jobs:
       - name: Apply bootstrap migration
         run: pnpm db:migrate
 
+      # The generated types must depend only on the schema this project owns.
+      # The pinned postgis/postgis image's own init script loads four
+      # extensions into every database, two of which — postgis_tiger_geocoder
+      # and postgis_topology — create the `tiger` and `topology` schemas full
+      # of tables. kysely-codegen introspects every schema it can see, so
+      # without the --include-pattern="public.*" in db's generate-types script
+      # this check compares a CI database against a baseline generated on a
+      # database that never had those extensions, and can never pass.
       - name: Verify generated types are current
         run: |
           pnpm db:generate-types
