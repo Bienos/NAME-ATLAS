@@ -19,6 +19,7 @@ describe("MIGRATIONS_DIR", () => {
       "0008_pesel_rights_decision.ts", // D-007
       "0009_rarity_context.ts", // TASK-014 / U-6
       "0010_places_core.ts", // TASK-011 / D-004
+      "0011_current_distribution.ts", // TASK-012
     ]);
   });
 });

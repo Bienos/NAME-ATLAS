@@ -1,14 +1,21 @@
 /**
- * The plumbing every derived statistic shares (TASK-009, TASK-014):
- * resolve the input exactly, load the national values backing the surname,
- * and put each resource version through the completeness gate. `rank.ts`
- * and `rarity.ts` both start here, so there is one gate, not two, and a
- * universe that fails it fails for both claims identically.
+ * The plumbing every derived statistic shares (TASK-009, TASK-014, TASK-012):
+ * resolve the input exactly, load the values backing the surname, and put each
+ * resource version through the completeness gate. `rank.ts`, `rarity.ts` and
+ * `distribution.ts` all start here, so there is one gate, not three, and a
+ * universe that fails it fails for every claim identically.
+ *
+ * The national and regional paths deliberately share `resolveForDerivation`
+ * and `assessUniverseCompleteness`, and differ only in what they count: the
+ * national universe is one value per surname, the regional one is one value
+ * per (surname, voivodeship) cell. Both are compared against the same
+ * registry facts.
  */
 import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { resolveSurname } from "@name-atlas/resolver";
-import { findPeselResource } from "@name-atlas/sources";
+import { findPeselResource, TERYT_PROVIDER_KEY } from "@name-atlas/sources";
+import type { PeselResourceDescriptor } from "@name-atlas/sources";
 import { assessUniverseCompleteness } from "./completeness.js";
 import type { CompletenessVerdict } from "./completeness.js";
 import type { EffectiveRights } from "./rights.js";
@@ -117,15 +124,27 @@ export type PreparedDerivation =
       readonly complete: readonly CompleteUniverse[];
     };
 
+/** The shape a successful resolution hands to either derivation path. */
+export type ResolvedForDerivation =
+  | DerivationRefusal
+  | {
+      readonly kind: "RESOLVED";
+      readonly status: string;
+      readonly surname: CanonicalSurnameIdentity;
+    };
+
 /**
- * Resolves the input, loads its national values, and gates each resource
- * version. Returns a refusal — with nothing written — for invalid input,
- * ambiguity, an unresolved surname, no evidence, or no complete universe.
+ * Resolves one raw input to exactly one canonical surname, or returns the
+ * refusal that says why not. Shared by every derivation so that the national
+ * and regional chains cannot drift on what counts as resolved — the same
+ * failure mode `lookup.ts`'s bulk path was refactored to prevent.
+ *
+ * `EXACT` only, as TASK-005 §15 U-5 settled for the population chain.
  */
-export async function prepareDerivation(
+export async function resolveForDerivation(
   db: Kysely<DB>,
   rawInput: string,
-): Promise<PreparedDerivation> {
+): Promise<ResolvedForDerivation> {
   const lookup = await resolveSurname(db, rawInput);
 
   if (lookup.kind === "LOOKUP_FAILED") {
@@ -159,7 +178,6 @@ export async function prepareDerivation(
       message: "resolution is ambiguous or requires review; no candidate was selected",
     };
   }
-  // EXACT only, as TASK-005 §15 U-5 settled for the population chain.
   if (status !== "EXACT" || !resolution.resolved_surname_id) {
     return {
       kind: "NO_RESULT",
@@ -188,6 +206,24 @@ export async function prepareDerivation(
     canonical_key: surnameRow.canonical_key,
     primary_script: surnameRow.primary_script,
   };
+  return { kind: "RESOLVED", status, surname };
+}
+
+/**
+ * Resolves the input, loads its national values, and gates each resource
+ * version. Returns a refusal — with nothing written — for invalid input,
+ * ambiguity, an unresolved surname, no evidence, or no complete universe.
+ */
+export async function prepareDerivation(
+  db: Kysely<DB>,
+  rawInput: string,
+): Promise<PreparedDerivation> {
+  const resolved = await resolveForDerivation(db, rawInput);
+  if (resolved.kind !== "RESOLVED") {
+    return resolved;
+  }
+  const { status, surname } = resolved;
+  const surnameId = surname.surname_id;
 
   const candidates = await loadCandidates(db, surnameId);
   if (candidates.length === 0) {
@@ -312,4 +348,243 @@ export async function loadSourceContext(
   };
 }
 
-/** Derives or re-reads one rank claim, inside one transaction. */
+// ---------------------------------------------------------------------------
+// The regional path (TASK-012)
+// ---------------------------------------------------------------------------
+
+/** One published (surname, voivodeship) cell. */
+export interface RegionalCell {
+  readonly distribution_value_id: string;
+  readonly place_id: string;
+  /** The publisher's own geography string, kept so the join is auditable. */
+  readonly source_geography_key: string | null;
+  /** The TERYT TERC code for that place, via `entity_external_ids`. */
+  readonly terc_code: string | null;
+  readonly place_display_name: string;
+  readonly count: number;
+}
+
+/**
+ * One regional resource version's cells for one surname.
+ *
+ * Deliberately not a `UniverseCandidate`: a regional snapshot carries no
+ * single count, and giving it one would invite exactly the summing across the
+ * geography restriction that TASK-012 §8 forbids.
+ */
+export interface RegionalUniverseCandidate {
+  readonly distribution_snapshot_id: string;
+  readonly source_record_id: string;
+  readonly source_id: string;
+  readonly external_record_id: string | null;
+  readonly content_hash: string;
+  readonly as_of_date: string | null;
+  readonly universe_description: string;
+  readonly coverage_notes: string | null;
+  readonly comparability_group: string | null;
+  /** Descending by count, then by place name, so a projection is deterministic. */
+  readonly cells: readonly RegionalCell[];
+}
+
+/**
+ * Loads a surname's regional cells, grouped by resource version.
+ *
+ * A cell exists only where the publisher listed one. There is no row for a
+ * voivodeship the surname is absent from, and none is synthesised here:
+ * absence is not zero (`ARCHITECTURE.md` §10 invariant 4), and
+ * `docs/canonical/16` §28 forbids fabricated empty features specifically.
+ */
+export async function loadRegionalCandidates(
+  db: Kysely<DB>,
+  surnameId: string,
+): Promise<RegionalUniverseCandidate[]> {
+  const rows = await db
+    .selectFrom("distribution_snapshots as s")
+    .innerJoin(
+      "distribution_values as v",
+      "v.distribution_snapshot_id",
+      "s.distribution_snapshot_id",
+    )
+    .innerJoin("source_records as sr", "sr.source_record_id", "s.source_record_id")
+    .innerJoin("places as p", "p.place_id", "v.place_id")
+    .leftJoin("entity_external_ids as x", (join) =>
+      join.onRef("x.entity_id", "=", "p.place_id").on("x.provider_key", "=", TERYT_PROVIDER_KEY),
+    )
+    .select([
+      "s.distribution_snapshot_id",
+      "s.source_record_id",
+      "s.source_id",
+      "sr.external_record_id",
+      "sr.content_hash",
+      "s.universe_description",
+      "s.coverage_notes",
+      "s.comparability_group",
+      "v.distribution_value_id",
+      "v.place_id",
+      "v.source_geography_key",
+      "v.count",
+      "p.current_display_name",
+      "x.external_id as terc_code",
+    ])
+    .select((eb) =>
+      eb.fn<string | null>("to_char", ["s.as_of_date", eb.val("YYYY-MM-DD")]).as("as_of_date"),
+    )
+    .where("s.surname_id", "=", surnameId)
+    .where("s.geography_level", "=", "REGION")
+    .where("v.place_id", "is not", null)
+    .orderBy("s.source_record_id")
+    .orderBy("v.count", "desc")
+    .orderBy("p.current_display_name")
+    .execute();
+
+  const byRecord = new Map<string, RegionalUniverseCandidate>();
+  const cells = new Map<string, RegionalCell[]>();
+  for (const row of rows) {
+    if (row.place_id === null) continue;
+    if (!byRecord.has(row.source_record_id)) {
+      byRecord.set(row.source_record_id, {
+        distribution_snapshot_id: row.distribution_snapshot_id,
+        source_record_id: row.source_record_id,
+        source_id: row.source_id,
+        external_record_id: row.external_record_id,
+        content_hash: row.content_hash,
+        as_of_date: row.as_of_date,
+        universe_description: row.universe_description,
+        coverage_notes: row.coverage_notes,
+        comparability_group: row.comparability_group,
+        cells: [],
+      });
+      cells.set(row.source_record_id, []);
+    }
+    cells.get(row.source_record_id)?.push({
+      distribution_value_id: row.distribution_value_id,
+      place_id: row.place_id,
+      source_geography_key: row.source_geography_key,
+      terc_code: row.terc_code,
+      place_display_name: row.current_display_name,
+      count: Number(row.count),
+    });
+  }
+  return [...byRecord.values()].map((candidate) => ({
+    ...candidate,
+    cells: cells.get(candidate.source_record_id) ?? [],
+  }));
+}
+
+/**
+ * How many published cells exist against a regional source record.
+ *
+ * This, not the number of surnames, is what the registry's
+ * `official_row_count` records for a regional resource: the CSV has one data
+ * row per (voivodeship, surname) pair, so 646,052 rows describe 188,413
+ * surnames. Counting surnames here would fail the gate on every complete
+ * import.
+ */
+export async function regionalUniverseSize(
+  db: Kysely<DB>,
+  sourceRecordId: string,
+): Promise<number> {
+  const row = await db
+    .selectFrom("distribution_snapshots as s")
+    .innerJoin(
+      "distribution_values as v",
+      "v.distribution_snapshot_id",
+      "s.distribution_snapshot_id",
+    )
+    .select((eb) => eb.fn.countAll<string>().as("n"))
+    .where("s.source_record_id", "=", sourceRecordId)
+    .where("v.place_id", "is not", null)
+    .executeTakeFirstOrThrow();
+  return Number(row.n);
+}
+
+export interface CompleteRegionalUniverse {
+  readonly candidate: RegionalUniverseCandidate;
+  readonly verdict: Extract<CompletenessVerdict, { kind: "COMPLETE" }>;
+  /** The resource's registry descriptor, already matched by the gate. */
+  readonly descriptor: PeselResourceDescriptor;
+}
+
+export type PreparedRegionalDerivation =
+  | DerivationRefusal
+  | {
+      readonly kind: "READY";
+      readonly status: string;
+      readonly surname: CanonicalSurnameIdentity;
+      readonly complete: readonly CompleteRegionalUniverse[];
+    };
+
+/**
+ * The regional counterpart of `prepareDerivation`: resolve, load the cells,
+ * gate each resource version. Same gate, same refusals, nothing written.
+ */
+export async function prepareRegionalDerivation(
+  db: Kysely<DB>,
+  rawInput: string,
+): Promise<PreparedRegionalDerivation> {
+  const resolved = await resolveForDerivation(db, rawInput);
+  if (resolved.kind !== "RESOLVED") {
+    return resolved;
+  }
+  const { status, surname } = resolved;
+
+  const candidates = await loadRegionalCandidates(db, surname.surname_id);
+  if (candidates.length === 0) {
+    return {
+      kind: "NO_RESULT",
+      reason: "NO_APPLICABLE_EVIDENCE",
+      resolution_status: status,
+      surname,
+      message:
+        "surname resolved but no regional distribution snapshot exists; this is absence, " +
+        "not a distribution of zeroes",
+    };
+  }
+
+  const complete: CompleteRegionalUniverse[] = [];
+  const rejected: RejectedUniverse[] = [];
+
+  for (const candidate of candidates) {
+    const descriptor = candidate.external_record_id
+      ? findPeselResource(candidate.external_record_id)
+      : undefined;
+    const verdict = assessUniverseCompleteness({
+      externalRecordId: candidate.external_record_id,
+      actualContentHash: candidate.content_hash,
+      actualRowCount: await regionalUniverseSize(db, candidate.source_record_id),
+      descriptor: descriptor
+        ? {
+            officialSha256: descriptor.official_sha256,
+            officialRowCount: descriptor.official_row_count,
+          }
+        : null,
+    });
+    if (verdict.kind === "COMPLETE" && descriptor) {
+      complete.push({ candidate, verdict, descriptor });
+    } else {
+      rejected.push({
+        source_record_id: candidate.source_record_id,
+        external_record_id: candidate.external_record_id,
+        reason: verdict.kind === "COMPLETE" ? "UNKNOWN_RESOURCE" : verdict.reason,
+        expected_row_count: verdict.kind === "COMPLETE" ? null : verdict.expectedRowCount,
+        actual_row_count:
+          verdict.kind === "COMPLETE" ? verdict.universeSize : verdict.actualRowCount,
+      });
+    }
+  }
+
+  if (complete.length === 0) {
+    return {
+      kind: "NO_RESULT",
+      reason: "INCOMPLETE_UNIVERSE",
+      resolution_status: status,
+      surname,
+      message:
+        "no regional resource version backing this surname is a complete universe, so no " +
+        "distribution can be derived; a distribution over a partial import would misstate " +
+        "both the shares and the coverage",
+      incomplete_universes: rejected,
+    };
+  }
+
+  return { kind: "READY", status, surname, complete };
+}

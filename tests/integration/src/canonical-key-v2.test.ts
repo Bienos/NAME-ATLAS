@@ -124,12 +124,13 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
       SELECT canonical_key, canonical_key_version FROM surnames ORDER BY canonical_key
     `.execute(db);
 
-    // `0009`, `0008` and `0007` sit above `0006` and revert cleanly (two enum
-    // place tables, two enum additions that cannot be removed, a data update
-    // and two dropped columns). The refusal under test is `0006`'s, so step
-    // past all of them first, then ask for the next step down.
+    // `0011` down to `0007` sit above `0006` and revert cleanly (three enum
+    // additions that cannot be removed, the place tables, a data update and
+    // two dropped columns). The refusal under test is `0006`'s, so step past
+    // all of them first, then ask for the next step down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0011_current_distribution",
       "0010_places_core",
       "0009_rarity_context",
       "0008_pesel_rights_decision",

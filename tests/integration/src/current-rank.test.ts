@@ -364,6 +364,7 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
       "CURRENT_POPULATION",
       "CURRENT_RANK",
       "RARITY_CONTEXT", // 0009
+      "CURRENT_DISTRIBUTION", // 0011
     ]);
   });
 

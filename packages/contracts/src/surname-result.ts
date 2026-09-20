@@ -6,23 +6,25 @@
  * expressed in, and the single source of the types both sides use
  * (`ARCHITECTURE.md` §6, `docs/canonical/16` §1.3).
  *
- * Scope is deliberately one fact. There is no chapter framework, no
- * pagination, no rarity or rank placeholder, and no field whose only purpose
- * is a later task (`AGENTS.md` §6).
+ * Scope grew one fact at a time and still carries no field whose only purpose
+ * is a later task (`AGENTS.md` §6). TASK-006 added `population`, TASK-014
+ * `rarity` and TASK-012 `distribution`; there is still no chapter framework, no
+ * pagination and no placeholder for a fact that has no truth chain behind it.
  *
  * ── One recorded deviation ──────────────────────────────────────────────
  *
  * `docs/canonical/16` §26 fixes the population unit as the single literal
- * `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widens
- * it, because the PESEL publisher describes *"liczba wystąpień"* —
- * occurrences — and never states that one occurrence is one living person
- * (TASK-004 §14 U-4, still open). Emitting `"PEOPLE"` here would publish an
- * assertion the truth layer beneath is forbidden to make.
+ * `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widened
+ * it to a two-member enum while TASK-004 §14 U-4 was open. U-4 was decided on
+ * 2026-09-20 — the counted field is *nazwisko aktualne*, of which every living
+ * person in PESEL has exactly one — so PESEL-derived values emit `"PEOPLE"`
+ * again. `"SURNAME_OCCURRENCES"` stays in the enum for a source whose counted
+ * field is not one-per-person.
  */
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.1";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.2";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -35,7 +37,10 @@ export const numericValueStatusSchema = z.enum([
   "NOT_APPLICABLE",
 ]);
 
-/** ADR-0004. `PEOPLE` is unused until TASK-004 §14 U-4 is answered. */
+/**
+ * ADR-0004, as amended on 2026-09-20. PESEL emits `PEOPLE`;
+ * `SURNAME_OCCURRENCES` remains for a source counting something else.
+ */
 export const populationUnitSchema = z.enum(["PEOPLE", "SURNAME_OCCURRENCES"]);
 
 export const populationValueSchema = z
@@ -182,6 +187,111 @@ export const raritySectionSchema = z
   });
 
 /**
+ * `docs/canonical/16` §28's `PlaceStatDTO`.
+ *
+ * **§28 references `PlaceStatDTO` but never defines its fields** (recorded in
+ * `docs/contracts/surname-result.md`), so TASK-012 defines it here as the
+ * smallest shape the geography chapter needs: which place, how many, and what
+ * share of the covered set. No geometry and no `MapLayerDTO`: no place in the
+ * schema has a centroid, and §28 forbids returning fabricated map features.
+ *
+ * `share_of_covered` is a share of the **covered set** — the surname's own sum
+ * across the voivodeships the publisher listed for it. There is deliberately
+ * no field for a share of the national count (TASK-012 §2, §8).
+ */
+export const placeStatSchema = z.object({
+  place_id: z.string().uuid(),
+  /** TERYT TERC code, e.g. "30". Null only where no external id is recorded. */
+  terc_code: z.string().min(1).nullable(),
+  display_name: z.string().min(1),
+  count: z.number().int().positive(),
+  /** `count / covered_count`, nine places. Never over the national count. */
+  share_of_covered: z.number().positive().max(1),
+});
+
+/**
+ * Whether a distribution may be presented as the surname's distribution
+ * (TASK-012 §3). A scope property, never a confidence one.
+ *
+ * `COVERAGE_UNKNOWN` carries the same presentational obligation as
+ * `LOW_COVERAGE`: not knowing what share of the bearers these places hold is
+ * not a licence to present them as the whole.
+ */
+export const distributionCoverageStateSchema = z.enum([
+  "READY",
+  "LOW_COVERAGE",
+  "COVERAGE_UNKNOWN",
+]);
+
+/**
+ * One regional resource version's distribution for one surname.
+ *
+ * The refinements below are contract constraints, not conventions: a payload
+ * whose denominator disagrees with its numerators, or whose coverage state
+ * disagrees with its own ratio, fails validation rather than reaching a
+ * surface.
+ */
+export const distributionEntrySchema = z
+  .object({
+    coverage_state: distributionCoverageStateSchema,
+    /** Descending by count. Never padded to 16: an unlisted region has no entry. */
+    regions: z.array(placeStatSchema).min(1),
+    /** The surname's sum across `regions`. The denominator of every share. */
+    covered_count: z.number().int().positive(),
+    /** The same surname's count in the same partition's national resource. */
+    national_count: z.number().int().positive().nullable(),
+    /** `covered_count / national_count`, nine places, or null when unknown. */
+    coverage_ratio: z.number().positive().max(1).nullable(),
+    /** What that ratio is a ratio of, in words, on every entry. */
+    coverage_basis: z.string().min(1),
+    low_coverage_threshold: z.number().positive().max(1),
+    universe_label_code: z.string().min(1),
+    scope_label_code: z.string().min(1),
+    snapshot_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+    country_code: z.string().min(2),
+    comparability_group: z.string().min(1).nullable(),
+    confidence: confidenceSchema,
+    citation: citationSchema,
+  })
+  .refine((e) => e.regions.reduce((sum, r) => sum + r.count, 0) === e.covered_count, {
+    message: "covered_count must equal the sum of regions[].count",
+  })
+  .refine((e) => (e.coverage_ratio === null) === (e.national_count === null), {
+    message: "coverage_ratio is present exactly when national_count is",
+  })
+  .refine((e) => (e.coverage_ratio === null) === (e.coverage_state === "COVERAGE_UNKNOWN"), {
+    message: "coverage_state is COVERAGE_UNKNOWN exactly when coverage_ratio is null",
+  })
+  .refine(
+    (e) =>
+      e.coverage_ratio === null ||
+      e.coverage_ratio >= e.low_coverage_threshold === (e.coverage_state === "READY"),
+    {
+      message: "coverage_state must be READY exactly when coverage_ratio meets the threshold",
+    },
+  )
+  .refine((e) => e.national_count === null || e.covered_count <= e.national_count, {
+    message: "covered_count may never exceed national_count",
+  });
+
+/**
+ * `docs/canonical/16` §28's geography chapter, one entry per complete regional
+ * resource version (TASK-012). `state = UNAVAILABLE` where no approved current
+ * regional source is complete — never an empty map, never zero-filled regions.
+ */
+export const distributionSectionSchema = z
+  .object({
+    state: populationStateSchema,
+    /** Empty unless `state` is `READY`. */
+    entries: z.array(distributionEntrySchema),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine((s) => (s.state === "READY" ? s.entries.length > 0 : s.entries.length === 0), {
+    message: "entries are present exactly when state is READY",
+  });
+
+/**
  * `docs/canonical/16` §21, minus `canonical_slug`/`canonical_path`.
  *
  * Those are omitted deliberately (TASK-006 §15 U-2): no slug exists in the
@@ -217,6 +327,8 @@ export const surnameResultResponseSchema = z
     population: populationSectionSchema.nullable(),
     /** Added in 1.1 (TASK-014). Present exactly when RESOLVED, like population. */
     rarity: raritySectionSchema.nullable(),
+    /** Added in 1.2 (TASK-012). Present exactly when RESOLVED, like the rest. */
+    distribution: distributionSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -226,6 +338,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.rarity !== null : r.rarity === null), {
     message: "rarity section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.distribution !== null : r.distribution === null), {
+    message: "distribution section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -263,6 +378,10 @@ export type PopulationSection = z.infer<typeof populationSectionSchema>;
 export type RarityMetric = z.infer<typeof rarityMetricSchema>;
 export type RarityEntry = z.infer<typeof rarityEntrySchema>;
 export type RaritySection = z.infer<typeof raritySectionSchema>;
+export type PlaceStat = z.infer<typeof placeStatSchema>;
+export type DistributionCoverageState = z.infer<typeof distributionCoverageStateSchema>;
+export type DistributionEntry = z.infer<typeof distributionEntrySchema>;
+export type DistributionSection = z.infer<typeof distributionSectionSchema>;
 export type PublicSurnameIdentity = z.infer<typeof publicSurnameIdentitySchema>;
 export type ResultStatus = z.infer<typeof resultStatusSchema>;
 export type SurnameResultResponse = z.infer<typeof surnameResultResponseSchema>;

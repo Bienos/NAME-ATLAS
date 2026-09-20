@@ -315,3 +315,38 @@ export function findPeselResource(resourceId: string): PeselResourceDescriptor |
     (r) => r.resource_id === resourceId,
   );
 }
+
+/**
+ * The national resource describing the same partition as a regional one.
+ *
+ * This is registry truth, not arithmetic: only the registry knows that
+ * `1148786` and `1148808` are the same publisher's same partition of the same
+ * register on the same reference date, one restricted to permanent registered
+ * residence and one not. TASK-012 needs the pairing to state what share of a
+ * surname's national count can be placed in a voivodeship at all.
+ *
+ * `docs/canonical/11` §6.1 forbids comparing snapshots across comparability
+ * groups **without explicit justification**. The justification is exactly the
+ * pairing this function encodes — same publisher, same partition, same
+ * `data_date`, same counted field (*nazwisko aktualne*), same register, the
+ * regional resource differing only by the residence restriction — and it holds
+ * for no other pair of resources here. In particular it never pairs male with
+ * female: U-1 leaves the partition undisambiguated, so those stay unsummable
+ * and uncomparable, and `role` is matched on its suffix rather than guessed.
+ *
+ * Returns `undefined` for a national descriptor: it has no counterpart because
+ * it *is* the counterpart.
+ */
+export function nationalCounterpartOf(
+  descriptor: PeselResourceDescriptor,
+): PeselResourceDescriptor | undefined {
+  switch (descriptor.role) {
+    case "regional_male":
+      return PESEL_NATIONAL_MALE_2026;
+    case "regional_female":
+      return PESEL_NATIONAL_FEMALE_2026;
+    case "national_male":
+    case "national_female":
+      return undefined;
+  }
+}

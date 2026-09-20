@@ -216,7 +216,9 @@ describe("RARITY_CONTEXT against a real PostgreSQL", () => {
     expect(outcome.response.rarity?.state).toBe("UNAVAILABLE");
     expect(outcome.response.rarity?.reason_code).toBe("NO_COMPLETE_UNIVERSE");
     expect(outcome.response.rarity?.entries).toHaveLength(0);
-    expect(outcome.response.schema_version).toBe("1.1");
+    // 1.2 since TASK-012 added the geography chapter; the rarity rules above
+    // are unchanged by it.
+    expect(outcome.response.schema_version).toBe("1.2");
   });
 
   it("keys a rarity claim on the source record, so one exists per resource version", () => {

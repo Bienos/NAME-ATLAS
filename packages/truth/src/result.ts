@@ -255,3 +255,98 @@ export type SurnameRarityResult =
         readonly actual_row_count: number;
       }[];
     };
+
+/**
+ * Whether a distribution may be presented as the surname's distribution
+ * (TASK-012 §3). A scope property, never a confidence one: the counts are
+ * exactly what the source says in all three states.
+ */
+export type DistributionCoverageState =
+  /** Coverage is at or above the threshold. Presentable as the distribution. */
+  | "READY"
+  /**
+   * Coverage is below the threshold. The entries are real and returned, but a
+   * surface must present them as "of the N bearers with a registered
+   * voivodeship", never as where the surname is found.
+   */
+  | "LOW_COVERAGE"
+  /**
+   * No complete national resource version for this partition, so what share of
+   * the surname's bearers these cells represent is unknown. Presented exactly
+   * as `LOW_COVERAGE`: unknown coverage is not adequate coverage.
+   */
+  | "COVERAGE_UNKNOWN";
+
+/** One voivodeship's published figure for one surname. */
+export interface DistributionEntryResult {
+  readonly place_id: string;
+  /** TERYT TERC code, e.g. "30" for WIELKOPOLSKIE. Null if no id is recorded. */
+  readonly terc_code: string | null;
+  readonly place_display_name: string;
+  /** The publisher's own geography string, kept so the join stays auditable. */
+  readonly source_geography_key: string | null;
+  readonly count: number;
+  /** `count / covered_count`, to nine places. Never over the national count. */
+  readonly share_of_covered: number;
+}
+
+/**
+ * One `CURRENT_DISTRIBUTION` claim — one per regional resource version.
+ *
+ * There is deliberately no field expressing a share of the national count, and
+ * no entry for a voivodeship the publisher did not list. Both would state
+ * something the source does not support (TASK-012 §2, §8).
+ */
+export interface CurrentDistributionClaimResult {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly state: DistributionCoverageState;
+  /** Descending by count, then by place name. */
+  readonly entries: readonly DistributionEntryResult[];
+  /** How many voivodeships the publisher listed. Never assumed to be 16. */
+  readonly regions_present: number;
+  /** The surname's sum across those voivodeships. The shares' denominator. */
+  readonly covered_count: number;
+  /** The same surname's count in the same partition's national resource. */
+  readonly national_count: number | null;
+  /** `covered_count / national_count`, to nine places, or null when unknown. */
+  readonly coverage_ratio: number | null;
+  /** What that ratio is a ratio of, in words, on every claim. */
+  readonly coverage_basis: string;
+  /** The threshold `state` was decided against, so the decision is auditable. */
+  readonly low_coverage_threshold: number;
+  readonly universe: RankUniverse;
+  readonly universe_label_code: string;
+  readonly snapshot_date: string;
+  readonly country_code: string;
+  readonly source_population_scope: string;
+  /** Carries the registered-residence restriction verbatim. */
+  readonly coverage_notes: string | null;
+  readonly method_version: string;
+  readonly confidence: ConfidenceProjection;
+  readonly citation: CitationProjection;
+}
+
+export type SurnameDistributionResult =
+  | {
+      readonly kind: "RESULT";
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity;
+      /** One entry per complete regional resource version. Never merged. */
+      readonly current_distribution: readonly CurrentDistributionClaimResult[];
+      readonly surface_eligibility: readonly SurfaceEligibility[];
+    }
+  | {
+      readonly kind: "NO_RESULT";
+      readonly reason: NoRankReason;
+      readonly resolution_status: string;
+      readonly surname: CanonicalSurnameIdentity | null;
+      readonly message: string;
+      readonly incomplete_universes?: readonly {
+        readonly source_record_id: string;
+        readonly external_record_id: string | null;
+        readonly reason: string;
+        readonly expected_row_count: number | null;
+        readonly actual_row_count: number;
+      }[];
+    };

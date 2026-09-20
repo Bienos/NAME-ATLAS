@@ -33,6 +33,7 @@ export {
   PESEL_REGIONAL_FEMALE_2026,
   PESEL_REGIONAL_RESOURCES_2026,
   findPeselResource,
+  nationalCounterpartOf,
 } from "./registry.js";
 export type {
   CachePermission,

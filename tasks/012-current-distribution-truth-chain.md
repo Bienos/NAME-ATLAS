@@ -1,7 +1,12 @@
 # TASK-012 — `CURRENT_DISTRIBUTION` truth chain (registered-domicile, voivodeship)
 
-- **Status:** SPECIFIED 2026-09-20, not implemented. One open decision for the project owner: §3's
-  low-coverage threshold. Everything else is settled in this file.
+- **Status:** IMPLEMENTED 2026-09-20. All eight acceptance criteria met; see `PROGRESS.md`. §3's
+  threshold was implemented at the recommended 0.50 and is recorded as **D-015** for the project
+  owner's confirmation; it is a one-constant change. Two refinements were made during
+  implementation, both recorded in `PROGRESS.md`: a third read state `COVERAGE_UNKNOWN` for a
+  complete regional resource whose national counterpart is not complete, and AC-3's share-sum
+  tolerance widened to the per-entry rounding the shares actually carry (up to 1e-9 per entry;
+  observed maximum 3e-9 over 310 claims).
 - **Created:** 2026-09-20, after TASK-011 stored the regional values it needs.
 - **Milestone:** M2, the last claim of the current-surname vertical.
 - **Depends on:** TASK-011 (regional storage, the 16 voivodeship places), TASK-009 (the

@@ -23,6 +23,8 @@
 import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import type {
+  DistributionEntry,
+  DistributionSection,
   PopulationObservation,
   PopulationSection,
   SurfaceEligibilityDto,
@@ -32,8 +34,12 @@ import type {
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname } from "@name-atlas/resolver";
-import { readCurrentPopulation, readRarityContext } from "./read.js";
-import type { PersistedCurrentPopulation, PersistedRarityContext } from "./read.js";
+import { readCurrentDistribution, readCurrentPopulation, readRarityContext } from "./read.js";
+import type {
+  PersistedCurrentDistribution,
+  PersistedCurrentPopulation,
+  PersistedRarityContext,
+} from "./read.js";
 import { evaluateSurface } from "./rights.js";
 import type { Surface } from "./rights.js";
 import { RARITY_METHODOLOGY_CODE } from "./version.js";
@@ -88,6 +94,60 @@ function emptyRarity(
   surface: SurfaceEligibilityDto,
 ): RaritySection {
   return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+function emptyDistribution(
+  state: "UNAVAILABLE" | "RIGHTS_BLOCKED",
+  reasonCode: string,
+  surface: SurfaceEligibilityDto,
+): DistributionSection {
+  return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+/**
+ * Projects one persisted distribution claim into canonical/16 §28's shape
+ * (TASK-012).
+ *
+ * `coverage_state` travels with the figures rather than being derived by the
+ * consumer: a surface must not have to recompute whether 210 of 6,442 bearers
+ * is enough to call something a distribution.
+ */
+function toDistributionEntry(claim: PersistedCurrentDistribution): DistributionEntry {
+  return {
+    coverage_state: claim.state as DistributionEntry["coverage_state"],
+    regions: claim.entries.map((entry) => ({
+      place_id: entry.place_id,
+      terc_code: entry.terc_code,
+      display_name: entry.place_display_name,
+      count: entry.count,
+      share_of_covered: entry.share_of_covered,
+    })),
+    covered_count: claim.covered_count,
+    national_count: claim.national_count,
+    coverage_ratio: claim.coverage_ratio,
+    coverage_basis: claim.coverage_basis,
+    low_coverage_threshold: claim.low_coverage_threshold,
+    universe_label_code: claim.universe_label_code,
+    scope_label_code: PESEL_SCOPE_LABEL_CODE,
+    snapshot_date: claim.snapshot_date,
+    country_code: claim.country_code,
+    comparability_group: claim.comparability_group,
+    confidence: {
+      status: claim.confidence_status as DistributionEntry["confidence"]["status"],
+      methodology_code: `${claim.assessment_method}@${claim.assessment_version}`,
+    },
+    citation: {
+      id: claim.citation_id,
+      title: claim.citation_title,
+      publisher: claim.citation_publisher,
+      publication_date: claim.citation_publication_date,
+      source_type: claim.source_type,
+      locator: claim.citation_locator,
+      url: claim.citation_url,
+      attribution: claim.attribution_text,
+      terms: claim.terms_version,
+    },
+  };
 }
 
 /** Projects one persisted rarity claim into canonical/16 §27's shape (TASK-014). */
@@ -196,6 +256,7 @@ export async function querySurnameResult(
         surname: null,
         population: null,
         rarity: null,
+        distribution: null,
       },
     };
   }
@@ -212,6 +273,7 @@ export async function querySurnameResult(
         surname: null,
         population: null,
         rarity: null,
+        distribution: null,
       },
     };
   }
@@ -219,6 +281,7 @@ export async function querySurnameResult(
   const surnameId = resolution.resolved_surname_id;
   const claims = await readCurrentPopulation(db, surnameId);
   const rarityClaims = await readRarityContext(db, surnameId);
+  const distributionClaims = await readCurrentDistribution(db, surnameId);
 
   const identity = {
     id: surnameId,
@@ -248,6 +311,7 @@ export async function querySurnameResult(
         surname: identity,
         population: emptySection("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
         rarity: emptyRarity("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
+        distribution: emptyDistribution("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
       },
     };
   }
@@ -271,6 +335,7 @@ export async function querySurnameResult(
         surname: identity,
         population: emptySection("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         rarity: emptyRarity("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
+        distribution: emptyDistribution("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
       },
     };
   }
@@ -301,6 +366,19 @@ export async function querySurnameResult(
               surface: eligibility,
             }
           : emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", eligibility),
+      // The geography chapter needs a complete *regional* resource version,
+      // which is a different universe from the national one, so it too can be
+      // absent where population is present. docs/canonical/16 §28: state the
+      // absence, never return an empty map.
+      distribution:
+        distributionClaims.length > 0
+          ? {
+              state: "READY",
+              entries: distributionClaims.map(toDistributionEntry),
+              reason_code: null,
+              surface: eligibility,
+            }
+          : emptyDistribution("UNAVAILABLE", "NO_COMPLETE_REGIONAL_UNIVERSE", eligibility),
     },
   };
 }

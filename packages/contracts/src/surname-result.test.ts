@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   SURNAME_RESULT_SCHEMA_VERSION,
   apiErrorResponseSchema,
+  distributionEntrySchema,
+  distributionSectionSchema,
   populationObservationSchema,
   populationSectionSchema,
   populationValueSchema,
@@ -199,6 +201,7 @@ describe("top-level response", () => {
         surname: null,
         population: null,
         rarity: null,
+        distribution: null,
       }).success,
     ).toBe(false);
   });
@@ -211,6 +214,7 @@ describe("top-level response", () => {
         surname: identity,
         population: null,
         rarity: null,
+        distribution: null,
       }).success,
     ).toBe(false);
   });
@@ -223,6 +227,7 @@ describe("top-level response", () => {
         surname: null,
         population: null,
         rarity: null,
+        distribution: null,
       }).success,
     ).toBe(true);
   });
@@ -240,6 +245,7 @@ describe("top-level response", () => {
           surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "X" },
         },
         rarity: null,
+        distribution: null,
       }).success,
     ).toBe(false);
   });
@@ -252,6 +258,176 @@ describe("top-level response", () => {
         surname: null,
         population: null,
         rarity: null,
+        distribution: null,
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("distribution entry (docs/canonical/16 §28, TASK-012)", () => {
+  // Three synthetic regions whose counts sum to 100, so the arithmetic a
+  // refinement checks is obvious by inspection.
+  const REGIONS = [
+    {
+      place_id: "01a0c057-0000-7000-8000-000000000001",
+      terc_code: "30",
+      display_name: "WIELKOPOLSKIE",
+      count: 50,
+      share_of_covered: 0.5,
+    },
+    {
+      place_id: "01a0c057-0000-7000-8000-000000000002",
+      terc_code: "24",
+      display_name: "ŚLĄSKIE",
+      count: 30,
+      share_of_covered: 0.3,
+    },
+    {
+      place_id: "01a0c057-0000-7000-8000-000000000003",
+      terc_code: "20",
+      display_name: "PODLASKIE",
+      count: 20,
+      share_of_covered: 0.2,
+    },
+  ];
+
+  const ENTRY = {
+    coverage_state: "READY" as const,
+    regions: REGIONS,
+    covered_count: 100,
+    national_count: 110,
+    coverage_ratio: 0.909090909,
+    coverage_basis: "covered_count / national_count",
+    low_coverage_threshold: 0.5,
+    universe_label_code: "PESEL_REGISTERED_VOIVODESHIP_COVERED_SET",
+    scope_label_code: "PESEL_CURRENT_SURNAME",
+    snapshot_date: "2026-01-20",
+    country_code: "PL",
+    comparability_group: "pesel_2026_regional_male",
+    confidence: { status: "VERIFIED" as const, methodology_code: "rule@1" },
+    citation: VALID_CITATION,
+  };
+
+  it("accepts a complete entry", () => {
+    expect(distributionEntrySchema.safeParse(ENTRY).success).toBe(true);
+  });
+
+  it("rejects a covered count that disagrees with its own regions", () => {
+    // The whole point of the covered set is that it is the sum of the
+    // numerators. A payload where it is not cannot be served.
+    expect(distributionEntrySchema.safeParse({ ...ENTRY, covered_count: 99 }).success).toBe(false);
+  });
+
+  it("rejects a region with a count of 0 — an unlisted region has no entry at all", () => {
+    expect(
+      distributionEntrySchema.safeParse({
+        ...ENTRY,
+        regions: [
+          ...REGIONS,
+          {
+            place_id: "01a0c057-0000-7000-8000-000000000004",
+            terc_code: "28",
+            display_name: "WARMIŃSKO-MAZURSKIE",
+            count: 0,
+            share_of_covered: 0,
+          },
+        ],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an entry with no regions", () => {
+    expect(
+      distributionEntrySchema.safeParse({ ...ENTRY, regions: [], covered_count: 100 }).success,
+    ).toBe(false);
+  });
+
+  it("requires COVERAGE_UNKNOWN exactly when the ratio is null", () => {
+    expect(
+      distributionEntrySchema.safeParse({
+        ...ENTRY,
+        coverage_state: "COVERAGE_UNKNOWN",
+        national_count: null,
+        coverage_ratio: null,
+      }).success,
+    ).toBe(true);
+    // A null ratio with a state claiming the figures are presentable.
+    expect(
+      distributionEntrySchema.safeParse({
+        ...ENTRY,
+        national_count: null,
+        coverage_ratio: null,
+      }).success,
+    ).toBe(false);
+    // A known ratio dressed as unknown.
+    expect(
+      distributionEntrySchema.safeParse({ ...ENTRY, coverage_state: "COVERAGE_UNKNOWN" }).success,
+    ).toBe(false);
+  });
+
+  it("requires a ratio and a national count to travel together", () => {
+    expect(distributionEntrySchema.safeParse({ ...ENTRY, national_count: null }).success).toBe(
+      false,
+    );
+    expect(distributionEntrySchema.safeParse({ ...ENTRY, coverage_ratio: null }).success).toBe(
+      false,
+    );
+  });
+
+  it("requires the coverage state to agree with the threshold it carries", () => {
+    // MELNYK's real shape: 210 placed of 6,442, which is not a distribution.
+    expect(
+      distributionEntrySchema.safeParse({
+        ...ENTRY,
+        coverage_state: "LOW_COVERAGE",
+        national_count: 3068,
+        coverage_ratio: 0.032594524,
+      }).success,
+    ).toBe(true);
+    // The same figures labelled READY.
+    expect(
+      distributionEntrySchema.safeParse({
+        ...ENTRY,
+        national_count: 3068,
+        coverage_ratio: 0.032594524,
+      }).success,
+    ).toBe(false);
+  });
+
+  it("refuses a covered count above the national count", () => {
+    expect(
+      distributionEntrySchema.safeParse({ ...ENTRY, national_count: 99, coverage_ratio: 0.99 })
+        .success,
+    ).toBe(false);
+  });
+
+  it("has no field for a share of the national count", () => {
+    const parsed = distributionEntrySchema.parse(ENTRY);
+    const keys = Object.keys(parsed).concat(Object.keys(parsed.regions[0] ?? {}));
+    expect(keys.filter((k) => k.includes("national"))).toEqual(["national_count"]);
+    expect(keys).not.toContain("share_of_national");
+    expect(keys).not.toContain("share");
+  });
+});
+
+describe("distribution section (docs/canonical/16 §28)", () => {
+  const SURFACE = { surface: "FREE" as const, decision: "ALLOWED" as const, reason_code: "OK" };
+
+  it("forbids entries when UNAVAILABLE — §28 forbids a fabricated empty map", () => {
+    expect(
+      distributionSectionSchema.safeParse({
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_COMPLETE_REGIONAL_UNIVERSE",
+        surface: SURFACE,
+      }).success,
+    ).toBe(true);
+    expect(
+      distributionSectionSchema.safeParse({
+        state: "READY",
+        entries: [],
+        reason_code: null,
+        surface: SURFACE,
       }).success,
     ).toBe(false);
   });

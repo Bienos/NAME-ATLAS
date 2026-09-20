@@ -2212,3 +2212,167 @@ cell with a `place_id`, and the reconciliation figures above. It may **not** ass
 sum equals a national count, that the residual is explained, or that a region may be compared with
 another sex's region. And the binding framing stands: this is *permanent registered residence*,
 never origin, ancestry, birthplace or unqualified current residence.
+
+## TASK-012 implemented — `CURRENT_DISTRIBUTION`, counts and shares of the covered set (2026-09-20)
+
+Scope authority: `tasks/012-current-distribution-truth-chain.md`. The last claim of the
+current-surname vertical. The spec left exactly one decision open — the low-coverage threshold — and
+it was implemented at the recommended **0.50**, in one named constant
+(`DISTRIBUTION_LOW_COVERAGE_THRESHOLD`) with its rationale; moving it changes nothing else. That
+value is an implementation default awaiting the project owner's confirmation, not a decision made on
+their behalf.
+
+### What exists now
+
+- `0011_current_distribution` — one enum value, `CURRENT_DISTRIBUTION` on `claim_type`. No table and
+  no column: the roles this chain needs already exist, and a derived value is a claim, not a column
+  (`ARCHITECTURE.md` §10 invariant 10).
+- `packages/truth/src/universe.ts` — `resolveForDerivation` extracted from `prepareDerivation`, so
+  the national and regional paths cannot drift on what counts as resolved, plus
+  `loadRegionalCandidates`, `regionalUniverseSize` and `prepareRegionalDerivation`. One gate for
+  three claims. `regionalUniverseSize` counts published **cells**, not surnames, because that is
+  what the registry's `official_row_count` records: 646,052 rows describe 188,413 surnames.
+- `packages/truth/src/distribution.ts` — `deriveCurrentDistribution` plus four pure, exported
+  functions (`coveredSetSum`, `shareOfCovered`, `coverageRatio`, `coverageState`).
+- `packages/sources/src/registry.ts` — `nationalCounterpartOf`, which pairs `1148786` with
+  `1148808` and `1148790` with `1148811` and returns nothing for anything else. It never pairs male
+  with female.
+- Read path: `readCurrentDistribution`, a `distribution` section in `query.ts`, and the contract at
+  schema **1.2** with `placeStatSchema`, `distributionEntrySchema` and `distributionSectionSchema`.
+- `pnpm demo:surname-distribution`.
+
+### The design question the data settled
+
+A regional figure could be published as a share of the national count. It is not, and must not be.
+The 16 voivodeships hold 78.3% (male) and 80.2% (female) of the national totals, and the shortfall
+is biased by surname size — 78.0% for surnames with 10–99 bearers against 89.3% above 10,000
+(TASK-008). Per surname it is far worse. Observed:
+
+| Surname | Partition | Regions | Covered | National | Coverage | State |
+|---|---|---:|---:|---:|---:|---|
+| `NOWAK` | male | 16 | 86,969 | 98,387 | 0.884 | `READY` |
+| `NOWAK` | female | 16 | 89,385 | 99,738 | 0.896 | `READY` |
+| `MELNYK` | male | 14 | 210 | 6,442 | 0.033 | `LOW_COVERAGE` |
+| `MELNYK` | female | 14 | 239 | 7,257 | 0.033 | `LOW_COVERAGE` |
+
+A share of the national count would report `MELNYK` as almost absent from every region of a country
+where it has 6,442 registered bearers. So every share is of the **covered set** — the surname's own
+regional sum — and coverage travels on the claim as a state a surface must honour, not a footnote it
+may drop.
+
+### Three honesty properties, each checked rather than asserted
+
+1. **Coverage never touches confidence.** All 310 derived claims are `VERIFIED`: 276 `READY` and 34
+   `LOW_COVERAGE`. The counts are exactly what the source says in both states; what differs is
+   scope. Conflating the two is what `ARCHITECTURE.md` §10 invariant 2 exists to prevent.
+2. **Unknown coverage is its own state.** `COVERAGE_UNKNOWN` exists because a regional resource can
+   be complete while its national counterpart is not, and not knowing what share of the bearers a
+   set of cells represents is not a licence to present it as the whole. Zero claims reached it here,
+   because both national resources are complete; the state and its contract refinement exist
+   regardless. This is a refinement of the spec, which named only two states.
+3. **The one cross-group comparison is justified in writing.** `coverage_ratio` compares a regional
+   snapshot with a national one, which `docs/canonical/11` §6.1 permits only with explicit
+   justification. The justification is `nationalCounterpartOf`'s pairing — same publisher, same
+   partition, same reference date, same counted field, same register, differing only by the
+   residence restriction — and `DISTRIBUTION_COVERAGE_BASIS` states it on every claim.
+
+### The complete-universe path, verified by SQL recomputation
+
+The committed regional fixtures are 40- and 38-row excerpts, so the integration suite can only prove
+the refusal — the same constraint TASK-009 and TASK-014 documented. AC-2 to AC-7 were therefore
+verified against the real imported resources, by recomputing every figure in SQL from
+`distribution_values` rather than from the code that wrote it. 180 surnames were derived, spanning
+the size range (the top 60 by covered count, 60 at the median percentile, the 60 smallest), giving
+**310 claims over 2,113 entries**:
+
+| Check | Result |
+|---|---|
+| Entries whose `count` ≠ the stored `distribution_values.count` | 0 of 2,113 |
+| Entries whose `share_of_covered` ≠ `round(count/covered, 9)` | 0 of 2,113 |
+| Entries with no corresponding stored row | 0 |
+| Entries missing a TERC code | 0 |
+| Entries with a count below 1 | 0 |
+| Claims whose `covered_count` ≠ `SUM(count)` | 0 of 310 |
+| Claims whose `regions_present` ≠ the SQL row count | 0 of 310 |
+| Claims whose `national_count` ≠ the same partition's national value | 0 of 310 |
+| Claims whose `coverage_ratio` ≠ `round(covered/national, 9)` | 0 of 310 |
+| Claims where `covered_count > national_count` | 0 of 310 |
+| Largest drift of a claim's shares from 1 | 3e-9 |
+| Regions per claim | min 1, max 16 |
+| Claims without exactly 3 lineage rows in roles `COUNT`/`DENOMINATOR`/`UNIVERSE` | 0 of 310 |
+| Distinct `claim_key` values / active claims / max per key | 310 / 310 / 1 |
+| Claims missing `coverage_basis` or the residence restriction | 0 of 310 |
+| Payload fields expressing a share of the national count | 0 |
+
+`min 1` region is the point of AC-6: a surname listed in one voivodeship gets one entry, not sixteen
+with fifteen zeroes. The 3e-9 drift is per-entry rounding at nine places over up to 16 entries;
+apportioning the remainder would distort individual shares, so the tolerance is stated instead.
+
+### The DTO, checked against a real payload rather than only a synthetic one
+
+The integration suite cannot reach a `READY` distribution, so the schema-1.2 projection was run
+against the real claims through `querySurnameResult` and validated with
+`surnameResultResponseSchema`. This is the check that would catch a key-name mismatch between the
+claim payload, the reader and the DTO, which no synthetic test can see:
+
+| Surname | Partition | Section state | Entry `coverage_state` | Regions | Largest region | Sum of shares | Schema valid |
+|---|---|---|---|---:|---|---:|---|
+| `NOWAK` | male | `READY` | `READY` | 16 | `WIELKOPOLSKIE` (TERC 30), 16,077 | 1 | yes |
+| `NOWAK` | female | `READY` | `READY` | 16 | `WIELKOPOLSKIE` (TERC 30), 16,203 | 1 | yes |
+| `MELNYK` | male | `READY` | `LOW_COVERAGE` | 14 | `WARMIŃSKO-MAZURSKIE` (TERC 28), 38 | 1.000000001 | yes |
+| `MELNYK` | female | `READY` | `LOW_COVERAGE` | 14 | `MAZOWIECKIE` (TERC 14), 40 | 1.000000001 | yes |
+
+The two levels are deliberate and must not be conflated. The **section** state says whether figures
+are present at all (`READY` / `UNAVAILABLE` / `RIGHTS_BLOCKED`, as `population` and `rarity` use).
+The **entry** `coverage_state` says how those figures may be presented. `MELNYK` is therefore a
+`READY` section carrying two `LOW_COVERAGE` entries: the data is real and is returned, and a surface
+must render it as "of the 210 bearers with a registered voivodeship".
+
+`1.000000001` is the per-entry rounding drift in the real data. The schema deliberately does not
+require the shares to sum to 1 — it requires `covered_count` to equal the sum of the *counts*, which
+is exact.
+
+### AC-8 — nothing else moved
+
+- `0001`–`0011` applied to a freshly created database in order; re-run reported `no pending
+  migrations`.
+- `pnpm db:generate-types` against that fresh database produced a file byte-identical to the
+  committed one. The only change from the previous commit is the new `ClaimType` member.
+- After deriving 310 distributions, `NOWAK` still reads: counts 98,387 / 99,738; rank **1 of
+  408,182**; **about 1 in 215** of 21,197,537, share 0.004641435. Unchanged.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 11 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 283 unit tests
+                                 (resolver 74, sources 74, truth 77, contracts 36, db 4,
+                                  domain 7, testing 3, web 5, worker 2, admin 1)
+pnpm test:integration         → passed, 182 tests across 12 files, exit 0
+pnpm db:migrate (fresh DB)    → 0001–0011 applied; re-run: no pending migrations
+pnpm db:generate-types        → 22 tables, byte-identical to the committed file
+pnpm build                    → passed, 3 apps
+pnpm demo:surname-distribution "NOWAK"   → 2 claims, both READY, 16 regions each
+pnpm demo:surname-distribution "MELNYK"  → 2 claims, both LOW_COVERAGE, 14 regions each
+```
+
+Three stale assertions in existing suites were corrected as part of this change: the `claim_type`
+enum list in `current-rank.test.ts`, the pinned schema version in `rarity-context.test.ts`, and the
+`migrateDown` step list in `canonical-key-v2.test.ts`. Two stale comments in
+`packages/contracts/src/surname-result.ts` still described U-4 as open; U-4 was decided on
+2026-09-20, so they were corrected to match.
+
+### What M2 has now, and what is still open
+
+The current-surname vertical is complete: `CURRENT_POPULATION`, `CURRENT_RANK`, `RARITY_CONTEXT` and
+`CURRENT_DISTRIBUTION`, each over a gated complete universe, each with lineage, confidence, a
+citation and a rights decision, and all four readable through one contract at schema 1.2.
+
+Still open, unchanged by this task: the low-coverage threshold awaits the owner's confirmation at
+0.50; the ~21% regional residual's *cause* stays `UNRESOLVED` pending a publisher enquiry (optional,
+blocks nothing); D-002 (onomastics rights) and D-003 (Polona rights) belong to later milestones.
+`GEOGRAPHIC_ORIGIN` was explicitly **not** produced here — `docs/canonical/14` §27.3 makes modern
+concentration contextual evidence, not proof of origin — and the binding framing stands: these
+counts are *permanent registered residence*, never location, origin, ancestry or birthplace.

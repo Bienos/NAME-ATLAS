@@ -20,7 +20,8 @@
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
-    "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity"
+    "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",
+    "demo:surname-distribution": "pnpm --filter @name-atlas/truth run demo:surname-distribution"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
