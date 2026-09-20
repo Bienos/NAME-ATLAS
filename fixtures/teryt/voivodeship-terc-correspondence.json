@@ -1,0 +1,220 @@
+{
+  "$schema_note": "TASK-008 §4 item 8 / acceptance item 24. Evidence only: a documented, checked correspondence between the 16 geography strings observed in the PESEL regional resources and the TERYT TERC voivodeship register. Not a Place, not a table, not a connector. Every code below was read from the TERC file named in `terc_source`; none was typed.",
+  "created": "2026-09-20",
+  "observed_values": {
+    "source": "fixtures/pesel/source-manifest.json → regional_resources_not_ingested[*].verified_from_bytes.geography_value_row_counts",
+    "resources": [
+      {
+        "resource_id": "1148786",
+        "checksum_sha256": "0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51"
+      },
+      {
+        "resource_id": "1148790",
+        "checksum_sha256": "cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989"
+      }
+    ],
+    "count": 16,
+    "identical_in_both_resources": true,
+    "all_nfc": true
+  },
+  "comparison_method": {
+    "name": "EXACT_BYTE_EQUAL",
+    "definition": "The observed value string is compared to TERC `NAZWA` of every row whose POW, GMI and RODZ are blank (the 16 voivodeship rows, all with NAZWA_DOD = 'województwo'). Equality is code-point equality after no transformation: no case folding, no whitespace change, no Unicode normalisation was applied. Both sides were checked to be NFC already.",
+    "rows_considered": 16
+  },
+  "result": {
+    "observed": 16,
+    "mapped": 16,
+    "unmapped": 0
+  },
+  "entries": [
+    {
+      "observed_geography_value": "DOLNOŚLĄSKIE",
+      "terc_woj": "02",
+      "terc_nazwa": "DOLNOŚLĄSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "KUJAWSKO-POMORSKIE",
+      "terc_woj": "04",
+      "terc_nazwa": "KUJAWSKO-POMORSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "LUBELSKIE",
+      "terc_woj": "06",
+      "terc_nazwa": "LUBELSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "LUBUSKIE",
+      "terc_woj": "08",
+      "terc_nazwa": "LUBUSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "MAZOWIECKIE",
+      "terc_woj": "14",
+      "terc_nazwa": "MAZOWIECKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "MAŁOPOLSKIE",
+      "terc_woj": "12",
+      "terc_nazwa": "MAŁOPOLSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "OPOLSKIE",
+      "terc_woj": "16",
+      "terc_nazwa": "OPOLSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "PODKARPACKIE",
+      "terc_woj": "18",
+      "terc_nazwa": "PODKARPACKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "PODLASKIE",
+      "terc_woj": "20",
+      "terc_nazwa": "PODLASKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "POMORSKIE",
+      "terc_woj": "22",
+      "terc_nazwa": "POMORSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "WARMIŃSKO-MAZURSKIE",
+      "terc_woj": "28",
+      "terc_nazwa": "WARMIŃSKO-MAZURSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "WIELKOPOLSKIE",
+      "terc_woj": "30",
+      "terc_nazwa": "WIELKOPOLSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "ZACHODNIOPOMORSKIE",
+      "terc_woj": "32",
+      "terc_nazwa": "ZACHODNIOPOMORSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "ŁÓDZKIE",
+      "terc_woj": "10",
+      "terc_nazwa": "ŁÓDZKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "ŚLĄSKIE",
+      "terc_woj": "24",
+      "terc_nazwa": "ŚLĄSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    },
+    {
+      "observed_geography_value": "ŚWIĘTOKRZYSKIE",
+      "terc_woj": "26",
+      "terc_nazwa": "ŚWIĘTOKRZYSKIE",
+      "terc_nazwa_dod": "województwo",
+      "terc_stan_na": "2026-01-01",
+      "comparison": "EXACT_BYTE_EQUAL"
+    }
+  ],
+  "terc_source": {
+    "supplied_by": "project owner, 2026-09-20, as the extracted contents of the acquisition run's `teryt_terc` download (acquisition report row `teryt_terc | DOWNLOADED | 132136 | raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip`)",
+    "files": [
+      {
+        "name": "TERC_Urzedowy_2026-09-18.csv",
+        "byte_size": 205660,
+        "sha256": "557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4",
+        "encoding": "UTF-8 with BOM",
+        "line_terminator": "CRLF",
+        "delimiter": ";",
+        "header": "WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA",
+        "data_rows": 4360
+      },
+      {
+        "name": "TERC_Urzedowy_2026-09-18.xml",
+        "byte_size": 960750,
+        "sha256": "84d4419a4e3018eb0de40298ed9c839fe3f39b33ffec197cb025a00dae02da0a",
+        "catalog": {
+          "name": "TERC",
+          "type": "ALL",
+          "date": "2026-01-01"
+        },
+        "rows": 4360,
+        "identical_to_csv_row_by_row": true
+      }
+    ],
+    "register_reference_date_stan_na": "2026-01-01",
+    "voivodeship_rows_in_register": 16,
+    "archive_identity": {
+      "expected_archive_file": "raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip",
+      "expected_archive_sha256": "1cfbb50ebf97dfc797aca94331029983bc7f1e752dff94c973026437ba7d2768",
+      "expected_archive_byte_size": 132136,
+      "match_status": "NOT_VERIFIED — the archive zip itself was not supplied; only its extracted files were. The digests above are of the supplied files, not of the zip. Supply the zip to close this."
+    },
+    "source_url_as_used": null,
+    "source_url_note": "Not recorded: the acquisition report logs the TERYT downloads without a URL, and both GUS hosts were egress-blocked in every session (HTTP 000, CONNECT 403), so no session fetched this file itself.",
+    "rights_statement_quoted_from_docs_canonical_12_s2_1": "GUS states that TERYT ws1 is available to public and commercial entities and that the service/data are free of charge.",
+    "gus_page_reached_by_this_project": false
+  },
+  "simc_supplied_alongside_not_used": [
+    {
+      "name": "SIMC_Urzedowy_2026-09-18.csv",
+      "byte_size": 5566752,
+      "sha256": "316c6446da15f53fef77ae3f28bda60f9c0300120c217eaa4431e1661a018c5a",
+      "header": "WOJ;POW;GMI;RODZ_GMI;RM;MZ;NAZWA;SYM;SYMPOD;STAN_NA",
+      "data_rows": 101865,
+      "stan_na": "2026-01-01"
+    },
+    {
+      "name": "SIMC_Urzedowy_2026-09-18.xml",
+      "byte_size": 28588307,
+      "sha256": "6e4e9aeed6caf4876c977cb0e28b7a5ec76d883c581ea215ee9a6b69c2929c06",
+      "catalog": {
+        "name": "SIMC",
+        "type": "ALL",
+        "date": "2026-01-01"
+      },
+      "rows": 101865
+    }
+  ]
+}

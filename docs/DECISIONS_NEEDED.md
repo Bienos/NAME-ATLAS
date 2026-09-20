@@ -154,6 +154,12 @@ Three acceptance items that do not depend on the bytes were completed, and they 
 
 Nothing was adopted, ingested, fixtured or approved. No TERC code was read or written. The manifest was deliberately left unedited, because everything the spike would add to it is bytes-dependent.
 
+### Findings — TERC correspondence established (2026-09-20). Status and decision still unchanged.
+
+- **All 16 geography values map to a current TERYT TERC voivodeship by exact code-point equality**, read from the official `TERC_Urzedowy_2026-09-18` register (`STAN_NA = 2026-01-01`, 4,360 rows, CSV and XML identical row for row). Recorded in `fixtures/teryt/voivodeship-terc-correspondence.json`: 16 observed, 16 mapped, 0 unmapped, no normalisation needed. The "name → TERC" prerequisite the preflight named is met, as evidence.
+- **One provenance item stays open:** the register arrived as extracted files, not as the archive's zip, so the archive digest `1cfbb50e…2768` is not matched and no source URL is recorded. The correspondence file states this in its own `archive_identity` block.
+- **Nothing changes for the decision.** No `Place`, table or connector exists; the "Preferred" path's remaining question — whether registered-domicile geography, framed with the ~21% residual, is an acceptable basis for a product feature, and on what licence terms — is exactly as before. What has changed is that the geographic-identity groundwork is no longer a blocker once that answer comes.
+
 ### Findings — TASK-008 EXECUTED, regional bytes verified (2026-09-19). Status and decision still unchanged.
 
 The project owner supplied both regional CSV files and both full national files. Each was checksum-verified against `fixtures/pesel/source-manifest.json` before any row was read. 23 of the spike's 27 acceptance items are now verified from the bytes. Full record, with every command and figure: `docs/sources/pesel-regional.md`, section "TASK-008 executed". Nothing was ingested, no `RightsProfile` exists, and this decision's status, options and adoption gate are untouched.

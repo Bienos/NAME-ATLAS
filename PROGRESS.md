@@ -1782,3 +1782,45 @@ lineage `docs/canonical/14` §30 requires.
   should not.
 - The male resource's rank claims are real, so the first production-scale read surface is now
   possible for male surnames — a task, not a change to slip into this one.
+
+## TASK-008 items 10 and 24 closed, 23 partly — the TERC correspondence exists (2026-09-20)
+
+The project owner supplied the TERYT TERC and SIMC registers as the **extracted** official files
+(`TERC_Urzedowy_2026-09-18.csv`/`.xml`, `SIMC_Urzedowy_2026-09-18.csv`/`.xml`), not the acquisition
+archive's zips, and directed the correspondence to be written from them. Evidence only; no code.
+
+### What was read from the bytes
+
+| Fact | Value |
+|---|---|
+| TERC CSV | 205,660 B, UTF-8 with BOM, CRLF, `;`, header `WOJ;POW;GMI;RODZ;NAZWA;NAZWA_DOD;STAN_NA`, 4,360 rows, SHA-256 `557edb28…85d4` |
+| TERC XML | 960,750 B, `<catalog name="TERC" type="ALL" date="2026-01-01">`, 4,360 rows, **identical to the CSV row by row** |
+| Register reference date | `STAN_NA = 2026-01-01` on every row |
+| Voivodeship rows | 16 (`POW`/`GMI`/`RODZ` blank, `NAZWA_DOD = województwo`) |
+| SIMC | 101,865 rows in CSV and XML alike, `STAN_NA = 2026-01-01`; identity recorded, nothing used |
+
+### The correspondence
+
+`fixtures/teryt/voivodeship-terc-correspondence.json`: **16 observed geography values, 16 mapped,
+0 unmapped**, by exact code-point equality against the 16 voivodeship `NAZWA` values — no case
+folding, no normalisation, both sides verified NFC first. Every code was read from the register;
+none was typed. The file carries the method, the result, both TERC files' identity, and its own
+provenance gap.
+
+### The provenance gap, stated rather than papered over
+
+TASK-008's gate for this file was an archive-zip digest match or a recorded GUS URL. Neither holds:
+the zip `teryt_terc__1cfbb50ebf97.zip` was not supplied, only its contents, and the acquisition
+report logs the TERYT downloads without URLs. Item 23 is therefore **partly** verified — the
+supplied files' identity in full, the archive match outstanding. Supplying the zip closes it.
+
+### Verification run
+
+| Command | Result |
+|---|---|
+| `python3 -c "json.load(...)"` on the correspondence file | valid JSON |
+| `pnpm test` | **Passed** — 235 unit tests; no code changed, run to prove it |
+| `pnpm format:check` | **Passed** |
+
+TASK-008 stands at 25 of 27 verified, item 23 partly, item 22 (publisher licence) not this task's.
+**Nothing ingested; no `Place`, no table, no connector; D-004 unchanged.**
