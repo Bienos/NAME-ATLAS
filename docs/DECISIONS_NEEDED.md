@@ -298,6 +298,62 @@ Option B (link both inputs through `ClaimEvidence` and record an ADR) and Option
 
 ---
 
+## D-014 — two official rows mix Latin and Cyrillic letters, so the female resource cannot be imported
+
+**Status:** **BLOCKS INGESTING THE FEMALE NATIONAL RESOURCE `1148811`, and therefore every female-side capability** — female `CURRENT_POPULATION` at production scale, female `CURRENT_RANK`, and any surface that needs both sexes. NON-BLOCKING for the male resource `1148808`, which is imported in full and whose rank claims work.
+**Owner:** project owner, on a resolver-policy question with a source-data cause.
+
+Found 2026-09-20 by running the full import after D-013 was resolved. The male resource imported cleanly — 408,182 of 408,182 rows, zero quarantined. The female import **failed and wrote nothing**, which is TASK-004 U-5 option (a) working as specified:
+
+```text
+[import] FAILED (UNRESOLVED_ROWS): 2 row(s) could not be resolved unambiguously
+[import]   line 338202: HODŽIЌ — REVIEW_REQUIRED
+[import]   line 420083: ЌATOVIЌ — REVIEW_REQUIRED
+```
+
+### What the two rows actually contain
+
+Read from the official bytes, code point by code point:
+
+| Line | Value | Code points | `Liczba` |
+|---|---|---|---:|
+| 338,202 | `HODŽIЌ` | `H O D` + U+017D LATIN CAPITAL Z WITH CARON + `I` + **U+040C CYRILLIC CAPITAL LETTER KJE** | 2 |
+| 420,083 | `ЌATOVIЌ` | **U+040C** + `A T O V I` + **U+040C** | 2 |
+
+Both sit at `Liczba = 2`, the publisher's minimum publishable value. Both are single-script-violating by one letter: every other character is Latin. U+040C is visually close to a Latin `K` with an acute, so the likely story is a data-entry homoglyph for a South Slavic surname (`HODŽIĆ`, `KATOVIĆ` would be the ordinary spellings) — **plausible, and not verified.** Nothing here should be treated as established beyond the code points above.
+
+`detectScripts` sees Latin and Cyrillic in one token, `validateSurnameInput` returns `MIXED_SCRIPT_REVIEW`, the resolver reports `REVIEW_REQUIRED`, and U-5 aborts the whole resource rather than guessing. Every layer behaved exactly as designed; the designs simply do not yet say what to do with an authoritative register that contains such a row.
+
+### Why it cannot be fixed silently
+
+`docs/canonical/13` §5.6 is explicit: a mixed Latin/Cyrillic string should `flag MIXED_SCRIPT_REVIEW` "rather than silently normalize one script into the other", and confusable-skeleton equality is never surname identity evidence. So mapping U+040C to `K`, to `Ć`, or to anything else is out. `ARCHITECTURE.md` §10 invariant 8 points the same way: orthography is identity-bearing.
+
+### Options
+
+**Option A — quarantine `MIXED_SCRIPT_REVIEW` rows, import the rest, count them in the report.** Narrows U-5 from "any unresolved row aborts" to "a mixed-script row is quarantined and counted; anything else still aborts". Cheapest, and the reconciliation report already makes the shortfall visible. **But it does not unblock the female rank**, and that matters: the completeness gate compares persisted rows against `official_row_count`, so 420,080 of 420,082 is an incomplete universe and `CURRENT_RANK` would still refuse — correctly. It also means two real surnames are absent from the product, and absence must never be read as zero.
+
+**Option B — adjudicate the two rows as data.** Record an explicit review decision per row: accept each as its own `Surname` with its bytes verbatim, flagged as reviewed, or attach it as a `NameForm` of an existing Latin-script surname with an explicit, eligible association. Keeps the import complete — 420,082 persisted, gate satisfied, female ranks unblocked — and is what the canonical review model anticipates. Cost: it needs a mechanism that does not exist yet (a stored, auditable adjudication), and a human decision per row, repeated at every annual refresh.
+
+**Option C — let a mixed-script row resolve and create its own identity, flagged for review.** The resolver would stop refusing and instead create the surname with its exact code points, recording the mixed-script finding on the row. Nothing is normalised and nothing is merged, so §5.6's prohibition is respected in substance — §5.6 is about not *fusing* scripts, and the flag exists for query-time security, not for refusing the publisher's own register. Keeps the import complete and needs no per-row human step. Cost: the review flag becomes a thing the product must surface and act on rather than a gate, and a genuinely confusable pair could enter the corpus as two near-identical identities.
+
+### Recommendation
+
+**Option C for bulk ingestion of an authoritative register, with the flag persisted** — the publisher's row is evidence of what the register says, and refusing it loses data while resolving nothing. Option B is the more principled answer and the better one if the adjudication mechanism is wanted anyway; Option A is not sufficient on its own, because it leaves the female universe permanently incomplete. Whichever is chosen, the mixed-script *finding* must be stored, never discarded.
+
+### Do not
+
+- Do not map U+040C to any Latin letter, and do not use confusable skeletons as identity (§5.6).
+- Do not merge either row into an existing surname without an explicit, recorded decision.
+- Do not silence `MIXED_SCRIPT_REVIEW` generally to get the import through: the same policy protects the query path, where it is doing real work.
+- Do not widen the completeness gate to accept a short universe. A rank over 420,080 of 420,082 rows would be a claim about a set nobody holds.
+
+### What is blocked until this is answered
+
+- The female national resource `1148811` cannot be imported, so female `CURRENT_POPULATION` and `CURRENT_RANK` exist only over the 23-row fixture.
+- Any surface needing both sexes. The male side is complete and unaffected.
+
+---
+
 ## D-013 — RESOLVED (ADR-0005, 2026-09-20)
 
 **Resolution: Option A — the canonical identity key folds with Unicode *simple* case folding, as `canonical_key_v2`.** Decided by the project owner, 2026-09-20. Full detail, including the measurement, what it deviates from and what it now owes elsewhere: `docs/adr/0005-canonical-key-simple-case-folding.md`.
@@ -312,7 +368,7 @@ Concretely:
 
 **Measured with the real `canonicalKey` export over both full official resources:** `canonical_key_v2` produces 408,182 and 420,082 distinct keys — **zero collisions**, one key per source surname, across all 828,264 real surnames. Under v1 there were 171, every one the sharp S. Proven exhaustively rather than by example: `normalize.property.test.ts` re-derives Unicode's simple-fold relation from the runtime over every code point and asserts the fold neither joins what Unicode separates nor separates what it joins.
 
-**What this unblocked:** the full official import, `CURRENT_RANK`'s passing path, and `RARITY_CONTEXT`'s prerequisite. `PROGRESS.md` records what was actually run, including the import.
+**What this unblocked, verified by running on 2026-09-20:** the male national resource `1148808` imported in full — 408,182 of 408,182 rows, zero quarantined — and `CURRENT_RANK`'s passing path now produces real claims over it (`NOWAK` rank 1 of 408,182; `GROẞ` and `GROSS` ranking separately). The female resource `1148811` is blocked on a different cause, **D-014**. `RARITY_CONTEXT` still waits on U-6's denominator. `PROGRESS.md` records the runs.
 
 **One consequence that is now owed elsewhere:** `ß`≡`ss` is a real retrieval expectation for a user typing `GROSS`, and it is deliberately absent from the exact tier. Whichever task builds the fuzzy tiers owes German orthographic equivalence as an explicit versioned rule, the way §6.1 handles Polish diacritics.
 

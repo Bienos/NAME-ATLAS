@@ -1689,3 +1689,96 @@ this change.
 - TASK-008 items 10, 23 and 24 still need `raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip`.
 - `RARITY_CONTEXT` needs U-6's denominator decision; `distribution_snapshots.universe_size` is null.
 - `ß`≡`ss` as a **retrieval** rule belongs to whichever task builds the fuzzy tiers (ADR-0005).
+
+## Full official import run — male resource ingested, `CURRENT_RANK` proven, female blocked on D-014 (2026-09-20)
+
+The step neither D-013 session could take: importing the real resources. The bytes were on disk in
+this session, both files matching their official SHA-256 exactly, so the import was run for real.
+
+### The male resource imported cleanly — the thing D-013 made impossible
+
+```text
+[import] IMPORTED source_record 01a0be06-ca69-729e-9a5f-a1103e96f915
+[import] superseded          01a0bbe8-ae8b-72c4-94fc-ffbd2486a393
+[import] resource            1148808
+[import] rows read           408182
+[import] rows imported       408182
+[import] rows quarantined    0
+[import] surnames created    408154
+[import] surnames reused     28
+[import] snapshots written   408182
+[import] values written      408182
+```
+
+Twenty-two minutes, one transaction, zero quarantined rows. The 28 reused surnames are the TASK-002
+fixture identities the excerpt had already created; the fixture-derived source record for the same
+resource was **superseded, not rewritten** (invariant 6).
+
+### The female resource failed, and it is not D-013
+
+```text
+[import] FAILED (UNRESOLVED_ROWS): 2 row(s) could not be resolved unambiguously
+[import]   line 338202: HODŽIЌ — REVIEW_REQUIRED
+[import]   line 420083: ЌATOVIЌ — REVIEW_REQUIRED
+```
+
+Both rows carry **U+040C CYRILLIC CAPITAL LETTER KJE** among otherwise Latin letters, both at
+`Liczba = 2`. `detectScripts` sees two scripts in one token, validation returns
+`MIXED_SCRIPT_REVIEW`, the resolver refuses to guess, and TASK-004 U-5 aborts the resource without
+writing. Every layer did what it was built to do. Recorded as **D-014** with three options and a
+recommendation; nothing was changed in code to work around it, and no row was normalised.
+
+### `canonical_key_v2` verified at production scale
+
+Migration `0006_canonical_key_v2` applied to the populated database in **14.9 seconds**. Then every
+stored key was compared against what the live resolver computes from the display form:
+
+| Check | Result |
+|---|---|
+| Surnames checked | 408,192 |
+| Keys disagreeing with the live `canonicalKey` | **0** |
+| Stale `canonical_key_version` | **0** |
+| Name forms checked | 408,192 |
+| Search keys disagreeing | **0** |
+| Stale `normalization_version` | **0** |
+| Keys containing `ß` | 86 |
+
+`GROSS → gross` and `GROẞ → groß` are stored side by side, as are `WEISS`/`WEIẞ`. That pair is
+the one the UNIQUE constraint could not hold under v1, so this is the defect's fix observed in the
+database rather than in a test fixture.
+
+### `CURRENT_RANK`'s passing path — the gate let a complete universe through
+
+`pnpm demo:surname` then `pnpm demo:surname-rank`, against the imported resource:
+
+| Surname | Count | Rank | Universe |
+|---|---:|---:|---|
+| `NOWAK` | 98,387 | **1 of 408,182** | source record `1148808`, `pesel_2026_national_male` |
+| `GROSS` | 928 | 3,297 of 408,182 | same |
+| `GROẞ` | 27 | 73,813 of 408,182 | same |
+
+Each claim carries `confidence VERIFIED` from `derived_statistic_rule`, ties policy `COMPETITION`,
+algorithm `current_rank@1`, and a citation locating resource `1148808`. Rank derivation took about
+1.5 seconds end to end over the 408,182-row universe, because the rank is one SQL aggregate rather
+than a sort. `GROẞ` and `GROSS` ranking separately is the clearest statement of what D-013 cost:
+under v1 neither row could be stored at all, and now they are two surnames 70,000 places apart.
+
+`evidence_dependencies` holds three `COUNT` and three `UNIVERSE` rows — one pair per rank claim, the
+lineage `docs/canonical/14` §30 requires.
+
+### Invariants checked against 408,227 real value rows
+
+| Invariant | Observed |
+|---|---|
+| A rank is a claim, not a column (§10.10) | `distribution_values.rank` null on all 408,227 rows |
+| No derived value written by ingestion | `surname_share`, `population_denominator` null on all 408,227 |
+| `universe_size` still unknown | null on all 408,227 snapshots — this is what still blocks `RARITY_CONTEXT` (U-6) |
+
+### What this leaves open
+
+- **D-014** is now the blocker for the female side, and the only thing between the product and a
+  complete national pair.
+- `RARITY_CONTEXT` still needs U-6's denominator decision; the import writes no `universe_size` and
+  should not.
+- The male resource's rank claims are real, so the first production-scale read surface is now
+  possible for male surnames — a task, not a change to slip into this one.

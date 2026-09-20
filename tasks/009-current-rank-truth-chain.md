@@ -1,16 +1,21 @@
 # TASK-009 — `CURRENT_RANK` Truth Chain (the first derived claim)
 
-- **Status:** **IMPLEMENTED AND VERIFIED 2026-09-19 on the refusing path; the passing path is
-  BLOCKED by D-013, not by this task.** Migration `0005_current_rank`, `packages/truth`'s
-  completeness gate, rank derivation, derived-statistic confidence rule, result projection and
-  `demo:surname-rank` CLI all exist, with 23 new unit tests and 18 new integration tests. D-011 was
-  answered Option A: `evidence_dependencies` exists and records each input's role.
-  **The gate refuses over the committed fixtures and writes nothing, which is correct** — and while
-  proving the passing path, the first full-resource import surfaced **D-013**: `canonical_key_v1`
-  merges 171 genuinely distinct surnames because Unicode full case folding maps `ẞ` to `ss`, so the
-  full official resource cannot be ingested at all yet. The gate is therefore refusing for exactly
-  the right reason. Outcome and evidence: `PROGRESS.md`; the blocker: D-013 in
-  `docs/DECISIONS_NEEDED.md`.
+- **Status:** **IMPLEMENTED AND VERIFIED 2026-09-20 on both paths.** Migration
+  `0005_current_rank`, `packages/truth`'s completeness gate, rank derivation, derived-statistic
+  confidence rule, result projection and `demo:surname-rank` CLI all exist, with 23 unit tests and
+  18 integration tests. D-011 was answered Option A: `evidence_dependencies` exists and records each
+  input's role.
+  - The **refusing** path was verified 2026-09-19: the gate refuses over the committed fixtures and
+    writes nothing. While proving the passing path, the first full-resource import surfaced
+    **D-013** — `canonical_key_v1` merged 171 genuinely distinct surnames because Unicode full case
+    folding maps `ẞ` to `ss` — so no complete universe could exist.
+  - The **passing** path was verified 2026-09-20, once D-013 was resolved (ADR-0005) and the male
+    national resource `1148808` imported in full: `NOWAK` is **rank 1 of 408,182** with count
+    98,387, confidence `VERIFIED`, over the complete source-record universe. `GROẞ` (rank 73,813)
+    and `GROSS` (rank 3,297) rank separately, which is the pair v1 could not even store.
+  - **Female ranks remain blocked**, on a different and newly found cause: the female resource
+    `1148811` cannot be imported because two of its rows mix Latin and Cyrillic letters and resolve
+    `REVIEW_REQUIRED`. That is **D-014**, not this task. Outcome and evidence: `PROGRESS.md`.
 - **Created:** 2026-09-19 at the project owner's direction, as the next unblocked step in M2.
   `tasks/008-pesel-regional-source-spike.md` §5 forbade *its own* session from writing
   `tasks/009-*.md`; that was scope discipline for the spike, not a standing ban. TASK-008 is
