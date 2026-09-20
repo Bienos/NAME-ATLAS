@@ -2702,3 +2702,35 @@ inspector** (`apps/admin` is one page), and a **structured logging and tracing b
 and the route handler log to `console.error` with a request id, which is not an observability
 baseline. Neither blocks the journey; both are what an internal alpha would want before it is
 watched by anyone other than its author.
+
+## D-018 resolved — one source record per resource wins, by authority (2026-09-20)
+
+The duplicate counts the result page exposed are fixed. `NOWAK` returned four population observations
+and the page rendered each count twice; it now returns two.
+
+**The rule is authority, not recency.** When more than one `SourceRecord` exists for one publisher
+resource id, the record whose `content_hash` matches the registry's `official_sha256` is the one that
+counts, and claims from the others become `SUPERSEDED`. Import order is irrelevant, so re-importing an
+older or truncated copy cannot displace the real file, and the rule applies retroactively to data
+already imported rather than depending on what the importer knew at the time.
+
+**A lone partial import stays active.** If no record for a resource is complete, they all stay: that
+is the only thing that exists, `CURRENT_POPULATION` has no universe requirement, and its count is
+honest about its own scope. It is the state the committed fixtures are in, which is why every refusal
+test still works unchanged.
+
+Nothing is deleted — a superseded claim stays readable.
+
+| | Before | After |
+|---|---:|---:|
+| `NOWAK` active `CURRENT_POPULATION` claims | 4 | 2 |
+| Superseded | 0 | 2 |
+| Observations in the API and on the page | 4 | 2 |
+
+Still open deliberately: `source_records.supersedes_source_record_id` exists and the importer does not
+set it, so the lineage between two imports is not recorded at import time, only its consequence. The
+authority rule does not need it; wiring it is an importer-side follow-up.
+
+Verified: `pnpm typecheck`, `pnpm lint`, `pnpm format:check` passed; **366 unit tests**; **207
+integration tests across 15 files, exit 0**, including four new ones asserting the lone-partial case,
+the supersession, that repeated derivation does not flip the decision, and that nothing is deleted.

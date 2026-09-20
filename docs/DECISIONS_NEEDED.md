@@ -512,61 +512,29 @@ Revisit when any of these becomes true:
 
 ---
 
-## D-018 — two source records for one publisher resource produce duplicate observations (NON-BLOCKING NOW)
+## D-018 — RESOLVED (2026-09-20)
 
-**Status:** open. Found by rendering the result page against the real register (TASK-017). Nothing is
-wrong in the page, the contract or the truth chain; what is missing is a rule about superseding.
+**Resolution:** option (a), supersede — decided by **authority, not recency**. When more than one `SourceRecord` exists for one publisher resource id, the record whose `content_hash` matches the registry's `official_sha256` is the one that counts; claims derived from the others are marked `SUPERSEDED`. Implemented in `packages/truth/src/derive.ts` (`authoritativeSnapshots`, `supersede`), covered by `tests/integration/src/claim-supersession.test.ts`.
 
-### What was observed
+Choosing on authority rather than import order matters: re-importing an older or truncated copy of a resource cannot displace the real one, and the rule works retroactively on data already imported rather than depending on what the importer knew at the time.
 
-Searching `NOWAK` on the page rendered its male count **twice** and its female count twice. The cause
-is in the data, not the rendering: the verification database holds **two source records per publisher
-resource id** — one from importing the committed 22-row fixture, one from importing the full
-408,182-row resource. Both are legitimate `SourceRecord` rows under ADR-0003, both carry a
-`DistributionSnapshot` for `NOWAK`, and `CURRENT_POPULATION` derived a claim from each. The read path
-returns both, so the page renders both.
+**When no record for a resource is complete, they all stay active.** A partial import is then the only thing that exists, `CURRENT_POPULATION` has no universe requirement, and a count from it is honest about its own scope — which is the state the committed fixtures are in, and why the refusal tests still work.
 
-| Resource | Source records | Snapshots on each |
-|---|---:|---|
-| `1148808` (male) | 2 | 22 and 408,182 |
-| `1148811` (female) | 2 | 23 and 420,082 |
+Nothing is deleted. `docs/canonical/11` keeps claim history, so a superseded claim remains readable.
 
-`MELNYK` renders once, because it is absent from the fixture. So the duplication appears only for
-surnames present in both imports, which is exactly the set a developer is most likely to search.
+### Observed
 
-### Why it matters beyond a test database
+Before: `NOWAK` returned four population observations and the result page rendered its count twice per partition. After: two active claims, two superseded, two observations, and the page shows each count once.
 
-A production re-import of the same annual resource — a corrected file, a re-fetch after a failed run —
-creates a new `SourceRecord` and therefore a second claim for every surname in it. Nothing currently
-retires the first. `claims.supersedes_claim_id` and `claim_status = SUPERSEDED` exist for this and are
-unused. The completeness gate does not help: an incomplete import is refused a *rank* or a *rarity*
-figure, but `CURRENT_POPULATION` has no universe requirement and is derived from a partial import
-quite correctly.
+### Still open, deliberately
 
-### The decision
-
-**When two source records describe the same publisher resource, which claim is active?** Options:
-
-- **(a) Supersede on import.** A new complete `SourceRecord` for a resource id marks the earlier
-  resource's claims `SUPERSEDED`. Truthful and uses the model as designed; needs a rule for what
-  happens when the newer import is *less* complete than the older one.
-- **(b) Supersede at read time** by preferring the source record that passes the completeness gate.
-  No writes, but it means the read path decides what is true, which is the thing the truth layer
-  exists to avoid.
-- **(c) Forbid two source records per resource id** with a unique constraint. Simplest, and wrong:
-  ADR-0003 chose per-fetch granularity deliberately, and the fixture and the full file genuinely are
-  different bytes.
-
-**Recommendation: (a).** It is the only option that records the decision as data rather than
-recomputing it per request, and superseding is what the model already offers.
+The rule runs at derivation. `source_records.supersedes_source_record_id` exists and is **not** set by the importer, so the lineage between two imports of one resource is not recorded at import time — only the consequence is. Wiring that is an importer-side follow-up, not a correctness gap: the authority rule does not need it.
 
 ### Do not
 
-- Do not deduplicate in the page or in any presentation layer. Which claim is true is not a rendering
-  question, and the page must keep deriving nothing.
-- Do not add a unique constraint on `(source_id, external_record_id)` without reading ADR-0003 first.
-- Do not treat this as a reason to delete the fixture imports. They are how the refusal paths are
-  tested.
+- Do not deduplicate in a presentation layer. Which claim is true is not a rendering question.
+- Do not switch the rule to recency. A re-imported truncated file must not win.
+- Do not add a unique constraint on `(source_id, external_record_id)` — ADR-0003 chose per-fetch granularity deliberately.
 
 ---
 

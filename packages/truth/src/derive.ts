@@ -25,6 +25,7 @@ import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
 import { NORMALIZATION_VERSION, resolveSurname } from "@name-atlas/resolver";
+import { findPeselResource } from "@name-atlas/sources";
 import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
@@ -70,6 +71,10 @@ interface ApplicableSnapshot {
   readonly comparability_group: string | null;
   readonly dataset_version: string | null;
   readonly geography_level: string;
+  /** The publisher's resource id, for deciding which source record is authoritative. */
+  readonly external_record_id: string | null;
+  /** The digest of the bytes actually imported, compared against the registry. */
+  readonly content_hash: string;
 }
 
 async function loadApplicableSnapshots(
@@ -83,11 +88,14 @@ async function loadApplicableSnapshots(
       "v.distribution_snapshot_id",
       "s.distribution_snapshot_id",
     )
+    .innerJoin("source_records as sr", "sr.source_record_id", "s.source_record_id")
     .select([
       "s.distribution_snapshot_id",
       "v.distribution_value_id",
       "s.source_record_id",
       "s.source_id",
+      "sr.external_record_id",
+      "sr.content_hash",
       "v.count",
       "s.universe_description",
       "s.coverage_notes",
@@ -116,7 +124,80 @@ async function loadApplicableSnapshots(
     comparability_group: row.comparability_group,
     dataset_version: row.dataset_version,
     geography_level: row.geography_level,
+    external_record_id: row.external_record_id,
+    content_hash: row.content_hash,
   }));
+}
+
+/**
+ * Keeps one source record per publisher resource, and retires the rest (D-018).
+ *
+ * A publisher resource can be imported more than once — the committed fixture
+ * and the full file are different bytes, so ADR-0003 gives each its own
+ * `SourceRecord`, and both legitimately carry a snapshot for the same surname.
+ * Without a rule, every surname in both imports yields two claims and a reader
+ * sees its count twice. A production re-import of an annual resource would do
+ * the same.
+ *
+ * The rule is **authority, not recency**: the source record whose bytes and row
+ * count match the registry is the one that counts. Import order is irrelevant,
+ * so re-importing an older or truncated file cannot displace the real one.
+ *
+ * When **no** source record for a resource is complete, they all stay: a partial
+ * import is the only thing that exists, `CURRENT_POPULATION` has no universe
+ * requirement, and a count from it is honest about its own scope. That is the
+ * case the committed fixtures are in, which is why the refusal tests still work.
+ */
+function authoritativeSnapshots(snapshots: readonly ApplicableSnapshot[]): {
+  readonly keep: ApplicableSnapshot[];
+  readonly superseded: ApplicableSnapshot[];
+} {
+  const byResource = new Map<string, ApplicableSnapshot[]>();
+  const keep: ApplicableSnapshot[] = [];
+  for (const snapshot of snapshots) {
+    if (snapshot.external_record_id === null) {
+      keep.push(snapshot);
+      continue;
+    }
+    const group = byResource.get(snapshot.external_record_id) ?? [];
+    group.push(snapshot);
+    byResource.set(snapshot.external_record_id, group);
+  }
+
+  const superseded: ApplicableSnapshot[] = [];
+  for (const [resourceId, group] of byResource) {
+    const descriptor = findPeselResource(resourceId);
+    const complete = descriptor
+      ? group.filter((s) => s.content_hash === descriptor.official_sha256)
+      : [];
+    if (complete.length === 0 || complete.length === group.length) {
+      // Nothing to choose between: either none is the official file, or every
+      // record for this resource is. Both stay, and a duplicate here would be a
+      // finding about the import rather than something to resolve silently.
+      keep.push(...group);
+      continue;
+    }
+    keep.push(...complete);
+    superseded.push(...group.filter((s) => !complete.includes(s)));
+  }
+  return { keep, superseded };
+}
+
+/** Marks a stale claim SUPERSEDED. Never deletes: docs/canonical/11 keeps history. */
+async function supersede(
+  trx: Transaction<DB>,
+  surnameId: string,
+  stale: readonly ApplicableSnapshot[],
+): Promise<number> {
+  if (stale.length === 0) return 0;
+  const keys = stale.map((s) => currentPopulationClaimKey(surnameId, s.distribution_snapshot_id));
+  const result = await trx
+    .updateTable("claims")
+    .set({ claim_status: "SUPERSEDED" })
+    .where("claim_key", "in", keys)
+    .where("claim_status", "=", "ACTIVE")
+    .executeTakeFirst();
+  return Number(result.numUpdatedRows);
 }
 
 /** A violated source invariant is a finding, never something to work around. */
@@ -294,12 +375,18 @@ export async function deriveCurrentPopulation(
     };
   }
 
-  const source = await loadSourceContext(db, snapshots[0]?.source_id ?? "");
+  // D-018: one source record per publisher resource, chosen by authority.
+  const { keep, superseded } = authoritativeSnapshots(snapshots);
+  if (superseded.length > 0) {
+    await db.transaction().execute(async (trx) => supersede(trx, surnameId, superseded));
+  }
+
+  const source = await loadSourceContext(db, keep[0]?.source_id ?? "");
   const surfaceEligibility = evaluateAllSurfaces(options.rightsOverride ?? source.rights);
 
   const claims: CurrentPopulationClaimResult[] = [];
 
-  for (const snapshot of snapshots) {
+  for (const snapshot of keep) {
     claims.push(
       await db.transaction().execute(async (trx) => deriveOne(trx, surname, snapshot, source)),
     );
