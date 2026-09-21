@@ -1,7 +1,7 @@
+import { db as sharedDb } from "../lib/db.js";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
@@ -79,9 +79,8 @@ async function answer(query: string, origin: ReturnType<typeof searchOrigin>): P
   // timestamp is the visitor's, not the register's (TASK-019).
   const log = createLogger({ service: "web", base: { route: "/" } });
   const startedAt = Date.now();
-  let db: ReturnType<typeof createDb> | null = null;
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const outcome = await querySurnameResult(db, query);
     if (outcome.kind === "INVALID_INPUT") {
       log.info("page_rejected_input", { reason: outcome.reason, ms: Date.now() - startedAt });
@@ -112,8 +111,6 @@ async function answer(query: string, origin: ReturnType<typeof searchOrigin>): P
   } catch (cause: unknown) {
     log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
-  } finally {
-    await db?.destroy();
   }
 }
 

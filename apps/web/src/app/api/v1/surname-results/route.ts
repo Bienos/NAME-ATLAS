@@ -1,5 +1,5 @@
+import { db as sharedDb } from "../../../../lib/db.js";
 import { NextResponse } from "next/server";
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import type { ApiErrorResponse, PublicErrorCode } from "@name-atlas/contracts";
@@ -87,10 +87,9 @@ export async function GET(request: Request): Promise<NextResponse> {
   // the §78 error envelope like any other failure — not with a bare 500 that
   // carries no request id. (Found by inspection 2026-09-21: the same bug
   // `page.tsx` had, still here.)
-  let db: ReturnType<typeof createDb> | null = null;
 
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const outcome = await querySurnameResult(db, surname, { surface });
 
     switch (outcome.kind) {
@@ -170,7 +169,5 @@ export async function GET(request: Request): Promise<NextResponse> {
       errorBody("INTERNAL_ERROR", "the request could not be completed", false, requestId),
       { status: 500 },
     );
-  } finally {
-    await db?.destroy();
   }
 }

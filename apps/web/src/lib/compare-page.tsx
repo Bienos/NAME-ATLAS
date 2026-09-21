@@ -1,5 +1,7 @@
+import type { Kysely } from "kysely";
+import type { DB } from "@name-atlas/db";
+import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
@@ -22,7 +24,7 @@ export const COMPARISON_METADATA: Metadata = {
   robots: { index: false, follow: false },
 };
 
-async function loadSide(db: ReturnType<typeof createDb>, slug: string): Promise<ComparisonSide> {
+async function loadSide(db: Kysely<DB>, slug: string): Promise<ComparisonSide> {
   const resolved = await resolveSlug(db, slug);
   if (resolved.kind !== "RESOLVED") return { slug, display: null, response: null };
   const outcome = await querySurnameResult(db, resolved.display_name);
@@ -38,9 +40,8 @@ export async function loadComparison(
 ): Promise<{ readonly a: ComparisonSide; readonly b: ComparisonSide }> {
   const log = createLogger({ service: "web", base: { route: "/pl/porownaj" } });
   const startedAt = Date.now();
-  let db: ReturnType<typeof createDb> | null = null;
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const a = await loadSide(db, aSlug);
     const b = await loadSide(db, bSlug);
     log.info("comparison_rendered", {
@@ -55,8 +56,6 @@ export async function loadComparison(
       a: { slug: aSlug, display: null, response: null },
       b: { slug: bSlug, display: null, response: null },
     };
-  } finally {
-    await db?.destroy();
   }
 }
 

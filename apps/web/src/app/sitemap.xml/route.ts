@@ -1,4 +1,4 @@
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { db as sharedDb } from "../../lib/db.js";
 import { sitemapCount } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled } from "../../lib/seo.js";
@@ -29,16 +29,13 @@ export async function GET(): Promise<Response> {
   }
 
   const log = createLogger({ service: "web", base: { route: "/sitemap.xml" } });
-  let db: ReturnType<typeof createDb> | null = null;
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const total = await sitemapCount(db, "pl");
     return new Response(sitemapIndexXml(origin, pageCount(total)), { status: 200, headers: XML });
   } catch (cause: unknown) {
     log.error("sitemap_index_failed", { cause });
     // A 500 is right: an empty sitemap would tell a crawler we publish nothing.
     return new Response("sitemap unavailable", { status: 500 });
-  } finally {
-    await db?.destroy();
   }
 }

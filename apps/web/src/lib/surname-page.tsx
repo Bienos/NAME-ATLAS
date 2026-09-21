@@ -1,5 +1,5 @@
+import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
@@ -68,9 +68,8 @@ export async function answerSlug(
     base: { route: lang === "en" ? "/en/surname/[slug]" : "/pl/nazwisko/[slug]" },
   });
   const startedAt = Date.now();
-  let db: ReturnType<typeof createDb> | null = null;
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const resolved = await resolveSlug(db, slug, lang);
     if (resolved.kind === "INVALID") return { kind: "INVALID_SLUG" };
     if (resolved.kind === "MOVED") {
@@ -117,8 +116,6 @@ export async function answerSlug(
   } catch (cause: unknown) {
     log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
-  } finally {
-    await db?.destroy();
   }
 }
 

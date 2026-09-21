@@ -63,8 +63,39 @@ function reportToStderr(error: unknown): void {
  * CI run with nothing wrong in it. Handling the event fixes the real fault and
  * the false failure together.
  */
-export function createPool(config: DbConfig, onIdleError: IdleErrorHandler = reportToStderr): Pool {
-  const pool = new Pool({ connectionString: config.databaseUrl });
-  pool.on("error", onIdleError);
+export interface PoolOptions {
+  /**
+   * Largest number of connections this pool opens. `pg`'s default is 10, which
+   * is right for one long-lived server and wrong everywhere the process is
+   * multiplied.
+   *
+   * On a serverless host each concurrent invocation is its own process with its
+   * own pool, so the connections in flight are `max × instances`, not `max`.
+   * Ten of those against a 100-connection database is ten instances before it
+   * refuses. Two is the number that survives a crawl; the pooler in front
+   * (Supabase's Supavisor, PgBouncer) is what multiplexes them onto the real
+   * backends.
+   */
+  readonly max?: number;
+  /** How long an unused connection is kept. Short on serverless: the process dies anyway. */
+  readonly idleTimeoutMillis?: number;
+  /** Fail a connection attempt rather than hanging a request forever. */
+  readonly connectionTimeoutMillis?: number;
+  readonly onIdleError?: IdleErrorHandler;
+}
+
+export function createPool(config: DbConfig, options: PoolOptions | IdleErrorHandler = {}): Pool {
+  // The second parameter used to be the error handler alone. Both shapes are
+  // accepted so existing callers and tests keep working unchanged.
+  const opts: PoolOptions = typeof options === "function" ? { onIdleError: options } : options;
+  const pool = new Pool({
+    connectionString: config.databaseUrl,
+    ...(opts.max === undefined ? {} : { max: opts.max }),
+    ...(opts.idleTimeoutMillis === undefined ? {} : { idleTimeoutMillis: opts.idleTimeoutMillis }),
+    ...(opts.connectionTimeoutMillis === undefined
+      ? {}
+      : { connectionTimeoutMillis: opts.connectionTimeoutMillis }),
+  });
+  pool.on("error", opts.onIdleError ?? reportToStderr);
   return pool;
 }

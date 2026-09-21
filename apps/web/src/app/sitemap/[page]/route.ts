@@ -1,4 +1,4 @@
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { db as sharedDb } from "../../../lib/db.js";
 import { SITEMAP_PAGE_SIZE, sitemapEntries } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled } from "../../../lib/seo.js";
@@ -35,9 +35,8 @@ export async function GET(
   }
 
   const log = createLogger({ service: "web", base: { route: "/sitemap/[page]" } });
-  let db: ReturnType<typeof createDb> | null = null;
   try {
-    db = createDb(createPool(loadDbConfig()));
+    const db = sharedDb();
     const entries = await sitemapEntries(db, "pl", {
       limit: SITEMAP_PAGE_SIZE,
       offset: (index - 1) * SITEMAP_PAGE_SIZE,
@@ -47,7 +46,5 @@ export async function GET(
   } catch (cause: unknown) {
     log.error("sitemap_page_failed", { page: index, cause });
     return new Response("sitemap unavailable", { status: 500 });
-  } finally {
-    await db?.destroy();
   }
 }

@@ -4011,3 +4011,82 @@ deployment that wants parallel query needs `--shm-size` raised instead.
 `DeriveOptions.universeSizeCache` is accepted by the population chain and **not used**, because a
 count is a direct fact from one row and needs no complete universe — only rank, rarity and
 distribution do. It is documented as accepted-and-ignored rather than quietly implying otherwise.
+
+## TASK-029 — one pool per process, and a rate limit (2026-09-21)
+
+Both fixes the pre-deployment review found, with the target platform decided:
+**Vercel for the app, Supabase for the database** (project owner, 2026-09-21).
+
+### The connection defect, measured before and after
+
+`packages/db/src/pool.ts` documents "**one pool per process** (`ARCHITECTURE.md` §9, ADR-0002)" in
+its own header. Six places in `apps/web` did the opposite — `createDb(createPool(loadDbConfig()))`
+per request, destroyed in a `finally` — so every request paid for a TCP connect, a TLS handshake and
+an authentication, and held its own backend while it ran.
+
+| | Connections for 60 concurrent requests |
+|---|---:|
+| Before | **59** |
+| After | **10**, of which 8 are the derivation job → the app uses **2** |
+
+`max_connections` defaults to 100. Nothing failed in testing, which is why no test caught it: 150
+concurrent all returned 200, because Node serialises through one event loop. What breaks it is a
+crawler walking 248,406 sitemap URLs — the traffic indexing exists to invite.
+
+`apps/web/src/lib/db.ts` memoises one handle at module scope. `createPool` now takes `max`,
+`idleTimeoutMillis` and `connectionTimeoutMillis`, keeping its old single-argument shape so existing
+callers are untouched.
+
+### Why `max` is 2 and not 10
+
+On Vercel each concurrent invocation is a **separate process with its own module scope**, so the memo
+is per-instance and connections in flight are `max × instances`. Ten instances at `pg`'s default of
+10 would exhaust a 100-connection database on their own, before any other client.
+
+Two per instance plus a pooler in front is the shape that survives. **On Supabase the app must point
+at the pooler** (Supavisor, transaction mode, port 6543) and **migrations and batch jobs must point
+at the direct connection** (5432), because transaction-mode pooling does not carry session state.
+That distinction is now in `.env.example`; getting it backwards fails in ways that look random.
+
+### The rate limit, and what it is not
+
+`apps/web/src/middleware.ts`: 60 requests a minute for pages, 30 for the JSON API, fixed window,
+keyed on the first entry of `x-forwarded-for`. Verified live: 40 API requests → **30 × 200, 10 ×
+429** with `Retry-After: 59`; a second client unaffected; `robots.txt` and the sitemap **exempt**
+even from a blocked address, because rate-limiting the map while publishing the territory is
+self-defeating.
+
+The limits are deliberately generous. A reader clicks a few times a minute. A well-behaved crawler
+stays under 60 comfortably — the point is to survive indexing, not to prevent it.
+
+**What it is not:** the store is a `Map` in the process, so on Vercel it is per-instance. Ten
+instances means ten times the allowance, and a distributed flood sees a proportionally higher
+ceiling. It is a speed bump against one impatient client, not a defence — that belongs in a CDN or
+WAF rule upstream, where a request can be rejected before it costs a database connection. Both
+`lib/rate-limit.ts` and the middleware say so in their own headers rather than implying otherwise.
+
+`evictExpired` exists because without it the store grows by one entry per distinct client for the
+life of the process — an unbounded map keyed by something a stranger chooses.
+
+### Tests
+
+`db.test.ts` asserts **identity** — that the same handle comes back — because that is the property
+that was wrong; a test checking "a handle is returned" passed throughout the defect's life.
+`rate-limit.test.ts` covers the window boundary, client isolation, the `Retry-After` floor, and that
+an unidentifiable request is **bucketed** rather than exempted (a unique key per unknown request
+would give every anonymous caller a full allowance, which is no limit at all).
+
+### Verified
+
+```
+pnpm typecheck        passed (15 projects)
+pnpm lint             passed
+pnpm format:check     passed
+pnpm test             passed, 628 tests
+pnpm build            passed
+pnpm test:golden      passed, 364 tests
+pnpm test:integration passed, 263 tests
+```
+
+Plus live, on the full register: connections 59 → 10 under identical load, and the rate limit
+firing with correct headers.
