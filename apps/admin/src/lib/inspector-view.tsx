@@ -1,3 +1,4 @@
+import type { AssetEligibility } from "@name-atlas/truth";
 import type {
   InspectedClaim,
   InspectedRights,
@@ -165,27 +166,96 @@ function Claim({ claim }: { claim: InspectedClaim }) {
   );
 }
 
+/**
+ * The (asset kind x surface) decision matrix (TASK-021 AC-10, ADR-0007).
+ *
+ * A rights decision nobody can see is a rights decision nobody can check, and
+ * this console is the only surface allowed to show one.
+ */
+function RightsMatrix({ matrix }: { matrix: readonly AssetEligibility[] }) {
+  const surfaces = [...new Set(matrix.map((cell) => cell.surface))];
+  const assets = [...new Set(matrix.map((cell) => cell.asset))];
+  const at = (asset: string, surface: string): AssetEligibility | undefined =>
+    matrix.find((cell) => cell.asset === asset && cell.surface === surface);
+
+  return (
+    <table className="matrix">
+      <thead>
+        <tr>
+          <th scope="col">Asset</th>
+          {surfaces.map((surface) => (
+            <th scope="col" key={surface}>
+              {surface}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {assets.map((asset) => (
+          <tr key={asset}>
+            <th scope="row">{asset}</th>
+            {surfaces.map((surface) => {
+              const cell = at(asset, surface);
+              return (
+                <td key={surface} className={cell?.decision.toLowerCase()}>
+                  {cell?.decision ?? "—"}
+                  <span className="reason">{cell?.reason_code}</span>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function Rights({ rights }: { rights: readonly InspectedRights[] }) {
   return (
     <section>
       <h3>Rights in force</h3>
       {rights.map((profile) => (
-        <dl key={profile.rights_profile_id}>
-          <dt>Source</dt>
-          <dd>{profile.source_name}</dd>
-          <dt>Automated access</dt>
-          <dd>{profile.automated_access}</dd>
-          <dt>Commercial use</dt>
-          <dd>{profile.commercial_use}</dd>
-          <dt>Redistribution</dt>
-          <dd>{profile.redistribution}</dd>
-          <dt>Metadata</dt>
-          <dd>{profile.metadata_rights}</dd>
-          <dt>Review</dt>
-          <dd>{profile.review_status}</dd>
-          <dt>Terms</dt>
-          <dd>{profile.terms_version ?? "(none)"}</dd>
-        </dl>
+        <div key={profile.rights_profile_id}>
+          <dl>
+            <dt>Source</dt>
+            <dd>{profile.source_name}</dd>
+            <dt>Matrix row</dt>
+            <dd>{profile.rights_state}</dd>
+            <dt>Governs</dt>
+            <dd>
+              {profile.record_count} source record{profile.record_count === 1 ? "" : "s"} —{" "}
+              {profile.record_level_override ? "record-level override" : "source default"}
+            </dd>
+            <dt>Automated access</dt>
+            <dd>{profile.automated_access}</dd>
+            <dt>Commercial use</dt>
+            <dd>{profile.commercial_use}</dd>
+            <dt>Redistribution</dt>
+            <dd>{profile.redistribution}</dd>
+            <dt>Metadata</dt>
+            <dd>{profile.metadata_rights}</dd>
+            <dt>Transcription (OCR)</dt>
+            <dd>{profile.transcription_rights}</dd>
+            <dt>Image</dt>
+            <dd>{profile.image_rights}</dd>
+            <dt>Database</dt>
+            <dd>{profile.database_rights}</dd>
+            <dt>Reproduction eligible</dt>
+            <dd>{profile.reproduction_eligible ? "yes" : "no"}</dd>
+            <dt>Connector may run</dt>
+            <dd>{profile.connector_executable ? "yes" : "no"}</dd>
+            <dt>Attribution</dt>
+            <dd>
+              {profile.attribution_required ? "required — " : "not required — "}
+              {profile.attribution_text ?? profile.source_owner ?? "(none recorded)"}
+            </dd>
+            <dt>Review</dt>
+            <dd>{profile.review_status}</dd>
+            <dt>Terms</dt>
+            <dd>{profile.terms_version ?? "(none)"}</dd>
+          </dl>
+          <RightsMatrix matrix={profile.matrix} />
+        </div>
       ))}
     </section>
   );

@@ -19,6 +19,14 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { findPeselResource } from "@name-atlas/sources";
+import {
+  classifyRightsState,
+  completeRights,
+  connectorExecutable,
+  evaluateRightsMatrix,
+  reproductionEligible,
+} from "@name-atlas/truth";
+import type { AssetEligibility, RightsState } from "@name-atlas/truth";
 
 /**
  * Whether the inspector may run at all (TASK-018 §2).
@@ -118,8 +126,30 @@ export interface InspectedRights {
   readonly commercial_use: string;
   readonly redistribution: string;
   readonly metadata_rights: string;
+  // The two dimensions D-003 required to be evaluated independently of
+  // metadata (docs/canonical/12 §16.4, ADR-0007).
+  readonly transcription_rights: string;
+  readonly image_rights: string;
+  readonly database_rights: string;
+  readonly attribution_required: boolean;
+  readonly attribution_text: string | null;
+  readonly source_owner: string | null;
+  readonly rights_url: string | null;
   readonly review_status: string;
   readonly terms_version: string | null;
+  /** How many of this surname's source records this posture governs. */
+  readonly record_count: number;
+  /**
+   * Whether any of those records carries its own profile rather than
+   * inheriting the source default (`docs/canonical/12` §6.1).
+   */
+  readonly record_level_override: boolean;
+  /** Which row of §6.3's decision matrix this posture sits on. */
+  readonly rights_state: RightsState;
+  /** Every (asset kind x surface) decision. Computed, never stored. */
+  readonly matrix: readonly AssetEligibility[];
+  readonly reproduction_eligible: boolean;
+  readonly connector_executable: boolean;
 }
 
 export type Inspection =
@@ -338,16 +368,51 @@ export async function inspectSurname(db: Kysely<DB>, canonicalKey: string): Prom
         evidence: evidenceByClaim.get(row.claim_id) ?? [],
       }));
 
-      const rightsRows = await sql<InspectedRights>`
-        SELECT DISTINCT rp.rights_profile_id::text, src.name AS source_name,
+      // Rights are read per source record rather than per source, because
+      // docs/canonical/12 §6.1 lets a record tighten its source's default and
+      // §16.4 says a digital library's objects differ from one another. For
+      // PESEL every record inherits, so this collapses to one row per source.
+      type RightsRow = Omit<
+        InspectedRights,
+        "rights_state" | "matrix" | "reproduction_eligible" | "connector_executable"
+      >;
+
+      // Grouped by the profile actually in force, not by record: for PESEL every
+      // record inherits the source default, and six identical postures would be
+      // noise. A record carrying its own profile appears as its own row, which
+      // is the case this grouping exists to make visible.
+      const rightsRows = await sql<RightsRow>`
+        SELECT rp.rights_profile_id::text, src.name AS source_name,
                rp.automated_access::text, rp.commercial_use::text, rp.redistribution::text,
-               rp.metadata_rights::text, rp.review_status::text, rp.terms_version
+               rp.metadata_rights::text, rp.transcription_rights::text, rp.image_rights::text,
+               rp.database_rights::text, rp.attribution_required, rp.attribution_text,
+               rp.source_owner, rp.rights_url, rp.review_status::text, rp.terms_version,
+               count(DISTINCT sr.source_record_id)::int AS record_count,
+               bool_or(sr.rights_profile_id IS NOT NULL) AS record_level_override
         FROM distribution_snapshots s
         JOIN sources src ON src.source_id = s.source_id
-        JOIN rights_profiles rp ON rp.rights_profile_id = src.default_rights_profile_id
+        JOIN source_records sr ON sr.source_record_id = s.source_record_id
+        JOIN rights_profiles rp
+          ON rp.rights_profile_id = COALESCE(sr.rights_profile_id, src.default_rights_profile_id)
         WHERE s.surname_id = ${found.surname_id}::uuid
-        ORDER BY src.name
+        GROUP BY rp.rights_profile_id, src.name, rp.automated_access, rp.commercial_use,
+                 rp.redistribution, rp.metadata_rights, rp.transcription_rights,
+                 rp.image_rights, rp.database_rights, rp.attribution_required,
+                 rp.attribution_text, rp.source_owner, rp.rights_url, rp.review_status,
+                 rp.terms_version
+        ORDER BY src.name, rp.rights_profile_id
       `.execute(trx);
+
+      const rights: InspectedRights[] = rightsRows.rows.map((row) => {
+        const effective = completeRights(row);
+        return {
+          ...row,
+          rights_state: classifyRightsState(effective),
+          matrix: evaluateRightsMatrix(effective),
+          reproduction_eligible: reproductionEligible(effective),
+          connector_executable: connectorExecutable(effective),
+        };
+      });
 
       return {
         kind: "FOUND" as const,
@@ -355,7 +420,7 @@ export async function inspectSurname(db: Kysely<DB>, canonicalKey: string): Prom
         source_records,
         snapshots: [...snapshots.values()],
         claims,
-        rights: rightsRows.rows,
+        rights,
       };
     });
 }

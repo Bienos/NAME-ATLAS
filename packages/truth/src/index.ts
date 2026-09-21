@@ -53,6 +53,35 @@ export type {
 } from "./confidence.js";
 export { evaluateSurface, evaluateAllSurfaces, SURFACES } from "./rights.js";
 export type { EffectiveRights, Surface, SurfaceDecision, SurfaceEligibility } from "./rights.js";
+// Per-asset rights (ADR-0007, resolving D-003).
+export {
+  ASSET_KINDS,
+  asPermission,
+  attributionFor,
+  classifyRightsState,
+  completeRights,
+  connectorExecutable,
+  evaluateAsset,
+  evaluateRightsMatrix,
+  excerptTranscription,
+  mostRestrictive,
+  paidSurfaceEligible,
+  reproductionEligible,
+  resolveEffectiveRights,
+  TRANSCRIPTION_EXCERPT_MAX_CHARS,
+} from "./rights.js";
+export type {
+  AssetDecision,
+  AssetEligibility,
+  AssetKind,
+  FullRights,
+  Permission,
+  RightsLayer,
+  RightsState,
+  TranscriptionExcerpt,
+} from "./rights.js";
+export { loadEffectiveRights } from "./rights-load.js";
+export type { RightsLoadRequest } from "./rights-load.js";
 export type {
   CanonicalSurnameIdentity,
   CitationProjection,

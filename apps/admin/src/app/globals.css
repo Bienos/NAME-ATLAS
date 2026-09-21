@@ -191,3 +191,40 @@ dd {
   color: var(--soft);
   font-size: 0.82rem;
 }
+
+/* The (asset kind × surface) rights matrix (TASK-021, ADR-0007). */
+.matrix {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.6rem 0 0;
+  font-size: 0.82rem;
+}
+.matrix th,
+.matrix td {
+  border: 1px solid var(--rule);
+  padding: 0.3rem 0.45rem;
+  text-align: left;
+  vertical-align: top;
+}
+.matrix thead th {
+  color: var(--soft);
+  font-weight: 600;
+}
+.matrix .reason {
+  display: block;
+  color: var(--soft);
+  font-size: 0.72rem;
+}
+.matrix .allowed,
+.matrix .allowed_with_attribution {
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+.matrix .locator_only {
+  background: var(--stale-bg);
+  color: var(--stale-ink);
+}
+.matrix .blocked {
+  background: var(--bad-bg);
+  color: var(--bad-ink);
+}

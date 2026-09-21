@@ -58,9 +58,46 @@ Either way, define what the product shows when neither path yields evidence for 
 
 ---
 
-## D-003 — Polona rights per surface: metadata, OCR/transcription, image
+## D-003 — RESOLVED (2026-09-21) by ADR-0007
 
-**Status:** BLOCKS M3 (historical discovery). NON-BLOCKING now.
+**Resolution: rights are evaluated per asset kind, per surface, and fail closed.** Decided on the
+project owner's instruction to implement the open decisions rather than leave them waiting on
+outreach. Full record: `docs/adr/0007-rights-per-asset-and-surface.md`. Implemented by
+`tasks/021-rights-per-asset-and-surface.md`.
+
+All five questions the original record raised are answered, and each answer is executable code rather
+than a policy statement:
+
+1. **Unknown or unreadable rights → fail closed.** `UNKNOWN` on `FREE`/`PAID`/`SEO` is a refusal, not
+   a maybe, on every dimension — extending the treatment §6.4 already gave `commercial_use`. An
+   unparseable stored value reads as `UNKNOWN`, never as `ALLOWED`. `INTERNAL` stays open for metadata
+   so that rights review is possible at all.
+2. **OCR** is stored whatever the rights say, because without the matched text there is no
+   `EvidenceItem`; publishing an excerpt requires an explicit `transcription_rights = ALLOWED` and is
+   capped at **300 code points**, with truncation reported rather than silent.
+3. **Scans** are reproduced only on an explicit `image_rights = ALLOWED` (§6.4 taken literally, so
+   `CONDITIONAL` is not enough). Everything else is `LOCATOR_ONLY`: the object may be named and linked
+   at a stable locator, never copied, cropped, proxied or re-hosted.
+4. **Surfaces** are unlocked per (asset kind × surface) by `evaluateRightsMatrix`, not per source. The
+   metadata row delegates to the existing `evaluateSurface`, so nothing PESEL already publishes moved.
+5. **Attribution** is `attributionFor`: the rights holder's own wording verbatim when stored, else a
+   line composed from owner and rights URL — and a required attribution that cannot be built **blocks**
+   rather than publishes.
+
+**What this ADR does not claim.** It asserts nothing about what Polona's or Biblioteka Narodowa's
+terms actually say. It decides what Name Atlas does with whatever they say. The per-object values must
+still be read from each object at ingest, which `docs/canonical/12` §16.3 already requires as a
+retrieval stage.
+
+**Still to obtain from the rights holder** (no longer blocking, because the defaults are safe): the
+confirmed per-object rights values themselves, and confirmation that the attribution wording Name
+Atlas displays is acceptable to Biblioteka Narodowa.
+
+**Original record, for reference**
+
+### D-003 (original record) — Polona rights per surface: metadata, OCR/transcription, image
+
+**Status (superseded):** BLOCKS M3 (historical discovery). NON-BLOCKING now.
 **Owner:** project owner + rights review, informed by the TASK-010 Polona spike.
 
 Polona exposes object-level rights and they differ per object (`docs/canonical/12` §16.4). Three permissions must be modelled and evaluated **independently**: `metadata_rights`, `transcription_rights` (OCR), `image_rights`.

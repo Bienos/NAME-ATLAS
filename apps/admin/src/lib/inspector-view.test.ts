@@ -1,6 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
+import { completeRights, evaluateRightsMatrix } from "@name-atlas/truth";
 import { InspectionView } from "./inspector-view.js";
 import type { Inspection } from "./inspect.js";
 
@@ -154,8 +155,35 @@ const FOUND: Inspection = {
       commercial_use: "ALLOWED",
       redistribution: "ALLOWED",
       metadata_rights: "ALLOWED",
+      // PESEL's real posture: a CSV has no scan and no OCR, and nothing
+      // evidences a permission either way (packages/sources/src/registry.ts).
+      transcription_rights: "UNKNOWN",
+      image_rights: "UNKNOWN",
+      database_rights: "ALLOWED",
+      attribution_required: false,
+      attribution_text: null,
+      source_owner: "Ministerstwo Cyfryzacji",
+      rights_url: null,
       review_status: "APPROVED",
       terms_version: "CC0 1.0",
+      record_count: 2,
+      record_level_override: false,
+      rights_state: "METADATA_OPEN_IMAGE_RESTRICTED",
+      matrix: evaluateRightsMatrix(
+        completeRights({
+          metadata_rights: "ALLOWED",
+          transcription_rights: "UNKNOWN",
+          image_rights: "UNKNOWN",
+          database_rights: "ALLOWED",
+          automated_access: "ALLOWED",
+          commercial_use: "ALLOWED",
+          redistribution: "ALLOWED",
+          review_status: "APPROVED",
+          attribution_required: false,
+        }),
+      ),
+      reproduction_eligible: false,
+      connector_executable: true,
     },
   ],
 };

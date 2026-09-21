@@ -3003,3 +3003,69 @@ The runtime M3 needs exists and runs. What M3 still needs before historical work
 (Polona rights per surface) and **D-002** (onomastics rights), both still open and both decisions for
 the project owner; the Polona connector itself; and staff authentication if the admin console is ever
 to be reachable (`docs/canonical/22` §6 — the inspector is still gated by an environment flag).
+
+---
+
+## TASK-021 — rights per asset kind and surface (D-003 resolved)
+
+**Status: implemented and verified 2026-09-21.** `docs/DECISIONS_NEEDED.md` D-003 is resolved by
+**ADR-0007**. M3's rights blocker is closed.
+
+### What D-003 asked, and what is now in code
+
+| D-003's question | Answer, as code |
+|---|---|
+| Default when rights are unknown or unreadable | Fail closed. `UNKNOWN` on a public surface is a refusal, and an unparseable stored value reads as `UNKNOWN`, never as `ALLOWED` |
+| May OCR be stored, excerpted, cited, and how long | Stored always (it is the evidence); excerpted publicly only on an explicit `transcription_rights = ALLOWED`, capped at 300 code points, truncation reported |
+| May scans be reproduced, or only linked | `reproductionEligible` is true only for `image_rights = ALLOWED`; everything else is `LOCATOR_ONLY` — name it, link it, never copy it |
+| Which surfaces each combination unlocks | `evaluateRightsMatrix` — 3 asset kinds × 4 surfaces, evaluated independently |
+| Attribution text and format per rights state | `attributionFor`; a required attribution that cannot be built **blocks** rather than publishes |
+
+### The part that is load-bearing
+
+`docs/canonical/12` §6.1's precedence chain is a **most-restrictive-wins fold**: a child layer can
+tighten its parent and never loosen it. That is what makes object-level rights supplied by a third
+party safe to ingest — a wrong or hostile value can only restrict us further. Verified against a real
+PostgreSQL: a record-level profile claiming `image_rights = ALLOWED` over PESEL's `UNKNOWN` leaves the
+effective value `UNKNOWN`.
+
+`evaluateSurface` was not touched. The matrix's metadata row delegates to it, and a test asserts the
+two agree across eight rights postures × four surfaces, so nothing PESEL already publishes moved.
+
+### The inspector, against the live database
+
+`GET /?surname=KOWALCZYK` on `name_atlas_dev`, one profile governing 6 source records, source default,
+matrix row `METADATA_OPEN_IMAGE_RESTRICTED`:
+
+| Asset | INTERNAL | FREE | PAID | SEO |
+|---|---|---|---|---|
+| METADATA | ALLOWED | ALLOWED | ALLOWED | ALLOWED |
+| TRANSCRIPTION | ALLOWED | BLOCKED | BLOCKED | BLOCKED |
+| IMAGE | ALLOWED | LOCATOR_ONLY | LOCATOR_ONLY | LOCATOR_ONLY |
+
+That is the honest reading of PESEL's own profile: a CSV has no scan and no OCR, and
+`packages/sources/src/registry.ts` records `UNKNOWN` for both rather than `ALLOWED`. The row shows the
+gate working on real stored values, not on a fixture.
+
+### Deliberately not built
+
+The Polona connector — no search, no retrieval, no IIIF, no network call. The `digital_assets` table:
+§6.1's asset layer is a **parameter** to `resolveEffectiveRights`, so the precedence is complete and
+tested now, and the table lands with the connector that will write rows to it. And **this task asserts
+nothing about what Polona's terms actually say** — it decides what Name Atlas does with whatever they
+say, which is the part that was blocking.
+
+### Verification run
+
+```
+pnpm typecheck        → passed, 14 projects
+pnpm lint             → passed
+pnpm format:check     → passed
+pnpm test             → passed, 445 unit tests (truth 121, +33 new)
+pnpm test:integration → passed, 224 tests across 17 files (rights precedence 6 new)
+pnpm build            → passed
+inspector, live DB    → matrix above, rendered from name_atlas_dev
+```
+
+Integration tests run with `TEST_DATABASE_URL` against the local server; the container runtime is
+unavailable in this environment, which is the substitute path `packages/testing` documents.

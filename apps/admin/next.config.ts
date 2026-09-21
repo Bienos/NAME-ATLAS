@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     "@name-atlas/logging",
     "@name-atlas/resolver",
     "@name-atlas/sources",
+    "@name-atlas/truth",
   ],
   webpack: (config) => {
     config.resolve = config.resolve ?? {};
