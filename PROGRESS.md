@@ -4183,9 +4183,9 @@ half exists and was verified against the running deployment. The database half w
 | Vercel project | `name-atlas`, `prj_io95UvFcjCJfFtsyVcPZhrlkGZL1`, team `bienos' projects` |
 | Root directory | `apps/web`, source files outside it enabled |
 | Node | pinned **22.x** — `engines` is `>=22.12.0 <23`, and Vercel's newer default would fail `pnpm install` |
-| Function region | `fra1`, to sit beside a Frankfurt database rather than across the Atlantic |
+| Function region | **`fra1`** (Frankfurt), verified running — see below |
 | Production URL | `name-atlas-two.vercel.app`, behind the team's Vercel Authentication |
-| Deployed commit | `7a5c78a`, branch `claude/elegant-archimedes-w5ony1` |
+| Deployed commit | `1ef8087`, branch `claude/elegant-archimedes-w5ony1` |
 | `SITE_ORIGIN` | set for production only; preview stays unset so it renders relative paths |
 | `SEO_INDEXING_ENABLED` | **deliberately not set** — ADR-0009 §5's alpha gate |
 | `DATABASE_URL` | **not set** — see below |
@@ -4263,3 +4263,28 @@ because the repository has **no `main`**. The production deployment above was pi
 `claude/elegant-archimedes-w5ony1` explicitly, so it is correct, but a later push to the work branch
 would deploy as a *preview*. The available API cannot set a project's production branch; it needs the
 dashboard, or a default branch that holds the work.
+
+### The whole stack is in Europe, and production was moved to prove it
+
+The first production build ran in **`iad1`** (Washington): a project's region is fixed when the
+deployment is created, and the region was set afterwards, so the setting existed while no deployment
+used it. Configuration is not effect. Production was rebuilt and the alias moved.
+
+Verified from the live response, not from the project settings:
+
+| | `x-vercel-id` |
+|---|---|
+| Before | `iad1:iad1::iad1::…` |
+| After | `iad1:iad1::fra1::…` |
+
+The third segment is where the function ran. The leading `iad1` is only the edge point of presence the
+request entered through, which is wherever the client sits, and does not move with the function.
+
+The database belongs in Supabase **`eu-central-1`**, which is also Frankfurt, so the function and the
+database sit in one region rather than talking across one. Latency is the smaller reason: these
+figures derive from the PESEL register, and keeping the stack inside the EU is the defensible posture
+even though what is stored is aggregate counts and not personal records.
+
+Also observed while doing this: pushing to `claude/elegant-archimedes-w5ony1` auto-deployed a
+**preview**, not production, exactly as the production-branch note below predicts. That note is no
+longer a theory.
