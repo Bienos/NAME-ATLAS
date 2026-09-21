@@ -3420,8 +3420,13 @@ from a first without ever recording which surname.
 
 ## TASK-026 — the golden test corpus (2026-09-21)
 
-**Status: IMPLEMENTED, PARTIALLY VERIFIED.** 175 of 364 assertions ran and passed; the other 189
-could not run in this environment for lack of a database. See "Not verified here" below.
+**Status: IMPLEMENTED AND VERIFIED.** All 364 assertions run and pass, against the **pinned
+`postgis/postgis:16-3.4` container image** — which no session before this one had been able to
+exercise. `pnpm test:integration`'s 250 tests were re-run on the same image and also pass.
+
+This record was first written when the database-backed half could not run, and said so. It has been
+corrected rather than appended to: the earlier "not verified" statement is no longer true, and
+leaving it would misreport the state.
 
 `docs/CODEMAP.md` had listed `tests/golden` as "filled per task" since TASK-001, and the directory
 did not exist. It exists now, implementing `docs/canonical/17` §4–§13 and §20–§21 for the two QA
@@ -3486,42 +3491,85 @@ dependency and `AGENTS.md` §6 wants a justification for each new one; §6's met
 compile error rather than a runtime check; and a `forbidden` entry only protects semantics if it
 executes. §5's field names, nesting and vocabulary are preserved exactly.
 
-### Verified here
+### Verified
 
 ```
-pnpm typecheck        → passed (all 13 packages)
-pnpm lint             → passed, zero warnings
-pnpm format:check     → passed
-pnpm test             → passed, 584 tests across 51 files
-pnpm build            → passed
-pnpm test:golden      → 175 passed, 189 skipped (see below)
+pnpm typecheck        passed (14 projects)
+pnpm lint             passed, zero warnings
+pnpm format:check     passed
+pnpm test             passed, 584 tests across 51 files
+pnpm build            passed
+pnpm test:golden      passed, 364 tests across 4 files, exit 0
+pnpm test:integration passed, 250 tests across 19 files, exit 0
 ```
 
-The 175 that ran: `registry.test.ts` 32, `rights.test.ts` 72, `resolution-inputs.test.ts` 71.
+Golden breakdown: `registry.test.ts` 32, `rights.test.ts` 72, `resolution-inputs.test.ts` 71,
+`resolution.test.ts` 189.
 
 `resolution-inputs.test.ts` is worth naming separately. It asserts, per case, the pure normalisation
 property each expectation *rests on* — `nowak` and `Nowak` share a canonical key; `Luczak` and
 `Łuczak` do not; an en dash addresses a hyphen and a space does not; one Cyrillic letter inside a
-Latin word is `MIXED_SCRIPT_REVIEW` with both script flags set. So every one of the 23 resolution
-cases is proven **satisfiable** without a database. A case expecting `EXACT` against a display form
-whose key differs from its input could only ever fail, and nothing would have said so until someone
-ran it with a database.
+Latin word is `MIXED_SCRIPT_REVIEW` with both script flags set. So every resolution case is proven
+**satisfiable** without a database. A case expecting `EXACT` against a display form whose key
+differs from its input could only ever fail, and nothing would say so until someone ran it.
 
-### Not verified here
+### The container runtime, and how to get one here
 
-`tests/golden/src/resolution.test.ts` — 189 assertions — **did not run.** There is no container
-runtime in this session (`Could not find a working container runtime strategy`) and no reachable
-database: the local PostgreSQL 16 uses peer authentication, no role exists for this session's OS
-user, and creating one needs privileges this session was denied. Earlier sessions reached it through
-`TEST_DATABASE_URL`; that path is not available now.
+Every session from TASK-001 onwards recorded the pinned image as unexercised because container
+registries were egress-blocked. They are no longer wholly blocked, and the missing piece was one
+flag. Recorded because it is not guessable:
 
-`pnpm test:integration` is unrun for the same reason, so TASK-023/024/025's 243 integration tests are
-also unconfirmed in this session. They passed in the session that wrote them.
+- No daemon is running at session start, and `/etc/init.d/docker start` fails on `ulimit`
+  (`Operation not permitted`). Starting `dockerd` directly works.
+- `registry-1.docker.io` and `auth.docker.io` are both reachable, so **manifests resolve and the
+  pull appears to be working** — and then fails, because Docker Hub serves blobs from
+  `production.cloudfront.docker.com`, which the proxy answers `403` to. The failure looks like a
+  broken image rather than a policy denial.
+- `mirror.gcr.io` **is** permitted. So:
 
-Nothing in the resolution corpus is asserted to have passed. Its expectations were derived from
-`packages/resolver`'s code and from `tests/integration/src/resolver.test.ts`'s existing, previously
-passing assertions, and its input-side properties were measured (above) — but the corpus itself has
-not been executed.
+```
+setsid dockerd --iptables=false --ip6tables=false --registry-mirror=https://mirror.gcr.io \
+  > /tmp/dockerd.log 2>&1 < /dev/null &
+```
+
+The pinned digest then pulls intact, and `docker images --digests` confirms
+`sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5` — the exact value of
+`POSTGRES_TEST_IMAGE`. Testcontainers also pulls its `ryuk` reaper, so the containers are genuinely
+being driven by the harness and not by a hand-started server. `TEST_DATABASE_URL` was not used and
+is not needed.
+
+The local PostgreSQL 16 remains unusable as a fallback: peer authentication, no role for this
+session's OS user, and creating one needs privileges this session does not have. That no longer
+matters.
+
+### What the corpus caught on its first real run
+
+Six assertions failed the first time the resolution domain ran, all one root cause, and it was
+**the corpus that was wrong**:
+
+`RES-EXACT-001` (`Nowak`), `RES-EXACT-002` (`nowak`) and `RES-VARIANT-001` (`Novak`) are each five
+code points. They expected the suggestion path to suppress on `EXACT_MATCH_EXISTS`; it suppresses on
+`INPUT_TOO_SHORT`. The reason is structural: `EXACT_MATCH_EXISTS` is discovered *from the trigram
+shortlist* (`candidates.ts` — `shortlist.some(row => row.canonical_key === key)`), and below
+`MIN_FUZZY_INPUT_LENGTH` no retrieval runs at all, so that guard cannot fire. Both statements about
+`Nowak` are true.
+
+It is also unreachable from the read path: `suggestionsFor` (`packages/truth/src/query.ts`) calls
+`suggestSurnames` **only** when the resolution status is `UNKNOWN`, returning `NOT_APPLICABLE` for
+anything that resolved. So no consumer is ever told that a surname we resolved exactly was too
+short, and nothing needed fixing in `packages/resolver`.
+
+What was wrong was the predicate's scope. `EXACT_ENTITY_DISPLACED_BY_FUZZY` had bundled two claims:
+that no fuzzy list accompanies an exact hit (§13's actual hard fail — it holds), and that the
+suppression carries one particular reason code (a diagnostic §13 says nothing about). The predicate
+now asserts only the first, with the reasoning recorded next to it, and the reason code is pinned as
+a **case expectation on both sides of the six-character floor** — `RES-EXACT-001` below it,
+`RES-EXACTWINS-001` (`Kowalski`, eight) above it.
+
+That is more coverage than before, not less: the corpus previously asserted one value and had it
+wrong for three cases; it now pins the boundary itself. No assertion was removed without a strictly
+stronger one taking its place, and no existing test covered this interaction — `fuzzy-candidates.test.ts`
+tests `INPUT_TOO_SHORT` on `NOWK`, which is not a surname, and `EXACT_MATCH_EXISTS` on a long one.
 
 ### Recorded gaps, not omissions
 
@@ -3538,6 +3586,6 @@ not been executed.
   search-only suggestion under `USER_CONFIRM` with declared provenance and no score a consumer could
   read as confidence.
 - **Review.** Every case carries `reviewed_at: null`. The rights cases ask for a `LEGAL` reviewer
-  and have not had one.
+  and have not had one. This is the only gap in the corpus that a session cannot close by itself.
 - **Layers 9 and 12** (frontend state, product truthfulness) are covered by `apps/web/src/lib/*.test.ts`,
   including the honesty guard. Duplicating them here would give one truth two owners (`AGENTS.md` §1).

@@ -45,8 +45,8 @@ absolute.
 ## Running it
 
 ```
-pnpm test:golden                      # from the repository root
-TEST_DATABASE_URL=… pnpm test:golden  # substitute for the pinned container
+pnpm test:golden                      # from the repository root — 364 assertions
+TEST_DATABASE_URL=… pnpm test:golden  # substitute when no container runtime is available
 ```
 
 `registry.test.ts`, `rights.test.ts` and `resolution-inputs.test.ts` are pure and run

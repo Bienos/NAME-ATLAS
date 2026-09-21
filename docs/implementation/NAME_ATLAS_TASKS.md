@@ -34,7 +34,7 @@ the run recorded in `PROGRESS.md`. Code written but not verified is `IMPLEMENTED
 | **023** | Result experience: claim unit, evidence, snapshot, intent, second search | **DONE** | Contract 1.5 |
 | **024** | Canonical route, slug, indexability, share, OG image, events | **DONE** | ADR-0009 |
 | **025** | Surname comparison | **DONE** | `noindex`; strict comparability |
-| **026** | Golden test corpus | **DONE, PARTIALLY VERIFIED** | Resolution + rights, EXPECTED and FORBIDDEN per case; 175 of 364 assertions ran — the rest need a database |
+| **026** | Golden test corpus | **DONE** | Resolution + rights, EXPECTED and FORBIDDEN per case; 364 assertions pass on the pinned container image |
 
 All three of 023–025 passed an adversarial five-lens review before being marked DONE; see `PROGRESS.md`.
 

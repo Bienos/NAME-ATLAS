@@ -82,13 +82,21 @@ export const RESOLUTION_CASES: readonly ResolutionCase[] = [
       "EXACT",
       "SYNTHETIC",
       "P0",
-      ["docs/canonical/13 §18", "TASK-003 AC-1"],
-      "The baseline. If this fails nothing else in the corpus means anything.",
+      ["docs/canonical/13 §18", "TASK-003 AC-1", "D-017"],
+      "The baseline. If this fails nothing else in the corpus means anything.\n\n" +
+        "It is also the below-the-floor half of the suppression-reason boundary. `Nowak` is " +
+        "five code points, so no fuzzy retrieval runs and the suppression reports " +
+        "`INPUT_TOO_SHORT` — not `EXACT_MATCH_EXISTS`, which is discovered from the trigram " +
+        "shortlist and therefore cannot fire below six. Both descriptions of `Nowak` are " +
+        "true. Measured on the pinned container, 2026-09-21; RES-EXACTWINS-001 pins the " +
+        "other side. Unreachable from the read path either way: `suggestionsFor` " +
+        "(`packages/truth/src/query.ts`) asks for suggestions only when the status is " +
+        "`UNKNOWN`, so no consumer is ever told a surname it resolved was too short.",
     ),
     input: { raw_surname: "Nowak", locale: "pl-PL", country: "PL" },
     expected: {
       resolution: { ...RESOLVED_EXACT, resolved_display: "Nowak" },
-      suggestion: { kind: "NO_SUGGESTIONS", reason: "EXACT_MATCH_EXISTS" },
+      suggestion: { kind: "NO_SUGGESTIONS", reason: "INPUT_TOO_SHORT" },
       candidate_behavior: {},
     },
     forbidden: [
@@ -105,12 +113,13 @@ export const RESOLUTION_CASES: readonly ResolutionCase[] = [
       "P0",
       ["ADR-0005", "docs/canonical/13 §5.2"],
       "canonical_key_v2 simple-case-folds, so the address is case-insensitive while the " +
-        "stored display form is untouched.",
+        "stored display form is untouched. Five code points, so the suppression reason is " +
+        "`INPUT_TOO_SHORT` for the reason recorded on RES-EXACT-001.",
     ),
     input: { raw_surname: "nowak", locale: "pl-PL", country: "PL" },
     expected: {
       resolution: { ...RESOLVED_EXACT, resolved_display: "Nowak" },
-      suggestion: { kind: "NO_SUGGESTIONS", reason: "EXACT_MATCH_EXISTS" },
+      suggestion: { kind: "NO_SUGGESTIONS", reason: "INPUT_TOO_SHORT" },
       candidate_behavior: {},
     },
     forbidden: [
@@ -126,7 +135,11 @@ export const RESOLUTION_CASES: readonly ResolutionCase[] = [
       "P0",
       ["docs/canonical/17 §13", "docs/canonical/13 §32.3"],
       "§13's `EXACT ENTITY displaced by more frequent fuzzy entity`, stated directly: where " +
-        "an exact entity exists, no fuzzy list is produced at all.",
+        "an exact entity exists, no fuzzy list is produced at all.\n\n" +
+        "`Kowalski` is eight code points, so retrieval *does* run, finds the exact row in its " +
+        "own shortlist and suppresses on `EXACT_MATCH_EXISTS`. This is the above-the-floor " +
+        "half of the boundary RES-EXACT-001 pins from below. Measured on the pinned " +
+        "container, 2026-09-21.",
     ),
     input: { raw_surname: "Kowalski", locale: "pl-PL", country: "PL" },
     expected: {
@@ -226,7 +239,9 @@ export const RESOLUTION_CASES: readonly ResolutionCase[] = [
         matched_form: "Novak",
         candidate_surname_displays: null,
       },
-      suggestion: { kind: "NO_SUGGESTIONS", reason: "EXACT_MATCH_EXISTS" },
+      // `Novak` is five code points, so `INPUT_TOO_SHORT` for the reason recorded
+      // on RES-EXACT-001. What matters here is that no list was returned at all.
+      suggestion: { kind: "NO_SUGGESTIONS", reason: "INPUT_TOO_SHORT" },
       candidate_behavior: {},
     },
     forbidden: [

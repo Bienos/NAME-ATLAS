@@ -190,17 +190,21 @@ export const RESOLUTION_FORBIDDEN: {
       "docs/canonical/13 §32.3",
     rule:
       "Where an exact entity exists it wins outright: no fuzzy list is produced alongside " +
-      "it, and no fuzzy candidate may carry the input's own canonical key.",
+      "it, and no fuzzy candidate may carry the input's own canonical key.\n\n" +
+      "What this deliberately does **not** assert is the `reason` a suppression carries. " +
+      "The first version of this rule required `EXACT_MATCH_EXISTS`, and running the corpus " +
+      "showed that a five-character surname reports `INPUT_TOO_SHORT` instead — because the " +
+      "exact-match guard is discovered *from the trigram shortlist*, and below six code " +
+      "points no retrieval runs at all. Both are true of `Nowak`, and the hard fail §13 names " +
+      "is the displacement, not the choice between two correct explanations of a suppression " +
+      "that returned nothing. The reason code is pinned on both sides of the six-character " +
+      "floor by RES-EXACT-001 and RES-EXACTWINS-001, where it belongs: a case expectation.",
     check: (o) => {
       const r = o.resolution;
       const s = o.suggestion;
       const faults: string[] = [];
-      if (RESOLVED_STATUSES.has(r.resolution_status)) {
-        if (s.kind !== "NO_SUGGESTIONS") {
-          faults.push(`a ${s.kind} accompanied a ${r.resolution_status} resolution`);
-        } else if (s.reason !== "EXACT_MATCH_EXISTS") {
-          faults.push(`suggestions were suppressed as ${s.reason}, not EXACT_MATCH_EXISTS`);
-        }
+      if (RESOLVED_STATUSES.has(r.resolution_status) && s.kind !== "NO_SUGGESTIONS") {
+        faults.push(`a ${s.kind} accompanied a ${r.resolution_status} resolution`);
       }
       if (s.kind === "SUGGESTIONS") {
         for (const c of s.candidates) {

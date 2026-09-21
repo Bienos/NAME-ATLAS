@@ -38,17 +38,28 @@ pnpm lint             passed
 pnpm format:check     passed
 pnpm test             passed, 584 unit tests
 pnpm build            passed, 11 routes
-pnpm test:golden      175 passed, 189 skipped — the resolution domain did not run
-pnpm test:integration DID NOT RUN this session
+pnpm test:golden      passed, 364 tests across 4 files, exit 0
+pnpm test:integration passed, 250 tests across 19 files, exit 0
 ```
 
-**Every database-backed suite is unrun as of this handoff.** Integration and the golden resolution
-domain both need a container runtime or `TEST_DATABASE_URL` — the substitute path
-`packages/testing/src/postgres-container.ts` documents. This container has no container runtime, and
-the local PostgreSQL 16 uses peer authentication with no role for this session's OS user; creating
-one needs privileges this session was denied. The 250-test integration figure below the line was
-produced in the session that wrote TASK-023/024/025, through `TEST_DATABASE_URL`; it has not been
-reproduced since.
+**Everything passes, and for the first time in this project both database-backed suites ran on the
+pinned `postgis/postgis:16-3.4` image** rather than the `TEST_DATABASE_URL` substitute. Every session
+from TASK-001 onwards had to record the pinned image as unexercised; that caveat is now retired.
+`docker images --digests` confirms `sha256:44126d87…`, the exact value of `POSTGRES_TEST_IMAGE`.
+
+**How to get a runtime here — not guessable, so it is written down.** No daemon runs at session
+start and `/etc/init.d/docker start` fails on `ulimit`. `registry-1.docker.io` and `auth.docker.io`
+are reachable, so a pull *looks* like it is working and then fails: Docker Hub serves blobs from
+`production.cloudfront.docker.com`, which the proxy answers `403` to, and the error reads like a
+corrupt image rather than a policy denial. `mirror.gcr.io` is permitted, so:
+
+```
+setsid dockerd --iptables=false --ip6tables=false --registry-mirror=https://mirror.gcr.io \
+  > /tmp/dockerd.log 2>&1 < /dev/null &
+```
+
+The local PostgreSQL 16 is *not* a usable fallback: peer auth, no role for this session's OS user,
+and creating one needs privileges the session does not have.
 
 ## Task state
 
@@ -58,7 +69,7 @@ reproduced since.
 | **023** result experience: claim unit, evidence panel, snapshot, intent, second search | **DONE** |
 | **024** canonical route, slug, indexability, share, OG image, events | **DONE** |
 | **025** surname comparison | **DONE** |
-| **026** golden test corpus | **DONE, PARTIALLY VERIFIED** — 175 of 364 assertions ran; `src/resolution.test.ts` (189) needs a database |
+| **026** golden test corpus | **DONE** — all 364 assertions pass on the pinned container image |
 
 All three were reviewed adversarially by five independent readers before being marked DONE; the 21
 defects they found are listed in `PROGRESS.md` and every one is fixed. Three were pre-existing: the
@@ -73,21 +84,19 @@ public API accepting `surface=INTERNAL`, the API's bare 500 with no error envelo
 | A real map | **No geometry.** No GeoJSON/TopoJSON/Shapefile in the repository; `places.centroid` is NULL in all 16 rows; TERYT is a code register, not boundaries. | The geography chapter renders as an accessible table with its coverage caveat, which is truthful. |
 | Meaning coverage | **No licensed onomastic corpus** (D-002 resolved by ADR-0008: Path B). Every surname correctly returns `NO_SOURCED_MEANING`. | The chain, the rights gate and the honest gap are built and tested. A source is an import away. |
 | Turning indexing on | Deliberate: `SEO_INDEXING_ENABLED` is unset, so every page is `noindex, follow` (ADR-0009 §5). | The policy is implemented and unit-tested; a pilot needs a surname cohort and manual QA. |
-| `pnpm test:integration` and `tests/golden/src/resolution.test.ts` | **No database.** No container runtime (`Could not find a working container runtime strategy`); the local PostgreSQL 16 is peer-auth with no role for this session's OS user, and `CREATE ROLE` through the `postgres` OS user was denied. Earlier sessions used `TEST_DATABASE_URL`. | Everything pure: 584 unit tests, 175 golden assertions, the build. The corpus's expectations are written and its input-side properties measured; running it needs one reachable PostgreSQL 16 with `postgis` and `pg_trgm`. |
 
 ## Next action
 
-**A database, then `pnpm test:integration && pnpm test:golden`.** 189 golden assertions and 250
-integration assertions are written and unrun. Nothing else should be built on top of an unrun
-regression suite. One reachable PostgreSQL 16 with `postgis` and `pg_trgm` closes it — either a
-container runtime, or `TEST_DATABASE_URL` pointed at a server this session can authenticate to.
+Nothing is blocking. Two unblocked candidates, in the order I would take them:
 
-After that, two unblocked candidates:
-
-1. **A sitemap and the slug table** (D-019). Needed before any indexing pilot: a persisted
-   `(locale, slug)` with a collision suffix, a backfill over 598,476 rows, and a sitemap that lists
-   only pages `assessIndexability` returns `INDEX` for.
+1. **A sitemap and the slug table** (D-019). The last prerequisite for any indexing pilot: a
+   persisted `(locale, slug)` with a collision suffix, a backfill over 598,476 rows, and a sitemap
+   listing only pages `assessIndexability` returns `INDEX` for. D-019 needs deciding first — where
+   the slug lives and what the collision suffix is.
 2. **Extend the golden corpus as its fixtures arrive.** §22's evidence/claim domain (125 cases) needs
-   historical-source fixtures and is therefore blocked with M3; §20's `SHARE` surface needs an
+   historical-source fixtures and is therefore blocked behind M3; §20's `SHARE` surface needs an
    evaluator that does not exist. Both gaps are recorded in `tests/golden/README.md` rather than
    filled with invented decisions.
+
+One thing a session cannot close by itself: every golden case carries `reviewed_at: null`, and the
+ten rights cases ask for a `LEGAL` reviewer they have not had.

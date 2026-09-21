@@ -1,6 +1,6 @@
 # TASK-026 — golden test corpus: named cases with EXPECTED and FORBIDDEN
 
-- **Status:** IMPLEMENTED_UNVERIFIED 2026-09-21.
+- **Status:** IMPLEMENTED AND VERIFIED 2026-09-21 — 364 assertions, exit 0, on the pinned image.
 - **Priority:** P0. `docs/canonical/17` calls Layer 3 (Resolution), Layer 11 (Rights) and Layer 12
   (Product truthfulness) **Absolute P0**, and `docs/CODEMAP.md` has listed `tests/golden` as
   "filled per task" since TASK-001 with nothing in it.
@@ -90,16 +90,22 @@ parser over the same shape and not a redesign. This deviation is recorded here a
 ## 6. Verification
 
 ```
-pnpm typecheck
-pnpm lint
-pnpm format:check
-pnpm test
-TEST_DATABASE_URL=… pnpm test:golden
-TEST_DATABASE_URL=… pnpm test:integration
-pnpm build
+pnpm typecheck        passed (14 projects)
+pnpm lint             passed
+pnpm format:check     passed
+pnpm test             passed, 584 tests
+pnpm build            passed
+pnpm test:golden      passed, 364 tests across 4 files, exit 0
+pnpm test:integration passed, 250 tests across 19 files, exit 0
 ```
 
-The golden resolution domain needs PostgreSQL for the same reason `tests/integration` does: an
-exact resolver that is not exercised against a real `canonical_key` index proves nothing. Container
-registries remain network-egress-blocked in this environment, so the `TEST_DATABASE_URL` fallback
-is used and **the pinned `postgis/postgis` image is not exercised** — as in TASK-003 onwards.
+The golden resolution domain needs PostgreSQL for the same reason `tests/integration` does: an exact
+resolver that is not exercised against a real `canonical_key` index and a real
+`resolvable_name_forms` view proves nothing about either.
+
+Both database-backed suites ran on the **pinned `postgis/postgis:16-3.4` image**, verified by digest,
+with no `TEST_DATABASE_URL` substitute. That retires the caveat every task from TASK-003 onwards has
+had to carry. `PROGRESS.md`'s TASK-026 section records the one flag that makes the pull work here —
+`--registry-mirror=https://mirror.gcr.io`, because Docker Hub's blob CDN is refused by the proxy
+while its manifest host is not, so the failure looks like a corrupt image rather than a policy
+denial.
