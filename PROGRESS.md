@@ -4256,13 +4256,36 @@ pnpm truth:derive-batch      55m measured at 71.1/s
 All three are idempotent and resumable. The ceiling stays **248,406 indexable pages** (41.5% of the
 register) — a measurement, not a target.
 
-### Also outstanding, and not a code change
+### `main` now exists (2026-09-21)
 
-Vercel set the production branch to `claude/exciting-noether-05np1s`, the repository's default branch,
-because the repository has **no `main`**. The production deployment above was pinned to
-`claude/elegant-archimedes-w5ony1` explicitly, so it is correct, but a later push to the work branch
-would deploy as a *preview*. The available API cannot set a project's production branch; it needs the
-dashboard, or a default branch that holds the work.
+Created at `be826d9`, the work branch's tip, on the project owner's instruction, and production is
+deployed from it.
+
+The repository had **no `main`**: nine branches, all `claude/*`, so GitHub's default was
+`claude/exciting-noether-05np1s` and Vercel took its production branch from that.
+
+**Six branches carry commits that `main` does not**, and that was checked rather than assumed. All six
+fork from the same commit, `a528773`, and `main` is **62 commits ahead** of every one of them. Their
+extra commits (1–11 each) are earlier parallel attempts at TASK-004 and TASK-005 — one is titled
+"retire this branch" in so many words. Each one's substance was confirmed present on `main` before
+they were treated as superseded:
+
+| Divergent work | Where it lives on `main` |
+|---|---|
+| TASK-004 PESEL ingestion | `packages/sources/src/importer.ts` |
+| TASK-005 `CURRENT_POPULATION` chain | `0004_truth_layer.ts`, `packages/truth/src/derive.ts` |
+| Codegen restricted to the public schema | `include-pattern="public.*"` in `packages/db/package.json` |
+| D-006 | `docs/DECISIONS_NEEDED.md` §D-006, RESOLVED |
+
+Nothing was merged and nothing was deleted; the branches remain on the remote, and their commits stay
+reachable.
+
+**Two settings still point at the old default, and neither is reachable from here.** GitHub's default
+branch has no MCP tool and there is no `gh` CLI or token in this environment; Vercel's
+`update_project` rejects `link.productionBranch` outright. So a push to `main` still auto-deploys a
+*preview*. Production is correct because each production deployment was created explicitly against a
+named ref. Both are one dashboard toggle: GitHub Settings → General → Default branch, and Vercel
+Settings → Git → Production Branch.
 
 ### The whole stack is in Europe, and production was moved to prove it
 
