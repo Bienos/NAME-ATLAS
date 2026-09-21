@@ -4170,3 +4170,96 @@ above survived, because they are committed. The data never was — as recorded a
 
 A real deployment rebuilds it from the committed migrations plus the owner's archive: import 4m25s,
 slugs 57s, derive 55m, all idempotent and resumable.
+
+## Deployment — the app half is live; the database half is blocked (2026-09-21)
+
+The target platform decided in TASK-029 is **Vercel for the app, Supabase for the database**. The app
+half exists and was verified against the running deployment. The database half was not created.
+
+### What exists
+
+| | |
+|---|---|
+| Vercel project | `name-atlas`, `prj_io95UvFcjCJfFtsyVcPZhrlkGZL1`, team `bienos' projects` |
+| Root directory | `apps/web`, source files outside it enabled |
+| Node | pinned **22.x** — `engines` is `>=22.12.0 <23`, and Vercel's newer default would fail `pnpm install` |
+| Function region | `fra1`, to sit beside a Frankfurt database rather than across the Atlantic |
+| Production URL | `name-atlas-two.vercel.app`, behind the team's Vercel Authentication |
+| Deployed commit | `7a5c78a`, branch `claude/elegant-archimedes-w5ony1` |
+| `SITE_ORIGIN` | set for production only; preview stays unset so it renders relative paths |
+| `SEO_INDEXING_ENABLED` | **deliberately not set** — ADR-0009 §5's alpha gate |
+| `DATABASE_URL` | **not set** — see below |
+
+### The build works on Vercel unchanged
+
+**READY in 50 seconds.** This was the real unknown: a pnpm workspace whose packages are consumed as
+TypeScript source, built by Next 16 with `--webpack` because `extensionAlias` has no Turbopack
+equivalent (`apps/web/next.config.ts`). It needed no `vercel.json`, no build-command override and no
+change to the repository.
+
+Worth recording because it looks like a defect: `@name-atlas/seo` is imported by `apps/web` and is
+**not** in `transpilePackages`. The build passing is itself the evidence that these workspace packages
+compile regardless — webpack resolves the pnpm symlink to a real path inside the repository, where the
+app's own loader applies. Left alone rather than "fixed" on a guess.
+
+### What the running deployment actually returned
+
+Fetched against `name-atlas-two.vercel.app`, not inferred:
+
+| Request | Result |
+|---|---|
+| `/robots.txt` | `200`, `Disallow: /`, citing ADR-0009 §5 — the alpha gate holds in production |
+| `/` | `200`, full page; it queries only when a search is present |
+| `/?surname=NOWAK` | `200`, `noindex, follow`, and the service-unavailable message below |
+
+The response headers carry `x-ratelimit-limit: 60`, `x-ratelimit-remaining: 59` — TASK-029's
+middleware is live.
+
+**The §9 invariant held under a real failure.** With no database reachable, the search did not render
+a zero and did not leak a stack trace. It rendered *Usługa chwilowo niedostępna* — "try again shortly;
+this is a problem on our side, **not missing data**." An infrastructure failure is reported as an
+infrastructure failure. Nothing asserted this in production before; it is now observed.
+
+### Why there is no database
+
+Two blockers, neither of them code.
+
+**1. The Supabase organisation is on the free plan.** `gmeal prep` (`jcpbycnwgezwwtaayxjv`),
+`plan: "free"` — a **500 MB** cap against a measured **5,917 MB** database. `surname_slugs` alone
+(284 MB) is 57% of the free tier, so free cannot host this even with zero derivations. Supabase
+**Pro includes 8 GB**, which is where TASK-030's 8 GB target came from; upgrading the organisation
+lifts the cap on projects already inside it, so creating the project first and upgrading after is a
+valid order. Upgrading needs payment details that only the project owner can enter.
+
+**2. Creating the project was refused.** `create_project` was denied by this environment's permission
+classifier as modifying a shared resource. Not retried and not routed around.
+
+### One thing established that the next session should not re-derive
+
+Outbound raw TCP from the agent environment is **not** blocked: the egress proxy answers
+`HTTP/1.1 200 Connection Established` for `CONNECT <host>:5432`. A Postgres connection from here is
+therefore possible through a local CONNECT tunnel, which is what running the migration and import
+against a hosted database would need. Bare `/dev/tcp` does not work; the proxy must be used.
+
+### The remaining sequence, unchanged
+
+Against a `DATABASE_URL` on a plan of 8 GB or more, migrations and batch jobs on port **5432** and
+the app on **6543** (transaction pooling carries no session state):
+
+```
+pnpm db:migrate              schema, incl. postgis and pg_trgm
+<import the owner's archive> 4m25s measured
+pnpm seo:backfill-slugs      57s measured, 1,196,952 rows
+pnpm truth:derive-batch      55m measured at 71.1/s
+```
+
+All three are idempotent and resumable. The ceiling stays **248,406 indexable pages** (41.5% of the
+register) — a measurement, not a target.
+
+### Also outstanding, and not a code change
+
+Vercel set the production branch to `claude/exciting-noether-05np1s`, the repository's default branch,
+because the repository has **no `main`**. The production deployment above was pinned to
+`claude/elegant-archimedes-w5ony1` explicitly, so it is correct, but a later push to the work branch
+would deploy as a *preview*. The available API cannot set a project's production branch; it needs the
+dashboard, or a default branch that holds the work.
