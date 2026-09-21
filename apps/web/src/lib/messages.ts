@@ -258,6 +258,30 @@ export const UI = {
     sectionPopulation: "Liczba osób",
     sectionRarity: "Jak rzadkie",
     sectionDistribution: "Zameldowanie na pobyt stały",
+    sectionMeaning: "Znaczenie",
+    /**
+     * The gap sentence (ADR-0008 §3). It says three things, all of them true:
+     * we have no sourced meaning, the reason is that no admissible work covers
+     * this surname, and we will not guess. Deliberately not "unknown origin" —
+     * that would state something about the surname; this states something about
+     * our evidence.
+     */
+    meaningNoSource:
+      "Nie mamy udokumentowanego znaczenia tego nazwiska. Nie znaleźliśmy go w żadnym " +
+      "opracowaniu naukowym, które moglibyśmy tu zacytować, a znaczenia nie zgadujemy.",
+    meaningBlocked:
+      "Znaczenie tego nazwiska pochodzi z opracowania, którego licencja nie pozwala nam " +
+      "pokazać go tutaj.",
+    meaningUnavailable: "Znaczenia nie da się teraz pokazać.",
+    meaningRootLabel: "Rdzeń",
+    meaningLanguageLabel: "Język rdzenia",
+    meaningFormationLabel: "Typ",
+    meaningWorkLabel: "Opracowanie",
+    meaningConflictNote:
+      "Opracowania nie są zgodne co do pochodzenia tego nazwiska. Pokazujemy oba odczytania; " +
+      "nie wybieramy między nimi.",
+    meaningInterpretationNote:
+      "To interpretacja naukowa, nie zmierzona wartość. Pochodzenie nazwisk bywa sporne.",
     sectionSources: "Źródło",
     regionsHeading: "Województwa",
     regionColumn: "Województwo",
@@ -292,6 +316,23 @@ export const UI = {
     sectionPopulation: "How many people",
     sectionRarity: "How rare",
     sectionDistribution: "Permanent registered residence",
+    sectionMeaning: "Meaning",
+    meaningNoSource:
+      "We have no sourced meaning for this surname. We could not find it in any scholarly work " +
+      "we are able to cite here, and we do not guess at meanings.",
+    meaningBlocked:
+      "The meaning of this surname comes from a work whose licence does not let us show it here.",
+    meaningUnavailable: "The meaning cannot be shown right now.",
+    meaningRootLabel: "Root",
+    meaningLanguageLabel: "Root language",
+    meaningFormationLabel: "Type",
+    meaningWorkLabel: "Work",
+    meaningConflictNote:
+      "The works disagree about where this surname comes from. Both readings are shown; we do " +
+      "not choose between them.",
+    meaningInterpretationNote:
+      "This is a scholarly interpretation, not a measured value. Surname origins are often " +
+      "contested.",
     sectionSources: "Source",
     regionsHeading: "Voivodeships",
     regionColumn: "Voivodeship",

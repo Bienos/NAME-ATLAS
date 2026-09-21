@@ -69,3 +69,23 @@ export type {
   RegionalImportOutcome,
   RegionalReconciliationReport,
 } from "./import-result.js";
+
+// Onomastic (meaning/origin) sources — TASK-022, ADR-0008.
+export {
+  ADMISSIBLE_RELIABILITY_TIERS,
+  importOnomasticSource,
+  licenceNote,
+  onomasticContentHash,
+  parseOnomasticSource,
+} from "./onomastics.js";
+export type {
+  AdmissibleReliabilityTier,
+  FormationType,
+  ImportOnomasticOptions,
+  ImportOnomasticOutcome,
+  LicenceBasis,
+  OnomasticEntry,
+  OnomasticSourceFile,
+  OnomasticWork,
+  ParseOutcome,
+} from "./onomastics.js";

@@ -1,0 +1,59 @@
+{
+  "format_version": 1,
+  "synthetic": true,
+  "_warning": "SYNTHETIC TEST FIXTURE. Every entry below is invented. The work does not exist, the glosses are placeholders, and none of this is Polish onomastic scholarship. It exists only to exercise the SURNAME_MEANING chain end to end (TASK-022). The `synthetic` flag above makes importOnomasticSource refuse this file unless a caller passes allowSynthetic, which only a test does (ADR-0008 §6).",
+  "work": {
+    "source_key": "synthetic_test_onomastic_work_a",
+    "title": "Synthetic Test Work A (not a real publication)",
+    "author_or_publisher": "Name Atlas test fixture",
+    "year": 1900,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "PUBLIC_DOMAIN",
+      "reason": "Not applicable — this work does not exist. Stated so the parser's licence-basis requirement is exercised."
+    },
+    "reference_url": null,
+    "rights": {
+      "terms_version": "SYNTHETIC",
+      "terms_hash": null,
+      "checked_at": "2026-09-21T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "ALLOWED",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": false,
+      "attribution_text": "Synthetic Test Work A — a test fixture, not a real source",
+      "source_owner": "Name Atlas test fixture",
+      "rights_url": null,
+      "contact_required": false,
+      "review_status": "APPROVED",
+      "valid_from": "2026-09-21",
+      "valid_to": null,
+      "notes": "Synthetic. Carries an APPROVED review only so the rights gate can be exercised on the permissive path; asserts nothing about any real work."
+    }
+  },
+  "entries": [
+    {
+      "surname": "KOWALCZYK",
+      "root_form": "PLACEHOLDER-ROOT-1",
+      "root_language": "test",
+      "literal_gloss": "PLACEHOLDER GLOSS — invented for a test, not an etymology",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "p. 1, entry 1",
+      "quotation": "PLACEHOLDER QUOTATION — invented for a test"
+    },
+    {
+      "surname": "NOWAK",
+      "root_form": "PLACEHOLDER-ROOT-2",
+      "root_language": "test",
+      "literal_gloss": "PLACEHOLDER GLOSS — invented for a test, not an etymology",
+      "formation_type": "DESCRIPTIVE",
+      "locator": "p. 2, entry 7",
+      "quotation": null
+    }
+  ]
+}

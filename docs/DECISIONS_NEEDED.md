@@ -39,9 +39,46 @@ Do not revisit unless the 2026 resources are superseded by a new annual snapshot
 
 ---
 
-## D-002 — Onomastics rights and source strategy
+## D-002 — RESOLVED (2026-09-21) by ADR-0008
 
-**Status:** BLOCKS the meaning/etymology capability (M2 onward). NON-BLOCKING for M0–M1.
+**Resolution: Path B — meaning comes from attributed sources, or it is a stated gap; and Path A is
+left open at zero cost.** Decided on the project owner's instruction to implement the open decisions
+rather than leave them waiting on outreach. Full record:
+`docs/adr/0008-onomastics-path-b-attributed-sources.md`. Implemented by
+`tasks/022-surname-meaning-truth-chain.md`.
+
+What the decision settles:
+
+1. **Path B is the build.** Meaning is derived claim-by-claim from works that can be cited and whose
+   rights permit the surface — not from a bulk ingestion of a partnership-required dictionary.
+2. **A meaning is never generated.** No suffix-pattern inference, no morphological guess, no model
+   -written etymology, not even hedged. `-ski` is not evidence of anything the product may state.
+3. **The gap is a first-class result.** `NO_SOURCED_MEANING` is a state the contract carries and the
+   page renders in both languages. Meaning launches at **zero coverage**, which is the correct state
+   and is stated per surname rather than hidden.
+4. **Admissibility is four conditions, all required** — citable work, rights permitting the surface,
+   reliability tier `C_SCHOLARLY_SECONDARY` or better, and a stated licence basis. Enforced at import,
+   where a refusal is a result.
+5. **Competing interpretations are both kept**, the claim is assessed `CONFLICTING`, and neither is
+   preferred. `VERIFIED` is unreachable for a meaning.
+
+**Why this unblocks rather than pre-empts.** Path A — a licence or partnership with IJP PAN — remains
+the better product outcome and is still the project owner's to pursue. It is no longer *blocking*,
+because ADR-0007's rights gate makes either answer safe: an IJP PAN profile carrying
+`review_status = BLOCKED` is refused on every public surface while internal research stays open, and a
+licence later is a new `Source`, a new `rights_profile` and an import — not a rebuild. Nothing can
+leak while the conversation happens, and nothing must be rewritten when it concludes.
+
+**Still to obtain, and still the project owner's:** a licence or partnership with IJP PAN (or another
+specialist onomastic rights holder), or a decision to stay on public-domain scholarship. Note the
+constraint that has not changed: ISNP's PESEL frequency/geography base is **2014**, so it is a meaning
+source and never a current-data source.
+
+**Original record, for reference**
+
+### D-002 (original record) — Onomastics rights and source strategy
+
+**Status (superseded):** BLOCKS the meaning/etymology capability (M2 onward). NON-BLOCKING for M0–M1.
 **Owner:** project owner (commercial/legal outreach).
 
 IJP PAN's *Internet Dictionary of Polish Surnames* is the strongest specialist source, but (`docs/canonical/12` §2.1, `docs/canonical/10` §5.3):

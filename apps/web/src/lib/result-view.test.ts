@@ -65,7 +65,7 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.3",
+  schema_version: "1.4",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -125,6 +125,15 @@ const RESOLVED: unknown = {
     surface: SURFACE,
   },
   suggestions: null,
+  // The state ADR-0008 §3 makes first-class, and the answer for every surname
+  // until an onomastic source is imported.
+  meaning: {
+    state: "NO_SOURCED_MEANING",
+    interpretations: [],
+    confidence: null,
+    reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
+    surface: SURFACE,
+  },
 };
 
 /** MELNYK's real shape: coverage below the threshold. */
@@ -165,7 +174,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.3",
+  schema_version: "1.4",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -187,10 +196,17 @@ const RIGHTS_BLOCKED: unknown = {
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
   suggestions: null,
+  meaning: {
+    state: "RIGHTS_BLOCKED",
+    interpretations: [],
+    confidence: null,
+    reason_code: "COMMERCIAL_USE_UNKNOWN",
+    surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
+  },
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.3",
+  schema_version: "1.4",
   status: "UNRESOLVED",
   surname: null,
   population: null,
@@ -222,6 +238,7 @@ const WITH_SUGGESTIONS: unknown = {
       },
     ],
   },
+  meaning: null,
 };
 
 const NO_SUGGESTIONS: unknown = {
@@ -236,7 +253,7 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.3",
+  schema_version: "1.4",
   status: "AMBIGUOUS",
   surname: null,
   population: null,
@@ -249,6 +266,7 @@ const MIXED_SCRIPT: unknown = {
     reason_code: "MIXED_SCRIPT_REVIEW",
     suggestions: [],
   },
+  meaning: null,
 };
 
 /** Parses first: a fixture the contract would reject cannot prove anything. */
@@ -467,5 +485,157 @@ describe("provenance is on every figure", () => {
     expect(body).toContain("Ministerstwo Cyfryzacji");
     expect(body).toContain("Nazwiska występujące w rejestrze PESEL");
     expect(body).toContain("CC0 1.0");
+  });
+});
+
+/**
+ * TASK-022 AC-10 — the meaning section (ADR-0008).
+ *
+ * The interpretations below are placeholders, matching the committed synthetic
+ * fixtures. Nothing here states anything about a real surname's origin.
+ */
+const MEANING_AVAILABLE: unknown = {
+  ...(RESOLVED as Record<string, unknown>),
+  meaning: {
+    state: "AVAILABLE",
+    interpretations: [
+      {
+        root_form: "PLACEHOLDER-ROOT-1",
+        root_language: "test",
+        literal_gloss: "PLACEHOLDER GLOSS — first reading",
+        formation_type: "OCCUPATIONAL",
+        work: {
+          title: "Synthetic Test Work A (not a real publication)",
+          author_or_publisher: "Name Atlas test fixture",
+          year: 1900,
+        },
+        locator: "p. 1, entry 1",
+      },
+    ],
+    confidence: "POSSIBLE",
+    reason_code: null,
+    surface: SURFACE,
+  },
+};
+
+const MEANING_CONFLICTING: unknown = {
+  ...(MEANING_AVAILABLE as Record<string, unknown>),
+  meaning: {
+    ...((MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>),
+    confidence: "CONFLICTING",
+    interpretations: [
+      ...(((MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>)[
+        "interpretations"
+      ] as unknown[]),
+      {
+        root_form: "PLACEHOLDER-ROOT-DIFFERENT",
+        root_language: "test",
+        literal_gloss: "PLACEHOLDER GLOSS — competing reading",
+        formation_type: "TOPONYMIC",
+        work: {
+          title: "Synthetic Test Work B (not a real publication)",
+          author_or_publisher: "Name Atlas test fixture",
+          year: 1910,
+        },
+        locator: "p. 45, col. 1",
+      },
+    ],
+  },
+};
+
+describe("AC-10: the meaning gap is a sentence, not an absence", () => {
+  it("says in Polish that there is no sourced meaning, and that we do not guess", () => {
+    const body = text(render(RESOLVED, "pl"));
+    expect(body).toContain("Znaczenie");
+    expect(body).toContain("Nie mamy udokumentowanego znaczenia tego nazwiska");
+    expect(body).toContain("znaczenia nie zgadujemy");
+  });
+
+  it("says in English that there is no sourced meaning, and that we do not guess", () => {
+    const body = text(render(RESOLVED, "en"));
+    expect(body).toContain("Meaning");
+    expect(body).toContain("We have no sourced meaning for this surname");
+    expect(body).toContain("we do not guess at meanings");
+  });
+
+  it("never describes the surname itself as being of unknown origin", () => {
+    // The gap is a statement about our evidence, not about the surname. Saying
+    // the origin is unknown would be a claim we cannot support either.
+    for (const lang of ["pl", "en"] as const) {
+      const body = text(render(RESOLVED, lang)).toLowerCase();
+      for (const forbidden of ["unknown origin", "nieznane pochodzenie", "pochodzenie nieznane"]) {
+        expect(body).not.toContain(forbidden);
+      }
+    }
+  });
+
+  it("renders the licence refusal, and no interpretation, when rights block it", () => {
+    const body = text(render(RIGHTS_BLOCKED, "pl"));
+    expect(body).toContain("licencja nie pozwala nam pokazać");
+    expect(body).not.toContain("PLACEHOLDER");
+  });
+});
+
+describe("AC-10: an available meaning renders its work and its caveat", () => {
+  it("renders the gloss, root, work and locator", () => {
+    const body = text(render(MEANING_AVAILABLE, "en"));
+    expect(body).toContain("PLACEHOLDER GLOSS — first reading");
+    expect(body).toContain("PLACEHOLDER-ROOT-1");
+    expect(body).toContain("Synthetic Test Work A");
+    expect(body).toContain("p. 1, entry 1");
+    expect(body).toContain("1900");
+  });
+
+  it("marks it an interpretation, before the reading and not after", () => {
+    const markup = render(MEANING_AVAILABLE, "en");
+    const caveat = markup.indexOf("not a measured value");
+    const gloss = markup.indexOf("PLACEHOLDER GLOSS");
+    expect(caveat).toBeGreaterThan(-1);
+    expect(caveat).toBeLessThan(gloss);
+  });
+
+  it("shows both readings on a conflict, and says it does not choose", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const body = text(render(MEANING_CONFLICTING, lang));
+      expect(body).toContain("PLACEHOLDER-ROOT-1");
+      expect(body).toContain("PLACEHOLDER-ROOT-DIFFERENT");
+      expect(body).toContain("Synthetic Test Work A");
+      expect(body).toContain("Synthetic Test Work B");
+    }
+    expect(text(render(MEANING_CONFLICTING, "en"))).toContain("we do not choose between them");
+    expect(text(render(MEANING_CONFLICTING, "pl"))).toContain("nie wybieramy między nimi");
+  });
+
+  it("renders the confidence as a word, with no score or percentage", () => {
+    // Scoped to the meaning section: the distribution section legitimately
+    // renders percentages, and they are shares, not confidence.
+    const full = text(render(MEANING_CONFLICTING, "en"));
+    const section = full.slice(full.indexOf("Meaning"));
+    expect(section).not.toMatch(/\d+\s*%/u);
+    expect(section).not.toMatch(/0\.\d+/u);
+    expect(section).toContain("CONFLICTING");
+  });
+
+  it("omits a root the work did not propose rather than writing one", () => {
+    const withoutRoot = {
+      ...(MEANING_AVAILABLE as Record<string, unknown>),
+      meaning: {
+        ...((MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>),
+        interpretations: [
+          {
+            ...(
+              (
+                (MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>
+              )["interpretations"] as Record<string, unknown>[]
+            )[0],
+            root_form: null,
+            root_language: null,
+          },
+        ],
+      },
+    };
+    const body = text(render(withoutRoot, "en"));
+    expect(body).not.toContain("Root");
+    expect(body).toContain("PLACEHOLDER GLOSS — first reading");
   });
 });

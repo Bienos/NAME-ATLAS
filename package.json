@@ -22,6 +22,8 @@
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
     "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",
     "demo:surname-distribution": "pnpm --filter @name-atlas/truth run demo:surname-distribution",
+    "demo:surname-meaning": "pnpm --filter @name-atlas/truth run demo:surname-meaning",
+    "import-onomastics": "pnpm --filter @name-atlas/sources run import-onomastics",
     "demo:surname-candidates": "pnpm --filter @name-atlas/resolver run demo:surname-candidates",
     "measure:fuzzy-recall": "pnpm --filter @name-atlas/resolver run measure:fuzzy-recall",
     "enqueue:derive": "pnpm --filter @name-atlas/queue run enqueue:derive",

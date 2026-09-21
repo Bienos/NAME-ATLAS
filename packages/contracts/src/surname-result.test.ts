@@ -241,6 +241,7 @@ describe("top-level response", () => {
         rarity: null,
         distribution: null,
         suggestions: NO_SUGGESTIONS,
+        meaning: null,
       }).success,
     ).toBe(true);
   });

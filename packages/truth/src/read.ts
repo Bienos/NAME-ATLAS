@@ -496,3 +496,159 @@ export async function readCurrentDistribution(
     },
   }));
 }
+
+// ---------------------------------------------------------------------------
+// SURNAME_MEANING (TASK-022, ADR-0008)
+// ---------------------------------------------------------------------------
+
+/** One work's interpretation, as the claim payload stored it. */
+export interface PersistedInterpretation {
+  readonly root_form: string | null;
+  readonly root_language: string | null;
+  readonly literal_gloss: string;
+  readonly formation_type: string;
+  readonly work: {
+    readonly title: string;
+    readonly author_or_publisher: string;
+    readonly year: number;
+  };
+  readonly locator: string;
+}
+
+export interface PersistedSurnameMeaning {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly interpretations: readonly PersistedInterpretation[];
+  readonly supporting_works: number;
+  readonly works_agree: boolean;
+  readonly agreement_basis: string;
+  readonly confidence_status: string;
+  readonly assessment_method: string;
+  readonly assessment_version: string;
+  readonly citation_id: string;
+  readonly citation_title: string;
+  readonly citation_publisher: string | null;
+  readonly citation_publication_date: string | null;
+  readonly citation_url: string | null;
+  readonly citation_locator: string | null;
+  readonly source_type: string;
+  readonly attribution_text: string | null;
+  readonly terms_version: string | null;
+  readonly rights: EffectiveRights;
+}
+
+interface MeaningReadRow {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly interpretations: string | null;
+  readonly supporting_works: string | null;
+  readonly works_agree: string | null;
+  readonly agreement_basis: string | null;
+  readonly confidence_status: string;
+  readonly assessment_method: string;
+  readonly assessment_version: string;
+  readonly citation_id: string;
+  readonly citation_title: string;
+  readonly citation_publisher: string | null;
+  readonly citation_publication_date: string | null;
+  readonly citation_url: string | null;
+  readonly citation_locator: string | null;
+  readonly source_type: string;
+  readonly attribution_text: string | null;
+  readonly terms_version: string | null;
+  readonly automated_access: string;
+  readonly commercial_use: string;
+  readonly redistribution: string;
+  readonly metadata_rights: string;
+  readonly review_status: string;
+}
+
+/**
+ * Reads the active `SURNAME_MEANING` claim for one surname.
+ *
+ * Returns an **empty array** when no claim exists, which is the ordinary case
+ * and not a failure: ADR-0008 §3 makes "no sourced meaning" a first-class
+ * result, and until an onomastic source is imported it is the answer for every
+ * surname. The caller turns an empty array into `NO_SOURCED_MEANING`; nothing
+ * here invents a placeholder.
+ *
+ * One claim per surname (`surnameMeaningClaimKey`), but the citation join can
+ * multiply rows when several works support it, so rows are folded back to one
+ * claim and the first citation is kept as the display citation. Every work's
+ * own locator is already inside `interpretations`.
+ */
+export async function readSurnameMeaning(
+  db: Kysely<DB>,
+  surnameId: string,
+): Promise<PersistedSurnameMeaning[]> {
+  const result = await sql<MeaningReadRow>`
+    SELECT
+      c.claim_id::text                            AS claim_id,
+      c.claim_key                                 AS claim_key,
+      c.structured_value->>'interpretations'      AS interpretations,
+      c.structured_value->>'supporting_works'     AS supporting_works,
+      c.structured_value->>'works_agree'          AS works_agree,
+      c.structured_value->>'agreement_basis'      AS agreement_basis,
+      ca.status::text                             AS confidence_status,
+      ca.assessment_method                        AS assessment_method,
+      ca.assessment_version                       AS assessment_version,
+      cit.citation_id::text                       AS citation_id,
+      cit.title                                   AS citation_title,
+      cit.publisher                               AS citation_publisher,
+      cit.publication_date                        AS citation_publication_date,
+      cit.url_or_reference                        AS citation_url,
+      cit.supporting_locator                      AS citation_locator,
+      src.source_type::text                       AS source_type,
+      rp.attribution_text                         AS attribution_text,
+      rp.terms_version                            AS terms_version,
+      rp.automated_access::text                   AS automated_access,
+      rp.commercial_use::text                     AS commercial_use,
+      rp.redistribution::text                     AS redistribution,
+      rp.metadata_rights::text                    AS metadata_rights,
+      rp.review_status::text                      AS review_status
+    FROM claims c
+    JOIN confidence_assessments ca ON ca.claim_id = c.claim_id
+    JOIN citations cit             ON cit.claim_id = c.claim_id
+    JOIN sources src               ON src.source_id = cit.source_id
+    JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
+    WHERE c.subject_entity_id = ${surnameId}::uuid
+      AND c.claim_type = 'SURNAME_MEANING'
+      AND c.claim_status = 'ACTIVE'
+    ORDER BY c.claim_key, cit.created_at
+  `.execute(db);
+
+  const byClaim = new Map<string, PersistedSurnameMeaning>();
+  for (const row of result.rows) {
+    if (byClaim.has(row.claim_id)) continue;
+    byClaim.set(row.claim_id, {
+      claim_id: row.claim_id,
+      claim_key: row.claim_key,
+      interpretations: row.interpretations
+        ? (JSON.parse(row.interpretations) as PersistedInterpretation[])
+        : [],
+      supporting_works: row.supporting_works ? Number(row.supporting_works) : 0,
+      works_agree: row.works_agree === "true",
+      agreement_basis: row.agreement_basis ?? "",
+      confidence_status: row.confidence_status,
+      assessment_method: row.assessment_method,
+      assessment_version: row.assessment_version,
+      citation_id: row.citation_id,
+      citation_title: row.citation_title,
+      citation_publisher: row.citation_publisher,
+      citation_publication_date: row.citation_publication_date,
+      citation_url: row.citation_url,
+      citation_locator: row.citation_locator,
+      source_type: row.source_type,
+      attribution_text: row.attribution_text,
+      terms_version: row.terms_version,
+      rights: {
+        automated_access: row.automated_access,
+        commercial_use: row.commercial_use,
+        redistribution: row.redistribution,
+        metadata_rights: row.metadata_rights,
+        review_status: row.review_status,
+      },
+    });
+  }
+  return [...byClaim.values()];
+}

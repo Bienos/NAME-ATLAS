@@ -200,3 +200,77 @@ export function assessDerivedStatistic(inputs: DerivedConfidenceInputs): Confide
     human_review_required: false,
   };
 }
+
+/**
+ * The confidence rule for an onomastic interpretation (ADR-0008 §5).
+ *
+ * `SURNAME_MEANING` is an `INTERPRETATION` in the canonical taxonomy
+ * (`docs/canonical/11` §8), so `VERIFIED` is unreachable here by design: an
+ * interpretation of a name's origin is not a measurement, and §8 expects
+ * LIKELY/POSSIBLE/CONFLICTING and no more.
+ *
+ * The rule counts **agreeing independent works**, and nothing else. It does not
+ * read a rights value (`ARCHITECTURE.md` §10 invariant 2), it does not weight a
+ * work by its reliability tier — admissibility already gated that at import —
+ * and it never promotes a single source to `LIKELY`, because one work is one
+ * opinion however good the work is.
+ */
+export interface MeaningConfidenceInputs {
+  /** How many admissible works support an interpretation of this surname. */
+  readonly supportingWorks: number;
+  /** Whether every supporting work proposes the same root and language. */
+  readonly worksAgree: boolean;
+}
+
+export function assessSurnameMeaning(inputs: MeaningConfidenceInputs): ConfidenceVerdict {
+  const epistemic_type: EpistemicType = "INTERPRETATION";
+
+  if (inputs.supportingWorks <= 0) {
+    // Reachable only by a caller that asked for an assessment it should not
+    // have asked for: no evidence means no claim, so there is nothing to
+    // assess. Returning INSUFFICIENT_DATA rather than throwing keeps the rule
+    // total, and `deriveSurnameMeaning` never gets here.
+    return {
+      status: "INSUFFICIENT_DATA",
+      epistemic_type,
+      rationale:
+        "no admissible onomastic work supports an interpretation of this surname; " +
+        "absence of scholarship is not a meaning",
+      human_review_required: false,
+    };
+  }
+
+  if (inputs.supportingWorks === 1) {
+    return {
+      status: "POSSIBLE",
+      epistemic_type,
+      rationale:
+        "one admissible onomastic work proposes this interpretation; a single work is a single " +
+        "opinion, so the interpretation is POSSIBLE and not LIKELY",
+      human_review_required: false,
+    };
+  }
+
+  if (!inputs.worksAgree) {
+    return {
+      status: "CONFLICTING",
+      epistemic_type,
+      rationale:
+        `${inputs.supportingWorks} admissible onomastic works propose different roots for this ` +
+        "surname; both readings are retained and neither is preferred, because onomastic " +
+        "disagreement is a fact about the scholarship",
+      // A real disagreement between cited works is exactly what an editor
+      // should look at, even though the product can already display it.
+      human_review_required: true,
+    };
+  }
+
+  return {
+    status: "LIKELY",
+    epistemic_type,
+    rationale:
+      `${inputs.supportingWorks} admissible onomastic works independently propose the same root ` +
+      "and language for this surname",
+    human_review_required: false,
+  };
+}

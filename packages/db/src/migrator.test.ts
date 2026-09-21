@@ -22,6 +22,9 @@ describe("MIGRATIONS_DIR", () => {
       "0011_current_distribution.ts", // TASK-012
       "0012_surname_trigram_index.ts", // TASK-015 / ADR-0006
       "0013_runtime_outbox.ts", // TASK-020 / canonical 15 MCP 15-C
+      "0014_surname_meaning.ts", // TASK-022 / ADR-0008
+      "0015_surname_meaning_scope.ts", // TASK-022 — separate: a new enum value cannot be used in its own transaction
+      "0016_citations_per_source_record.ts", // TASK-022 — a multi-sourced claim cites every work
     ]);
   });
 });

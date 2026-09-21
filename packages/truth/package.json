@@ -12,7 +12,8 @@
     "demo:surname": "tsx bin/surname-profile.ts",
     "demo:surname-rank": "tsx bin/surname-rank.ts",
     "demo:surname-rarity": "tsx bin/surname-rarity.ts",
-    "demo:surname-distribution": "tsx bin/surname-distribution.ts"
+    "demo:surname-distribution": "tsx bin/surname-distribution.ts",
+    "demo:surname-meaning": "tsx bin/surname-meaning.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",

@@ -33,17 +33,26 @@ import type {
   SurnameResultResponse,
   RarityEntry,
   RaritySection,
+  MeaningSection,
+  MeaningInterpretation as MeaningInterpretationDto,
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname, suggestSurnames } from "@name-atlas/resolver";
-import { readCurrentDistribution, readCurrentPopulation, readRarityContext } from "./read.js";
+import {
+  readCurrentDistribution,
+  readCurrentPopulation,
+  readRarityContext,
+  readSurnameMeaning,
+} from "./read.js";
 import type {
   PersistedCurrentDistribution,
   PersistedCurrentPopulation,
+  PersistedInterpretation,
   PersistedRarityContext,
+  PersistedSurnameMeaning,
 } from "./read.js";
 import { evaluateSurface } from "./rights.js";
-import type { Surface } from "./rights.js";
+import type { EffectiveRights, Surface } from "./rights.js";
 import { RARITY_METHODOLOGY_CODE } from "./version.js";
 
 /**
@@ -167,6 +176,131 @@ function emptyDistribution(
 ): DistributionSection {
   return { state, entries: [], reason_code: reasonCode, surface };
 }
+
+/**
+ * The meaning section for a surname with no admissible onomastic work, or one
+ * whose rights close the surface (TASK-022, ADR-0008 §3).
+ *
+ * `NO_SOURCED_MEANING` is the ordinary case and will be the answer for every
+ * surname until an onomastic source is imported. It is a stated gap, not an
+ * omission: the reader is told Name Atlas has no sourced meaning, which is
+ * true and checkable, and is what ADR-0008 §2 requires instead of a guess.
+ */
+function emptyMeaning(
+  state: "NO_SOURCED_MEANING" | "RIGHTS_BLOCKED" | "UNAVAILABLE",
+  reasonCode: string,
+  surface: SurfaceEligibilityDto,
+): MeaningSection {
+  return { state, interpretations: [], confidence: null, reason_code: reasonCode, surface };
+}
+
+/**
+ * Projects the persisted meaning claim into the contract's shape.
+ *
+ * Carries every interpretation, unmerged and unranked. Where two works
+ * disagree the confidence is `CONFLICTING` and both readings travel, because
+ * `ARCHITECTURE.md` §10 invariant 2's sibling principle applies: the surface
+ * renders validated claims, it does not resolve scholarship.
+ */
+function projectMeaningSection(
+  claim: PersistedSurnameMeaning,
+  surface: SurfaceEligibilityDto,
+): MeaningSection {
+  const confidence = MEANING_CONFIDENCES.includes(claim.confidence_status)
+    ? (claim.confidence_status as MeaningSection["confidence"])
+    : null;
+  if (claim.interpretations.length === 0 || confidence === null) {
+    // A stored claim that carries no interpretation, or a confidence value the
+    // contract does not permit for an interpretation, is a finding rather than
+    // something to render. Report the gap; never guess at the missing half.
+    return emptyMeaning("UNAVAILABLE", "MEANING_CLAIM_INCOMPLETE", surface);
+  }
+  return {
+    state: "AVAILABLE",
+    interpretations: claim.interpretations.map((i: PersistedInterpretation) => ({
+      root_form: i.root_form,
+      root_language: i.root_language,
+      literal_gloss: i.literal_gloss,
+      formation_type: FORMATION_TYPES.includes(i.formation_type)
+        ? (i.formation_type as MeaningInterpretationDto["formation_type"])
+        : "UNKNOWN",
+      work: {
+        title: i.work.title,
+        author_or_publisher: i.work.author_or_publisher,
+        year: i.work.year,
+      },
+      locator: i.locator,
+    })),
+    confidence,
+    reason_code: null,
+    surface,
+  };
+}
+
+/**
+ * The rights posture used where no source exists to have any: every dimension
+ * `UNKNOWN`, review unresolved. Fail closed, so an absent section can never
+ * report a permission the project does not hold.
+ */
+const NO_RIGHTS_KNOWN: EffectiveRights = {
+  automated_access: "UNKNOWN",
+  commercial_use: "UNKNOWN",
+  redistribution: "UNKNOWN",
+  metadata_rights: "UNKNOWN",
+  review_status: "LEGAL_REVIEW_REQUIRED",
+};
+
+/**
+ * Builds the meaning section, evaluated against **its own** source's rights.
+ *
+ * Deliberately not gated by the population section's eligibility. A meaning
+ * comes from a scholarly work, a count comes from the register, and the two
+ * carry different rights profiles; letting one decide the other's surface
+ * would be wrong in both directions — it could hide a lawfully publishable
+ * meaning behind an unresolved register licence, or publish a partner-only
+ * interpretation because a CC0 count was publishable.
+ */
+async function meaningSectionFor(
+  db: Kysely<DB>,
+  surnameId: string,
+  surface: Surface,
+): Promise<MeaningSection> {
+  const claims = await readSurnameMeaning(db, surnameId);
+  const claim = claims[0];
+  if (!claim) {
+    // ADR-0008 §3: the stated gap. The expected answer for every surname until
+    // an onomastic source is imported.
+    return emptyMeaning(
+      "NO_SOURCED_MEANING",
+      "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
+      evaluateSurface(NO_RIGHTS_KNOWN, surface),
+    );
+  }
+  const eligibility = evaluateSurface(claim.rights, surface);
+  if (eligibility.decision === "BLOCKED") {
+    // No interpretation text in the payload at all — omitted, not sent and
+    // marked hidden (docs/canonical/16 §55).
+    return emptyMeaning("RIGHTS_BLOCKED", eligibility.reason_code, eligibility);
+  }
+  return projectMeaningSection(claim, eligibility);
+}
+
+/** The confidence values the contract permits for an interpretation. */
+const MEANING_CONFIDENCES: readonly string[] = [
+  "LIKELY",
+  "POSSIBLE",
+  "CONFLICTING",
+  "INSUFFICIENT_DATA",
+];
+
+const FORMATION_TYPES: readonly string[] = [
+  "PATRONYMIC",
+  "TOPONYMIC",
+  "OCCUPATIONAL",
+  "DESCRIPTIVE",
+  "OTHER",
+  "UNKNOWN",
+];
 
 /**
  * Projects one persisted distribution claim into canonical/16 §28's shape
@@ -322,6 +456,7 @@ export async function querySurnameResult(
         rarity: null,
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
+        meaning: null,
       },
     };
   }
@@ -340,12 +475,14 @@ export async function querySurnameResult(
         rarity: null,
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
+        meaning: null,
       },
     };
   }
 
   const surnameId = resolution.resolved_surname_id;
   const claims = await readCurrentPopulation(db, surnameId);
+  const meaningSection = await meaningSectionFor(db, surnameId, surface);
   const rarityClaims = await readRarityContext(db, surnameId);
   const distributionClaims = await readCurrentDistribution(db, surnameId);
 
@@ -379,6 +516,9 @@ export async function querySurnameResult(
         rarity: emptyRarity("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
         distribution: emptyDistribution("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
         suggestions: null,
+        // A meaning comes from a different source with different rights, so it
+        // is present or absent on its own terms even where no count exists.
+        meaning: meaningSection,
       },
     };
   }
@@ -404,6 +544,7 @@ export async function querySurnameResult(
         rarity: emptyRarity("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         distribution: emptyDistribution("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         suggestions: null,
+        meaning: meaningSection,
       },
     };
   }
@@ -450,6 +591,7 @@ export async function querySurnameResult(
       // An exact surname wins outright, so there is nothing to suggest
       // (docs/canonical/13 §32.3).
       suggestions: null,
+      meaning: meaningSection,
     },
   };
 }

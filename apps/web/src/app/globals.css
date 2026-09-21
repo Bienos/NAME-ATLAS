@@ -265,3 +265,14 @@ footer {
   font-size: 0.85rem;
   color: var(--ink-soft);
 }
+
+/* The meaning section (TASK-022). */
+.gloss {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+}
+.caveat {
+  color: var(--soft);
+  font-size: 0.86rem;
+  margin: 0 0 0.75rem;
+}

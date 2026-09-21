@@ -3069,3 +3069,122 @@ inspector, live DB    → matrix above, rendered from name_atlas_dev
 
 Integration tests run with `TEST_DATABASE_URL` against the local server; the container runtime is
 unavailable in this environment, which is the substitute path `packages/testing` documents.
+
+---
+
+## TASK-022 — the `SURNAME_MEANING` truth chain (D-002 resolved)
+
+**Status: implemented and verified 2026-09-21.** `docs/DECISIONS_NEEDED.md` D-002 is resolved by
+**ADR-0008**. `docs/DECISIONS_NEEDED.md` now holds **no open decisions**.
+
+### What exists
+
+The chain `Surname → onomastic SourceRecord entry → EvidenceItem → Claim → ClaimEvidence →
+ConfidenceAssessment → Citation`, at schema **1.4** on the read contract, rendered on the page in both
+languages.
+
+**Coverage is zero, and that is the correct state.** No onomastic corpus is licensed, so every surname
+returns `NO_SOURCED_MEANING`. Verified on the live page against `name_atlas_dev`:
+
+```
+pl: Znaczenie
+    Nie mamy udokumentowanego znaczenia tego nazwiska. Nie znaleźliśmy go w żadnym
+    opracowaniu naukowym, które moglibyśmy tu zacytować, a znaczenia nie zgadujemy.
+en: Meaning
+    We have no sourced meaning for this surname. We could not find it in any scholarly
+    work we are able to cite here, and we do not guess at meanings.
+```
+
+That is a statement about our evidence, not about the surname. A test asserts the page never says
+"unknown origin" / "nieznane pochodzenie" in either language, because that would be a claim about the
+name that no source supports either.
+
+### The chain proven end to end on real data
+
+Both synthetic works were imported into `name_atlas_dev` and derived against **real** PESEL surnames,
+then removed (the database is back to 330 claims, 10 of them `CURRENT_POPULATION`, 0 `SURNAME_MEANING`,
+598,476 surnames, no `DICTIONARY` source).
+
+| Surname | Works | Outcome | Rendered |
+|---|---|---|---|
+| KOWALCZYK | 2, agreeing | `LIKELY` | both readings, each with its work and page |
+| NOWAK | 2, differing roots | `CONFLICTING` | both readings, plus "we do not choose between them" |
+
+The import refused the same file without `--allow-synthetic`:
+
+```
+REFUSED (SYNTHETIC_SOURCE_NOT_ALLOWED)
+  - this file is marked synthetic; pass allowSynthetic to import it, which only a test does
+```
+
+### What D-002 asked, and what is now decided
+
+| D-002's question | Answer |
+|---|---|
+| Path A (licence IJP PAN) or Path B (public-domain scholarship)? | **Path B is the build.** Path A stays open and costs nothing to adopt later — it becomes a `Source`, a `rights_profile` and an import |
+| What does the product show when neither path yields evidence? | `NO_SOURCED_MEANING`, as a sentence, in both languages. Never a generated etymology |
+
+**Why this stopped blocking.** ADR-0007's gate makes either path safe. An IJP PAN profile carrying
+`review_status = BLOCKED` is refused on every public surface while internal research stays open —
+asserted by test — so nothing can leak while the owner negotiates, and nothing must be rewritten when
+they conclude.
+
+### Confidence, by a stated rule
+
+| Admissible works | Agreement | Confidence |
+|---|---|---|
+| 0 | — | no claim at all |
+| 1 | — | `POSSIBLE` |
+| ≥ 2 | same root and language | `LIKELY` |
+| ≥ 2 | differing | `CONFLICTING`, `human_review_required` |
+
+`VERIFIED` is unreachable, and asserted unreachable at 1, 2, 3, 10 and 1000 agreeing works plus a
+throw in the derivation. Works are counted, not entries, so one work quoting itself twice stays
+`POSSIBLE`.
+
+### Admissibility, enforced at import
+
+ADR-0008 §4's four conditions are checked at parse time, and every refusal names what was missing:
+a citable work (author/publisher, title, integer year), rights permitting the surface, tier
+`C_SCHOLARLY_SECONDARY` or better (`D_TERTIARY_LEAD` refused), and a stated licence basis —
+`PUBLIC_DOMAIN` with a reason, `OPEN_LICENCE` by name, or `LICENCE_AGREEMENT` by reference. An entry
+with no locator is refused: a citation a reader cannot check is not one.
+
+### One existing constraint was widened, deliberately
+
+`0004`'s `citations_claim_uq` was `UNIQUE (claim_id)`, scoped by its own comment to "this task's data".
+A meaning claim can rest on two works, and citing only one side of a `CONFLICTING` reading would
+misrepresent the evidence. Migration `0016` widens it to `(claim_id, source_record_id)`, which keeps
+the property `0004` wanted — re-derivation still cannot add a second citation for the same record.
+Recorded in ADR-0008's consequences, per `AGENTS.md` §6.
+
+### Deliberately not built
+
+Any real onomastic corpus (none is licensed; ADR-0008 §3 makes zero coverage correct).
+`MeaningInterpretation` as a table (`docs/canonical/11` §7.2) — the claim's `structured_value` carries
+root, language, gloss and formation type and nothing queries by root yet. `LINGUISTIC_ORIGIN`,
+`GEOGRAPHIC_ORIGIN`, `SURNAME_FORMATION_TYPE` and `ROOT_INTERPRETATION` — separate canonical claim
+types, each needing its own evidence; §7.2's own note applies, "the root means X" and "the surname
+derives from this root" are different claims. And any inference from surname form, which ADR-0008 §2
+prohibits outright.
+
+### Verification run
+
+```
+pnpm typecheck        → passed, 14 projects
+pnpm lint             → passed
+pnpm format:check     → passed
+pnpm test             → passed, 505 unit tests (truth 138, sources 97, web 63)
+pnpm test:integration → passed, 243 tests across 18 files (surname-meaning 19 new)
+pnpm build            → passed
+live page             → gap state in pl and en; LIKELY and CONFLICTING with both readings
+import refusal        → SYNTHETIC_SOURCE_NOT_ALLOWED without the flag, IMPORTED with it
+dev database          → synthetic data removed; 330 claims, 0 SURNAME_MEANING, 598,476 surnames
+```
+
+Integration tests run with `TEST_DATABASE_URL` against the local server; the container runtime is
+unavailable in this environment, which is the substitute path `packages/testing` documents.
+
+Three existing assertions were updated because legitimate new migrations exist: the migrator's file
+list, `extensions.test.ts`'s applied-migration list, `canonical-key-v2.test.ts`'s down-step sequence,
+and `current-rank.test.ts`'s `claim_type` enum list (now carrying `SURNAME_MEANING`).

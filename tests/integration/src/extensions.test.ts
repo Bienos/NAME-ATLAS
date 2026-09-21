@@ -63,6 +63,9 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0011_current_distribution",
       "0012_surname_trigram_index",
       "0013_runtime_outbox",
+      "0014_surname_meaning",
+      "0015_surname_meaning_scope",
+      "0016_citations_per_source_record",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);

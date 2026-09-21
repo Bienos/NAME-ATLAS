@@ -142,3 +142,30 @@ export const DISTRIBUTION_LOW_COVERAGE_THRESHOLD = 0.5;
 
 /** `share_of_covered` and `coverage_ratio` are both rounded to nine places. */
 export const DISTRIBUTION_SHARE_PRECISION = 9;
+
+/** The `SURNAME_MEANING` derivation method (TASK-022, ADR-0008). */
+export const SURNAME_MEANING_METHOD_VERSION = "surname_meaning@1";
+
+/** Shape version of the `SURNAME_MEANING` claim payload. */
+export const SURNAME_MEANING_PAYLOAD_VERSION = "surname_meaning_payload@1";
+
+/**
+ * The confidence rule for an onomastic interpretation (ADR-0008 §5).
+ *
+ * Distinct from both the source-native rule and the derived-statistic rule,
+ * because it counts **agreeing independent works** rather than assessing a
+ * computation. Keeping the method identifiable in the data is the same reason
+ * TASK-009 gave for separating its own (§9 AC-15).
+ */
+export const MEANING_CONFIDENCE_ASSESSMENT_METHOD = "onomastic_agreement_rule";
+export const MEANING_CONFIDENCE_ASSESSMENT_VERSION = "onomastic_confidence@1";
+
+/**
+ * How two interpretations are judged to agree: same root form and same root
+ * language, both compared case-insensitively after trimming.
+ *
+ * Deliberately strict. Two works proposing roots that merely look related is
+ * not agreement, and treating it as such would manufacture a `LIKELY` out of
+ * two `POSSIBLE`s.
+ */
+export const MEANING_AGREEMENT_BASIS = "identical root_form and root_language, case-insensitive";

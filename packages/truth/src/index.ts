@@ -14,7 +14,13 @@ export {
   TruthInvariantError,
 } from "./derive.js";
 export type { DeriveOptions } from "./derive.js";
-export { readCurrentDistribution, readCurrentPopulation, readRarityContext } from "./read.js";
+export {
+  readCurrentDistribution,
+  readCurrentPopulation,
+  readRarityContext,
+  readSurnameMeaning,
+} from "./read.js";
+export type { PersistedInterpretation, PersistedSurnameMeaning } from "./read.js";
 export type {
   PersistedCurrentDistribution,
   PersistedCurrentPopulation,
@@ -133,3 +139,20 @@ export {
   SURFACE_ELIGIBILITY_VERSION,
   WORKFLOW_VERSION,
 } from "./version.js";
+
+// The SURNAME_MEANING chain — TASK-022, ADR-0008.
+export {
+  deriveSurnameMeaning,
+  distinctWorks,
+  interpretationsAgree,
+  loadInterpretations,
+  surnameMeaningClaimKey,
+} from "./meaning.js";
+export type {
+  DeriveMeaningOptions,
+  OnomasticInterpretation,
+  SurnameMeaningClaimResult,
+  SurnameMeaningResult,
+} from "./meaning.js";
+export { assessSurnameMeaning } from "./confidence.js";
+export type { MeaningConfidenceInputs } from "./confidence.js";

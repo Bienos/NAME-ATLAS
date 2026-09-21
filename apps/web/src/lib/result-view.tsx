@@ -15,6 +15,7 @@
 import type {
   CitationDto,
   DistributionEntry,
+  MeaningSection,
   PopulationSection,
   RaritySection,
   SurnameResultResponse,
@@ -272,6 +273,84 @@ function Suggestions({ section, lang }: { section: SuggestionsSection; lang: Lan
   );
 }
 
+/**
+ * The meaning section (TASK-022, ADR-0008).
+ *
+ * The gap is rendered as a sentence, not as an absence. `NO_SOURCED_MEANING` is
+ * the expected state for every surname until an onomastic source is imported,
+ * and saying so plainly is the whole point of ADR-0008 §3 — the alternative is
+ * an empty heading a reader reads as "we know nothing about this name", or
+ * worse, a guess.
+ *
+ * Nothing here composes a gloss. Every string rendered either comes from the
+ * claim verbatim or from the `UI` table; there is no template that could turn
+ * a root and a language into a sentence the source did not write.
+ */
+/** A bibliographic reference: author, title (year), locator. */
+function reference(interpretation: MeaningSection["interpretations"][number]): string {
+  const { author_or_publisher, title, year } = interpretation.work;
+  return `${author_or_publisher}, ${title} (${String(year)}), ${interpretation.locator}`;
+}
+
+function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
+  const t = UI[lang];
+
+  if (section.state !== "AVAILABLE") {
+    const body =
+      section.state === "NO_SOURCED_MEANING"
+        ? t.meaningNoSource
+        : section.state === "RIGHTS_BLOCKED"
+          ? t.meaningBlocked
+          : t.meaningUnavailable;
+    return (
+      <section>
+        <h3>{t.sectionMeaning}</h3>
+        <p className="absent">{body}</p>
+      </section>
+    );
+  }
+
+  return (
+    <section>
+      <h3>{t.sectionMeaning}</h3>
+      {/* Before the readings, not after: a reader must know these are
+          interpretations before they read one as a fact. */}
+      <p className="caveat">{t.meaningInterpretationNote}</p>
+      {section.confidence === "CONFLICTING" ? (
+        <p className="caveat">{t.meaningConflictNote}</p>
+      ) : null}
+      {section.interpretations.map((interpretation, index) => (
+        <div className="fact" key={`${interpretation.work.title}-${String(index)}`}>
+          {/* The work's own gloss, verbatim. */}
+          <p className="gloss">{interpretation.literal_gloss}</p>
+          <dl>
+            {interpretation.root_form === null ? null : (
+              <>
+                <dt>{t.meaningRootLabel}</dt>
+                <dd>{interpretation.root_form}</dd>
+              </>
+            )}
+            {interpretation.root_language === null ? null : (
+              <>
+                <dt>{t.meaningLanguageLabel}</dt>
+                <dd>{interpretation.root_language}</dd>
+              </>
+            )}
+            <dt>{t.meaningFormationLabel}</dt>
+            <dd>{interpretation.formation_type}</dd>
+            <dt>{t.meaningWorkLabel}</dt>
+            {/* Composed in one expression: JSX would put a space before each
+                comma and inside the parentheses. */}
+            <dd>{reference(interpretation)}</dd>
+            <dt>{t.confidenceLabel}</dt>
+            <dd>{section.confidence}</dd>
+          </dl>
+        </div>
+      ))}
+    </section>
+  );
+}
+
 export function Result({ response, lang }: { response: SurnameResultResponse; lang: Lang }) {
   const t = UI[lang];
 
@@ -287,6 +366,7 @@ export function Result({ response, lang }: { response: SurnameResultResponse; la
           <Rarity section={response.rarity} surname={surname} lang={lang} />
         ) : null}
         <Distribution response={response} surname={surname} lang={lang} />
+        {response.meaning !== null ? <Meaning section={response.meaning} lang={lang} /> : null}
       </>
     );
   }

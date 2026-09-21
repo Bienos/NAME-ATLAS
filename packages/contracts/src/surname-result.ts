@@ -24,7 +24,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.3";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.4";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -292,6 +292,89 @@ export const distributionSectionSchema = z
   });
 
 /**
+ * `SURNAME_MEANING` — one work's interpretation (TASK-022, ADR-0008).
+ *
+ * `work` is not optional and `locator` is not optional. ADR-0008 §4 makes a
+ * meaning admissible only if a reader can go and check it, and a gloss without
+ * a citable work and a place in that work is exactly what this product must
+ * never publish.
+ */
+export const meaningInterpretationSchema = z.object({
+  /** The proposed lexical root, where the work proposes one. Never inferred. */
+  root_form: z.string().min(1).nullable(),
+  root_language: z.string().min(1).nullable(),
+  /** The work's own short gloss, carried verbatim. */
+  literal_gloss: z.string().min(1),
+  formation_type: z.enum([
+    "PATRONYMIC",
+    "TOPONYMIC",
+    "OCCUPATIONAL",
+    "DESCRIPTIVE",
+    "OTHER",
+    "UNKNOWN",
+  ]),
+  work: z.object({
+    title: z.string().min(1),
+    author_or_publisher: z.string().min(1),
+    year: z.number().int(),
+  }),
+  /** Page, entry number or column within the work. */
+  locator: z.string().min(1),
+});
+
+/**
+ * Why a meaning section is in the state it is.
+ *
+ * `NO_SOURCED_MEANING` is the state ADR-0008 §3 makes a first-class result: it
+ * is not an omitted field and not an empty list, and it is the honest answer
+ * for every surname no admissible onomastic work covers. `RIGHTS_BLOCKED`
+ * carries no interpretation text at all — omitted, not sent and hidden.
+ */
+export const meaningStateSchema = z.enum([
+  "AVAILABLE",
+  "NO_SOURCED_MEANING",
+  "RIGHTS_BLOCKED",
+  "UNAVAILABLE",
+]);
+
+/**
+ * `docs/canonical/11` §8 types `SURNAME_MEANING` as an `INTERPRETATION` with
+ * LIKELY/POSSIBLE/CONFLICTING confidence. `VERIFIED` is deliberately absent
+ * here: an interpretation of a name's origin is not a measurement, and
+ * ADR-0008 §5 makes it unreachable in the derivation too.
+ */
+export const meaningConfidenceSchema = z.enum([
+  "LIKELY",
+  "POSSIBLE",
+  "CONFLICTING",
+  "INSUFFICIENT_DATA",
+]);
+
+export const meaningSectionSchema = z
+  .object({
+    state: meaningStateSchema,
+    /**
+     * Every admissible interpretation, never merged and never ranked. Two works
+     * proposing different roots both appear, and `confidence` is `CONFLICTING`.
+     */
+    interpretations: z.array(meaningInterpretationSchema),
+    confidence: meaningConfidenceSchema.nullable(),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine(
+    (s) =>
+      s.state === "AVAILABLE" ? s.interpretations.length > 0 : s.interpretations.length === 0,
+    { message: "interpretations are present exactly when state is AVAILABLE" },
+  )
+  .refine((s) => (s.state === "AVAILABLE") === (s.confidence !== null), {
+    message: "confidence is present exactly when state is AVAILABLE",
+  })
+  .refine((s) => (s.state === "AVAILABLE") === (s.reason_code === null), {
+    message: "a reason code is present exactly when state is not AVAILABLE",
+  });
+
+/**
  * `docs/canonical/16` §21, minus `canonical_slug`/`canonical_path`.
  *
  * Those are omitted deliberately (TASK-006 §15 U-2): no slug exists in the
@@ -399,6 +482,13 @@ export const surnameResultResponseSchema = z
      * §33.4 forbids resolving — and the reason code says which.
      */
     suggestions: suggestionsSectionSchema.nullable(),
+    /**
+     * Added in 1.4 (TASK-022). Present exactly when RESOLVED, like the other
+     * fact sections — and carrying `NO_SOURCED_MEANING` rather than being
+     * absent when no admissible onomastic work covers the surname, which is
+     * the answer for every surname until a source is imported (ADR-0008 §3).
+     */
+    meaning: meaningSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -414,6 +504,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status !== "RESOLVED") === (r.suggestions !== null), {
     message: "suggestions are present exactly when status is not RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.meaning !== null : r.meaning === null), {
+    message: "meaning section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -455,6 +548,8 @@ export type PlaceStat = z.infer<typeof placeStatSchema>;
 export type DistributionCoverageState = z.infer<typeof distributionCoverageStateSchema>;
 export type DistributionEntry = z.infer<typeof distributionEntrySchema>;
 export type DistributionSection = z.infer<typeof distributionSectionSchema>;
+export type MeaningSection = z.infer<typeof meaningSectionSchema>;
+export type MeaningInterpretation = z.infer<typeof meaningInterpretationSchema>;
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type SuggestionsSection = z.infer<typeof suggestionsSectionSchema>;
 export type PublicSurnameIdentity = z.infer<typeof publicSurnameIdentitySchema>;

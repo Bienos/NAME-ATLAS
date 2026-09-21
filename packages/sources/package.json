@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "import-pesel": "tsx bin/import-pesel.ts",
-    "import-pesel-regional": "tsx bin/import-pesel-regional.ts"
+    "import-pesel-regional": "tsx bin/import-pesel-regional.ts",
+    "import-onomastics": "tsx bin/import-onomastics.ts"
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",
