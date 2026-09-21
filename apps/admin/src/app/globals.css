@@ -1,0 +1,193 @@
+/* The inspector's only stylesheet (TASK-018). Dense and plain: this is a tool. */
+:root {
+  --ink: #16181d;
+  --soft: #5b616d;
+  --paper: #fbfbfa;
+  --card: #fff;
+  --rule: #dfe1e6;
+  --accent: #1f4d7a;
+  --ok-bg: #edf7ed;
+  --ok-ink: #24512a;
+  --stale-bg: #f3f1ee;
+  --stale-ink: #6b6257;
+  --bad-bg: #fdeeee;
+  --bad-ink: #7a2020;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e7e8ec;
+    --soft: #a2a8b4;
+    --paper: #13151a;
+    --card: #1a1d23;
+    --rule: #2d313a;
+    --accent: #8fb8de;
+    --ok-bg: #1c2a1e;
+    --ok-ink: #a9d3ae;
+    --stale-bg: #24211d;
+    --stale-ink: #b7ab99;
+    --bad-bg: #2c1a1a;
+    --bad-ink: #e7a9a9;
+  }
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 1.25rem 1rem 3rem;
+  background: var(--paper);
+  color: var(--ink);
+  font:
+    0.94rem/1.55 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+main {
+  max-width: 62rem;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 1.15rem;
+  margin: 0 0 0.25rem;
+}
+h2 {
+  font-size: 1.35rem;
+  margin: 1.5rem 0 0.75rem;
+  word-break: break-word;
+}
+h3 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--soft);
+  margin: 0 0 0.6rem;
+  font-weight: 700;
+}
+p {
+  margin: 0 0 0.6rem;
+}
+a {
+  color: var(--accent);
+}
+.gate {
+  padding: 1rem;
+  background: var(--bad-bg);
+  color: var(--bad-ink);
+  border: 1px solid var(--rule);
+  border-left-width: 4px;
+  border-radius: 6px;
+}
+.banner {
+  margin: 0 0 1.5rem;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  background: var(--stale-bg);
+  color: var(--stale-ink);
+  border: 1px dashed var(--rule);
+  border-radius: 6px;
+}
+form {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+}
+input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+button {
+  padding: 0.55rem 1rem;
+  font: inherit;
+  color: var(--paper);
+  background: var(--accent);
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+section {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.35rem 0.6rem 0.35rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.86rem;
+  word-break: break-word;
+}
+th {
+  color: var(--soft);
+  font-weight: 700;
+  white-space: nowrap;
+}
+dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.2rem 0.9rem;
+  margin: 0;
+}
+dt {
+  color: var(--soft);
+}
+dd {
+  margin: 0;
+  word-break: break-all;
+}
+.tag {
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.tag-ok {
+  background: var(--ok-bg);
+  color: var(--ok-ink);
+}
+.tag-stale {
+  background: var(--stale-bg);
+  color: var(--stale-ink);
+}
+.tag-bad {
+  background: var(--bad-bg);
+  color: var(--bad-ink);
+}
+.claim {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.claim:last-child {
+  border-bottom: 0;
+}
+.claim-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+.rationale {
+  color: var(--soft);
+  font-size: 0.84rem;
+  margin: 0.35rem 0 0;
+}
+.lineage {
+  color: var(--soft);
+  font-size: 0.82rem;
+}

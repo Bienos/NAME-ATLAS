@@ -2734,3 +2734,81 @@ authority rule does not need it; wiring it is an importer-side follow-up.
 Verified: `pnpm typecheck`, `pnpm lint`, `pnpm format:check` passed; **366 unit tests**; **207
 integration tests across 15 files, exit 0**, including four new ones asserting the lone-partial case,
 the supersession, that repeated derivation does not flip the decision, and that nothing is deleted.
+
+## TASK-018 implemented — the read-only admin surname inspector (2026-09-21)
+
+Scope authority: `tasks/018-admin-surname-inspector.md`. `apps/admin` was a placeholder page. It now
+answers "where did this number come from?" without SQL.
+
+### What exists now
+
+One read-only page at `/`, showing for a surname: identity; source records with their registry
+authority; snapshots and values; claims of **every** status; evidence with its lineage roles;
+confidence with its assessment method and its internal rationale; citations; and the rights in force.
+`src/lib/inspect.ts` runs every statement inside a `READ ONLY` transaction, so a write would be
+refused by the server rather than by a convention. `src/lib/inspector-view.tsx` renders, split out so
+the markup is asserted in tests.
+
+### It fails closed, and says why
+
+`docs/canonical/22` §6 requires staff authentication and §11–§13 a role model. **Neither exists.** An
+unauthenticated console over internal evidence is not something to ship quietly, so the page queries
+nothing unless `ADMIN_INSPECTOR_ENABLED=true` is set, and the refusal states plainly that the flag is
+a lock on a door that has no lock — not authentication, and not a reason to expose the app. With the
+flag set, a banner repeats it above every result. The gate accepts the exact string only: `1`, `yes`
+and `TRUE` do not open it.
+
+### Two things it shows that nothing else did
+
+**Which import the registry vouches for.** Each source record is marked `authoritative`,
+`not authoritative`, or `not in registry`, with its persisted row count against the registry's. On
+`NOWAK` that reads, from real data:
+
+| Resource | Verdict | Rows |
+|---|---|---:|
+| `1148786` | authoritative | 646,052 / 646,052 |
+| `1148790` | authoritative | 694,553 / 694,553 |
+| `1148808` | not authoritative | 22 / 408,182 |
+
+That is the D-018 decision made visible. D-018 was found by noticing a duplicate count on the public
+page and then writing SQL by hand; this is the tool that would have shown it directly.
+
+**Superseded claims.** `NOWAK` renders ten claims, eight active and two `SUPERSEDED`, each tagged and
+visually distinct. Hiding a retired claim would defeat the purpose of the page.
+
+### Deliberately absent
+
+No search-candidate panel. `docs/canonical/22` §18 describes one, but candidates are ephemeral value
+objects that are never persisted (`docs/canonical/13` §18.2), so there is nothing to inspect and a
+panel implying otherwise would be worse than its absence. No write, no command, no re-derivation
+trigger, and none of §22's other sections — auth, roles, audit, merge, split, connectors, rights
+console, coverage, SEO, reports. Each is its own task.
+
+### One build change
+
+`apps/admin` gained workspace dependencies, so it now needs the `extensionAlias` configuration and the
+`--webpack` flag that `apps/web` already carries under **D-012**. Verified by running: the bare
+Turbopack build failed `module-not-found` across every workspace import, exactly as `apps/web`'s note
+records. Two of Next's own constraints also bit and were fixed rather than worked around: a page file
+may export only a known set, so the gate lives in the lib module; and the extra export had to move
+before the build's type check would pass.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 11 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 379 unit tests (admin 14, web 54, resolver 102,
+                                 sources 74, truth 77, contracts 42, db 4, domain 7,
+                                 testing 3, worker 2)
+pnpm build                    → passed; both apps' `/` are ƒ (server-rendered, no client bundle)
+next start + real register    → NOWAK and MELNYK inspected by eye, figures as tabled above
+```
+
+### Where this leaves M2
+
+The milestone's exit journey and its inspector both exist. What its description still names and this
+repository does not have: a **structured logging and tracing baseline**. Both apps log to
+`console.error` with a request id where there is one, which is enough for one developer and is not an
+observability baseline. That is the last item, and nothing blocks it.

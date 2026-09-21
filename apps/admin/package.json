@@ -3,13 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
+    "@name-atlas/sources": "workspace:*",
+    "kysely": "0.29.6",
     "next": "16.3.5",
     "react": "19.3.0",
     "react-dom": "19.3.0"
