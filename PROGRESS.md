@@ -4311,3 +4311,38 @@ even though what is stored is aggregate counts and not personal records.
 Also observed while doing this: pushing to `claude/elegant-archimedes-w5ony1` auto-deployed a
 **preview**, not production, exactly as the production-branch note below predicts. That note is no
 longer a theory.
+
+## Measured: what a 500 MB slice of the register would actually cover (2026-09-21)
+
+The free Supabase tier caps a database at 500 MB against a measured 5,917 MB, so the question is
+whether a *subset* is worth hosting. Surname frequency is steeply long-tailed, so it is.
+
+Computed directly from the two 2026 national CSVs — no database — by merging male and female files and
+summing counts per surname. The merge returned **598,476 distinct surnames**, which is exactly the
+count the importer recorded, so the arithmetic agrees with the pipeline. Zero non-numeric counts: the
+national files carry no suppressed values. Register total **42,757,839** people.
+
+| top N surnames | people covered | share of register |
+| ---: | ---: | ---: |
+| 1,000 | 11,902,227 | 27.84% |
+| 5,000 | 21,105,884 | 49.36% |
+| 10,000 | 25,624,754 | 59.93% |
+| 20,000 | 30,223,011 | 70.68% |
+| 50,000 | 35,783,934 | 83.69% |
+| 100,000 | 38,995,254 | 91.20% |
+| 248,406 | 41,574,143 | 97.23% |
+| 598,476 (all) | 42,757,839 | 100.00% |
+
+248,406 is the indexable ceiling recorded earlier, and it reaches **97.23%** of the register — so the
+41.5% of surnames that can be indexed are the ones nearly everybody has.
+
+**The free tier is therefore not useless.** The top 20,000 surnames cover 70.68% of registered people.
+Scaling the measured 5,917 MB by that share of surnames puts it near 200–300 MB once every one of them
+is derived — an **estimate from per-row averages, not a measurement**, and to be verified against a
+real database rather than trusted.
+
+Note on the total: 42,757,839 exceeds Poland's living population. That is a property of the register,
+not an error in this count, and it is why `DistributionSnapshot` carries its universe description
+rather than being presented as a population figure. Nothing here re-interprets it.
+
+Numbers only. No hosting decision is recorded here.
