@@ -70,7 +70,8 @@ and creating one needs privileges the session does not have.
 | **024** canonical route, slug, indexability, share, OG image, events | **DONE** |
 | **025** surname comparison | **DONE** |
 | **026** golden test corpus | **DONE** — all 364 assertions pass on the pinned container image |
-| **027** persisted slugs, collision suffixes, robots, sitemap | **DONE** — ADR-0010 resolves D-019; indexing's last code prerequisite |
+| **027** persisted slugs, collision suffixes, robots, sitemap | **DONE** — ADR-0010 resolves D-019 |
+| **028** batch derivation over the register | **DONE** — 71/s; ceiling measured at 248,406 indexable pages |
 
 All three were reviewed adversarially by five independent readers before being marked DONE; the 21
 defects they found are listed in `PROGRESS.md` and every one is fixed. Three were pre-existing: the
@@ -96,35 +97,39 @@ is not code quality:
 | | |
 |---|---|
 | **Deployment** | Nothing exists — no `ops/`, Dockerfile, compose file, host or domain. INF-001 unstarted. |
-| **Data** | Only lawful excerpts are in the repo. Rank, rarity and geography correctly *refuse* until the full register is imported. |
-| **Indexing** | `SEO_INDEXING_ENABLED` unset by design. Needs D-019, a slug table, a sitemap, a QA cohort. |
+| **Data** | **Supplied and verified 2026-09-21.** The full register imports in 4m25s, 598,476 surnames, and every derivation answers. The repo still commits only excerpts (size and rights); the bytes are the owner's. |
+| **Indexing** | **Works.** A page serves `index, follow`, the sitemap lists eligible surnames, 31,000+ derived and climbing. `SEO_INDEXING_ENABLED` still unset by design — turning it on needs a QA cohort and a domain, not code. |
 | **Legal review** | Ten rights golden cases carry `reviewed_at: null` and want a `LEGAL` reviewer. D-004 is an unverified assumption. |
 | **Staff access** | Admin inspector gated off; no staff authentication exists. |
 | **Environment-blocked** | M3 historical discovery and any real map. |
 
 ## Next action
 
-**Supply the full PESEL register.** It is now the single thing standing between this and an indexable
-site, and it is a manual supply because egress is blocked — as the excerpts were. Four resources from
-dataset `1681`:
+**Deployment (INF-001).** It is now the only thing between this and a live, indexable site. Nothing
+exists: no `ops/`, Dockerfile, compose file, host or domain. Everything upstream of it is done and
+verified end to end on the real register.
 
-| Role | Resource | Rows |
-|---|---|---:|
-| national male | `1148808` | 408,182 |
-| national female | `1148811` | 420,082 |
-| regional male | `1148786` | 646,052 |
-| regional female | `1148790` | 694,553 |
+A deployment needs, in this order:
 
-Each needs its CSV and its resource-metadata JSON, as before. With them: rank and rarity stop
-refusing, `GEOGRAPHY` becomes a second value family, §42 is satisfiable, and the sitemap fills.
+1. A host and a PostgreSQL 16 with PostGIS and `pg_trgm`, and `SITE_ORIGIN` set — a sitemap must
+   carry absolute URLs and a `Host` header is not a safe basis for one.
+2. Import the four 2026 resources (4m25s), `pnpm seo:backfill-slugs` (57s), `pnpm truth:derive-batch`
+   (about an hour). All three are idempotent and resumable, so a failed deploy is re-runnable.
+3. Raise the container's `--shm-size` if parallel query is wanted; the derivation does not need it.
+4. A QA cohort reviewed by hand, then `SEO_INDEXING_ENABLED=true` as a deliberate act (ADR-0009 §5).
 
-Then, in order: run `pnpm seo:backfill-slugs`, review a QA cohort of pages by hand, set
-`SITE_ORIGIN`, and set `SEO_INDEXING_ENABLED` deliberately (ADR-0009 §5).
+Unblocked but not required:
 
-Unblocked but not required for indexing:
-
-- **Deployment (INF-001).** Nothing exists — no `ops/`, Dockerfile, compose file, host or domain.
 - **Legal review.** Ten rights golden cases carry `reviewed_at: null` and want a `LEGAL` reviewer.
   D-004 (resource-level licence inheritance) is a recorded unverified assumption.
+- **The 2019–2025 time series** is verified and in hand (`docs/sources/INVENTORY.md`). Year-over-year
+  claims need their own claim type and comparability rules — a task, not an import.
 - **`packages/sources`' stale comment.** `PESEL_RIGHTS_PROFILE`'s doc block still describes the
-  pre-D-007 posture (`commercial_use = UNKNOWN`) and contradicts the values beneath it.
+  pre-D-007 posture and contradicts the values beneath it.
+
+## What cannot be fixed by building anything
+
+**350,070 surnames — 58.5% of the register — can never be indexable.** They are published
+nationally and suppressed regionally, so they can never carry `docs/canonical/21` §42's second value
+family, and §43 withholds a page whose whole content is one count. The ceiling is **248,406 pages**.
+That is the policy working, and the number to plan against.

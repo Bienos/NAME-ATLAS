@@ -35,7 +35,8 @@ the run recorded in `PROGRESS.md`. Code written but not verified is `IMPLEMENTED
 | **024** | Canonical route, slug, indexability, share, OG image, events | **DONE** | ADR-0009 |
 | **025** | Surname comparison | **DONE** | `noindex`; strict comparability |
 | **026** | Golden test corpus | **DONE** | Resolution + rights, EXPECTED and FORBIDDEN per case; 364 assertions pass on the pinned container image |
-| **027** | Persisted slugs, collision suffixes, robots, sitemap | **DONE** | ADR-0010, resolves D-019. Indexing's last code prerequisite; the sitemap is correctly empty until a second value family exists |
+| **027** | Persisted slugs, collision suffixes, robots, sitemap | **DONE** | ADR-0010, resolves D-019. Indexing's last code prerequisite |
+| **028** | Batch derivation over the register | **DONE** | 71/s after a 140× cache fix. Ceiling is 248,406 indexable pages, not 598,476 — 58.5% are regionally suppressed |
 
 All three of 023–025 passed an adversarial five-lens review before being marked DONE; see `PROGRESS.md`.
 
