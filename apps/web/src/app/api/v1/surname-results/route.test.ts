@@ -30,6 +30,31 @@ describe("GET /api/v1/surname-results — request shape", () => {
     expect(body.error.message).toContain("FREE");
   });
 
+  it("refuses every surface but FREE — a caller may not choose its own rights", async () => {
+    // INTERNAL is the most permissive surface in docs/canonical/12 §6.3's
+    // matrix: it is where a value with unresolved commercial rights may still
+    // be read. An anonymous caller naming it in a query string would be a
+    // rights bypass, so the endpoint answers on FREE and nothing else.
+    for (const surface of ["INTERNAL", "PAID", "SEO"]) {
+      const response = await GET(
+        new Request(`http://localhost/api/v1/surname-results?surname=Nowak&surface=${surface}`),
+      );
+      expect(response.status).toBe(400);
+      const body = (await response.json()) as { error: { code: string; message: string } };
+      expect(body.error.code).toBe("INVALID_REQUEST");
+      expect(body.error.message).toContain("authorisation");
+    }
+  });
+
+  it("accepts an explicit FREE, which is also the default", async () => {
+    // Reaches the database and fails there (no DATABASE_URL in this suite), so
+    // the assertion is only that it was not rejected as a bad request.
+    const response = await GET(
+      new Request("http://localhost/api/v1/surname-results?surname=Nowak&surface=FREE"),
+    );
+    expect(response.status).not.toBe(400);
+  });
+
   it("carries a request id on every error", async () => {
     const response = await GET(new Request("http://localhost/api/v1/surname-results"));
     const body = (await response.json()) as { error: { request_id: string } };

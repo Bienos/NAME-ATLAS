@@ -41,6 +41,7 @@ export interface PersistedCurrentPopulation {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -65,6 +66,7 @@ interface ReadRow {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -104,6 +106,12 @@ export async function readCurrentPopulation(
       cit.publication_date                               AS citation_publication_date,
       cit.url_or_reference                               AS citation_url,
       cit.supporting_locator                             AS citation_locator,
+      -- ISO 8601 in UTC, explicitly. A plain ::text cast renders in the
+      -- session's own time zone, which shifts the DATE by a day either side of
+      -- midnight, and in PostgreSQL's display format rather than the ISO the
+      -- contract declares. Caught by review 2026-09-21.
+      to_char(cit.accessed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                                         AS citation_retrieved_at,
       src.source_type::text                              AS source_type,
       rp.attribution_text                                AS attribution_text,
       rp.terms_version                                   AS terms_version,
@@ -143,6 +151,7 @@ export async function readCurrentPopulation(
     citation_publication_date: row.citation_publication_date,
     citation_url: row.citation_url,
     citation_locator: row.citation_locator,
+    citation_retrieved_at: row.citation_retrieved_at,
     source_type: row.source_type,
     attribution_text: row.attribution_text,
     terms_version: row.terms_version,
@@ -181,6 +190,7 @@ export interface PersistedRarityContext {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -211,6 +221,7 @@ interface RarityReadRow {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -255,6 +266,8 @@ export async function readRarityContext(
       cit.publication_date                               AS citation_publication_date,
       cit.url_or_reference                               AS citation_url,
       cit.supporting_locator                             AS citation_locator,
+      to_char(cit.accessed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                                         AS citation_retrieved_at,
       src.source_type::text                              AS source_type,
       rp.attribution_text                                AS attribution_text,
       rp.terms_version                                   AS terms_version,
@@ -300,6 +313,7 @@ export async function readRarityContext(
     citation_publication_date: row.citation_publication_date,
     citation_url: row.citation_url,
     citation_locator: row.citation_locator,
+    citation_retrieved_at: row.citation_retrieved_at,
     source_type: row.source_type,
     attribution_text: row.attribution_text,
     terms_version: row.terms_version,
@@ -350,6 +364,7 @@ export interface PersistedCurrentDistribution {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -383,6 +398,7 @@ interface DistributionReadRow {
   readonly citation_publication_date: string | null;
   readonly citation_url: string | null;
   readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
@@ -428,6 +444,8 @@ export async function readCurrentDistribution(
       cit.publication_date                               AS citation_publication_date,
       cit.url_or_reference                               AS citation_url,
       cit.supporting_locator                             AS citation_locator,
+      to_char(cit.accessed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                                         AS citation_retrieved_at,
       src.source_type::text                              AS source_type,
       rp.attribution_text                                AS attribution_text,
       rp.terms_version                                   AS terms_version,
@@ -484,6 +502,7 @@ export async function readCurrentDistribution(
     citation_publication_date: row.citation_publication_date,
     citation_url: row.citation_url,
     citation_locator: row.citation_locator,
+    citation_retrieved_at: row.citation_retrieved_at,
     source_type: row.source_type,
     attribution_text: row.attribution_text,
     terms_version: row.terms_version,

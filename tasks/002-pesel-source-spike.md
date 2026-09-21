@@ -1,6 +1,6 @@
 # TASK-002 — PESEL source spike
 
-- **Status:** NOT STARTED
+- **Status:** IMPLEMENTED AND VERIFIED. Stale `NOT STARTED` corrected 2026-09-21: the deliverables exist and are committed — `fixtures/pesel/national-{male,female}-2026-01-20.csv`, `fixtures/pesel/source-manifest.json`, and `@name-atlas/sources`' schema description and fail-closed parser (`packages/sources/src/schema.ts`, `parser.ts`), covered by the package's own tests. D-001 records the resolution.
 - **Milestone:** M0
 - **Depends on:** TASK-001 (project foundation)
 - **Blocks:** TASK-004 (PESEL ingestion + Source/Rights) — resolves D-001 in `docs/DECISIONS_NEEDED.md`

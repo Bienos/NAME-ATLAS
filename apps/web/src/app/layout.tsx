@@ -3,12 +3,18 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 /**
- * The web app's root layout (TASK-001, reworked by TASK-017).
+ * The web app's root layout (TASK-001; reworked by TASK-017 and TASK-023).
  *
- * `lang` is set per request by the page, which is the only place that knows
- * which language was asked for; this layout declares the default so a crawler
- * and a screen reader are never left guessing. Polish is the default because
+ * `<html lang="pl">` is the document default, and it is Polish because
  * `PRODUCT.md` §2's primary user is Polish.
+ *
+ * It is **not** the whole answer, and that was a real bug until TASK-023: this
+ * app answers in Polish and English from the same route tree, so every English
+ * page was announced to a screen reader as Polish, which reads English prose
+ * with Polish phonetics. A root layout owns the `<html>` element and a page
+ * cannot change its attributes, so each page instead sets `lang` on its own
+ * `<main>` — the nearest `lang` wins, which is exactly what HTML specifies.
+ * `htmlLang` in `lib/messages.ts` is the single source of the value.
  */
 export const metadata: Metadata = {
   title: "Name Atlas",

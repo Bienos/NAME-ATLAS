@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; and TASK-022 (`meaning`, 1.4), 2026-09-21
-- **Schema version:** `1.4` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21
+- **Schema version:** `1.5` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -58,7 +58,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
         "confidence": { "status": "VERIFIED", "methodology_code": "…@confidence@1" },
         "citation": { "id": "…", "title": "…", "publisher": "…", "publication_date": "2026-01-20",
                       "source_type": "OFFICIAL_DATASET", "locator": "resource:1148808",
-                      "url": "…", "attribution": null, "terms": "CC0 1.0" }
+                      "url": "…", "attribution": null, "terms": "CC0 1.0", "retrieved_at": "2026-09-18T17:40:00Z" }
       }
     ]
   },
@@ -115,6 +115,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
     "state": "NO_SOURCED_MEANING",   // AVAILABLE | NO_SOURCED_MEANING | RIGHTS_BLOCKED | UNAVAILABLE
     "interpretations": [],           // non-empty exactly when state is AVAILABLE
     "confidence": null,              // LIKELY | POSSIBLE | CONFLICTING | INSUFFICIENT_DATA; never VERIFIED
+    "methodology_code": null,        // added in 1.5; present exactly when AVAILABLE
     "reason_code": "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     "surface": { "surface": "FREE", "decision": "BLOCKED", "reason_code": "COMMERCIAL_USE_UNRESOLVED" }
   }
@@ -137,6 +138,7 @@ An `AVAILABLE` meaning carries one entry per work, unmerged and unranked:
     }
   ],
   "confidence": "CONFLICTING",       // two works, differing roots — both retained above
+  "methodology_code": "onomastic_agreement_rule@onomastic_confidence@1",
   "reason_code": null,
   "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
 }
@@ -146,7 +148,7 @@ For an input that did not resolve, the fact sections are null and `suggestions` 
 
 ```jsonc
 {
-  "schema_version": "1.4",
+  "schema_version": "1.5",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -185,10 +187,11 @@ These are schema constraints, not conventions — a violating payload fails vali
 11. **A suggestion carries no similarity, distance or score.** Added in 1.3. `docs/canonical/16` §35 keeps internal scores off the wire and `docs/canonical/13` §24 calls these diagnostic retrieval features, "not historical confidence". A suggestion is an identity, a match type and localisable explanation codes; a number would invite a surface to render "91% match", which is a claim this project does not make.
 12. **A suggestion can never be expressed as auto-applied.** `decision_mode` is the literal `USER_CONFIRM` whenever suggestions are present, so a payload claiming `AUTO` fails validation (`docs/canonical/13` §32.2: "Do not silently replace input"; §33.4 forbids auto-resolving a fuzzy relation at any score).
 13. **`outcome` and the number of candidates must agree.** `SUGGESTION_REQUIRED` carries exactly one; `MULTIPLE_CANDIDATES` carries more. A mismatch fails validation rather than reaching a surface.
-15. **A meaning is never generated, and its absence is stated.** Added in 1.4. `state = NO_SOURCED_MEANING` with a reason code is the answer for every surname no admissible onomastic work covers, and it is not an omitted field or an empty list (ADR-0008 §2, §3). No field can carry an inferred root: `root_form` is null where the work proposed none.
-16. **A meaning can never be `VERIFIED`.** Added in 1.4. `docs/canonical/11` §8 types `SURNAME_MEANING` as an `INTERPRETATION`, and the enum simply has no such member — an interpretation of a name's origin is not a measurement (ADR-0008 §5).
-17. **Competing interpretations are both present, and `confidence` is `CONFLICTING`.** Added in 1.4. The contract has no field for a preferred reading, a rank or a weight, so a producer cannot express "this one wins"; onomastic disagreement travels as disagreement.
-18. **A meaning's `surface` is evaluated against its own source's rights.** Added in 1.4. A scholarly work and the PESEL register carry different rights profiles, so `meaning.surface` and `population.surface` can legitimately differ in the same response, and `RIGHTS_BLOCKED` carries no interpretation text at all.
+15. **Every citation carries three dates, and they are three different things.** Added in 1.5. `publication_date` is when the publisher published; the observation's own `snapshot_date` is what the data describes; `retrieved_at` is when Name Atlas fetched the record. None is ever inferred from another, and the page labels all three separately (directive §37; `docs/canonical/11` §9.2 keeps `retrieved_at` distinct from `source_modified_at`).
+16. **A meaning is never generated, and its absence is stated.** Added in 1.4. `state = NO_SOURCED_MEANING` with a reason code is the answer for every surname no admissible onomastic work covers, and it is not an omitted field or an empty list (ADR-0008 §2, §3). No field can carry an inferred root: `root_form` is null where the work proposed none.
+17. **A meaning can never be `VERIFIED`.** Added in 1.4. `docs/canonical/11` §8 types `SURNAME_MEANING` as an `INTERPRETATION`, and the enum simply has no such member — an interpretation of a name's origin is not a measurement (ADR-0008 §5).
+18. **Competing interpretations are both present, and `confidence` is `CONFLICTING`.** Added in 1.4. The contract has no field for a preferred reading, a rank or a weight, so a producer cannot express "this one wins"; onomastic disagreement travels as disagreement.
+19. **A meaning's `surface` is evaluated against its own source's rights.** Added in 1.4. A scholarly work and the PESEL register carry different rights profiles, so `meaning.surface` and `population.surface` can legitimately differ in the same response, and `RIGHTS_BLOCKED` carries no interpretation text at all.
 14. **`regions` is never empty and never zero-filled.** A voivodeship the publisher did not list for a surname has no entry at all (`docs/canonical/16` §28's prohibition on fabricated empty map features; `ARCHITECTURE.md` §10 invariant 4).
 
 ## Accepted rendering of a rarity entry
@@ -242,6 +245,8 @@ and a below-threshold entry says so **before** any figure:
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.4 → 1.5 (2026-09-21, TASK-023).** Two additive fields, both required and nullable. `citation.retrieved_at` carries the citation row's `accessed_at`, which the database has held since TASK-005 and the wire never exposed; the page's evidence panel shows it beside the publication and dataset dates, because a reader checking a figure needs to know when we fetched it. `meaning.methodology_code` carries `assessment_method@assessment_version` for the onomastic agreement rule, so a meaning's assessment is as traceable as a population claim's; it is present exactly when the state is `AVAILABLE`. A consumer written against 1.4 is unaffected; a producer must now supply both.
 
 **1.3 → 1.4 (2026-09-21, TASK-022).** Adds the `meaning` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule `population`, `rarity` and `distribution` follow. A consumer written against 1.3 is unaffected; a producer must now supply it. The section is `NO_SOURCED_MEANING` for every surname until an onomastic source is imported, which ADR-0008 §3 makes the correct launch state rather than a defect.
 

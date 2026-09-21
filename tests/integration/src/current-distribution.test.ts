@@ -259,7 +259,7 @@ describe("CURRENT_DISTRIBUTION against a real PostgreSQL (TASK-012)", () => {
     expect(await readCurrentDistribution(db(), surnameId)).toEqual([]);
   });
 
-  it("AC-7: the API answers schema 1.2 with the geography chapter UNAVAILABLE, not an empty map", async () => {
+  it("AC-7: the API answers the current schema with the geography chapter UNAVAILABLE, not an empty map", async () => {
     const surname = await aRegionalSurname();
     await deriveCurrentPopulation(db(), surname);
 
@@ -268,8 +268,8 @@ describe("CURRENT_DISTRIBUTION against a real PostgreSQL (TASK-012)", () => {
     if (outcome.kind !== "OK") throw new Error("unreachable");
     // 1.3 since TASK-016 added the suggestions section; the geography rules
     // this test asserts are unchanged by it.
-    expect(outcome.response.schema_version).toBe("1.4");
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.4");
+    expect(outcome.response.schema_version).toBe("1.5");
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.5");
     expect(outcome.response.distribution?.state).toBe("UNAVAILABLE");
     expect(outcome.response.distribution?.reason_code).toBe("NO_COMPLETE_REGIONAL_UNIVERSE");
     // docs/canonical/16 §28: no fabricated empty features.

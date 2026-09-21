@@ -246,6 +246,82 @@ export function distributionSentence(
   );
 }
 
+/**
+ * The `lang` attribute value for a rendered page.
+ *
+ * The root layout cannot know it — the same tree answers in both languages —
+ * so each page passes its own. Polish is `pl`; English is `en-GB`, because the
+ * dates this app renders are day-month-year.
+ */
+export function htmlLang(lang: Lang): string {
+  return lang === "en" ? "en-GB" : "pl";
+}
+
+/**
+ * Presentation intent (TASK-023 §2.5; directive §17). Changes only the order
+ * of sections; the payload and the canonical URL are unaffected
+ * (`docs/canonical/21` §35).
+ */
+export type Intent = "default" | "rarity" | "map" | "meaning";
+
+export function parseIntent(value: string | null | undefined): Intent {
+  switch (value) {
+    case "rarity":
+    case "map":
+    case "meaning":
+      return value;
+    default:
+      return "default";
+  }
+}
+
+/**
+ * Polish plural forms: 1 → singular, 2–4 (but not 12–14) → paucal, else genitive
+ * plural. `1 fakt`, `2 fakty`, `5 faktów`, `22 fakty`, `112 faktów`.
+ */
+export function pluralPl(n: number, one: string, few: string, many: string): string {
+  const abs = Math.abs(n);
+  if (abs === 1) return one;
+  const tens = abs % 100;
+  const units = abs % 10;
+  if (units >= 2 && units <= 4 && !(tens >= 12 && tens <= 14)) return few;
+  return many;
+}
+
+/**
+ * The assessment as a word (directive §14). The canonical status is the
+ * vocabulary — nothing is added to it — and the word is what the reader sees.
+ * Never a number, never a bar, never a percentage (`docs/canonical/16` §35).
+ */
+export function assessmentWord(status: string, lang: Lang): string {
+  const words: Record<string, { pl: string; en: string }> = {
+    VERIFIED: { pl: "Zweryfikowane", en: "Verified" },
+    LIKELY: { pl: "Prawdopodobne", en: "Likely" },
+    POSSIBLE: { pl: "Możliwe", en: "Possible" },
+    UNCONFIRMED: { pl: "Niepotwierdzone", en: "Unconfirmed" },
+    CONFLICTING: { pl: "Źródła się różnią", en: "Sources disagree" },
+    INSUFFICIENT_DATA: { pl: "Za mało danych", en: "Insufficient data" },
+  };
+  return words[status]?.[lang] ?? status;
+}
+
+/**
+ * The kind of source, from the citation's `source_type` (directive §15: source
+ * category is not confidence and not freshness). An unrecognised code falls
+ * back to the plain word "source" rather than being shown raw.
+ */
+export function sourceKindWord(sourceType: string, lang: Lang): string {
+  const words: Record<string, { pl: string; en: string }> = {
+    OFFICIAL_DATASET: { pl: "Dane urzędowe", en: "Official data" },
+    DICTIONARY: { pl: "Opracowanie naukowe", en: "Scholarly work" },
+    ACADEMIC: { pl: "Publikacja naukowa", en: "Academic publication" },
+    ARCHIVE: { pl: "Archiwum", en: "Archive" },
+    DIGITAL_LIBRARY: { pl: "Biblioteka cyfrowa", en: "Digital library" },
+    PUBLICATION: { pl: "Publikacja", en: "Publication" },
+  };
+  return words[sourceType]?.[lang] ?? (lang === "pl" ? "Źródło" : "Source");
+}
+
 /** Fixed interface strings. Every state has words; a state without them is a bug. */
 export const UI = {
   pl: {
@@ -283,6 +359,55 @@ export const UI = {
     meaningInterpretationNote:
       "To interpretacja naukowa, nie zmierzona wartość. Pochodzenie nazwisk bywa sporne.",
     sectionSources: "Źródło",
+    sectionSourcesAll: "Źródła na tej stronie",
+    viewEvidence: "Zobacz dowody",
+    searchAnother: "Sprawdź inne nazwisko",
+    heroPeople: "osób",
+    heroNoCount: "Ten zbiór nie podaje liczby osób o tym nazwisku.",
+    heroRightsBlocked: "Liczby nie można pokazać tutaj z powodu licencji źródła.",
+    heroStrongestRegion: "Najwięcej zameldowanych",
+    rarityNotComparable:
+      "Każda wartość „1 na X” liczona jest w obrębie własnego zbioru. Zbiory mają różną wielkość, " +
+      "więc tych dwóch wartości nie porównujemy ze sobą.",
+    evidenceSourceTitle: "Źródło",
+    evidenceProvider: "Wydawca",
+    evidenceSourceType: "Rodzaj źródła",
+    evidenceDataset: "Zakres zbioru",
+    evidenceUnderlyingDate: "Dane na dzień",
+    evidencePublicationDate: "Data publikacji",
+    evidenceRetrieved: "Pobrano",
+    evidenceLocator: "Identyfikator rekordu",
+    evidenceRecordLink: "otwórz źródło",
+    evidenceMethod: "Metoda",
+    evidenceSupportedClaim: "Potwierdzane stwierdzenie",
+    evidenceLimitations: "Ograniczenia",
+    evidenceContradictions: "Rozbieżności",
+    evidenceNoneRecorded: "nie odnotowano",
+    evidenceAttribution: "Atrybucja",
+    limitationNotSummed: "Zbiory męski i żeński są odrębne i nigdy nie są sumowane.",
+    limitationSuppressed:
+      "Nazwiska występujące raz nie są publikowane; brak w zbiorze nie oznacza zera.",
+    limitationRegistered:
+      "Zameldowanie na pobyt stały to adres w rejestrze — nie faktyczny adres i nie informacja " +
+      "o korzeniach rodziny.",
+    limitationInterpretation: "To interpretacja naukowa, nie zmierzona wartość.",
+    limitationRounded: "Wartość „1 na X” jest zaokrąglona; liczba osób jest dokładna.",
+    limitationPartition:
+      "Wydawca nie podaje, czy podział dotyczy płci osoby, czy rodzaju gramatycznego nazwiska. " +
+      "Dlatego zbiory nie są sumowane ani porównywane liczbowo.",
+    slugUnknownBody: "Pod tym adresem nie ma nazwiska. Wpisz nazwisko w wyszukiwarce powyżej.",
+    compareVersus: " a ",
+    compareOneIn: "1 na",
+    compareNothingToCompare: "Nie ma tu wartości, które dałoby się porównać.",
+    compareEqualRarity: "Oba nazwiska są w tym zbiorze równie rzadkie.",
+    compareTooClose:
+      "Te wartości są zbyt bliskie, aby je rozróżnić po zaokrągleniu — nie wskazujemy, które " +
+      "nazwisko jest rzadsze.",
+    compareDisclaimer:
+      "Porównujemy liczby z tego samego zbioru. Wspólne lub podobne nazwisko nie oznacza " +
+      "wspólnej rodziny, wspólnych korzeni ani wspólnej narodowości.",
+    slugCollisionBody:
+      "Ten adres pasuje do więcej niż jednego nazwiska, więc nie wybieramy żadnego. Wpisz nazwisko w wyszukiwarce powyżej:",
     regionsHeading: "Województwa",
     regionColumn: "Województwo",
     countColumn: "Liczba",
@@ -334,6 +459,54 @@ export const UI = {
       "This is a scholarly interpretation, not a measured value. Surname origins are often " +
       "contested.",
     sectionSources: "Source",
+    sectionSourcesAll: "Sources on this page",
+    viewEvidence: "View evidence",
+    searchAnother: "Search another surname",
+    heroPeople: "people",
+    heroNoCount: "This dataset publishes no count for this surname.",
+    heroRightsBlocked: "The count cannot be shown here because of the source's licence.",
+    heroStrongestRegion: "Most registered in",
+    rarityNotComparable:
+      "Each 1-in-X is computed within its own dataset. The datasets are different sizes, so these " +
+      "two figures are not compared with each other.",
+    evidenceSourceTitle: "Source",
+    evidenceProvider: "Provider",
+    evidenceSourceType: "Source type",
+    evidenceDataset: "Dataset scope",
+    evidenceUnderlyingDate: "Data as of",
+    evidencePublicationDate: "Publication date",
+    evidenceRetrieved: "Retrieved",
+    evidenceLocator: "Record identifier",
+    evidenceRecordLink: "open source",
+    evidenceMethod: "Method",
+    evidenceSupportedClaim: "Supported claim",
+    evidenceLimitations: "Limitations",
+    evidenceContradictions: "Contradictions",
+    evidenceNoneRecorded: "none recorded",
+    evidenceAttribution: "Attribution",
+    limitationNotSummed: "The male and female datasets are separate and are never summed.",
+    limitationSuppressed:
+      "Surnames occurring once are not published; absence from the dataset is not zero.",
+    limitationRegistered:
+      "A permanent registered residence is an address in the register — not an actual address, " +
+      "and not information about a family's roots.",
+    limitationInterpretation: "This is a scholarly interpretation, not a measured value.",
+    limitationRounded: "The 1-in-X figure is rounded; the count of people is exact.",
+    limitationPartition:
+      "The publisher does not state whether the split is by a person's sex or by the grammatical " +
+      "gender of the surname form. The datasets are therefore neither summed nor compared numerically.",
+    slugUnknownBody: "There is no surname at this address. Type a surname in the search above.",
+    compareVersus: " vs ",
+    compareOneIn: "1 in",
+    compareNothingToCompare: "There is no figure here that can be compared.",
+    compareEqualRarity: "Both surnames are equally rare in this dataset.",
+    compareTooClose:
+      "These figures are too close to separate once rounded, so neither is called rarer.",
+    compareDisclaimer:
+      "We compare figures from the same dataset. A shared or similar surname does not mean a " +
+      "shared family, shared roots or shared nationality.",
+    slugCollisionBody:
+      "This address matches more than one surname, so none is chosen. Type the surname in the search above:",
     regionsHeading: "Voivodeships",
     regionColumn: "Voivodeship",
     countColumn: "Count",

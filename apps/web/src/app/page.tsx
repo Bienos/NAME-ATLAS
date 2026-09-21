@@ -1,32 +1,52 @@
+import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { parseLang, UI } from "../lib/messages.js";
+import { htmlLang, parseIntent, parseLang, UI } from "../lib/messages.js";
 import type { Lang } from "../lib/messages.js";
 import { Result } from "../lib/result-view.js";
+import { SearchForm } from "../lib/search-form.js";
+import { surnamePath } from "../lib/slug.js";
+import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
 
 /**
- * The free surname result page (TASK-017) — M2's exit journey.
+ * The search page (TASK-017; TASK-024 gave resolved results an address).
  *
- * A server component. There is no client bundle: a `GET` form and server
- * rendering answer this journey, and `PRODUCT.md` §2's user is on mobile.
+ * A server component with no client bundle: a `GET` form and server rendering
+ * answer this journey, and `PRODUCT.md` §2's user is on mobile.
+ *
+ * A query that resolves to exactly one surname is **redirected** to that
+ * surname's canonical page (ADR-0009) — `/pl/nazwisko/{slug}` — so the address
+ * in the bar is the shareable one. An unresolved or ambiguous query renders
+ * here with suggestions, because a miss is not a page.
  *
  * **This page derives nothing.** It calls `querySurnameResult`, parses the
  * result with `surnameResultResponseSchema`, and renders from the parsed value.
  * If validation fails it renders an error and no figures at all, because a
  * payload that violates its own contract is a bug and must not reach a reader
  * (`ARCHITECTURE.md` §6; `docs/canonical/16` §1.3).
- *
- * Consequences of that one rule, all visible below: nothing here sums the two
- * sex partitions, rounds a figure, divides a regional count by a national one,
- * decides whether a distribution may be presented, or renders a value the rights
- * layer withheld — a `RIGHTS_BLOCKED` section carries no values in the payload at
- * all, so there is nothing to hide (`docs/canonical/16` §55).
  */
 
 export const dynamic = "force-dynamic";
+
+/**
+ * A search result carries the visitor's raw query in the URL, so it is never
+ * indexed: `docs/canonical/21` §36 keeps internal search out of the index, and
+ * an indexed `/?surname=<whatever someone typed>` would publish it. The bare
+ * landing page has no query and stays indexable.
+ *
+ * A resolved query redirects to its canonical page before this matters; this
+ * covers the unresolved, ambiguous and invalid answers, which render here.
+ */
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = await searchParams;
+  const searched = first(params["surname"])?.trim() ?? "";
+  return searched === "" ? {} : { robots: { index: false, follow: true } };
+}
 
 interface PageProps {
   readonly searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -43,7 +63,8 @@ function first(value: string | string[] | undefined): string | null {
  * Deliberately not JSX: React renders lazily, so building JSX inside a
  * `try`/`catch` produces a block that looks like it handles render errors and
  * does not. This returns a value, and the component below turns it into markup
- * outside any try.
+ * outside any try. The redirect also happens outside the try, because Next
+ * implements it by throwing.
  */
 type Answer =
   | { readonly kind: "NONE" }
@@ -51,15 +72,7 @@ type Answer =
   | { readonly kind: "UNAVAILABLE" }
   | { readonly kind: "RESULT"; readonly response: SurnameResultResponse };
 
-/**
- * Answers one query, or says honestly that it cannot.
- *
- * Configuration, connection, query and validation are all inside the try.
- * `loadDbConfig` throws when `DATABASE_URL` is absent, and a misconfigured
- * deployment must render the unavailable state rather than crash — the reader is
- * owed the same answer either way.
- */
-async function answer(query: string): Promise<Answer> {
+async function answer(query: string, origin: ReturnType<typeof searchOrigin>): Promise<Answer> {
   if (query === "") return { kind: "NONE" };
   // The surname is deliberately absent from every line below: canonical/19 §85
   // wants request content redacted by default, and a search term with a
@@ -75,34 +88,28 @@ async function answer(query: string): Promise<Answer> {
       return { kind: "INVALID" };
     }
     if (outcome.kind === "UNAVAILABLE") {
-      // Logged so an outage is diagnosable; nothing about it reaches the page.
       log.error("page_unavailable", { reason: outcome.reason, ms: Date.now() - startedAt });
       return { kind: "UNAVAILABLE" };
     }
-    // The rule this page is built on: render only what validated.
     const parsed = surnameResultResponseSchema.safeParse(outcome.response);
     if (!parsed.success) {
-      // A payload that violates its own contract is a bug, not an outage. The
-      // reader sees the same honest message; the log tells the two apart.
       log.error("page_contract_violation", {
         issues: parsed.error.issues,
         ms: Date.now() - startedAt,
       });
       return { kind: "UNAVAILABLE" };
     }
-    log.info("page_rendered", {
+    log.info("search_completed", {
       result_status: parsed.data.status,
-      population_state: parsed.data.population?.state ?? null,
-      rarity_state: parsed.data.rarity?.state ?? null,
-      distribution_state: parsed.data.distribution?.state ?? null,
       suggestions_state: parsed.data.suggestions?.state ?? null,
+      // Where the search came from — a result page, the home page, elsewhere —
+      // and never which surname. `second_surname_search` is this field being
+      // `result_page` (TASK-023 §2.6).
+      search_origin: origin,
       ms: Date.now() - startedAt,
     });
     return { kind: "RESULT", response: parsed.data };
   } catch (cause: unknown) {
-    // Nothing from `cause` reaches the page: no message, no stack, no SQL and no
-    // connection string (docs/canonical/16 §78's rule, applied to a page). The
-    // logger redacts it, so it cannot reach a log file either.
     log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
   } finally {
@@ -137,11 +144,27 @@ function Body({ answer: given, lang }: { answer: Answer; lang: Lang }) {
 export default async function HomePage({ searchParams }: PageProps) {
   const params = await searchParams;
   const lang = parseLang(first(params["lang"]));
+  const intent = parseIntent(first(params["intent"]));
   const t = UI[lang];
   const raw = first(params["surname"]);
   const query = raw?.trim() ?? "";
+  const h = await headers();
+  const origin = searchOrigin(referrerPath(h.get("referer"), requestOrigin(h.get("host"))));
 
-  const given = await answer(query);
+  const given = await answer(query, origin);
+
+  if (
+    given.kind === "RESULT" &&
+    given.response.status === "RESOLVED" &&
+    given.response.surname !== null
+  ) {
+    // The result has an address of its own. `?intent=` travels with it; the
+    // canonical URL does not change (canonical/21 §35).
+    const path = surnamePath(given.response.surname.display_name, lang);
+    // A display form that slugs to nothing has no canonical address, so the
+    // answer stays here rather than redirecting to `/pl/nazwisko/`.
+    if (path !== null) redirect(intent === "default" ? path : `${path}?intent=${intent}`);
+  }
 
   const otherLang: Lang = lang === "pl" ? "en" : "pl";
   const switchParams = new URLSearchParams();
@@ -150,29 +173,18 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   return (
     <>
-      <main>
+      {/* The nearest `lang` wins: the document is Polish by default and an
+          English answer says so here (see `layout.tsx`). */}
+      <main lang={htmlLang(lang)}>
         <div className="masthead">
           <h1>{t.title}</h1>
           <a href={`/?${switchParams.toString()}`}>{t.langSwitch}</a>
         </div>
         <p className="tagline">{t.tagline}</p>
-        <form className="search" action="/" method="get">
-          <label htmlFor="surname">{t.searchLabel}</label>
-          <input
-            id="surname"
-            name="surname"
-            type="text"
-            defaultValue={query}
-            placeholder={t.searchPlaceholder}
-            autoComplete="off"
-            spellCheck={false}
-          />
-          {lang === "en" ? <input type="hidden" name="lang" value="en" /> : null}
-          <button type="submit">{t.searchAction}</button>
-        </form>
+        <SearchForm lang={lang} query={query} />
         <Body answer={given} lang={lang} />
       </main>
-      <footer>{t.footer}</footer>
+      <footer lang={htmlLang(lang)}>{t.footer}</footer>
     </>
   );
 }

@@ -3188,3 +3188,232 @@ unavailable in this environment, which is the substitute path `packages/testing`
 Three existing assertions were updated because legitimate new migrations exist: the migrator's file
 list, `extensions.test.ts`'s applied-migration list, `canonical-key-v2.test.ts`'s down-step sequence,
 and `current-rank.test.ts`'s `claim_type` enum list (now carrying `SURNAME_MEANING`).
+
+---
+
+## TASK-023, TASK-024, TASK-025 — the consumer loop
+
+**Status: IMPLEMENTED and verified 2026-09-21.** The product now has the loop the directive's north
+star describes: a fast answer with an assessment and its evidence, at a shareable address, with a
+second search one control away.
+
+### What the repository looked like before this session, verified rather than assumed
+
+A six-agent sweep read the code, ran the suites, measured latency and probed egress. What it found:
+
+| Area | State |
+|---|---|
+| `SURNAME` → source → claim → citation → API → page | **WORKING** end to end, no LLM anywhere, nothing mocked on the request path |
+| Latency (local, warm, sequential, n=60) | API p50 18.1 ms / **p95 26.5 ms**; HTML page p50 20.6 / p95 26.1 |
+| Result page | One fixed stack, citations as a small list per fact, **no** snapshot, evidence link, share, OG, comparison, intent or map |
+| Canonical route, sitemap, robots, `generateMetadata` | **MISSING** |
+| Analytics provider | **MISSING** — `packages/logging` is the only event sink |
+| `README.md` | **MISSING** |
+| Redis/BullMQ on the read path | **Not on it** — confirmed by import graph |
+| Polona, dane.gov.pl, Wikidata, GeoNames | **BLOCKED** — every host 403s at the agent proxy's CONNECT |
+| Voivodeship boundary geometry | **ABSENT** — no geojson anywhere, `places.centroid` NULL in all 16 rows |
+
+Two defects the sweep found that this session fixed, both real:
+
+1. **`GET /api/v1/surname-results` answered a bare 500 with no `docs/canonical/16` §78 envelope and no
+   request id** when `DATABASE_URL` was absent, because `loadDbConfig()` sat outside the `try`. It was
+   the same bug `page.tsx` had had and that TASK-017 fixed there; the route kept it.
+2. **`<html lang="pl">` was hard-coded for the English pages too**, so a screen reader announced
+   English prose with Polish phonetics. A root layout owns `<html>` and a page cannot change it, so
+   each page now sets `lang` on its own `<main>` — the nearest `lang` wins, which is what HTML
+   specifies.
+
+A third was found while running the suites: **`pnpm test:integration` exited non-zero while all 243 of
+its tests passed.** The external-server teardown drops its throwaway database `WITH (FORCE)`, which
+terminates a connection still closing, and the resulting FATAL `57P01` surfaced as an unhandled error —
+a red CI run with nothing wrong in it. The cause was that `createPool` attached no `error` listener,
+which is also a production fault: `pg` emits `error` on an idle connection failure, and an
+`EventEmitter` error with no listener ends the Node process. A pool without that listener is a web
+server a PostgreSQL restart can kill. Fixed in `packages/db/src/pool.ts`, with a test that the default
+report can never write the connection password (`pg` attaches the offending `Client`, whose
+`connectionParameters` hold it).
+
+### The result experience (TASK-023)
+
+Every figure is now one `Claim`: the statement, the assessment as a **word**, the kind of source, the
+scope and date, and a native `<details>` evidence panel. Confidence, source category and freshness stay
+four separate things (directive §15) — a 2014 dataset can be VERIFIED, OFFICIAL and OLD at once, and
+collapsing them would hide whichever the reader needed.
+
+The evidence panel is `<details>` on purpose: keyboard-operable, state exposed to assistive technology,
+focus returned to its own `<summary>` on close, and **no script**. The canonical status travels as
+`data-assessment` so it stays machine-readable while the reader sees the word.
+
+Rendered live against `name_atlas_dev` for KOWALCZYK, the evidence panel carries: source title,
+publisher, source kind, dataset scope, data-as-of date, publication date, **retrieved date**, record
+identifier and link, method (`pesel_current_population_rule@confidence@1`), the supported claim, the
+assessment, limitations, contradictions, licence and attribution.
+
+**Contract 1.5** adds `citation.retrieved_at` — the `citations.accessed_at` the database has held since
+TASK-005 and the wire never exposed — and `meaning.methodology_code`. Three dates, three meanings,
+never inferred from one another.
+
+The **snapshot** opens the page: the surname, the count per partition as hero figures, `1 in X` only
+when rarity is `READY`, the strongest registered voivodeship only when an entry's `coverage_state` is
+`READY`, and a tally by assessment. Asserted against markup: the two partitions' sum appears nowhere,
+in either separator.
+
+`?intent=rarity|map|meaning` moves that section first and changes nothing else — not the payload, not
+the canonical URL (`docs/canonical/21` §35).
+
+One thing this fixed while wiring it: the page had been rendering `distribution_snapshots.coverage_notes`
+verbatim, which is **this project's own English annotation**, on a Polish page. It is now a localised
+limitation; the raw note stays internal, where the admin inspector shows it.
+
+### The canonical route, sharing and the image (TASK-024, ADR-0009)
+
+`/pl/nazwisko/{slug}` and `/en/surname/{slug}`, with `/` redirecting on an exact resolution (verified:
+`307 → /pl/nazwisko/kowalczyk`). The slug is `docs/canonical/21` §21–§23's, Unicode-preserving:
+`ŁUCZAK` → `łuczak`, **never** `luczak`. That closes TASK-006 §15 U-2, which had deferred slugs for
+fear of inventing a transliteration — canonical §21 had already decided not to.
+
+Slug → entity resolves to exactly one surname or refuses. A round-trip test over **every** imported
+surname found a real bug: `A/GADIR` has slug `a-gadir`, and no reading of that slug produces the key
+`a/gadir`, so the page was unreachable. There is now a fallback that narrows candidates on the one
+thing a slug and a key always agree on — their alphanumeric characters — and then **confirms** each by
+recomputing its slug, so `canonicalSlug` stays the only authority. It scans: 94 ms over 598,476 rows,
+measured, and it is reached only for a surname holding such a character. D-019's persisted slug would
+make it an index lookup.
+
+A slug two entities produce is a **collision**: the page says the address is ambiguous and resolves
+neither. Never the more common one.
+
+**Indexability** is `docs/canonical/21` §40–§43 as code, behind `SEO_INDEXING_ENABLED`, which is unset
+everywhere. Verified live: `<meta name="robots" content="noindex, follow">`, with the canonical link
+and Open Graph tags whose description is built only from figures the payload carries.
+
+The **share control** is this app's one `'use client'` file. Web Share where supported, clipboard
+otherwise, a visible status line for shared / copied / cancelled / denied, and the canonical link
+always present as text so it works with no script at all. A dismissed sheet is `AbortError` and is
+reported as "not shared" — not an error, and not retried into a clipboard write the reader did not ask
+for. The URL is a server-supplied prop, never client state.
+
+The **Open Graph image** is deterministic and built from `ogFacts`, a pure function over the payload:
+the surname, the count per partition, `1 in X` only when rarity is `READY`. A rights-blocked or absent
+count yields a card that says so and carries **no number** — asserted by a test that the serialised
+facts contain no multi-digit run. Verified live: `200 image/png`, 1200×630, 65,524 bytes, 296 ms. Geist,
+which `next/og` bundles, covers every Polish letter — checked against the font's own cmap table, not
+assumed.
+
+`POST /api/v1/events` accepts `{ event: <allow-listed name> }` and **nothing else**. The allow-list is
+the privacy mechanism: there is no field a surname could travel in. Verified live: an allow-listed
+event returns 202; the same event with a `surname` field returns 400.
+
+### Comparison (TASK-025)
+
+`/pl/porownaj?a=&b=`, `noindex, nofollow`. A figure is compared only when `comparability_group`,
+`snapshot_date` and — for rarity — `denominator` all match; otherwise the page says the figures are not
+directly comparable and shows both without ranking them. The disclaimer that a shared surname means no
+shared family, roots or nationality is rendered **before** any figure, because the side-by-side layout
+is the thing that could mislead.
+
+### Adversarial review, and the 21 defects it found
+
+The work above was reviewed by five independent readers — privacy, the honesty rules, slug
+correctness, the contract and data path, runtime and accessibility — each asked to find defects it
+could demonstrate from the code. Every finding below was verified and fixed in this session. Several
+were in code written earlier in the same session, and three were pre-existing.
+
+**Rights and privacy**
+
+| Defect | Fix |
+|---|---|
+| The pool's new error handler wrote `pg`'s message raw, and a connection string reaches a log through that message far more often than through a field called `password` | The message is scrubbed; a test asserts a password in the message text never reaches stderr. My first test had checked only the attached `Client` object — the wrong vector |
+| **`GET /api/v1/surname-results?surface=INTERNAL`** was answerable by anyone. `INTERNAL` is the most permissive surface in `docs/canonical/12` §6.3 — where a value with unresolved commercial rights may still be read | The endpoint answers on `FREE` and refuses every other surface. Pre-existing since TASK-006 |
+| `referrerPath` skipped its same-origin check when `SITE_ORIGIN` was unset, so any third party could set the `search_origin` metric by linking in | An unknown origin means external; `requestOrigin` falls back to the request's own `Host` |
+| A search result rendered at `/?surname=<raw query>` with no `robots` | `noindex, follow` when a query is present; the landing page stays indexable |
+| The comparison heading echoed an unbounded query parameter | Bounded to 40 characters |
+
+**Honesty**
+
+| Defect | Fix |
+|---|---|
+| The snapshot set the two partitions' `1 in X` side by side. Each is computed within **its own** resource version's published universe, and the two universes are different sizes — the exact cross-denominator comparison `compare.ts` refuses to make | Stacked on separate lines, with a sentence saying they are not comparable |
+| `rarerOf` compared the **rounded** `1 in X`, so two surnames with different counts could be called "equally rare" | Compares `share`; a genuine tie is a tie, and two shares that round to the same figure are reported as too close to separate |
+| The snapshot named `regions[0]` as the strongest voivodeship even when the top two were **tied** — a sort artefact presented as a fact | A tie yields nothing; the section's table shows both |
+| The strongest-region share, and the Open Graph and meta descriptions, carried counts **without their date** | All now carry it (`ARCHITECTURE.md` §10 invariant 5) |
+| The share card put two rarity figures from different universes on one card | Rarity appears only when the entries share a denominator |
+| The tally called derived restatements "verified facts" | "verified statements": a rarity figure is arithmetic over the count above it |
+| Comparison rendered `?? 0` for an absent count | Renders `—`; absence is never zero |
+
+**Slug and route**
+
+| Defect | Fix |
+|---|---|
+| A surname containing **İ** (U+0130) was unreachable at its own address: `canonicalSlug` used `toLocaleLowerCase`, which expands it, while the resolver's `canonicalKey` uses `simpleCaseFold`, which keeps it whole | The slug folds with the resolver's own primitive, so a slug and a key can never disagree about case |
+| The separator fallback was guarded by `slug.includes("-")`, which is unsound — the edge-hyphen strip removes the very hyphen the guard relies on, so `/GADIR` was unreachable | **Migration `0017`** indexes `regexp_replace(canonical_key, '[^[:alnum:]]+', '', 'g')`. The 94 ms scan became a **0.08 ms index lookup** (`EXPLAIN ANALYZE`), and both heuristic guards were deleted |
+| The fallback ran only when the earlier readings missed, so a collision between a direct reading and a separator-mapped surname resolved silently to whichever was found first | All lookups always run and their results are unioned; a collision is still a collision |
+| The comparison route ran two unguarded scans per request | Moot: the lookup is indexed |
+| The canonical and share URLs echoed the request slug, and `resolveSlug` decoded a parameter Next had already decoded | Both derive from the **resolved** surname; the parameter is taken as given |
+| `surnamePath` could emit `/pl/nazwisko/` for a display form that slugs to nothing | Returns `null`; callers render no link |
+| `assessIndexability` never checked the **SEO** surface, which `docs/canonical/21` §40 requires alongside the public one, and counted a `CONDITIONAL` section as publishable | Both gates added. Nothing projects the SEO surface yet, so the page passes `false` and every page is `NOINDEX` — correct, not a placeholder |
+
+**Runtime and accessibility**
+
+| Defect | Fix |
+|---|---|
+| The share island set state **during render** to sniff `navigator.share`, and Node 22 defines a global `navigator`, so the check ran on the server too — a hydration mismatch on every browser with Web Share | The label no longer depends on capability: both paths share, and one label is honest for both |
+| Every English page announced its `<footer>` in Polish: `<footer>` is a **sibling** of `<main>`, so the `lang` on `main` never covered it | `lang` on both |
+| An `aria-label` on the share URL replaced the link text — hiding the URL in the one state that tells a reader to copy it by hand | Removed |
+| The events beacon's `fetch` fallback had no `.catch`, so a rejected telemetry request became an unhandled rejection | `.catch` added; the enclosing `try` could never have caught it |
+| `.caveat` referenced `--soft`, which is defined nowhere | `--ink-soft` |
+| The evidence disclosure, the search button and the suggestion links were under the 44 px target the rest of the stylesheet keeps | `min-height: 44px` |
+| With `SITE_ORIGIN` unset the share control copied a bare **path**, which is not a link | The request's `Host` makes it absolute; with neither, the control is withheld |
+
+Two findings were also raised against the contract documentation and corrected: both `meaning` examples in `docs/contracts/surname-result.md` were invalid under the 1.5 schema the same document declares (re-validated against `meaningSectionSchema`, both now parse), and `docs/CODEMAP.md` still described the contract as 1.3.
+
+One measurement correction: an apparent horizontal-overflow bug at 320 px was a **screenshot artefact**. Headless Chromium's minimum window width is 500 px, so `--window-size=320` lays out at 500 and crops, which looks exactly like an overflow. Measured in a real 320 px iframe, nothing overflows. The table scroll container and the narrow-viewport rules were kept — the voivodeship names do need to wrap — and the blunt `overflow-x: hidden` added on the false premise was removed.
+
+### Verification run
+
+```
+pnpm typecheck        → passed, 13 projects
+pnpm lint             → passed
+pnpm format:check     → passed
+pnpm test             → passed, 584 unit tests (web 138, db 8, contracts 42)
+pnpm test:integration → passed, 250 tests across 19 files, exit 0 (canonical-route 7 new)
+pnpm build            → passed; 11 routes
+```
+
+Live, built app against `name_atlas_dev` with `SITE_ORIGIN=https://nameatlas.example`:
+
+| Check | Result |
+|---|---|
+| `/?surname=KOWALCZYK` | `307 → /pl/nazwisko/kowalczyk` |
+| `/pl/nazwisko/kowalczyk` | 200 in 64 ms |
+| `/en/surname/kowalczyk` | 200, `<main lang="en-GB">` inside `<html lang="pl">` |
+| `/pl/nazwisko/w%C3%B3jcik` | 200 — Polish letters survive the round trip |
+| `opengraph-image` | 200, `image/png`, 1200×630, 65 KB, 296 ms |
+| `/api/v1/events` | 202 allow-listed · 400 with an extra field |
+| `/pl/porownaj?a=kowalczyk&b=nowak` | 200, disclaimer first, per-partition tables |
+| Anchors | `#today #today-count #rarity #where #meaning #sources` all present |
+
+Integration tests run with `TEST_DATABASE_URL` against the local server; the container runtime is
+unavailable here, which is the substitute path `packages/testing` documents.
+
+### Stale records corrected
+
+`tasks/002`, `tasks/005` and `tasks/006` said `NOT STARTED`. All three are implemented and have been
+for several sessions; each status line now names the evidence — the fixtures and parser, migration
+`0004` plus `packages/truth`, and the read path plus its route and integration test.
+
+### Blocked, and why
+
+**M3 historical discovery is blocked by the environment, not by a decision.** Polona, `polona2.pl`,
+`api.dane.gov.pl`, Wikidata and GeoNames every one answer `403` to the proxy's `CONNECT`. ADR-0007
+settled what to *do* with Polona's rights; the connector cannot be built or tested without reaching it.
+
+**A real map is blocked for the same reason.** No boundary geometry exists in the repository or the
+database — no GeoJSON, and `places.centroid` is NULL in all 16 rows — and TERYT is a code register, not
+geometry. The geography chapter therefore stays an accessible table with its coverage caveat, which is
+truthful; `docs/canonical/21`'s map layers wait on a lawful geometry source.
+
+**Analytics stays the structured logger.** The directive (§54) says not to add a vendor for its own
+sake, and the metrics it names — second search, share start and completion, evidence opened — are all
+recorded as events on stdout with a correlation ID, where `search_origin` distinguishes a second search
+from a first without ever recording which surname.

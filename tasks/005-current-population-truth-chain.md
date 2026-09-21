@@ -1,6 +1,6 @@
 # TASK-005 — `CURRENT_POPULATION` Truth Chain
 
-- **Status:** NOT STARTED — specification only. **Four decisions block implementation:** D-008 and D-009 (`docs/DECISIONS_NEEDED.md`, both recorded during this task's preflight) must be answered before the migration is written; TASK-004 §14 **U-1** and **U-4** must be answered by the publisher before any claim is phrased as a statement about *people*. §15 explains what can and cannot proceed without them.
+- **Status:** IMPLEMENTED AND VERIFIED. Stale `NOT STARTED` corrected 2026-09-21: migration `0004_truth_layer.ts` and `packages/truth/src/derive.ts` exist, the chain is exercised end to end by `tests/integration/src/truth-chain.test.ts` against a real PostgreSQL, and the four blockers named below are resolved — D-008 and D-009 in `docs/DECISIONS_NEEDED.md`, and TASK-004 §14 U-1/U-4 by the project owner (ADR-0004 as amended: the unit is `PEOPLE`). The original text is kept below because §15's reasoning is the record of how they were answered.
 - **Milestone:** M1 (`PLAN.md`: "Tasks: TASK-004 PESEL ingestion + Source/Rights · TASK-005 `CURRENT_POPULATION` truth chain"). This task closes M1.
 - **Depends on:** TASK-003 (exact resolution, identity tables) and TASK-004 (PESEL ingestion, source/rights registry, distribution rows) — both implemented and verified, see `PROGRESS.md`.
 - **Blocks:** M2 (`CURRENT_RANK`, `RARITY_CONTEXT`, the shared API contract and the first consumer surface).

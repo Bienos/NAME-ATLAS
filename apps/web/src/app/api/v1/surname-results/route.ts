@@ -55,29 +55,42 @@ export async function GET(request: Request): Promise<NextResponse> {
     );
   }
 
-  const allowedSurfaces = ["INTERNAL", "FREE", "PAID", "SEO"] as const;
-  type Surface = (typeof allowedSurfaces)[number];
-  let surface: Surface = "FREE";
-  if (surfaceParam !== null) {
-    if (!(allowedSurfaces as readonly string[]).includes(surfaceParam)) {
-      log.warn("request_rejected", { status: 400, code: "INVALID_REQUEST", field: "surface" });
-      return NextResponse.json(
-        errorBody(
-          "INVALID_REQUEST",
-          `'surface' must be one of: ${allowedSurfaces.join(", ")}`,
-          false,
-          requestId,
-        ),
-        { status: 400 },
-      );
-    }
-    surface = surfaceParam as Surface;
+  // **This endpoint answers on the free surface and no other.**
+  //
+  // `evaluateSurface` treats `INTERNAL` as the most permissive surface: it is
+  // where a value whose commercial rights are unresolved may still be read, for
+  // research and rights review. Letting an anonymous caller name it in a query
+  // string handed that permission to anyone with a URL, which is a rights
+  // bypass — `docs/canonical/12` §6.3's matrix distinguishes the surfaces
+  // precisely so they cannot be chosen by the audience. (Caught by review
+  // 2026-09-21; the parameter had accepted all four since TASK-006.)
+  //
+  // `PAID` needs an entitlement and `SEO` a projection, neither of which
+  // exists. When they do, the surface will follow from the caller's
+  // authorisation, never from a parameter.
+  const surface = "FREE" as const;
+  if (surfaceParam !== null && surfaceParam !== "FREE") {
+    log.warn("request_rejected", { status: 400, code: "INVALID_REQUEST", field: "surface" });
+    return NextResponse.json(
+      errorBody(
+        "INVALID_REQUEST",
+        "'surface' may only be FREE on this endpoint; other surfaces require authorisation",
+        false,
+        requestId,
+      ),
+      { status: 400 },
+    );
   }
 
-  const pool = createPool(loadDbConfig());
-  const db = createDb(pool);
+  // Configuration and connection are inside the try. `loadDbConfig` throws when
+  // `DATABASE_URL` is absent, and a misconfigured deployment must answer with
+  // the §78 error envelope like any other failure — not with a bare 500 that
+  // carries no request id. (Found by inspection 2026-09-21: the same bug
+  // `page.tsx` had, still here.)
+  let db: ReturnType<typeof createDb> | null = null;
 
   try {
+    db = createDb(createPool(loadDbConfig()));
     const outcome = await querySurnameResult(db, surname, { surface });
 
     switch (outcome.kind) {
@@ -139,6 +152,14 @@ export async function GET(request: Request): Promise<NextResponse> {
           ),
           { status: 503 },
         );
+
+      default: {
+        // Exhaustiveness, stated rather than assumed: a new outcome kind added
+        // to `SurnameQueryOutcome` fails this assignment at compile time
+        // instead of silently falling through to a 500.
+        const unreachable: never = outcome;
+        throw new Error(`unhandled outcome: ${JSON.stringify(unreachable)}`);
+      }
     }
   } catch (cause: unknown) {
     // Nothing from `cause` reaches the client: no message, no stack, no SQL,
@@ -150,6 +171,6 @@ export async function GET(request: Request): Promise<NextResponse> {
       { status: 500 },
     );
   } finally {
-    await db.destroy();
+    await db?.destroy();
   }
 }

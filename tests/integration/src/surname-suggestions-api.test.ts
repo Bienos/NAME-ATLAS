@@ -65,12 +65,12 @@ describe("surname suggestions on the read API (TASK-016)", () => {
     }
   });
 
-  it("AC-7: the response is schema 1.3 and validates", async () => {
+  it("AC-7: the response carries the current schema version and validates", async () => {
     const outcome = await querySurnameResult(db(), "CICHWOSKI");
     expect(outcome.kind).toBe("OK");
     if (outcome.kind !== "OK") throw new Error("unreachable");
-    expect(outcome.response.schema_version).toBe("1.4");
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.4");
+    expect(outcome.response.schema_version).toBe("1.5");
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.5");
     expect(surnameResultResponseSchema.safeParse(outcome.response).success).toBe(true);
   });
 

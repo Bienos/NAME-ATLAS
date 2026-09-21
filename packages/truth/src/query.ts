@@ -191,7 +191,14 @@ function emptyMeaning(
   reasonCode: string,
   surface: SurfaceEligibilityDto,
 ): MeaningSection {
-  return { state, interpretations: [], confidence: null, reason_code: reasonCode, surface };
+  return {
+    state,
+    interpretations: [],
+    confidence: null,
+    methodology_code: null,
+    reason_code: reasonCode,
+    surface,
+  };
 }
 
 /**
@@ -232,6 +239,7 @@ function projectMeaningSection(
       locator: i.locator,
     })),
     confidence,
+    methodology_code: `${claim.assessment_method}@${claim.assessment_version}`,
     reason_code: null,
     surface,
   };
@@ -344,6 +352,7 @@ function toDistributionEntry(claim: PersistedCurrentDistribution): DistributionE
       url: claim.citation_url,
       attribution: claim.attribution_text,
       terms: claim.terms_version,
+      retrieved_at: claim.citation_retrieved_at,
     },
   };
 }
@@ -377,6 +386,7 @@ function toRarityEntry(claim: PersistedRarityContext): RarityEntry {
       url: claim.citation_url,
       attribution: claim.attribution_text,
       terms: claim.terms_version,
+      retrieved_at: claim.citation_retrieved_at,
     },
   };
 }
@@ -413,6 +423,7 @@ function toObservation(claim: PersistedCurrentPopulation): PopulationObservation
       url: claim.citation_url,
       attribution: claim.attribution_text,
       terms: claim.terms_version,
+      retrieved_at: claim.citation_retrieved_at,
     },
   };
 }

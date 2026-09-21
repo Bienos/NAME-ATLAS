@@ -1,0 +1,303 @@
+import type { Metadata } from "next";
+import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { createLogger } from "@name-atlas/logging";
+import { querySurnameResult } from "@name-atlas/truth";
+import { surnameResultResponseSchema } from "@name-atlas/contracts";
+import type { SurnameResultResponse } from "@name-atlas/contracts";
+import { assessIndexability, indexingEnabled } from "./seo.js";
+import { resolveSlug, surnamePath } from "./slug.js";
+import {
+  formatDate,
+  formatInteger,
+  htmlLang,
+  parseIntent,
+  partitionLabel,
+  UI,
+} from "./messages.js";
+import type { Intent, Lang } from "./messages.js";
+import { Result } from "./result-view.js";
+import { SearchForm } from "./search-form.js";
+import { ShareButton } from "./share-button.js";
+
+/**
+ * The canonical surname page (TASK-024, ADR-0009), shared by
+ * `/pl/nazwisko/[slug]` and `/en/surname/[slug]`.
+ *
+ * The same rule as `/`: it derives nothing, queries once, validates against
+ * the contract and renders only what validated. What is new here is that the
+ * page has an *address*: a slug that maps back to exactly one entity or to an
+ * honest refusal, a canonical URL, robots metadata that says `noindex` until
+ * `docs/canonical/21` §42's policy and the alpha flag both allow indexing, and
+ * a share control whose URL is this page's own.
+ */
+
+export const SITE_ORIGIN_ENV = "SITE_ORIGIN";
+
+/** The public origin for canonical and Open Graph URLs. Never guessed from a request. */
+export function siteOrigin(env: Record<string, string | undefined> = process.env): string | null {
+  const value = env[SITE_ORIGIN_ENV]?.trim();
+  return value ? value.replace(/\/+$/u, "") : null;
+}
+
+export type PageAnswer =
+  | { readonly kind: "INVALID_SLUG" }
+  | { readonly kind: "UNKNOWN"; readonly slug: string }
+  | { readonly kind: "COLLISION"; readonly displays: readonly string[] }
+  | { readonly kind: "UNAVAILABLE" }
+  | { readonly kind: "RESULT"; readonly response: SurnameResultResponse; readonly display: string };
+
+/**
+ * Resolves the slug and reads the projection. Every failure is a typed answer;
+ * nothing from a caught error reaches the page (canonical/16 §78).
+ */
+export async function answerSlug(slug: string, referrerPath: string | null): Promise<PageAnswer> {
+  const log = createLogger({ service: "web", base: { route: "/pl/nazwisko/[slug]" } });
+  const startedAt = Date.now();
+  let db: ReturnType<typeof createDb> | null = null;
+  try {
+    db = createDb(createPool(loadDbConfig()));
+    const resolved = await resolveSlug(db, slug);
+    if (resolved.kind === "INVALID") return { kind: "INVALID_SLUG" };
+    if (resolved.kind === "COLLISION") {
+      log.warn("slug_collision", {
+        candidates: resolved.displays.length,
+        ms: Date.now() - startedAt,
+      });
+      return { kind: "COLLISION", displays: resolved.displays };
+    }
+    if (resolved.kind === "UNKNOWN") {
+      log.info("slug_unknown", { ms: Date.now() - startedAt });
+      return { kind: "UNKNOWN", slug };
+    }
+    const outcome = await querySurnameResult(db, resolved.display_name);
+    if (outcome.kind !== "OK") {
+      log.error("page_unavailable", { reason: outcome.reason, ms: Date.now() - startedAt });
+      return { kind: "UNAVAILABLE" };
+    }
+    const parsed = surnameResultResponseSchema.safeParse(outcome.response);
+    if (!parsed.success) {
+      log.error("page_contract_violation", {
+        issues: parsed.error.issues,
+        ms: Date.now() - startedAt,
+      });
+      return { kind: "UNAVAILABLE" };
+    }
+    log.info("page_rendered", {
+      route: "canonical",
+      result_status: parsed.data.status,
+      population_state: parsed.data.population?.state ?? null,
+      rarity_state: parsed.data.rarity?.state ?? null,
+      distribution_state: parsed.data.distribution?.state ?? null,
+      meaning_state: parsed.data.meaning?.state ?? null,
+      search_origin: searchOrigin(referrerPath),
+      ms: Date.now() - startedAt,
+    });
+    return { kind: "RESULT", response: parsed.data, display: resolved.display_name };
+  } catch (cause: unknown) {
+    log.error("page_failed", { cause, ms: Date.now() - startedAt });
+    return { kind: "UNAVAILABLE" };
+  } finally {
+    await db?.destroy();
+  }
+}
+
+/**
+ * Where a search came from, from the referrer's **path** only (TASK-023 §2.6).
+ * A second search from a result page is the metric the directive names; the
+ * surname in that path is never logged, only the fact that it was a result page.
+ */
+export function searchOrigin(
+  referrerPath: string | null,
+): "result_page" | "home" | "external" | "direct" {
+  if (referrerPath === null) return "direct";
+  if (/^\/(pl\/nazwisko|en\/surname)\//u.test(referrerPath)) return "result_page";
+  if (referrerPath === "/" || referrerPath.startsWith("/?")) return "home";
+  return "external";
+}
+
+/**
+ * The referrer's path when it is same-origin, else the marker `"external"`.
+ * Never the query string: a referrer from a search page carries the visitor's
+ * surname in it, and that must not reach a log (`docs/canonical/19` §85).
+ *
+ * `origin` is this deployment's own. When it is unknown the referrer is
+ * **external** — not trusted. Review on 2026-09-21 pointed out that skipping
+ * the check when `SITE_ORIGIN` is unset let any third party set the
+ * `search_origin` metric by linking in. Callers pass the request's own `Host`
+ * as a fallback so the check still works in local development.
+ */
+export function referrerPath(referer: string | null, origin: string | null): string | null {
+  if (!referer) return null;
+  try {
+    const url = new URL(referer);
+    if (origin === null || url.origin !== origin) return "external";
+    return url.pathname;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * This deployment's origin: `SITE_ORIGIN` when set, else the request's own
+ * `Host`. The header is not trustworthy for building a *canonical* URL — which
+ * is why `siteOrigin` alone does that — but it is exactly right for deciding
+ * whether a referrer came from this same site.
+ */
+export function requestOrigin(host: string | null, protocol = "https"): string | null {
+  const fromEnv = siteOrigin();
+  if (fromEnv !== null) return fromEnv;
+  if (!host) return null;
+  try {
+    return new URL(`${host.startsWith("localhost") ? "http" : protocol}://${host}`).origin;
+  } catch {
+    return null;
+  }
+}
+
+/** Title and description from the projection alone; never a fact it lacks. */
+/**
+ * The canonical path for an answer.
+ *
+ * Derived from the **resolved** surname where there is one, never echoed from
+ * the request: a differently-encoded address must still declare the one
+ * canonical URL, which is the whole point of the tag. Only an unresolved
+ * address falls back to what was asked for, and that address is `noindex`.
+ */
+export function canonicalPathFor(answer: PageAnswer, lang: Lang, slug: string): string {
+  if (answer.kind === "RESULT") {
+    const path = surnamePath(answer.display, lang);
+    if (path !== null) return path;
+  }
+  const encoded = encodeURIComponent(slug);
+  return lang === "en" ? `/en/surname/${encoded}` : `/pl/nazwisko/${encoded}`;
+}
+
+export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metadata {
+  const t = UI[lang];
+  const origin = siteOrigin();
+  const path = canonicalPathFor(answer, lang, slug);
+  const canonical = origin === null ? path : `${origin}${path}`;
+  const base: Metadata = {
+    alternates: { canonical },
+    robots: { index: false, follow: true },
+  };
+  if (answer.kind !== "RESULT" || answer.response.status !== "RESOLVED") {
+    return { ...base, title: `${t.title}` };
+  }
+  const r = answer.response;
+  const indexability = assessIndexability(r, {
+    enabled: indexingEnabled(),
+    // Nothing projects the SEO surface yet: this payload was queried on FREE,
+    // and `docs/canonical/21` §40 requires the SEO surface to be allowed too.
+    // Until a projection exists the honest answer is that it is not.
+    seoSurfaceAllowed: false,
+  });
+  const description =
+    r.population?.state === "READY"
+      ? r.population.observations
+          .map((o) => {
+            const sex = partitionLabel(o.comparability_group, lang);
+            const n = o.value.value === null ? null : formatInteger(o.value.value, lang);
+            if (n === null) return null;
+            // The date travels with the count. `ARCHITECTURE.md` §10 invariant 5
+            // applies to a search-result snippet as much as to the page: a
+            // count without its date is not a count (review, 2026-09-21).
+            const on = formatDate(o.snapshot_date, lang);
+            return lang === "pl"
+              ? `${n} osób${sex ? ` (${sex})` : ""} w rejestrze PESEL na dzień ${on}`
+              : `${n} people${sex ? ` (${sex})` : ""} in the PESEL register on ${on}`;
+          })
+          .filter((s): s is string => s !== null)
+          .join(" · ")
+      : t.heroNoCount;
+  return {
+    ...base,
+    title: `${answer.display} — ${t.title}`,
+    description,
+    robots: { index: indexability.indexability === "INDEX", follow: true },
+    openGraph: {
+      title: `${answer.display} — ${t.title}`,
+      description,
+      url: canonical,
+      type: "website",
+      locale: lang === "pl" ? "pl_PL" : "en_GB",
+    },
+  };
+}
+
+export function CanonicalSurnamePage({
+  answer,
+  lang,
+  slug,
+  intent,
+  origin,
+}: {
+  answer: PageAnswer;
+  lang: Lang;
+  slug: string;
+  intent: Intent;
+  /**
+   * The absolute origin to build the share URL from — `SITE_ORIGIN`, else the
+   * request's own `Host`. `null` withholds the share control, because a
+   * relative path in someone's clipboard is not a link (review, 2026-09-21).
+   */
+  origin: string | null;
+}) {
+  const t = UI[lang];
+  // What the reader shares is this page's canonical address, not the one they
+  // happened to type (review, 2026-09-21).
+  const path = canonicalPathFor(answer, lang, slug);
+  const shareUrl = origin === null ? null : `${origin}${path}`;
+  const otherLang: Lang = lang === "pl" ? "en" : "pl";
+  const otherPath =
+    (answer.kind === "RESULT" ? surnamePath(answer.display, otherLang) : null) ??
+    (otherLang === "en" ? "/?lang=en" : "/");
+
+  return (
+    <>
+      <main lang={htmlLang(lang)}>
+        <div className="masthead">
+          <h1>
+            <a href={lang === "en" ? "/?lang=en" : "/"}>{t.title}</a>
+          </h1>
+          <a href={otherPath}>{t.langSwitch}</a>
+        </div>
+        <SearchForm lang={lang} query={answer.kind === "RESULT" ? answer.display : ""} />
+        {answer.kind === "INVALID_SLUG" || answer.kind === "UNKNOWN" ? (
+          <section>
+            <h3>{t.unresolvedHeading}</h3>
+            <p className="absent">{t.slugUnknownBody}</p>
+          </section>
+        ) : answer.kind === "COLLISION" ? (
+          <section>
+            <h3>{t.ambiguousHeading}</h3>
+            <p className="absent">{t.slugCollisionBody}</p>
+            <ul className="suggestions">
+              {answer.displays.map((d) => (
+                <li key={d}>{d}</li>
+              ))}
+            </ul>
+          </section>
+        ) : answer.kind === "UNAVAILABLE" ? (
+          <section>
+            <h3>{t.unavailableHeading}</h3>
+            <p className="absent">{t.unavailableBody}</p>
+          </section>
+        ) : (
+          <>
+            <Result response={answer.response} lang={lang} intent={intent} />
+            {shareUrl === null ? null : (
+              <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
+            )}
+            <p className="again">
+              <a href="#surname">{t.searchAnother}</a>
+            </p>
+          </>
+        )}
+      </main>
+      <footer lang={htmlLang(lang)}>{t.footer}</footer>
+    </>
+  );
+}
+
+export { parseIntent };

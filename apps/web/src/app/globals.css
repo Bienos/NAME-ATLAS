@@ -117,6 +117,7 @@ a {
 
 .search button {
   flex: 0 0 auto;
+  min-height: 44px;
   padding: 0.7rem 1.1rem;
   font-size: 1rem;
   color: var(--paper);
@@ -243,7 +244,8 @@ th:nth-child(3) {
 
 .suggestions a {
   display: inline-block;
-  padding: 0.5rem 0.8rem;
+  min-height: 44px;
+  padding: 0.7rem 0.8rem;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
   background: var(--card);
@@ -272,7 +274,386 @@ footer {
   margin: 0 0 0.5rem;
 }
 .caveat {
-  color: var(--soft);
+  color: var(--ink-soft);
   font-size: 0.86rem;
   margin: 0 0 0.75rem;
+}
+
+/* --- snapshot (TASK-023) ------------------------------------------------ */
+
+.snapshot {
+  margin: 0 0 1.5rem;
+  padding: 1.1rem 1.1rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--accent);
+  border-radius: var(--radius);
+}
+
+.eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.snapshot .surname {
+  margin: 0 0 0.9rem;
+  font-size: clamp(1.7rem, 8vw, 2.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin: 0 0 0.75rem;
+}
+
+.hero-figure {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hero-number {
+  font-size: clamp(1.9rem, 9vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-label {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+.hero-line {
+  margin: 0 0 0.35rem;
+}
+
+.tally {
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+
+.hero-actions {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* --- claim unit (TASK-023) ---------------------------------------------- */
+
+.claim {
+  margin: 0 0 1.1rem;
+  padding: 0 0 1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.claim:last-of-type {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.claim-statement {
+  margin: 0 0 0.45rem;
+  font-size: 1.05rem;
+}
+
+.claim-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  align-items: baseline;
+  margin: 0 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+
+/* The word is the signal; the tint only helps scanning. Never colour alone. */
+.assessment {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--paper);
+  font-weight: 600;
+}
+
+.assessment-verified,
+.assessment-likely {
+  border-color: var(--accent);
+}
+
+.assessment-conflicting,
+.assessment-insufficient_data {
+  border-color: var(--warn-rule);
+  background: var(--warn-bg);
+  color: var(--warn-ink);
+}
+
+.claim-kind::before,
+.claim-scope::before {
+  content: "·";
+  margin-right: 0.6rem;
+}
+
+.meaning-facts {
+  margin: 0 0 0.6rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.15rem 0.8rem;
+  font-size: 0.92rem;
+}
+
+.meaning-facts dt {
+  color: var(--ink-soft);
+}
+
+.meaning-facts dd {
+  margin: 0;
+}
+
+/* --- evidence panel (TASK-023) ------------------------------------------ */
+
+.evidence {
+  margin: 0.4rem 0 0;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.evidence > summary {
+  cursor: pointer;
+  /* A tap target, so it is sized like one (directive §49). */
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.92rem;
+  color: var(--accent);
+  list-style-position: inside;
+}
+
+.evidence > summary::after {
+  content: " →";
+}
+
+.evidence[open] > summary::after {
+  content: " ↓";
+}
+
+.evidence > summary:focus-visible,
+.share button:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.evidence-list {
+  margin: 0;
+  padding: 0.5rem 0.8rem 0.8rem;
+  display: grid;
+  grid-template-columns: minmax(7rem, max-content) 1fr;
+  gap: 0.3rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+.evidence-list dt {
+  color: var(--ink-soft);
+}
+
+.evidence-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.evidence-list ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.evidence-list code {
+  font-size: 0.85em;
+}
+
+@media (max-width: 360px) {
+  .evidence-list,
+  .meaning-facts {
+    grid-template-columns: 1fr;
+    gap: 0.1rem 0;
+  }
+  .evidence-list dd,
+  .meaning-facts dd {
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* --- sources, share, second search (TASK-023/024) ------------------------ */
+
+.sources {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.92rem;
+}
+
+.sources li {
+  margin: 0.3rem 0;
+}
+
+.source-kind {
+  color: var(--ink-soft);
+}
+
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  margin: 0 0 1rem;
+}
+
+.share button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  color: var(--paper);
+  background: var(--accent);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.share-url {
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.share-status {
+  flex-basis: 100%;
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.again {
+  margin: 0 0 1.5rem;
+}
+
+.again a {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.masthead h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* --- comparison (TASK-025) ---------------------------------------------- */
+
+.compare-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.4rem;
+  font-size: clamp(1.4rem, 6vw, 2.1rem);
+}
+
+.versus {
+  color: var(--ink-soft);
+  font-size: 0.6em;
+  font-weight: 400;
+}
+
+.compare-row {
+  margin: 0 0 1.1rem;
+}
+
+.compare-row:last-child {
+  margin-bottom: 0;
+}
+
+.compare-group {
+  margin: 0 0 0.3rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.again a + a {
+  margin-left: 0.5rem;
+}
+
+/* --- narrow viewports (TASK-023) ---------------------------------------- */
+
+/*
+ * A wide table scrolls inside its own box rather than widening the document.
+ * Checked at a true 320px viewport (a 320px-wide iframe, because headless
+ * Chromium's own minimum window width is 500px and screenshotting at
+ * `--window-size=320` renders at 500 and crops, which looks exactly like an
+ * overflow bug and is not one): the voivodeship names wrap and nothing
+ * overflows. This keeps that true for a longer name.
+ */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.table-scroll th[scope="row"] {
+  overflow-wrap: anywhere;
+}
+
+.claim-statement,
+.gloss,
+.absent,
+p {
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 400px) {
+  body {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  section,
+  .snapshot {
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+  .search {
+    flex-wrap: wrap;
+  }
+  .search input {
+    flex: 1 1 100%;
+  }
+  .search button {
+    flex: 1 1 auto;
+  }
 }

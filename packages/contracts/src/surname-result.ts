@@ -24,7 +24,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.4";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.5";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -88,6 +88,13 @@ export const citationSchema = z.object({
   url: z.string().min(1).nullable(),
   attribution: z.string().min(1).nullable(),
   terms: z.string().min(1).nullable(),
+  /**
+   * When Name Atlas retrieved the record (ISO 8601). Added in 1.5 (TASK-023).
+   * Distinct from `publication_date` and from the observation's own
+   * `snapshot_date`: three dates, three meanings, never inferred from one
+   * another (directive §37).
+   */
+  retrieved_at: z.string().min(1).nullable(),
 });
 
 /** `docs/canonical/12` §6.3/§6.4, projected per surface. */
@@ -359,6 +366,8 @@ export const meaningSectionSchema = z
      */
     interpretations: z.array(meaningInterpretationSchema),
     confidence: meaningConfidenceSchema.nullable(),
+    /** `assessment_method@assessment_version`. Added in 1.5; present exactly when AVAILABLE. */
+    methodology_code: z.string().min(1).nullable(),
     reason_code: z.string().min(1).nullable(),
     surface: surfaceEligibilitySchema,
   })
@@ -369,6 +378,9 @@ export const meaningSectionSchema = z
   )
   .refine((s) => (s.state === "AVAILABLE") === (s.confidence !== null), {
     message: "confidence is present exactly when state is AVAILABLE",
+  })
+  .refine((s) => (s.state === "AVAILABLE") === (s.methodology_code !== null), {
+    message: "methodology_code is present exactly when state is AVAILABLE",
   })
   .refine((s) => (s.state === "AVAILABLE") === (s.reason_code === null), {
     message: "a reason code is present exactly when state is not AVAILABLE",

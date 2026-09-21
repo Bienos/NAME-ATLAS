@@ -13,7 +13,9 @@
     "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
     "@name-atlas/logging": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
     "@name-atlas/truth": "workspace:*",
+    "kysely": "0.29.6",
     "next": "16.3.5",
     "react": "19.3.0",
     "react-dom": "19.3.0"

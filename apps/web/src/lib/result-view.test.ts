@@ -23,6 +23,7 @@ const CITATION = {
   url: "https://api.dane.gov.pl/resources/1148808/csv",
   attribution: null,
   terms: "CC0 1.0",
+  retrieved_at: "2026-09-18T17:40:00Z",
 };
 const CONFIDENCE = { status: "VERIFIED", methodology_code: "rule@1" };
 const SURFACE = { surface: "FREE", decision: "ALLOWED", reason_code: "RIGHTS_PERMIT_FREE_SURFACE" };
@@ -65,7 +66,7 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.4",
+  schema_version: "1.5",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -131,6 +132,7 @@ const RESOLVED: unknown = {
     state: "NO_SOURCED_MEANING",
     interpretations: [],
     confidence: null,
+    methodology_code: null,
     reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     surface: SURFACE,
   },
@@ -174,7 +176,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.4",
+  schema_version: "1.5",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -200,13 +202,14 @@ const RIGHTS_BLOCKED: unknown = {
     state: "RIGHTS_BLOCKED",
     interpretations: [],
     confidence: null,
+    methodology_code: null,
     reason_code: "COMMERCIAL_USE_UNKNOWN",
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.4",
+  schema_version: "1.5",
   status: "UNRESOLVED",
   surname: null,
   population: null,
@@ -253,7 +256,7 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.4",
+  schema_version: "1.5",
   status: "AMBIGUOUS",
   surname: null,
   population: null,
@@ -456,8 +459,13 @@ describe("AC-8: every state has distinct words in both languages", () => {
 
 describe("AC-9: no score, probability or percentage of confidence", () => {
   it("renders confidence as a status word only", () => {
-    const body = text(render(RESOLVED, "en"));
-    expect(body).toContain("Confidence: VERIFIED");
+    const markup = render(RESOLVED, "en");
+    const body = text(markup);
+    // Since TASK-023 the reader sees the word and the canonical status travels
+    // as a machine-readable attribute. Both are asserted; a number still is not.
+    expect(body).toContain("Verified");
+    expect(markup).toContain('data-assessment="VERIFIED"');
+    expect(body).toContain("Confidence");
     expect(body).not.toMatch(/confidence[^.]{0,20}\d/iu);
     for (const forbidden of [
       "probability",
@@ -513,6 +521,7 @@ const MEANING_AVAILABLE: unknown = {
       },
     ],
     confidence: "POSSIBLE",
+    methodology_code: "onomastic_agreement_rule@onomastic_confidence@1",
     reason_code: null,
     surface: SURFACE,
   },
@@ -523,6 +532,7 @@ const MEANING_CONFLICTING: unknown = {
   meaning: {
     ...((MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>),
     confidence: "CONFLICTING",
+    methodology_code: "onomastic_agreement_rule@onomastic_confidence@1",
     interpretations: [
       ...(((MEANING_AVAILABLE as Record<string, unknown>)["meaning"] as Record<string, unknown>)[
         "interpretations"
@@ -609,11 +619,13 @@ describe("AC-10: an available meaning renders its work and its caveat", () => {
   it("renders the confidence as a word, with no score or percentage", () => {
     // Scoped to the meaning section: the distribution section legitimately
     // renders percentages, and they are shares, not confidence.
-    const full = text(render(MEANING_CONFLICTING, "en"));
+    const markup = render(MEANING_CONFLICTING, "en");
+    const full = text(markup);
     const section = full.slice(full.indexOf("Meaning"));
     expect(section).not.toMatch(/\d+\s*%/u);
     expect(section).not.toMatch(/0\.\d+/u);
-    expect(section).toContain("CONFLICTING");
+    expect(section).toContain("Sources disagree");
+    expect(markup).toContain('data-assessment="CONFLICTING"');
   });
 
   it("omits a root the work did not propose rather than writing one", () => {
@@ -637,5 +649,198 @@ describe("AC-10: an available meaning renders its work and its caveat", () => {
     const body = text(render(withoutRoot, "en"));
     expect(body).not.toContain("Root");
     expect(body).toContain("PLACEHOLDER GLOSS — first reading");
+  });
+});
+
+/**
+ * TASK-023 — the claim unit, the evidence panel, the snapshot, intent order
+ * and the second-search control, asserted against markup.
+ */
+describe("TASK-023 AC-1/AC-2: every figure is a claim with inline evidence", () => {
+  it("renders each observation, rarity entry and distribution entry as a claim", () => {
+    const markup = render(RESOLVED, "pl");
+    // 2 population + 2 rarity + 1 distribution entries in the fixture.
+    expect(markup.match(/class="claim"/gu)?.length).toBe(5);
+    expect(markup.match(/<details class="evidence">/gu)?.length).toBe(5);
+  });
+
+  it("shows the assessment as a word, the source kind and the scope line", () => {
+    const body = text(render(RESOLVED, "pl"));
+    expect(body).toContain("Zweryfikowane");
+    expect(body).toContain("Dane urzędowe");
+    expect(body).toContain("Polska · Ministerstwo Cyfryzacji · 20 stycznia 2026 r.");
+    expect(body).not.toMatch(/VERIFIED/u);
+  });
+
+  it("names source, provider, data date, retrieved date and method in the evidence", () => {
+    const body = text(render(RESOLVED, "en"));
+    expect(body).toContain("Nazwiska występujące w rejestrze PESEL");
+    expect(body).toContain("Retrieved");
+    expect(body).toContain("18 September 2026");
+    expect(body).toContain("Method");
+    expect(body).toContain("rule@1");
+    expect(body).toContain("Limitations");
+  });
+
+  it("puts no confidence number anywhere and no event handler attributes", () => {
+    const markup = render(RESOLVED, "en");
+    expect(markup).not.toMatch(/onclick|onchange|onsubmit/iu);
+    expect(text(markup)).not.toMatch(/\d+\s*% (confidence|pewności)/iu);
+  });
+});
+
+describe("TASK-023 AC-3/AC-4: the snapshot", () => {
+  it("shows both counts as hero figures and never their sum", () => {
+    const markup = render(RESOLVED, "pl");
+    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    expect(snapshot).toContain("98\u00A0387");
+    expect(snapshot).toContain("99\u00A0738");
+    // Their sum, in either separator. It must appear nowhere.
+    expect(snapshot).not.toContain("198\u00A0125");
+    expect(snapshot).not.toContain("198125");
+    expect(snapshot).toContain("mężczyźni");
+    expect(snapshot).toContain("kobiety");
+  });
+
+  it("shows 1 in X only when rarity is READY", () => {
+    const markup = render(RESOLVED, "en");
+    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    expect(snapshot).toContain("about 1 in 215");
+    const noRarity = {
+      ...(RESOLVED as Record<string, unknown>),
+      rarity: {
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_COMPLETE_UNIVERSE",
+        surface: SURFACE,
+      },
+    };
+    const m2 = render(noRarity, "en");
+    const s2 = m2.slice(m2.indexOf('class="snapshot"'), m2.indexOf("</header>"));
+    expect(s2).not.toContain("1 in");
+  });
+
+  it("names no strongest voivodeship when the top two are tied", () => {
+    // The fixture's WIELKOPOLSKIE and ŚLĄSKIE both hold 16,077. `regions` is
+    // ordered by count, but a tie is broken by whatever the sort did, so naming
+    // the first would present a sort artefact as a fact.
+    const ready = render(RESOLVED, "en");
+    const s1 = ready.slice(ready.indexOf('class="snapshot"'), ready.indexOf("</header>"));
+    expect(s1).not.toContain("Most registered in");
+  });
+
+  it("names the strongest voivodeship, with its date, when one is clearly ahead", () => {
+    const clear = JSON.parse(JSON.stringify(RESOLVED)) as Record<string, unknown>;
+    const distribution = clear["distribution"] as {
+      entries: { regions: { count: number; share_of_covered: number }[]; covered_count: number }[];
+    };
+    for (const entry of distribution.entries) {
+      // Break the tie downward, and keep the payload legal: covered_count is
+      // the sum of its own regions and every share is over it.
+      entry.regions[1]!.count = 9_000;
+      entry.covered_count = entry.regions.reduce((sum, r) => sum + r.count, 0);
+      for (const region of entry.regions) {
+        region.share_of_covered = Number((region.count / entry.covered_count).toFixed(9));
+      }
+    }
+    const markup = render(clear, "en");
+    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    expect(snapshot).toContain("Most registered in");
+    expect(snapshot).toContain("WIELKOPOLSKIE");
+    // No share without its date (ARCHITECTURE.md §10 invariant 5).
+    expect(snapshot).toContain("20 January 2026");
+  });
+
+  it("names no strongest voivodeship when coverage is below the threshold", () => {
+    const low = render(LOW_COVERAGE, "en");
+    const s2 = low.slice(low.indexOf('class="snapshot"'), low.indexOf("</header>"));
+    expect(s2).not.toContain("Most registered in");
+  });
+
+  it("stacks the two rarity figures and says they are not comparable", () => {
+    // Each 1-in-X is computed within its own resource version's published
+    // universe, and the two universes are different sizes.
+    const markup = render(RESOLVED, "en");
+    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    expect(snapshot).toContain("about 1 in 215");
+    expect(snapshot).toContain("about 1 in 216");
+    // Never joined into one line that invites the comparison.
+    expect(snapshot).not.toMatch(/1 in 215[^<]*·[^<]*1 in 216/u);
+    expect(snapshot).toContain("not compared with each other");
+  });
+
+  it("tallies claims by their stored assessment", () => {
+    const body = text(render(RESOLVED, "en"));
+    // "statements", not "facts": a rarity figure is arithmetic over the count
+    // above it, and calling the two independent facts would overstate it.
+    expect(body).toMatch(/\d verified statements/u);
+  });
+
+  it("still renders for a surname with no count, stating the absence", () => {
+    const absent = {
+      ...(RESOLVED as Record<string, unknown>),
+      population: {
+        state: "UNAVAILABLE",
+        observations: [],
+        reason_code: "NO_APPLICABLE_EVIDENCE",
+        surface: SURFACE,
+      },
+      rarity: {
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_COMPLETE_UNIVERSE",
+        surface: SURFACE,
+      },
+      distribution: {
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_COMPLETE_REGIONAL_UNIVERSE",
+        surface: SURFACE,
+      },
+    };
+    const body = text(render(absent, "en"));
+    expect(body).toContain("This dataset publishes no count for this surname");
+    expect(body).not.toMatch(/\b0 people\b/u);
+  });
+});
+
+describe("TASK-023 AC-5: intent changes order only", () => {
+  it("defaults to count, rarity, geography, meaning", () => {
+    const m = render(RESOLVED, "en");
+    const order = ['id="today-count"', 'id="rarity"', 'id="where"', 'id="meaning"'].map((id) =>
+      m.indexOf(id),
+    );
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+  });
+
+  it("moves rarity first for ?intent=rarity, and the map first for ?intent=map", () => {
+    const parsed = surnameResultResponseSchema.parse(RESOLVED) as SurnameResultResponse;
+    const rarityFirst = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "rarity" }),
+    );
+    expect(rarityFirst.indexOf('id="rarity"')).toBeLessThan(
+      rarityFirst.indexOf('id="today-count"'),
+    );
+    const mapFirst = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "map" }),
+    );
+    expect(mapFirst.indexOf('id="where"')).toBeLessThan(mapFirst.indexOf('id="today-count"'));
+    // The snapshot is always first.
+    expect(mapFirst.indexOf('class="snapshot"')).toBeLessThan(mapFirst.indexOf('id="where"'));
+  });
+});
+
+describe("TASK-023: sources section and anchors", () => {
+  it("lists every distinct citation once under #sources", () => {
+    const m = render(RESOLVED, "en");
+    expect(m).toContain('id="sources"');
+    const sources = m.slice(m.indexOf('id="sources"'));
+    expect(sources.match(/<li>/gu)?.length).toBe(1);
+  });
+
+  it("carries the locale-neutral anchors", () => {
+    const m = render(RESOLVED, "pl");
+    for (const id of ['id="today"', 'id="where"', 'id="meaning"', 'id="sources"'])
+      expect(m).toContain(id);
   });
 });

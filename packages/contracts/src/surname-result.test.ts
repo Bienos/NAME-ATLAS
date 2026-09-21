@@ -28,6 +28,7 @@ const VALID_CITATION = {
   url: "https://api.dane.gov.pl/resources/1148808/csv",
   attribution: null,
   terms: "CC0 1.0",
+  retrieved_at: "2026-09-18T17:40:00Z",
 };
 
 /** An empty suggestions section, which every non-RESOLVED response carries. */

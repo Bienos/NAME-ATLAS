@@ -1,6 +1,6 @@
 # TASK-006 — Surname Result Read API / Query Contract
 
-- **Status:** NOT STARTED — specification only, and **no longer blocked**. TASK-005 is implemented and verified (migration `0004`, `packages/truth`), and D-010 is resolved by **ADR-0004**. Every precondition is met; §15 now holds implementer choices only.
+- **Status:** IMPLEMENTED AND VERIFIED. Stale `NOT STARTED` corrected 2026-09-21: `packages/truth/src/read.ts` and `query.ts` are the read path, `apps/web/src/app/api/v1/surname-results/route.ts` is the route, and both are exercised by `tests/integration/src/surname-result-api.test.ts`. §15 U-2's deferred `canonical_slug` is closed by **ADR-0009**, which adopts `docs/canonical/21` §21–§23's Unicode-preserving slug; the contract still omits the fields, and the slug is computed on the server.
 - **Milestone:** M2, first slice. `PLAN.md` bundles "shared API contracts" into M2 alongside `pg_trgm` candidate generation, `CURRENT_RANK`, `RARITY_CONTEXT` and the free result UI. This task takes **only** the contract-and-read-path part, for one fact. Everything else in M2 stays out (§8).
 - **Depends on:** TASK-003 (exact resolution), TASK-004 (PESEL ingestion) and TASK-005 (`CURRENT_POPULATION` truth chain) — all three implemented and verified.
 - **Blocks:** the free result UI, and every later chapter of the surname profile.

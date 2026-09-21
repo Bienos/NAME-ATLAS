@@ -131,6 +131,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     // next step down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0017_surname_slug_lookup_index",
       "0016_citations_per_source_record",
       "0015_surname_meaning_scope",
       "0014_surname_meaning",

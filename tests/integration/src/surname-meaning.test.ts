@@ -324,7 +324,7 @@ describe("SURNAME_MEANING against a real PostgreSQL", () => {
       const outcome = await querySurnameResult(db(), "KOWALCZYK", { surface: "FREE" });
       if (outcome.kind !== "OK") throw new Error("expected OK");
       const parsed = surnameResultResponseSchema.parse(outcome.response);
-      expect(parsed.schema_version).toBe("1.4");
+      expect(parsed.schema_version).toBe("1.5");
       expect(parsed.meaning?.state).toBe("AVAILABLE");
       expect(parsed.meaning?.confidence).toBe("POSSIBLE");
 
