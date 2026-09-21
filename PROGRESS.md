@@ -3589,3 +3589,110 @@ tests `INPUT_TOO_SHORT` on `NOWK`, which is not a surname, and `EXACT_MATCH_EXIS
   and have not had one. This is the only gap in the corpus that a session cannot close by itself.
 - **Layers 9 and 12** (frontend state, product truthfulness) are covered by `apps/web/src/lib/*.test.ts`,
   including the honesty guard. Duplicating them here would give one truth two owners (`AGENTS.md` §1).
+
+## Live end-to-end verification, and two findings (2026-09-21)
+
+Asked whether the project is ready, I checked rather than answered from memory. With a container
+runtime now available (see TASK-026 above), a real instance was stood up from nothing: a pinned
+PostGIS container, all 17 migrations, both real national PESEL fixtures imported through the real
+CLI, claims derived through the real derivation service, and the built Next app served against it.
+
+### Routes, all served
+
+| Route | Status | Time |
+|---|---|---|
+| `/` | 200 | 11 ms |
+| `/?surname=NOWAK` | 307 → `/pl/nazwisko/nowak` | 41 ms |
+| `/pl/nazwisko/nowak` | 200 | 41 ms |
+| `/en/surname/nowak` | 200 | 43 ms |
+| `/pl/nazwisko/qzyrfblat` (absent) | 200 | 20 ms |
+| `/pl/porownaj?a=nowak&b=kowalski` | 200 | 38 ms |
+| `/api/v1/surname-results?surname=NOWAK` | 200 | 24 ms |
+| `/pl/nazwisko/nowak/opengraph-image` | 200 | 64 ms |
+
+Import: 22 male rows + 23 female rows → 38 surnames, 45 snapshots, 0 quarantined, 0 mixed-script.
+The live API payload parses against `surnameResultResponseSchema` (schema 1.5) and contains no
+`similarity`, `confidence_score`, `probability` or `likelihood` field.
+
+### Every refusal held on real data
+
+The fixtures are lawful **excerpts** — 22 of 408,182 male rows — and the system noticed:
+
+- **Rank and rarity refuse.** `CONTENT_HASH_MISMATCH`, rows expected 408,182, rows persisted 22:
+  "no resource version backing this surname is a complete universe, so no rank can be derived; a
+  rank over a partial import would be false even where the arithmetic is right." Non-zero exit by
+  design. This is `ARCHITECTURE.md` §10 invariant 4 doing its job against a real partial import,
+  not against a fixture built to trigger it.
+- **Geography refuses** — no complete regional universe was imported, so no distribution is shown.
+- **Meaning refuses** — "nie mamy udokumentowanego znaczenia … a znaczenia nie zgadujemy."
+- **An absent surname** says there is no surname at that address, and nothing else.
+- **Comparison** compares the male partition (98 387 vs 66 589, with `Stan na: 20 stycznia 2026 r.`)
+  and refuses the female one, because `KOWALSKI` has no female claim — the feminine form is a
+  different entity. Rarity refuses on both sides. The disclaimer that a shared surname means no
+  shared family, roots or nationality is rendered **first**.
+- `robots: noindex, follow`, canonical URL correct, all six `docs/canonical/21` §34 anchors present,
+  `<main lang="en-GB">` and `<footer lang="en-GB">` on the English page.
+- **`KOWALSKI` read `population: UNAVAILABLE` until it was derived.** Correct, and worth recording:
+  the row was imported, but the page reads *claims*, never raw snapshots (§10 invariant 10). The
+  read path does not quietly fall back to the evidence when a claim is missing.
+
+### Finding 1 — CI never ran the golden corpus
+
+`docs/canonical/17` §13 and §21 say "Any golden-case occurrence blocks release". That is only true
+where releases are gated, and `.github/workflows/ci.yml` ran typecheck, lint, format, unit tests,
+migrations, type-drift, integration and build — but not `pnpm test:golden`. The corpus committed in
+`ee0db21` would have guarded nothing in CI. A step was added after the integration tests.
+
+### Finding 2 — the honesty guard passed for the wrong reason
+
+`apps/web/src/lib/result-view.test.ts` forbids the substrings `lives in`, `comes from`, `originat`,
+`is found in`, `mieszka`, `pochodzi` and `urodzon` anywhere in the rendered result view. A live page
+contains `pochodzą` twice, and the guard had never seen either:
+
+1. `citation.attribution` — "Dane pochodzą z rejestru PESEL, Ministerstwo Cyfryzacji, dane.gov.pl
+   (CC0 1.0)". The fixture set `attribution: null`, so the guard's input was unrealistic.
+2. `UI.footer` — "Każda liczba pochodzi z rejestru PESEL …". Rendered outside `Result`, so out of
+   this guard's scope by construction.
+
+Both are statements about where the **data** came from. Neither says anything about a person's
+origin, so the live pages are correct and nothing was wrong with the product. The defect was in the
+test: the trap is that making the fixture realistic turns the guard red on licence-mandated text,
+and the obvious way back to green is to delete `pochodzi` from the list — blinding a P0 guard to
+`nazwisko pochodzi z Mazowsza`, the one phrasing that matters most.
+
+Fixed by making the fixture carry the real attribution and excluding exactly one region from the
+guard — the verbatim rights-holder line, which ADR-0007 §5 requires to be rendered unaltered and
+which is therefore not ours to make comply. To ensure that exclusion cannot smuggle anything in, a
+new test asserts the attribution is rendered *byte-for-byte as supplied* and that it is the only
+reason any forbidden substring appears. Strictly more coverage over strictly more realistic input.
+
+`UI.footer` was left alone: it is fixed, human-reviewed UI copy stating a truthfulness promise, not
+prose composed from data, and it is outside the claim renderer the guard is scoped to.
+
+### Verification after both fixes
+
+```
+pnpm typecheck        passed (14 projects)
+pnpm lint             passed
+pnpm format:check     passed
+pnpm test             passed, 585 unit tests
+pnpm build            passed
+pnpm test:golden      passed, 364 tests, exit 0
+pnpm test:integration passed, 250 tests, exit 0
+```
+
+585 rather than 584: the new attribution-verbatim test.
+
+### So is it ready?
+
+**The consumer loop is built, verified end to end, and honest under every state it was shown.** What
+stands between this and a public launch is not code quality:
+
+| | |
+|---|---|
+| Deployment | Nothing exists. No `ops/`, no Dockerfile, no compose file, no hosting provider, no domain. `docs/canonical/23` §48's INF-001 is unstarted. |
+| Data | Only lawful excerpts are in the repository. A launch needs the full register imported, which is what makes rank, rarity and geography answer instead of refusing. |
+| Indexing | `SEO_INDEXING_ENABLED` unset, so every page is `noindex` by design. Turning it on needs D-019 decided, a slug table, a sitemap and a surname cohort for manual QA. |
+| Legal review | Ten rights golden cases ask for a `LEGAL` reviewer and carry `reviewed_at: null`. D-004 (resource-level licence inheritance) is recorded as an unverified assumption. |
+| Staff access | The admin inspector is gated off because no staff authentication exists. |
+| Blocked by environment | M3 historical discovery and any real map — egress and the absence of a lawful geometry source. |

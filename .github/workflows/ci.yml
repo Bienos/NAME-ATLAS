@@ -71,5 +71,11 @@ jobs:
       - name: Integration tests (Testcontainers)
         run: pnpm test:integration
 
+      # docs/canonical/17 §13 and §21: "Any golden-case occurrence blocks
+      # release." That is only true if the corpus runs where releases are
+      # gated, so it runs here and its failure fails the build.
+      - name: Golden test corpus (Testcontainers)
+        run: pnpm test:golden
+
       - name: Build
         run: pnpm build

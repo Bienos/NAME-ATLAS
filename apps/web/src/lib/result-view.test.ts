@@ -21,7 +21,10 @@ const CITATION = {
   source_type: "OFFICIAL_DATASET",
   locator: "resource:1148808",
   url: "https://api.dane.gov.pl/resources/1148808/csv",
-  attribution: null,
+  // The real line, as the rights profile stores it and as a live page renders
+  // it. It was `null` until 2026-09-21, which made the honesty guard below pass
+  // for the wrong reason — see the comment there.
+  attribution: "Dane pochodzą z rejestru PESEL, Ministerstwo Cyfryzacji, dane.gov.pl (CC0 1.0)",
   terms: "CC0 1.0",
   retrieved_at: "2026-09-18T17:40:00Z",
 };
@@ -345,22 +348,63 @@ describe("AC-4: a low-coverage warning precedes its figures", () => {
     }
   });
 
+  /**
+   * The forbidden substrings, in every string this project **authors**.
+   *
+   * One string on the page is not ours: `citation.attribution` is the rights
+   * holder's own wording, which ADR-0007 §5 requires to be rendered verbatim
+   * because it "is not ours to paraphrase". The real PESEL line is
+   * "Dane pochodzą z rejestru PESEL…" — a statement about where the *data* came
+   * from, which is exactly what an attribution is for, and which contains
+   * `pochodzą`.
+   *
+   * Until 2026-09-21 the fixture above carried `attribution: null`, so this
+   * guard passed without ever seeing that line. Making the fixture realistic is
+   * what exposed it. The trap was that the obvious way to get green again is to
+   * drop `pochodzi` from the list — which would blind a P0 honesty guard to the
+   * one phrasing that matters most, "nazwisko pochodzi z Mazowsza".
+   *
+   * So the guard keeps every substring and excludes exactly one region: the
+   * verbatim attribution. To make sure that exclusion cannot be used to smuggle
+   * anything in, the test below asserts the attribution is rendered *exactly* as
+   * supplied — it is not a place where prose can be composed.
+   */
+  const FORBIDDEN = [
+    "lives in",
+    "comes from",
+    "originat",
+    "is found in",
+    "mieszka",
+    "pochodzi",
+    "urodzon",
+  ] as const;
+
   it("never says lives in, comes from, originates, mieszka or pochodzi", () => {
-    for (const payload of [RESOLVED, LOW_COVERAGE]) {
+    for (const [name, payload] of [
+      ["RESOLVED", RESOLVED],
+      ["LOW_COVERAGE", LOW_COVERAGE],
+    ] as const) {
       for (const lang of ["pl", "en"] as const) {
-        const body = text(render(payload, lang)).toLowerCase();
-        for (const wrong of [
-          "lives in",
-          "comes from",
-          "originat",
-          "is found in",
-          "mieszka",
-          "pochodzi",
-          "urodzon",
-        ]) {
-          expect(body).not.toContain(wrong);
+        const body = text(render(payload, lang))
+          // Remove only the verbatim rights-holder line, nothing else.
+          .split(CITATION.attribution ?? "\u0000")
+          .join(" ")
+          .toLowerCase();
+        for (const wrong of FORBIDDEN) {
+          expect(body, `${name}/${lang}`).not.toContain(wrong);
         }
       }
+    }
+  });
+
+  it("renders the rights holder's attribution verbatim and composes no prose around it", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const body = text(render(RESOLVED, lang));
+      // Present, unaltered, and the only reason a forbidden substring appears.
+      expect(body).toContain(CITATION.attribution);
+      const withoutAttribution = body.split(CITATION.attribution ?? "\u0000").join(" ");
+      const leaked = FORBIDDEN.filter((w) => withoutAttribution.toLowerCase().includes(w));
+      expect(leaked).toEqual([]);
     }
   });
 

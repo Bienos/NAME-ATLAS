@@ -85,6 +85,22 @@ public API accepting `surface=INTERNAL`, the API's bare 500 with no error envelo
 | Meaning coverage | **No licensed onomastic corpus** (D-002 resolved by ADR-0008: Path B). Every surname correctly returns `NO_SOURCED_MEANING`. | The chain, the rights gate and the honest gap are built and tested. A source is an import away. |
 | Turning indexing on | Deliberate: `SEO_INDEXING_ENABLED` is unset, so every page is `noindex, follow` (ADR-0009 §5). | The policy is implemented and unit-tested; a pilot needs a surname cohort and manual QA. |
 
+## Is it ready?
+
+The consumer loop is **built and verified end to end** — a real instance was stood up this session
+from a pinned container, real fixtures and the real CLIs, and every route served with every refusal
+intact (`PROGRESS.md`, "Live end-to-end verification"). What stands between this and a public launch
+is not code quality:
+
+| | |
+|---|---|
+| **Deployment** | Nothing exists — no `ops/`, Dockerfile, compose file, host or domain. INF-001 unstarted. |
+| **Data** | Only lawful excerpts are in the repo. Rank, rarity and geography correctly *refuse* until the full register is imported. |
+| **Indexing** | `SEO_INDEXING_ENABLED` unset by design. Needs D-019, a slug table, a sitemap, a QA cohort. |
+| **Legal review** | Ten rights golden cases carry `reviewed_at: null` and want a `LEGAL` reviewer. D-004 is an unverified assumption. |
+| **Staff access** | Admin inspector gated off; no staff authentication exists. |
+| **Environment-blocked** | M3 historical discovery and any real map. |
+
 ## Next action
 
 Nothing is blocking. Two unblocked candidates, in the order I would take them:
