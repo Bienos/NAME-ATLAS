@@ -62,6 +62,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0010_places_core",
       "0011_current_distribution",
       "0012_surname_trigram_index",
+      "0013_runtime_outbox",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -105,6 +106,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "research_runs", table_type: "BASE TABLE" },
       { table_name: "resolvable_name_forms", table_type: "VIEW" },
       { table_name: "rights_profiles", table_type: "BASE TABLE" },
+      { table_name: "runtime_outbox", table_type: "BASE TABLE" },
       { table_name: "source_records", table_type: "BASE TABLE" },
       { table_name: "sources", table_type: "BASE TABLE" },
       { table_name: "spatial_ref_sys", table_type: "BASE TABLE" },

@@ -55,6 +55,8 @@ export type NameFormType = "CANONICAL" | "HISTORICAL_ATTESTED" | "LINGUISTIC_NOR
 
 export type Numeric = ColumnType<string, number | string, number | string>;
 
+export type OutboxStatus = "DELIVERED" | "FAILED" | "PENDING";
+
 export type PlaceNameType = "CURRENT" | "ENDONYM" | "EXONYM" | "HISTORICAL" | "OFFICIAL" | "OTHER" | "PARISH_FORM" | "TRANSCRIPTION";
 
 export type PlaceStatus = "ACTIVE" | "DISPUTED" | "HISTORICAL_ONLY" | "MERGED";
@@ -340,6 +342,21 @@ export interface RightsProfiles {
   valid_to: Timestamp | null;
 }
 
+export interface RuntimeOutbox {
+  attempts: Generated<number>;
+  available_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
+  delivered_at: Timestamp | null;
+  delivered_job_id: string | null;
+  idempotency_key: string;
+  job_name: string;
+  last_error: string | null;
+  outbox_event_id: string;
+  payload: Json;
+  queue_name: string;
+  status: Generated<OutboxStatus>;
+}
+
 export interface SourceRecords {
   content_hash: string;
   created_at: Generated<Timestamp>;
@@ -420,6 +437,7 @@ export interface DB {
   research_runs: ResearchRuns;
   resolvable_name_forms: ResolvableNameForms;
   rights_profiles: RightsProfiles;
+  runtime_outbox: RuntimeOutbox;
   source_records: SourceRecords;
   sources: Sources;
   spatial_ref_sys: SpatialRefSys;

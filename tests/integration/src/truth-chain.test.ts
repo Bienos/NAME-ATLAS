@@ -680,14 +680,22 @@ describe("CURRENT_POPULATION truth chain against a real PostgreSQL", () => {
       // foundation. What TASK-005 must still not do is touch it: the assertion
       // below checks the table is empty and no value carries a place, which is
       // the property that actually mattered.
+      // `runtime_outbox` left this list at TASK-020, which owns the
+      // asynchronous runtime ADR-0001 deferred to M3. What TASK-005 must still
+      // not do is use it: the assertion below checks it holds no row, which is
+      // the property that actually mattered — a synchronous derivation enqueues
+      // nothing.
       for (const forbidden of [
         "digital_assets",
         "research_module_runs",
-        "runtime_outbox",
         "surface_eligibility_assessments",
       ]) {
         expect(names).not.toContain(forbidden);
       }
+      const outbox = await sql<{ n: string }>`
+        SELECT count(*)::text AS n FROM runtime_outbox
+      `.execute(db());
+      expect(outbox.rows[0]?.n).toBe("0");
 
       const geographic = await sql<{ places: string; placed_values: string }>`
         SELECT (SELECT count(*)::text FROM places)                                  AS places,

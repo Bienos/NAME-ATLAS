@@ -131,6 +131,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     // down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0013_runtime_outbox",
       "0012_surname_trigram_index",
       "0011_current_distribution",
       "0010_places_core",

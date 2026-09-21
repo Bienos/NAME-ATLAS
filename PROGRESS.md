@@ -2901,3 +2901,105 @@ What M3 needs before it starts, and what this milestone did not build: staff aut
 (`docs/canonical/22` §6 — the inspector is gated by an environment flag, which is a lock on a door with
 no lock), and the asynchronous runtime ADR-0001 defers to M3 (Redis/Valkey, BullMQ, `ResearchRun`
 orchestration, the outbox).
+
+## TASK-020 implemented — the asynchronous runtime: Redis, BullMQ and the outbox (2026-09-21)
+
+Scope authority: `tasks/020-async-runtime.md`. ADR-0001 deferred Redis and BullMQ to M3 and recorded
+that introducing them then needs no new ADR. Work can now be scheduled by a database transaction and
+performed by a separate process, without a crash between the two losing it.
+
+### What exists now
+
+- **`0013_runtime_outbox`** — the table `docs/canonical/15` MCP 15-C asks for. Constraints keep the
+  two systems reconcilable: a `DELIVERED` row must carry the queue's job id and a timestamp, the
+  idempotency key is UNIQUE, and the index covers the pending set only.
+- **`packages/queue`** — the job contract, the Redis connection, `enqueueInTransaction`,
+  `dispatchOutbox`.
+- **`apps/worker`** — a real process at last: the outbox dispatcher and the BullMQ consumer, both
+  shutting down cleanly on a signal.
+- **`pnpm worker`** and **`pnpm enqueue:derive "<surname>"`**.
+
+### The outbox, and why the type signature carries the guarantee
+
+Creating a run in PostgreSQL and enqueueing a job in Redis are two writes to two systems. A crash
+between them leaves a run with no job, or a job pointing at state that rolled back. Neither fails
+loudly — the work simply never happens.
+
+`enqueueInTransaction` takes a **`Transaction`, not a `Kysely`**, so it cannot be called outside one.
+The guarantee is in the type rather than in a comment, and an integration test asserts the
+consequence: an intent whose transaction throws leaves no row.
+
+Delivery is therefore **at-least-once**. That is the right trade because every job is idempotent, and
+it was proven rather than asserted: enqueuing the same surname a second time left the claim count
+unchanged at 8.
+
+The dispatcher claims with `FOR UPDATE SKIP LOCKED`, so two dispatchers are safe, and publishes
+**outside** the transaction — holding a database transaction open across a network call to Redis is
+how a queue takes a database down with it.
+
+### Observed end to end, against real Redis and the real register
+
+```json
+{"event":"enqueued","service":"enqueue","correlationId":"01a0c366-7353-…","surname":"KOWALCZYK","outbox_event_id":"01a0c366-7370-…"}
+{"event":"outbox_delivered","service":"worker","outbox_event_id":"01a0c366-7370-…","job_name":"derive-surname-claims"}
+{"event":"outbox_dispatched","service":"worker","claimed":1,"delivered":1,"failed":0,"parked":0}
+{"event":"job_started","service":"worker","correlationId":"01a0c366-7353-…","job_id":"01a0c366-7370-…"}
+{"event":"chain_derived","chain":"CURRENT_POPULATION","claims":2}
+{"event":"chain_derived","chain":"CURRENT_RANK","claims":2}
+{"event":"chain_derived","chain":"RARITY_CONTEXT","claims":2}
+{"event":"chain_derived","chain":"CURRENT_DISTRIBUTION","claims":2}
+{"event":"job_completed","claims":8}
+```
+
+**The job ran under the producer's correlation ID.** `01a0c366-7353-…` appears on the enqueue line and
+on every line the worker wrote, in a different process, so a request and the work it caused share one
+trace. That is what TASK-019's logger was for.
+
+Afterwards: `KOWALCZYK` holds 2 active claims of each of the four types, and the outbox row is
+`DELIVERED` with a job id and zero attempts.
+
+### Failure paths, each tested rather than hoped for
+
+| Case | Behaviour |
+|---|---|
+| Caller's transaction rolls back | No outbox row at all |
+| Payload fails its schema | Refused before it can commit |
+| Same idempotency key twice | One row; the second enqueue reports success |
+| Publish throws | Backs off in the row, retries when due |
+| Publish keeps throwing | Parked `FAILED` after 5 attempts, never deleted |
+| Unknown job name | Parked immediately — a deployment mismatch is not a retry |
+| `DELIVERED` with no job id | Refused by a database constraint |
+
+### Deliberately not built
+
+`ResearchPlan` and `ResearchModuleRun` (MCP 15-A and 15-B): nothing plans modules yet. The wider
+`ResearchRunStatus` enum of §7: no consumer for the extra states. `ProjectionBuild`: MCP 15-D defers
+it. Temporal, scheduled jobs, dead-letter surfacing in the admin console. And seven of the eight run
+types in §6, because they describe work no module performs — a queue full of unimplemented job names is
+scaffolding, not capability.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 14 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 412 unit tests (queue 9 new)
+pnpm test:integration         → passed, 218 tests across 16 files, exit 0 (outbox 11 new)
+pnpm build                    → passed
+end to end                    → redis-server + pnpm worker + pnpm enqueue:derive "KOWALCZYK"
+                                 → 8 claims, outbox DELIVERED, one correlation ID across processes
+re-enqueue the same surname   → claims still 8, so at-least-once delivery is safe
+```
+
+Two existing table-list assertions were updated because a legitimate new table exists:
+`extensions.test.ts`'s exhaustive list, and `truth-chain.test.ts`'s exclusion list — where
+`runtime_outbox` was replaced by the stronger assertion that TASK-005's synchronous derivation leaves
+it **empty**, which is the property that actually mattered.
+
+### Where this leaves M3
+
+The runtime M3 needs exists and runs. What M3 still needs before historical work starts: **D-003**
+(Polona rights per surface) and **D-002** (onomastics rights), both still open and both decisions for
+the project owner; the Polona connector itself; and staff authentication if the admin console is ever
+to be reachable (`docs/canonical/22` §6 — the inspector is still gated by an environment flag).

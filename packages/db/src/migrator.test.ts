@@ -21,6 +21,7 @@ describe("MIGRATIONS_DIR", () => {
       "0010_places_core.ts", // TASK-011 / D-004
       "0011_current_distribution.ts", // TASK-012
       "0012_surname_trigram_index.ts", // TASK-015 / ADR-0006
+      "0013_runtime_outbox.ts", // TASK-020 / canonical 15 MCP 15-C
     ]);
   });
 });
