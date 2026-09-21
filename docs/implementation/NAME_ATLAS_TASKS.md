@@ -35,6 +35,7 @@ the run recorded in `PROGRESS.md`. Code written but not verified is `IMPLEMENTED
 | **024** | Canonical route, slug, indexability, share, OG image, events | **DONE** | ADR-0009 |
 | **025** | Surname comparison | **DONE** | `noindex`; strict comparability |
 | **026** | Golden test corpus | **DONE** | Resolution + rights, EXPECTED and FORBIDDEN per case; 364 assertions pass on the pinned container image |
+| **027** | Persisted slugs, collision suffixes, robots, sitemap | **DONE** | ADR-0010, resolves D-019. Indexing's last code prerequisite; the sitemap is correctly empty until a second value family exists |
 
 All three of 023–025 passed an adversarial five-lens review before being marked DONE; see `PROGRESS.md`.
 
@@ -46,7 +47,6 @@ There is no `007`: the number was skipped when the plan was reorganised.
 |---|---|---|
 | Evidence/claim golden corpus (`docs/canonical/17` §22, 125 cases) | **Yes** | Historical-source fixtures. TASK-026 built the resolution and rights domains; §22's needs a source M3 cannot yet reach. |
 | E2E and load corpora (§3.3, §3.6) | No | Playwright and k6; neither is installed, and neither is worth adding before there is a journey to hold still. |
-| Sitemap + persisted slug table | No | D-019's decision on the collision suffix and where the slug is stored |
 | Polona connector / M3 | **Yes** | Network egress — every candidate host 403s at the proxy |
 | Map layers | **Yes** | A lawful boundary-geometry source; none is in the repository |
 | Premium eligibility, report, commerce (M4–M6) | No | Deliberately not started: the directive's §73 puts them behind the consumer loop |

@@ -10,8 +10,8 @@ facts only; `PROGRESS.md` holds the detail and `AGENTS.md` holds the rules.
 | Branch | `claude/elegant-archimedes-w5ony1` |
 | Last commit before this session | `d3ea799` — TASK-023/024/025, the consumer loop |
 | Working tree | Clean as of the commit below |
-| Schema version | Contract **1.5**; database migrations `0001`–`0017` applied |
-| Open decisions | **D-019** only (slug collisions need a persisted slug table) — non-blocking |
+| Schema version | Contract **1.5**; database migrations `0001`–`0018` applied |
+| Open decisions | **None.** D-019 resolved by ADR-0010 (TASK-027) |
 
 ## What runs
 
@@ -39,7 +39,7 @@ pnpm format:check     passed
 pnpm test             passed, 584 unit tests
 pnpm build            passed, 11 routes
 pnpm test:golden      passed, 364 tests across 4 files, exit 0
-pnpm test:integration passed, 250 tests across 19 files, exit 0
+pnpm test:integration passed, 258 tests across 20 files, exit 0
 ```
 
 **Everything passes, and for the first time in this project both database-backed suites ran on the
@@ -70,6 +70,7 @@ and creating one needs privileges the session does not have.
 | **024** canonical route, slug, indexability, share, OG image, events | **DONE** |
 | **025** surname comparison | **DONE** |
 | **026** golden test corpus | **DONE** — all 364 assertions pass on the pinned container image |
+| **027** persisted slugs, collision suffixes, robots, sitemap | **DONE** — ADR-0010 resolves D-019; indexing's last code prerequisite |
 
 All three were reviewed adversarially by five independent readers before being marked DONE; the 21
 defects they found are listed in `PROGRESS.md` and every one is fixed. Three were pre-existing: the
@@ -83,7 +84,7 @@ public API accepting `surface=INTERNAL`, the API's bare 500 with no error envelo
 | Polona connector, M3 historical discovery | **Egress**: `polona.pl`, `polona2.pl`, `api.dane.gov.pl`, `wikidata.org`, `data.geonames.org` all return `403` to the proxy's `CONNECT`. Attempted with `curl` through `$HTTPS_PROXY`; the proxy's own status endpoint records each as `connect_rejected`, a policy denial. | Everything else. ADR-0007 already decided what to do with per-object rights, so the connector is a build-and-test job the moment a host is reachable. |
 | A real map | **No geometry.** No GeoJSON/TopoJSON/Shapefile in the repository; `places.centroid` is NULL in all 16 rows; TERYT is a code register, not boundaries. | The geography chapter renders as an accessible table with its coverage caveat, which is truthful. |
 | Meaning coverage | **No licensed onomastic corpus** (D-002 resolved by ADR-0008: Path B). Every surname correctly returns `NO_SOURCED_MEANING`. | The chain, the rights gate and the honest gap are built and tested. A source is an import away. |
-| Turning indexing on | Deliberate: `SEO_INDEXING_ENABLED` is unset, so every page is `noindex, follow` (ADR-0009 §5). | The policy is implemented and unit-tested; a pilot needs a surname cohort and manual QA. |
+| Turning indexing on | **Data, not code.** `docs/canonical/21` §42 needs two substantive value families and only `CURRENT_STATS` exists: the regional fixtures are 40 of 646,052 rows, so the distribution chain refuses and `GEOGRAPHY` cannot be produced. The sitemap is correctly empty and asserts its own reason (`SINGLE_VALUE_FAMILY`). | Everything else. The slug table, backfill, 308 redirects, robots and sitemap are built and verified; supplying the full register is what unblocks it. |
 
 ## Is it ready?
 
@@ -103,16 +104,27 @@ is not code quality:
 
 ## Next action
 
-Nothing is blocking. Two unblocked candidates, in the order I would take them:
+**Supply the full PESEL register.** It is now the single thing standing between this and an indexable
+site, and it is a manual supply because egress is blocked — as the excerpts were. Four resources from
+dataset `1681`:
 
-1. **A sitemap and the slug table** (D-019). The last prerequisite for any indexing pilot: a
-   persisted `(locale, slug)` with a collision suffix, a backfill over 598,476 rows, and a sitemap
-   listing only pages `assessIndexability` returns `INDEX` for. D-019 needs deciding first — where
-   the slug lives and what the collision suffix is.
-2. **Extend the golden corpus as its fixtures arrive.** §22's evidence/claim domain (125 cases) needs
-   historical-source fixtures and is therefore blocked behind M3; §20's `SHARE` surface needs an
-   evaluator that does not exist. Both gaps are recorded in `tests/golden/README.md` rather than
-   filled with invented decisions.
+| Role | Resource | Rows |
+|---|---|---:|
+| national male | `1148808` | 408,182 |
+| national female | `1148811` | 420,082 |
+| regional male | `1148786` | 646,052 |
+| regional female | `1148790` | 694,553 |
 
-One thing a session cannot close by itself: every golden case carries `reviewed_at: null`, and the
-ten rights cases ask for a `LEGAL` reviewer they have not had.
+Each needs its CSV and its resource-metadata JSON, as before. With them: rank and rarity stop
+refusing, `GEOGRAPHY` becomes a second value family, §42 is satisfiable, and the sitemap fills.
+
+Then, in order: run `pnpm seo:backfill-slugs`, review a QA cohort of pages by hand, set
+`SITE_ORIGIN`, and set `SEO_INDEXING_ENABLED` deliberately (ADR-0009 §5).
+
+Unblocked but not required for indexing:
+
+- **Deployment (INF-001).** Nothing exists — no `ops/`, Dockerfile, compose file, host or domain.
+- **Legal review.** Ten rights golden cases carry `reviewed_at: null` and want a `LEGAL` reviewer.
+  D-004 (resource-level licence inheritance) is a recorded unverified assumption.
+- **`packages/sources`' stale comment.** `PESEL_RIGHTS_PROFILE`'s doc block still describes the
+  pre-D-007 posture (`commercial_use = UNKNOWN`) and contradicts the values beneath it.

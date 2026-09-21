@@ -5,6 +5,7 @@ import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { assessIndexability, indexingEnabled } from "./seo.js";
+import { seoGatesFor } from "./seo-surface.js";
 import { resolveSlug, surnamePath } from "./slug.js";
 import {
   formatDate,
@@ -42,28 +43,42 @@ export function siteOrigin(env: Record<string, string | undefined> = process.env
 export type PageAnswer =
   | { readonly kind: "INVALID_SLUG" }
   | { readonly kind: "UNKNOWN"; readonly slug: string }
-  | { readonly kind: "COLLISION"; readonly displays: readonly string[] }
+  /** A retired address (ADR-0010 §2). The route answers a permanent redirect. */
+  | { readonly kind: "MOVED"; readonly current_slug: string }
   | { readonly kind: "UNAVAILABLE" }
-  | { readonly kind: "RESULT"; readonly response: SurnameResultResponse; readonly display: string };
+  | {
+      readonly kind: "RESULT";
+      readonly response: SurnameResultResponse;
+      readonly display: string;
+      /** §40's SEO-surface and privacy gates, evaluated where the database is. */
+      readonly gates: { readonly seoSurfaceAllowed: boolean; readonly privacyPublic: boolean };
+    };
 
 /**
  * Resolves the slug and reads the projection. Every failure is a typed answer;
  * nothing from a caught error reaches the page (canonical/16 §78).
  */
-export async function answerSlug(slug: string, referrerPath: string | null): Promise<PageAnswer> {
-  const log = createLogger({ service: "web", base: { route: "/pl/nazwisko/[slug]" } });
+export async function answerSlug(
+  slug: string,
+  referrerPath: string | null,
+  lang: Lang = "pl",
+): Promise<PageAnswer> {
+  const log = createLogger({
+    service: "web",
+    base: { route: lang === "en" ? "/en/surname/[slug]" : "/pl/nazwisko/[slug]" },
+  });
   const startedAt = Date.now();
   let db: ReturnType<typeof createDb> | null = null;
   try {
     db = createDb(createPool(loadDbConfig()));
-    const resolved = await resolveSlug(db, slug);
+    const resolved = await resolveSlug(db, slug, lang);
     if (resolved.kind === "INVALID") return { kind: "INVALID_SLUG" };
-    if (resolved.kind === "COLLISION") {
-      log.warn("slug_collision", {
-        candidates: resolved.displays.length,
-        ms: Date.now() - startedAt,
-      });
-      return { kind: "COLLISION", displays: resolved.displays };
+    if (resolved.kind === "MOVED") {
+      // A display form was corrected and this address retired. The link is
+      // already in somebody's index, so it is redirected rather than refused
+      // (ADR-0010 §2). The surname itself is never logged — only that it moved.
+      log.info("slug_superseded", { ms: Date.now() - startedAt });
+      return { kind: "MOVED", current_slug: resolved.current_slug };
     }
     if (resolved.kind === "UNKNOWN") {
       log.info("slug_unknown", { ms: Date.now() - startedAt });
@@ -92,7 +107,13 @@ export async function answerSlug(slug: string, referrerPath: string | null): Pro
       search_origin: searchOrigin(referrerPath),
       ms: Date.now() - startedAt,
     });
-    return { kind: "RESULT", response: parsed.data, display: resolved.display_name };
+    const gates = await seoGatesFor(db, resolved.surname_id);
+    return {
+      kind: "RESULT",
+      response: parsed.data,
+      display: resolved.display_name,
+      gates: { seoSurfaceAllowed: gates.seoSurfaceAllowed, privacyPublic: gates.privacyPublic },
+    };
   } catch (cause: unknown) {
     log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
@@ -187,10 +208,11 @@ export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metad
   const r = answer.response;
   const indexability = assessIndexability(r, {
     enabled: indexingEnabled(),
-    // Nothing projects the SEO surface yet: this payload was queried on FREE,
-    // and `docs/canonical/21` §40 requires the SEO surface to be allowed too.
-    // Until a projection exists the honest answer is that it is not.
-    seoSurfaceAllowed: false,
+    // Real values now (TASK-027): `answerSlug` folds every cited source's rights
+    // most-restrictively and evaluates the SEO surface from the fold, and reads
+    // the entity's privacy class. §40 wants both gates, and both are answered.
+    seoSurfaceAllowed: answer.gates.seoSurfaceAllowed,
+    privacyPublic: answer.gates.privacyPublic,
   });
   const description =
     r.population?.state === "READY"
@@ -268,22 +290,12 @@ export function CanonicalSurnamePage({
             <h3>{t.unresolvedHeading}</h3>
             <p className="absent">{t.slugUnknownBody}</p>
           </section>
-        ) : answer.kind === "COLLISION" ? (
-          <section>
-            <h3>{t.ambiguousHeading}</h3>
-            <p className="absent">{t.slugCollisionBody}</p>
-            <ul className="suggestions">
-              {answer.displays.map((d) => (
-                <li key={d}>{d}</li>
-              ))}
-            </ul>
-          </section>
         ) : answer.kind === "UNAVAILABLE" ? (
           <section>
             <h3>{t.unavailableHeading}</h3>
             <p className="absent">{t.unavailableBody}</p>
           </section>
-        ) : (
+        ) : answer.kind === "RESULT" ? (
           <>
             <Result response={answer.response} lang={lang} intent={intent} />
             {shareUrl === null ? null : (
@@ -293,7 +305,9 @@ export function CanonicalSurnamePage({
               <a href="#surname">{t.searchAnother}</a>
             </p>
           </>
-        )}
+        ) : // `MOVED`. The route answers a permanent redirect before rendering, so
+        // this branch exists only to keep the union exhaustive.
+        null}
       </main>
       <footer lang={htmlLang(lang)}>{t.footer}</footer>
     </>

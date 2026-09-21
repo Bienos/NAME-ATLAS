@@ -75,6 +75,15 @@ export interface IndexabilityOptions {
   /** `SEO_INDEXING_ENABLED`. The alpha gate (ADR-0009 §5). */
   readonly enabled: boolean;
   /**
+   * `docs/canonical/21` §40's `privacy = pass` gate.
+   *
+   * The surname's `knowledge_entities.privacy_class` is `PUBLIC`. Supplied by
+   * the caller rather than read from the payload because the contract does not
+   * carry it, and adding it would be a schema change for a value no consumer
+   * needs. `false` is the safe default for a caller that cannot tell.
+   */
+  readonly privacyPublic: boolean;
+  /**
    * Whether the **SEO surface** is allowed for this surname's evidence.
    *
    * `docs/canonical/21` §40 requires *both* the public and the SEO surface to
@@ -120,8 +129,20 @@ export function assessIndexability(
       policy,
     };
   }
+  if (!options.privacyPublic) {
+    // §40: privacy = pass. A non-public entity is not published, whatever its
+    // rights say — the two dimensions are independent (ARCHITECTURE.md §10
+    // invariant 2) and this is the privacy one.
+    return {
+      indexability: "BLOCKED",
+      reason_code: "PRIVACY_NOT_PUBLIC",
+      families,
+      citations,
+      policy,
+    };
+  }
   if (!options.seoSurfaceAllowed) {
-    // §40's second hard gate, and the one this project cannot yet evaluate.
+    // §40's second hard gate.
     return {
       indexability: "NOINDEX",
       reason_code: "SEO_SURFACE_NOT_ALLOWED",

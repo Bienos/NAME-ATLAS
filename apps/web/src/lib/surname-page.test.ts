@@ -43,7 +43,7 @@ describe("metadataFor", () => {
       { kind: "UNKNOWN", slug: "x" },
       { kind: "INVALID_SLUG" },
       { kind: "UNAVAILABLE" },
-      { kind: "COLLISION", displays: ["A", "B"] },
+      { kind: "MOVED", current_slug: "nowak" },
     ];
     for (const a of answers) {
       const m = metadataFor(a, "pl", "x");

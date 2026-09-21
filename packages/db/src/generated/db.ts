@@ -418,6 +418,15 @@ export interface Surnames {
   updated_at: Generated<Timestamp>;
 }
 
+export interface SurnameSlugs {
+  created_at: Generated<Timestamp>;
+  is_current: Generated<boolean>;
+  locale: string;
+  slug: string;
+  surname_id: string;
+  surname_slug_id: string;
+}
+
 export interface DB {
   citations: Citations;
   claim_evidence: ClaimEvidence;
@@ -441,5 +450,6 @@ export interface DB {
   source_records: SourceRecords;
   sources: Sources;
   spatial_ref_sys: SpatialRefSys;
+  surname_slugs: SurnameSlugs;
   surnames: Surnames;
 }

@@ -26,6 +26,7 @@ describe("MIGRATIONS_DIR", () => {
       "0015_surname_meaning_scope.ts", // TASK-022 — separate: a new enum value cannot be used in its own transaction
       "0016_citations_per_source_record.ts", // TASK-022 — a multi-sourced claim cites every work
       "0017_surname_slug_lookup_index.ts", // TASK-024 / ADR-0009 — slug lookup without a scan
+      "0018_surname_slugs.ts", // TASK-027 / ADR-0010 — the persisted slug, resolving D-019
     ]);
   });
 });

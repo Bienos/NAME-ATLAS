@@ -19,6 +19,7 @@
     "test:golden": "pnpm --filter @name-atlas/golden-tests run test:golden",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
+    "seo:backfill-slugs": "pnpm --filter @name-atlas/seo run backfill-slugs",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
     "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",

@@ -67,6 +67,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0015_surname_meaning_scope",
       "0016_citations_per_source_record",
       "0017_surname_slug_lookup_index",
+      "0018_surname_slugs",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -114,6 +115,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "source_records", table_type: "BASE TABLE" },
       { table_name: "sources", table_type: "BASE TABLE" },
       { table_name: "spatial_ref_sys", table_type: "BASE TABLE" },
+      { table_name: "surname_slugs", table_type: "BASE TABLE" },
       { table_name: "surnames", table_type: "BASE TABLE" },
     ];
 

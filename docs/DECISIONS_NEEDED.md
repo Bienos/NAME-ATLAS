@@ -8,21 +8,23 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-019 — slug collisions need a persisted slug table
+## D-019 — RESOLVED (TASK-027, ADR-0010)
 
-**Status:** NON-BLOCKING NOW. Recorded by ADR-0009 (2026-09-21).
-**Owner:** whichever task first needs a sitemap or alias redirects.
+**Resolution**, decided by the project owner 2026-09-21: a persisted slug in its **own table**, keyed
+`(locale, slug)`, with superseded rows kept and answered by a permanent redirect; collisions
+disambiguated by a **stable short id derived from `surname_id`** (Crockford base32, six characters),
+never by a sequence number.
 
-ADR-0009 adopts `docs/canonical/21` §21–§23's Unicode-preserving slug and computes it from
-`canonical_display` with a pure function. §24's collision handling — a `(locale, canonical_slug)`
-constraint and a `base-slug-{stable_short_slug_id}` suffix — is **not built**: it needs a persisted
-slug per surname and a backfill over 598,476 rows, and nothing consumes it yet.
+The reasoning is in `docs/adr/0010-persisted-slugs-and-sitemap.md`. In short: a table can hold a
+retired address, so a corrected display form does not break a URL a crawler already indexed, and
+`(locale, slug)` is the key §25's future ASCII aliases will need. A suffix that is a function of the
+entity cannot be reassigned by a re-import; an ordinal can, and a reassigned suffix points an indexed
+URL at a different family's page.
 
-Today a slug that two entities both produce (a hyphenated and a space-separated form of the same
-letters, for instance) is **detected** and rendered as an honest ambiguous-address page; neither
-entity is chosen. Decision required when a sitemap, §25 ASCII aliases or §26 slug history is built:
-the short-id derivation, the migration, and whether the slug is stored on `surnames` or in its own
-table.
+Implemented by migration `0018_surname_slugs`, `@name-atlas/seo`, `pnpm seo:backfill-slugs` and the
+`robots.txt` / `sitemap.xml` routes. `UNIQUE (locale, slug)` and a partial
+`UNIQUE (locale, surname_id) WHERE is_current` make both invariants database facts; integration tests
+assert that each index refuses.
 
 ---
 

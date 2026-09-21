@@ -3696,3 +3696,128 @@ stands between this and a public launch is not code quality:
 | Legal review | Ten rights golden cases ask for a `LEGAL` reviewer and carry `reviewed_at: null`. D-004 (resource-level licence inheritance) is recorded as an unverified assumption. |
 | Staff access | The admin inspector is gated off because no staff authentication exists. |
 | Blocked by environment | M3 historical discovery and any real map — egress and the absence of a lawful geometry source. |
+
+## TASK-027 — persisted slugs, collision suffixes, robots and sitemap (2026-09-21)
+
+**Status: IMPLEMENTED AND VERIFIED.** Resolves **D-019**, the last open decision. ADR-0010 records
+the choice; the project owner decided both halves on 2026-09-21.
+
+This is indexing's last **code** prerequisite. It does not make any page indexable, and an acceptance
+criterion asserts that rather than hiding it — see "What still blocks indexing" below.
+
+### What was actually blocking indexing, verified rather than recalled
+
+Asked to do indexing, the first job was to find the real gate. Three findings, each checked against a
+running instance:
+
+1. **Rights are not the blocker.** An earlier session's handoff implied the PESEL profile's
+   `commercial_use = UNKNOWN` closed the SEO surface. It does not: **D-007 was resolved by the project
+   owner on 2026-09-20**, and the profile carries `commercial_use = ALLOWED`,
+   `redistribution = ALLOWED`, `review_status = APPROVED`. `evaluateAllSurfaces` on the real profile:
+
+   ```
+   INTERNAL  ALLOWED   FREE  ALLOWED   PAID  ALLOWED   SEO  ALLOWED
+   ```
+
+   The doc comment above `PESEL_RIGHTS_PROFILE` still describes the pre-D-007 posture and contradicts
+   the values below it. Left alone — it is `packages/sources`, not this task — and recorded here.
+
+2. **`seoSurfaceAllowed` was hardcoded `false`** in `surname-page.tsx`, with an honest comment saying
+   nothing projected the SEO surface yet. Honest but permanent: no page could ever be indexed.
+   TASK-027 makes it real (below).
+
+3. **§40's `privacy = pass` gate was not evaluated at all.** Neither was `critical QA`; that one has
+   no signal to read and ADR-0010 §4 records the gap rather than inventing a check.
+
+### The binding constraint is data, not code
+
+`docs/canonical/21` §42 needs **two** substantive value families. Only `CURRENT_STATS` exists.
+Verified on a full instance with all four PESEL fixtures imported:
+
+```
+[dist] result  NO_RESULT (INCOMPLETE_UNIVERSE)
+[dist]   resource 1148786  CONTENT_HASH_MISMATCH  rows expected 646052  rows persisted 40
+[dist]   resource 1148790  CONTENT_HASH_MISMATCH  rows expected 694553  rows persisted 38
+```
+
+`GEOGRAPHY` needs the full regional register; `ONOMASTICS` a licensed corpus (ADR-0008 Path B);
+`HISTORY` M3. So the sitemap is **empty**, and `sitemap-policy.test.ts` asserts the *reason* —
+`SINGLE_VALUE_FAMILY` for every surname — rather than merely asserting zero. If a second family ever
+appears, that test fails and tells whoever added it to re-check the sitemap instead of silently
+starting to publish.
+
+### What was built
+
+| Piece | What it does |
+|---|---|
+| `packages/seo` | New package. The slug rule, the collision suffix, the backfill and §42-as-SQL. A package because the backfill is a CLI and cannot import from `apps/web`. |
+| `0018_surname_slugs` | `UNIQUE (locale, slug)` makes a collision impossible to *store*; a partial `UNIQUE (locale, surname_id) WHERE is_current` makes "one current address per surname" a database fact. Superseded rows stay. |
+| `pnpm seo:backfill-slugs` | Idempotent and order-independent. Lowest `surname_id` keeps the bare slug; the rest take a suffix from their own id. Re-running created 0 and found 88 already correct. |
+| `lookupSlug` | One indexed exact lookup, replacing ADR-0009's three readings plus a confirmation loop. `COLLISION` is gone as an outcome — it cannot happen. |
+| 308 redirect | A retired address answers `308 Permanent Redirect` to the current one. Verified live. |
+| `seoGatesFor` | Folds **every** cited source's rights most-restrictively and evaluates `SEO` from the fold, plus the entity's `privacy_class`. Two sources with different terms cannot produce a page that publishes under the permissive one's rules. |
+| `robots.txt` | Flag unset → `Disallow: /`. Not a placeholder: no page is cleared, every page serves `noindex`, and a crawler reading them anyway wastes its budget and ours. Flag set → surname routes allowed, §36's internal search and the comparison page disallowed, sitemap named. |
+| `sitemap.xml` + `sitemap/{n}.xml` | A sitemap **index** plus pages of 50,000, because 598,476 surnames cannot be one valid sitemap. `pageCount(598_476) === 12`. |
+
+### Two defects found while building it
+
+**`shortSlugId` read the leading hex digits of the UUID.** A UUIDv7 carries a millisecond timestamp
+in its leading 48 bits, so **every surname created by one import would have received the same
+suffix** — identical for exactly the entities most likely to collide. A test over 2,000 ids differing
+only in their tail collapsed them to **one** suffix. Rewritten to hash the whole id (FNV-1a, pure JS
+so the module stays runtime-agnostic); 5,000 real `uuidv7()`s minted back to back now yield >4,990
+distinct suffixes, and three tests pin it — differing-tail, differing-head, and real minted ids.
+
+**The moved `canonicalSlug` had to be proved identical, and nearly was not checked.** Moving it from
+`apps/web` involved rewriting an odd `.replace(/[\s\S]*/u, …)` construct. A one-off equivalence
+property — 24 concrete cases including `İ`, `ß` and combining marks, plus 20,000 random strings
+across ASCII, grapheme, grapheme-composite and lone-surrogate generators — confirmed identical
+output. (The first run "failed" on `fc.fullUnicodeString`, which fast-check 4 removed; that was my
+API error, not a counterexample.) The check pinned a dead implementation, so it is not kept.
+
+### Corrections to records I wrote earlier
+
+- **AC-5 said HTTP 301.** The implementation answers **308**, via Next's `permanentRedirect`. Search
+  engines treat 308 as a permanent move exactly as they treat 301. The AC is corrected to what the
+  code does rather than the code bent to an AC.
+- `tests/integration/src/canonical-route.test.ts` asserted that a colliding slug resolves to
+  **neither** entity. Under ADR-0010 both are reachable, so the test now asserts that — plus *which*
+  one keeps the bare slug, because "whichever was imported first" is an address that moves.
+
+### Verified
+
+```
+pnpm typecheck        passed (15 projects)
+pnpm lint             passed
+pnpm format:check     passed
+pnpm test             passed, 613 tests
+pnpm build            passed, 14 routes
+pnpm test:golden      passed, 364 tests, exit 0
+pnpm test:integration passed, 258 tests, exit 0
+```
+
+Live, built app on the pinned container with all four fixtures imported and slugs backfilled:
+
+| Check | Result |
+|---|---|
+| `robots.txt`, flag unset | `Disallow: /` with the reason as a comment |
+| `robots.txt`, flag set | surname routes allowed, `/?`, `/pl/porownaj`, `/api/` disallowed, sitemap named |
+| `sitemap.xml` | valid empty `<sitemapindex>` in both postures |
+| `sitemap/1.xml` | 404 — a crawler asking for a page that does not exist is told so |
+| `/pl/nazwisko/nowak`, flag set | still `noindex, follow` — the policy, not the flag, is what withholds it |
+| retired address | `308` → `location: /pl/nazwisko/nowak-poprawiony`; target 200 |
+| backfill | 44 surnames → 88 addresses, 0 suffixed; second run created 0, found 88 correct |
+
+### What still blocks indexing
+
+Nothing in code. In order of what would unblock it:
+
+1. **The full PESEL register** — dataset `1681`, resources `1148786` (regional male, 646,052 rows) and
+   `1148790` (regional female, 694,553 rows), plus the national `1148808`/`1148811` at 408,182 and
+   420,082. Egress is blocked, so these are a manual supply as the excerpts were. This is what gives
+   every page its second value family, and it is also what makes rank and rarity answer at all.
+2. **A QA cohort and a human pass** before `SEO_INDEXING_ENABLED` is set. The flag is deliberately a
+   separate, manual act (ADR-0009 §5).
+3. **`SITE_ORIGIN` and a domain.** A sitemap must carry absolute URLs, and a `Host` header is not a
+   safe basis for one a crawler will treat as canonical — `sitemap.xml` returns an empty index rather
+   than guessing.

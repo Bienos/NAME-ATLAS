@@ -124,7 +124,9 @@ describe("indexingEnabled", () => {
 describe("assessIndexability", () => {
   it("is NOINDEX with the flag off, whatever the page holds", () => {
     const r = response({ distribution: GEO });
-    expect(assessIndexability(r, { enabled: false, seoSurfaceAllowed: true })).toMatchObject({
+    expect(
+      assessIndexability(r, { enabled: false, seoSurfaceAllowed: true, privacyPublic: true }),
+    ).toMatchObject({
       indexability: "NOINDEX",
       reason_code: "INDEXING_DISABLED",
     });
@@ -132,7 +134,11 @@ describe("assessIndexability", () => {
 
   it("is NOINDEX for CURRENT_STATS alone even with the flag on (§43)", () => {
     expect(
-      assessIndexability(response({}), { enabled: true, seoSurfaceAllowed: true }),
+      assessIndexability(response({}), {
+        enabled: true,
+        seoSurfaceAllowed: true,
+        privacyPublic: true,
+      }),
     ).toMatchObject({
       indexability: "NOINDEX",
       reason_code: "SINGLE_VALUE_FAMILY",
@@ -143,7 +149,9 @@ describe("assessIndexability", () => {
     const r = response({ distribution: GEO });
     expect(publishableFamilies(r)).toEqual(["CURRENT_STATS", "GEOGRAPHY"]);
     expect(distinctCitations(r)).toBe(2);
-    expect(assessIndexability(r, { enabled: true, seoSurfaceAllowed: true })).toMatchObject({
+    expect(
+      assessIndexability(r, { enabled: true, seoSurfaceAllowed: true, privacyPublic: true }),
+    ).toMatchObject({
       indexability: "INDEX",
     });
   });
@@ -169,6 +177,7 @@ describe("assessIndexability", () => {
       assessIndexability(response({ distribution: sameCitation }), {
         enabled: true,
         seoSurfaceAllowed: true,
+        privacyPublic: true,
       }),
     ).toMatchObject({ indexability: "NOINDEX", reason_code: "FEWER_THAN_TWO_CITATIONS" });
   });
@@ -184,6 +193,7 @@ describe("assessIndexability", () => {
       assessIndexability(response({ population: blocked }), {
         enabled: true,
         seoSurfaceAllowed: true,
+        privacyPublic: true,
       }),
     ).toMatchObject({
       indexability: "BLOCKED",
@@ -193,7 +203,9 @@ describe("assessIndexability", () => {
   it("is NOINDEX when the SEO surface is not allowed, whatever else passes", () => {
     // docs/canonical/21 §40 requires both the public and the SEO surface.
     const r = response({ distribution: GEO });
-    expect(assessIndexability(r, { enabled: true, seoSurfaceAllowed: false })).toMatchObject({
+    expect(
+      assessIndexability(r, { enabled: true, seoSurfaceAllowed: false, privacyPublic: true }),
+    ).toMatchObject({
       indexability: "NOINDEX",
       reason_code: "SEO_SURFACE_NOT_ALLOWED",
     });

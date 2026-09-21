@@ -14,6 +14,7 @@
     "@name-atlas/db": "workspace:*",
     "@name-atlas/logging": "workspace:*",
     "@name-atlas/resolver": "workspace:*",
+    "@name-atlas/seo": "workspace:*",
     "@name-atlas/truth": "workspace:*",
     "kysely": "0.29.6",
     "next": "16.3.5",

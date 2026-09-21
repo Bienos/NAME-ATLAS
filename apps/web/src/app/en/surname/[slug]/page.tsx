@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import { permanentRedirect } from "next/navigation";
 import {
   answerSlug,
   CanonicalSurnamePage,
@@ -20,7 +21,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  return metadataFor(await answerSlug(slug, null), "en", slug);
+  return metadataFor(await answerSlug(slug, null, "en"), "en", slug);
 }
 
 export default async function Page({ params, searchParams }: Props) {
@@ -30,7 +31,15 @@ export default async function Page({ params, searchParams }: Props) {
   const answer = await answerSlug(
     slug,
     referrerPath(h.get("referer"), requestOrigin(h.get("host"))),
+    "en",
   );
+  // A retired address is a redirect, not a page (ADR-0010 §2). `permanentRedirect`
+  // answers 308, which search engines treat as a permanent move exactly as they
+  // treat 301, and which — unlike 301 — cannot be rewritten to a GET by an
+  // intermediary. It throws, so nothing below runs.
+  if (answer.kind === "MOVED") {
+    permanentRedirect(`/en/surname/${encodeURIComponent(answer.current_slug)}`);
+  }
   const intentParam = query["intent"];
   const intent = parseIntent(Array.isArray(intentParam) ? intentParam[0] : intentParam);
   return (

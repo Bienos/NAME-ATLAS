@@ -13,6 +13,7 @@
     "@name-atlas/domain": "workspace:*",
     "@name-atlas/queue": "workspace:*",
     "@name-atlas/resolver": "workspace:*",
+    "@name-atlas/seo": "workspace:*",
     "@name-atlas/sources": "workspace:*",
     "@name-atlas/testing": "workspace:*",
     "@name-atlas/truth": "workspace:*",
