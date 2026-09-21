@@ -1,0 +1,97 @@
+{
+  "source": {
+    "id": "be_top10000_2025",
+    "group": "belgium",
+    "bundle": "belgium",
+    "kind": "html_link",
+    "title": "Statbel top 10,000 family names 2025",
+    "source_page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery": {
+      "page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+      "text_regex": "(?i)top\\s+10[, .]?000.*2025",
+      "url_regex": "(?i)\\.(xlsx|xls)(?:\\?|$)"
+    },
+    "format": "xlsx",
+    "reference_date": "2025",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "Statbel",
+    "license_label": "Use Statbel open-data conditions; preserve attribution",
+    "license_url": "https://statbel.fgov.be/en/open-data",
+    "warnings": [
+      "Top-10,000 list, NOT an exhaustive registry. Absence is not zero."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/belgium/be_top10000_2025__0b14e03a2c8d.xlsx",
+  "bytes": 562590,
+  "sha256": "0b14e03a2c8da40b182c5c2f75612bc4294aa59e1c66be40c180bbde1d3fbd0c",
+  "http": {
+    "requested_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.1%20Familienamen/Family_names_2025.xlsx",
+    "final_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.1%20Familienamen/Family_names_2025.xlsx",
+    "retrieved_at": "2026-09-18T17:43:56Z",
+    "http_status": 200,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "last_modified": "Thu, 03 Jul 2025 07:22:45 GMT",
+    "etag": "\"68662fc5-8959e\"",
+    "content_disposition": null
+  },
+  "discovery": {
+    "discovery_page_url": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery_page_sha256": "4518ccfeb5c551813df66a4211c51d98f6aa4d8e179871cd948326d5a95dabea",
+    "discovery_page_retrieved_at": "2026-09-18T17:43:41Z"
+  },
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "xlsx",
+    "member_count": 10,
+    "uncompressed_bytes": 3720316,
+    "members": [
+      {
+        "name": "[Content_Types].xml",
+        "bytes": 1168
+      },
+      {
+        "name": "_rels/.rels",
+        "bytes": 588
+      },
+      {
+        "name": "xl/workbook.xml",
+        "bytes": 2443
+      },
+      {
+        "name": "xl/_rels/workbook.xml.rels",
+        "bytes": 698
+      },
+      {
+        "name": "xl/worksheets/sheet1.xml",
+        "bytes": 3366304
+      },
+      {
+        "name": "xl/theme/theme1.xml",
+        "bytes": 8721
+      },
+      {
+        "name": "xl/styles.xml",
+        "bytes": 2920
+      },
+      {
+        "name": "xl/sharedStrings.xml",
+        "bytes": 335849
+      },
+      {
+        "name": "docProps/core.xml",
+        "bytes": 682
+      },
+      {
+        "name": "docProps/app.xml",
+        "bytes": 943
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Top-10,000 list, NOT an exhaustive registry. Absence is not zero."
+  ]
+}

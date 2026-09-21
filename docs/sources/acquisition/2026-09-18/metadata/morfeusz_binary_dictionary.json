@@ -1,0 +1,49 @@
+{
+  "source": {
+    "id": "morfeusz_binary_dictionary",
+    "group": "morphology",
+    "bundle": "morphology",
+    "kind": "direct",
+    "title": "SGJP morphology morfeusz2-dictionary-sgjp-20260726.tgz",
+    "urls": [
+      "https://download.sgjp.pl/morfeusz/20260726/morfeusz2-dictionary-sgjp-20260726.tgz"
+    ],
+    "format": "tgz",
+    "source_page": "https://download.sgjp.pl/morfeusz/20260726/",
+    "reference_date": "2026-07-26",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "SGJP / IPI PAN",
+    "license_label": "BSD-2-Clause: preserve embedded copyright, conditions and disclaimer",
+    "license_url": "https://morfeusz.sgjp.pl/doc/license/en",
+    "warnings": [
+      "Pinned observed release, not a claim to be newest. Linguistic forms are not genealogical identity.",
+      "No binaries are executed or installed."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/morphology/morfeusz_binary_dictionary__9a417af69a9d.tgz",
+  "bytes": 7504773,
+  "sha256": "9a417af69a9d4a668c70869d8ee1e5673ef1d19ef21e4a5f0b135ea63d9a9b4b",
+  "http": {
+    "requested_url": "https://download.sgjp.pl/morfeusz/20260726/morfeusz2-dictionary-sgjp-20260726.tgz",
+    "final_url": "https://download.sgjp.pl/morfeusz/20260726/morfeusz2-dictionary-sgjp-20260726.tgz",
+    "retrieved_at": "2026-09-18T17:44:11Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Sun, 26 Jul 2026 23:20:53 GMT",
+    "etag": "\"6a669655-728385\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "GZIP_INTEGRITY_VALIDATED",
+    "uncompressed_bytes": 19240960,
+    "semantic_validation": "NOT_PERFORMED"
+  },
+  "warnings": [
+    "Pinned observed release, not a claim to be newest. Linguistic forms are not genealogical identity.",
+    "No binaries are executed or installed."
+  ]
+}

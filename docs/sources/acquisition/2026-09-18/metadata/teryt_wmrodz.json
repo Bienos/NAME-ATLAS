@@ -1,0 +1,22 @@
+{
+  "source": {
+    "id": "teryt_wmrodz",
+    "group": "polish_geo",
+    "bundle": "polska_teryt",
+    "kind": "teryt_form",
+    "registry": "WMRODZ",
+    "title": "TERYT WMRODZ — basic version",
+    "source_page": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+    "format": "zip",
+    "evidence_status": "OFFICIAL_DYNAMIC_EXPORT_ADAPTER_UNTESTED_AGAINST_LIVE_SERVICE",
+    "warnings": [
+      "Uses the state selected by the official page. Record STAN_NA from actual files; not automatically 2026-01-20.",
+      "Keep all identifiers as text with leading zeros.",
+      "Can fail on changed ASP.NET form or anti-bot restriction; no bypass."
+    ]
+  },
+  "acquisition_status": "FAILED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "error": "HTML_ERROR_PAGE_NOT_DATA"
+}

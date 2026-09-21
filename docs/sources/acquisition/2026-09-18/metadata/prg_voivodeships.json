@@ -1,0 +1,22 @@
+{
+  "source": {
+    "id": "prg_voivodeships",
+    "group": "polish_geo",
+    "bundle": "polska_prg",
+    "kind": "prg_wfs",
+    "title": "PRG voivodeship geometries — WFS",
+    "source_page": "https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-granic-prg/",
+    "endpoint": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBoundaries",
+    "format": "gml",
+    "evidence_status": "OFFICIAL_WFS_DISCOVERY_ADAPTER_UNTESTED_AGAINST_LIVE_SERVICE",
+    "license_label": "Geoportal states free access/use; preserve source and supplied metadata",
+    "warnings": [
+      "Current WFS geometries; do not assume historical geometry matches a PESEL snapshot.",
+      "No silent CRS reprojection; retain original GML. Completeness checked against WFS counts."
+    ]
+  },
+  "acquisition_status": "FAILED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "error": "PRG_VOIVODESHIP_FEATURE_TYPE_AMBIGUOUS_OR_MISSING"
+}

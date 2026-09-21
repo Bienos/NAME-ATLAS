@@ -1,0 +1,119 @@
+{
+  "source": {
+    "id": "pesel_national_2019_female_18988",
+    "group": "pesel",
+    "bundle": "polska_pesel_national",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "18988",
+    "title": "Nazwiska żeńskie - stan na 2019-06-30",
+    "scope": "national",
+    "sex_partition": "female",
+    "reference_date": "2019-06-30",
+    "source_dates": {
+      "data_date": "2019-06-30",
+      "created": "2019-08-13T07:16:07Z",
+      "modified": "2020-03-17T06:58:33Z",
+      "verified": "2024-01-10T11:34:09Z"
+    },
+    "source_description": "<p>lista nazwisk żeńskich w rejestrze PESEL stan na 30.06.2019</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/18988,nazwiska-zenskie-stan-na-2019-06-30",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/18988,nazwiska-zenskie-stan-na-2019-06-30",
+    "urls": [
+      "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/csv",
+      "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 3993861,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_national_2019_female_18988.official_resource.json",
+    "sha256": "5559c0c6ecbc6b1de83f6380c7a8731a46b3b48b0d3d355889f986a183c07df5",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/18988,nazwiska-zenskie-stan-na-2019-06-30",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/18988,nazwiska-zenskie-stan-na-2019-06-30",
+      "retrieved_at": "2026-09-18T17:36:34Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2019-06-30",
+      "created": "2019-08-13T07:16:07Z",
+      "modified": "2020-03-17T06:58:33Z",
+      "verified": "2024-01-10T11:34:09Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_national/pesel_national_2019_female_18988__c35e44779eb3.csv",
+  "bytes": 3993861,
+  "sha256": "c35e44779eb3e655f66c453a71b1c8db192b309375e828f16893864822fdbba8",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv",
+    "retrieved_at": "2026-09-18T17:36:43Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Wed, 10 Jan 2024 11:34:35 GMT",
+    "etag": "\"659e80cb-3cf105\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "nazwisko",
+      "liczba"
+    ],
+    "column_count": 2,
+    "data_row_count": 297456,
+    "sample_rows": [
+      [
+        "NOWAK",
+        "103439"
+      ],
+      [
+        "KOWALSKA",
+        "69920"
+      ],
+      [
+        "WIŚNIEWSKA",
+        "55816"
+      ],
+      [
+        "WÓJCIK",
+        "50352"
+      ],
+      [
+        "KOWALCZYK",
+        "49576"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      1
+    ],
+    "schema_fingerprint": "0a13a9e24a9eaefb257aa79c254cb4ed1b54c4f95c53f884acb6a4c072da652a",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+  ]
+}

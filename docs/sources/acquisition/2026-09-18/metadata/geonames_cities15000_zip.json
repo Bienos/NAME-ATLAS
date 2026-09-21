@@ -1,0 +1,56 @@
+{
+  "source": {
+    "id": "geonames_cities15000_zip",
+    "group": "geonames",
+    "bundle": "geonames",
+    "kind": "direct",
+    "title": "GeoNames cities15000.zip",
+    "urls": [
+      "https://download.geonames.org/export/dump/cities15000.zip"
+    ],
+    "format": "zip",
+    "source_page": "https://www.geonames.org/export/",
+    "reference_date": null,
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "license_label": "CC BY; attribution required; see included README and official terms",
+    "license_url": "https://www.geonames.org/export/",
+    "warnings": [
+      "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+      "Place coordinates/names do not establish surname origin or kinship."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/geonames/geonames_cities15000_zip__97a144934e72.zip",
+  "bytes": 3354141,
+  "sha256": "97a144934e72fb4c1cebe3776b9fc93330a00cfd8cbfcdce11885ccec4826158",
+  "http": {
+    "requested_url": "https://download.geonames.org/export/dump/cities15000.zip",
+    "final_url": "https://download.geonames.org/export/dump/cities15000.zip",
+    "retrieved_at": "2026-09-18T17:44:06Z",
+    "http_status": 200,
+    "content_type": "application/zip",
+    "last_modified": "Fri, 18 Sep 2026 01:57:08 GMT",
+    "etag": "\"332e1d-65bb837c691ab\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "zip",
+    "member_count": 1,
+    "uncompressed_bytes": 8519164,
+    "members": [
+      {
+        "name": "cities15000.txt",
+        "bytes": 8519164
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+    "Place coordinates/names do not establish surname origin or kinship."
+  ]
+}

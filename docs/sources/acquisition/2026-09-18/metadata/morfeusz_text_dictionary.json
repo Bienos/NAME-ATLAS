@@ -1,0 +1,49 @@
+{
+  "source": {
+    "id": "morfeusz_text_dictionary",
+    "group": "morphology",
+    "bundle": "morphology",
+    "kind": "direct",
+    "title": "SGJP morphology sgjp-20260726.tab.gz",
+    "urls": [
+      "https://download.sgjp.pl/morfeusz/20260726/sgjp-20260726.tab.gz"
+    ],
+    "format": "gz",
+    "source_page": "https://download.sgjp.pl/morfeusz/20260726/",
+    "reference_date": "2026-07-26",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "SGJP / IPI PAN",
+    "license_label": "BSD-2-Clause: preserve embedded copyright, conditions and disclaimer",
+    "license_url": "https://morfeusz.sgjp.pl/doc/license/en",
+    "warnings": [
+      "Pinned observed release, not a claim to be newest. Linguistic forms are not genealogical identity.",
+      "No binaries are executed or installed."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/morphology/morfeusz_text_dictionary__7bcbbf4b168b.gz",
+  "bytes": 42690073,
+  "sha256": "7bcbbf4b168b345daa33211ce9b61bb53ca4d1be9743bb5460fcb88488b90457",
+  "http": {
+    "requested_url": "https://download.sgjp.pl/morfeusz/20260726/sgjp-20260726.tab.gz",
+    "final_url": "https://download.sgjp.pl/morfeusz/20260726/sgjp-20260726.tab.gz",
+    "retrieved_at": "2026-09-18T17:44:14Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Sun, 26 Jul 2026 23:07:02 GMT",
+    "etag": "\"6a669316-28b6619\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "GZIP_INTEGRITY_VALIDATED",
+    "uncompressed_bytes": 415355202,
+    "semantic_validation": "NOT_PERFORMED"
+  },
+  "warnings": [
+    "Pinned observed release, not a claim to be newest. Linguistic forms are not genealogical identity.",
+    "No binaries are executed or installed."
+  ]
+}

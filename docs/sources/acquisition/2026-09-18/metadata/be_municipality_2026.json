@@ -1,0 +1,55 @@
+{
+  "source": {
+    "id": "be_municipality_2026",
+    "group": "belgium",
+    "bundle": "belgium",
+    "kind": "direct",
+    "title": "Statbel family names by municipality 2026",
+    "urls": [
+      "https://statbel.fgov.be/sites/default/files/files/opendata/Familienamen/TA_POP_LST_2026.zip"
+    ],
+    "format": "zip",
+    "source_page": "https://statbel.fgov.be/en/open-data/family-names-total-population-municipality",
+    "reference_date": "2026",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "Statbel",
+    "license_url": "https://statbel.fgov.be/en/open-data",
+    "license_label": "Statbel open data; retain source; inspect delivered conditions",
+    "warnings": [
+      "Only figures from five occurrences are published. Summing published municipality cells does not guarantee an exact national count."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/belgium/be_municipality_2026__8a63e09de4c1.zip",
+  "bytes": 2582044,
+  "sha256": "8a63e09de4c1d26c1806577b90a70e2ca766b6963de6f52f59d3589f550dad7e",
+  "http": {
+    "requested_url": "https://statbel.fgov.be/sites/default/files/files/opendata/Familienamen/TA_POP_LST_2026.zip",
+    "final_url": "https://statbel.fgov.be/sites/default/files/files/opendata/Familienamen/TA_POP_LST_2026.zip",
+    "retrieved_at": "2026-09-18T17:44:03Z",
+    "http_status": 200,
+    "content_type": "application/zip",
+    "last_modified": "Wed, 01 Jul 2026 06:08:27 GMT",
+    "etag": "\"6a44aedb-27661c\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "zip",
+    "member_count": 1,
+    "uncompressed_bytes": 18897085,
+    "members": [
+      {
+        "name": "TA_POP_LST_2026.txt",
+        "bytes": 18897085
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Only figures from five occurrences are published. Summing published municipality cells does not guarantee an exact national count."
+  ]
+}

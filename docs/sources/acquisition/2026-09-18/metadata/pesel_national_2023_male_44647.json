@@ -1,0 +1,119 @@
+{
+  "source": {
+    "id": "pesel_national_2023_male_44647",
+    "group": "pesel",
+    "bundle": "polska_pesel_national",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "44647",
+    "title": "Nazwiska męskie - stan na 2023-01-30",
+    "scope": "national",
+    "sex_partition": "male",
+    "reference_date": "2023-01-30",
+    "source_dates": {
+      "data_date": "2023-01-30",
+      "created": "2023-01-31T14:13:58Z",
+      "modified": "2024-01-25T14:56:41Z",
+      "verified": "2024-01-25T15:06:11Z"
+    },
+    "source_description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30",
+    "urls": [
+      "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/csv",
+      "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 4692377,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_national_2023_male_44647.official_resource.json",
+    "sha256": "235685ffa332502c486bdabcde40a18a882320927762a433859ef37f464be0cb",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30",
+      "retrieved_at": "2026-09-18T17:38:17Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2023-01-30",
+      "created": "2023-01-31T14:13:58Z",
+      "modified": "2024-01-25T14:56:41Z",
+      "verified": "2024-01-25T15:06:11Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_national/pesel_national_2023_male_44647__7e95c307a2eb.csv",
+  "bytes": 4692377,
+  "sha256": "7e95c307a2ebf62b1ea14b936925c46cc0b6db960dec8fc98c6b5fe8980f9af0",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv",
+    "retrieved_at": "2026-09-18T17:38:27Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Thu, 25 Jan 2024 15:06:43 GMT",
+    "etag": "\"65b27903-479999\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 2,
+    "data_row_count": 363360,
+    "sample_rows": [
+      [
+        "NOWAK",
+        "99803"
+      ],
+      [
+        "KOWALSKI",
+        "67505"
+      ],
+      [
+        "WIŚNIEWSKI",
+        "53766"
+      ],
+      [
+        "WÓJCIK",
+        "48421"
+      ],
+      [
+        "KOWALCZYK",
+        "47614"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      1
+    ],
+    "schema_fingerprint": "a7477880b08460be40250ce2a669defd133e9edc6ccb2a528796fc568c869b2c",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "source": {
+    "id": "pesel_national_2024_male_54097",
+    "group": "pesel",
+    "bundle": "polska_pesel_national",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "54097",
+    "title": "Nazwiska męskie - stan na 2024-01-19",
+    "scope": "national",
+    "sex_partition": "male",
+    "reference_date": "2024-01-19",
+    "source_dates": {
+      "data_date": "2024-01-19",
+      "created": "2024-01-26T06:35:27Z",
+      "modified": "2024-01-26T06:35:27Z",
+      "verified": "2024-10-29T07:54:27Z"
+    },
+    "source_description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19",
+    "urls": [
+      "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/csv",
+      "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 4904484,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_national_2024_male_54097.official_resource.json",
+    "sha256": "2a457b1faef54f08a54c13584afeb17b2d36bfef2c62301b327c2ba4fdb89e6d",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19",
+      "retrieved_at": "2026-09-18T17:38:48Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2024-01-19",
+      "created": "2024-01-26T06:35:27Z",
+      "modified": "2024-01-26T06:35:27Z",
+      "verified": "2024-10-29T07:54:27Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_national/pesel_national_2024_male_54097__3c722cada73f.csv",
+  "bytes": 4904484,
+  "sha256": "3c722cada73f0b52184931a4cc521a5c7d6905683f5103a417f867fd9547be0e",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.csv",
+    "retrieved_at": "2026-09-18T17:38:59Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Tue, 29 Oct 2024 07:55:18 GMT",
+    "etag": "\"672094e6-4ad624\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 2,
+    "data_row_count": 379712,
+    "sample_rows": [
+      [
+        "NOWAK",
+        "99310"
+      ],
+      [
+        "KOWALSKI",
+        "67218"
+      ],
+      [
+        "WIŚNIEWSKI",
+        "53616"
+      ],
+      [
+        "WÓJCIK",
+        "48197"
+      ],
+      [
+        "KOWALCZYK",
+        "47472"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      1
+    ],
+    "schema_fingerprint": "a7477880b08460be40250ce2a669defd133e9edc6ccb2a528796fc568c869b2c",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+  ]
+}

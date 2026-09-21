@@ -1,0 +1,127 @@
+{
+  "source": {
+    "id": "pesel_regional_2025_male_65049",
+    "group": "pesel",
+    "bundle": "polska_pesel_regional",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "65049",
+    "title": "Nazwiska męskie wg województwa zameldowania na pobyt stały - stan na 2025-02-24",
+    "scope": "regional",
+    "sex_partition": "male",
+    "reference_date": "2025-02-24",
+    "source_dates": {
+      "data_date": "2025-02-24",
+      "created": "2025-03-05T08:25:26Z",
+      "modified": "2025-03-10T11:45:42Z",
+      "verified": "2025-04-17T07:57:35Z"
+    },
+    "source_description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL (bez zgonów) w podziale na województwa, stan na 24.02.2025</p>\n\n<p> </p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+    "urls": [
+      "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+      "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 16619443,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+      "Geography is voivodeship of permanent registration, not ancestry/origin or necessarily current physical residence. Regional cell suppression and reconciliation with national totals require review."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_regional_2025_male_65049.official_resource.json",
+    "sha256": "f172789a753fb466452e44258add85d893c3df15cc109c8b136de203b9c568b6",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+      "retrieved_at": "2026-09-18T17:40:58Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2025-02-24",
+      "created": "2025-03-05T08:25:26Z",
+      "modified": "2025-03-10T11:45:42Z",
+      "verified": "2025-04-17T07:57:35Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_regional/pesel_regional_2025_male_65049__4e258a328cf7.csv",
+  "bytes": 16619443,
+  "sha256": "4e258a328cf7a8f66766a73e486505e760d2ebb0840814df72c09695c374ef39",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+    "retrieved_at": "2026-09-18T17:41:30Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Thu, 17 Apr 2025 07:59:16 GMT",
+    "etag": "\"6800b4d4-fd97b3\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Województwo zameldowania na pobyt stały",
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 3,
+    "data_row_count": 646100,
+    "sample_rows": [
+      [
+        "DOLNOŚLĄSKIE",
+        "NOWAK",
+        "5607"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "KOWALSKI",
+        "4043"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "WÓJCIK",
+        "3110"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "KOWALCZYK",
+        "2886"
+      ],
+      [
+        "DOLNOŚLĄSKIE",
+        "MAZUR",
+        "2883"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      2
+    ],
+    "schema_fingerprint": "d233cd4a2108a7360a3721604b655c36b02a1125377ec63003b3ed7a216ac6f1",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+    "Geography is voivodeship of permanent registration, not ancestry/origin or necessarily current physical residence. Regional cell suppression and reconciliation with national totals require review."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "source": {
+    "id": "be_top10000_2018",
+    "group": "belgium",
+    "bundle": "belgium",
+    "kind": "html_link",
+    "title": "Statbel top 10,000 family names 2018",
+    "source_page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery": {
+      "page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+      "text_regex": "(?i)top\\s+10[, .]?000.*2018",
+      "url_regex": "(?i)\\.(xlsx|xls)(?:\\?|$)"
+    },
+    "format": "xlsx",
+    "reference_date": "2018",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "Statbel",
+    "license_label": "Use Statbel open-data conditions; preserve attribution",
+    "license_url": "https://statbel.fgov.be/en/open-data",
+    "warnings": [
+      "Top-10,000 list, NOT an exhaustive registry. Absence is not zero."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/belgium/be_top10000_2018__c72dc99fadde.xlsx",
+  "bytes": 594244,
+  "sha256": "c72dc99fadde385778404a8ff71f447c4adfcb047f4f4e4e6490fc946f3322e6",
+  "http": {
+    "requested_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.2%20Voornamen%20van%20vrouwen%20en%20mannen/Noms_de_famille_2018.xlsx",
+    "final_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.2%20Voornamen%20van%20vrouwen%20en%20mannen/Noms_de_famille_2018.xlsx",
+    "retrieved_at": "2026-09-18T17:43:45Z",
+    "http_status": 200,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "last_modified": "Tue, 18 Dec 2018 14:40:19 GMT",
+    "etag": "\"5c1906d3-91144\"",
+    "content_disposition": null
+  },
+  "discovery": {
+    "discovery_page_url": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery_page_sha256": "4518ccfeb5c551813df66a4211c51d98f6aa4d8e179871cd948326d5a95dabea",
+    "discovery_page_retrieved_at": "2026-09-18T17:43:41Z"
+  },
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "xlsx",
+    "member_count": 10,
+    "uncompressed_bytes": 3730318,
+    "members": [
+      {
+        "name": "[Content_Types].xml",
+        "bytes": 1168
+      },
+      {
+        "name": "_rels/.rels",
+        "bytes": 588
+      },
+      {
+        "name": "xl/_rels/workbook.xml.rels",
+        "bytes": 698
+      },
+      {
+        "name": "xl/workbook.xml",
+        "bytes": 656
+      },
+      {
+        "name": "xl/sharedStrings.xml",
+        "bytes": 339461
+      },
+      {
+        "name": "xl/theme/theme1.xml",
+        "bytes": 7082
+      },
+      {
+        "name": "xl/styles.xml",
+        "bytes": 2585
+      },
+      {
+        "name": "xl/worksheets/sheet1.xml",
+        "bytes": 3376500
+      },
+      {
+        "name": "docProps/core.xml",
+        "bytes": 621
+      },
+      {
+        "name": "docProps/app.xml",
+        "bytes": 959
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Top-10,000 list, NOT an exhaustive registry. Absence is not zero."
+  ]
+}

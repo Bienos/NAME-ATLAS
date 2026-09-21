@@ -1,0 +1,47 @@
+{
+  "source": {
+    "id": "geonames_countryInfo_txt",
+    "group": "geonames",
+    "bundle": "geonames",
+    "kind": "direct",
+    "title": "GeoNames countryInfo.txt",
+    "urls": [
+      "https://download.geonames.org/export/dump/countryInfo.txt"
+    ],
+    "format": "txt",
+    "source_page": "https://www.geonames.org/export/",
+    "reference_date": null,
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "license_label": "CC BY; attribution required; see included README and official terms",
+    "license_url": "https://www.geonames.org/export/",
+    "warnings": [
+      "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+      "Place coordinates/names do not establish surname origin or kinship."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/geonames/geonames_countryInfo_txt__93bafc525813.txt",
+  "bytes": 31678,
+  "sha256": "93bafc525813f22e4711ff9ed6d626343094ce48c26388dc7c49189b3d7d5512",
+  "http": {
+    "requested_url": "https://download.geonames.org/export/dump/countryInfo.txt",
+    "final_url": "https://download.geonames.org/export/dump/countryInfo.txt",
+    "retrieved_at": "2026-09-18T17:44:07Z",
+    "http_status": 200,
+    "content_type": "text/plain; charset=utf-8",
+    "last_modified": "Fri, 18 Sep 2026 02:02:25 GMT",
+    "etag": "\"7bbe-65bb84aab0817\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "TEXT_ACQUIRED",
+    "semantic_validation": "NOT_PERFORMED"
+  },
+  "warnings": [
+    "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+    "Place coordinates/names do not establish surname origin or kinship."
+  ]
+}

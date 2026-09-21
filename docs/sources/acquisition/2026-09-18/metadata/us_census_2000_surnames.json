@@ -1,0 +1,62 @@
+{
+  "source": {
+    "id": "us_census_2000_surnames",
+    "group": "usa",
+    "bundle": "usa",
+    "kind": "direct",
+    "title": "US Census 2000 surname release",
+    "urls": [
+      "https://www2.census.gov/topics/genealogy/2000surnames/names.zip"
+    ],
+    "format": "zip",
+    "source_page": "https://www.census.gov/topics/population/genealogy/data/2000_surnames.html",
+    "reference_date": "2000",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "U.S. Census Bureau",
+    "license_label": "US federal publication; retain source and release methodology; inspect any third-party exclusions",
+    "warnings": [
+      "1990 provides frequency/rank data and is not an exact-count file comparable to later releases.",
+      "2000/2010/2020 thresholds and disclosure methods differ. 2020 is disclosure-protected; preserve methodology.",
+      "Do not infer ethnicity of an individual from aggregate surname attributes."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/usa/us_census_2000_surnames__8dffe1e686ad.zip",
+  "bytes": 12250510,
+  "sha256": "8dffe1e686ad12fd618e8533f2a079e12d3ea60e60be3450a66a6d17499b35bc",
+  "http": {
+    "requested_url": "https://www2.census.gov/topics/genealogy/2000surnames/names.zip",
+    "final_url": "https://www2.census.gov/topics/genealogy/2000surnames/names.zip",
+    "retrieved_at": "2026-09-18T17:43:23Z",
+    "http_status": 200,
+    "content_type": "application/zip",
+    "last_modified": "Thu, 16 Jun 2022 13:36:18 GMT",
+    "etag": null,
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "zip",
+    "member_count": 2,
+    "uncompressed_bytes": 20197696,
+    "members": [
+      {
+        "name": "app_c.csv",
+        "bytes": 9346026
+      },
+      {
+        "name": "app_c.xlsx",
+        "bytes": 10851670
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "1990 provides frequency/rank data and is not an exact-count file comparable to later releases.",
+    "2000/2010/2020 thresholds and disclosure methods differ. 2020 is disclosure-protected; preserve methodology.",
+    "Do not infer ethnicity of an individual from aggregate surname attributes."
+  ]
+}

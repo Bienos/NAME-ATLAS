@@ -1,0 +1,57 @@
+{
+  "source": {
+    "id": "fr_insee_national",
+    "group": "france",
+    "bundle": "france",
+    "kind": "direct",
+    "title": "INSEE Fichier des noms — national",
+    "urls": [
+      "https://www.insee.fr/fr/statistiques/fichier/3536630/noms2008nat_txt.zip"
+    ],
+    "format": "zip",
+    "source_page": "https://www.insee.fr/fr/statistiques/3536630",
+    "reference_date": "birth cohorts 1891–2000; release 2018-05-22",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "INSEE",
+    "license_label": "INSEE reuse policy / Licence Ouverte subject to attribution and dataset documentation",
+    "license_url": "https://www.insee.fr/fr/information/2008466",
+    "warnings": [
+      "Birth-cohort counts, NOT the living population at each date. Do not merge into PESEL population trend.",
+      "National/departement thresholds, exclusions, AUTRES NOMS and XX require source-specific handling."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/france/fr_insee_national__c8693ff69bed.zip",
+  "bytes": 3003271,
+  "sha256": "c8693ff69bed32621250f1fc06e71b686e72bba1dbd771055e431d305527cfba",
+  "http": {
+    "requested_url": "https://www.insee.fr/fr/statistiques/fichier/3536630/noms2008nat_txt.zip",
+    "final_url": "https://www.insee.fr/fr/statistiques/fichier/3536630/noms2008nat_txt.zip",
+    "retrieved_at": "2026-09-18T17:43:30Z",
+    "http_status": 200,
+    "content_type": "application/zip",
+    "last_modified": null,
+    "etag": null,
+    "content_disposition": "attachment; filename=\"noms2008nat_txt.zip\""
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "zip",
+    "member_count": 1,
+    "uncompressed_bytes": 8049773,
+    "members": [
+      {
+        "name": "noms2008nat_txt.txt",
+        "bytes": 8049773
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Birth-cohort counts, NOT the living population at each date. Do not merge into PESEL population trend.",
+    "National/departement thresholds, exclusions, AUTRES NOMS and XX require source-specific handling."
+  ]
+}

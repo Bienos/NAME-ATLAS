@@ -3821,3 +3821,121 @@ Nothing in code. In order of what would unblock it:
 3. **`SITE_ORIGIN` and a domain.** A sitemap must carry absolute URLs, and a `Host` header is not a
    safe basis for one a crawler will treat as canonical — `sitemap.xml` returns an empty index rather
    than guessing.
+
+## The full register imported — indexing works end to end (2026-09-21)
+
+The project owner supplied the full PESEL register and, separately, a five-part archive of the whole
+2026-09-18 acquisition run. Both were verified before use.
+
+### Verification before import
+
+| Resource | Registry rows | File rows | SHA-256 | Bytes |
+|---|---:|---:|---|---|
+| `1148808` national male | 408,182 | 408,182 | **match** | match |
+| `1148811` national female | 420,082 | 420,082 | **match** | match |
+| `1148786` regional male | 646,052 | 646,052 | **match** | match |
+| `1148790` regional female | 694,553 | 694,553 | **match** | match |
+
+Every one matches `packages/sources/src/registry.ts`'s pinned `official_sha256`, `official_byte_size`
+and `official_row_count` — values recorded from the owner's earlier manual acquisition, checked here
+against the actual bytes. The 46-file archive verified 46/46 against its own `SHA256SUMS.txt`.
+
+### The import
+
+2,168,869 rows, **0 quarantined**, in 4m25s total. `no national row: 0` on both regional imports —
+every surname in the regional files exists in the national ones.
+
+**598,476 surnames**, the figure this project has been quoting from the source metadata since
+TASK-002, now actually in a database.
+
+### Every refusal became an answer
+
+`NOWAK`, derived through the real services:
+
+| | Before (excerpts) | After (full register) |
+|---|---|---|
+| Population | 98,387 ✓ | 98,387 ✓ |
+| Rank | `INCOMPLETE_UNIVERSE` | **1 of 408,182** |
+| Rarity | `INCOMPLETE_UNIVERSE` | **about 1 in 215**, of 21,197,537 |
+| Distribution | `INCOMPLETE_UNIVERSE` | **READY**, 16 regions, 88.4% coverage, WIELKOPOLSKIE 18.5% |
+
+The rank derivation refused first with "derive CURRENT_POPULATION first, because a derived statistic
+may not invent the input it depends on" — the dependency invariant holding on real data.
+
+### Indexing, end to end
+
+With 300 surnames derived (population + distribution), the policy is satisfied and a page is
+indexable for the first time:
+
+```
+/pl/nazwisko/nowak   <meta name="robots" content="index, follow"/>
+/sitemap.xml         <sitemap><loc>…/sitemap/1.xml</loc></sitemap>
+/sitemap/1.xml       300 URLs, hreflang alternates, real lastmod
+```
+
+`sitemapCount` = 300, exactly the number of surnames carrying both value families. The honesty rules
+hold on full data: geography is worded as *registered residence*, the two rarity figures carry the
+not-comparable note, and no forbidden substring appears outside the verbatim attribution.
+
+### 850 real collisions — surnames that had no address at all
+
+The backfill assigned 1,196,952 addresses and **850 of them needed a suffix**. These are real pairs
+in the register, for example:
+
+```
+wnuk-lipiński          WNUK-LIPIŃSKI
+wnuk-lipiński-96b0w8   WNUK LIPIŃSKI
+```
+
+Before ADR-0010 both were detected as a collision and **both were left unreachable**. 850 surnames
+had no canonical URL; now each has one, and which one keeps the bare slug is a function of
+`surname_id` rather than of import order.
+
+### A performance defect found only at scale
+
+The first backfill did a SELECT, a SELECT and an INSERT per (surname, locale). Against the real
+register that measured **559 rows a second — about 36 minutes** for 1,196,952 rows, on a job meant to
+run after every import.
+
+Rewritten to batch: one SELECT for the batch's existing slugs, one multi-row
+`INSERT … ON CONFLICT (locale, slug) DO NOTHING … RETURNING` that lets the database decide the
+collisions, and a suffix pass over only what did not land. **56.9 seconds** — about 38× faster, same
+algorithm, same addresses.
+
+It also proved resumable by accident: the first run was killed at 64,021 rows, and the batched run
+reported exactly those as `already correct` and assigned the rest.
+
+### A false property I had written
+
+`packages/seo/src/slug.test.ts` claimed `canonicalSlug` and `canonicalKey` agree on all alphanumeric
+characters. fast-check found `ʼ` (U+02BC MODIFIER LETTER APOSTROPHE): it is Unicode category Lm — a
+*letter* — so the slug keeps it, while `canonicalKey` folds every apostrophe-like code point to ASCII
+`'`, which is not alphanumeric. The claim was wrong, not the code. The property now states the
+agreement with apostrophe-likes removed, and a second test pins the exception as a fact. It passed
+earlier runs only because the seed had not reached that character.
+
+### Correction to ADR-0010 §5
+
+It says the backfill "uses the same expression" as migration `0017`'s alphanumeric index to find
+candidate entities. The batched backfill does not: it computes slugs in TypeScript and lets
+`UNIQUE (locale, slug)` arbitrate. `0017`'s index is now used by nothing on the request path either,
+since `resolveSlug` is a table lookup. It is left in place — dropping an index is its own change —
+and recorded here as unused rather than described as load-bearing.
+
+### Not imported, and why
+
+- **PESEL national 2019–2025** (14 files, verified). A real time series, but year-over-year claims
+  need their own claim type and comparability rules. A task, not an import.
+- **PESEL regional 2025** (`data_date = 2025-02-24`). A second snapshot, not a correction of 2026.
+- **US Census, INSEE, Belgium, GeoNames, Morfeusz.** No rights profile has been assessed for any of
+  them, and `docs/canonical/12` requires one before data is used. `docs/sources/INVENTORY.md` records
+  what each is, and in particular that **Morfeusz is morphology, not etymology** and may not be used
+  as a `SURNAME_MEANING` source: ADR-0008 requires an attributed specialist interpretation, and a
+  morphological analyser attributing nothing is exactly the generated meaning that ADR forbids.
+
+### What is committed
+
+The 63 new resource-metadata records (464 KB of JSON, the publisher's own), and
+`docs/sources/INVENTORY.md`. **Not** the 238 MB of source data: size, and rights that have not been
+assessed for five of the eight publishers. What is committed is enough to re-acquire and verify any
+of it.

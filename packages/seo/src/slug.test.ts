@@ -60,16 +60,36 @@ describe("canonicalSlug", () => {
     );
   });
 
-  it("agrees with the resolver's key on the alphanumeric characters", () => {
-    // The one thing a routing form and a lookup key always share. The backfill
-    // relies on it to narrow the entities a slug could belong to.
-    const alphanumeric = (s: string) => [...s].filter((c) => /[\p{L}\p{N}]/u.test(c)).join("");
+  it("agrees with the resolver's key on letters and digits, apostrophes aside", () => {
+    // A real property with a real exception, found by fast-check at seed
+    // -775871556 on the counterexample "ʼ" (U+02BC MODIFIER LETTER APOSTROPHE).
+    //
+    // U+02BC is Unicode category Lm — a *letter* — so `canonicalSlug` keeps it
+    // under `\p{L}`. `canonicalKey` maps every apostrophe-like code point to
+    // ASCII `'` (docs/canonical/13 §5.4, so that `O'X` never becomes `OX`), and
+    // `'` is not alphanumeric. The two therefore disagree on exactly that
+    // character class and on nothing else.
+    //
+    // The property is stated with the exception removed rather than deleted,
+    // because the agreement it describes is what migration `0017`'s index
+    // exploits, and a claim that is true except for one character is worth
+    // writing down precisely.
+    const APOSTROPHE_LIKE = /['\u02BC\u02B9\u2018\u2019\u201B\u0060\u00B4\uFF07]/gu;
+    const alphanumeric = (s: string) =>
+      [...s.replace(APOSTROPHE_LIKE, "")].filter((c) => /[\p{L}\p{N}]/u.test(c)).join("");
     fc.assert(
       fc.property(fc.string({ unit: "grapheme", maxLength: 40 }), (s) => {
         return alphanumeric(canonicalSlug(s)) === alphanumeric(canonicalKey(s));
       }),
-      { numRuns: 2000 },
+      { numRuns: 4000 },
     );
+  });
+
+  it("keeps a modifier-letter apostrophe that the key folds to ASCII", () => {
+    // The exception above, pinned as a fact rather than left as a footnote.
+    expect(canonicalSlug("o\u02BCneil")).toContain("\u02BC");
+    expect(canonicalKey("o\u02BCneil")).toContain("'");
+    expect(canonicalKey("o\u02BCneil")).not.toContain("\u02BC");
   });
 
   it("yields no slug for a display form made only of separators", () => {

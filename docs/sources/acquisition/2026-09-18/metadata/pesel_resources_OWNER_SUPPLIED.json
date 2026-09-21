@@ -1,0 +1,2253 @@
+{
+  "meta": {
+    "relative_uri": "/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources?per_page=100",
+    "aggregations": {},
+    "params": {
+      "per_page": "100"
+    },
+    "server_time": "2026-09-18T15:24:00Z",
+    "count": 21,
+    "path": "/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources",
+    "language": "en"
+  },
+  "data": [
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "18988"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18988/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "18988"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18988/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/18988,nazwiska-zenskie-stan-na-2019-06-30"
+      },
+      "id": "18988",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2019-06-30",
+        "has_research_data": null,
+        "has_dynamic_data": null,
+        "modified": "2020-03-17T06:58:33Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2019-08-13T07:16:07Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.jsonld",
+        "jsonld_file_size": 207232054,
+        "csv_file_size": 3993861,
+        "files": [
+          {
+            "file_size": 5334208,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 207232054,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 3993861,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.xlsx",
+        "has_high_value_data": null,
+        "description": "<p>lista nazwisk żeńskich w rejestrze PESEL stan na 30.06.2019</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.xlsx",
+        "verified": "2024-01-10T11:34:09Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/csv",
+        "contains_protected_data": false,
+        "views_count": 67317,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv",
+        "file_size": 5334208,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/file",
+        "data_date": "2019-06-30",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/18988,nazwiska-zenskie-stan-na-2019-06-30/jsonld",
+        "downloads_count": 112822
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "36401"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/36401/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "36401"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/36401/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/36401,nazwiska-meskie-stan-na-2022-01-27"
+      },
+      "id": "36401",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2022-01-27",
+        "has_research_data": null,
+        "has_dynamic_data": null,
+        "modified": "2022-02-07T08:19:30Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2022-02-07T08:09:53Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20220207/NAZWISKA_M%C4%98SKIE-OSOBY_%C5%BBYJ%C4%84CE_oAcmDus.jsonld",
+        "jsonld_file_size": 253024398,
+        "csv_file_size": 4160756,
+        "files": [
+          {
+            "file_size": 5831782,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 253024398,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 4160756,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20220207/NAZWISKA_M%C4%98SKIE-OSOBY_%C5%BBYJ%C4%84CE_oAcmDus.XLSX",
+        "has_high_value_data": null,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 27.01.2022</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20220207/NAZWISKA_M%C4%98SKIE-OSOBY_%C5%BBYJ%C4%84CE_oAcmDus.XLSX",
+        "verified": "2022-02-07T08:14:47Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/csv",
+        "contains_protected_data": false,
+        "views_count": 774689,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20220207/NAZWISKA_M%C4%98SKIE-OSOBY_%C5%BBYJ%C4%84CE_oAcmDus.csv",
+        "file_size": 5831782,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/file",
+        "data_date": "2022-01-27",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/jsonld",
+        "downloads_count": 149895
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "18990"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18990/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "18990"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18990/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/18990,nazwiska-meskie-stan-na-2019-06-30"
+      },
+      "id": "18990",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2019-06-30",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2024-01-10T12:45:57Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2019-08-13T07:16:07Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_m%C4%99skie.jsonld",
+        "jsonld_file_size": 188773700,
+        "csv_file_size": 3610164,
+        "files": [
+          {
+            "file_size": 4620056,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 188773700,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 3610164,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_m%C4%99skie.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>lista nazwisk męskich w rejestrze PESEL stan na 30.06.2019</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_m%C4%99skie.xlsx",
+        "verified": "2024-01-10T12:55:10Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/csv",
+        "contains_protected_data": false,
+        "views_count": 87504,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_m%C4%99skie.csv",
+        "file_size": 4620056,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/file",
+        "data_date": "2019-06-30",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/jsonld",
+        "downloads_count": 117107
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "65049"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/65049/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "65049"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/65049/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24"
+      },
+      "id": "65049",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie wg województwa zameldowania na pobyt stały - stan na 2025-02-24",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2025-03-10T11:45:42Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2025-03-05T08:25:26Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.jsonld",
+        "jsonld_file_size": 722585043,
+        "csv_file_size": 16619443,
+        "files": [
+          {
+            "file_size": 12153276,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 722585043,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 16619443,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL (bez zgonów) w podziale na województwa, stan na 24.02.2025</p>\n\n<p> </p>",
+        "link": "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "verified": "2025-04-17T07:57:35Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+        "contains_protected_data": false,
+        "views_count": 30416,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20250305/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+        "file_size": 12153276,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/file",
+        "data_date": "2025-02-24",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/jsonld",
+        "downloads_count": 26849
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "65090"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/65090/data"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24"
+      },
+      "id": "65090",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie wg województwa zameldowania na pobyt stały - stan na 2025-02-24",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2025-03-10T11:45:12Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2025-03-06T07:21:23Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20250306/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.jsonld",
+        "jsonld_file_size": 793089745,
+        "csv_file_size": 17891156,
+        "files": [
+          {
+            "file_size": 13150790,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 793089745,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 17891156,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20250306/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL w podziale na województwa, stan na 24.02.2025</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20250306/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "verified": "2025-04-17T09:11:02Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+        "contains_protected_data": false,
+        "views_count": 19079,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20250306/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+        "file_size": 13150790,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/file",
+        "data_date": "2025-02-24",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/jsonld",
+        "downloads_count": 24351
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "22815"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/22815/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "22815"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/22815/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22"
+      },
+      "id": "22815",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2020-01-22",
+        "has_research_data": null,
+        "has_dynamic_data": false,
+        "modified": "2022-05-23T10:50:33Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2020-03-30T12:42:57Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.jsonld",
+        "jsonld_file_size": 247950300,
+        "csv_file_size": 3988200,
+        "files": [
+          {
+            "file_size": 5748437,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 247950300,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 3988200,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.xlsx",
+        "verified": "2022-05-23T11:39:08Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/csv",
+        "contains_protected_data": false,
+        "views_count": 27754,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.csv",
+        "file_size": 5748437,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/file",
+        "data_date": "2020-01-22",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/jsonld",
+        "downloads_count": 163662
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "22817"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/22817/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "22817"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/22817/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/22817,nazwiska-meskie-stan-na-2020-01-22"
+      },
+      "id": "22817",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2020-01-22",
+        "has_research_data": null,
+        "has_dynamic_data": false,
+        "modified": "2022-05-23T11:47:22Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2020-03-30T12:45:24Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__m%C4%99skich_os__%C5%BCyj%C4%85ce_2020-01-22.jsonld",
+        "jsonld_file_size": 229167941,
+        "csv_file_size": 3662490,
+        "files": [
+          {
+            "file_size": 4812575,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 229167941,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 3662490,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__m%C4%99skich_os__%C5%BCyj%C4%85ce_2020-01-22.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskie osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__m%C4%99skich_os__%C5%BCyj%C4%85ce_2020-01-22.xlsx",
+        "verified": "2022-05-23T13:10:16Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/csv",
+        "contains_protected_data": false,
+        "views_count": 43517,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__m%C4%99skich_os__%C5%BCyj%C4%85ce_2020-01-22.csv",
+        "file_size": 4812575,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/file",
+        "data_date": "2020-01-22",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/jsonld",
+        "downloads_count": 272764
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "35279"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/35279/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "35279"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/35279/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/35279,nazwiska-zenskie-stan-na-2021-02-02"
+      },
+      "id": "35279",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2021-02-02",
+        "has_research_data": null,
+        "has_dynamic_data": null,
+        "modified": "2021-12-21T13:31:47Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2021-12-21T13:22:40Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20211221/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_knRevCC.jsonld",
+        "jsonld_file_size": 250110955,
+        "csv_file_size": 4141803,
+        "files": [
+          {
+            "file_size": 5186584,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 250110955,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 4141803,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20211221/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_knRevCC.xlsx",
+        "has_high_value_data": null,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 02.02.2021</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20211221/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_knRevCC.xlsx",
+        "verified": "2021-12-21T13:27:14Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/csv",
+        "contains_protected_data": false,
+        "views_count": 13302,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20211221/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_knRevCC.csv",
+        "file_size": 5186584,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/file",
+        "data_date": "2021-02-02",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/jsonld",
+        "downloads_count": 134682
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "63888"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/63888/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "63888"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/63888/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/63888,nazwiska-zenskie-stan-na-2025-01-22"
+      },
+      "id": "63888",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2025-01-22",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2025-01-23T11:54:55Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2025-01-23T11:54:55Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_efby1gw.jsonld",
+        "jsonld_file_size": 330354528,
+        "csv_file_size": 5465724,
+        "files": [
+          {
+            "file_size": 6916458,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 330354528,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5465724,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_efby1gw.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_efby1gw.xlsx",
+        "verified": "2025-01-23T12:03:29Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/csv",
+        "contains_protected_data": false,
+        "views_count": 21962,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_efby1gw.csv",
+        "file_size": 6916458,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/file",
+        "data_date": "2025-01-22",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/jsonld",
+        "downloads_count": 32563
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "44647"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/44647/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "44647"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/44647/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30"
+      },
+      "id": "44647",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2023-01-30",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2024-01-25T14:56:41Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2023-01-31T14:13:58Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.jsonld",
+        "jsonld_file_size": 276627315,
+        "csv_file_size": 4692377,
+        "files": [
+          {
+            "file_size": 6666338,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 4692377,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/csv",
+            "openness_score": 3
+          },
+          {
+            "file_size": 276627315,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/jsonld",
+            "openness_score": 4
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "verified": "2024-01-25T15:06:11Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/csv",
+        "contains_protected_data": false,
+        "views_count": 321699,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv",
+        "file_size": 6666338,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/file",
+        "data_date": "2023-01-30",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/jsonld",
+        "downloads_count": 121335
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "28052"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/28052/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "28052"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/28052/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01"
+      },
+      "id": "28052",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2021-02-01",
+        "has_research_data": null,
+        "has_dynamic_data": null,
+        "modified": "2021-02-03T11:06:56Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2021-02-03T11:01:24Z",
+        "jsonld_file_url": null,
+        "jsonld_file_size": null,
+        "csv_file_size": 3859773,
+        "files": [
+          {
+            "file_size": 4952551,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 3859773,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 3,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20210203/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_3jHNovW.xlsx",
+        "has_high_value_data": null,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 01.02.2021</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20210203/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_3jHNovW.xlsx",
+        "verified": "2024-01-10T13:33:04Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/csv",
+        "contains_protected_data": false,
+        "views_count": 194824,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20210203/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_3jHNovW.csv",
+        "file_size": 4952551,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/file",
+        "data_date": "2021-02-01",
+        "jsonld_download_url": null,
+        "downloads_count": 104358
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "54098"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/54098/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "54098"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/54098/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/54098,nazwiska-zenskie-stan-na-2024-01-19"
+      },
+      "id": "54098",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2024-01-19",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2024-01-26T07:06:19Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2024-01-26T07:06:19Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_aktualne.jsonld",
+        "jsonld_file_size": 323308982,
+        "csv_file_size": 5324053,
+        "files": [
+          {
+            "file_size": 7552155,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 323308982,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5324053,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_aktualne.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_aktualne.xlsx",
+        "verified": "2024-01-26T07:14:12Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/csv",
+        "contains_protected_data": false,
+        "views_count": 145301,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_aktualne.csv",
+        "file_size": 7552155,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/file",
+        "data_date": "2024-01-19",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/jsonld",
+        "downloads_count": 84409
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "44646"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/44646/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "44646"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/44646/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/44646,nazwiska-zenskie-stan-na-2023-01-30"
+      },
+      "id": "44646",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2023-01-30",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2023-01-31T14:12:44Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2023-01-31T14:12:44Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.jsonld",
+        "jsonld_file_size": 303590916,
+        "csv_file_size": 5169657,
+        "files": [
+          {
+            "file_size": 7298777,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 303590916,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5169657,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "verified": "2023-01-31T14:28:21Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/csv",
+        "contains_protected_data": false,
+        "views_count": 259038,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20230131/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.csv",
+        "file_size": 7298777,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/file",
+        "data_date": "2023-01-31",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/jsonld",
+        "downloads_count": 119352
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "1148786"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148786/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "1148786"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148786/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20"
+      },
+      "id": "1148786",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie wg województwa zameldowania na pobyt stały - stan na 2026-01-20",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2026-01-28T13:32:49Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2026-01-28T13:32:49Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.jsonld",
+        "jsonld_file_size": 722529033,
+        "csv_file_size": 16615897,
+        "files": [
+          {
+            "file_size": 12159696,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 722529033,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 16615897,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL (bez zgonów) w podziale na województwa, stan na 20.01.2026</p>\n\n<p> </p>",
+        "link": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "verified": "2026-01-28T13:32:49Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+        "contains_protected_data": false,
+        "views_count": 14357,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+        "file_size": 12159696,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/file",
+        "data_date": "2026-01-20",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/1148786,nazwiska-meskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/jsonld",
+        "downloads_count": 6049
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "1148808"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148808/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "1148808"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148808/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/1148808,nazwiska-meskie-stan-na-2026-01-20"
+      },
+      "id": "1148808",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2026-01-20",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2026-01-28T13:47:34Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2026-01-28T13:47:34Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.jsonld",
+        "jsonld_file_size": 315698219,
+        "csv_file_size": 5293415,
+        "files": [
+          {
+            "file_size": 7621712,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 315698219,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5293415,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "verified": "2026-01-28T13:47:34Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/csv",
+        "contains_protected_data": false,
+        "views_count": 23344,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv",
+        "file_size": 7621712,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/file",
+        "data_date": "2026-01-20",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/1148808,nazwiska-meskie-stan-na-2026-01-20/jsonld",
+        "downloads_count": 7360
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "1148811"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148811/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "1148811"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148811/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20"
+      },
+      "id": "1148811",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2026-01-20",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2026-01-28T13:48:39Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2026-01-28T13:48:39Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.jsonld",
+        "jsonld_file_size": 332615067,
+        "csv_file_size": 5592881,
+        "files": [
+          {
+            "file_size": 7972934,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 332615067,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5592881,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "verified": "2026-01-28T13:48:39Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/csv",
+        "contains_protected_data": false,
+        "views_count": 15150,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20260128/2_-_nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce.csv",
+        "file_size": 7972934,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/file",
+        "data_date": "2026-01-20",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/1148811,nazwiska-zenskie-stan-na-2026-01-20/jsonld",
+        "downloads_count": 6429
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "63892"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/63892/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "63892"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/63892/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/63892,nazwiska-meskie-stan-na-2025-01-22"
+      },
+      "id": "63892",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2025-01-22",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2025-01-23T14:29:44Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2025-01-23T14:25:55Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.jsonld",
+        "jsonld_file_size": 300842980,
+        "csv_file_size": 5114559,
+        "files": [
+          {
+            "file_size": 6627442,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 300842980,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 5114559,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.xlsx",
+        "verified": "2025-01-23T14:42:39Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/csv",
+        "contains_protected_data": false,
+        "views_count": 34604,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20250123/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce.csv",
+        "file_size": 6627442,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/file",
+        "data_date": "2025-01-22",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/jsonld",
+        "downloads_count": 33778
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "1148790"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148790/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "1148790"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/1148790/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20"
+      },
+      "id": "1148790",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie wg województwa zameldowania na pobyt stały - stan na 2026-01-20",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2026-01-28T13:35:13Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2026-01-28T13:35:13Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.jsonld",
+        "jsonld_file_size": 793494377,
+        "csv_file_size": 17900370,
+        "files": [
+          {
+            "file_size": 13158936,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 793494377,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 17900370,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": false,
+        "file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL w podziale na województwa, stan na 20.01.2026</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.xlsx",
+        "verified": "2026-01-28T13:35:13Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/csv",
+        "contains_protected_data": false,
+        "views_count": 9911,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20260128/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_w_podziale_na_wojew%C3%B3dztwo_zameldowania.csv",
+        "file_size": 13158936,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/file",
+        "data_date": "2026-01-20",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/1148790,nazwiska-zenskie-wg-wojewodztwa-zameldowania-na-pobyt-stay-stan-na-2026-01-20/jsonld",
+        "downloads_count": 5484
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "18989"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18989/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "18989"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/18989/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/18989,nazwiska-zenskie-stan-na-2019-06-30"
+      },
+      "id": "18989",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2019-06-30",
+        "has_research_data": null,
+        "has_dynamic_data": null,
+        "modified": "2020-03-17T06:58:30Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "chart",
+          "table"
+        ],
+        "created": "2019-08-13T07:16:07Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.jsonld",
+        "jsonld_file_size": 207232054,
+        "csv_file_size": null,
+        "files": [
+          {
+            "file_size": 3993861,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/18989,nazwiska-zenskie-stan-na-2019-06-30/file",
+            "openness_score": 3
+          },
+          {
+            "file_size": 207232054,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/18989,nazwiska-zenskie-stan-na-2019-06-30/jsonld",
+            "openness_score": 4
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv",
+        "has_high_value_data": null,
+        "description": "<p>lista nazwisk żeńskich w rejestrze PESEL stan na 30.06.2019</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv",
+        "verified": "2024-01-10T12:12:52Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": null,
+        "contains_protected_data": false,
+        "views_count": 27681,
+        "csv_file_url": null,
+        "file_size": 3993861,
+        "special_signs": [],
+        "format": "csv",
+        "download_url": "https://api.dane.gov.pl/resources/18989,nazwiska-zenskie-stan-na-2019-06-30/file",
+        "data_date": "2019-06-30",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/18989,nazwiska-zenskie-stan-na-2019-06-30/jsonld",
+        "downloads_count": 157026
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "38772"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/38772/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "38772"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/38772/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/38772,nazwiska-zenskie-stan-na-2022-01-27"
+      },
+      "id": "38772",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska żeńskie - stan na 2022-01-27",
+        "has_research_data": null,
+        "has_dynamic_data": false,
+        "modified": "2022-05-25T09:38:12Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2022-05-25T09:32:01Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20220525/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_soxLKbB.jsonld",
+        "jsonld_file_size": 250110955,
+        "csv_file_size": 4141803,
+        "files": [
+          {
+            "file_size": 5785728,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 250110955,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 4141803,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20220525/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_soxLKbB.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 27.01.2022</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20220525/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_soxLKbB.xlsx",
+        "verified": "2022-05-25T10:03:01Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/csv",
+        "contains_protected_data": false,
+        "views_count": 561446,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20220525/nazwiska_%C5%BCe%C5%84skie-osoby_%C5%BCyj%C4%85ce_soxLKbB.csv",
+        "file_size": 5785728,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/file",
+        "data_date": "2022-01-27",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/jsonld",
+        "downloads_count": 136093
+      }
+    },
+    {
+      "type": "resource",
+      "relationships": {
+        "tabular_data": {
+          "data": {
+            "type": "tabular_data",
+            "id": "54097"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/54097/data"
+          }
+        },
+        "chart": {
+          "data": {
+            "type": "chart",
+            "id": "54097"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/resources/54097/chart"
+          }
+        },
+        "dataset": {
+          "data": {
+            "type": "dataset",
+            "id": "1681"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel"
+          }
+        },
+        "institution": {
+          "data": {
+            "type": "institution",
+            "id": "333"
+          },
+          "links": {
+            "related": "https://api.dane.gov.pl/1.4/institutions/333,ministerstwo-cyfryzacji"
+          }
+        }
+      },
+      "links": {
+        "self": "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19"
+      },
+      "id": "54097",
+      "attributes": {
+        "is_chart_creation_blocked": false,
+        "title": "Nazwiska męskie - stan na 2024-01-19",
+        "has_research_data": false,
+        "has_dynamic_data": false,
+        "modified": "2024-01-26T06:35:27Z",
+        "regions": [
+          {
+            "hierarchy_label": "Poland",
+            "region_id": "85633723",
+            "name": "Poland"
+          }
+        ],
+        "visualization_types": [
+          "table"
+        ],
+        "created": "2024-01-26T06:35:27Z",
+        "jsonld_file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.jsonld",
+        "jsonld_file_size": 273139152,
+        "csv_file_size": 4904484,
+        "files": [
+          {
+            "file_size": 6232464,
+            "format": "xlsx",
+            "download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/file",
+            "openness_score": 2
+          },
+          {
+            "file_size": 273139152,
+            "format": "jsonld",
+            "download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/jsonld",
+            "openness_score": 4
+          },
+          {
+            "file_size": 4904484,
+            "format": "csv",
+            "download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/csv",
+            "openness_score": 3
+          }
+        ],
+        "openness_score": 4,
+        "language": "pl",
+        "has_high_value_data_from_ec_list": null,
+        "file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.xlsx",
+        "has_high_value_data": false,
+        "description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024</p>",
+        "link": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.xlsx",
+        "verified": "2024-10-29T07:54:27Z",
+        "supplements": [],
+        "media_type": "file",
+        "csv_download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/csv",
+        "contains_protected_data": false,
+        "views_count": 256168,
+        "csv_file_url": "https://api.dane.gov.pl/media/resources/20240126/nazwiska_m%C4%99skie_aktualne.csv",
+        "file_size": 6232464,
+        "special_signs": [],
+        "format": "xlsx",
+        "download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/file",
+        "data_date": "2024-01-19",
+        "jsonld_download_url": "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/jsonld",
+        "downloads_count": 91594
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.4"
+  },
+  "links": {
+    "self": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel/resources?per_page=100&page=1"
+  }
+}

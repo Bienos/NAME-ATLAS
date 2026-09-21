@@ -1,0 +1,47 @@
+{
+  "source": {
+    "id": "geonames_admin1CodesASCII_txt",
+    "group": "geonames",
+    "bundle": "geonames",
+    "kind": "direct",
+    "title": "GeoNames admin1CodesASCII.txt",
+    "urls": [
+      "https://download.geonames.org/export/dump/admin1CodesASCII.txt"
+    ],
+    "format": "txt",
+    "source_page": "https://www.geonames.org/export/",
+    "reference_date": null,
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "license_label": "CC BY; attribution required; see included README and official terms",
+    "license_url": "https://www.geonames.org/export/",
+    "warnings": [
+      "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+      "Place coordinates/names do not establish surname origin or kinship."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/geonames/geonames_admin1CodesASCII_txt__1da92a6323a5.txt",
+  "bytes": 151583,
+  "sha256": "1da92a6323a5fec3176f3f743bf4cf4040fd56a876da55e46fbca23c863aa60a",
+  "http": {
+    "requested_url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+    "final_url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+    "retrieved_at": "2026-09-18T17:44:08Z",
+    "http_status": 200,
+    "content_type": "text/plain; charset=utf-8",
+    "last_modified": "Fri, 18 Sep 2026 01:57:08 GMT",
+    "etag": "\"2501f-65bb837c691ab\"",
+    "content_disposition": null
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "TEXT_ACQUIRED",
+    "semantic_validation": "NOT_PERFORMED"
+  },
+  "warnings": [
+    "Poland extract / cities-over-15000 and lookup tables only; NOT entire global allCountries or alternateNames dump.",
+    "Place coordinates/names do not establish surname origin or kinship."
+  ]
+}

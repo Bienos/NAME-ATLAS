@@ -1,7 +1,7 @@
 import { uuidv7 } from "@name-atlas/domain";
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
-import { canonicalSlug, shortSlugId, SLUG_LOCALES } from "./slug.js";
+import { canonicalSlug, SHORT_SLUG_ID_LENGTH, shortSlugId, SLUG_LOCALES } from "./slug.js";
 import type { SlugLocale } from "./slug.js";
 
 /**
@@ -62,8 +62,9 @@ export async function backfillSlugs(
   const unaddressable: string[] = [];
   const stale: { surname_id: string; stored: string; computed: string }[] = [];
 
-  // Ordered by surname_id so the "lowest id keeps the bare slug" rule is
-  // reached in that order without holding 598,476 rows in memory.
+  // Ordered by surname_id, so "the lowest id keeps the bare slug" is reached in
+  // that order without holding 598,476 rows in memory — and so a resumed run
+  // assigns the same addresses as an uninterrupted one.
   let after: string | null = null;
   for (;;) {
     let query = db
@@ -76,23 +77,21 @@ export async function backfillSlugs(
     const rows: SurnameRow[] = await query.execute();
     if (rows.length === 0) break;
     after = rows[rows.length - 1]?.surname_id ?? null;
+    surnames += rows.length;
 
+    const addressable: { row: SurnameRow; base: string }[] = [];
     for (const row of rows) {
-      surnames += 1;
       const base = canonicalSlug(row.canonical_display);
-      if (base === "") {
-        unaddressable.push(row.canonical_display);
-        continue;
-      }
-      for (const locale of SLUG_LOCALES) {
-        const outcome = await assignSlug(db, locale, row, base);
-        if (outcome === "CREATED") created += 1;
-        else if (outcome === "CREATED_SUFFIXED") {
-          created += 1;
-          suffixed += 1;
-        } else if (outcome === "UNCHANGED") unchanged += 1;
-        else stale.push(outcome);
-      }
+      if (base === "") unaddressable.push(row.canonical_display);
+      else addressable.push({ row, base });
+    }
+
+    for (const locale of SLUG_LOCALES) {
+      const outcome = await assignBatch(db, locale, addressable);
+      created += outcome.created;
+      suffixed += outcome.suffixed;
+      unchanged += outcome.unchanged;
+      stale.push(...outcome.stale);
     }
     options.onProgress?.(surnames);
   }
@@ -100,77 +99,143 @@ export async function backfillSlugs(
   return { surnames, created, unchanged, suffixed, unaddressable, stale };
 }
 
-type AssignOutcome =
-  | "CREATED"
-  | "CREATED_SUFFIXED"
-  | "UNCHANGED"
-  | { readonly surname_id: string; readonly stored: string; readonly computed: string };
-
-async function assignSlug(
-  db: Kysely<DB>,
-  locale: SlugLocale,
-  row: SurnameRow,
-  base: string,
-): Promise<AssignOutcome> {
-  const existing = await db
-    .selectFrom("surname_slugs")
-    .select(["slug"])
-    .where("surname_id", "=", row.surname_id)
-    .where("locale", "=", locale)
-    .where("is_current", "=", true)
-    .executeTakeFirst();
-
-  if (existing) {
-    if (existing.slug === base || existing.slug.startsWith(`${base}-`)) return "UNCHANGED";
-    return { surname_id: row.surname_id, stored: existing.slug, computed: base };
-  }
-
-  // The bare slug first; then the suffix this entity's own id yields, lengthened
-  // only if that exact string is somehow already taken. Every candidate is a
-  // function of `row.surname_id`, so two runs try the same sequence.
-  const candidates = [base];
-  for (let length = 6; length <= MAX_SUFFIX_LENGTH; length += 1) {
-    candidates.push(`${base}-${shortSlugId(row.surname_id, length)}`);
-  }
-
-  for (const [index, slug] of candidates.entries()) {
-    const taken = await db
-      .selectFrom("surname_slugs")
-      .select(["surname_id"])
-      .where("locale", "=", locale)
-      .where("slug", "=", slug)
-      .executeTakeFirst();
-    if (taken) continue;
-    try {
-      await db
-        .insertInto("surname_slugs")
-        .values({
-          surname_slug_id: uuidv7(),
-          locale,
-          slug,
-          surname_id: row.surname_id,
-          is_current: true,
-        })
-        .execute();
-      return index === 0 ? "CREATED" : "CREATED_SUFFIXED";
-    } catch (cause: unknown) {
-      // A concurrent run took this slug between the check and the insert. The
-      // UNIQUE index is the authority; try the next candidate.
-      if (!isUniqueViolation(cause)) throw cause;
-    }
-  }
-  throw new Error(
-    `no free slug for ${row.surname_id} (${row.canonical_display}) after ` +
-      `${String(candidates.length)} candidates — the suffix space is exhausted, which means the ` +
-      `hash is degenerate rather than that the data is unusual`,
-  );
+interface BatchOutcome {
+  readonly created: number;
+  readonly suffixed: number;
+  readonly unchanged: number;
+  readonly stale: readonly { surname_id: string; stored: string; computed: string }[];
 }
 
-function isUniqueViolation(cause: unknown): boolean {
-  return (
-    typeof cause === "object" &&
-    cause !== null &&
-    "code" in cause &&
-    (cause as { code: unknown }).code === "23505"
+/**
+ * One batch, in a handful of round trips rather than three per row.
+ *
+ * The first implementation did a SELECT, a SELECT and an INSERT for every
+ * (surname, locale). Measured against the real register that was **559 rows a
+ * second — about 36 minutes** for the 1,196,952 rows 598,476 surnames need, on
+ * a job meant to run after every import. Batching is the same algorithm with the
+ * round trips removed:
+ *
+ *   1. one SELECT for the batch's existing current slugs;
+ *   2. one multi-row INSERT … ON CONFLICT (locale, slug) DO NOTHING … RETURNING,
+ *      which lets the database decide the collisions rather than asking it about
+ *      each one in advance;
+ *   3. a suffix pass over only what step 2 did not insert, which on real data is
+ *      a handful of rows per batch.
+ *
+ * Step 2 is where the order matters: rows are offered lowest-`surname_id` first,
+ * so the entity that keeps the bare slug is the same one a differently-batched
+ * or resumed run would choose.
+ */
+async function assignBatch(
+  db: Kysely<DB>,
+  locale: SlugLocale,
+  batch: readonly { row: SurnameRow; base: string }[],
+): Promise<BatchOutcome> {
+  if (batch.length === 0) return { created: 0, suffixed: 0, unchanged: 0, stale: [] };
+
+  const existing = new Map<string, string>();
+  for (const row of await db
+    .selectFrom("surname_slugs")
+    .select(["surname_id", "slug"])
+    .where("locale", "=", locale)
+    .where("is_current", "=", true)
+    .where(
+      "surname_id",
+      "in",
+      batch.map((b) => b.row.surname_id),
+    )
+    .execute()) {
+    existing.set(row.surname_id, row.slug);
+  }
+
+  const stale: { surname_id: string; stored: string; computed: string }[] = [];
+  const pending: { row: SurnameRow; base: string }[] = [];
+  let unchanged = 0;
+
+  for (const item of batch) {
+    const stored = existing.get(item.row.surname_id);
+    if (stored === undefined) {
+      pending.push(item);
+    } else if (stored === item.base || stored.startsWith(`${item.base}-`)) {
+      unchanged += 1;
+    } else {
+      stale.push({ surname_id: item.row.surname_id, stored, computed: item.base });
+    }
+  }
+  if (pending.length === 0) return { created: 0, suffixed: 0, unchanged, stale };
+
+  // Two entities in one batch can want one slug. Offer only the first — lowest
+  // surname_id, since the batch is ordered — and let the rest fall to the suffix
+  // pass, rather than relying on how one statement resolves its own duplicates.
+  const offered = new Map<string, { row: SurnameRow; base: string }>();
+  const deferred: { row: SurnameRow; base: string }[] = [];
+  for (const item of pending) {
+    if (offered.has(item.base)) deferred.push(item);
+    else offered.set(item.base, item);
+  }
+
+  const inserted = await insertSlugs(
+    db,
+    locale,
+    [...offered.values()].map((item) => ({ surname_id: item.row.surname_id, slug: item.base })),
   );
+  let created = inserted.size;
+  let suffixed = 0;
+
+  // Whatever the database refused is a collision with a row that already exists.
+  const collided = [...offered.values()]
+    .filter((item) => !inserted.has(item.row.surname_id))
+    .concat(deferred);
+
+  for (const item of collided) {
+    let placed = false;
+    for (let length = SHORT_SLUG_ID_LENGTH; length <= MAX_SUFFIX_LENGTH; length += 1) {
+      const slug = `${item.base}-${shortSlugId(item.row.surname_id, length)}`;
+      const got = await insertSlugs(db, locale, [{ surname_id: item.row.surname_id, slug }]);
+      if (got.size === 1) {
+        created += 1;
+        suffixed += 1;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      throw new Error(
+        `no free slug for ${item.row.surname_id} (${item.row.canonical_display}) after ` +
+          `${String(MAX_SUFFIX_LENGTH - SHORT_SLUG_ID_LENGTH + 1)} suffix lengths — the suffix ` +
+          `space is exhausted, which means the hash is degenerate rather than that the data is ` +
+          `unusual`,
+      );
+    }
+  }
+
+  return { created, suffixed, unchanged, stale };
+}
+
+/** Inserts, skipping whatever `(locale, slug)` already holds. Returns what landed. */
+async function insertSlugs(
+  db: Kysely<DB>,
+  locale: SlugLocale,
+  values: readonly { readonly surname_id: string; readonly slug: string }[],
+): Promise<ReadonlySet<string>> {
+  if (values.length === 0) return new Set();
+  const rows = await db
+    .insertInto("surname_slugs")
+    .values(
+      values.map((v) => ({
+        surname_slug_id: uuidv7(),
+        locale,
+        slug: v.slug,
+        surname_id: v.surname_id,
+        is_current: true,
+      })),
+    )
+    // `(locale, slug)` is the collision guarantee; `(locale, surname_id) WHERE
+    // is_current` catches a surname that gained an address concurrently. Neither
+    // is an error here — both mean "somebody else got there", so both are
+    // skipped and reported by absence from the returned set.
+    .onConflict((oc) => oc.doNothing())
+    .returning("surname_id")
+    .execute();
+  return new Set(rows.map((r) => r.surname_id));
 }

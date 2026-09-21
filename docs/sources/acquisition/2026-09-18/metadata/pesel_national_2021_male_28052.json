@@ -1,0 +1,121 @@
+{
+  "source": {
+    "id": "pesel_national_2021_male_28052",
+    "group": "pesel",
+    "bundle": "polska_pesel_national",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "28052",
+    "title": "Nazwiska męskie - stan na 2021-02-01",
+    "scope": "national",
+    "sex_partition": "male",
+    "reference_date": "2021-02-01",
+    "source_dates": {
+      "data_date": "2021-02-01",
+      "created": "2021-02-03T11:01:24Z",
+      "modified": "2021-02-03T11:06:56Z",
+      "verified": "2024-01-10T13:33:04Z"
+    },
+    "source_description": "<p>Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 01.02.2021</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01",
+    "urls": [
+      "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/csv",
+      "https://api.dane.gov.pl/media/resources/20210203/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_3jHNovW.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 3859773,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+      "The 2021 national male and female reference dates differ: do not present their sum as one exact-date observation."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_national_2021_male_28052.official_resource.json",
+    "sha256": "52aba9c5a1a8637285a9c353c2827a6b5f27cc187380693606abf50d5ff9bd65",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01",
+      "retrieved_at": "2026-09-18T17:37:29Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2021-02-01",
+      "created": "2021-02-03T11:01:24Z",
+      "modified": "2021-02-03T11:06:56Z",
+      "verified": "2024-01-10T13:33:04Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_national/pesel_national_2021_male_28052__ea466f2b8611.csv",
+  "bytes": 3859773,
+  "sha256": "ea466f2b8611be038913c6354bb13a5d029f5ff0ced07eea7ef282f5f52c215c",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20210203/nazwiska_m%C4%99skie-osoby_%C5%BCyj%C4%85ce_3jHNovW.csv",
+    "retrieved_at": "2026-09-18T17:37:37Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Wed, 03 Feb 2021 11:06:55 GMT",
+    "etag": "\"601a83cf-3ae53d\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 2,
+    "data_row_count": 298692,
+    "sample_rows": [
+      [
+        "NOWAK",
+        "100617"
+      ],
+      [
+        "KOWALSKI",
+        "68061"
+      ],
+      [
+        "WIŚNIEWSKI",
+        "54170"
+      ],
+      [
+        "WÓJCIK",
+        "48786"
+      ],
+      [
+        "KOWALCZYK",
+        "47992"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      1
+    ],
+    "schema_fingerprint": "a7477880b08460be40250ce2a669defd133e9edc6ccb2a528796fc568c869b2c",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity.",
+    "The 2021 national male and female reference dates differ: do not present their sum as one exact-date observation."
+  ]
+}

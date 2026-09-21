@@ -1,0 +1,59 @@
+{
+  "source": {
+    "id": "teryt_terc",
+    "group": "polish_geo",
+    "bundle": "polska_teryt",
+    "kind": "teryt_form",
+    "registry": "TERC",
+    "title": "TERYT TERC — basic version",
+    "source_page": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+    "format": "zip",
+    "evidence_status": "OFFICIAL_DYNAMIC_EXPORT_ADAPTER_UNTESTED_AGAINST_LIVE_SERVICE",
+    "warnings": [
+      "Uses the state selected by the official page. Record STAN_NA from actual files; not automatically 2026-01-20.",
+      "Keep all identifiers as text with leading zeros.",
+      "Can fail on changed ASP.NET form or anti-bot restriction; no bypass."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/polska_teryt/teryt_terc__1cfbb50ebf97.zip",
+  "bytes": 132136,
+  "sha256": "1cfbb50ebf97dfc797aca94331029983bc7f1e752dff94c973026437ba7d2768",
+  "http": {
+    "requested_url": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+    "final_url": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+    "retrieved_at": "2026-09-18T17:44:19Z",
+    "http_status": 200,
+    "content_type": "application/zip",
+    "last_modified": null,
+    "etag": null,
+    "content_disposition": "attachment; filename=TERC_Urzedowy_2026-09-18.zip"
+  },
+  "discovery": {
+    "export_state": "Read actual STAN_NA; default portal state not assumed"
+  },
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "zip",
+    "member_count": 2,
+    "uncompressed_bytes": 1166410,
+    "members": [
+      {
+        "name": "TERC_Urzedowy_2026-09-18.xml",
+        "bytes": 960750
+      },
+      {
+        "name": "TERC_Urzedowy_2026-09-18.csv",
+        "bytes": 205660
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Uses the state selected by the official page. Record STAN_NA from actual files; not automatically 2026-01-20.",
+    "Keep all identifiers as text with leading zeros.",
+    "Can fail on changed ASP.NET form or anti-bot restriction; no bypass."
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "source": {
+    "id": "be_regions_2022_2026",
+    "group": "belgium",
+    "bundle": "belgium",
+    "kind": "html_link",
+    "title": "Statbel most common surnames by province/region 2022–2026",
+    "source_page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery": {
+      "page": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+      "text_regex": "(?i)most common family names by province/region.*2022.*2026",
+      "url_regex": "(?i)\\.(xlsx|xls)(?:\\?|$)"
+    },
+    "format": "xlsx",
+    "reference_date": "2022–2026",
+    "evidence_status": "OFFICIAL_PAGE_LINK_IDENTIFIED_DOWNLOAD_NOT_TESTED_END_TO_END",
+    "publisher": "Statbel",
+    "warnings": [
+      "Ranking coverage depends on workbook; inspect documentation before aggregation."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "file_path": "raw/belgium/be_regions_2022_2026__b12b60fa2275.xlsx",
+  "bytes": 2461674,
+  "sha256": "b12b60fa2275bf3c0274d0d033db0607be84e73f98899355526395a775a330e5",
+  "http": {
+    "requested_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.1%20Familienamen/Fam_names_STATBEL_prov_en.xlsx",
+    "final_url": "https://statbel.fgov.be/sites/default/files/files/documents/bevolking/5.10%20Namen%20en%20voornamen/5.10.1%20Familienamen/Fam_names_STATBEL_prov_en.xlsx",
+    "retrieved_at": "2026-09-18T17:44:00Z",
+    "http_status": 200,
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "last_modified": "Thu, 02 Jul 2026 06:39:59 GMT",
+    "etag": "\"6a4607bf-258fea\"",
+    "content_disposition": null
+  },
+  "discovery": {
+    "discovery_page_url": "https://statbel.fgov.be/en/themes/population/family-names-and-first-names/family-names",
+    "discovery_page_sha256": "4518ccfeb5c551813df66a4211c51d98f6aa4d8e179871cd948326d5a95dabea",
+    "discovery_page_retrieved_at": "2026-09-18T17:43:41Z"
+  },
+  "inspection": {
+    "status": "ARCHIVE_CRC_VALIDATED",
+    "detected_format": "xlsx",
+    "member_count": 18,
+    "uncompressed_bytes": 20148581,
+    "members": [
+      {
+        "name": "[Content_Types].xml",
+        "bytes": 1828
+      },
+      {
+        "name": "_rels/.rels",
+        "bytes": 588
+      },
+      {
+        "name": "xl/workbook.xml",
+        "bytes": 2872
+      },
+      {
+        "name": "xl/_rels/workbook.xml.rels",
+        "bytes": 1262
+      },
+      {
+        "name": "xl/worksheets/sheet1.xml",
+        "bytes": 4017351
+      },
+      {
+        "name": "xl/worksheets/sheet2.xml",
+        "bytes": 4013481
+      },
+      {
+        "name": "xl/worksheets/sheet3.xml",
+        "bytes": 4005382
+      },
+      {
+        "name": "xl/worksheets/sheet4.xml",
+        "bytes": 3904975
+      },
+      {
+        "name": "xl/worksheets/sheet5.xml",
+        "bytes": 3890118
+      },
+      {
+        "name": "xl/theme/theme1.xml",
+        "bytes": 7127
+      },
+      {
+        "name": "xl/styles.xml",
+        "bytes": 2462
+      },
+      {
+        "name": "xl/sharedStrings.xml",
+        "bytes": 233885
+      },
+      {
+        "name": "xl/worksheets/_rels/sheet2.xml.rels",
+        "bytes": 322
+      },
+      {
+        "name": "xl/worksheets/_rels/sheet3.xml.rels",
+        "bytes": 322
+      },
+      {
+        "name": "xl/printerSettings/printerSettings1.bin",
+        "bytes": 32360
+      },
+      {
+        "name": "xl/printerSettings/printerSettings2.bin",
+        "bytes": 32360
+      },
+      {
+        "name": "docProps/core.xml",
+        "bytes": 646
+      },
+      {
+        "name": "docProps/app.xml",
+        "bytes": 1240
+      }
+    ],
+    "semantic_validation": "NOT_PERFORMED; workbook/tables and licence metadata still require inspection"
+  },
+  "warnings": [
+    "Ranking coverage depends on workbook; inspect documentation before aggregation."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "source": {
+    "id": "prng_localities_xlsx",
+    "group": "polish_geo",
+    "bundle": "polska_prng",
+    "kind": "prng_wms_export",
+    "title": "PRNG localities — country-wide export",
+    "source_page": "https://www.geoportal.gov.pl/pl/dane/panstwowy-rejestr-nazw-geograficznych-prng/",
+    "endpoint": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRNG/WMS/DaneDoPobrania",
+    "format": "auto_binary",
+    "evidence_status": "OFFICIAL_WMS_DISCOVERY_ADAPTER_UNTESTED_AGAINST_LIVE_SERVICE",
+    "license_label": "Geoportal states free access/use; preserve source and supplied metadata",
+    "warnings": [
+      "Geographic names and coordinates are not evidence of surname etymology.",
+      "Reference date and coordinate system must be read from the delivered export."
+    ]
+  },
+  "acquisition_status": "FAILED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "error": "XML_DTD_NOT_ALLOWED"
+}

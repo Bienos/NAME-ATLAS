@@ -97,8 +97,11 @@ agreement over real data rather than trusting two implementations of one policy.
 
 `resolveSlug` becomes one indexed exact lookup instead of three lookups and a confirmation loop, and
 the alphanumeric-fallback query that migration `0017` was created for is no longer on the request
-path. Migration `0017`'s index is kept: the backfill uses the same expression to find the entities a
-slug could belong to.
+path. Migration `0017`'s index is kept but is no longer load-bearing. `resolveSlug` is a table lookup, and
+the backfill computes slugs in TypeScript and lets `UNIQUE (locale, slug)` arbitrate rather than
+narrowing candidates by their alphanumeric characters — so nothing uses that expression on the
+request path or in the backfill. Dropping an index is its own change; it is recorded as unused
+(`PROGRESS.md`, 2026-09-21) rather than described as something it is not.
 
 The cost is a backfill: every surname needs a row before its page is reachable, so an import that
 creates surnames must create their slugs too. The backfill is idempotent and re-runnable, and

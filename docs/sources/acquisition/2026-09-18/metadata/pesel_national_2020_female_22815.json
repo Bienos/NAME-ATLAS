@@ -1,0 +1,119 @@
+{
+  "source": {
+    "id": "pesel_national_2020_female_22815",
+    "group": "pesel",
+    "bundle": "polska_pesel_national",
+    "kind": "direct",
+    "publisher": "Ministerstwo Cyfryzacji",
+    "dataset_id": "1681",
+    "resource_id": "22815",
+    "title": "Nazwiska żeńskie - stan na 2020-01-22",
+    "scope": "national",
+    "sex_partition": "female",
+    "reference_date": "2020-01-22",
+    "source_dates": {
+      "data_date": "2020-01-22",
+      "created": "2020-03-30T12:42:57Z",
+      "modified": "2022-05-23T10:50:33Z",
+      "verified": "2022-05-23T11:39:08Z"
+    },
+    "source_description": "<p>Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020</p>",
+    "source_page": "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22",
+    "metadata_url": "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22",
+    "urls": [
+      "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/csv",
+      "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.csv"
+    ],
+    "format": "csv",
+    "metadata_expected_bytes": 3988200,
+    "license_label": "CC0 1.0 — dataset-level value supplied by project owner; refresh official metadata where reachable",
+    "license_url": "https://api.dane.gov.pl/1.4/datasets/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel?lang=pl",
+    "evidence_status": "OWNER_SUPPLIED_OFFICIAL_API_TRANSCRIPTION_NOT_INDEPENDENT_BYTE_RETRIEVAL",
+    "warnings": [
+      "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+    ]
+  },
+  "acquisition_status": "DOWNLOADED",
+  "product_validation": "NOT_PERFORMED",
+  "task_D001_status": "UNCHANGED",
+  "resource_metadata": {
+    "status": "FETCHED",
+    "path": "metadata/pesel_national_2020_female_22815.official_resource.json",
+    "sha256": "6105c8e476bbb3c8e1a4c2e2890622fa453c2723dc9afdcaeb913f62cb3f4a32",
+    "http": {
+      "requested_url": "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22",
+      "final_url": "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22",
+      "retrieved_at": "2026-09-18T17:36:56Z",
+      "http_status": 200,
+      "content_type": "application/vnd.api+json",
+      "last_modified": null,
+      "etag": null,
+      "content_disposition": null
+    },
+    "source_dates": {
+      "data_date": "2020-01-22",
+      "created": "2020-03-30T12:42:57Z",
+      "modified": "2022-05-23T10:50:33Z",
+      "verified": "2022-05-23T11:39:08Z"
+    }
+  },
+  "file_path": "raw/polska_pesel_national/pesel_national_2020_female_22815__b0ede69ca796.csv",
+  "bytes": 3988200,
+  "sha256": "b0ede69ca79698cd8f6b09462916234be67dd4322d888e6a9263b89a52bfd99b",
+  "http": {
+    "requested_url": "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/csv",
+    "final_url": "https://api.dane.gov.pl/media/resources/20200330/Wykaz_nazwisk__%C5%BCe%C5%84skich_os__%C5%BCyj%C4%85ce_2020-01-22.csv",
+    "retrieved_at": "2026-09-18T17:37:04Z",
+    "http_status": 200,
+    "content_type": "application/octet-stream",
+    "last_modified": "Mon, 23 May 2022 11:32:58 GMT",
+    "etag": "\"628b70ea-3cdae8\"",
+    "content_disposition": "attachment"
+  },
+  "discovery": {},
+  "inspection": {
+    "status": "CSV_STRUCTURE_INSPECTED",
+    "encoding_used": "utf-8",
+    "encoding_evidence": "STRICT_UTF8_COMPATIBLE",
+    "bom": null,
+    "delimiter": ",",
+    "quotechar": "\"",
+    "headers": [
+      "Nazwisko aktualne",
+      "Liczba"
+    ],
+    "column_count": 2,
+    "data_row_count": 299612,
+    "sample_rows": [
+      [
+        "NOWAK",
+        "102944"
+      ],
+      [
+        "KOWALSKA",
+        "69581"
+      ],
+      [
+        "WIŚNIEWSKA",
+        "55553"
+      ],
+      [
+        "WÓJCIK",
+        "50141"
+      ],
+      [
+        "KOWALCZYK",
+        "49353"
+      ]
+    ],
+    "mismatched_row_examples": [],
+    "lexically_integer_column_indices": [
+      1
+    ],
+    "schema_fingerprint": "a7477880b08460be40250ce2a669defd133e9edc6ccb2a528796fc568c869b2c",
+    "important": "Values are NOT converted. Type hints are observational, not a semantic import contract."
+  },
+  "warnings": [
+    "Missing/suppressed row is not zero. Source sex partition is not a grammatical-name-form identity."
+  ]
+}
