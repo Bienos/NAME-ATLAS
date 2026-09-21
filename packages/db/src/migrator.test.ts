@@ -27,6 +27,7 @@ describe("MIGRATIONS_DIR", () => {
       "0016_citations_per_source_record.ts", // TASK-022 — a multi-sourced claim cites every work
       "0017_surname_slug_lookup_index.ts", // TASK-024 / ADR-0009 — slug lookup without a scan
       "0018_surname_slugs.ts", // TASK-027 / ADR-0010 — the persisted slug, resolving D-019
+      "0019_snapshot_profile_to_source_record.ts", // TASK-030 — 1 GB of repeated text, normalised
     ]);
   });
 });

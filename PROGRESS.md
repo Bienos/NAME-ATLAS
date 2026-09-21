@@ -4090,3 +4090,83 @@ pnpm test:integration passed, 263 tests
 
 Plus live, on the full register: connections 59 → 10 under identical load, and the rate limit
 firing with correct headers.
+
+## TASK-030 — 1 GB of repeated text taken off the snapshot rows (2026-09-21)
+
+The database had to fit an 8 GB plan with room for next year's register. It does now, without
+storing less.
+
+**6,974 MB → 5,917 MB.** 1,057 MB, reclaimed by a 4.3-second `VACUUM FULL`. 72% of 8 GB, 2.1 GB
+spare, and the saving compounds every year another register is added.
+
+### What it was
+
+Five columns on `distribution_snapshots` describe the **resource**, not the surname, and were stored
+once per snapshot — 1,223,015 times over four source records:
+
+| Column | Space | Distinct values |
+|---|---:|---:|
+| `coverage_notes` | 695 MB | **2** |
+| `universe_description` | 157 MB | 4 |
+| `methodology_key` | 60 MB | 4 |
+| `comparability_group` | 30 MB | 4 |
+| `dataset_version` | 25 MB | 4 |
+
+967 MB of a 1,162 MB table holding at most four strings. `coverage_notes` alone was the same two
+sentences 1.2 million times.
+
+The dependency on `source_record_id` was **verified before anything was written**: grouping the whole
+table by source record returned exactly one distinct value of every column, for all four records. So
+this is normalisation against a proven functional dependency, not a guess that happened to work.
+
+### What changed, and what did not
+
+They live on `source_records` now — four rows instead of 1.2 million. Nullable there, because a
+source record need not carry a distribution at all.
+
+Nothing the product says changed. A page rendered before and after the migration, against the full
+register, produced the same scope line, the same limitations and the same methodology text.
+
+### Two decisions worth recording
+
+**A view was considered and rejected.** Renaming the table and exposing the old shape through a view
+would have left all eight reading files untouched — but `kysely-codegen` types every view column as
+nullable regardless of the underlying constraint (the resolver already carries a comment about
+exactly that for `resolvable_name_forms`), so the nullability churn arrives either way, with a view
+in the path. Retargeting was also cheaper than it looked: **three of the six reading queries already
+joined `source_records`**, so those were one-token changes.
+
+**A missing profile throws.** `universe_description` and `methodology_key` were `NOT NULL` on the
+snapshot and cannot be on `source_records`. Rather than let a null flow into a claim as an empty
+string, `requiredProfileText` throws and names the source record — the same shape, and the same
+reason, as the resolver's `eligibleForm`. `migrateDown` refuses for the same reason instead of
+inventing a description.
+
+### The narrowing immediately caught something
+
+`claim-supersession.test.ts` hand-creates a second source record with raw SQL to simulate D-018's two
+imports of one resource. It copied fourteen columns and not the five new ones, so the derivation
+correctly refused with `source record … has no universe_description`. The test now copies the profile
+too — both records are the same resource, so it is the same profile, which is what the importer would
+have written. The error message did its job: it named the record and said what should have written it.
+
+### Verified
+
+```
+pnpm typecheck        passed (15 projects)
+pnpm lint             passed
+pnpm format:check     passed
+pnpm test             passed
+pnpm build            passed
+pnpm test:golden      passed, 364 tests
+pnpm test:integration passed, 263 tests
+```
+
+### The session's database is gone, and that is worth stating
+
+A worker restart took the Docker daemon with it, and the throwaway container holding 598,476
+surnames and 264,880 derivations went with the daemon. The code, the migration and every measurement
+above survived, because they are committed. The data never was — as recorded at the time.
+
+A real deployment rebuilds it from the committed migrations plus the owner's archive: import 4m25s,
+slugs 57s, derive 55m, all idempotent and resumable.

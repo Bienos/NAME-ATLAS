@@ -273,8 +273,12 @@ describe("regional ingestion and the voivodeship Place foundation (TASK-011)", (
       coverage_notes: string;
       comparability_group: string;
     }>`
-      SELECT DISTINCT universe_description, coverage_notes, comparability_group
-      FROM distribution_snapshots
+      -- TASK-030: the resource's descriptive text is stored once on the source
+      -- record rather than on every snapshot. The assertion is unchanged; only
+      -- where the value is read from has moved.
+      SELECT DISTINCT sr.universe_description, sr.coverage_notes, sr.comparability_group
+      FROM distribution_snapshots s
+      JOIN source_records sr ON sr.source_record_id = s.source_record_id
     `.execute(db());
     expect(rows.rows).toHaveLength(1);
     const row = rows.rows[0];
@@ -295,7 +299,10 @@ describe("regional ingestion and the voivodeship Place foundation (TASK-011)", (
       rawPayload: REGIONAL_FEMALE_PAYLOAD,
     });
     const groups = await sql<{ comparability_group: string }>`
-      SELECT DISTINCT comparability_group FROM distribution_snapshots ORDER BY 1
+      SELECT DISTINCT sr.comparability_group
+        FROM distribution_snapshots s
+        JOIN source_records sr ON sr.source_record_id = s.source_record_id
+       ORDER BY 1
     `.execute(db());
     expect(groups.rows.map((r) => r.comparability_group)).toEqual([
       "pesel_2026_regional_female",

@@ -95,8 +95,8 @@ export async function readCurrentPopulation(
       c.structured_value->>'snapshot_date'               AS snapshot_date,
       c.structured_value->>'country_code'                AS country_code,
       c.structured_value->>'source_population_scope'     AS source_population_scope,
-      s.coverage_notes                                   AS coverage_notes,
-      s.comparability_group                              AS comparability_group,
+      sr_prof.coverage_notes                                   AS coverage_notes,
+      sr_prof.comparability_group                              AS comparability_group,
       ca.status::text                                    AS confidence_status,
       ca.assessment_method                               AS assessment_method,
       ca.assessment_version                              AS assessment_version,
@@ -127,6 +127,9 @@ export async function readCurrentPopulation(
     JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
     JOIN distribution_snapshots s
       ON s.distribution_snapshot_id = (c.structured_value->>'distribution_snapshot_id')::uuid
+    -- TASK-030: the resource's own descriptive text lives on the source record,
+    -- not repeated on every snapshot row. Same values, one place.
+    JOIN source_records sr_prof    ON sr_prof.source_record_id = s.source_record_id
     WHERE c.subject_entity_id = ${surnameId}::uuid
       AND c.claim_type = 'CURRENT_POPULATION'
       AND c.claim_status = 'ACTIVE'
@@ -255,8 +258,8 @@ export async function readRarityContext(
       c.structured_value->>'snapshot_date'               AS snapshot_date,
       c.structured_value->>'country_code'                AS country_code,
       c.structured_value->>'source_population_scope'     AS source_population_scope,
-      s.coverage_notes                                   AS coverage_notes,
-      s.comparability_group                              AS comparability_group,
+      sr_prof.coverage_notes                                   AS coverage_notes,
+      sr_prof.comparability_group                              AS comparability_group,
       ca.status::text                                    AS confidence_status,
       ca.assessment_method                               AS assessment_method,
       ca.assessment_version                              AS assessment_version,
@@ -283,6 +286,9 @@ export async function readRarityContext(
     JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
     JOIN distribution_snapshots s
       ON s.distribution_snapshot_id = (c.structured_value->>'distribution_snapshot_id')::uuid
+    -- TASK-030: the resource's own descriptive text lives on the source record,
+    -- not repeated on every snapshot row. Same values, one place.
+    JOIN source_records sr_prof    ON sr_prof.source_record_id = s.source_record_id
     WHERE c.subject_entity_id = ${surnameId}::uuid
       AND c.claim_type = 'RARITY_CONTEXT'
       AND c.claim_status = 'ACTIVE'
@@ -433,8 +439,8 @@ export async function readCurrentDistribution(
       c.structured_value->>'snapshot_date'               AS snapshot_date,
       c.structured_value->>'country_code'                AS country_code,
       c.structured_value->>'source_population_scope'     AS source_population_scope,
-      s.coverage_notes                                   AS coverage_notes,
-      s.comparability_group                              AS comparability_group,
+      sr_prof.coverage_notes                                   AS coverage_notes,
+      sr_prof.comparability_group                              AS comparability_group,
       ca.status::text                                    AS confidence_status,
       ca.assessment_method                               AS assessment_method,
       ca.assessment_version                              AS assessment_version,
@@ -461,6 +467,9 @@ export async function readCurrentDistribution(
     JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
     JOIN distribution_snapshots s
       ON s.distribution_snapshot_id = (c.structured_value->>'distribution_snapshot_id')::uuid
+    -- TASK-030: the resource's own descriptive text lives on the source record,
+    -- not repeated on every snapshot row. Same values, one place.
+    JOIN source_records sr_prof    ON sr_prof.source_record_id = s.source_record_id
     WHERE c.subject_entity_id = ${surnameId}::uuid
       AND c.claim_type = 'CURRENT_DISTRIBUTION'
       AND c.claim_status = 'ACTIVE'

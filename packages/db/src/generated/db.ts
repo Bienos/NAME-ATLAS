@@ -152,18 +152,13 @@ export interface ConfidenceAssessments {
 
 export interface DistributionSnapshots {
   as_of_date: Timestamp | null;
-  comparability_group: string | null;
-  coverage_notes: string | null;
   created_at: Generated<Timestamp>;
-  dataset_version: string | null;
   distribution_snapshot_id: string;
   geography_level: GeographyLevel;
-  methodology_key: string;
   source_id: string;
   source_record_id: string;
   surname_id: string;
   surname_total_count: Int8 | null;
-  universe_description: string;
   universe_size: Int8 | null;
 }
 
@@ -358,10 +353,14 @@ export interface RuntimeOutbox {
 }
 
 export interface SourceRecords {
+  comparability_group: string | null;
   content_hash: string;
+  coverage_notes: string | null;
   created_at: Generated<Timestamp>;
+  dataset_version: string | null;
   external_parent_id: string | null;
   external_record_id: string | null;
+  methodology_key: string | null;
   raw_payload: Json | null;
   raw_text_ref: string | null;
   record_status: SourceRecordStatus;
@@ -373,6 +372,7 @@ export interface SourceRecords {
   source_record_id: string;
   source_url: string | null;
   supersedes_source_record_id: string | null;
+  universe_description: string | null;
 }
 
 export interface Sources {

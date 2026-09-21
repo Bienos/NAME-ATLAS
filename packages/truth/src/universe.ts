@@ -22,6 +22,29 @@ import type { EffectiveRights } from "./rights.js";
 import { TruthInvariantError } from "./derive.js";
 import type { CanonicalSurnameIdentity, SurnameRankResult } from "./result.js";
 
+/**
+ * A source record's `universe_description` cannot be absent for a snapshot that
+ * exists: the importer writes both in one transaction (TASK-030). A null here is
+ * therefore a broken database, not a value to render — so it throws rather than
+ * flowing into a claim as an empty string.
+ *
+ * The same shape as the resolver's `eligibleForm`, and for the same reason: a
+ * column the schema cannot make NOT NULL, but the writing path guarantees.
+ */
+export function requiredProfileText(
+  value: string | null,
+  field: string,
+  sourceRecordId: string,
+): string {
+  if (value === null) {
+    throw new Error(
+      `source record ${sourceRecordId} has no ${field}; a distribution snapshot exists for it, ` +
+        `so the importer should have written one (TASK-030)`,
+    );
+  }
+  return value;
+}
+
 export interface UniverseCandidate {
   readonly distribution_snapshot_id: string;
   readonly distribution_value_id: string;
@@ -56,9 +79,9 @@ export async function loadCandidates(
       "sr.external_record_id",
       "sr.content_hash",
       "v.count",
-      "s.universe_description",
-      "s.coverage_notes",
-      "s.comparability_group",
+      "sr.universe_description",
+      "sr.coverage_notes",
+      "sr.comparability_group",
     ])
     .select((eb) =>
       eb.fn<string | null>("to_char", ["s.as_of_date", eb.val("YYYY-MM-DD")]).as("as_of_date"),
@@ -77,7 +100,11 @@ export async function loadCandidates(
     content_hash: row.content_hash,
     count: Number(row.count),
     as_of_date: row.as_of_date,
-    universe_description: row.universe_description,
+    universe_description: requiredProfileText(
+      row.universe_description,
+      "universe_description",
+      row.source_record_id,
+    ),
     coverage_notes: row.coverage_notes,
     comparability_group: row.comparability_group,
   }));
@@ -442,9 +469,9 @@ export async function loadRegionalCandidates(
       "s.source_id",
       "sr.external_record_id",
       "sr.content_hash",
-      "s.universe_description",
-      "s.coverage_notes",
-      "s.comparability_group",
+      "sr.universe_description",
+      "sr.coverage_notes",
+      "sr.comparability_group",
       "v.distribution_value_id",
       "v.place_id",
       "v.source_geography_key",
@@ -475,7 +502,11 @@ export async function loadRegionalCandidates(
         external_record_id: row.external_record_id,
         content_hash: row.content_hash,
         as_of_date: row.as_of_date,
-        universe_description: row.universe_description,
+        universe_description: requiredProfileText(
+          row.universe_description,
+          "universe_description",
+          row.source_record_id,
+        ),
         coverage_notes: row.coverage_notes,
         comparability_group: row.comparability_group,
         cells: [],

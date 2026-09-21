@@ -124,12 +124,19 @@ describe("claim supersession across two imports of one resource (D-018)", () => 
       INSERT INTO source_records (
         source_record_id, source_id, external_record_id, external_parent_id, source_url,
         retrieved_at, source_modified_at, content_hash, raw_payload, raw_text_ref,
-        record_status, record_type, rights_profile_id, supersedes_source_record_id
+        record_status, record_type, rights_profile_id, supersedes_source_record_id,
+        -- TASK-030 put the resource's descriptive text here. Both records are
+        -- the same resource, so the second carries the same profile; copying it
+        -- is what the importer would have written.
+        dataset_version, universe_description, methodology_key, comparability_group,
+        coverage_notes
       )
       SELECT gen_random_uuid(), source_id, external_record_id, external_parent_id, source_url,
              retrieved_at, source_modified_at, ${PESEL_NATIONAL_MALE_2026.official_sha256},
              raw_payload, raw_text_ref, record_status, record_type, rights_profile_id,
-             source_record_id
+             source_record_id,
+             dataset_version, universe_description, methodology_key, comparability_group,
+             coverage_notes
       FROM source_records
       WHERE external_record_id = ${PESEL_NATIONAL_MALE_2026.resource_id}
       RETURNING source_record_id::text
@@ -140,14 +147,15 @@ describe("claim supersession across two imports of one resource (D-018)", () => 
     // Copy this surname's snapshot and value onto the authoritative record.
     await sql`
       WITH new_snapshot AS (
+        -- TASK-030: the profile columns moved to source_records, so copying a
+        -- snapshot no longer copies them. The authoritative record carries its
+        -- own, written by the importer that created it.
         INSERT INTO distribution_snapshots (
           distribution_snapshot_id, surname_id, source_id, source_record_id, geography_level,
-          methodology_key, universe_description, coverage_notes, comparability_group,
-          dataset_version, as_of_date
+          as_of_date
         )
         SELECT gen_random_uuid(), s.surname_id, s.source_id, ${authoritative}::uuid,
-               s.geography_level, s.methodology_key, s.universe_description, s.coverage_notes,
-               s.comparability_group, s.dataset_version, s.as_of_date
+               s.geography_level, s.as_of_date
         FROM distribution_snapshots s
         JOIN surnames n ON n.surname_id = s.surname_id
         WHERE n.canonical_display = ${surname}

@@ -29,6 +29,7 @@ import { findPeselResource } from "@name-atlas/sources";
 import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
+import { requiredProfileText } from "./universe.js";
 import type { UniverseSizeCache } from "./universe.js";
 import {
   CONFIDENCE_ASSESSMENT_METHOD,
@@ -98,10 +99,10 @@ async function loadApplicableSnapshots(
       "sr.external_record_id",
       "sr.content_hash",
       "v.count",
-      "s.universe_description",
-      "s.coverage_notes",
-      "s.comparability_group",
-      "s.dataset_version",
+      "sr.universe_description",
+      "sr.coverage_notes",
+      "sr.comparability_group",
+      "sr.dataset_version",
       "s.geography_level",
     ])
     .select((eb) =>
@@ -120,7 +121,11 @@ async function loadApplicableSnapshots(
     source_id: row.source_id,
     count: String(row.count),
     as_of_date: row.as_of_date,
-    universe_description: row.universe_description,
+    universe_description: requiredProfileText(
+      row.universe_description,
+      "universe_description",
+      row.source_record_id,
+    ),
     coverage_notes: row.coverage_notes,
     comparability_group: row.comparability_group,
     dataset_version: row.dataset_version,

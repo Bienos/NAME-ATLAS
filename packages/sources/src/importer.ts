@@ -498,6 +498,12 @@ export async function importPeselResource(
           content_hash: actualSha256,
           retrieved_at: resource.retrieved_at,
           source_modified_at: resource.portal_modified_at,
+          // The resource's own descriptive text, stored once (TASK-030).
+          dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
+          universe_description: resource.universe_description,
+          methodology_key: resource.methodology_key,
+          comparability_group: resource.comparability_group,
+          coverage_notes: resource.coverage_notes,
           rights_profile_id: null,
           record_status: "ACTIVE",
           supersedes_source_record_id: previous?.source_record_id ?? null,
@@ -562,9 +568,7 @@ export async function importPeselResource(
           // The PESEL reference date — never the portal timestamp and
           // never retrieved_at.
           as_of_date: resource.data_date,
-          dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
           geography_level: "NATIONAL",
-          universe_description: resource.universe_description,
           // Denominator not verified; storing one would be invention
           // (TASK-004 §14 U-6).
           universe_size: null,
@@ -572,9 +576,10 @@ export async function importPeselResource(
           // below. Writing it here too would give one source fact two
           // places to drift apart.
           surname_total_count: null,
-          methodology_key: resource.methodology_key,
-          comparability_group: resource.comparability_group,
-          coverage_notes: resource.coverage_notes,
+          // TASK-030: `dataset_version`, `universe_description`,
+          // `methodology_key`, `comparability_group` and `coverage_notes`
+          // describe the resource, not the surname, so they are written once on
+          // the source record below rather than 408,182 times here.
         });
         newValues.push({
           distribution_value_id: uuidv7(),

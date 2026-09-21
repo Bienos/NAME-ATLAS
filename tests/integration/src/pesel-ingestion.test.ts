@@ -395,8 +395,10 @@ describe("PESEL ingestion against a real PostgreSQL", () => {
     await importMale();
     await importFemale();
     const groups = await sql<{ comparability_group: string; n: string }>`
-      SELECT comparability_group, count(*)::text AS n
-      FROM distribution_snapshots GROUP BY comparability_group ORDER BY comparability_group
+      SELECT sr.comparability_group, count(*)::text AS n
+      FROM distribution_snapshots s
+      JOIN source_records sr ON sr.source_record_id = s.source_record_id
+      GROUP BY sr.comparability_group ORDER BY sr.comparability_group
     `.execute(db());
     expect(groups.rows.map((r) => r.comparability_group)).toEqual([
       "pesel_2026_national_female",

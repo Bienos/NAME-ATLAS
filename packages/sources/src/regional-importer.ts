@@ -274,6 +274,13 @@ export async function importPeselRegionalResource(
         rights_profile_id: null,
         record_status: "ACTIVE",
         supersedes_source_record_id: previous?.source_record_id ?? null,
+        // The resource's own descriptive text, stored once (TASK-030). The
+        // registered-residence restriction and the residual travel with it.
+        dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
+        universe_description: resource.universe_description,
+        methodology_key: resource.methodology_key,
+        comparability_group: resource.comparability_group,
+        coverage_notes: resource.coverage_notes,
       })
       .execute();
     if (previous) {
@@ -330,18 +337,15 @@ export async function importPeselRegionalResource(
         source_id: sourceId,
         source_record_id: sourceRecordId,
         as_of_date: resource.data_date,
-        dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
         geography_level: "REGION",
-        universe_description: resource.universe_description,
         // Not verified for the regional universe either; U-6's published-
         // universe denominator is a derived claim input, not a source fact.
         universe_size: null,
         // The counts live in the values below. One source fact, one place.
         surname_total_count: null,
-        methodology_key: resource.methodology_key,
-        comparability_group: resource.comparability_group,
-        // Carries the registered-residence restriction and the residual.
-        coverage_notes: resource.coverage_notes,
+        // TASK-030: the resource's descriptive text — including the
+        // registered-residence restriction and the residual — is written once on
+        // the source record, not 646,052 times here.
       });
     }
     await insertChunked(trx, "distribution_snapshots", newSnapshots);
