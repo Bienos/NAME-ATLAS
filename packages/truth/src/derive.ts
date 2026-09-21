@@ -29,6 +29,7 @@ import { findPeselResource } from "@name-atlas/sources";
 import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
+import type { UniverseSizeCache } from "./universe.js";
 import {
   CONFIDENCE_ASSESSMENT_METHOD,
   CONFIDENCE_ASSESSMENT_VERSION,
@@ -280,6 +281,17 @@ async function loadSourceContext(
 export interface DeriveOptions {
   /** Overridable so tests can exercise a restrictive rights posture. */
   readonly rightsOverride?: EffectiveRights;
+  /**
+   * A run-scoped memo for the universe-completeness count, accepted so a batch
+   * caller can pass one option object to every derivation.
+   *
+   * **The population chain does not use it**, and that is not an oversight: a
+   * count is a direct fact read from one row, so it needs no complete universe.
+   * Only rank, rarity and distribution do (`universe.ts`). Accepting and
+   * ignoring it is honest; silently implying population is gated on a universe
+   * would not be.
+   */
+  readonly universeSizeCache?: UniverseSizeCache;
 }
 
 /**

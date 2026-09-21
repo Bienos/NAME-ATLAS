@@ -156,3 +156,5 @@ export type {
 } from "./meaning.js";
 export { assessSurnameMeaning } from "./confidence.js";
 export type { MeaningConfidenceInputs } from "./confidence.js";
+export { regionalUniverseSize, universeSize } from "./universe.js";
+export type { UniverseSizeCache } from "./universe.js";

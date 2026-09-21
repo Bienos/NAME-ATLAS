@@ -84,7 +84,31 @@ export async function loadCandidates(
 }
 
 /** How many surnames have a national value against this source record. */
-export async function universeSize(db: Kysely<DB>, sourceRecordId: string): Promise<number> {
+/**
+ * A run-scoped memo for {@link universeSize}.
+ *
+ * Deliberately **not** module-level state. The count is immutable once an
+ * import has finished — a source record's distribution values are written once
+ * and never mutated — but it is not immutable *during* one: a derivation run
+ * that counted a half-imported record would cache the partial figure and go on
+ * refusing after the import completed. A cache the caller creates and discards
+ * cannot outlive the run that made it, so that false refusal has a bounded
+ * lifetime instead of an unbounded one.
+ *
+ * A single-page request creates none: it derives one surname and would gain
+ * nothing. A batch run over 598,476 surnames creates one and gains everything —
+ * the count is 379 ms against the real register, and it is the same 379 ms for
+ * every surname.
+ */
+export type UniverseSizeCache = Map<string, number>;
+
+export async function universeSize(
+  db: Kysely<DB>,
+  sourceRecordId: string,
+  cache?: UniverseSizeCache,
+): Promise<number> {
+  const memo = cache?.get(sourceRecordId);
+  if (memo !== undefined) return memo;
   const row = await db
     .selectFrom("distribution_snapshots as s")
     .innerJoin(
@@ -96,7 +120,9 @@ export async function universeSize(db: Kysely<DB>, sourceRecordId: string): Prom
     .where("s.source_record_id", "=", sourceRecordId)
     .where("v.place_id", "is", null)
     .executeTakeFirstOrThrow();
-  return Number(row.n);
+  const size = Number(row.n);
+  cache?.set(sourceRecordId, size);
+  return size;
 }
 
 export interface RejectedUniverse {
@@ -217,6 +243,7 @@ export async function resolveForDerivation(
 export async function prepareDerivation(
   db: Kysely<DB>,
   rawInput: string,
+  cache?: UniverseSizeCache,
 ): Promise<PreparedDerivation> {
   const resolved = await resolveForDerivation(db, rawInput);
   if (resolved.kind !== "RESOLVED") {
@@ -249,7 +276,7 @@ export async function prepareDerivation(
     const verdict = assessUniverseCompleteness({
       externalRecordId: candidate.external_record_id,
       actualContentHash: candidate.content_hash,
-      actualRowCount: await universeSize(db, candidate.source_record_id),
+      actualRowCount: await universeSize(db, candidate.source_record_id, cache),
       descriptor: descriptor
         ? {
             officialSha256: descriptor.official_sha256,
@@ -482,7 +509,10 @@ export async function loadRegionalCandidates(
 export async function regionalUniverseSize(
   db: Kysely<DB>,
   sourceRecordId: string,
+  cache?: UniverseSizeCache,
 ): Promise<number> {
+  const memo = cache?.get(`region:${sourceRecordId}`);
+  if (memo !== undefined) return memo;
   const row = await db
     .selectFrom("distribution_snapshots as s")
     .innerJoin(
@@ -494,7 +524,9 @@ export async function regionalUniverseSize(
     .where("s.source_record_id", "=", sourceRecordId)
     .where("v.place_id", "is not", null)
     .executeTakeFirstOrThrow();
-  return Number(row.n);
+  const size = Number(row.n);
+  cache?.set(`region:${sourceRecordId}`, size);
+  return size;
 }
 
 export interface CompleteRegionalUniverse {
@@ -520,6 +552,7 @@ export type PreparedRegionalDerivation =
 export async function prepareRegionalDerivation(
   db: Kysely<DB>,
   rawInput: string,
+  cache?: UniverseSizeCache,
 ): Promise<PreparedRegionalDerivation> {
   const resolved = await resolveForDerivation(db, rawInput);
   if (resolved.kind !== "RESOLVED") {
@@ -550,7 +583,7 @@ export async function prepareRegionalDerivation(
     const verdict = assessUniverseCompleteness({
       externalRecordId: candidate.external_record_id,
       actualContentHash: candidate.content_hash,
-      actualRowCount: await regionalUniverseSize(db, candidate.source_record_id),
+      actualRowCount: await regionalUniverseSize(db, candidate.source_record_id, cache),
       descriptor: descriptor
         ? {
             officialSha256: descriptor.official_sha256,

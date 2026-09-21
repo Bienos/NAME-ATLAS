@@ -3939,3 +3939,75 @@ The 63 new resource-metadata records (464 KB of JSON, the publisher's own), and
 `docs/sources/INVENTORY.md`. **Not** the 238 MB of source data: size, and rights that have not been
 assessed for five of the eight publishers. What is committed is enough to re-acquire and verify any
 of it.
+
+## TASK-028 — batch derivation, and a 140× cache bug (2026-09-21)
+
+Asked to "derive the rest so every surname is indexable". Two answers: a measured ceiling that is
+not every surname, and a job that can reach it.
+
+### "Every surname" is not achievable, and that is the policy working
+
+Measured on the full register:
+
+| | Surnames |
+|---|---:|
+| In the register | 598,476 |
+| With **any** regional evidence | 270,021 |
+| With a partition whose coverage clears 50% | **248,406** |
+
+`docs/canonical/21` §42 needs two substantive value families. `CURRENT_STATS` is available for all
+598,476; `GEOGRAPHY` needs a `CURRENT_DISTRIBUTION` claim, which needs regional evidence. **350,070
+surnames — 58.5% — appear in the national resource and not in the regional one**, because a surname
+with a handful of bearers nationally falls under the per-region publication threshold and is
+suppressed there. They can never have a second family, so §43 withholds their page as thin.
+
+That is the correct outcome, not a gap: a page whose entire content is one count is exactly what §43
+says not to index. The ceiling is **248,406 pages, 41.5% of the register** — and median coverage
+among the eligible is 87.9%, so the ones that qualify qualify comfortably.
+
+### The job
+
+`pnpm truth:derive-batch [--limit N] [--concurrency C] [--all]`
+(`packages/truth/bin/derive-batch.ts`). Resumable by construction: it asks the claims table what
+still needs work rather than keeping a cursor, so an interrupted run and a fresh one are the same
+query. Ordered by `surname_id`. Idempotent, because the derivations are. It targets the surnames
+that *can* be indexable; `--all` derives population for the rest, which improves their page without
+making it indexable.
+
+### The bug that mattered
+
+`deriveCurrentDistribution` calls `universeSize` — a `COUNT(*)` over a source record's whole value
+set — **once per surname**, though the answer is identical for every surname. Measured: **379 ms**.
+That was the entire cost: 1.55 s per surname, and 248,406 of them is 107 hours.
+
+The fix is a run-scoped `UniverseSizeCache`, threaded explicitly rather than held as module state —
+a cache that outlived a half-finished import would keep refusing after the import completed, so it
+is created and discarded by the caller.
+
+**Then it did not work, and the reason is worth recording.** `regionalUniverseSize` got the cache
+*read* and no *write*. It compiled. Every existing test passed. The batch job ran at **0.5
+surnames a second** — worse than no cache, because now eight workers were each running the 379 ms
+count concurrently. `pg_stat_activity` showed every backend executing the same count, which is what
+identified it.
+
+With the write added: **71.1/s**. About 140× — the difference between 107 hours and under an hour.
+
+Nothing caught it because nothing asserted the caching, only the arithmetic.
+`tests/integration/src/universe-cache.test.ts` now does, with two assertions that a value check
+cannot make: that a call **populates** the cache, and that a **poisoned** entry is returned rather
+than the database being asked again and happening to agree. Verified by removing the fix and
+watching 2 of the 5 fail.
+
+### An environmental failure, and its fix
+
+Six derivations failed with `could not resize shared memory segment … No space left on device` —
+the container's default 64 MB `/dev/shm` starving PostgreSQL's parallel workers. Not a code defect.
+Since the counts are cached, parallel query buys nothing here:
+`ALTER DATABASE name_atlas SET max_parallel_workers_per_gather = 0`. Zero failures after. A
+deployment that wants parallel query needs `--shm-size` raised instead.
+
+### Also recorded
+
+`DeriveOptions.universeSizeCache` is accepted by the population chain and **not used**, because a
+count is a direct fact from one row and needs no complete universe — only rank, rarity and
+distribution do. It is documented as accepted-and-ignored rather than quietly implying otherwise.

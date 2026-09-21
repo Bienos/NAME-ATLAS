@@ -34,6 +34,7 @@ import { assessUniverseCompleteness } from "./completeness.js";
 import { assessDerivedStatistic, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
+import type { UniverseSizeCache } from "./universe.js";
 import { TruthInvariantError } from "./derive.js";
 import {
   loadCandidates,
@@ -167,6 +168,7 @@ async function nationalCoverageCount(
   db: Kysely<DB>,
   surnameId: string,
   regional: PeselResourceDescriptor,
+  cache?: UniverseSizeCache,
 ): Promise<number | null> {
   const national = nationalCounterpartOf(regional);
   if (!national) return null;
@@ -178,7 +180,7 @@ async function nationalCoverageCount(
     const verdict = assessUniverseCompleteness({
       externalRecordId: candidate.external_record_id,
       actualContentHash: candidate.content_hash,
-      actualRowCount: await universeSize(db, candidate.source_record_id),
+      actualRowCount: await universeSize(db, candidate.source_record_id, cache),
       descriptor: {
         officialSha256: national.official_sha256,
         officialRowCount: national.official_row_count,
@@ -198,6 +200,8 @@ export interface DeriveDistributionOptions {
    * incomplete universe may be used.
    */
   readonly lowCoverageThreshold?: number;
+  /** Run-scoped memo for the completeness counts. See `UniverseSizeCache`. */
+  readonly universeSizeCache?: UniverseSizeCache;
 }
 
 /**
@@ -211,7 +215,7 @@ export async function deriveCurrentDistribution(
   rawInput: string,
   options: DeriveDistributionOptions = {},
 ): Promise<SurnameDistributionResult> {
-  const prepared = await prepareRegionalDerivation(db, rawInput);
+  const prepared = await prepareRegionalDerivation(db, rawInput, options.universeSizeCache);
   if (prepared.kind === "NO_RESULT") {
     return prepared;
   }
@@ -223,7 +227,12 @@ export async function deriveCurrentDistribution(
 
   const claims: CurrentDistributionClaimResult[] = [];
   for (const universe of complete) {
-    const nationalCount = await nationalCoverageCount(db, surname.surname_id, universe.descriptor);
+    const nationalCount = await nationalCoverageCount(
+      db,
+      surname.surname_id,
+      universe.descriptor,
+      options.universeSizeCache,
+    );
     claims.push(
       await db
         .transaction()
