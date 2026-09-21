@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   transpilePackages: [
     "@name-atlas/db",
     "@name-atlas/domain",
+    "@name-atlas/logging",
     "@name-atlas/resolver",
     "@name-atlas/sources",
   ],

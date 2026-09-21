@@ -12,6 +12,7 @@
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
+    "@name-atlas/logging": "workspace:*",
     "@name-atlas/truth": "workspace:*",
     "next": "16.3.5",
     "react": "19.3.0",

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",
+    "@name-atlas/logging": "workspace:*",
     "@name-atlas/resolver": "workspace:*",
     "@name-atlas/sources": "workspace:*",
     "kysely": "0.29.6",

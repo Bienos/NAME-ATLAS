@@ -1,6 +1,6 @@
-import { randomUUID } from "node:crypto";
 import { NextResponse } from "next/server";
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import type { ApiErrorResponse, PublicErrorCode } from "@name-atlas/contracts";
 
@@ -37,12 +37,18 @@ function errorBody(
 }
 
 export async function GET(request: Request): Promise<NextResponse> {
-  const requestId = randomUUID();
+  // One logger per request. Its correlation ID is the `request_id` a client sees
+  // in an error envelope and the `x-request-id` header, so a user quoting an id
+  // can be matched to exactly these lines (TASK-019).
+  const log = createLogger({ service: "web", base: { route: "/api/v1/surname-results" } });
+  const requestId = log.correlationId;
+  const startedAt = Date.now();
   const url = new URL(request.url);
   const surname = url.searchParams.get("surname");
   const surfaceParam = url.searchParams.get("surface");
 
   if (surname === null) {
+    log.warn("request_rejected", { status: 400, code: "INVALID_REQUEST" });
     return NextResponse.json(
       errorBody("INVALID_REQUEST", "the 'surname' query parameter is required", false, requestId),
       { status: 400 },
@@ -54,6 +60,7 @@ export async function GET(request: Request): Promise<NextResponse> {
   let surface: Surface = "FREE";
   if (surfaceParam !== null) {
     if (!(allowedSurfaces as readonly string[]).includes(surfaceParam)) {
+      log.warn("request_rejected", { status: 400, code: "INVALID_REQUEST", field: "surface" });
       return NextResponse.json(
         errorBody(
           "INVALID_REQUEST",
@@ -75,6 +82,20 @@ export async function GET(request: Request): Promise<NextResponse> {
 
     switch (outcome.kind) {
       case "OK":
+        // The surname itself is deliberately not logged. docs/canonical/19 §85
+        // requires request bodies redacted by default, and a search term tied to
+        // a timestamp is the visitor's, not the register's. The outcome is what
+        // diagnosis needs.
+        log.info("request_completed", {
+          status: 200,
+          surface,
+          result_status: outcome.response.status,
+          population_state: outcome.response.population?.state ?? null,
+          rarity_state: outcome.response.rarity?.state ?? null,
+          distribution_state: outcome.response.distribution?.state ?? null,
+          suggestions_state: outcome.response.suggestions?.state ?? null,
+          ms: Date.now() - startedAt,
+        });
         return NextResponse.json(outcome.response, {
           status: 200,
           // Cache by state, not by an assumed truth lifetime
@@ -84,6 +105,13 @@ export async function GET(request: Request): Promise<NextResponse> {
         });
 
       case "INVALID_INPUT":
+        log.info("request_rejected", {
+          status: 400,
+          code: "INVALID_SURNAME_INPUT",
+          // The validation verdict, not the input that produced it.
+          reason: outcome.reason,
+          ms: Date.now() - startedAt,
+        });
         return NextResponse.json(
           errorBody(
             "INVALID_SURNAME_INPUT",
@@ -97,7 +125,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       case "UNAVAILABLE":
         // The reason is logged internally, never returned. A client gets a
         // stable code and nothing that describes our infrastructure.
-        console.error(`[surname-results] ${requestId}: ${outcome.reason}`);
+        log.error("request_unavailable", {
+          status: 503,
+          reason: outcome.reason,
+          ms: Date.now() - startedAt,
+        });
         return NextResponse.json(
           errorBody(
             "SERVICE_UNAVAILABLE",
@@ -110,8 +142,9 @@ export async function GET(request: Request): Promise<NextResponse> {
     }
   } catch (cause: unknown) {
     // Nothing from `cause` reaches the client: no message, no stack, no SQL,
-    // no file path (docs/canonical/16 §78).
-    console.error(`[surname-results] ${requestId}: unexpected error`, cause);
+    // no file path (docs/canonical/16 §78). It is logged, redacted, so a
+    // connection string inside it cannot land in a log file either.
+    log.error("request_failed", { status: 500, cause, ms: Date.now() - startedAt });
     return NextResponse.json(
       errorBody("INTERNAL_ERROR", "the request could not be completed", false, requestId),
       { status: 500 },

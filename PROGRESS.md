@@ -2812,3 +2812,92 @@ The milestone's exit journey and its inspector both exist. What its description 
 repository does not have: a **structured logging and tracing baseline**. Both apps log to
 `console.error` with a request id where there is one, which is enough for one developer and is not an
 observability baseline. That is the last item, and nothing blocks it.
+
+## TASK-019 implemented — structured logging baseline; M2 is complete (2026-09-21)
+
+Scope authority: `tasks/019-structured-logging-baseline.md`. Both apps and the worker wrote to
+`console.error` with a request id where there was one. They now write structured lines through one
+shared logger, and M2's description has nothing left in it.
+
+### What exists now
+
+`packages/logging` — `createLogger({ service, correlationId?, level?, base? })`, one JSON object per
+line: timestamp, level, service, event, correlationId, then fields. `child()` repeats fields across a
+request's lines. Level from `LOG_LEVEL`, default `info`. No dependency beyond the correlation-ID
+helper, and no vendor: `docs/canonical/19` §85 makes an error-tracking provider a processor requiring
+review, which is a decision, not a default.
+
+`apps/worker`'s own logger is deleted; it was a duplicate of the same idea.
+
+### Redaction has two defences, because there are two dangers
+
+A field *named* after a secret is one. A secret inside a string that is **not** named after one is the
+other, and it is the likelier: a connection string reaches a log through `pg`'s own error message far
+more often than through a field called `password`. So every string value is scrubbed of
+`scheme://user:pass@` as well, including inside an `Error`'s message and stack.
+
+One deliberate omission from the name list: `url`. It would catch `DATABASE_URL`, and also
+`source_url` — a published dataset URL that is useful in a log and is not a secret. The string
+scrubber catches credentials wherever they appear instead, which is the better place to catch them.
+
+**Checked by running**, not only by unit test. With
+`DATABASE_URL=postgres://atlas:SUPERSECRETPW@localhost:5999/nope`, the password appears **zero** times
+across every log line while the failure is still reported:
+
+```json
+{"level":"error","service":"web","event":"request_unavailable","correlationId":"01a0c30b-2f08-…",
+ "route":"/api/v1/surname-results","status":503,"reason":"resolution lookup failed at TRANSACTION","ms":2}
+```
+
+### What is deliberately not logged
+
+**The visitor's surname query.** `docs/canonical/19` §85 requires request content redacted by default,
+and a search term with a timestamp is the visitor's, not the register's. The public app logs the
+outcome instead — resolution status, each section's state, duration — which is what diagnosis needs:
+
+```json
+{"level":"info","service":"web","event":"page_rendered","correlationId":"01a0c30a-c803-…","route":"/",
+ "result_status":"RESOLVED","population_state":"READY","rarity_state":"READY",
+ "distribution_state":"READY","suggestions_state":null,"ms":47}
+```
+
+The admin inspector **does** log the canonical key it inspected: that is a surname from the public
+register chosen by a staff member, and which surname an inspection covered is the point of the line.
+
+### The request id a user quotes is the log's correlation ID
+
+Confirmed by running: the `x-request-id` header from a live response matched exactly one log line.
+A user reporting an error id can be traced to it with no guessing.
+
+### Verification run
+
+```
+pnpm typecheck                → passed, 12 projects
+pnpm lint                     → passed
+pnpm format:check             → passed
+pnpm test                     → passed, 403 unit tests (logging 24 new; admin 14, web 54,
+                                 resolver 102, sources 74, truth 77, contracts 42, db 4,
+                                 domain 7, testing 3, worker 2)
+pnpm test:integration         → passed, 207 tests across 15 files, exit 0
+pnpm build                    → passed, both apps
+running check (AC-9)          → password occurrences in the log: 0
+running check (request id)    → x-request-id matched exactly 1 log line
+```
+
+### M2 is complete
+
+Every item in the milestone's description now exists: gender-safe Unicode identity, `pg_trgm`
+candidate generation with an edit-distance rerank, `CURRENT_RANK` and `RARITY_CONTEXT`,
+`CURRENT_DISTRIBUTION`, shared API contracts at schema 1.3, the free result UI, a read-only internal
+inspector, and structured logs with request IDs.
+
+M2's exit journey works end to end in a browser: search → resolution or suggestions → current result →
+confidence, source and date → honest low-data state.
+
+Open decisions remaining in the whole repository: **D-002** (onomastics rights) and **D-003** (Polona
+rights per surface), both belonging to M3. Nothing in M2 is blocked.
+
+What M3 needs before it starts, and what this milestone did not build: staff authentication
+(`docs/canonical/22` §6 — the inspector is gated by an environment flag, which is a lock on a door with
+no lock), and the asynchronous runtime ADR-0001 defers to M3 (Redis/Valkey, BullMQ, `ResearchRun`
+orchestration, the outbox).

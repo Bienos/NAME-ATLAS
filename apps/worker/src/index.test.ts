@@ -19,7 +19,7 @@ describe("runWorker", () => {
     const started: unknown = JSON.parse(String(startedLine));
     expect(started).toMatchObject({
       level: "info",
-      message: "worker started",
+      event: "worker_started",
       correlationId,
       service: "worker",
     });
@@ -28,8 +28,9 @@ describe("runWorker", () => {
     const exited: unknown = JSON.parse(String(exitedLine));
     expect(exited).toMatchObject({
       level: "info",
-      message: "worker exiting cleanly",
+      event: "worker_exiting_cleanly",
       correlationId,
+      service: "worker",
     });
   });
 

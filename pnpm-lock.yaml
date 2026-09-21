@@ -47,6 +47,9 @@ importers:
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@name-atlas/logging':
+        specifier: workspace:*
+        version: link:../../packages/logging
       '@name-atlas/resolver':
         specifier: workspace:*
         version: link:../../packages/resolver
@@ -84,6 +87,9 @@ importers:
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@name-atlas/logging':
+        specifier: workspace:*
+        version: link:../../packages/logging
       '@name-atlas/truth':
         specifier: workspace:*
         version: link:../../packages/truth
@@ -109,6 +115,9 @@ importers:
       '@name-atlas/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@name-atlas/logging':
+        specifier: workspace:*
+        version: link:../../packages/logging
 
   packages/contracts:
     dependencies:
@@ -137,6 +146,12 @@ importers:
       uuid:
         specifier: 14.0.2
         version: 14.0.2
+
+  packages/logging:
+    dependencies:
+      '@name-atlas/domain':
+        specifier: workspace:*
+        version: link:../domain
 
   packages/resolver:
     dependencies:

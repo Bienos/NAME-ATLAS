@@ -1,4 +1,5 @@
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
@@ -60,14 +61,22 @@ type Answer =
  */
 async function answer(query: string): Promise<Answer> {
   if (query === "") return { kind: "NONE" };
+  // The surname is deliberately absent from every line below: canonical/19 §85
+  // wants request content redacted by default, and a search term with a
+  // timestamp is the visitor's, not the register's (TASK-019).
+  const log = createLogger({ service: "web", base: { route: "/" } });
+  const startedAt = Date.now();
   let db: ReturnType<typeof createDb> | null = null;
   try {
     db = createDb(createPool(loadDbConfig()));
     const outcome = await querySurnameResult(db, query);
-    if (outcome.kind === "INVALID_INPUT") return { kind: "INVALID" };
+    if (outcome.kind === "INVALID_INPUT") {
+      log.info("page_rejected_input", { reason: outcome.reason, ms: Date.now() - startedAt });
+      return { kind: "INVALID" };
+    }
     if (outcome.kind === "UNAVAILABLE") {
       // Logged so an outage is diagnosable; nothing about it reaches the page.
-      console.error("[page] surname lookup unavailable:", outcome.reason);
+      log.error("page_unavailable", { reason: outcome.reason, ms: Date.now() - startedAt });
       return { kind: "UNAVAILABLE" };
     }
     // The rule this page is built on: render only what validated.
@@ -75,14 +84,26 @@ async function answer(query: string): Promise<Answer> {
     if (!parsed.success) {
       // A payload that violates its own contract is a bug, not an outage. The
       // reader sees the same honest message; the log tells the two apart.
-      console.error("[page] response failed contract validation:", parsed.error.issues);
+      log.error("page_contract_violation", {
+        issues: parsed.error.issues,
+        ms: Date.now() - startedAt,
+      });
       return { kind: "UNAVAILABLE" };
     }
+    log.info("page_rendered", {
+      result_status: parsed.data.status,
+      population_state: parsed.data.population?.state ?? null,
+      rarity_state: parsed.data.rarity?.state ?? null,
+      distribution_state: parsed.data.distribution?.state ?? null,
+      suggestions_state: parsed.data.suggestions?.state ?? null,
+      ms: Date.now() - startedAt,
+    });
     return { kind: "RESULT", response: parsed.data };
   } catch (cause: unknown) {
     // Nothing from `cause` reaches the page: no message, no stack, no SQL and no
-    // connection string (docs/canonical/16 §78's rule, applied to a page).
-    console.error("[page] unexpected failure answering the query:", cause);
+    // connection string (docs/canonical/16 §78's rule, applied to a page). The
+    // logger redacts it, so it cannot reach a log file either.
+    log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
   } finally {
     await db?.destroy();

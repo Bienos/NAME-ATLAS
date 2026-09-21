@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
     "@name-atlas/contracts",
     "@name-atlas/db",
     "@name-atlas/domain",
+    "@name-atlas/logging",
     "@name-atlas/resolver",
     "@name-atlas/sources",
     "@name-atlas/truth",

@@ -1,4 +1,5 @@
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { createLogger } from "@name-atlas/logging";
 import { canonicalKey } from "@name-atlas/resolver";
 import { inspectorEnabled, inspectSurname } from "../lib/inspect.js";
 import type { Inspection } from "../lib/inspect.js";
@@ -35,14 +36,28 @@ type Answer =
 
 async function inspect(query: string): Promise<Answer> {
   if (query === "") return { kind: "NONE" };
+  // An internal tool, so the inspected key *is* logged: it is a surname from the
+  // public register chosen by a staff member, not a visitor's search term, and
+  // knowing which surname an inspection covered is the point of the line.
+  const log = createLogger({ service: "admin", base: { route: "/" } });
+  const startedAt = Date.now();
   let db: ReturnType<typeof createDb> | null = null;
   try {
     db = createDb(createPool(loadDbConfig()));
     // The resolver's own key function, so the inspector cannot disagree with the
     // thing it is inspecting about what a surname's identity is.
-    return { kind: "INSPECTION", inspection: await inspectSurname(db, canonicalKey(query)) };
+    const key = canonicalKey(query);
+    const inspection = await inspectSurname(db, key);
+    log.info("inspection_completed", {
+      canonical_key: key,
+      found: inspection.kind === "FOUND",
+      claims: inspection.kind === "FOUND" ? inspection.claims.length : 0,
+      source_records: inspection.kind === "FOUND" ? inspection.source_records.length : 0,
+      ms: Date.now() - startedAt,
+    });
+    return { kind: "INSPECTION", inspection };
   } catch (cause: unknown) {
-    console.error("[inspector] lookup failed:", cause);
+    log.error("inspection_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "FAILED" };
   } finally {
     await db?.destroy();
