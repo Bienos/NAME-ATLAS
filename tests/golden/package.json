@@ -1,0 +1,17 @@
+{
+  "name": "@name-atlas/golden-tests",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:golden": "vitest run"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
+    "@name-atlas/testing": "workspace:*",
+    "@name-atlas/truth": "workspace:*",
+    "kysely": "0.29.6"
+  }
+}

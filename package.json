@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "test": "pnpm -r --if-present run test",
     "test:integration": "pnpm --filter @name-atlas/integration-tests run test:integration",
+    "test:golden": "pnpm --filter @name-atlas/golden-tests run test:golden",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",

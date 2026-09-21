@@ -3417,3 +3417,127 @@ truthful; `docs/canonical/21`'s map layers wait on a lawful geometry source.
 sake, and the metrics it names — second search, share start and completion, evidence opened — are all
 recorded as events on stdout with a correlation ID, where `search_origin` distinguishes a second search
 from a first without ever recording which surname.
+
+## TASK-026 — the golden test corpus (2026-09-21)
+
+**Status: IMPLEMENTED, PARTIALLY VERIFIED.** 175 of 364 assertions ran and passed; the other 189
+could not run in this environment for lack of a database. See "Not verified here" below.
+
+`docs/CODEMAP.md` had listed `tests/golden` as "filled per task" since TASK-001, and the directory
+did not exist. It exists now, implementing `docs/canonical/17` §4–§13 and §20–§21 for the two QA
+layers §2 marks *Absolute P0* and whose fixtures exist: Layer 3 (Resolution) and Layer 11 (Rights).
+
+### What is actually different about it
+
+Every other test in this repository asserts what the code does. These cases also assert what it must
+never do, **by name**, because §4 requires it:
+
+> Every high-risk golden case must contain both `EXPECTED` and `FORBIDDEN`. […] This is
+> substantially stronger than `expected top result = Łuczak`, because it protects semantics.
+
+A `forbidden` list of strings protects nothing, so each code resolves to a **predicate that runs**
+against what the system returned *and against what it stored*. Four of §13's seven hard fails are
+about something being persisted — a search candidate accepted as a historical form, an unaccepted
+association quietly gaining a `surname_id` — which no return value can show, so each resolution case
+carries an identity-table snapshot taken either side of it.
+
+Three structural consequences:
+
+- A `forbidden` code with no predicate does not compile.
+- `registry.test.ts` fails if any declared rule is exercised by no case. An unchecked rule and a
+  passing rule look identical in a green run; this is the difference.
+- Two suites run **every** rule against **every** case, not only the ones each case lists. The
+  per-case list says what a case is *about*; §13 and §21 are absolute.
+
+### Files
+
+| File | What it holds |
+|---|---|
+| `tests/golden/src/case.ts` | §5/§6's schema. All ten required metadata fields are non-optional, so a case that forgets `linked_requirements` does not compile |
+| `src/forbidden-resolution.ts` | §13's seven hard fails + `SILENT_DIACRITIC_IDENTITY_MERGE_WITHOUT_ACCEPTED_RELATION`, `HISTORICAL_VARIANT_CREATED_FROM_FOLD_ONLY` (§4's own two), `CANDIDATE_CARRIES_CONFIDENCE_SCORE`, `INVALID_INPUT_REPORTED_AS_UNKNOWN_SURNAME` — 11 predicates |
+| `src/forbidden-rights.ts` | §21's four hard fails + `RESTRICTION_WIDENED_AN_EXISTING_DECISION`, the attribution obligation and the two OCR-excerpt rules — 8 predicates |
+| `src/corpus/resolution.ts` | 23 cases: exact, case fold, three diacritic pairs, an accepted variant, the gendered ambiguity, four ineligible-form classes, two typos, short input, absent surname, two script cases, two separator cases, three invalid inputs |
+| `src/corpus/rights.ts` | §20's nine profiles plus `RIGHTS-ATTRIBUTION-UNBUILDABLE`, each with its whole twelve-cell (asset × surface) matrix written out rather than summarised |
+| `src/fixtures.ts` | `surname-set-v1` — 11 synthetic entities and 7 name forms, each annotated with what asserts against it |
+| `src/metrics.ts` | §12's two launch-priority rates |
+| `src/registry.test.ts`, `src/rights.test.ts`, `src/resolution-inputs.test.ts` | pure; run anywhere |
+| `src/resolution.test.ts` | needs PostgreSQL |
+| `tests/golden/README.md` | the §5 deviation and the recorded gaps |
+
+`pnpm test:golden` added to the root `package.json`, mirroring `test:integration`.
+
+### Two findings from writing it
+
+**A check I wrote was wrong and the code was right.** `RIGHTS_BLOCKED_BUT_STILL_EXPOSED` initially
+asserted `paid_surface_eligible === false` under a blocked review. It is not: `paidSurfaceEligible`
+is one of §6.4's *named gates* and reads `commercial_use` alone, so an open commercial licence keeps
+it true while the review blocks every surface. The verdict is the matrix, which is closed. The
+assertion was removed and the reason written next to it — a gate is not a verdict, and making this
+one answer a question it was not asked would have hidden which rule actually closed the surface.
+
+**Nine of ten rights matrices were derived by hand from §6.3/§6.4 and ADR-0007 before being run, and
+all 72 assertions passed first time.** That is the only evidence in this repository that the
+implementation and the canonical matrix agree cell by cell rather than approximately.
+
+### Recorded deviation from §5
+
+§5 recommends YAML; the corpus is TypeScript. Reasons in `tasks/026` §5: no YAML parser is a
+dependency and `AGENTS.md` §6 wants a justification for each new one; §6's metadata becomes a
+compile error rather than a runtime check; and a `forbidden` entry only protects semantics if it
+executes. §5's field names, nesting and vocabulary are preserved exactly.
+
+### Verified here
+
+```
+pnpm typecheck        → passed (all 13 packages)
+pnpm lint             → passed, zero warnings
+pnpm format:check     → passed
+pnpm test             → passed, 584 tests across 51 files
+pnpm build            → passed
+pnpm test:golden      → 175 passed, 189 skipped (see below)
+```
+
+The 175 that ran: `registry.test.ts` 32, `rights.test.ts` 72, `resolution-inputs.test.ts` 71.
+
+`resolution-inputs.test.ts` is worth naming separately. It asserts, per case, the pure normalisation
+property each expectation *rests on* — `nowak` and `Nowak` share a canonical key; `Luczak` and
+`Łuczak` do not; an en dash addresses a hyphen and a space does not; one Cyrillic letter inside a
+Latin word is `MIXED_SCRIPT_REVIEW` with both script flags set. So every one of the 23 resolution
+cases is proven **satisfiable** without a database. A case expecting `EXACT` against a display form
+whose key differs from its input could only ever fail, and nothing would have said so until someone
+ran it with a database.
+
+### Not verified here
+
+`tests/golden/src/resolution.test.ts` — 189 assertions — **did not run.** There is no container
+runtime in this session (`Could not find a working container runtime strategy`) and no reachable
+database: the local PostgreSQL 16 uses peer authentication, no role exists for this session's OS
+user, and creating one needs privileges this session was denied. Earlier sessions reached it through
+`TEST_DATABASE_URL`; that path is not available now.
+
+`pnpm test:integration` is unrun for the same reason, so TASK-023/024/025's 243 integration tests are
+also unconfirmed in this session. They passed in the session that wrote them.
+
+Nothing in the resolution corpus is asserted to have passed. Its expectations were derived from
+`packages/resolver`'s code and from `tests/integration/src/resolver.test.ts`'s existing, previously
+passing assertions, and its input-side properties were measured (above) — but the corpus itself has
+not been executed.
+
+### Recorded gaps, not omissions
+
+- **§8's 598 P0 cases.** Resolution and rights are built because their fixtures exist. The
+  evidence/claim corpus (§22, 125 cases) needs historical-source fixtures, the LLM corpus needs an
+  LLM layer, and the E2E corpus needs Playwright. Claiming a count the fixtures cannot support would
+  be the fabrication `AGENTS.md` §9 forbids.
+- **§20's `SHARE` surface.** No evaluator exists. TASK-024's share control puts this page's own URL
+  on a clipboard and carries no evidence, so no case asserts a share decision.
+- **Fuzzy recall.** No case asserts that a given candidate *is* returned. A rate over a
+  twelve-entity fixture is not a recall figure; recall is measured on the real 598,476-surname
+  register by `pnpm measure:fuzzy-recall`. §4's own example writes `MAY_APPEAR` for this reason, and
+  what the cases assert is §4's actual subject: that **if** a candidate appears, it appears as a
+  search-only suggestion under `USER_CONFIRM` with declared provenance and no score a consumer could
+  read as confidence.
+- **Review.** Every case carries `reviewed_at: null`. The rights cases ask for a `LEGAL` reviewer
+  and have not had one.
+- **Layers 9 and 12** (frontend state, product truthfulness) are covered by `apps/web/src/lib/*.test.ts`,
+  including the honesty guard. Duplicating them here would give one truth two owners (`AGENTS.md` §1).

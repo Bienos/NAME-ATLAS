@@ -271,6 +271,24 @@ importers:
         specifier: 0.29.6
         version: 0.29.6
 
+  tests/golden:
+    dependencies:
+      '@name-atlas/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@name-atlas/resolver':
+        specifier: workspace:*
+        version: link:../../packages/resolver
+      '@name-atlas/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
+      '@name-atlas/truth':
+        specifier: workspace:*
+        version: link:../../packages/truth
+      kysely:
+        specifier: 0.29.6
+        version: 0.29.6
+
   tests/integration:
     dependencies:
       '@name-atlas/contracts':
