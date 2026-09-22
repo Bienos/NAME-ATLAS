@@ -58,9 +58,19 @@ Timings are measured, from `PROGRESS.md`, not estimates. All four steps are
 idempotent and resumable, so a failure part-way through is safe to re-run.
 
 ```bash
-# ~4m25s — repeat per resource (male, female)
+# Male — 408,182 rows, ~4m25s
 pnpm --filter @name-atlas/sources run import-pesel -- \
-  --resource <resource-id> --file <path/to/national.csv> --metadata <path/to/manifest.json>
+  --resource 1148808 \
+  --file <path/to/nazwiska-meskie-2026-01-20.csv> \
+  --metadata fixtures/pesel/source-manifest.json \
+  --sha256 ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4
+
+# Female — 420,082 rows, ~4m25s
+pnpm --filter @name-atlas/sources run import-pesel -- \
+  --resource 1148811 \
+  --file <path/to/nazwiska-zenskie-2026-01-20.csv> \
+  --metadata fixtures/pesel/source-manifest.json \
+  --sha256 c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6
 
 # ~57s, 1,196,952 rows
 pnpm seo:backfill-slugs
@@ -69,8 +79,13 @@ pnpm seo:backfill-slugs
 pnpm truth:derive-batch
 ```
 
-`import-pesel` also takes `--sha256 <hex>` to pin the file's content before it is
-decoded. Use it when you have the publisher's checksum.
+The two `--resource` values are the official dane.gov.pl resource IDs, matched by
+`findPeselResource` in `packages/sources/src/registry.ts`. `--sha256` is optional —
+the registry already carries `official_sha256` — but passing it pins the file's
+content before it is decoded, which is the point of having a checksum.
+
+408,182 + 420,082 = **828,264 rows**, deduplicating to roughly **598,476**
+surnames across both files.
 
 ## 5. Check it landed
 
