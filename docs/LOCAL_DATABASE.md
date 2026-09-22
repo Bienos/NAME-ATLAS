@@ -18,7 +18,7 @@ there is no cap.
 | Node | the version in `.nvmrc` (`nvm use`) |
 | pnpm | the version in `package.json`'s `packageManager` (`corepack enable`) |
 | Disk | ~10 GB free — 5,917 MB of data plus WAL and working space |
-| The PESEL CSVs | the **full** national files. The importer reads bytes already on disk and never downloads; `fixtures/pesel/` holds 22- and 23-row excerpts for tests, not the register |
+| The PESEL CSVs | the **full** national files, kept in `data/` (git-ignored) or anywhere outside the repository. **Do not put them in `fixtures/pesel/`** — the excerpts there share the same file names, and overwriting them breaks the test suite. The importer reads bytes already on disk and never downloads; `fixtures/pesel/` holds 22- and 23-row excerpts for tests, not the register |
 
 ## 1. Start the database
 

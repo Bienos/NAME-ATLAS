@@ -27,3 +27,9 @@ pnpm-debug.log*
 # Test artifacts
 coverage/
 .vitest-cache/
+
+# Source data held locally for import (docs/LOCAL_DATABASE.md).
+# The full PESEL national CSVs are ~5 MB each and are NOT fixtures: the small
+# verbatim excerpts in fixtures/pesel/ are, and they share the same file names.
+# Keep the full files here so neither gets committed or overwritten.
+data/
