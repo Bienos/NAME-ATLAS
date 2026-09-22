@@ -64,18 +64,16 @@ idempotent and resumable, so a failure part-way through is safe to re-run.
 
 ```bash
 # Male — 408,182 rows, ~4m25s
-pnpm --filter @name-atlas/sources run import-pesel -- \
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
   --resource 1148808 \
-  --file <path/to/nazwiska-meskie-2026-01-20.csv> \
-  --metadata fixtures/pesel/source-manifest.json \
-  --sha256 ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4
+  --file data/national-male-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
 
 # Female — 420,082 rows, ~4m25s
-pnpm --filter @name-atlas/sources run import-pesel -- \
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
   --resource 1148811 \
-  --file <path/to/nazwiska-zenskie-2026-01-20.csv> \
-  --metadata fixtures/pesel/source-manifest.json \
-  --sha256 c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6
+  --file data/national-female-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
 
 # ~57s, 1,196,952 rows
 pnpm seo:backfill-slugs
@@ -83,6 +81,22 @@ pnpm seo:backfill-slugs
 # ~55m at 71.1 rows/s — the long one, leave it running
 pnpm truth:derive-batch
 ```
+
+Run these **from the repository root**, and note it is `pnpm exec tsx <path>`, not
+`pnpm --filter ... run import-pesel`. Two reasons, both learned the hard way:
+pnpm 10 forwards a `--` separator to the script verbatim, so the script sees `--`
+as an argument and dies with `missing value for --`; and `pnpm run` executes with
+the working directory set to `packages/sources`, where `data/` and `fixtures/` do
+not exist.
+
+The two `--resource` values are the official dane.gov.pl resource IDs, matched by
+`findPeselResource` in `packages/sources/src/registry.ts`. There is no `--sha256`
+flag here because the registry already carries `official_sha256` and the importer
+enforces it regardless — a wrong file fails with `CHECKSUM_MISMATCH` before a byte
+is decoded. Pass `--sha256 <hex>` only to assert a different expected digest.
+
+408,182 + 420,082 = **828,264 rows**, deduplicating to roughly **598,476**
+surnames across both files.
 
 The two `--resource` values are the official dane.gov.pl resource IDs, matched by
 `findPeselResource` in `packages/sources/src/registry.ts`. `--sha256` is optional —
