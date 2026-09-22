@@ -182,3 +182,92 @@ This is a development database. It is not a deployment, it has no backups, and
 nothing outside your machine can reach it. Production remains Vercel plus a
 hosted PostgreSQL; see `PROGRESS.md` for the current state of that and for why the
 hosted half is still empty.
+
+## Loading a slice into the hosted database — from your own machine
+
+This has to run from a machine that has the CSVs and can open a socket to the
+pooler. A Claude Code web session cannot: three things were checked on
+2026-09-22 and all three refuse.
+
+| Checked | Result |
+| --- | --- |
+| `fixtures/pesel/national-*.csv` | 22 and 23 data rows — enough for ~22 surnames, not 1,000 |
+| `https://api.dane.gov.pl/...` | proxy answers `403` to `CONNECT`; `recentRelayFailures` records it as a policy denial |
+| TCP to `aws-0-eu-central-1.pooler.supabase.com` :5432 and :6543 | both refused |
+
+So the register cannot be fetched there and the database cannot be reached
+there. The steps below are the whole job; they take a few minutes.
+
+### 0. Clear the fixture seed first
+
+The hosted database currently holds seven surnames imported from the committed
+fixtures. Those source records carry the *fixture's* `content_hash`, not the
+official one, so a real import creates a **second** source record for the same
+resource and every surname in both ends up with duplicate claims.
+
+```sql
+DELETE FROM claim_evidence;   DELETE FROM confidence_assessments;
+DELETE FROM citations;        DELETE FROM claims;
+DELETE FROM evidence_items;   DELETE FROM distribution_values;
+DELETE FROM distribution_snapshots; DELETE FROM research_runs;
+DELETE FROM surname_slugs;    DELETE FROM name_forms;
+DELETE FROM surnames;         DELETE FROM knowledge_entities;
+DELETE FROM source_records;   DELETE FROM sources;
+DELETE FROM rights_profiles;
+```
+
+### 1. Point `DATABASE_URL` at the session pooler
+
+Use port **5432**, not 6543. 6543 is transaction mode and is the right choice
+for the app's short queries; 5432 is session mode and is the safer port for a
+bulk load that holds a connection across many statements. (Not verified against
+this importer — if 5432 refuses, 6543 is worth trying.)
+
+```bash
+export DATABASE_URL='postgresql://postgres.xujctkjpvnmcdpximtda:<HASŁO>@aws-0-eu-central-1.pooler.supabase.com:5432/postgres?uselibpqcompat=true&sslmode=require'
+```
+
+`uselibpqcompat=true` is not optional — see the 2026-09-22 entry in
+`PROGRESS.md` for why `sslmode=require` alone means `verify-full` and drops the
+connection before any query runs.
+
+### 2. Import 1,000 surnames from each resource
+
+Point `--file` at the real downloaded CSVs, not at `fixtures/`.
+
+```bash
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
+  --resource 1148808 --file data/national-male-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json --slice top:1000
+
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
+  --resource 1148811 --file data/national-female-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json --slice top:1000
+```
+
+`top:1000` keeps the thousand most frequent surnames in each resource, so the
+result is roughly 1,300 distinct surnames — the two lists overlap but are not
+the same list. Well inside the 500 MB free tier, whose measured ceiling is
+~5,673 surnames.
+
+The importer prints a reconciliation report. `rowsExcludedBySlice` will be large
+and that is the point; `rowsRead` must equal
+`rowsImported + rowsQuarantined + rowsExcludedBySlice` or it throws.
+
+### 3. Derive the claims
+
+```bash
+pnpm exec tsx packages/truth/bin/derive-batch.ts --all
+```
+
+`--all` is required here. Without it the job only targets surnames carrying
+regional evidence, and no regional resource has been imported, so it would
+derive nothing.
+
+### 4. What you will and will not see afterwards
+
+Every one of those surnames gets a full page: counts, confidence, source,
+licence, limitations. **Rank and rarity stay withheld** — the universe gate
+compares the persisted snapshot count against the registry's
+`official_row_count` (408,182 and 420,082), and 1,000 is short of it. That is
+the gate working, not a fault, and no flag overrides it.
