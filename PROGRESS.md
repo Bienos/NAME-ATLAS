@@ -4336,10 +4336,40 @@ national files carry no suppressed values. Register total **42,757,839** people.
 248,406 is the indexable ceiling recorded earlier, and it reaches **97.23%** of the register — so the
 41.5% of surnames that can be indexed are the ones nearly everybody has.
 
-**The free tier is therefore not useless.** The top 20,000 surnames cover 70.68% of registered people.
-Scaling the measured 5,917 MB by that share of surnames puts it near 200–300 MB once every one of them
-is derived — an **estimate from per-row averages, not a measurement**, and to be verified against a
-real database rather than trusted.
+### Sizing a slice by surname count was wrong, and by how much
+
+An earlier version of this section scaled the measured 5,917 MB by the slice's **share of surnames**
+and concluded the top 20,000 would fit the 500 MB free tier at 200–300 MB. **That was wrong.** It is
+recorded rather than deleted because the error is the interesting part.
+
+Storage follows **rows**, not surnames, and the two diverge sharply: a common surname has a row in all
+16 voivodeships while a rare one has one or two. Measured from the 2026 regional files —
+**1,340,605 regional rows** against **828,264 national**, 2,168,869 in total, every row accounted for:
+
+| top N | share of surnames | share of **rows** | share of people |
+| ---: | ---: | ---: | ---: |
+| 1,000 | 0.17% | 1.36% | 27.84% |
+| 5,000 | 0.84% | 6.31% | 49.36% |
+| 20,000 | 3.34% | **20.29%** | 70.68% |
+| 100,000 | 16.71% | 53.09% | 91.20% |
+| 248,406 | 41.51% | 75.78% | 97.23% |
+
+The top 20,000 are 3.34% of surnames but **20.29% of rows** — six times the naive figure. Their real
+cost is about **1,240 MB**, not 200–300 MB, so they do **not** fit 500 MB.
+
+What each tier actually holds, taking size as proportional to rows, calibrated so the full set returns
+the measured 5,917 MB, and reserving 40 MB for extensions and catalogs:
+
+| tier | surnames | people covered |
+| --- | ---: | ---: |
+| 500 MB (free) | ~5,673 | **51.25%** |
+| 1 GB | ~14,144 | 65.32% |
+| 2 GB | ~39,676 | 80.66% |
+| 8 GB (Pro) | 598,476 (all) | 100.00% |
+
+Still an **estimate**, not a measurement, and it leans optimistic: the measured 5,917 MB carried
+derivations for 264,880 of 598,476 surnames, whereas a slice would derive all of its own. For small
+slices the gap is small, because derivation already targeted the highest-coverage surnames.
 
 Note on the total: 42,757,839 exceeds Poland's living population. That is a property of the register,
 not an error in this count, and it is why `DistributionSnapshot` carries its universe description
