@@ -4486,3 +4486,42 @@ coordinate-system definitions and no project data.
 3. **Version divergence recorded, not resolved.** Supabase runs PostgreSQL 17.6; D-005 pins
    PostgreSQL 16 / PostGIS 3.4.2 for local development, CI and Testcontainers. The schema applied
    cleanly to both, but production and test now differ by a major version.
+
+### The register can be run locally for nothing (2026-09-22)
+
+No hosted free tier holds this database. Checked rather than assumed: the largest
+is Crunchy Bridge at 5 GB, then Render 1 GB (expiring after 30 days), Aiven 1 GB,
+Neon 0.5 GB, Supabase 500 MB — against a measured 5,917 MB that TASK-030 already
+reduced from 6,974 MB. Locally there is no cap, and nothing outside the machine
+can reach the site anyway while `robots.txt` is `Disallow: /`, `SEO_INDEXING_ENABLED`
+is unset and the deployment sits behind team SSO.
+
+Added:
+
+- `docker-compose.yml` — PostgreSQL pinned to the same tag **and digest** as D-005,
+  `.github/workflows/ci.yml` and `packages/testing`, so local finally runs identical
+  bytes to CI. Credentials and database name match `.env.example`, so the documented
+  `DATABASE_URL` works unedited. `shm_size: 1gb` addresses the TASK-028 finding
+  directly: six derivations failed on the container's default 64 MB `/dev/shm`, and
+  that note records that a deployment wanting parallel query must raise the shm size
+  rather than set `max_parallel_workers_per_gather = 0`.
+- `docs/LOCAL_DATABASE.md` — the runbook, carrying the measured timings (import
+  4m25s, `seo:backfill-slugs` 57s for 1,196,952 rows, `truth:derive-batch` 55m at
+  71.1/s) rather than estimates.
+
+#### Verified
+
+| Command | Result |
+|---|---|
+| `docker compose config` | Resolves: correct digest, `shm_size` 1073741824, credentials matching `.env.example`. |
+| `pnpm db:migrate` with the runbook's literal `DATABASE_URL` | Passed — all 19 applied, then `up to date`. |
+| `select … from pg_extension` | `postgis 3.4.2`, `pg_trgm 1.6`. |
+| `select count(*) from surnames` | `0` — schema only, as expected before import. |
+| `pnpm test:integration` | Passed — **263 tests across 21 files**. |
+
+**The container itself was not started.** This environment has the Docker CLI but no
+daemon, and container registries are egress-blocked, so `docker compose config` is a
+syntax and resolution check only. Every other row above ran against a real local
+PostgreSQL 16.13 / PostGIS 3.4.2. The import chain was not exercised: it needs the
+full national CSVs, which are not in the repository (`fixtures/pesel/` holds 22- and
+23-row excerpts for tests).
