@@ -185,6 +185,7 @@ describe("reconciliation arithmetic (AC-23)", () => {
         surnamesReused: 0,
         snapshotsWritten: 3,
         valuesWritten: 3,
+        rowsExcludedBySlice: 0,
         mixedScriptRows: [],
       }),
     ).not.toThrow();
@@ -202,6 +203,7 @@ describe("reconciliation arithmetic (AC-23)", () => {
         surnamesReused: 0,
         snapshotsWritten: 3,
         valuesWritten: 3,
+        rowsExcludedBySlice: 0,
         mixedScriptRows: [],
       }),
     ).toThrow(/reconciliation failed/u);
@@ -219,6 +221,7 @@ describe("reconciliation arithmetic (AC-23)", () => {
         surnamesReused: 0,
         snapshotsWritten: 3,
         valuesWritten: 3,
+        rowsExcludedBySlice: 0,
         mixedScriptRows: [],
       }),
     ).toThrow(/quarantine tally/u);

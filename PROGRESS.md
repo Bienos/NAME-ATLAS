@@ -4557,3 +4557,46 @@ The Neon project does not exist yet. There is no Neon MCP in this environment an
 `create_connector` provisions auth connectors, not databases, so creating it is the project owner's
 step. Once `DATABASE_URL` points at the direct endpoint, `pnpm db:migrate` applies all 19 migrations
 from the owner's machine — no tunnel and no MCP needed, unlike the Supabase route.
+
+### `--slice`: part of a resource, for a database too small to hold it (2026-09-22)
+
+Asked for by the project owner, to put something real on a free-tier host.
+
+`packages/sources/src/slice.ts` — `--slice top:N` keeps the N largest counts;
+`--slice prefix:A-F` keeps an inclusive letter range, folding Polish diacritics onto their base
+letter (`Ćwik` files under C; `Łuczak` under L, which NFD does not decompose). A surname whose first
+character is not a Latin letter is excluded rather than guessed at.
+
+**It adds no way past the completeness gate, and does not need one.** The importer still reads,
+checksums and counts the whole official file; only the persisted rows are fewer. The gate in
+`packages/truth/src/completeness.ts` compares persisted rows against the registry's
+`official_row_count`, returns `ROW_COUNT_SHORT`, and the read path withholds rank and rarity with
+`NO_COMPLETE_UNIVERSE`. TASK-009 AC-03 asserts no flag can pass that gate; this one does not try.
+
+Two details that would otherwise have been quiet defects:
+
+- **Line numbers travel with the row.** `collectDistinct` derived `firstLine` from array position, so
+  filtering would have reported a row at line 338,202 as line 47 — a false provenance claim in the
+  one report that locates mixed-script findings by line.
+- **Excluded rows get their own bucket.** `rowsExcludedBySlice` is not folded into
+  `rowsQuarantined`, and `assertReconciles` now checks
+  `rowsRead === rowsImported + rowsQuarantined + rowsExcludedBySlice`. A quarantined row is one the
+  importer could not trust; an excluded row is one it never looked at. Reporting a deliberate
+  omission as a data problem would send the next reader hunting a defect that is not there.
+
+#### Verified
+
+| Check | Result |
+|---|---|
+| `slice.test.ts` | 14 tests — spec parsing fails closed, diacritic folding, order and line preservation, deterministic tie-break. |
+| Sliced import, 22-row fixture, `--slice top:5` | `rows read 22`, `rows excluded 17`, `rows imported 5`, `surnames created 5`. |
+| `pnpm truth:derive-batch --all` over that slice | **`CURRENT_POPULATION` 5; zero `CURRENT_RANK`, zero `RARITY_CONTEXT`** — the gate held without being asked. |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 642 tests. |
+| `pnpm test:integration` | Passed — 263 tests across 21 files. |
+
+#### Not done
+
+No slice has been loaded to a hosted database. The sizing in `docs/LOCAL_DATABASE.md` (~5,673
+surnames in 500 MB, covering 51.25% of people) remains the estimate computed on 2026-09-21, not a
+measurement of an actual sliced deployment.

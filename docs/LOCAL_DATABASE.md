@@ -125,6 +125,57 @@ docker compose start
 docker compose down -v    # DESTROY the data; a reload is another ~1 hour
 ```
 
+## Loading a slice into a small hosted database
+
+The full register needs ~5,917 MB. Every provider's free tier is smaller, so
+`--slice` persists part of a resource for an environment that cannot hold all of
+it. From `PROGRESS.md`'s measured estimate:
+
+| tier | surnames | people covered |
+| --- | ---: | ---: |
+| 500 MB (Supabase / Neon free) | ~5,673 | **51.25%** |
+| 1 GB | ~14,144 | 65.32% |
+| 2 GB | ~39,676 | 80.66% |
+| 8 GB | 598,476 (all) | 100% |
+
+Surname frequency is steeply long-tailed, so ~5,000 surnames covers about half
+the population and most searches land.
+
+```bash
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
+  --resource 1148808 \
+  --file data/national-male-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json \
+  --slice top:5000
+```
+
+`--slice top:N` keeps the N largest counts; `--slice prefix:A-F` keeps an
+inclusive letter range, folding Polish diacritics onto their base letter so
+`Ćwik` files under C and `Łuczak` under L. A surname whose first character is
+not a Latin letter is never in a range, and is excluded rather than guessed at.
+
+### What a slice does to the figures, and why that is safe
+
+The whole file is still read, checksummed and counted — `rows read` stays the
+resource's real size and `content_hash` stays the real file's digest. Only the
+persisted rows are fewer, which is reported as its own `rows excluded` bucket
+rather than folded into `rows quarantined`: a quarantined row is one the
+importer could not trust, an excluded row is one it never looked at.
+
+The universe completeness gate then compares persisted rows against the
+registry's `official_row_count`, returns `ROW_COUNT_SHORT`, and the read path
+withholds rank and rarity with `NO_COMPLETE_UNIVERSE` — *"Nie można podać tej
+wartości, bo wgrany zbiór nie jest kompletny."*
+
+So a sliced deployment shows **real counts with real citations**, and **no rank
+and no rarity**. That is not a limitation to work around: TASK-009 built that
+gate because a rank over a fragment would assert "NOWAK is rank 1 of 22" in the
+language of a national ranking, and be false from rank 16 on. The gate is
+unconditional — AC-03 asserts no flag can pass it, and `--slice` adds none.
+
+Verified on a 22-row fixture sliced to `top:5`: 5 `CURRENT_POPULATION` claims
+were derived, and zero `CURRENT_RANK` or `RARITY_CONTEXT`.
+
 ## What this is not
 
 This is a development database. It is not a deployment, it has no backups, and

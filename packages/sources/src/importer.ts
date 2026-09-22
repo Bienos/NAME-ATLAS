@@ -59,6 +59,8 @@ import type {
   QuarantinedRow,
   ReconciliationReport,
 } from "./import-result.js";
+import { applySlice } from "./slice.js";
+import type { LinedRow, SliceSpec } from "./slice.js";
 
 export interface ImportPeselOptions {
   /** The approved, checksum-pinned resource this file claims to be. */
@@ -81,6 +83,15 @@ export interface ImportPeselOptions {
   readonly rawPayload: unknown;
   /** Overridable only so tests can exercise the rights gate. */
   readonly rightsProfile?: RightsProfileSeed;
+  /**
+   * Persist only part of the resource (`./slice.js`).
+   *
+   * The whole file is still read, checksummed and counted; this decides only
+   * what is written. A sliced import is therefore an *incomplete* universe by
+   * construction, and the completeness gate withholds rank and rarity for it.
+   * Absent on a normal import.
+   */
+  readonly slice?: SliceSpec;
 }
 
 /** Computes the lowercase hex SHA-256 of the given bytes. */
@@ -120,12 +131,12 @@ interface ResolvedIdentity {
   readonly created: boolean;
 }
 
-function collectDistinct(rows: readonly PeselSourceRow[]): {
+function collectDistinct(rows: readonly LinedRow[]): {
   distinct: DistinctSurname[];
   duplicate: { key: string; first: string; second: string } | null;
 } {
   const byKey = new Map<string, DistinctSurname>();
-  for (const [index, row] of rows.entries()) {
+  for (const { row, line } of rows) {
     const key = canonicalKey(row.surname);
     const existing = byKey.get(key);
     if (existing) {
@@ -136,7 +147,10 @@ function collectDistinct(rows: readonly PeselSourceRow[]): {
         duplicate: { key, first: existing.surname, second: row.surname },
       };
     }
-    byKey.set(key, { surname: row.surname, key, firstLine: index + 2 });
+    // The line travels with the row rather than being recomputed from its
+    // position: under a slice the two differ, and a finding reported against
+    // the wrong line is a false provenance claim.
+    byKey.set(key, { surname: row.surname, key, firstLine: line });
   }
   return { distinct: [...byKey.values()], duplicate: null };
 }
@@ -344,9 +358,9 @@ export async function importPeselResource(
   }
 
   // 3. Decode and parse, reusing TASK-002's validator unchanged.
-  let rows: PeselSourceRow[];
+  let allRows: PeselSourceRow[];
   try {
-    rows = parsePeselFile(decodePeselBytes(bytes));
+    allRows = parsePeselFile(decodePeselBytes(bytes));
   } catch (cause: unknown) {
     if (cause instanceof PeselSchemaError) {
       return {
@@ -360,6 +374,14 @@ export async function importPeselResource(
     }
     throw cause;
   }
+
+  // 3b. Slice, if one was asked for. Line numbers are attached before the
+  //     filter so a kept row still reports the line it occupies in the
+  //     official file. `rowsRead` stays the whole file either way.
+  const lined: LinedRow[] = allRows.map((row, index) => ({ row, line: index + 2 }));
+  const sliced = options.slice ? applySlice(lined, options.slice) : { kept: lined, excluded: 0 };
+  const rows = sliced.kept;
+  const rowsExcludedBySlice = sliced.excluded;
 
   // 4. Duplicate canonical keys within one file are schema drift.
   const { distinct, duplicate } = collectDistinct(rows);
@@ -431,9 +453,10 @@ export async function importPeselResource(
   if (quarantined.length > 0) {
     const report: ReconciliationReport = {
       ...blank,
-      rowsRead: rows.length,
+      rowsRead: allRows.length,
       rowsImported: 0,
       rowsQuarantined: quarantined.length,
+      rowsExcludedBySlice,
       quarantinedByReason: tallyReasons(quarantined),
     };
     return {
@@ -464,7 +487,7 @@ export async function importPeselResource(
         return {
           kind: "ALREADY_IMPORTED" as const,
           sourceRecordId: alreadyImported.source_record_id,
-          report: { ...blank, rowsRead: rows.length },
+          report: { ...blank, rowsRead: allRows.length, rowsExcludedBySlice },
         };
       }
 
@@ -553,7 +576,7 @@ export async function importPeselResource(
       // and one value per row, exactly as before.
       const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
       const newValues: Insertable<DB["distribution_values"]>[] = [];
-      for (const row of rows) {
+      for (const { row } of rows) {
         const key = canonicalKey(row.surname);
         const surnameId = surnameIdByKey.get(key);
         if (!surnameId) {
@@ -602,10 +625,11 @@ export async function importPeselResource(
 
       const report: ReconciliationReport = {
         resourceId: resource.resource_id,
-        rowsRead: rows.length,
+        rowsRead: allRows.length,
         rowsImported: rows.length,
         rowsQuarantined: 0,
         quarantinedByReason: {},
+        rowsExcludedBySlice,
         surnamesCreated,
         surnamesReused,
         snapshotsWritten,
