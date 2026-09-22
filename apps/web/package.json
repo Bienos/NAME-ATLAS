@@ -16,6 +16,7 @@
     "@name-atlas/resolver": "workspace:*",
     "@name-atlas/seo": "workspace:*",
     "@name-atlas/truth": "workspace:*",
+    "@vercel/analytics": "^2.0.1",
     "kysely": "0.29.6",
     "next": "16.3.5",
     "react": "19.3.0",
