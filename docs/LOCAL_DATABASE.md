@@ -32,15 +32,20 @@ same PostgreSQL 16 / PostGIS 3.4 that CI and Testcontainers run.
 
 ## 2. Point the repository at it
 
+**Export it in the shell. Do not put it in `.env`** — nothing in this repository
+reads a `.env` file: no dotenv, no `--env-file`. `.env.example` documents variable
+names only (`AGENTS.md` §6) and `packages/db/src/config.ts` reads `process.env`
+directly, so a `.env` file is silently ignored and every command fails with
+`MissingDatabaseUrlError`.
+
 ```bash
-cp .env.example .env
+export DATABASE_URL="postgres://postgres:postgres@localhost:5432/name_atlas"
+echo $DATABASE_URL
 ```
 
-Then set, exactly as `.env.example` documents:
-
-```
-DATABASE_URL=postgres://postgres:postgres@localhost:5432/name_atlas
-```
+`export` matters: a bare `DATABASE_URL=...` sets a shell variable that child
+processes never see. The value lasts for that terminal window only, so export it
+again in any new tab — including the one you leave `truth:derive-batch` running in.
 
 ## 3. Install and create the schema
 
