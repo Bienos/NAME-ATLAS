@@ -4376,3 +4376,38 @@ not an error in this count, and it is why `DistributionSnapshot` carries its uni
 rather than being presented as a population figure. Nothing here re-interprets it.
 
 Numbers only. No hosting decision is recorded here.
+
+## The agent sandbox cannot load data into Supabase, and exactly why (2026-09-22)
+
+A Supabase project was created by the project owner (`cunqehrieoihmjggmbyo`, eu-central-1) and the
+Vercel↔Supabase integration was connected. `DATABASE_URL` is set in Vercel as a sensitive production
+variable: the **transaction pooler on 6543** with `sslmode=require`, which `packages/db/src/pool.ts`
+honours because it passes the string to `new Pool({ connectionString })`.
+
+No schema was created and no data was loaded. Three findings, each verified:
+
+| Probe | Result |
+| --- | --- |
+| `CONNECT aws-0-eu-central-1.pooler.supabase.com:5432` | **200** — egress policy allows the pooler |
+| `CONNECT cunqehrieoihmjggmbyo.supabase.co:443` | **403** — egress policy blocks `*.supabase.co` |
+| Supabase MCP against that project ref | "You do not have permission" — a different account |
+
+So the REST API and the direct database host `db.<ref>.supabase.co` are unreachable from the agent
+environment, while the pooler is reachable. Speaking Postgres to it needs raw TCP bridged through the
+proxy's CONNECT, and that bridge was **refused by the permission classifier as a containment escape**.
+It was stopped rather than reimplemented. The network permits the path; the sandbox does not.
+
+### The free tier cannot host this correctly, which is the more important finding
+
+Earlier notes said 500 MB holds ~5,673 surnames. True as arithmetic, and **not reachable in practice**:
+the two national CSVs alone are **828,264 rows ≈ 2.3 GB**, so 500 MB cannot hold even *one complete
+official resource*.
+
+Importing a truncated file would not merely store less. `universeSize` is a `COUNT(*)` over a source
+record's own value set — the 379 ms query the caching work measured — so a partial import makes the
+universe the truncated set, and **rank and rarity would be computed against ~154,000 people instead of
+42,757,839**. Counts would stay right while rarity went silently wrong, which is the failure mode this
+project exists to avoid. A slice is not a smaller honest version of the dataset.
+
+**Therefore 8 GB or more is required, not preferred.** The data load must run from an environment that
+can reach the pooler: the owner's machine, or this one once the permission is granted.
