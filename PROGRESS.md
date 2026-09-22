@@ -4411,3 +4411,78 @@ project exists to avoid. A slice is not a smaller honest version of the dataset.
 
 **Therefore 8 GB or more is required, not preferred.** The data load must run from an environment that
 can reach the pooler: the owner's machine, or this one once the permission is granted.
+
+## The schema is live on Supabase, applied through the MCP (2026-09-22)
+
+The previous section's blocker was the *bridge*, not the network. It is gone: the Supabase MCP now
+resolves the project, which is a sanctioned channel and needs no raw TCP. The CONNECT bridge was
+**not** reimplemented.
+
+| | |
+|---|---|
+| Project | `NAME-ATLAS`, `xujctkjpvnmcdpximtda`, `eu-central-1` |
+| Organisation | `bienos' projects` (`vercel_icfg_yUfrE9gy2zxalQIiJ0VDfqMZ`) — created by the Vercel integration |
+| Plan | **`free`** — still the 500 MB cap |
+| Server | PostgreSQL **17.6** |
+| Extensions | `postgis 3.3.7`, `pg_trgm 1.6`, both in `public` |
+| Database size | 19 MB (schema only) |
+
+### How, since `pnpm db:migrate` could not run
+
+Outbound TCP 5432/6543 is blocked from this environment (`/dev/tcp` refused; `pg_isready` no
+response), so the real migrator could not reach Supabase. Instead:
+
+1. All 19 migrations were run by the **real Kysely migrator** against a local PostgreSQL 16.13 /
+   PostGIS 3.4.2 — every one reported `applied`.
+2. `pg_dump --schema-only` captured the result; psql meta-commands, the `SET` preamble and
+   `CREATE SCHEMA public` were stripped.
+3. The DDL was replayed onto Supabase in four `apply_migration` calls: extensions, 34 enum types,
+   22 tables, then the view plus 106 constraints and 54 indexes.
+4. `kysely_migration` was seeded with all 19 rows and `kysely_migration_lock` with its single row, so
+   a future `pnpm db:migrate` against this database reports **no pending migrations** rather than
+   trying to re-apply everything.
+
+### Verified by digest, not by eye
+
+The same query ran on both databases and every value matched exactly:
+
+| | Local (migrator) | Supabase |
+|---|---|---|
+| Columns | 259 | 259 |
+| Column digest | `062fd82ed06303ca2ab5f4952a2d14f4` | `062fd82ed06303ca2ab5f4952a2d14f4` |
+| Indexes | 54 / `e776cfe01d8b92a633e179806b4ee441` | 54 / `e776cfe01d8b92a633e179806b4ee441` |
+| Constraints | 106 / `d4424b29c5adf6c0d2005cd9c76f189f` | 106 / `d4424b29c5adf6c0d2005cd9c76f189f` |
+
+`spatial_ref_sys` excluded on both sides: PostGIS 3.4.2 locally against 3.3.7 on Supabase.
+
+### A real exposure found and closed
+
+Supabase serves the `public` schema over PostgREST, and Vercel ships
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` to the browser. Supabase grants `anon` and `authenticated` full
+privileges on public tables by default, so with RLS off, **every table was readable and writable by
+anyone holding that key**. The app never uses PostgREST — `packages/db` connects as the table-owning
+`postgres` role, which bypasses RLS — so RLS was enabled on all 22 application tables with no
+policies, denying those roles everything and leaving the app untouched. The `resolvable_name_forms`
+view, which pg_dump recreates owned by `postgres`, was switched to `security_invoker = on`.
+
+Advisors before and after: both `ERROR` classes (`rls_disabled_in_public` across 23 tables,
+`security_definer_view`) are cleared. What remains is `INFO`/`WARN` and deliberate —
+`rls_enabled_no_policy` on 22 tables *is* the deny-all posture; `extension_in_public` is forced by
+`0001_bootstrap_extensions` and by the schema's own references to `public.geography` and
+`public.gin_trgm_ops`; the three `st_estimatedextent` findings are PostGIS's own functions, a
+consequence of that placement. `spatial_ref_sys` keeps RLS off — PostGIS owns it, it holds
+coordinate-system definitions and no project data.
+
+### Not done
+
+1. **No data.** The free plan's 500 MB still stands against the measured 5,917 MB, and the previous
+   section's finding is unchanged: a slice is not a smaller honest version of the dataset. The load
+   waits on the organisation being upgraded, which needs payment details only the project owner can
+   enter.
+2. **The live deployment was not re-checked.** `name-atlas-two.vercel.app` is refused by this
+   environment's egress policy (`403` to `CONNECT`), reported rather than routed around. Whether the
+   search page now returns an empty result instead of *Usługa chwilowo niedostępna* is unverified
+   from here.
+3. **Version divergence recorded, not resolved.** Supabase runs PostgreSQL 17.6; D-005 pins
+   PostgreSQL 16 / PostGIS 3.4.2 for local development, CI and Testcontainers. The schema applied
+   cleanly to both, but production and test now differ by a major version.
