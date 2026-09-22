@@ -4731,3 +4731,74 @@ The hosted database holds seven surnames, not the register. Every other surname 
 app would show for a surname whose claims simply have not been derived yet — `packages/truth`
 returns `NO_APPLICABLE_EVIDENCE` for both. Loading a larger slice still needs a machine that can
 reach the pooler and a copy of the national CSVs.
+
+### Measured: what a rank actually costs (2026-09-22)
+
+`PROGRESS.md` has carried one figure for the register — 5,917 MB — and it has
+been read as the price of having anything at all. It is not. Loading the
+register and deriving a page for every surname are separate costs, and only the
+first is forced.
+
+Measured by importing two files of the same row count and byte size as the real
+resources into a throwaway local database. The surnames in them were
+constructed, so nothing here is a fact about any surname; the row counts,
+byte sizes and overlap were matched to the register so the **storage** transfers.
+The model reproduces the register exactly: 408,182 + 420,082 rows, 229,788
+shared, **598,476 distinct** — the register's own figure.
+
+| | |
+|---|---|
+| Complete universe, both national resources | **781 MB** |
+| Import time | 134 s (78 s + 56 s) |
+| Per surname, all three claim families | **12.0 KB** |
+
+Per table after both imports: `distribution_snapshots` 200 MB (828,264 rows),
+`surnames` 155 MB (598,476), `distribution_values` 149 MB (828,264),
+`name_forms` 138 MB (598,476), `knowledge_entities` 123 MB (1,196,952).
+
+The measurement file ran 1–4% under the real byte sizes, so 781 MB is a floor,
+not a ceiling.
+
+#### What this means for a bounded deployment
+
+The universe must be complete or no rank may be derived, but a *page* is only
+needed for the surnames anyone will open. The two costs add rather than multiply:
+
+| pages derived | total | derive time |
+|---|---:|---:|
+| 1,000 | 793 MB | 8 min |
+| 10,000 | 898 MB | 83 min |
+| all 598,476 | 7,794 MB | 83 h |
+
+So a deployment carrying rank and rarity for the thousand most frequent surnames
+needs **~800 MB and ten minutes**, not 7.8 GB and three and a half days. The
+500 MB free tier still does not fit: 781 MB of universe is the floor beneath any
+rank at all.
+
+Slicing by first letter is the wrong axis. A–F is on the order of a quarter of
+the register (not measured — the real letter distribution is not in this
+environment), which is ~150,000 pages, ~2.5 GB and ~21 h: worse than 1,000 pages
+chosen by frequency, and it covers fewer searches.
+
+#### The 83 h is a query shape, not a slow database
+
+`competitionRank` (`packages/truth/src/rank.ts:73`) counts
+`distribution_values` rows above a surname's count, once per surname. There is
+no index on `count`, so each call is a parallel hash join over the pair —
+`EXPLAIN (ANALYZE, BUFFERS)` reports **20,495 buffers** for one surname's rank.
+Measured throughput was **2.0 surnames/s**, which is where 83 h comes from.
+
+Competition rank over a fixed resource is one sorted pass, so this is
+addressable — a single window function would rank every surname at once. It is
+recorded here as a finding, not fixed: it is a change to the derivation engine
+and belongs in a task of its own.
+
+#### Also found
+
+- `derive-batch` derives `CURRENT_POPULATION` and `CURRENT_DISTRIBUTION` only.
+  `CURRENT_RANK` and `RARITY_CONTEXT` come from `apps/worker`'s handlers or the
+  per-surname CLIs, and no worker is deployed.
+- `apps/web` derives nothing — it reads claims. A surname with no derived claim
+  renders as a gap however complete the universe is.
+- Against a complete universe all three families derive with no code change:
+  40 of 40 surnames returned population, rank and rarity.
