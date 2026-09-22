@@ -4600,3 +4600,55 @@ Two details that would otherwise have been quiet defects:
 No slice has been loaded to a hosted database. The sizing in `docs/LOCAL_DATABASE.md` (~5,673
 surnames in 500 MB, covering 51.25% of people) remains the estimate computed on 2026-09-21, not a
 measurement of an actual sliced deployment.
+
+### The hosted deployment reaches its database (2026-09-22)
+
+Two faults, found in sequence. Neither was code.
+
+**1. Production never had a `DATABASE_URL`.** The production deployment was built at
+`1790024666356`; the variable was created at `1790070655237`, about thirteen hours later. Vercel
+resolves environment variables when a deployment is built, so an existing deployment never sees one
+added afterwards. Confirmed from the database side rather than inferred: `pg_stat_activity` on the
+Supabase project listed only `mgmt-api`, `pg_cron scheduler`, `pg_net`, `postgres_exporter` and
+`PostgREST` — no application connection had ever been made. Fixed by redeploying the same commit.
+
+**2. `sslmode=require` meant `verify-full`.** `pg-connection-string@2.14` treats `require`,
+`prefer` and `verify-ca` as aliases for `verify-full`, and warns about it in the runtime logs. The
+function demanded a fully verifiable chain from the pooler, did not get one, and dropped the
+connection in 13–63 ms — before any query. The app reported `resolution lookup failed at
+TRANSACTION`, and `TRANSACTION` is the stage set *before* the transaction callback runs, which is
+what distinguished a connection failure from a missing table.
+
+Verified against the parser in the lockfile rather than assumed:
+
+| connection string | resulting TLS |
+|---|---|
+| `?sslmode=require` | `ssl: {}` — full verification |
+| `?sslmode=no-verify` | `rejectUnauthorized: false` |
+| `?uselibpqcompat=true&sslmode=require` | `rejectUnauthorized: false` |
+
+`DATABASE_URL` now ends `?uselibpqcompat=true&sslmode=require`, the forward-compatible form the
+warning itself recommends.
+
+#### Verified after the fix
+
+Fetched through Vercel's own URL tool, since this environment's egress policy refuses `vercel.app`:
+
+| Check | Result |
+|---|---|
+| `GET /?surname=NOWAK` | `200`, rendering **"Nie znaleziono takiego nazwiska"** — not *"Usługa chwilowo niedostępna"*. The database was reached and held no such row. |
+| `x-vercel-id` | `iad1:iad1::fra1::…` — the function ran in Frankfurt. |
+| `x-ratelimit-limit` | `60` — TASK-029's middleware is live. |
+| `robots` | `noindex, follow` — ADR-0009 §5's alpha gate holds. |
+| Supabase `pg_stat_activity` | **8 connections, up from 6.** The two added are the app's pool, which `apps/web` caps at `max: 2` per instance. |
+
+The two messages are not interchangeable, and that distinction was checked rather than assumed: a
+reachable but empty database renders "not found", and "unavailable" means the database could not be
+reached at all.
+
+#### Not done
+
+The hosted database holds the schema and **no data**: `surnames` is 0 against 19 applied migrations.
+Loading it needs `--slice`, run from a machine that can reach the pooler on 5432. This environment
+cannot — outbound TCP to both 5432 and 6543 is refused — and the full national CSVs are not in the
+repository, so the slice has not been loaded from here.
