@@ -19,7 +19,7 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/archive/` | Large combined copy | read-only, not routinely read |
 | `docs/reference/` | Method reference (PDF) | read-only |
 | `docs/review/` | Duplicate of the reviewed implementation plan | read-only |
-| `docs/adr/` | Accepted decisions — `0001-stack.md`, `0002-db-access.md`, `0003-source-record-granularity.md`, `0004-population-value-unit.md`, `0005-canonical-key-simple-case-folding.md` | active |
+| `docs/adr/` | Accepted decisions — `0001-stack.md`, `0002-db-access.md`, `0003-source-record-granularity.md`, `0004-population-value-unit.md`, `0005-canonical-key-simple-case-folding.md`, `0006-trigram-index-gin.md`, `0007-rights-per-asset-and-surface.md`, `0008-onomastics-path-b-attributed-sources.md`, `0009-canonical-surname-route-and-slug.md`, `0010-persisted-slugs-and-sitemap.md`, `0011-p0-hosting-plane.md` | active |
 | `docs/contracts/` | Accepted API/data contracts — `surname-result.md` (TASK-006, schema `1.0`) | active |
 | `docs/SOURCE_MAP.md` | Corpus classification and ownership | active |
 | `docs/LOCAL_DATABASE.md` | Runbook: a complete local copy of the register at no cost — start the container, migrate, import, backfill slugs, derive, verify. Measured timings, not estimates. | active |

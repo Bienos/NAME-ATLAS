@@ -4525,3 +4525,35 @@ syntax and resolution check only. Every other row above ran against a real local
 PostgreSQL 16.13 / PostGIS 3.4.2. The import chain was not exercised: it needs the
 full national CSVs, which are not in the repository (`fixtures/pesel/` holds 22- and
 23-row excerpts for tests).
+
+### The hosting decision is written down, and it is Neon (2026-09-22)
+
+`docs/adr/0011-p0-hosting-plane.md` — **Vercel in `fra1` for the app, Neon in an EU region for the
+database.**
+
+Three positions existed at once and none of them agreed. `docs/canonical/23` §6.2 and
+`ARCHITECTURE.md` §9 specify one Render plane and name the Vercel split as the thing to avoid.
+TASK-029 deployed to Vercel plus Supabase anyway, and production runs on it. That choice was never
+written to `docs/adr/`, so the corpus said Render while production said otherwise — the gap
+`AGENTS.md` §1 exists to prevent. ADR-0011 closes it and supersedes §6.2 for P0.
+
+Neon over Supabase on cost, measured rather than assumed: ~$5/month against $25 for the same ~6 GB.
+Supabase's $25 buys Auth, Storage, Realtime and PostgREST, none of which this project uses — ADR-0002
+commits to hand-written SQL over `pg`. The one Supabase feature it does rely on, the transaction
+pooler, Neon also provides. The ADR records that this should be revisited at M3, when BullMQ needs a
+host that keeps processes alive and `docs/canonical/23` §6.2's single-plane argument regains force.
+
+**No code change was needed.** `createPool` already takes `connectionString` unchanged, caps `max`
+per instance for serverless, and its own comments name PgBouncer — which is what Neon's pooled
+endpoint runs. `packages/db/src/config.ts` remains the only reader of `DATABASE_URL`, so the host is
+swappable by environment variable alone.
+
+Also corrected: `docs/CODEMAP.md`'s ADR row listed only `0001`–`0005` while `main` carried ten. It
+now lists all eleven.
+
+#### Not done
+
+The Neon project does not exist yet. There is no Neon MCP in this environment and Vercel's
+`create_connector` provisions auth connectors, not databases, so creating it is the project owner's
+step. Once `DATABASE_URL` points at the direct endpoint, `pnpm db:migrate` applies all 19 migrations
+from the owner's machine — no tunnel and no MCP needed, unlike the Supabase route.
