@@ -4652,3 +4652,82 @@ The hosted database holds the schema and **no data**: `surnames` is 0 against 19
 Loading it needs `--slice`, run from a machine that can reach the pooler on 5432. This environment
 cannot — outbound TCP to both 5432 and 6543 is refused — and the full national CSVs are not in the
 repository, so the slice has not been loaded from here.
+
+### A seven-surname slice is loaded on the hosted database (2026-09-22)
+
+The hosted database now holds real data. It was not loaded by the importer: this environment still
+cannot open TCP to the pooler on 5432 or 6543, and the national CSVs are not in the repository. The
+rows were built locally by the real importer and derive pipeline against the two committed fixtures,
+then replayed into Supabase as SQL through the management API.
+
+**How the rows were produced.** `--slice top:5` (the flag added in `ae913a9`) was applied to each
+fixture, giving seven distinct surnames: NOWAK, KOWALSKA, KOWALSKI, WIŚNIEWSKA, WIŚNIEWSKI, WÓJCIK,
+KOWALCZYK. The counts are the publisher's own, not derived or rounded — NOWAK is 98,387 (male
+resource) and 99,738 (female resource).
+
+**How they were transferred.** `pg_dump --data-only --column-inserts`, split into six chunks in
+foreign-key order. `--column-inserts` was required, not stylistic: the local and hosted schemas
+agree on column *names*, types and nullability (digest match) but not on column *ordinal position*
+(`9cfb37ae…` local vs `6d63eadd…` hosted), so positional `--inserts` would have written values into
+the wrong columns without erroring.
+
+**One deliberate omission.** `source_records.raw_payload` was set to NULL before the dump, on both
+sides. It held ~22 KB of publisher metadata JSON per row and was the highest transcription risk in a
+hand-replayed transfer. NULL states truthfully that the payload is absent here; a placeholder would
+have falsified provenance. Measured on the hosted database: `source_records` = 2 rows, of which
+**0 have a `raw_payload`**.
+
+#### Verified — the transfer is exact
+
+Every table was digested on both sides with a column-order-independent hash
+(`md5(string_agg(sorted key=value pairs))`, ordered by row text). All fifteen match:
+
+| Table | Rows | Digest (identical both sides) |
+|---|---|---|
+| `rights_profiles` | 1 | `34d12d5a3530eb188d40df2795abcdcc` |
+| `sources` | 1 | `b57081ca562501c2d49dbdb2da37940e` |
+| `source_records` | 2 | `a96a582199add6d2fa7ea6d8fd6e2fd0` |
+| `knowledge_entities` | 14 | `74bfeb6c2bcfeb6d20df99e493bb27e7` |
+| `surnames` | 7 | `8d5f87863f1e9bd2c008d393c33f8dc4` |
+| `name_forms` | 7 | `03fe960f60c6bc74b50cd643d180fd28` |
+| `research_runs` | 10 | `7cb4487df78320a82fbbf89c8652aad4` |
+| `distribution_snapshots` | 10 | `c0fad86a6f2f0c4dc1fef0a20d4a7610` |
+| `distribution_values` | 10 | `36b1994ec69cdcea9d994e1f04f28854` |
+| `evidence_items` | 10 | `86000e9fc63e0b2e73192bc301391e7e` |
+| `claims` | 10 | `f9eb46cf885b1443e3cfc5e980ecb3c1` |
+| `claim_evidence` | 10 | `64ef861c630642ee582a5dfa039956be` |
+| `confidence_assessments` | 10 | `c03aa1ea6465dd9da96b489ec7c1a8d0` |
+| `citations` | 10 | `052f66797a6aecd437acd78f0c58d809` |
+| `surname_slugs` | 14 | `1facf39617d57073e377a9856e34890c` |
+
+This check exists because an earlier attempt at the same transfer did corrupt a value — a
+`source_id` written into `default_rights_profile_id` — which the foreign key caught and rolled back.
+A digest comparison catches the class of error a foreign key would not.
+
+#### Verified — the completeness gate holds, unprompted
+
+All ten claims on the hosted database are `CURRENT_POPULATION`. There are **zero** `CURRENT_RANK`
+and **zero** `RARITY_CONTEXT` claims, and zero non-`NATIONAL` distribution snapshots. Nothing was
+configured to suppress them: TASK-009's universe gate is conjunctive and unconditional, the sliced
+universe fails its row-count arm, and rank and rarity are therefore never derived.
+
+`GET https://name-atlas-two.vercel.app/?surname=NOWAK` (fetched through Vercel's URL tool, since
+this environment's egress policy refuses `vercel.app`) returns `200` and renders:
+
+| Section | Rendered |
+|---|---|
+| Liczba osób | **98 387** (mężczyźni) and **99 738** (kobiety), each `Zweryfikowane`, with full source, licence and limitations |
+| Jak rzadkie | *"Nie można podać tej wartości, bo wgrany zbiór nie jest kompletny."* |
+| Zameldowanie na pobyt stały | *"Nie ma kompletnego zbioru regionalnego, więc nie pokazujemy rozkładu."* |
+| Znaczenie | *"Nie mamy udokumentowanego znaczenia tego nazwiska…"* |
+| `x-vercel-id` | `iad1:iad1::fra1::…` — Frankfurt |
+
+The two counts are shown side by side and never summed, as `sources.methodology_notes` requires.
+
+#### Not done
+
+The hosted database holds seven surnames, not the register. Every other surname renders
+*"Ten zbiór nie zawiera tego nazwiska"*, which is correct for a slice but is the same message the
+app would show for a surname whose claims simply have not been derived yet — `packages/truth`
+returns `NO_APPLICABLE_EVIDENCE` for both. Loading a larger slice still needs a machine that can
+reach the pooler and a copy of the national CSVs.
