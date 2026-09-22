@@ -33,7 +33,7 @@ import { assessDerivedStatistic, evidenceSetHash, isValidCombination } from "./c
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
 import { loadSourceContext, prepareDerivation } from "./universe.js";
-import type { DerivationSourceContext, UniverseCandidate } from "./universe.js";
+import type { DerivationSourceContext, UniverseCandidate, UniverseSizeCache } from "./universe.js";
 import { TruthInvariantError } from "./derive.js";
 import {
   CURRENT_RANK_METHOD_VERSION,
@@ -93,6 +93,8 @@ async function competitionRank(
 export interface DeriveRankOptions {
   /** Overridable so tests can exercise a restrictive rights posture. */
   readonly rightsOverride?: EffectiveRights;
+  /** Run-scoped memo for the completeness counts. See `UniverseSizeCache`. */
+  readonly universeSizeCache?: UniverseSizeCache;
 }
 
 /**
@@ -107,7 +109,7 @@ export async function deriveCurrentRank(
   rawInput: string,
   options: DeriveRankOptions = {},
 ): Promise<SurnameRankResult> {
-  const prepared = await prepareDerivation(db, rawInput);
+  const prepared = await prepareDerivation(db, rawInput, options.universeSizeCache);
   if (prepared.kind === "NO_RESULT") {
     return prepared;
   }

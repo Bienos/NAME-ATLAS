@@ -271,3 +271,39 @@ licence, limitations. **Rank and rarity stay withheld** — the universe gate
 compares the persisted snapshot count against the registry's
 `official_row_count` (408,182 and 420,082), and 1,000 is short of it. That is
 the gate working, not a fault, and no flag overrides it.
+
+## The whole register, locally, with rank — the free path
+
+A local Postgres has no tier. The complete national universe is 781 MB and the
+register with every page derived is 7.8 GB, which is nothing on a laptop disk,
+so the prototype that a hosted free tier cannot hold runs locally in full.
+
+```bash
+docker compose up -d
+export DATABASE_URL='postgresql://postgres:postgres@localhost:5432/name_atlas'
+pnpm db:migrate
+
+# The real files, and NO --slice: a slice fails the universe gate and there is
+# then no rank to derive.
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
+  --resource 1148808 --file data/national-male-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
+  --resource 1148811 --file data/national-female-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
+
+pnpm exec tsx packages/truth/bin/derive-batch.ts --all --rank --limit 10000
+pnpm --filter web dev            # http://localhost:3000
+```
+
+`--rank` is what puts `CURRENT_RANK` and `RARITY_CONTEXT` on the page; without
+it `derive-batch` derives population and regional distribution only, and the
+"Jak rzadkie" section stays a stated gap.
+
+`--limit` is worth keeping. Measured throughput with `--rank` is 11.3
+surnames/s, so 10,000 pages take about 15 minutes and the full 598,476 about
+15 hours. The run is resumable and idempotent — re-running continues rather
+than restarting — so raising the limit later costs only the new surnames.
+
+Without `--rank` the same job runs at 261/s, because rank and rarity are what
+cost.
