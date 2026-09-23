@@ -14,7 +14,8 @@
     "demo:surname-rarity": "tsx bin/surname-rarity.ts",
     "demo:surname-distribution": "tsx bin/surname-distribution.ts",
     "demo:surname-meaning": "tsx bin/surname-meaning.ts",
-    "derive-batch": "tsx bin/derive-batch.ts"
+    "derive-batch": "tsx bin/derive-batch.ts",
+    "coverage-report": "tsx bin/coverage-report.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",

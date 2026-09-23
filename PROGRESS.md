@@ -5130,3 +5130,29 @@ Screen #2. `/pl/porownaj` (and the English compare page) gained a regional secti
 
 **Not verified:** with real regional data — it needs the regional files imported on
 the owner's database.
+
+### Screen #3 step one: the coverage check (`pnpm coverage:report`) (2026-09-23)
+
+The owner asked for a premium report preview "after checking whether enough surnames
+have enough data to justify one" — `PLAN.md` M4's question. This builds the check; the
+preview waits for its answer on the owner's database.
+
+`coverageReport` in `packages/truth/src/coverage.ts`, printed by `pnpm -s
+coverage:report` as Markdown. Per national resource (male, female, never summed), per
+count band (10000+, 1000–9999, 100–999, 2–99) and overall: the share of surnames, and
+of the people carrying them, that have an **active** claim of each family —
+population, rank, rarity, distribution (against the registered regional counterpart),
+meaning — plus "all four statistics" and "all five". Claims are matched by their
+exact keys, so a rank in the male universe is never credited to the female one.
+Historical evidence is not counted (none exists, M3). **No threshold for "enough" is
+applied** — that is the owner's decision.
+
+| Check | Result |
+|---|---|
+| Local database (excerpts, 45 population claims, 3 Buryan meanings) | Male: 22 surnames / 714,547 people, population 100%, meaning 13.6% of surnames / 27.0% of people; 10000+ band 20.0% / 27.2% = (98,387 + 47,734 + 46,994) / 709,341, checked by hand; rank, rarity, distribution 0% (gate; no regional import) |
+| `coverage-report.test.ts` | 3 passed — totals and population cells computed independently from the CSV bytes, bands sum to the whole, Markdown states what it does not count |
+| `pnpm test` | 676 passed |
+| `pnpm test:integration` | 278 passed, 24 files |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+
+**Not run:** against the full register — only the owner's database has it.

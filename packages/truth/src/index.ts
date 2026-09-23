@@ -166,3 +166,5 @@ export { regionalUniverseSize, universeSize } from "./universe.js";
 export type { UniverseSizeCache } from "./universe.js";
 export { mostCommonSurnames } from "./common.js";
 export type { CommonSurname, CommonSurnameList } from "./common.js";
+export { COVERAGE_BANDS, COVERAGE_FAMILIES, coverageMarkdown, coverageReport } from "./coverage.js";
+export type { CoverageBand, CoverageCell, CoverageFamily, ResourceCoverage } from "./coverage.js";
