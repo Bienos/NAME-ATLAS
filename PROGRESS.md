@@ -4954,6 +4954,24 @@ Nothing was imported and no code changed.
   unchanged — free to read, `PARTNERSHIP_REQUIRED` for product use
   (`docs/canonical/12` §2.1, §20). ADR-0008's Path A.
 
+- **Cieślikowa, Szymowa, Rymut (opr.), *Słownik etymologiczno-motywacyjny
+  staropolskich nazw osobowych*, cz. 1, *Odapelatywne nazwy osobowe*** (red. Cieślikowa,
+  Malec, Rymut; Kraków: Wydawnictwo Naukowe DWN, 2000; ISBN 83-87623-23-7; RCIN
+  `oai:rcin.org.pl:24656`): **not usable without an agreement.** RCIN record (screenshot
+  supplied by the project owner, 2026-09-23): *Rights: Rights Reserved – Free Access*;
+  *Terms of use: Copyright-protected material. May be used within the limits of
+  statutory user freedoms*; *Access: Open*. The scan's imprint page reads *© Copyright by
+  Wydawnictwo Naukowe DWN, 2000* and *© Copyright by Instytut Języka Polskiego PAN,
+  2000*. Free to read is not a licence: statutory user freedoms are not among ADR-0008
+  §4 condition 4's licence bases, so it fails that condition. Technically it would
+  serve — a DjVu scan of 412 pages with a legible text layer, entries of the form
+  *Szafran : szafran 'przyprawa…'* — but it covers **Old Polish personal names**, not
+  modern surnames, so a claim built on it would have to say so. The owner downloaded
+  the scan; it was not committed and will not be without a licence.
+- The other named candidate, *Słownik najstarszych nazwisk polskich* (Kaleta,
+  Dacewicz, Raszewska-Żurek; IS PAN, 2007), is also on RCIN; its rights field was not
+  checked.
+
 IJP PAN publishes the online dictionary and is the institutional home of Rymut's work;
 whether it can license *Nazwiska Polaków* too is for that conversation to establish. Until one
 exists, every surname correctly returns `NO_SOURCED_MEANING`.
