@@ -4942,9 +4942,18 @@ Nothing was imported and no code changed.
   na wybranych terminalach w sieci Uniwersytetu Wrocławskiego*, *Licencja:*
   `https://rightsstatements.org/page/InC/1.0/`. Both volumes are reading-room
   only. It fails ADR-0008 §4 conditions 2 and 4.
+- The same work on **Polona** (vol. 2, L–Ż; screenshot supplied by the project owner,
+  2026-09-23): field *prawa do utworu* reads *Publikacja chroniona prawem autorskim —
+  reprodukcja cyfrowa dostępna w czytelniach BN i na terminalach Academiki*. The
+  record gives the publisher as *Kraków : Wydaw. Naukowe DWN, 2001*, not IJP PAN, so
+  the rights holder for Rymut may be DWN or the author's heirs rather than the
+  Institute. Also the first observed instance of Polona's object-level rights field
+  (label *prawa do utworu*, free-text value) — evidence for TASK-031 §4 item 6, from a
+  screenshot, not from an API response.
 - **Internetowy słownik nazwisk w Polsce** (IJP PAN, `https://nazwiska.ijppan.pl/`):
   unchanged — free to read, `PARTNERSHIP_REQUIRED` for product use
   (`docs/canonical/12` §2.1, §20). ADR-0008's Path A.
 
-IJP PAN publishes both, so one licensing conversation covers both. Until one
+IJP PAN publishes the online dictionary and is the institutional home of Rymut's work;
+whether it can license *Nazwiska Polaków* too is for that conversation to establish. Until one
 exists, every surname correctly returns `NO_SOURCED_MEANING`.
