@@ -83,3 +83,23 @@ export async function currentSlugFor(
     .executeTakeFirst();
   return row?.slug ?? null;
 }
+
+/**
+ * Current addresses for several surnames in one query, keyed by surname id.
+ * A surname with no current address in the locale is absent from the map.
+ */
+export async function currentSlugsFor(
+  db: Kysely<DB>,
+  locale: SlugLocale,
+  surnameIds: readonly string[],
+): Promise<Map<string, string>> {
+  if (surnameIds.length === 0) return new Map();
+  const rows = await db
+    .selectFrom("surname_slugs")
+    .select(["surname_id", "slug"])
+    .where("locale", "=", locale)
+    .where("surname_id", "in", surnameIds)
+    .where("is_current", "=", true)
+    .execute();
+  return new Map(rows.map((r) => [r.surname_id, r.slug]));
+}

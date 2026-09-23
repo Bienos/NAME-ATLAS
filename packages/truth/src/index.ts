@@ -164,3 +164,5 @@ export { assessSurnameMeaning } from "./confidence.js";
 export type { MeaningConfidenceInputs } from "./confidence.js";
 export { regionalUniverseSize, universeSize } from "./universe.js";
 export type { UniverseSizeCache } from "./universe.js";
+export { mostCommonSurnames } from "./common.js";
+export type { CommonSurname, CommonSurnameList } from "./common.js";

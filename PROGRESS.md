@@ -5052,3 +5052,52 @@ Also: a meaning's formation type now renders as words ("od zajęcia lub zawodu",
 database here holds excerpts, for which the completeness gate withholds the
 distribution. It will appear on the owner's database once the regional files are
 imported.
+
+### Home screen: suggest-as-you-type and the most common surnames (2026-09-23)
+
+First of the three screens the project owner chose ("do suggestions": home, compare
+with maps, premium preview).
+
+**Suggest-as-you-type.** `GET /api/v1/surname-prefix` with its own accepted contract,
+`docs/contracts/surname-prefix.md` (the result contract had listed autocomplete as out
+of scope; the canonical corpus does not specify it). `prefixSuggestions` in
+`@name-atlas/resolver`: prefix of the Polish-diacritic-folded canonical key
+(`docs/canonical/13` §6.1 — retrieval, never identity), so `wisn` finds WIŚNIEWSKI;
+as-typed matches first, then the larger national count (order only, never returned,
+never summed), then alphabetical; ≥ 2 characters; mixed-script input and
+script-confusable surnames get nothing. Migration `0020` adds a GIN trigram index on
+the folded key. The client is an ARIA 1.2 combobox island; without JavaScript it is
+the plain form it replaced. Own rate-limit bucket (120/min) so typing cannot starve
+the other API routes.
+
+**Most common surnames.** `mostCommonSurnames` in `@name-atlas/truth` reads active
+`CURRENT_RANK` claims with rank ≤ 10 — one list per rank universe, male and female
+side by side, never merged; no claims means no section. Migration `0021` adds a
+partial index on the rank.
+
+**Two defects found by running, not by inspection:**
+
+1. `0021` first used `WHERE claim_type = 'CURRENT_RANK'`. On a fresh database every
+   migration runs in one transaction and PostgreSQL refuses an enum value added in the
+   same transaction (`0005` adds it). A text cast is not allowed either — `enum_out` is
+   `STABLE`. The predicate is the rank claims' key prefix, `claim_key LIKE
+   'CURRENT_RANK|%'`, which `currentRankClaimKey` defines. It had applied cleanly to the
+   existing local database; only the fresh-database integration run showed it.
+2. The home note rendered "Stan na 20 stycznia 2026 r.." — now through the existing
+   `terminate` helper, with a test.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 670 passed at the full run; web suite 179 after the last fix |
+| `pnpm test:integration` (local PostgreSQL 16.13 / PostGIS 3.4.2) | 275 passed, 23 files — incl. `surname-prefix.test.ts` 8 and `common-surnames.test.ts` 3 (SYNTHETIC rank claims, cloned rows, since the gate refuses ranks over excerpts); the two migration-list pins updated |
+| `pnpm test:golden` | 364 passed |
+| Web build | Compiled; `/api/v1/surname-prefix` present |
+| API against the running app | `kow` → KOWALSKA, KOWALSKI, KOWALCZYK; `wisn`/`WIŚ` → WIŚNIEWSKA, WIŚNIEWSKI; `n` → `TOO_SHORT`; Cyrillic-О input → `INVALID_INPUT`; no `q` → 400; `lang=en` → `/en/surname/…`; headers `x-ratelimit-limit: 120`, `cache-control: public, max-age=300` |
+| Chromium, real page | Typing `wisn` lists 2 options and announces "Podpowiedzi: 2"; ↓↓ + Enter → `/pl/nazwisko/wiśniewski`; Escape closes; Enter with no option submits the plain form; no page errors |
+| Home list, real page (SYNTHETIC rank claims inserted for the screenshot, then deleted) | Both partitions in PL and EN, links open the right page, no overflow at 390px dark, absent from search results |
+| Prefix cost (408,182-surname benchmark database, synthetic names) | 4.4 µs a match: 111,111 matches 490 ms, 8 matches 20 ms; all-rows worst case 1.7 s, which no real two-letter prefix reaches |
+
+**Not verified here:** the list against real derived rank claims (the owner's database
+has ~5,300; which ranks they cover depends on derivation order), and prefix latency on
+the real register.

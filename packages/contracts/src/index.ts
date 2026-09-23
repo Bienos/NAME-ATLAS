@@ -72,3 +72,9 @@ export type {
   SurnameResultRequest,
   SurnameResultResponse,
 } from "./surname-result.js";
+export {
+  SURNAME_PREFIX_SCHEMA_VERSION,
+  prefixItemSchema,
+  surnamePrefixResponseSchema,
+} from "./surname-prefix.js";
+export type { PrefixItem, SurnamePrefixResponse } from "./surname-prefix.js";

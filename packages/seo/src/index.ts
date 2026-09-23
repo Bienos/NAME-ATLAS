@@ -18,7 +18,7 @@ export {
 export type { SlugLocale } from "./slug.js";
 export { backfillSlugs } from "./backfill.js";
 export type { BackfillReport } from "./backfill.js";
-export { currentSlugFor, lookupSlug } from "./lookup.js";
+export { currentSlugFor, currentSlugsFor, lookupSlug } from "./lookup.js";
 export type { SlugLookup } from "./lookup.js";
 export { SITEMAP_PAGE_SIZE, sitemapCount, sitemapEntries } from "./sitemap.js";
 export type { SitemapEntry } from "./sitemap.js";

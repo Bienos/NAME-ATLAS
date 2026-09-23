@@ -120,6 +120,13 @@ a {
   clip-path: inset(50%);
 }
 
+.combobox {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
 .search input {
   flex: 1 1 auto;
   min-width: 0;
@@ -777,4 +784,77 @@ p {
   .vmap-region {
     stroke: CanvasText;
   }
+}
+
+/* --- suggest-as-you-type -------------------------------------------------- */
+
+.combobox-list {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+}
+
+.combobox-list li a {
+  display: block;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.combobox-list li.is-active a,
+.combobox-list li a:hover {
+  background: var(--rule);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- most common surnames (home) ----------------------------------------- */
+
+.common-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.5rem 2rem;
+}
+
+.common h4 {
+  margin: 0.75rem 0 0.25rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.common ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.common li {
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.common-rank {
+  display: inline-block;
+  min-width: 1.8em;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
 }

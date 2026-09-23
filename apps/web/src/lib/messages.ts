@@ -134,7 +134,7 @@ function parenthetical(label: string | null): string {
  * which a unit test caught. A malformed date is returned unchanged by
  * {@link formatDate} and does not end in a stop, so it still gets one.
  */
-function terminate(sentence: string): string {
+export function terminate(sentence: string): string {
   return sentence.endsWith(".") ? sentence : `${sentence}.`;
 }
 
@@ -347,6 +347,12 @@ export const UI = {
     searchLabel: "Nazwisko",
     searchPlaceholder: "np. Nowak",
     searchAction: "Szukaj",
+    suggestionsAvailable: "Podpowiedzi:",
+    commonHeading: "Najczęstsze nazwiska",
+    commonNote:
+      "Pozycje w rejestrze PESEL; listy mężczyzn i kobiet są osobne i nie są sumowane. Stan na",
+    commonNoteUndated:
+      "Pozycje w rejestrze PESEL; listy mężczyzn i kobiet są osobne i nie są sumowane.",
     langSwitch: "English",
     sectionPopulation: "Liczba osób",
     sectionRarity: "Jak rzadkie",
@@ -458,6 +464,12 @@ export const UI = {
     searchLabel: "Surname",
     searchPlaceholder: "e.g. Nowak",
     searchAction: "Search",
+    suggestionsAvailable: "Suggestions:",
+    commonHeading: "Most common surnames",
+    commonNote:
+      "Positions in the PESEL register; the male and female lists are separate and never summed. As of",
+    commonNoteUndated:
+      "Positions in the PESEL register; the male and female lists are separate and never summed.",
     langSwitch: "Polski",
     sectionPopulation: "How many people",
     sectionRarity: "How rare",
