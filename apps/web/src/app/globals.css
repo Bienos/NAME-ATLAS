@@ -20,6 +20,14 @@
   --warn-rule: #e0b878;
   --radius: 10px;
   --measure: 34rem;
+  /* Map ramp, lowest share first: one blue hue, lighter to darker. Checked with
+     the dataviz validator (--ordinal, light, surface #ffffff): monotone
+     lightness, every step gap >= 0.06, lightest step 2.11:1 on the card. */
+  --map-0: #86b6ef;
+  --map-1: #5598e7;
+  --map-2: #2a78d6;
+  --map-3: #1c5cab;
+  --map-4: #0d366b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,6 +41,14 @@
     --warn-ink: #f5d9a8;
     --warn-bg: #2e2416;
     --warn-rule: #6b5024;
+    /* Dark: the same hue, its own steps, low share nearest the surface and a
+       larger share brighter. Validator (--ordinal, dark, surface #1b1e24):
+       all pass, darkest step 2.06:1 on the card. */
+    --map-0: #184f95;
+    --map-1: #256abf;
+    --map-2: #3987e5;
+    --map-3: #6da7ec;
+    --map-4: #b7d3f6;
   }
 }
 
@@ -655,5 +671,110 @@ p {
   }
   .search button {
     flex: 1 1 auto;
+  }
+}
+
+/* --- voivodeship map ----------------------------------------------------- */
+
+.vmap {
+  margin: 0.75rem 0 1rem;
+}
+
+.vmap > svg {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+}
+
+/* A 1.5px card-coloured gap between regions, whatever the map's rendered size. */
+.vmap-region {
+  stroke: var(--card);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.vmap-region:focus {
+  outline: none;
+}
+
+.vmap-highlight {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.vmap-b0 {
+  fill: var(--map-0);
+}
+.vmap-b1 {
+  fill: var(--map-1);
+}
+.vmap-b2 {
+  fill: var(--map-2);
+}
+.vmap-b3 {
+  fill: var(--map-3);
+}
+.vmap-b4 {
+  fill: var(--map-4);
+}
+
+/* Not listed is not "a little": grey with a hatch, never the palest blue. */
+.vmap-none-bg {
+  fill: var(--rule);
+}
+.vmap-none-line {
+  stroke: var(--ink-soft);
+  stroke-width: 1.2;
+  opacity: 0.55;
+}
+
+.vmap-readout {
+  margin: 0.4rem 0 0.5rem;
+  min-height: 1.5em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.vmap-legend {
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+.vmap-legend-title {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.vmap-legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vmap-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.vmap-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+}
+
+@media (forced-colors: active) {
+  .vmap-region {
+    stroke: CanvasText;
   }
 }

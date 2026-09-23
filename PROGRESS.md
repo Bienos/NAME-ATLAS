@@ -5008,3 +5008,47 @@ Warszawa 1933. The project owner supplied the scan (Zielonogórska Biblioteka Cy
 
 **Found, not fixed:** the meaning section prints the formation type as its raw code
 (`OCCUPATIONAL`) on the Polish page instead of a translated label.
+
+### The regional breakdown as a map of the 16 voivodeships (2026-09-23)
+
+Asked for by the project owner as the next screen. The regional section now draws a
+choropleth above the existing table; the table is unchanged and remains the exact,
+accessible view.
+
+- **Outlines:** Natural Earth 1:10m admin-1, release v5.1.2, **public domain**
+  ("Everything here is public domain", `LICENSE.md` at that tag). Source file SHA-256
+  `22d0e3ad…a62fb5`, recorded in the generated module; the 40 MB file is not
+  committed. Joined to TERC by exact name (`name_pl` without "województwo ",
+  upper-cased = TERC name), the same method as
+  `fixtures/teryt/voivodeship-terc-correspondence.json`; the generator aborts unless
+  it gets 16 unique matches. Simplified at 0.8 view-box units: 27.6 KB per map.
+- **Colour:** one blue hue in five equal, round-width bands of `share_of_covered`
+  (smallest of 0.5/1/2/3/4/5/10/15/20 points that lets five bands reach the largest
+  share, so the largest always lands in band 2 or above). Light and dark ramps are
+  separate steps of the same hue, each run through the dataviz validator
+  (`--ordinal`): all checks pass, 2.11:1 and 2.06:1 at the pale end.
+- **Not listed is not zero.** A voivodeship absent from the entry is grey and hatched
+  with the legend line "brak w zbiorze — nie oznacza zera", never the palest blue:
+  `docs/sources/pesel-regional.md` item 10 records that an absent cell may be zero,
+  suppressed or out of scope, and the resource does not say which.
+- **No map without codes.** If any region lacks a TERC code the map is not drawn, since
+  leaving that region off would show it as not listed.
+- The shares are rendered as the claim carries them; binning them into shades
+  derives nothing (`AGENTS.md` §10).
+
+Also: a meaning's formation type now renders as words ("od zajęcia lub zawodu",
+"occupational") instead of its code.
+
+| Check | Result |
+|---|---|
+| Unit tests | `pnpm test` 660 passed at the map commit (9 new: scale incl. a fast-check property, geometry = the 16 TERC codes/names, rendered page: 16 regions, hatching, the no-code case); web suite 174 after the formation-words test |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm --filter ./apps/web build` | Compiled |
+| `pnpm test:golden` | 364 passed |
+| Screenshots (SYNTHETIC shares, visual check only, not committed) | Light 760px, dark 760px, light 360px: no horizontal overflow. The dark screenshot caught a legend reading "ciemniej = więcej" where dark mode is lighter-is-more; reworded to "od najmniejszego". |
+| Hydrated in Chromium (esbuild bundle, SYNTHETIC props) | Hover shows the region's share and count, or the not-listed line; leaving restores the hint; the highlight outline appears and goes; no page errors. The first run found that moving the active region to the end of the SVG broke keyboard tab order — replaced with an inert overlay outline, and tab order made alphabetical by TERC (it had started at ŁÓDZKIE, "10" sorting before "02"). |
+
+**Not verified:** the map on a real surname page with real regional data — the local
+database here holds excerpts, for which the completeness gate withholds the
+distribution. It will appear on the owner's database once the regional files are
+imported.

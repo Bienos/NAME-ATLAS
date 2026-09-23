@@ -35,6 +35,7 @@ import {
   distributionSentence,
   explanationText,
   formatDate,
+  formationWord,
   formatInteger,
   formatPercent,
   populationSentence,
@@ -47,6 +48,9 @@ import {
 } from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
 import { Snapshot } from "./snapshot.js";
+import { VoivodeshipMap } from "./voivodeship-map.js";
+import type { MapRegion } from "./voivodeship-map.js";
+import { mapClass, mapScale } from "./voivodeship-map-scale.js";
 
 export function href(surname: string, lang: Lang): string {
   const params = new URLSearchParams({ surname });
@@ -192,6 +196,38 @@ function Rarity({
   );
 }
 
+/** A band edge as whole or half percentage points: "4%", "2,5%". */
+function bandEdge(fraction: number, lang: Lang): string {
+  const pct = Math.round(fraction * 1000) / 10;
+  const text = Number.isInteger(pct) ? String(pct) : pct.toFixed(1);
+  return `${lang === "pl" ? text.replace(".", ",") : text}%`;
+}
+
+/**
+ * The entry's regions as map input, or null when any region lacks a TERC code:
+ * such a region could not be placed, and leaving it off would draw it as "not
+ * listed", which the data contradicts. The table is then the whole view.
+ */
+function mapInput(
+  entry: DistributionEntry,
+  lang: Lang,
+): { regions: MapRegion[]; bandLabels: string[] } | null {
+  if (entry.regions.some((r) => r.terc_code === null)) return null;
+  const scale = mapScale(entry.regions.map((r) => r.share_of_covered));
+  return {
+    regions: entry.regions.map((r) => ({
+      terc_code: r.terc_code as string,
+      display_name: r.display_name,
+      count_text: formatInteger(r.count, lang),
+      share_text: formatPercent(r.share_of_covered, lang),
+      band: mapClass(scale, r.share_of_covered),
+    })),
+    bandLabels: scale.bounds.map(
+      (lo) => `${bandEdge(lo, lang)}–${bandEdge(lo + scale.step, lang)}`,
+    ),
+  };
+}
+
 /**
  * One regional entry. The coverage warning is rendered **before** any figure,
  * which is the order a reader must take them in and why it is the claim's
@@ -209,6 +245,7 @@ function DistributionFact({
   const t = UI[lang];
   const warning = coverageWarning(entry, lang);
   const leading = distributionSentence(entry, 0, surname, lang) ?? "";
+  const map = mapInput(entry, lang);
   const evidence: ClaimEvidence = {
     citation: entry.citation,
     scope: entry.coverage_basis,
@@ -234,6 +271,18 @@ function DistributionFact({
           page instead of scrolling its own table. `tabindex` and
           `role="region"` are what make a scrollable area reachable from the
           keyboard when it does scroll. */}
+      {map === null ? null : (
+        <VoivodeshipMap
+          regions={map.regions}
+          labels={{
+            title: t.mapTitle,
+            legendTitle: t.mapLegend,
+            bandLabels: map.bandLabels,
+            notListed: t.mapNotListed,
+            hint: t.mapHint,
+          }}
+        />
+      )}
       <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
         <table>
           <caption>{t.coveredNote}</caption>
@@ -386,7 +435,7 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
                 </>
               )}
               <dt>{t.meaningFormationLabel}</dt>
-              <dd>{interpretation.formation_type}</dd>
+              <dd>{formationWord(interpretation.formation_type, lang)}</dd>
             </dl>
           </Claim>
         );
