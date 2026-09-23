@@ -4975,3 +4975,36 @@ Nothing was imported and no code changed.
 IJP PAN publishes the online dictionary and is the institutional home of Rymut's work;
 whether it can license *Nazwiska Polaków* too is for that conversation to establish. Until one
 exists, every surname correctly returns `NO_SOURCED_MEANING`.
+
+### First real meaning source: Buryan 1933 (2026-09-23)
+
+`sources/onomastics/buryan-1933.json` — ks. Józef Buryan, *Skąd pochodzi twoje imię i
+nazwisko i nazwa miejscowości rodzinnej? (Zwięzły zarys imiennictwa polskiego)*,
+Warszawa 1933. The project owner supplied the scan (Zielonogórska Biblioteka Cyfrowa,
+`oai:zbc.uz.zgora.pl:82526`); its record gives the author as *Buryan, Józef (ksiądz;
+1883-1950)*.
+
+- **Licence basis:** public domain — author died 1950, art. 36, so since 2021-01-01.
+  `review_status = LEGAL_REVIEW_REQUIRED` because no lawyer has reviewed it; attribution
+  required (moral rights).
+- **Reliability tier `C_SCHOLARLY_SECONDARY`** is this session's classification of a
+  popular 1933 outline by a non-linguist, flagged to the owner; the page shows author
+  and year beside every reading, and one work alone derives `POSSIBLE`, never more.
+- **25 surnames**, chosen where Buryan explains a surname or places it under one of his
+  six headings: NOWAK, WÓJCIK, KOWALCZYK, SZEWCZYK, KRAWCZYK, KOŁODZIEJ, MAZUR, KRÓL,
+  ZAJĄC, WILK, ADAMCZYK, JANKOWSKI, JASIŃSKI, PAWŁOWSKI, JAKUBOWSKI, KUBIAK, SZYMAŃSKI,
+  TOMASZEWSKI, WALCZAK, JAWORSKI, OSTROWSKI, SOKOŁOWSKI, WYSOCKI, PIOTROWSKI, DĄBROWSKI.
+  Every gloss and quotation is verbatim (1933 orthography, `[…]` for omitted list
+  items), read off the page images, not only the OCR. Nothing was inferred from a
+  suffix or a common word.
+
+| Check | Result |
+|---|---|
+| `import-onomastics` into the local database | `IMPORTED`, 25 entries stored |
+| `demo:surname-meaning` NOWAK / WÓJCIK / KOWALCZYK | `POSSIBLE`, one interpretation each, with the page locator |
+| `demo:surname-meaning` ZAJĄC | `UNRESOLVED` — not in the 44-surname excerpt database; expected to resolve against the full register |
+| `/pl/nazwisko/nowak` | The meaning section renders Buryan's sentence, *Możliwe*, *Opracowanie naukowe*, *ks. Józef Buryan · 1933* |
+| `pnpm format:check` | Passed |
+
+**Found, not fixed:** the meaning section prints the formation type as its raw code
+(`OCCUPATIONAL`) on the Polish page instead of a translated label.
