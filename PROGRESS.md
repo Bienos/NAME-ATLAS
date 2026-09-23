@@ -4928,3 +4928,23 @@ internet access.
 **Not verified:** a successful download. `api.dane.gov.pl` is unreachable from this
 environment, so the happy path of `fetch:pesel` — and therefore `local:setup` past
 step 1 — has not run anywhere yet.
+
+### Onomastic sources checked for `SURNAME_MEANING` (2026-09-23)
+
+Asked for by the project owner, to find where surname meanings could come from.
+Nothing was imported and no code changed.
+
+- **Rymut, *Nazwiska Polaków. Słownik historyczno-etymologiczny*** (IJP PAN, 1999–2001):
+  **not usable.** A web-search summary attributed a CC BY-SA 4.0 licence to it via
+  AZON; that was not confirmed. The project owner opened the University of Wrocław
+  Digital Library copy (publication group 28106) and its record states *Prawa
+  dostępu: In Copyright / Objęty pełną ochroną prawnoautorską — dostępna wyłącznie
+  na wybranych terminalach w sieci Uniwersytetu Wrocławskiego*, *Licencja:*
+  `https://rightsstatements.org/page/InC/1.0/`. Both volumes are reading-room
+  only. It fails ADR-0008 §4 conditions 2 and 4.
+- **Internetowy słownik nazwisk w Polsce** (IJP PAN, `https://nazwiska.ijppan.pl/`):
+  unchanged — free to read, `PARTNERSHIP_REQUIRED` for product use
+  (`docs/canonical/12` §2.1, §20). ADR-0008's Path A.
+
+IJP PAN publishes both, so one licensing conversation covers both. Until one
+exists, every surname correctly returns `NO_SOURCED_MEANING`.
