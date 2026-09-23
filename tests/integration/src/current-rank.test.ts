@@ -11,7 +11,13 @@ import {
   PESEL_NATIONAL_MALE_2026,
   sha256Hex,
 } from "@name-atlas/sources";
-import { deriveCurrentPopulation, deriveCurrentRank, currentRankClaimKey } from "@name-atlas/truth";
+import {
+  competitionRank,
+  deriveCurrentPopulation,
+  deriveCurrentRank,
+  currentRankClaimKey,
+} from "@name-atlas/truth";
+import type { RankTableCache } from "@name-atlas/truth";
 
 /**
  * TASK-009 §9 — `CURRENT_RANK` against a real PostgreSQL.
@@ -327,6 +333,29 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
     if (result.kind !== "NO_RESULT") throw new Error("unreachable");
     expect(result.reason).toBe("INCOMPLETE_UNIVERSE");
     expect(await countOf("claims")).toBe(0);
+  });
+
+  it("ranks identically through the run-scoped table and the per-surname count", async () => {
+    // The gate is not involved: this compares the two ways of computing the
+    // same number, over every national value the importer actually wrote.
+    const values = await sql<{ source_record_id: string; count: number }>`
+      SELECT s.source_record_id, v.count
+      FROM distribution_snapshots s
+      JOIN distribution_values v USING (distribution_snapshot_id)
+      WHERE v.place_id IS NULL
+    `.execute(db());
+    expect(values.rows.length).toBe(45);
+
+    const cache: RankTableCache = new Map();
+    for (const { source_record_id, count } of values.rows) {
+      const counted = await competitionRank(db(), source_record_id, Number(count));
+      const looked = await competitionRank(db(), source_record_id, Number(count), cache);
+      expect(looked).toBe(counted);
+    }
+    // One table per universe, not per surname: male and female stay separate.
+    expect(cache.size).toBe(2);
+    const totals = [...cache.values()].map((t) => t.total).sort((a, b) => a - b);
+    expect(totals).toEqual([22, 23]);
   });
 
   it("keys a rank claim on the source record, so one exists per resource version", () => {

@@ -29,8 +29,14 @@ export type {
 } from "./read.js";
 export { querySurnameResult } from "./query.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
-export { deriveCurrentRank, currentRankClaimKey } from "./rank.js";
-export type { DeriveRankOptions } from "./rank.js";
+export {
+  buildRankTable,
+  competitionRank,
+  currentRankClaimKey,
+  deriveCurrentRank,
+  rankInTable,
+} from "./rank.js";
+export type { DeriveRankOptions, RankTable, RankTableCache } from "./rank.js";
 export { deriveRarityContext, rarityContextClaimKey, oneInX, shareOf } from "./rarity.js";
 export type { DeriveRarityOptions } from "./rarity.js";
 export {

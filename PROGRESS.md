@@ -4802,3 +4802,81 @@ and belongs in a task of its own.
   renders as a gap however complete the universe is.
 - Against a complete universe all three families derive with no code change:
   40 of 40 surnames returned population, rank and rarity.
+
+### Local database as the working target; rank computed once per universe (2026-09-23)
+
+At the project owner's request ("use just local data base we created"), the local
+PostgreSQL is the database this work proceeds on. No hosted database was touched.
+
+#### The local stack, run end to end in this session
+
+The Docker daemon is absent here, so `docker-compose.yml` was not started. Its exact
+settings were reproduced on a locally installed PostgreSQL 16.13 with the Ubuntu
+`postgresql-16-postgis-3` package (PostGIS 3.4.2): user, password and database
+`name_atlas` as in `docker-compose.yml`, so `docs/LOCAL_DATABASE.md`'s literal
+`DATABASE_URL` worked unedited.
+
+| Step | Result |
+|---|---|
+| `pnpm db:migrate` | 19 applied, then `up to date`. |
+| National imports, official path (no `--sha256`) | Refused, `CHECKSUM_MISMATCH` against the registry's `official_sha256` — correct: the committed files are excerpts. |
+| National imports with the excerpts' own `--sha256` | Male 22 rows / 22 surnames; female 23 rows, 16 created, 7 reused. |
+| Regional excerpts through `import-pesel.ts` | Refused, `SCHEMA_VIOLATION` on the header — the regional files have their own importer. |
+| Regional excerpts through `import-pesel-regional.ts` | Male 10 snapshots / 40 values, female 8 / 38; 16 places referenced each. |
+| `pnpm seo:backfill-slugs` | 88 addresses, 0 suffixed. |
+| `pnpm truth:derive-batch --all --rank` | 44 surnames, 0 failed. Claims: **45 `CURRENT_POPULATION`, nothing else** — rank, rarity and distribution withheld by the completeness gate, as they must be over excerpts. |
+| `apps/web` built and started on the local database | `/api/health` ok; `/pl/nazwisko/nowak` 200, rendering 98 387 (men) and 99 738 (women) with the Ministerstwo Cyfryzacji citation, and "the loaded set is not complete" in place of rarity and distribution; `GET /api/v1/surname-results?surname=NOWAK` → `population READY`, `rarity UNAVAILABLE`, `distribution UNAVAILABLE`, `meaning NO_SOURCED_MEANING`. |
+
+The full register was **not** loaded: the national and regional CSVs are not in the
+repository, `dane.gov.pl` answers `403` to `CONNECT` from this environment, and no
+copy was found in the owner's Google Drive (searched by title for PESEL/nazwisk).
+
+#### `docs/LOCAL_DATABASE.md` corrected
+
+Step 4 imported only the two national files. `truth:derive-batch` without `--all`
+derives only surnames with regional evidence, so following the runbook as written
+would have derived nothing. The two regional imports are now in it, the derive
+command carries `--rank`, a duplicated and self-contradicting `--sha256` paragraph
+was reduced to the correct one, and a section shows the excerpt walk-through above.
+
+#### The 83 h rank finding addressed
+
+`competitionRank` (`packages/truth/src/rank.ts`) counted every row above a
+surname's count, once per surname. It now takes an optional run-scoped
+`RankTableCache`: one `GROUP BY count` per source record, then a binary search over
+the distinct counts. Semantics are unchanged — competition rank, ties share, strictly
+greater — and without a cache (a single page) the original query still runs.
+`derive-batch` passes one cache for the run.
+
+Measured on a throwaway database holding **408,182** national values in one source
+record: the male excerpt imported for real, plus 408,160 synthetic surnames,
+snapshots and values cloned from one of its rows with counts
+`greatest(2, 99738 / g^0.85)` — **1,019 distinct counts**. The surnames are
+constructed; only the row count and the count range match the register, so this
+measures the query, not any fact about a surname.
+
+| | Result |
+|---|---|
+| Uncached `competitionRank`, 40 sampled surnames | **68.8 ms** a surname — 14.5/s, ~7.8 h for the universe |
+| Cached, first call (the grouped query) | **100 ms** |
+| Cached, all 408,182 ranks | **104 ms** in total, 0.25 µs a surname |
+| Cached vs uncached on the 40 sampled | 0 mismatches |
+
+The real register has more distinct counts than 1,019; the table grows with those,
+not with surnames. The end-to-end `derive-batch --rank` rate was **not** re-measured:
+that needs a universe that passes the completeness gate, i.e. the real files.
+
+#### Verification actually run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | Passed. |
+| `pnpm lint` | Passed — no errors, no warnings. |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — **647** (642 + 5 new in `rank.test.ts`: tie example, three fast-check properties against the definition — members, non-members, row order — and duplicate-count refusal). |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13 / PostGIS 3.4.2) | Passed — **264** across 21 files (263 + 1: cached and uncached ranks agree for all 45 imported national values; one table per universe, totals 22 and 23). |
+| `pnpm test:golden` | Passed — 364. |
+| `pnpm build` | Passed — `apps/web`, `apps/admin`, `apps/worker`. |
+
+**Not verified here:** the pinned container image (no Docker daemon); the full
+register; `derive-batch --rank` throughput against a complete universe.

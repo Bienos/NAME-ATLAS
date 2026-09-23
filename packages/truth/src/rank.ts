@@ -69,12 +69,27 @@ export function currentRankClaimKey(surnameId: string, sourceRecordId: string): 
  * Computed by the database rather than by sorting in memory, so the result
  * cannot depend on row order (AC-10) and a 408,182-row universe costs one
  * indexed aggregate rather than a full materialisation.
+ *
+ * Given a {@link RankTableCache}, the universe is aggregated once per source
+ * record and every later rank is a lookup. Without one, each call counts
+ * afresh, which is right for a single page and ruinous for a batch: the
+ * uncached count is a hash join over the whole universe, measured at 2.0
+ * surnames/s against the real register.
  */
-async function competitionRank(
+export async function competitionRank(
   db: Kysely<DB>,
   sourceRecordId: string,
   count: number,
+  cache?: RankTableCache,
 ): Promise<number> {
+  if (cache) {
+    let table = cache.get(sourceRecordId);
+    if (!table) {
+      table = await loadRankTable(db, sourceRecordId);
+      cache.set(sourceRecordId, table);
+    }
+    return rankInTable(table, count);
+  }
   const row = await db
     .selectFrom("distribution_snapshots as s")
     .innerJoin(
@@ -90,11 +105,88 @@ async function competitionRank(
   return Number(row.greater) + 1;
 }
 
+/**
+ * One universe's national counts as a histogram: distinct counts in strictly
+ * descending order, and for each, how many surnames have a strictly greater
+ * count. A register of 408,182 surnames has far fewer distinct counts, so the
+ * table is small and a rank is a binary search over it.
+ */
+export interface RankTable {
+  readonly counts: readonly number[];
+  readonly greater: readonly number[];
+  /** Every surname in the universe. */
+  readonly total: number;
+}
+
+/**
+ * A run-scoped memo of {@link RankTable}s by source record. Scoped to the run
+ * for the same reason as `UniverseSizeCache`: it is only true once an import
+ * has finished, and `deriveCurrentRank` consults it only after the
+ * completeness gate has said the import is complete.
+ */
+export type RankTableCache = Map<string, RankTable>;
+
+/** Builds a {@link RankTable} from (count, frequency) pairs in any order. */
+export function buildRankTable(
+  rows: readonly { readonly count: number; readonly frequency: number }[],
+): RankTable {
+  const sorted = [...rows].sort((a, b) => b.count - a.count);
+  const counts: number[] = [];
+  const greater: number[] = [];
+  let above = 0;
+  for (const { count, frequency } of sorted) {
+    if (counts.length > 0 && counts[counts.length - 1] === count) {
+      throw new TruthInvariantError(
+        "RANK_TABLE_DUPLICATE_COUNT",
+        `rank table: count ${count} appears twice`,
+      );
+    }
+    counts.push(count);
+    greater.push(above);
+    above += frequency;
+  }
+  return { counts, greater, total: above };
+}
+
+/** One plus the number of surnames with a strictly greater count. */
+export function rankInTable(table: RankTable, count: number): number {
+  // First index whose count is not strictly greater than `count`.
+  let lo = 0;
+  let hi = table.counts.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >>> 1;
+    if ((table.counts[mid] as number) > count) lo = mid + 1;
+    else hi = mid;
+  }
+  // Past the end, every surname's count is strictly greater.
+  return (lo === table.counts.length ? table.total : (table.greater[lo] as number)) + 1;
+}
+
+async function loadRankTable(db: Kysely<DB>, sourceRecordId: string): Promise<RankTable> {
+  const rows = await db
+    .selectFrom("distribution_snapshots as s")
+    .innerJoin(
+      "distribution_values as v",
+      "v.distribution_snapshot_id",
+      "s.distribution_snapshot_id",
+    )
+    .select((eb) => ["v.count", eb.fn.countAll<string>().as("frequency")])
+    .where("s.source_record_id", "=", sourceRecordId)
+    .where("v.place_id", "is", null)
+    .groupBy("v.count")
+    .execute();
+  return buildRankTable(
+    rows.map((r) => ({ count: Number(r.count), frequency: Number(r.frequency) })),
+  );
+}
+
 export interface DeriveRankOptions {
   /** Overridable so tests can exercise a restrictive rights posture. */
   readonly rightsOverride?: EffectiveRights;
   /** Run-scoped memo for the completeness counts. See `UniverseSizeCache`. */
   readonly universeSizeCache?: UniverseSizeCache;
+  /** Run-scoped memo for the rank lookup. See {@link RankTableCache}. */
+  readonly rankTableCache?: RankTableCache;
 }
 
 /**
@@ -121,7 +213,12 @@ export async function deriveCurrentRank(
   const claims: CurrentRankClaimResult[] = [];
   for (const { candidate, verdict } of complete) {
     if (verdict.kind !== "COMPLETE") continue;
-    const rank = await competitionRank(db, candidate.source_record_id, candidate.count);
+    const rank = await competitionRank(
+      db,
+      candidate.source_record_id,
+      candidate.count,
+      options.rankTableCache,
+    );
     claims.push(
       await db
         .transaction()

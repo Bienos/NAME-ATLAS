@@ -59,28 +59,48 @@ Expect 19 migrations, `0001_bootstrap_extensions` through
 
 ## 4. Load the register
 
-Timings are measured, from `PROGRESS.md`, not estimates. All four steps are
+Timings are measured, from `PROGRESS.md`, not estimates. Every step is
 idempotent and resumable, so a failure part-way through is safe to re-run.
 
 ```bash
-# Male — 408,182 rows, ~4m25s
+# National male — 408,182 rows, ~4m25s
 pnpm exec tsx packages/sources/bin/import-pesel.ts \
   --resource 1148808 \
   --file data/national-male-2026-01-20.csv \
   --metadata fixtures/pesel/source-manifest.json
 
-# Female — 420,082 rows, ~4m25s
+# National female — 420,082 rows, ~4m25s
 pnpm exec tsx packages/sources/bin/import-pesel.ts \
   --resource 1148811 \
   --file data/national-female-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
+
+# Regional male and female — 646,052 and 694,553 rows (timing not recorded separately)
+pnpm exec tsx packages/sources/bin/import-pesel-regional.ts \
+  --resource 1148786 \
+  --file data/regional-male-2026-01-20.csv \
+  --metadata fixtures/pesel/source-manifest.json
+pnpm exec tsx packages/sources/bin/import-pesel-regional.ts \
+  --resource 1148790 \
+  --file data/regional-female-2026-01-20.csv \
   --metadata fixtures/pesel/source-manifest.json
 
 # ~57s, 1,196,952 rows
 pnpm seo:backfill-slugs
 
 # ~55m at 71.1 rows/s — the long one, leave it running
-pnpm truth:derive-batch
+pnpm truth:derive-batch --rank
 ```
+
+**Do not skip the regional imports.** The regional files have their own importer
+(`import-pesel-regional.ts`; the national one refuses their header with
+`SCHEMA_VIOLATION`), and `truth:derive-batch` without `--all` derives only the
+surnames that appear in them. Without them it has nothing to do.
+
+`--rank` adds `CURRENT_RANK` and `RARITY_CONTEXT`. The rank itself is now one
+grouped query per resource and a lookup per surname (measured on a 408,182-row
+universe: 100 ms once, then 0.25 µs a surname). The ~55m above was measured
+without `--rank`; the whole run with it has not been timed since that change.
 
 Run these **from the repository root**, and note it is `pnpm exec tsx <path>`, not
 `pnpm --filter ... run import-pesel`. Two reasons, both learned the hard way:
@@ -89,22 +109,41 @@ as an argument and dies with `missing value for --`; and `pnpm run` executes wit
 the working directory set to `packages/sources`, where `data/` and `fixtures/` do
 not exist.
 
-The two `--resource` values are the official dane.gov.pl resource IDs, matched by
+The `--resource` values are the official dane.gov.pl resource IDs, matched by
 `findPeselResource` in `packages/sources/src/registry.ts`. There is no `--sha256`
 flag here because the registry already carries `official_sha256` and the importer
 enforces it regardless — a wrong file fails with `CHECKSUM_MISMATCH` before a byte
 is decoded. Pass `--sha256 <hex>` only to assert a different expected digest.
 
-408,182 + 420,082 = **828,264 rows**, deduplicating to roughly **598,476**
-surnames across both files.
+408,182 + 420,082 = **828,264 national rows**, deduplicating to roughly
+**598,476** surnames across both files.
 
-The two `--resource` values are the official dane.gov.pl resource IDs, matched by
-`findPeselResource` in `packages/sources/src/registry.ts`. `--sha256` is optional —
-the registry already carries `official_sha256` — but passing it pins the file's
-content before it is decoded, which is the point of having a checksum.
+### Without the full files: the committed excerpts
 
-408,182 + 420,082 = **828,264 rows**, deduplicating to roughly **598,476**
-surnames across both files.
+To see the whole stack run before you have the CSVs, load the 22- and 23-row
+excerpts in `fixtures/pesel/`. They are not the official files, so each import
+needs its own digest, and the completeness gate will then — correctly — withhold
+rank, rarity and regional distribution:
+
+```bash
+for r in "1148808 national-male" "1148811 national-female"; do set -- $r
+  f=fixtures/pesel/$2-2026-01-20.csv
+  pnpm exec tsx packages/sources/bin/import-pesel.ts --resource $1 --file $f \
+    --metadata fixtures/pesel/source-manifest.json --sha256 $(sha256sum $f | cut -d' ' -f1)
+done
+for r in "1148786 regional-male" "1148790 regional-female"; do set -- $r
+  f=fixtures/pesel/$2-2026-01-20.csv
+  pnpm exec tsx packages/sources/bin/import-pesel-regional.ts --resource $1 --file $f \
+    --metadata fixtures/pesel/source-manifest.json --sha256 $(sha256sum $f | cut -d' ' -f1)
+done
+pnpm seo:backfill-slugs
+pnpm truth:derive-batch --all --rank
+pnpm --filter ./apps/web build && (cd apps/web && pnpm start -p 3100)
+```
+
+Then open `http://localhost:3100/pl/nazwisko/nowak`: NOWAK's two counts, sourced
+and dated, and an explicit "the loaded set is not complete" in place of rarity
+and distribution.
 
 ## 5. Check it landed
 
