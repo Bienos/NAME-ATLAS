@@ -10,6 +10,23 @@ No hosted plan holds this. The measured database is **5,917 MB**, already reduce
 from 6,974 MB by TASK-030. The largest free tier on any provider is 5 GB. Locally
 there is no cap.
 
+## Quick start
+
+With Docker, Node 22 and pnpm installed, from the repository root:
+
+```bash
+docker compose up -d
+pnpm install --frozen-lockfile
+pnpm local:setup
+```
+
+`local:setup` (`scripts/local-setup.sh`) runs every step below in order:
+downloads the four official PESEL files into `data/` and refuses any whose size or
+SHA-256 differs from `packages/sources/src/registry.ts`, migrates, imports all four,
+assigns page addresses, and derives every claim. It is idempotent — re-run it after
+a failure and it continues. Set `DERIVE_LIMIT=1000` to derive only the first 1,000
+surnames for a quick look. The sections below are the same steps by hand.
+
 ## What you need
 
 | | |
@@ -18,7 +35,7 @@ there is no cap.
 | Node | the version in `.nvmrc` (`nvm use`) |
 | pnpm | the version in `package.json`'s `packageManager` (`corepack enable`) |
 | Disk | ~10 GB free — 5,917 MB of data plus WAL and working space |
-| The PESEL CSVs | the **full** national files, kept in `data/` (git-ignored) or anywhere outside the repository. **Do not put them in `fixtures/pesel/`** — the excerpts there share the same file names, and overwriting them breaks the test suite. The importer reads bytes already on disk and never downloads; `fixtures/pesel/` holds 22- and 23-row excerpts for tests, not the register |
+| The PESEL CSVs | ~45 MB for all four; `pnpm fetch:pesel` downloads and verifies them. The **full** files, kept in `data/` (git-ignored) or anywhere outside the repository. **Do not put them in `fixtures/pesel/`** — the excerpts there share the same file names, and overwriting them breaks the test suite. The importer reads bytes already on disk and never downloads; `fixtures/pesel/` holds 22- and 23-row excerpts for tests, not the register |
 
 ## 1. Start the database
 

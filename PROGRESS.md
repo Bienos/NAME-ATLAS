@@ -4898,3 +4898,33 @@ settings, or a machine with ordinary internet access.
 Nothing about Polona's interface, terms or rights vocabulary is asserted anywhere in
 this change. ADR-0007 decides what the product does with a rights value; the task
 exists to find out what the values are.
+
+### `pnpm local:setup` — the full local load in one command (2026-09-23)
+
+Asked for by the project owner ("i want the app to fully run"). The four official
+files total ~45 MB (5,293,415 + 5,592,881 + 16,615,897 + 17,900,370 bytes, from the
+registry), so there is no reason for acquisition to be manual on a machine with
+internet access.
+
+- `packages/sources/src/acquire.ts` — pure: `localFileName` (the `data/` names the
+  runbook already used) and `verifyResourceBytes` (size, then SHA-256, against the
+  registry's pinned values; a mismatch is reported, never tolerated).
+- `packages/sources/bin/fetch-pesel.ts`, `pnpm fetch:pesel` — for each registered
+  resource, keeps a verified file already on disk, otherwise downloads
+  `official_source_url` and writes it under its final name only if it matches. The
+  importers still download nothing.
+- `scripts/local-setup.sh`, `pnpm local:setup` — fetch, migrate, four imports,
+  `seo:backfill-slugs`, `truth:derive-batch --rank` (`DERIVE_LIMIT` passes `--limit`).
+  `set -euo pipefail`, so it stops at the first failed step.
+
+| Check | Result |
+|---|---|
+| `acquire.test.ts` | 4 passed — names match the fixtures; every committed excerpt refused (`SIZE_MISMATCH`); a same-size wrong file refused (`CHECKSUM_MISMATCH`); matching bytes accepted. |
+| `pnpm fetch:pesel --dir <tmp>` with an excerpt pre-placed | The excerpt reported as "not the official file" and left untouched; all four downloads `HTTP 403 Forbidden` (this environment's egress policy); nothing written; exit 1. |
+| `pnpm local:setup` here | Stopped at step 1 with exit 1; no database step ran. |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 651. |
+
+**Not verified:** a successful download. `api.dane.gov.pl` is unreachable from this
+environment, so the happy path of `fetch:pesel` — and therefore `local:setup` past
+step 1 — has not run anywhere yet.

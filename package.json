@@ -19,6 +19,8 @@
     "test:golden": "pnpm --filter @name-atlas/golden-tests run test:golden",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
+    "fetch:pesel": "tsx packages/sources/bin/fetch-pesel.ts",
+    "local:setup": "bash scripts/local-setup.sh",
     "seo:backfill-slugs": "pnpm --filter @name-atlas/seo run backfill-slugs",
     "truth:derive-batch": "pnpm --filter @name-atlas/truth run derive-batch",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
