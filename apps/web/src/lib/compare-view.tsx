@@ -1,10 +1,20 @@
-import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { comparePopulation, compareRarity, rarerOf } from "./compare.js";
+import type { DistributionEntry, SurnameResultResponse } from "@name-atlas/contracts";
+import { compareDistribution, comparePopulation, compareRarity, rarerOf } from "./compare.js";
 import type { NotComparable } from "./compare.js";
-import { formatDate, formatInteger, htmlLang, partitionLabel, UI } from "./messages.js";
+import {
+  coverageWarning,
+  formatDate,
+  formatInteger,
+  formatPercent,
+  htmlLang,
+  partitionLabel,
+  UI,
+} from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SearchForm } from "./search-form.js";
 import { surnamePath } from "./slug.js";
+import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
+import { mapInputs } from "./voivodeship-map-input.js";
 
 /**
  * The comparison page (TASK-025, directive §24–§25).
@@ -82,6 +92,7 @@ export function ComparisonView({
   const bothResolved = a.response !== null && b.response !== null;
   const populationPairs = bothResolved ? comparePopulation(a.response!, b.response!) : [];
   const rarityPairs = bothResolved ? compareRarity(a.response!, b.response!) : [];
+  const distributionPairs = bothResolved ? compareDistribution(a.response!, b.response!) : [];
 
   return (
     <>
@@ -225,6 +236,30 @@ export function ComparisonView({
                 ))
               )}
             </section>
+
+            <section id="where">
+              <h3>{t.sectionDistribution}</h3>
+              {distributionPairs.length === 0 ? (
+                <p className="absent">{t.compareNothingToCompare}</p>
+              ) : (
+                distributionPairs.map((pair, index) => (
+                  <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
+                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                    {pair.comparable ? (
+                      <DistributionPair
+                        pair={[
+                          { name: a.display ?? "", entry: pair.a },
+                          { name: b.display ?? "", entry: pair.b },
+                        ]}
+                        lang={lang}
+                      />
+                    ) : (
+                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                    )}
+                  </div>
+                ))
+              )}
+            </section>
           </>
         )}
 
@@ -241,6 +276,104 @@ export function ComparisonView({
         <SearchForm lang={lang} query="" />
       </main>
       <footer lang={htmlLang(lang)}>{t.footer}</footer>
+    </>
+  );
+}
+
+/**
+ * Two regional breakdowns from the same resource: two maps on **one shared
+ * scale** (so a shade means the same share in both), one legend, each side's
+ * coverage warning above its own map, and a table with both columns.
+ */
+function DistributionPair({
+  pair,
+  lang,
+}: {
+  pair: readonly [
+    { name: string; entry: DistributionEntry },
+    { name: string; entry: DistributionEntry },
+  ];
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const input = mapInputs(
+    pair.map((side) => side.entry),
+    lang,
+  );
+  const places = new Map<string, { name: string; a?: number; b?: number }>();
+  pair[0].entry.regions.forEach((r) =>
+    places.set(r.place_id, {
+      ...places.get(r.place_id),
+      name: r.display_name,
+      a: r.share_of_covered,
+    }),
+  );
+  pair[1].entry.regions.forEach((r) =>
+    places.set(r.place_id, {
+      ...places.get(r.place_id),
+      name: r.display_name,
+      b: r.share_of_covered,
+    }),
+  );
+  const rows = [...places.values()].sort((x, y) => x.name.localeCompare(y.name, "pl"));
+  const labels = {
+    title: t.mapTitle,
+    legendTitle: t.mapLegend,
+    bandLabels: input?.bandLabels ?? [],
+    notListed: t.mapNotListed,
+    hint: t.mapHint,
+  };
+  return (
+    <>
+      {input === null ? null : (
+        <>
+          <div className="compare-maps">
+            {pair.map((side, i) => {
+              const warning = coverageWarning(side.entry, lang);
+              return (
+                <div key={side.name + String(i)}>
+                  <h4>{side.name}</h4>
+                  {warning === null ? null : <p className="warning">{warning}</p>}
+                  <VoivodeshipMap
+                    regions={input.maps[i] ?? []}
+                    labels={{ ...labels, title: `${t.mapTitle}: ${side.name}` }}
+                    legend={false}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <MapLegend
+            title={labels.legendTitle}
+            bandLabels={labels.bandLabels}
+            notListed={labels.notListed}
+          />
+        </>
+      )}
+      <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
+        <table>
+          <caption>{t.coveredNote}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{t.regionColumn}</th>
+              <th scope="col">{pair[0].name}</th>
+              <th scope="col">{pair[1].name}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.name}>
+                <th scope="row">{row.name}</th>
+                <td>{row.a === undefined ? t.mapNotListedShort : formatPercent(row.a, lang)}</td>
+                <td>{row.b === undefined ? t.mapNotListedShort : formatPercent(row.b, lang)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="note">
+        {t.snapshotLabel}: {formatDate(pair[0].entry.snapshot_date, lang)}
+      </p>
     </>
   );
 }

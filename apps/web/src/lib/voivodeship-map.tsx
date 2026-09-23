@@ -47,9 +47,12 @@ export interface MapLabels {
 export function VoivodeshipMap({
   regions,
   labels,
+  legend = true,
 }: {
   regions: readonly MapRegion[];
   labels: MapLabels;
+  /** False when several maps share one legend (the comparison page). */
+  legend?: boolean;
 }) {
   const hatchId = `hatch-${useId().replace(/:/g, "")}`;
   const [active, setActive] = useState<string | null>(null);
@@ -116,25 +119,62 @@ export function VoivodeshipMap({
       <p className="vmap-readout" aria-live="polite">
         {active === null ? labels.hint : describe(active)}
       </p>
-      <figcaption className="vmap-legend">
-        <span className="vmap-legend-title">{labels.legendTitle}</span>
-        <ul>
-          {labels.bandLabels.map((label, band) => (
-            <li key={label}>
-              <svg className="vmap-swatch" viewBox="0 0 12 12" aria-hidden="true">
-                <rect width="12" height="12" rx="2" className={`vmap-b${String(band)}`} />
-              </svg>
-              {label}
-            </li>
-          ))}
-          <li>
-            <svg className="vmap-swatch" viewBox="0 0 12 12" aria-hidden="true">
-              <rect width="12" height="12" rx="2" fill={`url(#${hatchId})`} />
-            </svg>
-            {labels.notListed}
-          </li>
-        </ul>
-      </figcaption>
+      {legend ? (
+        <MapLegend
+          title={labels.legendTitle}
+          bandLabels={labels.bandLabels}
+          notListed={labels.notListed}
+        />
+      ) : null}
     </figure>
+  );
+}
+
+/**
+ * The legend: the bands, lowest first, and the not-listed swatch. Its own
+ * hatch pattern, so it can stand under several maps or none.
+ */
+export function MapLegend({
+  title,
+  bandLabels,
+  notListed,
+}: {
+  title: string;
+  bandLabels: readonly string[];
+  notListed: string;
+}) {
+  const hatchId = `legend-hatch-${useId().replace(/:/g, "")}`;
+  return (
+    <div className="vmap-legend">
+      <span className="vmap-legend-title">{title}</span>
+      <ul>
+        {bandLabels.map((label, band) => (
+          <li key={label}>
+            <svg className="vmap-swatch" viewBox="0 0 12 12" aria-hidden="true">
+              <rect width="12" height="12" rx="2" className={`vmap-b${String(band)}`} />
+            </svg>
+            {label}
+          </li>
+        ))}
+        <li>
+          <svg className="vmap-swatch" viewBox="0 0 12 12" aria-hidden="true">
+            <defs>
+              <pattern
+                id={hatchId}
+                width="6"
+                height="6"
+                patternUnits="userSpaceOnUse"
+                patternTransform="rotate(45)"
+              >
+                <rect width="6" height="6" className="vmap-none-bg" />
+                <line x1="0" y1="0" x2="0" y2="6" className="vmap-none-line" />
+              </pattern>
+            </defs>
+            <rect width="12" height="12" rx="2" fill={`url(#${hatchId})`} />
+          </svg>
+          {notListed}
+        </li>
+      </ul>
+    </div>
   );
 }

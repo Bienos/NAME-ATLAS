@@ -5101,3 +5101,32 @@ partial index on the rank.
 **Not verified here:** the list against real derived rank claims (the owner's database
 has ~5,300; which ranks they cover depends on derivation order), and prefix latency on
 the real register.
+
+### Compare page: two regional maps on one scale (2026-09-23)
+
+Screen #2. `/pl/porownaj` (and the English compare page) gained a regional section.
+
+- `compareDistribution` in `apps/web/src/lib/compare.ts` pairs the two surnames'
+  regional entries by `comparability_group` and snapshot date, exactly as population
+  and rarity are paired; a missing side or a different date is reported in words,
+  not drawn.
+- A comparable pair renders **two maps on one shared scale** with one legend: a shade
+  means the same share on both maps. On separate scales the same shade would mean
+  different shares, which is the misleading reading side-by-side maps invite. Each
+  side keeps its own coverage warning; a table lists both columns, with "brak w
+  zbiorze" where a side has no value. No sentence says which surname is "more"
+  anywhere — it is a layout, not a ranking.
+- Refactor: map input moved from `result-view.tsx` to `voivodeship-map-input.ts`
+  (`mapInputs`, one scale across any number of entries); the legend is now
+  `MapLegend`, usable under several maps. The surname page renders unchanged (its
+  tests pass unmodified).
+
+| Check | Result |
+|---|---|
+| `compare-distribution.test.ts` | 6 passed — pairing, date/missing refusals, two maps + one legend, shared scale (BETA's 50% is band 2 on the joint 20-point scale; alone it would be band 4), table columns and not-listed cells, refusal wording |
+| Web suite | 185 passed |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, web build | Passed |
+| Screenshots (SYNTHETIC figures) | 900px light: maps side by side, one legend; 390px dark: maps stacked; no horizontal overflow at either width |
+
+**Not verified:** with real regional data — it needs the regional files imported on
+the owner's database.

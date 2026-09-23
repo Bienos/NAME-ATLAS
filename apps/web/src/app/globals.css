@@ -745,6 +745,7 @@ p {
 .vmap-readout {
   margin: 0.4rem 0 0.5rem;
   min-height: 1.5em;
+  font-size: 0.9rem;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
@@ -857,4 +858,21 @@ p {
   min-width: 1.8em;
   color: var(--ink-soft);
   font-variant-numeric: tabular-nums;
+}
+
+/* --- comparison: two maps on one scale ------------------------------------ */
+
+.compare-maps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.5rem 1.5rem;
+}
+
+.compare-maps h4 {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+}
+
+.compare-maps .vmap {
+  margin-bottom: 0.25rem;
 }
