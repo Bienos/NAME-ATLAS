@@ -4880,3 +4880,21 @@ that needs a universe that passes the completeness gate, i.e. the real files.
 
 **Not verified here:** the pinned container image (no Docker daemon); the full
 register; `derive-batch --rank` throughput against a complete universe.
+
+### TASK-031 specified — Polona source spike, planning only (2026-09-23)
+
+At the project owner's request ("please do whats needed"), the first M3 task was
+written: `tasks/031-polona-source-spike.md`, `docs/canonical/23`'s SPIKE-03. It is
+research plus a fail-closed parser over captured responses, on the TASK-002 pattern:
+no table, no connector, no claim.
+
+**Not started, and not startable from this project's cloud environment as configured.**
+Checked on 2026-09-23: `polona.pl`, `polona2.pl`, `api.europeana.eu` and
+`fbc.pionier.net.pl` all answered `403` to `CONNECT`. The task's §11 says what the
+implementing session does in that case: record `UNRESOLVED` and stop, rather than
+describe Polona from memory. It needs `polona.pl` allowed in the environment's network
+settings, or a machine with ordinary internet access.
+
+Nothing about Polona's interface, terms or rights vocabulary is asserted anywhere in
+this change. ADR-0007 decides what the product does with a rights value; the task
+exists to find out what the values are.
