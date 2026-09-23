@@ -23,7 +23,8 @@ pnpm local:setup
 `local:setup` (`scripts/local-setup.sh`) runs every step below in order:
 downloads the four official PESEL files into `data/` and refuses any whose size or
 SHA-256 differs from `packages/sources/src/registry.ts`, migrates, imports all four,
-assigns page addresses, and derives every claim. It is idempotent — re-run it after
+assigns page addresses, and derives every claim — first for the surnames with
+regional data, then (`--all --rank`) population, rank and rarity for the rest. It is idempotent — re-run it after
 a failure and it continues. Set `DERIVE_LIMIT=1000` to derive only the first 1,000
 surnames for a quick look. The sections below are the same steps by hand.
 
