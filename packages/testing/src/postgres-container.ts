@@ -3,7 +3,7 @@ import type { StartedPostgreSqlContainer } from "@testcontainers/postgresql";
 import { createDb, createMigrator, createPool } from "@name-atlas/db";
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
-import type { Pool } from "pg";
+import type { Pool, PoolClient } from "pg";
 
 /**
  * Pinned PostgreSQL/PostGIS image (resolves D-005 — docs/DECISIONS_NEEDED.md).
@@ -48,6 +48,45 @@ export interface TestDatabase {
 }
 
 /**
+ * Tracks the connections a pool opens, so teardown can wait until they have
+ * really closed. `pool.end()` — reached through `db.destroy()` — resolves once
+ * it has asked each client to close, not once the sockets are gone. Dropping
+ * the database or stopping the server inside that window sends a closing
+ * client FATAL 57P01 with nothing left to handle it, and Vitest reports it as
+ * an unhandled error in whichever test file happens to be running.
+ */
+function trackOpenConnections(pool: Pool): () => Promise<void> {
+  const open = new Set<PoolClient>();
+  pool.on("connect", (client) => {
+    open.add(client);
+    client.once("end", () => {
+      open.delete(client);
+    });
+  });
+  return async function allClosed() {
+    if (open.size === 0) {
+      return;
+    }
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const closed = [...open].map(
+      (client) =>
+        new Promise<void>((resolve) => {
+          client.once("end", () => {
+            resolve();
+          });
+        }),
+    );
+    await Promise.race([
+      Promise.all(closed),
+      new Promise<void>((resolve) => {
+        timer = setTimeout(resolve, 5_000);
+      }),
+    ]);
+    clearTimeout(timer);
+  };
+}
+
+/**
  * Starts a fresh PostgreSQL+PostGIS database and returns a ready
  * connection. Does not run migrations — call {@link migrateTestDatabase}
  * afterwards for tests that need the schema in place.
@@ -61,6 +100,7 @@ export async function startTestDatabase(): Promise<TestDatabase> {
   const container = await new PostgreSqlContainer(POSTGRES_TEST_IMAGE).start();
   const connectionUri = container.getConnectionUri();
   const pool = createPool({ databaseUrl: connectionUri });
+  const allClosed = trackOpenConnections(pool);
   const db = createDb(pool);
 
   return {
@@ -70,6 +110,7 @@ export async function startTestDatabase(): Promise<TestDatabase> {
     db,
     async stop() {
       await db.destroy();
+      await allClosed();
       await container.stop();
     },
   };
@@ -92,6 +133,7 @@ async function startExternalTestDatabase(serverUri: string): Promise<TestDatabas
   url.pathname = `/${databaseName}`;
   const connectionUri = url.toString();
   const pool = createPool({ databaseUrl: connectionUri });
+  const allClosed = trackOpenConnections(pool);
   const db = createDb(pool);
 
   return {
@@ -101,6 +143,7 @@ async function startExternalTestDatabase(serverUri: string): Promise<TestDatabas
     db,
     async stop() {
       await db.destroy();
+      await allClosed();
       // FORCE (PostgreSQL 13+) terminates any connection a test left open —
       // e.g. a deliberately abandoned pool — so a throwaway database never
       // leaks because of one.
