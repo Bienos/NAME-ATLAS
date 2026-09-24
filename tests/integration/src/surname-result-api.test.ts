@@ -252,6 +252,30 @@ describe("surname result read API against a real PostgreSQL", () => {
     expect(JSON.stringify(outcome.response)).not.toContain('"value":0');
   });
 
+  it("says NOT_DERIVED_YET, not NO_APPLICABLE_EVIDENCE, for a register surname not yet derived", async () => {
+    await seedRealData();
+    // GENUINE: imported from the committed fixture by `seedRealData`, and
+    // deliberately not derived. The register lists it, so "the dataset does
+    // not list this surname" would be false.
+    const derived = new Set([surnameInBoth(), surnameInMaleOnly(), "WIŚNIEWSKI"]);
+    const underived = MALE_NAMES.find((s) => !derived.has(s));
+    if (!underived) throw new Error("fixture has no underived surname");
+    const before = await countAll();
+
+    const outcome = await querySurnameResult(db(), underived);
+    if (outcome.kind !== "OK") throw new Error("expected OK");
+    expect(outcome.response.status).toBe("RESOLVED");
+    const { population, rarity, distribution } = outcome.response;
+    for (const section of [population, rarity, distribution]) {
+      expect(section?.state).toBe("UNAVAILABLE");
+      expect(section?.reason_code).toBe("NOT_DERIVED_YET");
+    }
+    expect(population?.observations).toHaveLength(0);
+    // The register's count is not read onto the wire, and nothing is derived.
+    expect(JSON.stringify(outcome.response)).not.toMatch(/"value":\d/);
+    expect(await countAll()).toEqual(before);
+  });
+
   /**
    * Since D-007 the seeded PESEL profile permits every surface, so a blocked
    * surface has to be produced: the stored profile is tightened for the

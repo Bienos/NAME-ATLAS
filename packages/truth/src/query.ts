@@ -39,6 +39,7 @@ import type {
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname, suggestSurnames } from "@name-atlas/resolver";
 import {
+  hasNationalRegisterCount,
   readCurrentDistribution,
   readCurrentPopulation,
   readRarityContext,
@@ -506,7 +507,13 @@ export async function querySurnameResult(
   if (claims.length === 0) {
     // Absence. The surname may be below the publisher's suppression
     // threshold, or outside the resource's scope, or simply not derived yet.
-    // None of those is a count of zero.
+    // None of those is a count of zero. The last is told apart from the
+    // others, because "this dataset does not list it" would be false for a
+    // surname the register does list. Still no write: derivation stays off
+    // this path (TASK-006 AC-03).
+    const reason = (await hasNationalRegisterCount(db, surnameId))
+      ? "NOT_DERIVED_YET"
+      : "NO_APPLICABLE_EVIDENCE";
     const noRights = evaluateSurface(
       {
         automated_access: "UNKNOWN",
@@ -523,9 +530,9 @@ export async function querySurnameResult(
         schema_version: SURNAME_RESULT_SCHEMA_VERSION,
         status: "RESOLVED",
         surname: identity,
-        population: emptySection("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
-        rarity: emptyRarity("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
-        distribution: emptyDistribution("UNAVAILABLE", "NO_APPLICABLE_EVIDENCE", noRights),
+        population: emptySection("UNAVAILABLE", reason, noRights),
+        rarity: emptyRarity("UNAVAILABLE", reason, noRights),
+        distribution: emptyDistribution("UNAVAILABLE", reason, noRights),
         suggestions: null,
         // A meaning comes from a different source with different rights, so it
         // is present or absent on its own terms even where no count exists.

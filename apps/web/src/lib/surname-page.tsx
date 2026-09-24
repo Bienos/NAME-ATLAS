@@ -229,7 +229,9 @@ export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metad
           })
           .filter((s): s is string => s !== null)
           .join(" · ")
-      : t.heroNoCount;
+      : r.population?.reason_code === "NOT_DERIVED_YET"
+        ? t.heroNotDerived
+        : t.heroNoCount;
   return {
     ...base,
     title: `${answer.display} — ${t.title}`,

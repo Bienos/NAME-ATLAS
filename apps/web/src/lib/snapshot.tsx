@@ -149,7 +149,11 @@ export function Snapshot({
         </div>
       ) : (
         <p className="absent">
-          {population?.state === "RIGHTS_BLOCKED" ? t.heroRightsBlocked : t.heroNoCount}
+          {population?.state === "RIGHTS_BLOCKED"
+            ? t.heroRightsBlocked
+            : population?.reason_code === "NOT_DERIVED_YET"
+              ? t.heroNotDerived
+              : t.heroNoCount}
         </p>
       )}
 

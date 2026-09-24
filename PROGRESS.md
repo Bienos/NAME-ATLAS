@@ -5345,3 +5345,37 @@ unchanged.
 
 **Not verified:** Safari (cross-document view transitions from 18.2) and Firefox (no transition
 expected); the integration suite on the pinned container image (CI will run it); any deployment.
+
+### A surname the register lists is no longer called absent (2026-09-24)
+
+Observed on a local database set up with `DERIVE_LIMIT=3000`: 6,468 of 598,476 surnames had
+`CURRENT_POPULATION` claims. For every other surname the page said *"Ten zbiór nie zawiera tego
+nazwiska"*, which is false: WINIECKI's page said it, and the register lists 940 men and 7 women with
+that surname. After `pnpm demo:surname`, `demo:surname-distribution`, `demo:surname-rank` and
+`demo:surname-rarity` for WINIECKI (29 s together), its page showed both counts, rarity and the top
+voivodeship.
+
+- `querySurnameResult`, when a resolved surname has no `CURRENT_POPULATION` claim, now checks
+  whether the register publishes a national count for it (`hasNationalRegisterCount` in
+  `packages/truth/src/read.ts`: one `SELECT … LIMIT 1`, no count returned). If it does, all three
+  fact sections are `UNAVAILABLE` with `reason_code = NOT_DERIVED_YET`; otherwise
+  `NO_APPLICABLE_EVIDENCE`, as before. It is still read-only: derivation stays off the read path
+  (TASK-006 AC-03).
+- The page says *"Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze
+  opracowane."* / *"The PESEL register lists this surname, but its figures have not been prepared
+  yet."* in each section, in the snapshot header and in the meta description.
+- `reason_code` is a string and the contract lists new values as non-breaking, so the schema
+  version is unchanged; `docs/contracts/surname-result.md` names both codes.
+- The loaded files are the newest the publisher has: `api.dane.gov.pl` dataset 1681, queried
+  2026-09-24, lists 2026-01-20 as the latest `data_date`; before that, 2025-01-22 (national) and
+  2025-02-24 (regional).
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 203 (the reason-code test now covers `NOT_DERIVED_YET`) |
+| `vitest run src/surname-result-api.test.ts` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 passed, including the new test: an imported, underived fixture surname answers `NOT_DERIVED_YET` on all three sections, carries no value, and writes nothing. A `57P01` is logged by the pool's idle-client handler at teardown; the run passes |
+| `pnpm test:integration` (same server) | 24 files, 279 passed (278 before, plus the new test) |
+| `next start` on the local database | `/pl/nazwisko/dettlaff` and `/en/surname/homa` show the new sentence; `/pl/nazwisko/winiecki` shows figures after it is derived |
+
+**Not verified:** CI for this change.

@@ -387,6 +387,8 @@ export const UI = {
     searchAnother: "Sprawdź inne nazwisko",
     heroPeople: "osób",
     heroNoCount: "Ten zbiór nie podaje liczby osób o tym nazwisku.",
+    heroNotDerived:
+      "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
     heroRightsBlocked: "Liczby nie można pokazać tutaj z powodu licencji źródła.",
     heroStrongestRegion: "Najwięcej zameldowanych",
     rarityNotComparable:
@@ -498,6 +500,8 @@ export const UI = {
     searchAnother: "Search another surname",
     heroPeople: "people",
     heroNoCount: "This dataset publishes no count for this surname.",
+    heroNotDerived:
+      "The PESEL register lists this surname, but its figures have not been prepared yet.",
     heroRightsBlocked: "The count cannot be shown here because of the source's licence.",
     heroStrongestRegion: "Most registered in",
     rarityNotComparable:
@@ -579,6 +583,10 @@ export const UI = {
  * in this table, and the reader should still be told something true.
  */
 const REASON_CODES: Record<string, { pl: string; en: string }> = {
+  NOT_DERIVED_YET: {
+    pl: "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
+    en: "The PESEL register lists this surname, but its figures have not been prepared yet.",
+  },
   NO_APPLICABLE_EVIDENCE: {
     pl: "Ten zbiór nie zawiera tego nazwiska. Nie znaczy to, że nikt go nie nosi — nazwiska występujące raz nie są publikowane.",
     en: "This dataset does not list this surname. That does not mean nobody bears it: surnames occurring once are not published.",

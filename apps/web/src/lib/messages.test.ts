@@ -310,6 +310,7 @@ describe("reasonText", () => {
   it("has words for every code the query service can emit", () => {
     for (const code of [
       "NO_APPLICABLE_EVIDENCE",
+      "NOT_DERIVED_YET",
       "NO_COMPLETE_UNIVERSE",
       "NO_COMPLETE_REGIONAL_UNIVERSE",
       "INPUT_TOO_SHORT",
