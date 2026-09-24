@@ -66,14 +66,6 @@ function groupWords(group: string | null, lang: Lang): string {
 }
 
 /**
- * What an unresolved side may show for itself.
- *
- * The slug comes straight from the query string, so it is attacker-chosen.
- * React escapes it — there is no injection — but an unbounded string would
- * still render an enormous heading, so it is bounded here. Nothing else on the
- * page echoes a parameter.
- */
-/**
  * The same comparison in the other language, for the masthead's switch.
  *
  * It carries the slugs exactly as the reader gave them, so the other page
@@ -85,6 +77,15 @@ export function comparePath(a: string, b: string, lang: Lang): string {
   return `${base}?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`;
 }
 
+/**
+ * What an unresolved side may show for itself.
+ *
+ * The slug comes straight from the query string, so it is attacker-chosen.
+ * React escapes it — there is no injection — but an unbounded string would
+ * still render an enormous heading, so it is bounded here. Nothing else on the
+ * page echoes a parameter as text; the language switch carries both slugs
+ * only URL-encoded, behind a fixed path (`comparePath`).
+ */
 function displayFor(side: ComparisonSide): string {
   if (side.display !== null) return side.display;
   const slug = side.slug.trim();

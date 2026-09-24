@@ -9,13 +9,13 @@
  *
  * The custom properties below are the design system's tokens, with the same
  * names, so a value can be traced from here to the brand book. The three type
- * voices (--font-display, --font-ui, --font-data) are set by next/font in
- * layout.tsx from the files in apps/web/assets/fonts.
+ * voices (--font-display, --font-ui, --font-data) are set by next/font/google
+ * in layout.tsx; the files in apps/web/assets/fonts are for the share card only.
  *
  * Atlas Light is the product. The prefers-color-scheme block maps a reader's
  * dark preference onto Archive Night; the Visual System reserves Archive Night
  * for narrative moments, so deleting that block is the doc-faithful option
- * (recorded in the design system's README).
+ * (open as D-020 in docs/DECISIONS_NEEDED.md).
  */
 
 :root {
@@ -164,7 +164,7 @@ summary:focus-visible,
   margin-bottom: var(--space-2);
 }
 
-/* The wordmark: the name in the display face. No mark exists yet. */
+/* The wordmark: the name in the display face, beside the Name Print mark. */
 .masthead h1 {
   margin: 0;
   font-family: var(--font-display, Georgia, serif);

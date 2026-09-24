@@ -53,6 +53,18 @@ const nextConfig: NextConfig = {
     };
     return config;
   },
+  /**
+   * The share card reads its fonts from `assets/fonts/` at run time
+   * (`src/lib/og-card.tsx`), by a path the build's file tracing does not
+   * follow, so a deployment would leave them out and the card would fall back
+   * to Geist. Verified 2026-09-24: with the four TTFs present, neither
+   * `opengraph-image` route's trace listed a file from `assets/` until this was
+   * added. Keys are picomatch globs over the route, where `[slug]` would be a
+   * character class, hence the wildcard.
+   */
+  outputFileTracingIncludes: {
+    "/**/opengraph-image": ["./assets/fonts/*.ttf"],
+  },
 };
 
 export default nextConfig;

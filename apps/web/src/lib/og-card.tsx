@@ -125,7 +125,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
         fontFamily: "Inter",
       }}
     >
-      {/* Eyebrow and wordmark. The wordmark is type only: no mark exists yet. */}
+      {/* Eyebrow, then the mark and the wordmark. */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div
           style={{
