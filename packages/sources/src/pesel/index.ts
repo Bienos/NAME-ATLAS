@@ -52,3 +52,10 @@ export {
   importPeselResource,
 } from "./import.js";
 export type { IngestionRowCounts, PeselImportInput, PeselResourceMetadata } from "./import.js";
+export { readPeselRegister } from "./read.js";
+export type {
+  PeselAbsentEntry,
+  PeselListedEntry,
+  PeselRegisterEntry,
+  PeselRegisterReading,
+} from "./read.js";
