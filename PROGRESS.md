@@ -5426,3 +5426,30 @@ both entries are kept, PR #7's first.
 | `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium | `/pl/nazwisko/nowak`: no "Zobacz dowody"; "Źródła na tej stronie" with a `dane.gov.pl` link and "Jak czytać te liczby" at the foot. A search for "Nowak" runs the `surname-hero` view transition (650 ms). `/pl/nazwisko/dettlaff` shows the `NOT_DERIVED_YET` sentence |
 
 **Not verified:** CI on the merge.
+
+### The landing composition on `/`, light only, and accents in the field (2026-09-24)
+
+The project owner, shown the draft branch's landing (PR #8) beside `main`'s home page in Archive
+Night, asked why it was not the one they saw and why the page could not be white.
+
+- **The bare `/` is now the landing** (Visual System §39 screen 01), ported from the draft branch
+  and fitted to `main`'s page: a two-line display headline (*"Każde nazwisko / skądś pochodzi."*,
+  *"Every surname / begins somewhere."*), a lede, the search field shown with its label and set
+  larger (up to 48px, the mirror matching), a hint under it, and `atlas-field.tsx`, the draft's
+  decorative Atlas Thread in the lower right from 900px wide. Its lead node turns Atlas Blue while a
+  name is typed and its thread fills on submit, by CSS alone (`:has()`, `data-searching`); its
+  drawing runs once and only under `prefers-reduced-motion: no-preference`. It carries no data.
+  The most common surnames stay below. Any answered query (unresolved, ambiguous, invalid) keeps the
+  compact search and the tagline. `layout.tsx` also loads Newsreader italic for the headline.
+- **Light only (D-020 resolved, option 1).** Both `prefers-color-scheme: dark` blocks are deleted.
+- **Polish capitals in the search field.** At `line-height: normal` the input clipped the accents of
+  Ż, Ó and Ć, so a result page's field read "WOJCIK" for WÓJCIK (seen in a 2x screenshot). The input
+  and its mirror now use `line-height: 1.45`; the same screenshot shows the accents.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 205 |
+| `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium (Playwright) | Landing at 1440 px with a dark colour scheme renders Paper; 1280 px English; 820 px (no field graphic); 390 px phone, field and button on one row. Typing "Kowalczyk" turns the lead node blue. Search "Nowak" → `/pl/nazwisko/nowak` with the `surname-hero` transition (650 ms). Second search, reduced motion, unresolved query, phone and dark scheme: same results as before this change. No console errors |
+
+**Not verified:** Safari and Firefox; CI.

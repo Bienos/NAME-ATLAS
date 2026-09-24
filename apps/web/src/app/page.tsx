@@ -17,6 +17,7 @@ import { pathForSlug } from "../lib/slug.js";
 import { surnamePath } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
 import { NamePrint } from "../lib/name-print.js";
+import { AtlasField } from "../lib/atlas-field.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -209,11 +210,16 @@ export default async function HomePage({ searchParams }: PageProps) {
   if (query !== "") switchParams.set("surname", query);
   if (otherLang === "en") switchParams.set("lang", "en");
 
+  // The bare page is the landing (Visual System §39 screen 01): a headline, the
+  // field as the second-largest object, and the Atlas field graphic. Any query
+  // answered here keeps the compact search above its answer.
+  const landing = given.kind === "NONE";
+
   return (
     <>
       {/* The nearest `lang` wins: the document is Polish by default and an
           English answer says so here (see `layout.tsx`). */}
-      <main lang={htmlLang(lang)}>
+      <main lang={htmlLang(lang)} className={landing ? "landing" : undefined}>
         <div className="masthead">
           <h1>
             <NamePrint className="logo-mark" size="small" />
@@ -221,8 +227,22 @@ export default async function HomePage({ searchParams }: PageProps) {
           </h1>
           <a href={`/?${switchParams.toString()}`}>{t.langSwitch}</a>
         </div>
-        <p className="tagline">{t.tagline}</p>
-        <SearchForm lang={lang} query={query} />
+        {landing ? (
+          <div className="landing-stage">
+            <h2 className="landing-headline">
+              {t.landingHeadline} <em>{t.landingHeadlineEm}</em>
+            </h2>
+            <p className="landing-lede">{t.landingLede}</p>
+            <SearchForm lang={lang} query={query} />
+            <p className="landing-hint">{t.landingHint}</p>
+            <AtlasField />
+          </div>
+        ) : (
+          <>
+            <p className="tagline">{t.tagline}</p>
+            <SearchForm lang={lang} query={query} />
+          </>
+        )}
         <Body answer={given} lang={lang} />
         <CommonSurnames lists={common} lang={lang} />
       </main>

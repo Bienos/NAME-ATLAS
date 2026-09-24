@@ -8,46 +8,15 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-020 — a dark system preference: Archive Night on every page, or light only? — NON-BLOCKING NOW
+## D-020 — RESOLVED (2026-09-24): light only
 
-### The situation
-
-The visual system applied on 2026-09-24 maps a reader's `prefers-color-scheme: dark` onto
-the Archive Night palette for every page: two `@media (prefers-color-scheme: dark)` blocks
-in `apps/web/src/app/globals.css`, one for the tokens and one for the confidence symbols.
-The brand pack shipped it that way and marked deleting those blocks as the doc-faithful
-option.
-
-The Visual System (`docs/library/NAME_ATLAS_VISUAL_SYSTEM_v1(1).md`, "Dark mode" and
-"Secondary: Archive Night") says: "Do **not** build Name Atlas visually around dark mode."
-Light Atlas is ~90% of the experience. Archive Night is for a historical reveal, the archive
-viewer, a major migration sequence, the premium opening and family-research documentary
-moments, and "do not use it casually". Following an operating-system setting is a casual
-use, so the current behaviour departs from binding design input. It is recorded here
-instead of being resolved in code (AGENTS.md §2).
-
-The source also gives no night values for the confidence and state colours. The stylesheet
-keeps the light values for the symbols on the night ground: each is at least 3:1 there
-except Verified's, at 2.94:1 (`#236a58` on `#0f1211`). The word beside it, which carries
-the meaning, is `text-secondary` at 8.88:1.
-
-### Options
-
-1. **Light only.** Delete the two blocks. A reader who prefers dark sees Paper.
-2. **Keep Archive Night for a dark preference.** Record the exception to the Visual System
-   in an ADR and give the confidence and state colours night values.
-
-`apps/web/src/app/icon.svg` switches to its night colours under the same media query in
-either case. That concerns the browser's tab strip, not the page.
-
-### Recommendation
-
-Option 1, which is what the design input asks for, unless the project owner wants dark
-mode as a product feature. Then option 2.
-
-### What is blocked
-
-Nothing. Either option is a change to `globals.css` alone.
+**Resolution**, decided by the project owner 2026-09-24 ("why can't I change it to white", asked of
+a page that followed the operating system into Archive Night): option 1, **light only**. The two
+`@media (prefers-color-scheme: dark)` blocks are deleted from `apps/web/src/app/globals.css`, so a
+reader who prefers dark sees Paper. This is what the Visual System asks ("Do **not** build Name Atlas
+visually around dark mode"; Archive Night only for narrative moments), so it needs no ADR.
+`apps/web/src/app/icon.svg` keeps its own night colours: they concern the browser's tab strip, not
+the page.
 
 ---
 

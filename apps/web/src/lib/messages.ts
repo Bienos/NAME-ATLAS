@@ -344,6 +344,12 @@ export const UI = {
   pl: {
     title: "Name Atlas",
     tagline: "Uczciwe, udokumentowane odpowiedzi o polskich nazwiskach.",
+    landingHeadline: "Każde nazwisko",
+    landingHeadlineEm: "skądś pochodzi.",
+    landingLede:
+      "Zobacz, co oficjalny rejestr PESEL zapisuje o nazwisku — ze źródłem i datą przy każdej " +
+      "liczbie i z uczciwą luką wszędzie tam, gdzie kończą się dane.",
+    landingHint: "Wpisz dokładnie tak, jak się pisze — z polskimi znakami.",
     searchLabel: "Nazwisko",
     searchPlaceholder: "np. Nowak",
     searchAction: "Szukaj",
@@ -448,6 +454,12 @@ export const UI = {
   en: {
     title: "Name Atlas",
     tagline: "Honest, sourced answers about Polish surnames.",
+    landingHeadline: "Every surname",
+    landingHeadlineEm: "begins somewhere.",
+    landingLede:
+      "See what Poland's official register records about a surname — with the source and date " +
+      "behind every figure, and an honest blank wherever the evidence runs out.",
+    landingHint: "Exactly as it's written — Polish letters welcome.",
     searchLabel: "Surname",
     searchPlaceholder: "e.g. Nowak",
     searchAction: "Search",

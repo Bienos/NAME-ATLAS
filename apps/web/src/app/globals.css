@@ -12,10 +12,9 @@
  * voices (--font-display, --font-ui, --font-data) are set by next/font/google
  * in layout.tsx; the files in apps/web/assets/fonts are for the share card only.
  *
- * Atlas Light is the product. The prefers-color-scheme block maps a reader's
- * dark preference onto Archive Night; the Visual System reserves Archive Night
- * for narrative moments, so deleting that block is the doc-faithful option
- * (open as D-020 in docs/DECISIONS_NEEDED.md).
+ * Atlas Light is the product, and the only palette: a dark system preference
+ * does not switch the page to Archive Night, which the Visual System reserves
+ * for narrative moments (D-020, resolved light only by the project owner).
  */
 
 :root {
@@ -83,39 +82,6 @@
   --duration-standard: 300ms;
   --duration-narrative: 650ms;
   --ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Archive Night. The source gives the ground, both text colours, Atlas
-       Light Blue and Signal; the rest are mapped from the neutral scale. */
-    --surface-primary: #0f1211;
-    --surface-elevated: #1c211f;
-    --surface-inverse: #f3f0e8;
-    --text-primary: #f3f0e8;
-    --text-secondary: #b5b2a9;
-    --text-tertiary: #8d8c85;
-    --text-inverse: #101413;
-    --border-soft: #303532;
-    --border-default: #4f534f;
-    --border-strong: #8d8c85;
-    --accent: #7197ff;
-    --on-accent: #101413; /* white fails on Atlas Light Blue; Ink is 6.7:1 */
-    --hover-light: #1c211f;
-    --hover-blue: #9bb5ff;
-    /* No night confidence or state colours in the source: the light ones fail
-       as text on night grounds, so the words fall back to text-secondary
-       below and only the symbols keep their colour. */
-    /* Dark map ramp: the same hue, its own steps, low share nearest the
-       surface. Validator (--ordinal, dark, surface #0f1211): all pass,
-       darkest step 2.33:1 on the ground. */
-    --map-0: #224c9f;
-    --map-1: #2f63c8;
-    --map-2: #4d78e5;
-    --map-3: #82a5f2;
-    --map-4: #b5c8fa;
-    --map-no-data: #303532;
-  }
 }
 
 * {
@@ -254,6 +220,9 @@ summary:focus-visible,
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.75rem;
   font-weight: 500;
+  /* Room above the capitals: at "normal" the input clipped the accents of
+     Ż, Ó and Ć, so WÓJCIK read as WOJCIK. The mirror below matches it. */
+  line-height: 1.45;
   letter-spacing: -0.015em;
   color: var(--text-primary);
   background: transparent;
@@ -326,6 +295,7 @@ summary:focus-visible,
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.75rem;
   font-weight: 500;
+  line-height: 1.45;
   letter-spacing: -0.015em;
   white-space: pre;
   color: var(--text-primary);
@@ -743,30 +713,6 @@ footer {
 .assessment-conflicting::before {
   border-top-color: transparent;
   border-bottom-color: transparent;
-}
-
-@media (prefers-color-scheme: dark) {
-  .assessment {
-    color: var(--text-secondary);
-  }
-  .assessment-verified::before {
-    border-color: var(--confidence-verified);
-    background: var(--confidence-verified);
-  }
-  .assessment-likely::before {
-    border-color: var(--confidence-likely);
-    border-top-color: transparent;
-  }
-  .assessment-possible::before {
-    border-color: var(--confidence-possible);
-    border-top-color: transparent;
-    border-left-color: transparent;
-  }
-  .assessment-conflicting::before {
-    border-color: var(--state-warning);
-    border-top-color: transparent;
-    border-bottom-color: transparent;
-  }
 }
 
 .claim-kind::before,
@@ -1316,4 +1262,256 @@ p {
 
 .compare-maps .vmap {
   margin-bottom: var(--space-2);
+}
+
+/* --- landing: the bare home page (Visual System §39 screen 01) ------------ */
+
+/* A large serif line, the surname field as the second-largest object, open
+   Paper, and an extremely subtle Atlas Thread in the lower right. Results keep
+   the reading width; only the bare page widens. */
+main.landing {
+  max-width: 72rem;
+}
+
+.landing-stage {
+  position: relative;
+  padding: clamp(var(--space-8), 9vh, 7rem) 0 clamp(var(--space-7), 7vh, 5rem);
+}
+
+.landing-headline {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  /* 44px on phones, 120px on a wide desktop. */
+  font-size: clamp(2.75rem, 1.1667rem + 7.037vw, 7.5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.landing-headline em {
+  display: block;
+  font-style: italic;
+  letter-spacing: -0.035em;
+}
+
+.landing-lede {
+  max-width: 46ch;
+  margin: var(--space-6) 0 clamp(var(--space-8), 7vh, var(--space-9));
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.landing .search {
+  flex-wrap: wrap;
+  max-width: 44rem;
+  margin-bottom: var(--space-3);
+}
+
+/* The label takes its own row; the field and the button share the next. */
+.landing .combobox {
+  flex-basis: 0;
+}
+
+/* On the landing the label is shown, as a small eyebrow above the field. */
+.landing .search label {
+  position: static;
+  flex: 1 0 100%;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip-path: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* The mirror must match the input exactly: it measures the thread and becomes
+   the result heading in the transition. */
+.landing .search input,
+.landing .combobox-mirror {
+  font-size: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+}
+
+.landing-hint {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* The Atlas field. Not a map and no data: see `atlas-field.tsx`. */
+.atlas-field {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .landing .search {
+    max-width: 60%;
+  }
+
+  .atlas-field {
+    display: block;
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-end: var(--space-7);
+    inline-size: 34%;
+    block-size: auto;
+    overflow: visible;
+    pointer-events: none;
+  }
+}
+
+.atlas-links line {
+  stroke: var(--border-soft);
+  stroke-width: 1;
+}
+
+.atlas-points circle {
+  fill: var(--border-default);
+}
+
+.atlas-line {
+  fill: none;
+  stroke: var(--border-default);
+  stroke-width: 1;
+}
+
+/* The segment that fills with Atlas Blue on submit. */
+.atlas-fill {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.atlas-tick {
+  fill: none;
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+}
+
+.atlas-second {
+  fill: var(--text-tertiary);
+}
+
+/* Ring = possible / uncertain (§8, §11): dotted, never filled. */
+.atlas-possible {
+  fill: var(--surface-primary);
+  stroke: var(--text-tertiary);
+  stroke-width: 1.25;
+  stroke-dasharray: 2 2.4;
+}
+
+.atlas-lead {
+  fill: var(--surface-primary);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+}
+
+.atlas-halo {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.6);
+}
+
+/* While a name is typed, one node becomes active (§39 screen 01). */
+.landing:has(.combobox input:not(:placeholder-shown)) .atlas-lead {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.landing:has(.combobox input:not(:placeholder-shown)) .atlas-halo {
+  opacity: 0.35;
+  transform: scale(1);
+}
+
+:root[data-searching] .atlas-fill {
+  stroke-dashoffset: 0;
+}
+
+/* Drawing and connecting (§23), once, on arrival. Without motion the field
+   simply shows its final state. */
+@media (prefers-reduced-motion: no-preference) {
+  .atlas-links line,
+  .atlas-line {
+    stroke-dasharray: 1;
+    animation: atlas-draw 1600ms var(--ease-primary) both;
+  }
+
+  .atlas-line {
+    animation-duration: 900ms;
+    animation-delay: 200ms;
+  }
+
+  .atlas-points circle {
+    animation: atlas-appear var(--duration-standard) var(--ease-primary) both;
+  }
+
+  .atlas-tick {
+    animation: atlas-appear var(--duration-fast) var(--ease-primary) 520ms both;
+  }
+
+  .atlas-second,
+  .atlas-possible,
+  .atlas-lead {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: atlas-pop var(--duration-standard) var(--ease-primary) both;
+  }
+
+  .atlas-second {
+    animation-delay: 700ms;
+  }
+
+  .atlas-possible {
+    animation-delay: 900ms;
+  }
+
+  .atlas-lead {
+    animation-delay: 200ms;
+    transition:
+      fill var(--duration-fast) var(--ease-primary),
+      stroke var(--duration-fast) var(--ease-primary);
+  }
+
+  .atlas-halo {
+    transition:
+      opacity var(--duration-standard) var(--ease-primary),
+      transform var(--duration-standard) var(--ease-primary);
+  }
+
+  .atlas-fill {
+    transition: stroke-dashoffset var(--duration-narrative) var(--ease-primary);
+  }
+}
+
+@keyframes atlas-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes atlas-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes atlas-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
 }
