@@ -27,6 +27,8 @@ const CITATION = {
   attribution: "Dane pochodzą z rejestru PESEL, Ministerstwo Cyfryzacji, dane.gov.pl (CC0 1.0)",
   terms: "CC0 1.0",
   retrieved_at: "2026-09-18T17:40:00Z",
+  source_page_url:
+    "https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
 };
 const CONFIDENCE = { status: "VERIFIED", methodology_code: "rule@1" };
 const SURFACE = { surface: "FREE", decision: "ALLOWED", reason_code: "RIGHTS_PERMIT_FREE_SURFACE" };
@@ -69,7 +71,7 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.5",
+  schema_version: "1.6",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -179,7 +181,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.5",
+  schema_version: "1.6",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -212,7 +214,7 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.5",
+  schema_version: "1.6",
   status: "UNRESOLVED",
   surname: null,
   population: null,
@@ -259,7 +261,7 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.5",
+  schema_version: "1.6",
   status: "AMBIGUOUS",
   surname: null,
   population: null,
@@ -329,10 +331,11 @@ describe("AC-3: a count is exact, a rarity figure is hedged", () => {
     expect(body).not.toMatch(/estimated/iu);
   });
 
-  it("shows the dataset scope and date with every count", () => {
-    const body = text(render(RESOLVED, "en"));
-    expect(body).toContain("20 January 2026");
-    expect(body).toContain("Dataset scope");
+  it("shows the date with every count, and the dataset's own scope at the foot (ADR-0012)", () => {
+    const markup = render(RESOLVED, "en");
+    expect(text(markup)).toContain("20 January 2026");
+    const notes = text(markup.slice(markup.indexOf('<details class="notes">')));
+    expect(notes).toContain("Wykaz nazwisk osób żyjących");
   });
 });
 
@@ -507,9 +510,9 @@ describe("AC-9: no score, probability or percentage of confidence", () => {
     const body = text(markup);
     // Since TASK-023 the reader sees the word and the canonical status travels
     // as a machine-readable attribute. Both are asserted; a number still is not.
+    // (The evidence panel's "Confidence" label went with the panel, ADR-0012.)
     expect(body).toContain("Verified");
     expect(markup).toContain('data-assessment="VERIFIED"');
-    expect(body).toContain("Confidence");
     expect(body).not.toMatch(/confidence[^.]{0,20}\d/iu);
     for (const forbidden of [
       "probability",
@@ -697,15 +700,20 @@ describe("AC-10: an available meaning renders its work and its caveat", () => {
 });
 
 /**
- * TASK-023 — the claim unit, the evidence panel, the snapshot, intent order
- * and the second-search control, asserted against markup.
+ * TASK-023 — the claim unit, the snapshot, intent order and the second-search
+ * control, asserted against markup. ADR-0012 (2026-09-24) replaced TASK-023's
+ * per-claim evidence panel (AC-2) with one section at the foot of the page.
  */
-describe("TASK-023 AC-1/AC-2: every figure is a claim with inline evidence", () => {
-  it("renders each observation, rarity entry and distribution entry as a claim", () => {
+describe("TASK-023 AC-1, ADR-0012: every figure is a claim; its evidence is at the foot", () => {
+  it("renders each observation, rarity entry and distribution entry as a claim, with no panel", () => {
     const markup = render(RESOLVED, "pl");
     // 2 population + 2 rarity + 1 distribution entries in the fixture.
     expect(markup.match(/class="claim"/gu)?.length).toBe(5);
-    expect(markup.match(/<details class="evidence">/gu)?.length).toBe(5);
+    expect(markup).not.toContain('class="evidence"');
+    expect(markup).not.toContain("Zobacz dowody");
+    // The one disclosure left is the notes, inside #sources.
+    expect(markup.match(/<details/gu)?.length).toBe(1);
+    expect(markup.indexOf("<details")).toBeGreaterThan(markup.indexOf('id="sources"'));
   });
 
   it("shows the assessment as a word, the source kind and the scope line", () => {
@@ -716,14 +724,38 @@ describe("TASK-023 AC-1/AC-2: every figure is a claim with inline evidence", () 
     expect(body).not.toMatch(/VERIFIED/u);
   });
 
-  it("names source, provider, data date, retrieved date and method in the evidence", () => {
+  it("links each source once, to the website it was taken from, never to the file", () => {
+    const markup = render(RESOLVED, "en");
+    const from = markup.indexOf('<ul class="sources">');
+    const list = markup.slice(from, markup.indexOf("</ul>", from));
+    expect(list.match(/<li>/gu)?.length).toBe(1);
+    expect(list).toContain(`href="${CITATION.source_page_url}"`);
+    expect(list).toContain(">dane.gov.pl</a>");
+    // The retrieved file is provenance, not a destination: nothing links to it.
+    expect(markup).not.toContain(CITATION.url);
+  });
+
+  it("keeps what the panels told a reader, each note once, at the foot", () => {
+    const markup = render(RESOLVED, "en");
+    const notes = text(markup.slice(markup.indexOf('<details class="notes">')));
+    expect(notes).toContain("How to read these figures");
+    for (const needed of [
+      "Surnames occurring once are not published",
+      "The 1-in-X figure is rounded",
+      "A permanent registered residence is an address in the register",
+      "Denominator: 21",
+    ])
+      expect(notes).toContain(needed);
+    // Population and rarity both carry the suppression note; it is listed once.
+    expect(notes.split("Surnames occurring once are not published").length - 1).toBe(1);
+  });
+
+  it("shows no method code, record identifier or retrieval date", () => {
     const body = text(render(RESOLVED, "en"));
-    expect(body).toContain("Nazwiska występujące w rejestrze PESEL");
-    expect(body).toContain("Retrieved");
-    expect(body).toContain("18 September 2026");
-    expect(body).toContain("Method");
-    expect(body).toContain("rule@1");
-    expect(body).toContain("Limitations");
+    expect(body).not.toContain("rule@1");
+    expect(body).not.toContain(CITATION.locator);
+    expect(body).not.toContain("Retrieved");
+    expect(body).not.toContain("18 September 2026");
   });
 
   it("puts no confidence number anywhere and no event handler attributes", () => {
@@ -875,10 +907,12 @@ describe("TASK-023 AC-5: intent changes order only", () => {
 });
 
 describe("TASK-023: sources section and anchors", () => {
-  it("lists every distinct citation once under #sources", () => {
+  it("lists every distinct source once under #sources", () => {
     const m = render(RESOLVED, "en");
     expect(m).toContain('id="sources"');
-    const sources = m.slice(m.indexOf('id="sources"'));
+    // The source list only: the notes below it are a list of their own.
+    const from = m.indexOf('<ul class="sources">');
+    const sources = m.slice(from, m.indexOf("</ul>", from));
     expect(sources.match(/<li>/gu)?.length).toBe(1);
   });
 

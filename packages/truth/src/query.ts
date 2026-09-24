@@ -354,6 +354,7 @@ function toDistributionEntry(claim: PersistedCurrentDistribution): DistributionE
       attribution: claim.attribution_text,
       terms: claim.terms_version,
       retrieved_at: claim.citation_retrieved_at,
+      source_page_url: claim.citation_source_page_url,
     },
   };
 }
@@ -388,6 +389,7 @@ function toRarityEntry(claim: PersistedRarityContext): RarityEntry {
       attribution: claim.attribution_text,
       terms: claim.terms_version,
       retrieved_at: claim.citation_retrieved_at,
+      source_page_url: claim.citation_source_page_url,
     },
   };
 }
@@ -425,6 +427,7 @@ function toObservation(claim: PersistedCurrentPopulation): PopulationObservation
       attribution: claim.attribution_text,
       terms: claim.terms_version,
       retrieved_at: claim.citation_retrieved_at,
+      source_page_url: claim.citation_source_page_url,
     },
   };
 }

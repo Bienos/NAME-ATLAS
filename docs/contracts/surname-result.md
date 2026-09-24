@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21
-- **Schema version:** `1.5` · **API version:** `v1`
+- **Schema version:** `1.6` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.5",
+  "schema_version": "1.6",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -59,7 +59,8 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
         "confidence": { "status": "VERIFIED", "methodology_code": "…@confidence@1" },
         "citation": { "id": "…", "title": "…", "publisher": "…", "publication_date": "2026-01-20",
                       "source_type": "OFFICIAL_DATASET", "locator": "resource:1148808",
-                      "url": "…", "attribution": null, "terms": "CC0 1.0", "retrieved_at": "2026-09-18T17:40:00Z" }
+                      "url": "…", "attribution": null, "terms": "CC0 1.0", "retrieved_at": "2026-09-18T17:40:00Z",
+                      "source_page_url": "https://dane.gov.pl/pl/dataset/1681,…" }
       }
     ]
   },
@@ -149,7 +150,7 @@ For an input that did not resolve, the fact sections are null and `suggestions` 
 
 ```jsonc
 {
-  "schema_version": "1.5",
+  "schema_version": "1.6",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -246,6 +247,8 @@ and a below-threshold entry says so **before** any figure:
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.5 → 1.6 (2026-09-24, ADR-0012).** One additive field, required and nullable. `citation.source_page_url` carries the source registry's `homepage_or_reference_url`: the public page of the source a record was taken from, which for PESEL is the dataset's page on dane.gov.pl. `url` is unchanged and stays the exact resource retrieved, which for a dataset is a file download. The page links a reader to `source_page_url`, because the surname page now points at the source's own website instead of showing a per-claim evidence panel (ADR-0012). A consumer written against 1.5 is unaffected; a producer must now supply it.
 
 **1.4 → 1.5 (2026-09-21, TASK-023).** Two additive fields, both required and nullable. `citation.retrieved_at` carries the citation row's `accessed_at`, which the database has held since TASK-005 and the wire never exposed; the page's evidence panel shows it beside the publication and dataset dates, because a reader checking a figure needs to know when we fetched it. `meaning.methodology_code` carries `assessment_method@assessment_version` for the onomastic agreement rule, so a meaning's assessment is as traceable as a population claim's; it is present exactly when the state is `AVAILABLE`. A consumer written against 1.4 is unaffected; a producer must now supply both.
 

@@ -25,6 +25,8 @@ const citation = (id: string) => ({
   attribution: null,
   terms: "CC0 1.0",
   retrieved_at: "2026-09-18T17:40:00Z",
+  source_page_url:
+    "https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
 });
 const observation = (cit: string, group: string) => ({
   value: { status: "KNOWN" as const, value: 100, unit: "PEOPLE" as const, scope_label_code: "S" },
@@ -39,7 +41,7 @@ const observation = (cit: string, group: string) => ({
 
 function response(patch: Partial<SurnameResultResponse>): SurnameResultResponse {
   const base = {
-    schema_version: "1.5",
+    schema_version: "1.6",
     status: "RESOLVED",
     surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "TEST", script: "Latn" },
     population: {

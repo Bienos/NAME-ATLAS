@@ -649,35 +649,6 @@ footer {
   color: var(--text-secondary);
 }
 
-/* An editorial CTA: "VIEW EVIDENCE  →", underlined, not a filled button. */
-.hero-actions {
-  margin: var(--space-6) 0 0;
-}
-
-.hero-actions a {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-5);
-  min-height: 44px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-  text-decoration: none;
-  border-bottom: 1px solid var(--text-primary);
-}
-
-.hero-actions a::after {
-  content: "→";
-  font-weight: 400;
-}
-
-.hero-actions a:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-
 /* --- claim unit (TASK-023) ---------------------------------------------- */
 
 .claim {
@@ -820,24 +791,21 @@ footer {
   margin: 0;
 }
 
-/* --- evidence panel (TASK-023) ------------------------------------------ */
+/* --- how to read the figures (ADR-0012) ------------------------------- */
 
-.evidence {
-  margin: var(--space-3) 0 0;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  background: var(--surface-elevated);
+/* The notes that sat in a panel under every claim, now one disclosure at the
+   foot of the page: quiet enough not to read as another box. */
+.notes {
+  margin: var(--space-5) 0 0;
 }
 
-.evidence > summary {
+.notes > summary {
   cursor: pointer;
   /* A tap target, so it is sized like one (directive §49). */
   min-height: 44px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
-  padding: 0 var(--space-5);
+  gap: var(--space-3);
   font-size: 0.8125rem;
   font-weight: 600;
   letter-spacing: 0.035em;
@@ -846,57 +814,35 @@ footer {
   list-style: none;
 }
 
-.evidence > summary::-webkit-details-marker {
+.notes > summary::-webkit-details-marker {
   display: none;
 }
 
-.evidence > summary::after {
+.notes > summary::after {
   content: "→";
   font-weight: 400;
 }
 
-.evidence[open] > summary::after {
+.notes[open] > summary::after {
   content: "↓";
 }
 
-.evidence-list {
-  margin: 0;
-  padding: var(--space-3) var(--space-5) var(--space-5);
-  border-top: 1px solid var(--border-soft);
-  display: grid;
-  grid-template-columns: minmax(7rem, max-content) 1fr;
-  gap: var(--space-2) var(--space-5);
-  font-size: 0.875rem;
-}
-
-.evidence-list dt {
+.notes ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+  font-size: 0.9375rem;
   color: var(--text-secondary);
 }
 
-.evidence-list dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-}
-
-.evidence-list ul {
-  margin: 0;
-  padding-left: var(--space-5);
-}
-
-/* IDs and method codes are data: the mono voice. */
-.evidence-list code {
-  font-family: var(--font-data, ui-monospace, monospace);
-  font-size: 0.875rem;
-  font-weight: 500;
+.notes li {
+  margin: var(--space-2) 0;
 }
 
 @media (max-width: 360px) {
-  .evidence-list,
   .meaning-facts {
     grid-template-columns: 1fr;
     gap: 0;
   }
-  .evidence-list dd,
   .meaning-facts dd {
     margin-bottom: var(--space-3);
   }

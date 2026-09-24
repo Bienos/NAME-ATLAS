@@ -5307,6 +5307,38 @@ WÓJCIK redirected there, and the home page's suggestions linked there.
 
 **Not verified:** the three pages on production, which needs this change deployed.
 
+### Evidence at the foot of the page, linked to the source's website (ADR-0012) (2026-09-24)
+
+The project owner asked for "Zobacz dowody" to be removed, with the evidence moved to the bottom or
+out of the way and pointing only at the website the data was taken from. Recorded as ADR-0012, which
+supersedes TASK-023's per-claim evidence panel (§2 item 2, AC-2).
+
+- **Page:** no evidence panel on any claim, and no "Zobacz dowody" link under the snapshot. `#sources`
+  lists each source once, grouped by page, title, publisher, date, licence and attribution, and links
+  it to the source's own website by host name. For PESEL that is `dane.gov.pl`, the dataset page. The
+  CSV that `citation.url` points to is linked nowhere. A source with no public page, a printed work,
+  is cited by its locator. Below the list, one "Jak czytać te liczby" disclosure holds the notes the
+  panels carried, each once.
+- **Contract 1.6:** `citation.source_page_url`, required and nullable, from
+  `sources.homepage_or_reference_url` (the three citation reads in `packages/truth/src/read.ts`, the
+  three projections in `query.ts`). `schema_version` fixtures and integration pins moved from 1.5 to
+  1.6.
+- **Off the public page:** the method code, a web source's record identifier and the retrieval date.
+  They remain in the payload and the admin inspector.
+- `ClaimEvidence` carries `notes` in place of `scope`, `limitations` and `contradictions`. Eighteen
+  panel-only message keys were removed, in Polish and English.
+
+| Check | Result |
+|---|---|
+| `pnpm -r --no-bail run typecheck`, `pnpm lint`, `pnpm format:check` | Pass |
+| `pnpm test` | 698 passed across 13 packages on `main` at `4d605e5` plus this change (contracts 48, including 2 new; web 205, 2 net new). With `DATABASE_URL` exported at a loaded local database, `surname-prefix/route.test.ts` fails, because its forced-failure case gets a 200. It passes with the variable unset, which is how CI runs it (before migrations). That route is unchanged |
+| `pnpm test:integration`, `pnpm test:golden` | 278 passed (24 files); 364 passed (4 files) |
+| `pnpm build` | Pass |
+| `/pl/nazwisko/nowak` on the local register | 0 × "Zobacz dowody", one `<details>` (the notes), 0 links to `api.dane.gov.pl`. One source line linking to `https://dane.gov.pl/pl/dataset/1681,…` as "dane.gov.pl". 10 distinct notes, all Polish |
+
+**Not verified:** a meaning with a real locator on real data, because no local surname tested here
+has an `AVAILABLE` meaning; the fixture case passes.
+
 ### Motion: the search becomes the result, and a test-teardown race (2026-09-24)
 
 Ported from the draft PR #8 (built on the stale default branch) at the project owner's "go".
@@ -5379,3 +5411,18 @@ voivodeship.
 | `next start` on the local database | `/pl/nazwisko/dettlaff` and `/en/surname/homa` show the new sentence; `/pl/nazwisko/winiecki` shows figures after it is derived |
 
 **Not verified:** CI for this change.
+
+### PR #7 merged into this branch (2026-09-24)
+
+At the project owner's request, `claude/awesome-archimedes-t6hb55` (PR #7, ADR-0012, `6340182`) is
+merged into this branch so that one local server shows both changes. Only `PROGRESS.md` conflicted;
+both entries are kept, PR #7's first.
+
+| Check (on the merge) | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 205, `packages/contracts` 48 |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 files, 279 passed |
+| `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium | `/pl/nazwisko/nowak`: no "Zobacz dowody"; "Źródła na tej stronie" with a `dane.gov.pl` link and "Jak czytać te liczby" at the foot. A search for "Nowak" runs the `surname-hero` view transition (650 ms). `/pl/nazwisko/dettlaff` shows the `NOT_DERIVED_YET` sentence |
+
+**Not verified:** CI on the merge.

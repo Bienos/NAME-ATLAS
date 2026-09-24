@@ -196,9 +196,6 @@ export function Snapshot({
       ) : null}
 
       {line !== null ? <p className="tally">{line}</p> : null}
-      <p className="hero-actions">
-        <a href="#sources">{t.viewEvidence}</a>
-      </p>
     </header>
   );
 }

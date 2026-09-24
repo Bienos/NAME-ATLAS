@@ -19,6 +19,7 @@ const CITATION = {
   attribution: null,
   terms: null,
   retrieved_at: null,
+  source_page_url: null,
 };
 const UNAVAILABLE = { state: "UNAVAILABLE", reason_code: "NO_COMPLETE_UNIVERSE", surface: SURFACE };
 
@@ -58,7 +59,7 @@ function entry(
 
 function response(name: string, entries: unknown[]): SurnameResultResponse {
   return surnameResultResponseSchema.parse({
-    schema_version: "1.5",
+    schema_version: "1.6",
     status: "RESOLVED",
     surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: name, script: "Latn" },
     population: { ...UNAVAILABLE, observations: [] },
