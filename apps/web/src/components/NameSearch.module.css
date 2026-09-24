@@ -1,0 +1,269 @@
+/*
+ * NameSearchField — visual system §22 (surname field), §19 (states),
+ * §8 (Atlas Thread), §23 (motion).
+ */
+
+.search {
+  /* Typed surname: 32 px on phones → 56 px on desktop; never below 24 px. */
+  --field-size: clamp(2rem, 1.5rem + 2.2222vw, 3.5rem);
+  --field-min: 1.5rem;
+  --node-size: 11px;
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+}
+
+.compact {
+  --field-size: clamp(1.5rem, 1.25rem + 1.1111vw, 2.25rem);
+  --field-min: 1.25rem;
+  --node-size: 9px;
+}
+
+.label {
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: var(--space-4);
+  padding-block-end: var(--space-4);
+  container-type: inline-size;
+}
+
+.control {
+  --field-font-size: max(
+    var(--field-min),
+    min(
+      calc(var(--field-size) * var(--surname-scale, 1)),
+      calc(100cqi * 1.5 / var(--surname-graphemes, 1))
+    )
+  );
+  position: relative;
+  min-inline-size: 0;
+}
+
+.input,
+.mirror {
+  font-family: var(--font-display);
+  font-size: var(--field-font-size);
+  font-weight: 400;
+  font-variation-settings: "opsz" 48;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.input {
+  display: block;
+  inline-size: 100%;
+  block-size: calc(var(--field-font-size) * 1.2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  caret-color: var(--color-brand-atlas);
+  transition: font-size var(--duration-fast) var(--ease-primary);
+}
+
+.input:placeholder-shown {
+  /* Size the placeholder by its own length so it never clips on a phone. */
+  --surname-graphemes: 18;
+}
+
+.input::placeholder {
+  /* Large text: tertiary holds 4.35:1 on Paper, above the 3:1 it needs. */
+  color: var(--text-tertiary);
+  opacity: 1;
+}
+
+/* The rule below replaces the outline as the focus indicator (§32). */
+.input:focus-visible {
+  outline: none;
+}
+
+.mirror {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  block-size: calc(var(--field-font-size) * 1.2);
+  white-space: pre;
+  color: var(--text-primary);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.node {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: calc(var(--node-size) / -2);
+  z-index: 1;
+  inline-size: var(--node-size);
+  block-size: var(--node-size);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface-primary);
+  transition:
+    background-color var(--duration-fast) var(--ease-primary),
+    border-color var(--duration-fast) var(--ease-primary),
+    transform var(--duration-fast) var(--ease-primary);
+}
+
+.rule {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 1px;
+  background: var(--border-default);
+  transition:
+    background-color var(--duration-fast) var(--ease-primary),
+    block-size var(--duration-fast) var(--ease-primary);
+}
+
+.thread {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: 0;
+  block-size: 2px;
+  inline-size: min(var(--typed-width, 0px), 100%);
+  background: var(--color-brand-atlas);
+  transition: inline-size var(--duration-fast) var(--ease-primary);
+}
+
+/* A dot rides the thread's end: it appears on submit and travels to the arrow. */
+.thread::after {
+  content: "";
+  position: absolute;
+  inset-inline-end: -5px;
+  inset-block-start: 50%;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--color-brand-atlas);
+  transform: translateY(-50%) scale(0);
+  transition: transform var(--duration-fast) var(--ease-primary);
+}
+
+.go {
+  display: grid;
+  place-items: center;
+  inline-size: 56px;
+  block-size: 56px;
+  margin-block-end: calc(var(--space-3) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  /* Neutral 600: 4.35:1, above the 3:1 a control's icon needs (WCAG 1.4.11). */
+  color: var(--neutral-600);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-primary);
+}
+
+.go svg {
+  transition: transform var(--duration-fast) var(--ease-primary);
+}
+
+.compact .go {
+  inline-size: 48px;
+  block-size: 48px;
+}
+
+.help,
+.message {
+  font-size: var(--type-body-s);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* Stays in the accessibility tree while empty, so what it later says is announced. */
+.message:empty {
+  margin-block-start: calc(var(--space-3) * -1);
+}
+
+/* ------------------------------------------------------------- states */
+
+.field:hover .rule {
+  background: var(--border-strong);
+}
+
+.field:has(.input:focus-visible) .rule {
+  block-size: 2px;
+  background: var(--text-primary);
+}
+
+[data-search-phase="idle"] .thread {
+  inline-size: 0;
+}
+
+[data-search-phase="typing"] .node,
+[data-search-phase="submitting"] .node {
+  border-color: var(--color-brand-atlas);
+  background: var(--color-brand-atlas);
+}
+
+[data-search-phase="typing"] .go,
+[data-search-phase="submitting"] .go {
+  color: var(--color-brand-atlas);
+}
+
+[data-search-phase="typing"] .go:hover {
+  color: var(--atlas-hover);
+}
+
+[data-search-phase="typing"] .go:hover svg {
+  transform: translateX(3px);
+}
+
+/* Pressed on touch: 95–98 % brightness, no dramatic scaling (§19). */
+.go:active {
+  opacity: 0.96;
+}
+
+[data-search-phase="invalid"] .node {
+  border-color: var(--error);
+}
+
+[data-search-phase="invalid"] .thread {
+  background: var(--error);
+}
+
+[data-search-phase="invalid"] .message {
+  color: var(--error);
+}
+
+[data-search-phase="submitting"] .thread {
+  inline-size: 100%;
+  transition: inline-size var(--duration-narrative) var(--ease-primary);
+}
+
+[data-search-phase="submitting"] .thread::after {
+  transform: translateY(-50%) scale(1);
+}
+
+[data-search-phase="submitting"] .mirror {
+  visibility: visible;
+}
+
+[data-search-phase="submitting"] .input {
+  color: transparent;
+  caret-color: transparent;
+}
+
+@media (forced-colors: active) {
+  .rule,
+  .thread,
+  .node {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}

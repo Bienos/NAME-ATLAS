@@ -1,0 +1,52 @@
+/* Results composition — visual system §39 screen 02: top-left aligned, not centred. */
+
+.page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-block-size: 100svh;
+}
+
+.main {
+  inline-size: 100%;
+  max-inline-size: var(--canvas-max);
+  margin-inline: auto;
+  padding: clamp(var(--space-7), 6vh, var(--space-10)) var(--page-margin)
+    clamp(var(--space-10), 12vh, var(--space-13));
+}
+
+.eyebrow {
+  margin-block-end: var(--space-4);
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  animation: appear var(--duration-standard) var(--ease-primary) 120ms both;
+}
+
+/* The surname sizes against this width (§6.3 fitting). */
+.hero {
+  container-type: inline-size;
+  margin-block-end: clamp(var(--space-6), 3vw, var(--space-8));
+}
+
+.newSearch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 44px;
+  font-size: var(--type-body-s);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.newSearch:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}

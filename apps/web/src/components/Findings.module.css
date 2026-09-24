@@ -1,0 +1,402 @@
+/*
+ * Findings — visual system §39 screen 02, §12 (large editorial number),
+ * §17 (source cards and S-references), §20 (cards only for discrete source
+ * objects), §7 (8/4 "main insight + annotation" on desktop).
+ */
+
+.findings {
+  display: grid;
+  gap: clamp(var(--space-10), 9vw, var(--space-13));
+  margin-block-start: clamp(var(--space-8), 6vw, var(--space-10));
+  animation: enter var(--duration-narrative) var(--ease-primary) 160ms both;
+}
+
+.grid {
+  display: grid;
+  gap: var(--space-10);
+}
+
+.figures {
+  display: grid;
+  gap: clamp(var(--space-8), 5vw, var(--space-10));
+  align-content: start;
+}
+
+/* ------------------------------------------------------ listed figure */
+
+.figure {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.count {
+  font-family: var(--font-ui);
+  font-size: var(--type-display-l);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.digits span {
+  display: inline-block;
+  animation: resolve 360ms var(--ease-primary) both;
+}
+
+.caption {
+  max-inline-size: 36ch;
+  font-size: var(--type-body-l);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.caption cite,
+.absentTitle cite {
+  font-family: var(--font-display);
+  font-size: 1.08em;
+  font-style: italic;
+}
+
+.form {
+  font-family: var(--font-data);
+  font-size: 0.88em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  font-family: var(--font-data);
+  font-size: var(--type-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.ref {
+  margin-block: calc(var(--space-2) * -1);
+  padding: var(--space-2) var(--space-2);
+  font-weight: 500;
+  color: var(--color-brand-atlas);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.ref:hover {
+  color: var(--atlas-hover);
+}
+
+/* ------------------------------------------------ absent from a list */
+
+.absent {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  padding-block-start: var(--space-6);
+  border-block-start: var(--border-hairline) solid var(--border-soft);
+}
+
+.noDataMark {
+  inline-size: 14px;
+  block-size: 14px;
+  margin-block-start: 0.4em;
+  border: 2px dotted var(--neutral-600);
+  border-radius: 50%;
+}
+
+.absentTitle {
+  font-size: var(--type-body-l);
+  line-height: 1.45;
+}
+
+.absentBody {
+  max-inline-size: 52ch;
+  margin-block: var(--space-2) var(--space-4);
+  color: var(--text-secondary);
+}
+
+/* ---------------------------------------------------------------- rail */
+
+.rail {
+  display: grid;
+  gap: var(--space-4);
+  align-content: start;
+}
+
+.sectionLabel {
+  margin-block-end: var(--space-5);
+  font-size: var(--type-label);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.rail .sectionLabel {
+  margin-block-end: var(--space-1);
+}
+
+.caveats {
+  padding-block-start: var(--space-6);
+  border-block-start: var(--border-hairline) solid var(--border-soft);
+}
+
+.caveatList {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.caveatList dt {
+  font-weight: 600;
+}
+
+.caveatList dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--type-body-s);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.sourceCard {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: var(--border-hairline) solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
+  scroll-margin-block-start: var(--space-8);
+  transition: border-color var(--duration-fast) var(--ease-primary);
+}
+
+.sourceCard:hover {
+  border-color: var(--border-default);
+}
+
+/* Arriving from an S-reference: Atlas Blue + 1 px emphasis (§19 "Active"). */
+.sourceCard:target {
+  border-color: var(--color-brand-atlas);
+  box-shadow: 0 0 0 1px var(--color-brand-atlas);
+}
+
+.sourceCard:focus {
+  outline: none;
+}
+
+.sourceRef {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  font-family: var(--font-data);
+  font-size: var(--type-caption);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--color-brand-atlas);
+}
+
+.sourceId {
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.sourceTitle {
+  font-family: var(--font-display);
+  font-size: var(--type-h4);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.sourcePublisher {
+  font-size: var(--type-body-s);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.sourceFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-block: var(--space-3) var(--space-1);
+  font-size: var(--type-body-s);
+  line-height: 1.45;
+}
+
+.sourceFacts > div {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
+.sourceFacts dt {
+  font-family: var(--font-data);
+  font-size: var(--type-micro);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.sourceFacts dd {
+  margin: 0;
+}
+
+.sourceWording {
+  font-size: var(--type-body-s);
+  line-height: 1.55;
+}
+
+.sourceWording summary {
+  inline-size: fit-content;
+  min-block-size: 24px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sourceWording summary:hover {
+  color: var(--text-primary);
+}
+
+.sourceWording q {
+  display: block;
+  margin-block-start: var(--space-2);
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.sourceLink {
+  justify-self: start;
+  min-block-size: 24px;
+  font-size: var(--type-body-s);
+  font-weight: 500;
+  color: var(--color-brand-atlas);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.sourceLink:hover {
+  color: var(--atlas-hover);
+}
+
+/* ----------------------------------------------------------- uncharted */
+
+.uncharted {
+  display: grid;
+  gap: var(--space-5);
+}
+
+/* A small thread rather than a generic rule (§8 "Divider"). */
+.divider {
+  margin-block-end: var(--space-6);
+}
+
+.divider span {
+  position: relative;
+  display: block;
+  block-size: 1px;
+  background: var(--border-soft);
+}
+
+.divider span::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: 50%;
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transform: translateY(-50%);
+}
+
+.unchartedTitle {
+  font-family: var(--font-display);
+  font-size: var(--type-h2);
+  font-weight: 450;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.unchartedIntro {
+  max-inline-size: 56ch;
+  color: var(--text-secondary);
+}
+
+.chapters {
+  display: grid;
+  gap: var(--space-6);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.chapterTitle {
+  font-size: var(--type-body-l);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.chapterReason {
+  max-inline-size: 46ch;
+  margin-block-start: var(--space-1);
+  font-size: var(--type-body-s);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+@media (min-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+  }
+
+  .figures {
+    grid-column: 1 / span 7;
+  }
+
+  .rail {
+    grid-column: 9 / span 4;
+  }
+
+  .caveatList {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    column-gap: var(--gutter);
+  }
+
+  .chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: var(--space-7);
+    max-inline-size: 58rem;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes resolve {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+}

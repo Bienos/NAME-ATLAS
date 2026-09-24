@@ -1,0 +1,16 @@
+.progress {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.status {
+  font-size: var(--type-body-s);
+  color: var(--text-secondary);
+  animation: appear var(--duration-fast) linear 400ms both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}

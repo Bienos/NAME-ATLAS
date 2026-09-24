@@ -1,0 +1,104 @@
+/* Landing composition — visual system §39 screen 01, grid §7. */
+
+.page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-block-size: 100svh;
+}
+
+.stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-content: center;
+  inline-size: 100%;
+  max-inline-size: var(--canvas-max);
+  margin-inline: auto;
+  padding: clamp(var(--space-7), 7vh, var(--space-12)) var(--page-margin)
+    clamp(var(--space-7), 6vh, var(--space-11));
+}
+
+.headline {
+  grid-column: 1 / -1;
+  max-inline-size: 12ch;
+  font-family: var(--font-display);
+  /* 44 px on phones → Display XL (120 px) on desktop. */
+  font-size: clamp(2.75rem, 1.1667rem + 7.037vw, 7.5rem);
+  font-weight: 400;
+  font-variation-settings: "opsz" 72;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.headline em {
+  font-style: italic;
+  letter-spacing: -0.035em;
+}
+
+.lede {
+  grid-column: 1 / -1;
+  max-inline-size: 38ch;
+  margin-block-start: var(--space-6);
+  font-size: var(--type-body-l);
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.search {
+  grid-column: 1 / -1;
+  margin-block-start: clamp(var(--space-8), 7vh, var(--space-10));
+}
+
+.field {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .stage {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+
+  .search {
+    grid-column: 1 / span 7;
+  }
+
+  /* Tablet: the thread sits in flow, lower right, below the field. */
+  .field {
+    grid-column: 4 / -1;
+    justify-self: end;
+    display: block;
+    inline-size: min(100%, 380px);
+    margin-block-start: var(--space-9);
+    pointer-events: none;
+  }
+}
+
+@media (min-width: 900px) {
+  .stage {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .headline {
+    grid-column: 1 / span 10;
+  }
+
+  .lede {
+    grid-column: 1 / span 6;
+    max-inline-size: 46ch;
+  }
+
+  .search {
+    grid-column: 1 / span 7;
+  }
+
+  .field {
+    position: absolute;
+    inset-inline-end: var(--page-margin);
+    inset-block-end: var(--space-7);
+    inline-size: clamp(300px, 30vw, 460px);
+    margin-block-start: 0;
+  }
+}

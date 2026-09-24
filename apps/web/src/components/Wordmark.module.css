@@ -1,0 +1,20 @@
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 44px;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.point {
+  flex: none;
+  color: var(--text-primary);
+}
+
+.name {
+  font-size: var(--type-label);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}

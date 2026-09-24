@@ -1,0 +1,146 @@
+.thread {
+  display: grid;
+  gap: var(--space-3);
+  inline-size: 100%;
+}
+
+.track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  block-size: 18px;
+}
+
+.start,
+.end {
+  flex: none;
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 50%;
+}
+
+.start {
+  background: var(--text-primary);
+}
+
+.line {
+  position: relative;
+  flex: 1;
+  block-size: 1px;
+  background: var(--border-default);
+}
+
+.tick {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  inline-size: 1px;
+  block-size: 18px;
+  background: var(--text-primary);
+  transform: translate(-50%, -50%);
+}
+
+.end {
+  border: 1.5px solid var(--neutral-600);
+  background: var(--surface-primary);
+}
+
+.labels {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  column-gap: var(--space-4);
+  font-family: var(--font-data);
+  font-size: var(--type-caption);
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: var(--text-secondary);
+}
+
+.labelStart {
+  grid-column: 1;
+  overflow-wrap: anywhere;
+}
+
+.labelTick {
+  grid-column: 2;
+  text-align: center;
+}
+
+.labelEnd {
+  grid-column: 3;
+  text-align: end;
+  overflow-wrap: anywhere;
+}
+
+/* found — a real record joined the line (CONNECT), drawn in reading order. */
+[data-thread-state="found"] .line::before {
+  content: "";
+  position: absolute;
+  inset: -0.5px 0;
+  background: var(--color-brand-atlas);
+  transform-origin: left center;
+  animation: draw var(--duration-narrative) var(--ease-primary) both;
+}
+
+[data-thread-state="found"] .tick {
+  animation: appear var(--duration-fast) var(--ease-primary) 280ms both;
+}
+
+[data-thread-state="found"] .end {
+  border-color: var(--color-brand-atlas);
+  background: var(--color-brand-atlas);
+  animation: pop var(--duration-standard) var(--ease-primary) 520ms both;
+}
+
+/* missing — nothing to connect: a dotted ring, the no-data mark (§4.5). */
+[data-thread-state="missing"] .end {
+  border-style: dotted;
+  border-width: 2px;
+}
+
+/*
+ * pending — real backend work only (§24). Hidden for the first 400 ms, so a
+ * quick lookup shows no loader at all.
+ */
+[data-thread-state="pending"] .line::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background: var(--color-brand-atlas);
+  transform: translate(-50%, -50%);
+  animation:
+    appear var(--duration-fast) linear 400ms both,
+    travel 1400ms var(--ease-primary) 400ms infinite;
+}
+
+@keyframes draw {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes travel {
+  from {
+    inset-inline-start: 0%;
+  }
+  to {
+    inset-inline-start: 100%;
+  }
+}

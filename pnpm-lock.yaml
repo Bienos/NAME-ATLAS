@@ -66,6 +66,15 @@ importers:
 
   apps/web:
     dependencies:
+      '@name-atlas/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@name-atlas/resolver':
+        specifier: workspace:*
+        version: link:../../packages/resolver
+      '@name-atlas/sources':
+        specifier: workspace:*
+        version: link:../../packages/sources
       next:
         specifier: 16.3.5
         version: 16.3.5(@babel/core@7.29.7)(@types/node@22.20.3)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)

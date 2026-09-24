@@ -1,0 +1,130 @@
+/*
+ * Extremely subtle by design (§39 screen 01): neutrals only, until the one
+ * node that becomes active while typing. Motion is limited to drawing and
+ * connecting (§23), once, on arrival; reduced motion shows the final state.
+ */
+
+.field {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+.links line {
+  stroke: var(--neutral-300);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw 1600ms var(--ease-primary) both;
+}
+
+.points circle {
+  fill: var(--neutral-400);
+  animation: appear var(--duration-standard) var(--ease-primary) both;
+}
+
+.line {
+  fill: none;
+  stroke: var(--neutral-400);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--duration-reveal) var(--ease-primary) 200ms both;
+}
+
+/* The segment that fills with Atlas Blue on submit. */
+.fill {
+  fill: none;
+  stroke: var(--color-brand-atlas);
+  stroke-width: 2;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset var(--duration-narrative) var(--ease-primary);
+}
+
+.tick {
+  fill: none;
+  stroke: var(--neutral-500);
+  stroke-width: 1;
+  animation: appear var(--duration-fast) var(--ease-primary) 520ms both;
+}
+
+.second {
+  fill: var(--neutral-500);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop var(--duration-standard) var(--ease-primary) 700ms both;
+}
+
+/* Ring = possible / uncertain (§8, §11): dotted, never filled. */
+.possible {
+  fill: var(--surface-primary);
+  stroke: var(--neutral-500);
+  stroke-width: 1.25;
+  stroke-dasharray: 2 2.4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop var(--duration-standard) var(--ease-primary) 900ms both;
+}
+
+.lead {
+  fill: var(--surface-primary);
+  stroke: var(--neutral-600);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    fill var(--duration-fast) var(--ease-primary),
+    stroke var(--duration-fast) var(--ease-primary);
+  animation: pop var(--duration-standard) var(--ease-primary) 200ms both;
+}
+
+.halo {
+  fill: none;
+  stroke: var(--color-brand-atlas);
+  stroke-width: 1;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0.6);
+  transition:
+    opacity var(--duration-standard) var(--ease-primary),
+    transform var(--duration-standard) var(--ease-primary);
+}
+
+/* While typing, one node becomes active (§39 screen 01). */
+:global([data-landing]):has([data-search-phase="typing"]) .lead,
+:global([data-landing]):has([data-search-phase="submitting"]) .lead {
+  fill: var(--color-brand-atlas);
+  stroke: var(--color-brand-atlas);
+}
+
+:global([data-landing]):has([data-search-phase="typing"]) .halo,
+:global([data-landing]):has([data-search-phase="submitting"]) .halo {
+  opacity: 0.35;
+  transform: scale(1);
+}
+
+:global([data-landing]):has([data-search-phase="submitting"]) .fill {
+  stroke-dashoffset: 0;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}

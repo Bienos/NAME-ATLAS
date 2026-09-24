@@ -1,0 +1,26 @@
+/*
+ * §6.3: ≤ 10 graphemes full Display XL; then reduced; 23+ fitted. Every tier
+ * is also capped by the container width, so nothing overflows, and held at
+ * the minimum (32 px mobile → 56 px desktop). At most two lines, breaking at
+ * spaces and hyphens first; never an ellipsis, never an inserted hyphen.
+ */
+.name {
+  --surname-min: clamp(2rem, 1.1667rem + 3.7037vw, 3.5rem);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  font-family: var(--font-display);
+  font-size: max(
+    var(--surname-min),
+    min(
+      calc(var(--type-display-xl) * var(--surname-scale, 1)),
+      calc(100cqi * 1.6 / var(--surname-graphemes, 1))
+    )
+  );
+  font-weight: 450;
+  font-variation-settings: "opsz" 72;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
