@@ -2,7 +2,7 @@
 
 Coarse milestones only. Detailed work exists only as a task file in `tasks/`, and only one task is specified at a time.
 
-Milestone numbering follows `docs/canonical/23` §17. Current state is in `PROGRESS.md`.
+Milestone numbering follows `docs/canonical/23` §17. Current state is in `STATUS.md`.
 
 ## M0 — Foundation + source risk removal
 

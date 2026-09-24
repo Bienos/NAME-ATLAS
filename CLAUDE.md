@@ -6,8 +6,8 @@
 
 ## Session shape
 
-- One task per session, in a fresh context. Do not chain TASK-001 into TASK-002.
-- Session 0 (control plane) is complete. Implementation sessions start from `tasks/001-project-foundation.md`.
+- One task per session, in a fresh context. Do not chain one task into the next.
+- First, check that the branch is built on the latest `origin/main` (`AGENTS.md` §11). A web session's start hook prints a warning when it is not; act on it before anything else. Then read `STATUS.md` for the current state and the next task.
 - Prefer a stronger model for architecture/decision sessions; implementation tasks are written to be executable by a mid-tier model.
 
 ## Context budget
@@ -17,6 +17,7 @@ The canonical corpus is roughly 1.1 MB of Markdown and `docs/archive/` alone is 
 - Locate sections with `grep -n` on headings, then read only the line ranges you need.
 - Never `cat` a canonical document in full.
 - Never read `docs/archive/` or `docs/library/` unless the task names the exact file and section.
+- `PROGRESS.md` is a 373 KB frozen log. `grep -n` it; never read it whole.
 
 ## When compacting or summarising
 

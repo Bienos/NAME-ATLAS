@@ -1,6 +1,6 @@
 # PRODUCT.md — Name Atlas product truth
 
-Durable product definition. No implementation status, no session history — those live in `PROGRESS.md`.
+Durable product definition. No implementation status, no session history — those live in `STATUS.md` and `docs/progress/`.
 
 Authority: `docs/canonical/10` (MVP contract), `docs/canonical/23` (paid MVP scope), `docs/canonical/19` (privacy boundary).
 
