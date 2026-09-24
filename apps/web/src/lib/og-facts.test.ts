@@ -15,10 +15,11 @@ const citation = {
   attribution: null,
   terms: null,
   retrieved_at: null,
+  source_page_url: null,
 };
 
 const RESOLVED = {
-  schema_version: "1.5",
+  schema_version: "1.6",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {

@@ -69,8 +69,8 @@ describe("surname suggestions on the read API (TASK-016)", () => {
     const outcome = await querySurnameResult(db(), "CICHWOSKI");
     expect(outcome.kind).toBe("OK");
     if (outcome.kind !== "OK") throw new Error("unreachable");
-    expect(outcome.response.schema_version).toBe("1.5");
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.5");
+    expect(outcome.response.schema_version).toBe("1.6");
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.6");
     expect(surnameResultResponseSchema.safeParse(outcome.response).success).toBe(true);
   });
 

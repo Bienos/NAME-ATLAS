@@ -24,7 +24,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.5";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.6";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -95,6 +95,13 @@ export const citationSchema = z.object({
    * another (directive §37).
    */
   retrieved_at: z.string().min(1).nullable(),
+  /**
+   * The public web page of the source the record was taken from — for PESEL,
+   * the dataset's page on dane.gov.pl — from the source registry. Added in 1.6
+   * (ADR-0012). `url` stays the exact resource retrieved, which for a dataset
+   * is a file download, not a page a reader should be sent to.
+   */
+  source_page_url: z.string().min(1).nullable(),
 });
 
 /** `docs/canonical/12` §6.3/§6.4, projected per surface. */
