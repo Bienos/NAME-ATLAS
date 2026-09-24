@@ -438,8 +438,9 @@ Local PostgreSQL 16 + PostGIS 3.4.2 (apt), as in earlier sessions. Container reg
 | Real browser (Playwright + Chromium) against `next dev` and `next start` | Typed flow landing → results; `document.startViewTransition` instrumented: `surname-hero` and `atlas-thread` both animate as old→new pairs. Checked at 1440×900, 834×1112 and 390×844 (touch), and with reduced motion (final state at once). NOWAK 98,387 / 99,738, KOWALSKI 66,589 + absent, KOWALCZYK 46,994 / 48,264, WIŚNIEWSKA absent + 54,177, NGUYỄN 3,730 / 2,132 — each equal to its fixture row. Unknown (`Zzyzx`), mixed script (`Nоwak`, Cyrillic о) and a 32-grapheme name render their states. |
 | `next start` states | DB present → figures; `DATABASE_URL` unset → "isn't connected to its data"; unreachable DB (port 5999) → "couldn't reach the atlas", not "unknown"; whitespace-only name → 307 to `/`; `robots: noindex, nofollow`. |
 | `git status` on `docs/canonical/`, `docs/library/`, `docs/archive/`, `docs/reference/`, `docs/review/`, `prompts/` | Empty — untouched. |
+| GitHub Actions CI, run #158 on `34bcef1` (branch `claude/kind-edison-eod395`) | Passed — every step, including **Integration tests (Testcontainers)** on the pinned `postgis/postgis:16-3.4@sha256:44126d87…` image, which this environment cannot pull, and **Build** (webpack; fonts fetched at build time). |
 
-**Not verified:** Safari and Firefox (only Chromium was run; browsers without `document.startViewTransition` navigate without the morph); a screen reader pass (semantics reviewed, not tested with assistive technology); the integration suite on the pinned container image; the page against the full national lists (blocked by D-007); CI end to end.
+**Not verified:** Safari and Firefox (only Chromium was run; browsers without `document.startViewTransition` navigate without the morph); a screen reader pass (semantics reviewed, not tested with assistive technology); the page against the full national lists (blocked by D-007).
 
 ## Next action
 
