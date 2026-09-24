@@ -9,6 +9,7 @@ import {
   referrerPath,
   requestOrigin,
 } from "../../../../lib/surname-page.js";
+import { pageSlug } from "../../../../lib/slug.js";
 
 /** `/en/surname/{slug}` — the English rendering of the canonical page (ADR-0009). */
 
@@ -25,7 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function Page({ params, searchParams }: Props) {
-  const { slug } = await params;
+  // Unlike `generateMetadata`, the page is handed its segment percent-encoded.
+  const slug = pageSlug((await params).slug);
   const query = await searchParams;
   const h = await headers();
   const answer = await answerSlug(

@@ -49,3 +49,30 @@ export async function resolveSlug(
   const outcome: SlugLookup = await lookupSlug(db, lang === "en" ? "en" : "pl", slug);
   return outcome;
 }
+
+/**
+ * A page component's `[slug]` segment, decoded.
+ *
+ * Next 16 does not hand a page component the value it hands the rest of the
+ * route. `generateMetadata` and the image routes receive the segment decoded;
+ * the page receives `encodeURIComponent` of it (`getParamValue` in
+ * `next/dist/shared/lib/router/utils/get-dynamic-param.js` encodes what
+ * `getDynamicParam` calls "the value that is passed to user code"). An ASCII
+ * slug passes through that unchanged, so only surnames with a Polish letter
+ * broke: at `/pl/nazwisko/w%C3%B3jcik` the title named WÓJCIK while the page,
+ * given `w%C3%B3jcik`, failed the canonical-form check and said there was no
+ * surname at that address (found in production, 2026-09-24).
+ *
+ * One decoding undoes exactly that encoding and gives the page the value its
+ * metadata already has. It is not a second decoding of the request:
+ * `/pl/nazwisko/a%2520b` still reaches the lookup as `a%20b`, which it refuses.
+ */
+export function pageSlug(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    // Not a value `encodeURIComponent` produced, so there is nothing to undo;
+    // the canonical-form check refuses it as given.
+    return segment;
+  }
+}

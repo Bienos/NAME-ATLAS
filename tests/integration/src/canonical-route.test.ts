@@ -97,10 +97,10 @@ describe("canonical slug resolution against a real PostgreSQL", () => {
   });
 
   it("resolves a slug carrying Polish letters", async () => {
-    // WÓJCIK is in the committed fixture, and its slug keeps the Ó. Next
-    // decodes a dynamic route segment before handing it over, so `resolveSlug`
-    // receives the decoded form — the percent-encoding is a transport detail
-    // that never reaches it.
+    // WÓJCIK is in the committed fixture, and its slug keeps the Ó.
+    // `resolveSlug` receives the decoded form — Next decodes the segment for
+    // `generateMetadata`, and the page decodes the percent-encoded copy Next
+    // hands it (`pageSlug`) — so the encoding never reaches it.
     const slug = canonicalSlug("WÓJCIK");
     expect(slug).toBe("wójcik");
     expect(encodeURIComponent(slug)).toBe("w%C3%B3jcik");
