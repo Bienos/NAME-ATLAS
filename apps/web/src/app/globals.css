@@ -468,6 +468,8 @@ footer {
 .snapshot {
   margin: 0 0 var(--space-8);
   padding: 0;
+  /* The surname is fitted to this box's width: see `.snapshot .surname`. */
+  container-type: inline-size;
 }
 
 .eyebrow {
@@ -482,9 +484,21 @@ footer {
 .snapshot .surname {
   margin: 0 0 var(--space-6);
   font-size: clamp(2.5rem, 12vw, 5.5rem);
+  /* Fitted to one line where it can be (Visual System §6.3): the size above is
+     the ceiling, the box's width over the name's measured width (--surname-em,
+     from surname-fit.ts) the fit, and 32px the floor (56px on desktop). A name
+     that still does not fit wraps, at a space or a hyphen first. Without
+     container units the line above applies unchanged. */
+  font-size: max(2rem, min(clamp(2.5rem, 12vw, 5.5rem), calc(98cqi / var(--surname-em, 1))));
   line-height: 0.95;
   letter-spacing: -0.04em;
   overflow-wrap: anywhere;
+}
+
+@media (min-width: 900px) {
+  .snapshot .surname {
+    font-size: max(3.5rem, min(clamp(2.5rem, 12vw, 5.5rem), calc(98cqi / var(--surname-em, 1))));
+  }
 }
 
 .hero {

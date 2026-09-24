@@ -5210,3 +5210,40 @@ repository. Nothing was deployed from this branch. The local derive covered only
 the register: step 6 derived 1,504 surnames with regional data (722.9s, 0 failed); step 7
 was stopped part-way, at 4,616 surnames with population. When the screenshots were taken,
 the home screen's female list showed 3 entries.
+
+### Visual system, follow-up: the share card's fonts, the icons, long surnames (2026-09-24)
+
+Stacked on the review commits above, which left "the share card in the brand fonts" open. It adds
+only what they did not:
+
+- **The share card's four fonts, committed.** `og-card.tsx` reads them from `assets/fonts/`; until
+  now only the README was there, so the card rendered in Geist. Unmodified, each beside its OFL
+  text, with its source and SHA-256 in the README: Newsreader Medium in the **72 pt** display
+  optical size (the README asked for the display cut "if offered"), Inter Regular and SemiBold,
+  IBM Plex Mono Medium. The tracing setting above already ships them.
+- **Icons outside the rate limiter.** `icon.svg` and `apple-icon.png` join `favicon.ico` in the
+  middleware's exclusions, as its own comment says static assets are.
+- **Long surnames broke inside the word on phones.** At `clamp(2.5rem, 12vw, 5.5rem)` a 390px
+  screen sets `WOJCIECHOWSKA` at 46.8px, which does not fit, and it split as "WOJCIECHOWS / KA";
+  the Visual System (§6.3) wants one line, a 32px floor and a break at a space or hyphen first.
+  The snapshot now carries the surname's measured width (`--surname-em`, `surname-fit.ts`), and
+  the stylesheet takes the smaller of the designed size and the heading's width over it, floored
+  at 32px (56px from 900px). A surname that fits is untouched. The widths are the pages' own face:
+  every advance in the build's Newsreader woff2 files equals Google's 16 pt static instance's,
+  from which `display-metrics.ts` is generated (`scripts/build-display-metrics.ts`; all 564
+  advances also match fontTools). The card's 72 pt cut is about 3% wider and is not used for it.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 691 passed; web 200 (193 before + 7 new: the surname measure, the card's four fonts present as TrueType, the snapshot's `--surname-em`) |
+| `pnpm --filter ./apps/web build` | Compiled; both `opengraph-image` traces list the four fonts |
+| `next start`, no database | `/`, the three icons and `/pl/nazwisko/nowak/opengraph-image` 200; no `og_fonts_missing` logged |
+| Share card, rendered with sample facts (not committed) | Newsreader, Inter and IBM Plex Mono in place of Geist; `GRZEGORZEWSKA-MAŁACHOWSKA` wraps at its hyphen |
+| Chromium, SYNTHETIC figures | 390px: `WOJCIECHOWSKA` 46.8px on 2 lines → 40.8px on 1; `KONSTANTYNOWICZ` 2 lines → 35.5px on 1; `NOWAK` unchanged at 46.8px (390px) and 88px (1280px). 320px: `KONSTANTYNOWICZ` at the 32px floor, 2 lines. No horizontal overflow |
+
+**Not verified:** pages with real data after this change (no database in this session) and any
+deployment.
+**Found, not fixed (pre-existing):** the English `opengraph-image` route calls `answerSlug(slug,
+null)` without `"en"`, so it resolves in the Polish slug table; a surname whose English slug carries
+a different collision suffix would get a "not found" card.

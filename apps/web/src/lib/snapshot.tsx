@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { PlaceStat, SurnameResultResponse } from "@name-atlas/contracts";
 import {
   assessmentWord,
@@ -9,6 +10,7 @@ import {
   UI,
 } from "./messages.js";
 import type { Lang } from "./messages.js";
+import { surnameEm } from "./surname-fit.js";
 
 /**
  * The surname snapshot (TASK-023, directive §16): the first useful fact above
@@ -120,7 +122,13 @@ export function Snapshot({
   return (
     <header className="snapshot" id="today">
       <p className="eyebrow">{t.searchLabel}</p>
-      <h2 className="surname">{surname}</h2>
+      {/* Its measured width, for the stylesheet to fit it to one line (`surname-fit.ts`). */}
+      <h2
+        className="surname"
+        style={{ "--surname-em": surnameEm(surname).toFixed(3) } as CSSProperties}
+      >
+        {surname}
+      </h2>
 
       {population?.state === "READY" ? (
         <div className="hero" role="group" aria-label={t.sectionPopulation}>
