@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { assessCurrentPopulation } from "./confidence.js";
-import { evaluateAllSurfaces, evaluateSurface, SURFACES } from "./rights.js";
+import { evaluateAllSurfaces, evaluateSurface, sectionEligibility, SURFACES } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
 
 /**
@@ -133,5 +133,57 @@ describe("rights and confidence are independent (ARCHITECTURE.md §10 invariant 
     for (const eligibility of evaluateAllSurfaces(PESEL_AS_SEEDED)) {
       expect(confidenceStatuses).not.toContain(eligibility.decision);
     }
+  });
+});
+
+/**
+ * One section of a result, gated on its own claims. The result-level decision is
+ * the population's; a rarity or distribution claim cites its own source record,
+ * whose rights may be stricter, and must not be shown where they forbid it.
+ */
+describe("sectionEligibility", () => {
+  const REVIEW_BLOCKED: EffectiveRights = { ...FULLY_OPEN, review_status: "BLOCKED" };
+  const allowedFree = evaluateSurface(FULLY_OPEN, "FREE");
+
+  it("keeps the result's decision when the section's claims allow the surface", () => {
+    expect(sectionEligibility(allowedFree, [FULLY_OPEN, FULLY_OPEN], "FREE")).toEqual(allowedFree);
+  });
+
+  it("blocks the section when one of its own claims is blocked, though the result is allowed", () => {
+    // Before this rule, the section inherited the population's ALLOWED and
+    // showed a claim whose own rights are blocked.
+    expect(sectionEligibility(allowedFree, [FULLY_OPEN, REVIEW_BLOCKED], "FREE")).toEqual({
+      surface: "FREE",
+      decision: "BLOCKED",
+      reason_code: "RIGHTS_REVIEW_BLOCKED",
+    });
+  });
+
+  it("never loosens the result's decision", () => {
+    // PESEL as seeded is CONDITIONAL on the free surface; a fully open section
+    // claim does not make the section more permissive than the result.
+    const conditional = evaluateSurface(PESEL_AS_SEEDED, "FREE");
+    expect(conditional.decision).toBe("CONDITIONAL");
+    expect(sectionEligibility(conditional, [FULLY_OPEN], "FREE")).toEqual(conditional);
+  });
+
+  it("tightens ALLOWED to CONDITIONAL when a section claim is conditional", () => {
+    expect(sectionEligibility(allowedFree, [PESEL_AS_SEEDED], "FREE")).toMatchObject({
+      decision: "CONDITIONAL",
+      reason_code: "COMMERCIAL_USE_UNRESOLVED",
+    });
+  });
+
+  it("keeps the result's decision for a section with no claims", () => {
+    expect(sectionEligibility(allowedFree, [], "FREE")).toEqual(allowedFree);
+  });
+
+  it("evaluates each claim on the surface asked for", () => {
+    // Paid: PESEL as seeded blocks it (commercial use unknown).
+    const allowedPaid = evaluateSurface(FULLY_OPEN, "PAID");
+    expect(sectionEligibility(allowedPaid, [PESEL_AS_SEEDED], "PAID")).toMatchObject({
+      surface: "PAID",
+      decision: "BLOCKED",
+    });
   });
 });

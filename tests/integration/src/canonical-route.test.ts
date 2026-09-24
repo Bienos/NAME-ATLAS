@@ -7,7 +7,7 @@ import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import { importPeselResource, PESEL_NATIONAL_MALE_2026, sha256Hex } from "@name-atlas/sources";
 import { backfillSlugs, shortSlugId } from "@name-atlas/seo";
-import { canonicalSlug, resolveSlug } from "../../../apps/web/src/lib/slug.js";
+import { canonicalSlug, currentPathFor, resolveSlug } from "../../../apps/web/src/lib/slug.js";
 
 /**
  * TASK-024 AC-1/AC-2/AC-3 and TASK-027 AC-3/AC-4 — slug resolution against a
@@ -170,7 +170,16 @@ describe("canonical slug resolution against a real PostgreSQL", () => {
       kind: "RESOLVED",
       surname_id: second,
       display_name: "TEST COLLISION",
+      slug: suffixed,
     });
+
+    // Every link to a surname is built from its stored slug. The display form
+    // cannot produce the suffix: TEST COLLISION slugs to the *other* surname's
+    // address, so a link rebuilt from it would open the wrong surname.
+    expect(canonicalSlug("TEST COLLISION")).toBe("test-collision");
+    await expect(currentPathFor(db(), second, "pl")).resolves.toBe(`/pl/nazwisko/${suffixed}`);
+    await expect(currentPathFor(db(), second, "en")).resolves.toBe(`/en/surname/${suffixed}`);
+    await expect(currentPathFor(db(), first, "pl")).resolves.toBe("/pl/nazwisko/test-collision");
   });
 
   it("assigns the same addresses however many times the backfill runs", async () => {

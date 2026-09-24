@@ -51,7 +51,7 @@ import type {
   PersistedRarityContext,
   PersistedSurnameMeaning,
 } from "./read.js";
-import { evaluateSurface } from "./rights.js";
+import { evaluateSurface, sectionEligibility } from "./rights.js";
 import type { EffectiveRights, Surface } from "./rights.js";
 import { RARITY_METHODOLOGY_CODE } from "./version.js";
 
@@ -284,7 +284,13 @@ async function meaningSectionFor(
       evaluateSurface(NO_RIGHTS_KNOWN, surface),
     );
   }
-  const eligibility = evaluateSurface(claim.rights, surface);
+  // Every supporting work's rights count: publishing the claim publishes all of
+  // its evidence, so the most restrictive posture governs (as `meaning.ts` says).
+  const eligibility = sectionEligibility(
+    evaluateSurface(claim.rights, surface),
+    claim.citation_rights,
+    surface,
+  );
   if (eligibility.decision === "BLOCKED") {
     // No interpretation text in the payload at all — omitted, not sent and
     // marked hidden (docs/canonical/16 §55).
@@ -540,7 +546,12 @@ export async function querySurnameResult(
   if (!firstClaim) {
     throw new Error("unreachable: claims array is non-empty");
   }
-  const eligibility = evaluateSurface(firstClaim.rights, surface);
+  // Every population claim counts, not only the first; the most restrictive wins.
+  const eligibility = sectionEligibility(
+    evaluateSurface(firstClaim.rights, surface),
+    claims.map((c) => c.rights),
+    surface,
+  );
 
   if (eligibility.decision === "BLOCKED") {
     // The value is omitted from the payload entirely — not sent and marked
@@ -560,6 +571,20 @@ export async function querySurnameResult(
     };
   }
 
+  // Rarity and distribution cite their own source records, whose rights need
+  // not be the population claims'. Each section is gated on its own claims too,
+  // and can only be more restricted than the population, never less.
+  const rarityEligibility = sectionEligibility(
+    eligibility,
+    rarityClaims.map((c) => c.rights),
+    surface,
+  );
+  const distributionEligibility = sectionEligibility(
+    eligibility,
+    distributionClaims.map((c) => c.rights),
+    surface,
+  );
+
   // ALLOWED and CONDITIONAL both surface the values; CONDITIONAL carries its
   // reason so a caller can apply the condition (docs/canonical/12 §6.3).
   return {
@@ -578,27 +603,39 @@ export async function querySurnameResult(
       // absent where population is present. Absence is stated, never a
       // figure invented.
       rarity:
-        rarityClaims.length > 0
-          ? {
-              state: "READY",
-              entries: rarityClaims.map(toRarityEntry),
-              reason_code: null,
-              surface: eligibility,
-            }
-          : emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", eligibility),
+        rarityClaims.length === 0
+          ? emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", rarityEligibility)
+          : rarityEligibility.decision === "BLOCKED"
+            ? emptyRarity("RIGHTS_BLOCKED", rarityEligibility.reason_code, rarityEligibility)
+            : {
+                state: "READY",
+                entries: rarityClaims.map(toRarityEntry),
+                reason_code: null,
+                surface: rarityEligibility,
+              },
       // The geography chapter needs a complete *regional* resource version,
       // which is a different universe from the national one, so it too can be
       // absent where population is present. docs/canonical/16 §28: state the
       // absence, never return an empty map.
       distribution:
-        distributionClaims.length > 0
-          ? {
-              state: "READY",
-              entries: distributionClaims.map(toDistributionEntry),
-              reason_code: null,
-              surface: eligibility,
-            }
-          : emptyDistribution("UNAVAILABLE", "NO_COMPLETE_REGIONAL_UNIVERSE", eligibility),
+        distributionClaims.length === 0
+          ? emptyDistribution(
+              "UNAVAILABLE",
+              "NO_COMPLETE_REGIONAL_UNIVERSE",
+              distributionEligibility,
+            )
+          : distributionEligibility.decision === "BLOCKED"
+            ? emptyDistribution(
+                "RIGHTS_BLOCKED",
+                distributionEligibility.reason_code,
+                distributionEligibility,
+              )
+            : {
+                state: "READY",
+                entries: distributionClaims.map(toDistributionEntry),
+                reason_code: null,
+                surface: distributionEligibility,
+              },
       // An exact surname wins outright, so there is nothing to suggest
       // (docs/canonical/13 §32.3).
       suggestions: null,

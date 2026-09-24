@@ -1,6 +1,6 @@
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
-import { canonicalSlug, lookupSlug, surnameRoute } from "@name-atlas/seo";
+import { canonicalSlug, currentSlugFor, lookupSlug, surnameRoute } from "@name-atlas/seo";
 import type { SlugLookup } from "@name-atlas/seo";
 import type { Lang } from "./messages.js";
 
@@ -21,25 +21,32 @@ import type { Lang } from "./messages.js";
 
 export { canonicalSlug };
 
-/** `/pl/nazwisko/{slug}` or `/en/surname/{slug}` (§19–§20). */
-export function surnamePath(display: string, lang: Lang): string | null {
-  const slug = canonicalSlug(display);
-  // A display form made only of characters that map to `-` slugs to the empty
-  // string, and `/pl/nazwisko/` is not that surname's address — it is no address
-  // at all. The caller renders a link only when there is one.
-  return surnameRoute(slug, lang === "en" ? "en" : "pl");
-}
-
 /** The path a slug string addresses, without consulting the database. */
 export function pathForSlug(slug: string, lang: Lang): string | null {
   return surnameRoute(slug, lang === "en" ? "en" : "pl");
 }
 
-export type SlugResolution =
-  | { readonly kind: "RESOLVED"; readonly surname_id: string; readonly display_name: string }
-  | { readonly kind: "MOVED"; readonly current_slug: string }
-  | { readonly kind: "UNKNOWN" }
-  | { readonly kind: "INVALID" };
+/**
+ * A surname's address in `lang`: its stored current slug, or `null` when it has
+ * none yet (the slug backfill has not reached it).
+ *
+ * This is the only way the app builds a link to a surname. It is never
+ * recomputed from the display form, because the two can differ. When two
+ * surnames produce one slug, the backfill gives one a suffix derived from its
+ * own id (ADR-0010 §2), and that suffix cannot be derived from the display
+ * form. On the full register 850 surnames have one, and a recomputed link would
+ * open the other surname of the pair.
+ */
+export async function currentPathFor(
+  db: Kysely<DB>,
+  surnameId: string,
+  lang: Lang,
+): Promise<string | null> {
+  const slug = await currentSlugFor(db, lang === "en" ? "en" : "pl", surnameId);
+  return slug === null ? null : pathForSlug(slug, lang);
+}
+
+export type SlugResolution = SlugLookup;
 
 export async function resolveSlug(
   db: Kysely<DB>,

@@ -13,8 +13,7 @@ import { Result } from "../lib/result-view.js";
 import { SearchForm } from "../lib/search-form.js";
 import { CommonSurnames } from "../lib/common-surnames.js";
 import type { CommonList } from "../lib/common-surnames.js";
-import { pathForSlug } from "../lib/slug.js";
-import { surnamePath } from "../lib/slug.js";
+import { currentPathFor, pathForSlug } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
 import { NamePrint } from "../lib/name-print.js";
 
@@ -75,9 +74,18 @@ type Answer =
   | { readonly kind: "NONE" }
   | { readonly kind: "INVALID" }
   | { readonly kind: "UNAVAILABLE" }
-  | { readonly kind: "RESULT"; readonly response: SurnameResultResponse };
+  | {
+      readonly kind: "RESULT";
+      readonly response: SurnameResultResponse;
+      /** A resolved surname's stored address, when it has one. The page redirects there. */
+      readonly path: string | null;
+    };
 
-async function answer(query: string, origin: ReturnType<typeof searchOrigin>): Promise<Answer> {
+async function answer(
+  query: string,
+  origin: ReturnType<typeof searchOrigin>,
+  lang: Lang,
+): Promise<Answer> {
   if (query === "") return { kind: "NONE" };
   // The surname is deliberately absent from every line below: canonical/19 §85
   // wants request content redacted by default, and a search term with a
@@ -112,7 +120,13 @@ async function answer(query: string, origin: ReturnType<typeof searchOrigin>): P
       search_origin: origin,
       ms: Date.now() - startedAt,
     });
-    return { kind: "RESULT", response: parsed.data };
+    // The stored address, never one recomputed from the display form, which
+    // cannot produce a collision suffix (`currentPathFor`).
+    const path =
+      parsed.data.status === "RESOLVED" && parsed.data.surname !== null
+        ? await currentPathFor(db, parsed.data.surname.id, lang)
+        : null;
+    return { kind: "RESULT", response: parsed.data, path };
   } catch (cause: unknown) {
     log.error("page_failed", { cause, ms: Date.now() - startedAt });
     return { kind: "UNAVAILABLE" };
@@ -188,20 +202,15 @@ export default async function HomePage({ searchParams }: PageProps) {
   const h = await headers();
   const origin = searchOrigin(referrerPath(h.get("referer"), requestOrigin(h.get("host"))));
 
-  const given = await answer(query, origin);
+  const given = await answer(query, origin, lang);
   const common = given.kind === "NONE" ? await commonLists(lang) : [];
 
-  if (
-    given.kind === "RESULT" &&
-    given.response.status === "RESOLVED" &&
-    given.response.surname !== null
-  ) {
+  if (given.kind === "RESULT" && given.path !== null) {
     // The result has an address of its own. `?intent=` travels with it; the
-    // canonical URL does not change (canonical/21 §35).
-    const path = surnamePath(given.response.surname.display_name, lang);
-    // A display form that slugs to nothing has no canonical address, so the
-    // answer stays here rather than redirecting to `/pl/nazwisko/`.
-    if (path !== null) redirect(intent === "default" ? path : `${path}?intent=${intent}`);
+    // canonical URL does not change (canonical/21 §35). A surname with no
+    // stored address yet is answered here rather than sent to an address that
+    // would not resolve.
+    redirect(intent === "default" ? given.path : `${given.path}?intent=${intent}`);
   }
 
   const otherLang: Lang = lang === "pl" ? "en" : "pl";
