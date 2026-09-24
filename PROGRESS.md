@@ -5156,3 +5156,57 @@ applied** — that is the owner's decision.
 | `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
 
 **Not run:** against the full register — only the owner's database has it.
+
+### Visual system: the Name Atlas brand pack applied (2026-09-24)
+
+The project owner's brand pack (`name-atlas-brand.patch`, built against `210425b`), which the
+owner committed as `06a7396` on `claude/lucid-goodall-t2ai7d`, was reviewed and corrected in
+two commits on top of it. The pack changes 7 files and adds 16, all under `apps/web/`. No dependency was added: `next/font/google` and `next/og` ship
+with `next`.
+
+- `globals.css`: the Visual System v1 tokens under their own names (Paper `#f3f0e8`, Ink
+  `#101413`, Atlas Blue `#1e4fd7`), editorial sections in place of cards, the underline
+  search, confidence as symbol and word, the Atlas Blue map ramp with a no-data ground, a
+  wider desktop compare page, and Archive Night for a dark system preference (D-020).
+- `layout.tsx`: Newsreader, Inter and IBM Plex Mono through `next/font/google`.
+- The Name Print mark (`src/lib/name-print.tsx`) in the three mastheads, plus `icon.svg`,
+  `apple-icon.png` and `favicon.ico`. The mark's masters and usage rules are in
+  `apps/web/assets/brand/`.
+- `src/lib/og-card.tsx`: one share-card renderer for both canonical routes, drawing only
+  what `ogFacts` gives it. Its fonts are TTFs in `apps/web/assets/fonts/`. None is
+  committed, so the card renders in Geist and logs `og_fonts_missing` once per process.
+- `compare-view.tsx`: a Polski/English switch that keeps the pair.
+
+Corrected on review:
+
+- `next.config.ts` gains `outputFileTracingIncludes` for `assets/fonts/*.ttf` on the two
+  `opengraph-image` routes. With four stand-in TTFs in place (removed afterwards), neither
+  route's build trace listed them, so fonts added later would not have reached a
+  deployment. With the setting, both traces list all four and the page traces list none.
+- The masthead's language switch sat 10.4px below the wordmark's baseline on all three
+  pages. The mark made the `h1` a flex row whose baseline is the SVG's bottom edge.
+  `.masthead` now centres instead, which puts the switch 1.6px above the wordmark's
+  baseline. The mark's box is unchanged. Measured in the running app.
+- Wrong or stale comments: two "no mark exists yet", the page fonts' source, and a pointer
+  to a README that is not in the repository. `displayFor`'s doc comment had been
+  separated from it by the new `comparePath`; it is reattached, and it now says the
+  switch carries both slugs only URL-encoded.
+- D-020 recorded (NON-BLOCKING NOW): mapping a dark preference onto Archive Night departs
+  from the Visual System's "Dark mode" section. Kept, because the pack shipped it.
+
+| Check | Result |
+|---|---|
+| `git apply` | Clean on `210425b`; the 23 files are byte-identical to the pack's `files/` tree, and the resulting tree is identical to the owner's `06a7396`. Does not apply to `main` (`a8958e4`): `globals.css`, `page.tsx`, `compare-view.tsx` |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 684 passed across 13 packages. Web: 193 passed, 21 files, including the pack's `og-card.test.ts` (5) and `compare-view.test.ts` (3). One earlier run, while the local derive held the load average near 13 on 4 cores, timed out resolver property P5 (`normalize.property.test.ts`, 5,000 ms limit). P5 took 4,307 ms under that load and 1,749 ms at load 6. `packages/` is unchanged since `210425b` |
+| `pnpm test:integration`, `pnpm test:golden` | 278 passed (24 files); 364 passed (4 files). Local PostgreSQL 16 with PostGIS 3.4.2 through `TEST_DATABASE_URL` |
+| `pnpm build` | Passed. `/icon.svg`, `/apple-icon.png` and `/favicon.ico` are served with their content types, and the `<head>` links all three |
+| Contrast, computed from the tokens | Each figure the stylesheet's comments give holds: Ink 16.30:1, text-secondary 6.87:1, text-tertiary 4.35:1 on Paper; Ink on Atlas Light Blue 6.69:1; lightest map band 2.14:1 on Paper, 2.33:1 on night. White on Atlas Blue is 6.66:1. At night the Verified symbol is 2.94:1 (D-020) |
+| Running app on the real register | `pnpm local:setup` with `DERIVE_LIMIT=1500`: the four official files, SHA-256-verified; 408,182 + 420,082 national rows; 598,476 surnames. Home, `/pl/nazwisko/nowak`, `/en/surname/nowak` and `/pl/porownaj?a=nowak&b=kowalski` at 1280px light, 390px light and 390px dark: all 200, mark present, no horizontal overflow, no console errors. The browser loaded Newsreader 500, Inter 400/600 and IBM Plex Mono 500. The compare page draws four maps from the real regional files, a NOWAK/KOWALSKI pair for women and one for men, and KOWALSKI's female side shows its coverage warning (45.0% registered). This is the first run of that page on real regional data |
+| Share card | `/pl/nazwisko/nowak/opengraph-image`: 1200×630 PNG, in Geist, one `og_fonts_missing` |
+
+**Not verified:** the share card in the brand fonts, because the TTFs are not in the
+repository. Nothing was deployed from this branch. The local derive covered only part of
+the register: step 6 derived 1,504 surnames with regional data (722.9s, 0 failed); step 7
+was stopped part-way, at 4,616 surnames with population. When the screenshots were taken,
+the home screen's female list showed 3 entries.

@@ -156,9 +156,12 @@ summary:focus-visible,
 
 /* --- header ------------------------------------------------------------ */
 
+/* Centre, not baseline: the h1 is a flex row that starts with the mark, so its
+   baseline is the mark's bottom edge, which set the language switch 10px below
+   the wordmark. Centred, the two baselines land within 2px (measured). */
 .masthead {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
   margin-bottom: var(--space-2);
