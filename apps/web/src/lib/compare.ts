@@ -1,4 +1,5 @@
 import type {
+  DistributionEntry,
   PopulationObservation,
   RarityEntry,
   SurnameResultResponse,
@@ -101,6 +102,32 @@ export function compareRarity(
     // Two different published universes give two different X for the same count.
     if (x.denominator !== y.denominator) {
       return { comparable: false, group, reason: "DIFFERENT_DENOMINATOR" };
+    }
+    return { comparable: true, group, a: x, b: y };
+  });
+}
+
+/**
+ * Regional breakdowns side by side. Two entries may be drawn on one scale only
+ * when they come from the same regional resource: same comparability group and
+ * same snapshot date. Anything else is reported, not drawn.
+ *
+ * A pair is comparable as a *layout*, not as a ranking: the page shows both
+ * maps and both tables, and says nothing about which surname is "more"
+ * anywhere. Each side keeps its own coverage warning.
+ */
+export function compareDistribution(
+  left: SurnameResultResponse,
+  right: SurnameResultResponse,
+): readonly Pairing<DistributionEntry>[] {
+  const a = byGroup(left.distribution?.state === "READY" ? left.distribution.entries : []);
+  const b = byGroup(right.distribution?.state === "READY" ? right.distribution.entries : []);
+  return groupsOf(new Set(a.keys()), new Set(b.keys())).map((group) => {
+    const x = a.get(group);
+    const y = b.get(group);
+    if (!x || !y) return { comparable: false, group, reason: "MISSING_ON_ONE_SIDE" };
+    if (x.snapshot_date !== y.snapshot_date) {
+      return { comparable: false, group, reason: "DIFFERENT_SNAPSHOT_DATE" };
     }
     return { comparable: true, group, a: x, b: y };
   });

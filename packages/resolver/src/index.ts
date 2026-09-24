@@ -31,6 +31,8 @@ export type {
 export { resolveSurname, resolveSurnamesBulk } from "./lookup.js";
 export type { MixedScriptPolicy, ResolveOptions } from "./lookup.js";
 export { damerauLevenshtein, hasAdjacentTransposition } from "./distance.js";
+export { escapeLike, MIN_PREFIX_LENGTH, PREFIX_CAP, prefixSuggestions } from "./prefix.js";
+export type { PrefixOutcome, PrefixSuggestion } from "./prefix.js";
 export {
   compareCandidates,
   FUZZY_LENGTH_BANDS,

@@ -134,7 +134,7 @@ function parenthetical(label: string | null): string {
  * which a unit test caught. A malformed date is returned unchanged by
  * {@link formatDate} and does not end in a stop, so it still gets one.
  */
-function terminate(sentence: string): string {
+export function terminate(sentence: string): string {
   return sentence.endsWith(".") ? sentence : `${sentence}.`;
 }
 
@@ -322,6 +322,23 @@ export function sourceKindWord(sourceType: string, lang: Lang): string {
   return words[sourceType]?.[lang] ?? (lang === "pl" ? "Źródło" : "Source");
 }
 
+/**
+ * Words for a meaning's formation type (`docs/canonical/11` §7.2). The code is
+ * a machine value and is never shown raw; an unknown code reads as "not
+ * determined" rather than leaking.
+ */
+export function formationWord(code: string, lang: Lang): string {
+  const words: Record<string, { pl: string; en: string }> = {
+    PATRONYMIC: { pl: "odojcowskie (patronimiczne)", en: "patronymic" },
+    TOPONYMIC: { pl: "od nazwy miejscowej", en: "from a place name" },
+    OCCUPATIONAL: { pl: "od zajęcia lub zawodu", en: "occupational" },
+    DESCRIPTIVE: { pl: "od cechy lub przezwiska", en: "from a trait or nickname" },
+    OTHER: { pl: "inne", en: "other" },
+    UNKNOWN: { pl: "nieustalone", en: "not determined" },
+  };
+  return words[code]?.[lang] ?? words["UNKNOWN"]![lang];
+}
+
 /** Fixed interface strings. Every state has words; a state without them is a bug. */
 export const UI = {
   pl: {
@@ -330,6 +347,12 @@ export const UI = {
     searchLabel: "Nazwisko",
     searchPlaceholder: "np. Nowak",
     searchAction: "Szukaj",
+    suggestionsAvailable: "Podpowiedzi:",
+    commonHeading: "Najczęstsze nazwiska",
+    commonNote:
+      "Pozycje w rejestrze PESEL; listy mężczyzn i kobiet są osobne i nie są sumowane. Stan na",
+    commonNoteUndated:
+      "Pozycje w rejestrze PESEL; listy mężczyzn i kobiet są osobne i nie są sumowane.",
     langSwitch: "English",
     sectionPopulation: "Liczba osób",
     sectionRarity: "Jak rzadkie",
@@ -409,6 +432,11 @@ export const UI = {
     slugCollisionBody:
       "Ten adres pasuje do więcej niż jednego nazwiska, więc nie wybieramy żadnego. Wpisz nazwisko w wyszukiwarce powyżej:",
     regionsHeading: "Województwa",
+    mapTitle: "Mapa udziałów według województw",
+    mapLegend: "Udział osób z zameldowaniem, od najmniejszego:",
+    mapNotListed: "brak w zbiorze — nie oznacza zera",
+    mapNotListedShort: "brak w zbiorze",
+    mapHint: "Najedź na województwo lub je dotknij, aby zobaczyć liczby.",
     regionColumn: "Województwo",
     countColumn: "Liczba",
     shareColumn: "Udział",
@@ -437,6 +465,12 @@ export const UI = {
     searchLabel: "Surname",
     searchPlaceholder: "e.g. Nowak",
     searchAction: "Search",
+    suggestionsAvailable: "Suggestions:",
+    commonHeading: "Most common surnames",
+    commonNote:
+      "Positions in the PESEL register; the male and female lists are separate and never summed. As of",
+    commonNoteUndated:
+      "Positions in the PESEL register; the male and female lists are separate and never summed.",
     langSwitch: "Polski",
     sectionPopulation: "How many people",
     sectionRarity: "How rare",
@@ -508,6 +542,11 @@ export const UI = {
     slugCollisionBody:
       "This address matches more than one surname, so none is chosen. Type the surname in the search above:",
     regionsHeading: "Voivodeships",
+    mapTitle: "Map of shares by voivodeship",
+    mapLegend: "Share of people with a registered voivodeship, lowest first:",
+    mapNotListed: "not listed in the dataset — not zero",
+    mapNotListedShort: "not listed",
+    mapHint: "Hover over or tap a voivodeship to see its figures.",
     regionColumn: "Voivodeship",
     countColumn: "Count",
     shareColumn: "Share",

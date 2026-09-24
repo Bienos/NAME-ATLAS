@@ -4411,3 +4411,802 @@ project exists to avoid. A slice is not a smaller honest version of the dataset.
 
 **Therefore 8 GB or more is required, not preferred.** The data load must run from an environment that
 can reach the pooler: the owner's machine, or this one once the permission is granted.
+
+## The schema is live on Supabase, applied through the MCP (2026-09-22)
+
+The previous section's blocker was the *bridge*, not the network. It is gone: the Supabase MCP now
+resolves the project, which is a sanctioned channel and needs no raw TCP. The CONNECT bridge was
+**not** reimplemented.
+
+| | |
+|---|---|
+| Project | `NAME-ATLAS`, `xujctkjpvnmcdpximtda`, `eu-central-1` |
+| Organisation | `bienos' projects` (`vercel_icfg_yUfrE9gy2zxalQIiJ0VDfqMZ`) — created by the Vercel integration |
+| Plan | **`free`** — still the 500 MB cap |
+| Server | PostgreSQL **17.6** |
+| Extensions | `postgis 3.3.7`, `pg_trgm 1.6`, both in `public` |
+| Database size | 19 MB (schema only) |
+
+### How, since `pnpm db:migrate` could not run
+
+Outbound TCP 5432/6543 is blocked from this environment (`/dev/tcp` refused; `pg_isready` no
+response), so the real migrator could not reach Supabase. Instead:
+
+1. All 19 migrations were run by the **real Kysely migrator** against a local PostgreSQL 16.13 /
+   PostGIS 3.4.2 — every one reported `applied`.
+2. `pg_dump --schema-only` captured the result; psql meta-commands, the `SET` preamble and
+   `CREATE SCHEMA public` were stripped.
+3. The DDL was replayed onto Supabase in four `apply_migration` calls: extensions, 34 enum types,
+   22 tables, then the view plus 106 constraints and 54 indexes.
+4. `kysely_migration` was seeded with all 19 rows and `kysely_migration_lock` with its single row, so
+   a future `pnpm db:migrate` against this database reports **no pending migrations** rather than
+   trying to re-apply everything.
+
+### Verified by digest, not by eye
+
+The same query ran on both databases and every value matched exactly:
+
+| | Local (migrator) | Supabase |
+|---|---|---|
+| Columns | 259 | 259 |
+| Column digest | `062fd82ed06303ca2ab5f4952a2d14f4` | `062fd82ed06303ca2ab5f4952a2d14f4` |
+| Indexes | 54 / `e776cfe01d8b92a633e179806b4ee441` | 54 / `e776cfe01d8b92a633e179806b4ee441` |
+| Constraints | 106 / `d4424b29c5adf6c0d2005cd9c76f189f` | 106 / `d4424b29c5adf6c0d2005cd9c76f189f` |
+
+`spatial_ref_sys` excluded on both sides: PostGIS 3.4.2 locally against 3.3.7 on Supabase.
+
+### A real exposure found and closed
+
+Supabase serves the `public` schema over PostgREST, and Vercel ships
+`NEXT_PUBLIC_SUPABASE_ANON_KEY` to the browser. Supabase grants `anon` and `authenticated` full
+privileges on public tables by default, so with RLS off, **every table was readable and writable by
+anyone holding that key**. The app never uses PostgREST — `packages/db` connects as the table-owning
+`postgres` role, which bypasses RLS — so RLS was enabled on all 22 application tables with no
+policies, denying those roles everything and leaving the app untouched. The `resolvable_name_forms`
+view, which pg_dump recreates owned by `postgres`, was switched to `security_invoker = on`.
+
+Advisors before and after: both `ERROR` classes (`rls_disabled_in_public` across 23 tables,
+`security_definer_view`) are cleared. What remains is `INFO`/`WARN` and deliberate —
+`rls_enabled_no_policy` on 22 tables *is* the deny-all posture; `extension_in_public` is forced by
+`0001_bootstrap_extensions` and by the schema's own references to `public.geography` and
+`public.gin_trgm_ops`; the three `st_estimatedextent` findings are PostGIS's own functions, a
+consequence of that placement. `spatial_ref_sys` keeps RLS off — PostGIS owns it, it holds
+coordinate-system definitions and no project data.
+
+### Not done
+
+1. **No data.** The free plan's 500 MB still stands against the measured 5,917 MB, and the previous
+   section's finding is unchanged: a slice is not a smaller honest version of the dataset. The load
+   waits on the organisation being upgraded, which needs payment details only the project owner can
+   enter.
+2. **The live deployment was not re-checked.** `name-atlas-two.vercel.app` is refused by this
+   environment's egress policy (`403` to `CONNECT`), reported rather than routed around. Whether the
+   search page now returns an empty result instead of *Usługa chwilowo niedostępna* is unverified
+   from here.
+3. **Version divergence recorded, not resolved.** Supabase runs PostgreSQL 17.6; D-005 pins
+   PostgreSQL 16 / PostGIS 3.4.2 for local development, CI and Testcontainers. The schema applied
+   cleanly to both, but production and test now differ by a major version.
+
+### The register can be run locally for nothing (2026-09-22)
+
+No hosted free tier holds this database. Checked rather than assumed: the largest
+is Crunchy Bridge at 5 GB, then Render 1 GB (expiring after 30 days), Aiven 1 GB,
+Neon 0.5 GB, Supabase 500 MB — against a measured 5,917 MB that TASK-030 already
+reduced from 6,974 MB. Locally there is no cap, and nothing outside the machine
+can reach the site anyway while `robots.txt` is `Disallow: /`, `SEO_INDEXING_ENABLED`
+is unset and the deployment sits behind team SSO.
+
+Added:
+
+- `docker-compose.yml` — PostgreSQL pinned to the same tag **and digest** as D-005,
+  `.github/workflows/ci.yml` and `packages/testing`, so local finally runs identical
+  bytes to CI. Credentials and database name match `.env.example`, so the documented
+  `DATABASE_URL` works unedited. `shm_size: 1gb` addresses the TASK-028 finding
+  directly: six derivations failed on the container's default 64 MB `/dev/shm`, and
+  that note records that a deployment wanting parallel query must raise the shm size
+  rather than set `max_parallel_workers_per_gather = 0`.
+- `docs/LOCAL_DATABASE.md` — the runbook, carrying the measured timings (import
+  4m25s, `seo:backfill-slugs` 57s for 1,196,952 rows, `truth:derive-batch` 55m at
+  71.1/s) rather than estimates.
+
+#### Verified
+
+| Command | Result |
+|---|---|
+| `docker compose config` | Resolves: correct digest, `shm_size` 1073741824, credentials matching `.env.example`. |
+| `pnpm db:migrate` with the runbook's literal `DATABASE_URL` | Passed — all 19 applied, then `up to date`. |
+| `select … from pg_extension` | `postgis 3.4.2`, `pg_trgm 1.6`. |
+| `select count(*) from surnames` | `0` — schema only, as expected before import. |
+| `pnpm test:integration` | Passed — **263 tests across 21 files**. |
+
+**The container itself was not started.** This environment has the Docker CLI but no
+daemon, and container registries are egress-blocked, so `docker compose config` is a
+syntax and resolution check only. Every other row above ran against a real local
+PostgreSQL 16.13 / PostGIS 3.4.2. The import chain was not exercised: it needs the
+full national CSVs, which are not in the repository (`fixtures/pesel/` holds 22- and
+23-row excerpts for tests).
+
+### The hosting decision is written down, and it is Neon (2026-09-22)
+
+`docs/adr/0011-p0-hosting-plane.md` — **Vercel in `fra1` for the app, Neon in an EU region for the
+database.**
+
+Three positions existed at once and none of them agreed. `docs/canonical/23` §6.2 and
+`ARCHITECTURE.md` §9 specify one Render plane and name the Vercel split as the thing to avoid.
+TASK-029 deployed to Vercel plus Supabase anyway, and production runs on it. That choice was never
+written to `docs/adr/`, so the corpus said Render while production said otherwise — the gap
+`AGENTS.md` §1 exists to prevent. ADR-0011 closes it and supersedes §6.2 for P0.
+
+Neon over Supabase on cost, measured rather than assumed: ~$5/month against $25 for the same ~6 GB.
+Supabase's $25 buys Auth, Storage, Realtime and PostgREST, none of which this project uses — ADR-0002
+commits to hand-written SQL over `pg`. The one Supabase feature it does rely on, the transaction
+pooler, Neon also provides. The ADR records that this should be revisited at M3, when BullMQ needs a
+host that keeps processes alive and `docs/canonical/23` §6.2's single-plane argument regains force.
+
+**No code change was needed.** `createPool` already takes `connectionString` unchanged, caps `max`
+per instance for serverless, and its own comments name PgBouncer — which is what Neon's pooled
+endpoint runs. `packages/db/src/config.ts` remains the only reader of `DATABASE_URL`, so the host is
+swappable by environment variable alone.
+
+Also corrected: `docs/CODEMAP.md`'s ADR row listed only `0001`–`0005` while `main` carried ten. It
+now lists all eleven.
+
+#### Not done
+
+The Neon project does not exist yet. There is no Neon MCP in this environment and Vercel's
+`create_connector` provisions auth connectors, not databases, so creating it is the project owner's
+step. Once `DATABASE_URL` points at the direct endpoint, `pnpm db:migrate` applies all 19 migrations
+from the owner's machine — no tunnel and no MCP needed, unlike the Supabase route.
+
+### `--slice`: part of a resource, for a database too small to hold it (2026-09-22)
+
+Asked for by the project owner, to put something real on a free-tier host.
+
+`packages/sources/src/slice.ts` — `--slice top:N` keeps the N largest counts;
+`--slice prefix:A-F` keeps an inclusive letter range, folding Polish diacritics onto their base
+letter (`Ćwik` files under C; `Łuczak` under L, which NFD does not decompose). A surname whose first
+character is not a Latin letter is excluded rather than guessed at.
+
+**It adds no way past the completeness gate, and does not need one.** The importer still reads,
+checksums and counts the whole official file; only the persisted rows are fewer. The gate in
+`packages/truth/src/completeness.ts` compares persisted rows against the registry's
+`official_row_count`, returns `ROW_COUNT_SHORT`, and the read path withholds rank and rarity with
+`NO_COMPLETE_UNIVERSE`. TASK-009 AC-03 asserts no flag can pass that gate; this one does not try.
+
+Two details that would otherwise have been quiet defects:
+
+- **Line numbers travel with the row.** `collectDistinct` derived `firstLine` from array position, so
+  filtering would have reported a row at line 338,202 as line 47 — a false provenance claim in the
+  one report that locates mixed-script findings by line.
+- **Excluded rows get their own bucket.** `rowsExcludedBySlice` is not folded into
+  `rowsQuarantined`, and `assertReconciles` now checks
+  `rowsRead === rowsImported + rowsQuarantined + rowsExcludedBySlice`. A quarantined row is one the
+  importer could not trust; an excluded row is one it never looked at. Reporting a deliberate
+  omission as a data problem would send the next reader hunting a defect that is not there.
+
+#### Verified
+
+| Check | Result |
+|---|---|
+| `slice.test.ts` | 14 tests — spec parsing fails closed, diacritic folding, order and line preservation, deterministic tie-break. |
+| Sliced import, 22-row fixture, `--slice top:5` | `rows read 22`, `rows excluded 17`, `rows imported 5`, `surnames created 5`. |
+| `pnpm truth:derive-batch --all` over that slice | **`CURRENT_POPULATION` 5; zero `CURRENT_RANK`, zero `RARITY_CONTEXT`** — the gate held without being asked. |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 642 tests. |
+| `pnpm test:integration` | Passed — 263 tests across 21 files. |
+
+#### Not done
+
+No slice has been loaded to a hosted database. The sizing in `docs/LOCAL_DATABASE.md` (~5,673
+surnames in 500 MB, covering 51.25% of people) remains the estimate computed on 2026-09-21, not a
+measurement of an actual sliced deployment.
+
+### The hosted deployment reaches its database (2026-09-22)
+
+Two faults, found in sequence. Neither was code.
+
+**1. Production never had a `DATABASE_URL`.** The production deployment was built at
+`1790024666356`; the variable was created at `1790070655237`, about thirteen hours later. Vercel
+resolves environment variables when a deployment is built, so an existing deployment never sees one
+added afterwards. Confirmed from the database side rather than inferred: `pg_stat_activity` on the
+Supabase project listed only `mgmt-api`, `pg_cron scheduler`, `pg_net`, `postgres_exporter` and
+`PostgREST` — no application connection had ever been made. Fixed by redeploying the same commit.
+
+**2. `sslmode=require` meant `verify-full`.** `pg-connection-string@2.14` treats `require`,
+`prefer` and `verify-ca` as aliases for `verify-full`, and warns about it in the runtime logs. The
+function demanded a fully verifiable chain from the pooler, did not get one, and dropped the
+connection in 13–63 ms — before any query. The app reported `resolution lookup failed at
+TRANSACTION`, and `TRANSACTION` is the stage set *before* the transaction callback runs, which is
+what distinguished a connection failure from a missing table.
+
+Verified against the parser in the lockfile rather than assumed:
+
+| connection string | resulting TLS |
+|---|---|
+| `?sslmode=require` | `ssl: {}` — full verification |
+| `?sslmode=no-verify` | `rejectUnauthorized: false` |
+| `?uselibpqcompat=true&sslmode=require` | `rejectUnauthorized: false` |
+
+`DATABASE_URL` now ends `?uselibpqcompat=true&sslmode=require`, the forward-compatible form the
+warning itself recommends.
+
+#### Verified after the fix
+
+Fetched through Vercel's own URL tool, since this environment's egress policy refuses `vercel.app`:
+
+| Check | Result |
+|---|---|
+| `GET /?surname=NOWAK` | `200`, rendering **"Nie znaleziono takiego nazwiska"** — not *"Usługa chwilowo niedostępna"*. The database was reached and held no such row. |
+| `x-vercel-id` | `iad1:iad1::fra1::…` — the function ran in Frankfurt. |
+| `x-ratelimit-limit` | `60` — TASK-029's middleware is live. |
+| `robots` | `noindex, follow` — ADR-0009 §5's alpha gate holds. |
+| Supabase `pg_stat_activity` | **8 connections, up from 6.** The two added are the app's pool, which `apps/web` caps at `max: 2` per instance. |
+
+The two messages are not interchangeable, and that distinction was checked rather than assumed: a
+reachable but empty database renders "not found", and "unavailable" means the database could not be
+reached at all.
+
+#### Not done
+
+The hosted database holds the schema and **no data**: `surnames` is 0 against 19 applied migrations.
+Loading it needs `--slice`, run from a machine that can reach the pooler on 5432. This environment
+cannot — outbound TCP to both 5432 and 6543 is refused — and the full national CSVs are not in the
+repository, so the slice has not been loaded from here.
+
+### A seven-surname slice is loaded on the hosted database (2026-09-22)
+
+The hosted database now holds real data. It was not loaded by the importer: this environment still
+cannot open TCP to the pooler on 5432 or 6543, and the national CSVs are not in the repository. The
+rows were built locally by the real importer and derive pipeline against the two committed fixtures,
+then replayed into Supabase as SQL through the management API.
+
+**How the rows were produced.** `--slice top:5` (the flag added in `ae913a9`) was applied to each
+fixture, giving seven distinct surnames: NOWAK, KOWALSKA, KOWALSKI, WIŚNIEWSKA, WIŚNIEWSKI, WÓJCIK,
+KOWALCZYK. The counts are the publisher's own, not derived or rounded — NOWAK is 98,387 (male
+resource) and 99,738 (female resource).
+
+**How they were transferred.** `pg_dump --data-only --column-inserts`, split into six chunks in
+foreign-key order. `--column-inserts` was required, not stylistic: the local and hosted schemas
+agree on column *names*, types and nullability (digest match) but not on column *ordinal position*
+(`9cfb37ae…` local vs `6d63eadd…` hosted), so positional `--inserts` would have written values into
+the wrong columns without erroring.
+
+**One deliberate omission.** `source_records.raw_payload` was set to NULL before the dump, on both
+sides. It held ~22 KB of publisher metadata JSON per row and was the highest transcription risk in a
+hand-replayed transfer. NULL states truthfully that the payload is absent here; a placeholder would
+have falsified provenance. Measured on the hosted database: `source_records` = 2 rows, of which
+**0 have a `raw_payload`**.
+
+#### Verified — the transfer is exact
+
+Every table was digested on both sides with a column-order-independent hash
+(`md5(string_agg(sorted key=value pairs))`, ordered by row text). All fifteen match:
+
+| Table | Rows | Digest (identical both sides) |
+|---|---|---|
+| `rights_profiles` | 1 | `34d12d5a3530eb188d40df2795abcdcc` |
+| `sources` | 1 | `b57081ca562501c2d49dbdb2da37940e` |
+| `source_records` | 2 | `a96a582199add6d2fa7ea6d8fd6e2fd0` |
+| `knowledge_entities` | 14 | `74bfeb6c2bcfeb6d20df99e493bb27e7` |
+| `surnames` | 7 | `8d5f87863f1e9bd2c008d393c33f8dc4` |
+| `name_forms` | 7 | `03fe960f60c6bc74b50cd643d180fd28` |
+| `research_runs` | 10 | `7cb4487df78320a82fbbf89c8652aad4` |
+| `distribution_snapshots` | 10 | `c0fad86a6f2f0c4dc1fef0a20d4a7610` |
+| `distribution_values` | 10 | `36b1994ec69cdcea9d994e1f04f28854` |
+| `evidence_items` | 10 | `86000e9fc63e0b2e73192bc301391e7e` |
+| `claims` | 10 | `f9eb46cf885b1443e3cfc5e980ecb3c1` |
+| `claim_evidence` | 10 | `64ef861c630642ee582a5dfa039956be` |
+| `confidence_assessments` | 10 | `c03aa1ea6465dd9da96b489ec7c1a8d0` |
+| `citations` | 10 | `052f66797a6aecd437acd78f0c58d809` |
+| `surname_slugs` | 14 | `1facf39617d57073e377a9856e34890c` |
+
+This check exists because an earlier attempt at the same transfer did corrupt a value — a
+`source_id` written into `default_rights_profile_id` — which the foreign key caught and rolled back.
+A digest comparison catches the class of error a foreign key would not.
+
+#### Verified — the completeness gate holds, unprompted
+
+All ten claims on the hosted database are `CURRENT_POPULATION`. There are **zero** `CURRENT_RANK`
+and **zero** `RARITY_CONTEXT` claims, and zero non-`NATIONAL` distribution snapshots. Nothing was
+configured to suppress them: TASK-009's universe gate is conjunctive and unconditional, the sliced
+universe fails its row-count arm, and rank and rarity are therefore never derived.
+
+`GET https://name-atlas-two.vercel.app/?surname=NOWAK` (fetched through Vercel's URL tool, since
+this environment's egress policy refuses `vercel.app`) returns `200` and renders:
+
+| Section | Rendered |
+|---|---|
+| Liczba osób | **98 387** (mężczyźni) and **99 738** (kobiety), each `Zweryfikowane`, with full source, licence and limitations |
+| Jak rzadkie | *"Nie można podać tej wartości, bo wgrany zbiór nie jest kompletny."* |
+| Zameldowanie na pobyt stały | *"Nie ma kompletnego zbioru regionalnego, więc nie pokazujemy rozkładu."* |
+| Znaczenie | *"Nie mamy udokumentowanego znaczenia tego nazwiska…"* |
+| `x-vercel-id` | `iad1:iad1::fra1::…` — Frankfurt |
+
+The two counts are shown side by side and never summed, as `sources.methodology_notes` requires.
+
+#### Not done
+
+The hosted database holds seven surnames, not the register. Every other surname renders
+*"Ten zbiór nie zawiera tego nazwiska"*, which is correct for a slice but is the same message the
+app would show for a surname whose claims simply have not been derived yet — `packages/truth`
+returns `NO_APPLICABLE_EVIDENCE` for both. Loading a larger slice still needs a machine that can
+reach the pooler and a copy of the national CSVs.
+
+### Measured: what a rank actually costs (2026-09-22)
+
+`PROGRESS.md` has carried one figure for the register — 5,917 MB — and it has
+been read as the price of having anything at all. It is not. Loading the
+register and deriving a page for every surname are separate costs, and only the
+first is forced.
+
+Measured by importing two files of the same row count and byte size as the real
+resources into a throwaway local database. The surnames in them were
+constructed, so nothing here is a fact about any surname; the row counts,
+byte sizes and overlap were matched to the register so the **storage** transfers.
+The model reproduces the register exactly: 408,182 + 420,082 rows, 229,788
+shared, **598,476 distinct** — the register's own figure.
+
+| | |
+|---|---|
+| Complete universe, both national resources | **781 MB** |
+| Import time | 134 s (78 s + 56 s) |
+| Per surname, all three claim families | **12.0 KB** |
+
+Per table after both imports: `distribution_snapshots` 200 MB (828,264 rows),
+`surnames` 155 MB (598,476), `distribution_values` 149 MB (828,264),
+`name_forms` 138 MB (598,476), `knowledge_entities` 123 MB (1,196,952).
+
+The measurement file ran 1–4% under the real byte sizes, so 781 MB is a floor,
+not a ceiling.
+
+#### What this means for a bounded deployment
+
+The universe must be complete or no rank may be derived, but a *page* is only
+needed for the surnames anyone will open. The two costs add rather than multiply:
+
+| pages derived | total | derive time |
+|---|---:|---:|
+| 1,000 | 793 MB | 8 min |
+| 10,000 | 898 MB | 83 min |
+| all 598,476 | 7,794 MB | 83 h |
+
+So a deployment carrying rank and rarity for the thousand most frequent surnames
+needs **~800 MB and ten minutes**, not 7.8 GB and three and a half days. The
+500 MB free tier still does not fit: 781 MB of universe is the floor beneath any
+rank at all.
+
+Slicing by first letter is the wrong axis. A–F is on the order of a quarter of
+the register (not measured — the real letter distribution is not in this
+environment), which is ~150,000 pages, ~2.5 GB and ~21 h: worse than 1,000 pages
+chosen by frequency, and it covers fewer searches.
+
+#### The 83 h is a query shape, not a slow database
+
+`competitionRank` (`packages/truth/src/rank.ts:73`) counts
+`distribution_values` rows above a surname's count, once per surname. There is
+no index on `count`, so each call is a parallel hash join over the pair —
+`EXPLAIN (ANALYZE, BUFFERS)` reports **20,495 buffers** for one surname's rank.
+Measured throughput was **2.0 surnames/s**, which is where 83 h comes from.
+
+Competition rank over a fixed resource is one sorted pass, so this is
+addressable — a single window function would rank every surname at once. It is
+recorded here as a finding, not fixed: it is a change to the derivation engine
+and belongs in a task of its own.
+
+#### Also found
+
+- `derive-batch` derives `CURRENT_POPULATION` and `CURRENT_DISTRIBUTION` only.
+  `CURRENT_RANK` and `RARITY_CONTEXT` come from `apps/worker`'s handlers or the
+  per-surname CLIs, and no worker is deployed.
+- `apps/web` derives nothing — it reads claims. A surname with no derived claim
+  renders as a gap however complete the universe is.
+- Against a complete universe all three families derive with no code change:
+  40 of 40 surnames returned population, rank and rarity.
+
+### Local database as the working target; rank computed once per universe (2026-09-23)
+
+At the project owner's request ("use just local data base we created"), the local
+PostgreSQL is the database this work proceeds on. No hosted database was touched.
+
+#### The local stack, run end to end in this session
+
+The Docker daemon is absent here, so `docker-compose.yml` was not started. Its exact
+settings were reproduced on a locally installed PostgreSQL 16.13 with the Ubuntu
+`postgresql-16-postgis-3` package (PostGIS 3.4.2): user, password and database
+`name_atlas` as in `docker-compose.yml`, so `docs/LOCAL_DATABASE.md`'s literal
+`DATABASE_URL` worked unedited.
+
+| Step | Result |
+|---|---|
+| `pnpm db:migrate` | 19 applied, then `up to date`. |
+| National imports, official path (no `--sha256`) | Refused, `CHECKSUM_MISMATCH` against the registry's `official_sha256` — correct: the committed files are excerpts. |
+| National imports with the excerpts' own `--sha256` | Male 22 rows / 22 surnames; female 23 rows, 16 created, 7 reused. |
+| Regional excerpts through `import-pesel.ts` | Refused, `SCHEMA_VIOLATION` on the header — the regional files have their own importer. |
+| Regional excerpts through `import-pesel-regional.ts` | Male 10 snapshots / 40 values, female 8 / 38; 16 places referenced each. |
+| `pnpm seo:backfill-slugs` | 88 addresses, 0 suffixed. |
+| `pnpm truth:derive-batch --all --rank` | 44 surnames, 0 failed. Claims: **45 `CURRENT_POPULATION`, nothing else** — rank, rarity and distribution withheld by the completeness gate, as they must be over excerpts. |
+| `apps/web` built and started on the local database | `/api/health` ok; `/pl/nazwisko/nowak` 200, rendering 98 387 (men) and 99 738 (women) with the Ministerstwo Cyfryzacji citation, and "the loaded set is not complete" in place of rarity and distribution; `GET /api/v1/surname-results?surname=NOWAK` → `population READY`, `rarity UNAVAILABLE`, `distribution UNAVAILABLE`, `meaning NO_SOURCED_MEANING`. |
+
+The full register was **not** loaded: the national and regional CSVs are not in the
+repository, `dane.gov.pl` answers `403` to `CONNECT` from this environment, and no
+copy was found in the owner's Google Drive (searched by title for PESEL/nazwisk).
+
+#### `docs/LOCAL_DATABASE.md` corrected
+
+Step 4 imported only the two national files. `truth:derive-batch` without `--all`
+derives only surnames with regional evidence, so following the runbook as written
+would have derived nothing. The two regional imports are now in it, the derive
+command carries `--rank`, a duplicated and self-contradicting `--sha256` paragraph
+was reduced to the correct one, and a section shows the excerpt walk-through above.
+
+#### The 83 h rank finding addressed
+
+`competitionRank` (`packages/truth/src/rank.ts`) counted every row above a
+surname's count, once per surname. It now takes an optional run-scoped
+`RankTableCache`: one `GROUP BY count` per source record, then a binary search over
+the distinct counts. Semantics are unchanged — competition rank, ties share, strictly
+greater — and without a cache (a single page) the original query still runs.
+`derive-batch` passes one cache for the run.
+
+Measured on a throwaway database holding **408,182** national values in one source
+record: the male excerpt imported for real, plus 408,160 synthetic surnames,
+snapshots and values cloned from one of its rows with counts
+`greatest(2, 99738 / g^0.85)` — **1,019 distinct counts**. The surnames are
+constructed; only the row count and the count range match the register, so this
+measures the query, not any fact about a surname.
+
+| | Result |
+|---|---|
+| Uncached `competitionRank`, 40 sampled surnames | **68.8 ms** a surname — 14.5/s, ~7.8 h for the universe |
+| Cached, first call (the grouped query) | **100 ms** |
+| Cached, all 408,182 ranks | **104 ms** in total, 0.25 µs a surname |
+| Cached vs uncached on the 40 sampled | 0 mismatches |
+
+The real register has more distinct counts than 1,019; the table grows with those,
+not with surnames. The end-to-end `derive-batch --rank` rate was **not** re-measured:
+that needs a universe that passes the completeness gate, i.e. the real files.
+
+#### Verification actually run
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck` | Passed. |
+| `pnpm lint` | Passed — no errors, no warnings. |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — **647** (642 + 5 new in `rank.test.ts`: tie example, three fast-check properties against the definition — members, non-members, row order — and duplicate-count refusal). |
+| `pnpm test:integration` (`TEST_DATABASE_URL` → local PostgreSQL 16.13 / PostGIS 3.4.2) | Passed — **264** across 21 files (263 + 1: cached and uncached ranks agree for all 45 imported national values; one table per universe, totals 22 and 23). |
+| `pnpm test:golden` | Passed — 364. |
+| `pnpm build` | Passed — `apps/web`, `apps/admin`, `apps/worker`. |
+
+**Not verified here:** the pinned container image (no Docker daemon); the full
+register; `derive-batch --rank` throughput against a complete universe.
+
+### TASK-031 specified — Polona source spike, planning only (2026-09-23)
+
+At the project owner's request ("please do whats needed"), the first M3 task was
+written: `tasks/031-polona-source-spike.md`, `docs/canonical/23`'s SPIKE-03. It is
+research plus a fail-closed parser over captured responses, on the TASK-002 pattern:
+no table, no connector, no claim.
+
+**Not started, and not startable from this project's cloud environment as configured.**
+Checked on 2026-09-23: `polona.pl`, `polona2.pl`, `api.europeana.eu` and
+`fbc.pionier.net.pl` all answered `403` to `CONNECT`. The task's §11 says what the
+implementing session does in that case: record `UNRESOLVED` and stop, rather than
+describe Polona from memory. It needs `polona.pl` allowed in the environment's network
+settings, or a machine with ordinary internet access.
+
+Nothing about Polona's interface, terms or rights vocabulary is asserted anywhere in
+this change. ADR-0007 decides what the product does with a rights value; the task
+exists to find out what the values are.
+
+### `pnpm local:setup` — the full local load in one command (2026-09-23)
+
+Asked for by the project owner ("i want the app to fully run"). The four official
+files total ~45 MB (5,293,415 + 5,592,881 + 16,615,897 + 17,900,370 bytes, from the
+registry), so there is no reason for acquisition to be manual on a machine with
+internet access.
+
+- `packages/sources/src/acquire.ts` — pure: `localFileName` (the `data/` names the
+  runbook already used) and `verifyResourceBytes` (size, then SHA-256, against the
+  registry's pinned values; a mismatch is reported, never tolerated).
+- `packages/sources/bin/fetch-pesel.ts`, `pnpm fetch:pesel` — for each registered
+  resource, keeps a verified file already on disk, otherwise downloads
+  `official_source_url` and writes it under its final name only if it matches. The
+  importers still download nothing.
+- `scripts/local-setup.sh`, `pnpm local:setup` — fetch, migrate, four imports,
+  `seo:backfill-slugs`, `truth:derive-batch --rank` (`DERIVE_LIMIT` passes `--limit`).
+  `set -euo pipefail`, so it stops at the first failed step.
+
+| Check | Result |
+|---|---|
+| `acquire.test.ts` | 4 passed — names match the fixtures; every committed excerpt refused (`SIZE_MISMATCH`); a same-size wrong file refused (`CHECKSUM_MISMATCH`); matching bytes accepted. |
+| `pnpm fetch:pesel --dir <tmp>` with an excerpt pre-placed | The excerpt reported as "not the official file" and left untouched; all four downloads `HTTP 403 Forbidden` (this environment's egress policy); nothing written; exit 1. |
+| `pnpm local:setup` here | Stopped at step 1 with exit 1; no database step ran. |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 651. |
+
+**Not verified:** a successful download. `api.dane.gov.pl` is unreachable from this
+environment, so the happy path of `fetch:pesel` — and therefore `local:setup` past
+step 1 — has not run anywhere yet.
+
+### Onomastic sources checked for `SURNAME_MEANING` (2026-09-23)
+
+Asked for by the project owner, to find where surname meanings could come from.
+Nothing was imported and no code changed.
+
+- **Rymut, *Nazwiska Polaków. Słownik historyczno-etymologiczny*** (IJP PAN, 1999–2001):
+  **not usable.** A web-search summary attributed a CC BY-SA 4.0 licence to it via
+  AZON; that was not confirmed. The project owner opened the University of Wrocław
+  Digital Library copy (publication group 28106) and its record states *Prawa
+  dostępu: In Copyright / Objęty pełną ochroną prawnoautorską — dostępna wyłącznie
+  na wybranych terminalach w sieci Uniwersytetu Wrocławskiego*, *Licencja:*
+  `https://rightsstatements.org/page/InC/1.0/`. Both volumes are reading-room
+  only. It fails ADR-0008 §4 conditions 2 and 4.
+- The same work on **Polona** (vol. 2, L–Ż; screenshot supplied by the project owner,
+  2026-09-23): field *prawa do utworu* reads *Publikacja chroniona prawem autorskim —
+  reprodukcja cyfrowa dostępna w czytelniach BN i na terminalach Academiki*. The
+  record gives the publisher as *Kraków : Wydaw. Naukowe DWN, 2001*, not IJP PAN, so
+  the rights holder for Rymut may be DWN or the author's heirs rather than the
+  Institute. Also the first observed instance of Polona's object-level rights field
+  (label *prawa do utworu*, free-text value) — evidence for TASK-031 §4 item 6, from a
+  screenshot, not from an API response.
+- **Internetowy słownik nazwisk w Polsce** (IJP PAN, `https://nazwiska.ijppan.pl/`):
+  unchanged — free to read, `PARTNERSHIP_REQUIRED` for product use
+  (`docs/canonical/12` §2.1, §20). ADR-0008's Path A.
+
+- **Cieślikowa, Szymowa, Rymut (opr.), *Słownik etymologiczno-motywacyjny
+  staropolskich nazw osobowych*, cz. 1, *Odapelatywne nazwy osobowe*** (red. Cieślikowa,
+  Malec, Rymut; Kraków: Wydawnictwo Naukowe DWN, 2000; ISBN 83-87623-23-7; RCIN
+  `oai:rcin.org.pl:24656`): **not usable without an agreement.** RCIN record (screenshot
+  supplied by the project owner, 2026-09-23): *Rights: Rights Reserved – Free Access*;
+  *Terms of use: Copyright-protected material. May be used within the limits of
+  statutory user freedoms*; *Access: Open*. The scan's imprint page reads *© Copyright by
+  Wydawnictwo Naukowe DWN, 2000* and *© Copyright by Instytut Języka Polskiego PAN,
+  2000*. Free to read is not a licence: statutory user freedoms are not among ADR-0008
+  §4 condition 4's licence bases, so it fails that condition. Technically it would
+  serve — a DjVu scan of 412 pages with a legible text layer, entries of the form
+  *Szafran : szafran 'przyprawa…'* — but it covers **Old Polish personal names**, not
+  modern surnames, so a claim built on it would have to say so. The owner downloaded
+  the scan; it was not committed and will not be without a licence.
+- The other named candidate, *Słownik najstarszych nazwisk polskich* (Kaleta,
+  Dacewicz, Raszewska-Żurek; IS PAN, 2007), is also on RCIN; its rights field was not
+  checked.
+
+IJP PAN publishes the online dictionary and is the institutional home of Rymut's work;
+whether it can license *Nazwiska Polaków* too is for that conversation to establish. Until one
+exists, every surname correctly returns `NO_SOURCED_MEANING`.
+
+### First real meaning source: Buryan 1933 (2026-09-23)
+
+`sources/onomastics/buryan-1933.json` — ks. Józef Buryan, *Skąd pochodzi twoje imię i
+nazwisko i nazwa miejscowości rodzinnej? (Zwięzły zarys imiennictwa polskiego)*,
+Warszawa 1933. The project owner supplied the scan (Zielonogórska Biblioteka Cyfrowa,
+`oai:zbc.uz.zgora.pl:82526`); its record gives the author as *Buryan, Józef (ksiądz;
+1883-1950)*.
+
+- **Licence basis:** public domain — author died 1950, art. 36, so since 2021-01-01.
+  `review_status = LEGAL_REVIEW_REQUIRED` because no lawyer has reviewed it; attribution
+  required (moral rights).
+- **Reliability tier `C_SCHOLARLY_SECONDARY`** is this session's classification of a
+  popular 1933 outline by a non-linguist, flagged to the owner; the page shows author
+  and year beside every reading, and one work alone derives `POSSIBLE`, never more.
+- **25 surnames**, chosen where Buryan explains a surname or places it under one of his
+  six headings: NOWAK, WÓJCIK, KOWALCZYK, SZEWCZYK, KRAWCZYK, KOŁODZIEJ, MAZUR, KRÓL,
+  ZAJĄC, WILK, ADAMCZYK, JANKOWSKI, JASIŃSKI, PAWŁOWSKI, JAKUBOWSKI, KUBIAK, SZYMAŃSKI,
+  TOMASZEWSKI, WALCZAK, JAWORSKI, OSTROWSKI, SOKOŁOWSKI, WYSOCKI, PIOTROWSKI, DĄBROWSKI.
+  Every gloss and quotation is verbatim (1933 orthography, `[…]` for omitted list
+  items), read off the page images, not only the OCR. Nothing was inferred from a
+  suffix or a common word.
+
+| Check | Result |
+|---|---|
+| `import-onomastics` into the local database | `IMPORTED`, 25 entries stored |
+| `demo:surname-meaning` NOWAK / WÓJCIK / KOWALCZYK | `POSSIBLE`, one interpretation each, with the page locator |
+| `demo:surname-meaning` ZAJĄC | `UNRESOLVED` — not in the 44-surname excerpt database; expected to resolve against the full register |
+| `/pl/nazwisko/nowak` | The meaning section renders Buryan's sentence, *Możliwe*, *Opracowanie naukowe*, *ks. Józef Buryan · 1933* |
+| `pnpm format:check` | Passed |
+
+**Found, not fixed:** the meaning section prints the formation type as its raw code
+(`OCCUPATIONAL`) on the Polish page instead of a translated label.
+
+### The regional breakdown as a map of the 16 voivodeships (2026-09-23)
+
+Asked for by the project owner as the next screen. The regional section now draws a
+choropleth above the existing table; the table is unchanged and remains the exact,
+accessible view.
+
+- **Outlines:** Natural Earth 1:10m admin-1, release v5.1.2, **public domain**
+  ("Everything here is public domain", `LICENSE.md` at that tag). Source file SHA-256
+  `22d0e3ad…a62fb5`, recorded in the generated module; the 40 MB file is not
+  committed. Joined to TERC by exact name (`name_pl` without "województwo ",
+  upper-cased = TERC name), the same method as
+  `fixtures/teryt/voivodeship-terc-correspondence.json`; the generator aborts unless
+  it gets 16 unique matches. Simplified at 0.8 view-box units: 27.6 KB per map.
+- **Colour:** one blue hue in five equal, round-width bands of `share_of_covered`
+  (smallest of 0.5/1/2/3/4/5/10/15/20 points that lets five bands reach the largest
+  share, so the largest always lands in band 2 or above). Light and dark ramps are
+  separate steps of the same hue, each run through the dataviz validator
+  (`--ordinal`): all checks pass, 2.11:1 and 2.06:1 at the pale end.
+- **Not listed is not zero.** A voivodeship absent from the entry is grey and hatched
+  with the legend line "brak w zbiorze — nie oznacza zera", never the palest blue:
+  `docs/sources/pesel-regional.md` item 10 records that an absent cell may be zero,
+  suppressed or out of scope, and the resource does not say which.
+- **No map without codes.** If any region lacks a TERC code the map is not drawn, since
+  leaving that region off would show it as not listed.
+- The shares are rendered as the claim carries them; binning them into shades
+  derives nothing (`AGENTS.md` §10).
+
+Also: a meaning's formation type now renders as words ("od zajęcia lub zawodu",
+"occupational") instead of its code.
+
+| Check | Result |
+|---|---|
+| Unit tests | `pnpm test` 660 passed at the map commit (9 new: scale incl. a fast-check property, geometry = the 16 TERC codes/names, rendered page: 16 regions, hatching, the no-code case); web suite 174 after the formation-words test |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm --filter ./apps/web build` | Compiled |
+| `pnpm test:golden` | 364 passed |
+| Screenshots (SYNTHETIC shares, visual check only, not committed) | Light 760px, dark 760px, light 360px: no horizontal overflow. The dark screenshot caught a legend reading "ciemniej = więcej" where dark mode is lighter-is-more; reworded to "od najmniejszego". |
+| Hydrated in Chromium (esbuild bundle, SYNTHETIC props) | Hover shows the region's share and count, or the not-listed line; leaving restores the hint; the highlight outline appears and goes; no page errors. The first run found that moving the active region to the end of the SVG broke keyboard tab order — replaced with an inert overlay outline, and tab order made alphabetical by TERC (it had started at ŁÓDZKIE, "10" sorting before "02"). |
+
+**Not verified:** the map on a real surname page with real regional data — the local
+database here holds excerpts, for which the completeness gate withholds the
+distribution. It will appear on the owner's database once the regional files are
+imported.
+
+### Home screen: suggest-as-you-type and the most common surnames (2026-09-23)
+
+First of the three screens the project owner chose ("do suggestions": home, compare
+with maps, premium preview).
+
+**Suggest-as-you-type.** `GET /api/v1/surname-prefix` with its own accepted contract,
+`docs/contracts/surname-prefix.md` (the result contract had listed autocomplete as out
+of scope; the canonical corpus does not specify it). `prefixSuggestions` in
+`@name-atlas/resolver`: prefix of the Polish-diacritic-folded canonical key
+(`docs/canonical/13` §6.1 — retrieval, never identity), so `wisn` finds WIŚNIEWSKI;
+as-typed matches first, then the larger national count (order only, never returned,
+never summed), then alphabetical; ≥ 2 characters; mixed-script input and
+script-confusable surnames get nothing. Migration `0020` adds a GIN trigram index on
+the folded key. The client is an ARIA 1.2 combobox island; without JavaScript it is
+the plain form it replaced. Own rate-limit bucket (120/min) so typing cannot starve
+the other API routes.
+
+**Most common surnames.** `mostCommonSurnames` in `@name-atlas/truth` reads active
+`CURRENT_RANK` claims with rank ≤ 10 — one list per rank universe, male and female
+side by side, never merged; no claims means no section. Migration `0021` adds a
+partial index on the rank.
+
+**Two defects found by running, not by inspection:**
+
+1. `0021` first used `WHERE claim_type = 'CURRENT_RANK'`. On a fresh database every
+   migration runs in one transaction and PostgreSQL refuses an enum value added in the
+   same transaction (`0005` adds it). A text cast is not allowed either — `enum_out` is
+   `STABLE`. The predicate is the rank claims' key prefix, `claim_key LIKE
+   'CURRENT_RANK|%'`, which `currentRankClaimKey` defines. It had applied cleanly to the
+   existing local database; only the fresh-database integration run showed it.
+2. The home note rendered "Stan na 20 stycznia 2026 r.." — now through the existing
+   `terminate` helper, with a test.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 670 passed at the full run; web suite 179 after the last fix |
+| `pnpm test:integration` (local PostgreSQL 16.13 / PostGIS 3.4.2) | 275 passed, 23 files — incl. `surname-prefix.test.ts` 8 and `common-surnames.test.ts` 3 (SYNTHETIC rank claims, cloned rows, since the gate refuses ranks over excerpts); the two migration-list pins updated |
+| `pnpm test:golden` | 364 passed |
+| Web build | Compiled; `/api/v1/surname-prefix` present |
+| API against the running app | `kow` → KOWALSKA, KOWALSKI, KOWALCZYK; `wisn`/`WIŚ` → WIŚNIEWSKA, WIŚNIEWSKI; `n` → `TOO_SHORT`; Cyrillic-О input → `INVALID_INPUT`; no `q` → 400; `lang=en` → `/en/surname/…`; headers `x-ratelimit-limit: 120`, `cache-control: public, max-age=300` |
+| Chromium, real page | Typing `wisn` lists 2 options and announces "Podpowiedzi: 2"; ↓↓ + Enter → `/pl/nazwisko/wiśniewski`; Escape closes; Enter with no option submits the plain form; no page errors |
+| Home list, real page (SYNTHETIC rank claims inserted for the screenshot, then deleted) | Both partitions in PL and EN, links open the right page, no overflow at 390px dark, absent from search results |
+| Prefix cost (408,182-surname benchmark database, synthetic names) | 4.4 µs a match: 111,111 matches 490 ms, 8 matches 20 ms; all-rows worst case 1.7 s, which no real two-letter prefix reaches |
+
+**Not verified here:** the list against real derived rank claims (the owner's database
+has ~5,300; which ranks they cover depends on derivation order), and prefix latency on
+the real register.
+
+### Compare page: two regional maps on one scale (2026-09-23)
+
+Screen #2. `/pl/porownaj` (and the English compare page) gained a regional section.
+
+- `compareDistribution` in `apps/web/src/lib/compare.ts` pairs the two surnames'
+  regional entries by `comparability_group` and snapshot date, exactly as population
+  and rarity are paired; a missing side or a different date is reported in words,
+  not drawn.
+- A comparable pair renders **two maps on one shared scale** with one legend: a shade
+  means the same share on both maps. On separate scales the same shade would mean
+  different shares, which is the misleading reading side-by-side maps invite. Each
+  side keeps its own coverage warning; a table lists both columns, with "brak w
+  zbiorze" where a side has no value. No sentence says which surname is "more"
+  anywhere — it is a layout, not a ranking.
+- Refactor: map input moved from `result-view.tsx` to `voivodeship-map-input.ts`
+  (`mapInputs`, one scale across any number of entries); the legend is now
+  `MapLegend`, usable under several maps. The surname page renders unchanged (its
+  tests pass unmodified).
+
+| Check | Result |
+|---|---|
+| `compare-distribution.test.ts` | 6 passed — pairing, date/missing refusals, two maps + one legend, shared scale (BETA's 50% is band 2 on the joint 20-point scale; alone it would be band 4), table columns and not-listed cells, refusal wording |
+| Web suite | 185 passed |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, web build | Passed |
+| Screenshots (SYNTHETIC figures) | 900px light: maps side by side, one legend; 390px dark: maps stacked; no horizontal overflow at either width |
+
+**Not verified:** with real regional data — it needs the regional files imported on
+the owner's database.
+
+### Screen #3 step one: the coverage check (`pnpm coverage:report`) (2026-09-23)
+
+The owner asked for a premium report preview "after checking whether enough surnames
+have enough data to justify one" — `PLAN.md` M4's question. This builds the check; the
+preview waits for its answer on the owner's database.
+
+`coverageReport` in `packages/truth/src/coverage.ts`, printed by `pnpm -s
+coverage:report` as Markdown. Per national resource (male, female, never summed), per
+count band (10000+, 1000–9999, 100–999, 2–99) and overall: the share of surnames, and
+of the people carrying them, that have an **active** claim of each family —
+population, rank, rarity, distribution (against the registered regional counterpart),
+meaning — plus "all four statistics" and "all five". Claims are matched by their
+exact keys, so a rank in the male universe is never credited to the female one.
+Historical evidence is not counted (none exists, M3). **No threshold for "enough" is
+applied** — that is the owner's decision.
+
+| Check | Result |
+|---|---|
+| Local database (excerpts, 45 population claims, 3 Buryan meanings) | Male: 22 surnames / 714,547 people, population 100%, meaning 13.6% of surnames / 27.0% of people; 10000+ band 20.0% / 27.2% = (98,387 + 47,734 + 46,994) / 709,341, checked by hand; rank, rarity, distribution 0% (gate; no regional import) |
+| `coverage-report.test.ts` | 3 passed — totals and population cells computed independently from the CSV bytes, bands sum to the whole, Markdown states what it does not count |
+| `pnpm test` | 676 passed |
+| `pnpm test:integration` | 278 passed, 24 files |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+
+**Not run:** against the full register — only the owner's database has it.
+
+### Visual system: the Name Atlas brand pack applied (2026-09-24)
+
+The project owner's brand pack (`name-atlas-brand.patch`, built against `210425b`), which the
+owner committed as `06a7396` on `claude/lucid-goodall-t2ai7d`, was reviewed and corrected in
+two commits on top of it. The pack changes 7 files and adds 16, all under `apps/web/`. No dependency was added: `next/font/google` and `next/og` ship
+with `next`.
+
+- `globals.css`: the Visual System v1 tokens under their own names (Paper `#f3f0e8`, Ink
+  `#101413`, Atlas Blue `#1e4fd7`), editorial sections in place of cards, the underline
+  search, confidence as symbol and word, the Atlas Blue map ramp with a no-data ground, a
+  wider desktop compare page, and Archive Night for a dark system preference (D-020).
+- `layout.tsx`: Newsreader, Inter and IBM Plex Mono through `next/font/google`.
+- The Name Print mark (`src/lib/name-print.tsx`) in the three mastheads, plus `icon.svg`,
+  `apple-icon.png` and `favicon.ico`. The mark's masters and usage rules are in
+  `apps/web/assets/brand/`.
+- `src/lib/og-card.tsx`: one share-card renderer for both canonical routes, drawing only
+  what `ogFacts` gives it. Its fonts are TTFs in `apps/web/assets/fonts/`. None is
+  committed, so the card renders in Geist and logs `og_fonts_missing` once per process.
+- `compare-view.tsx`: a Polski/English switch that keeps the pair.
+
+Corrected on review:
+
+- `next.config.ts` gains `outputFileTracingIncludes` for `assets/fonts/*.ttf` on the two
+  `opengraph-image` routes. With four stand-in TTFs in place (removed afterwards), neither
+  route's build trace listed them, so fonts added later would not have reached a
+  deployment. With the setting, both traces list all four and the page traces list none.
+- The masthead's language switch sat 10.4px below the wordmark's baseline on all three
+  pages. The mark made the `h1` a flex row whose baseline is the SVG's bottom edge.
+  `.masthead` now centres instead, which puts the switch 1.6px above the wordmark's
+  baseline. The mark's box is unchanged. Measured in the running app.
+- Wrong or stale comments: two "no mark exists yet", the page fonts' source, and a pointer
+  to a README that is not in the repository. `displayFor`'s doc comment had been
+  separated from it by the new `comparePath`; it is reattached, and it now says the
+  switch carries both slugs only URL-encoded.
+- D-020 recorded (NON-BLOCKING NOW): mapping a dark preference onto Archive Night departs
+  from the Visual System's "Dark mode" section. Kept, because the pack shipped it.
+
+| Check | Result |
+|---|---|
+| `git apply` | Clean on `210425b`; the 23 files are byte-identical to the pack's `files/` tree, and the resulting tree is identical to the owner's `06a7396`. Does not apply to `main` (`a8958e4`): `globals.css`, `page.tsx`, `compare-view.tsx` |
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 684 passed across 13 packages. Web: 193 passed, 21 files, including the pack's `og-card.test.ts` (5) and `compare-view.test.ts` (3). One earlier run, while the local derive held the load average near 13 on 4 cores, timed out resolver property P5 (`normalize.property.test.ts`, 5,000 ms limit). P5 took 4,307 ms under that load and 1,749 ms at load 6. `packages/` is unchanged since `210425b` |
+| `pnpm test:integration`, `pnpm test:golden` | 278 passed (24 files); 364 passed (4 files). Local PostgreSQL 16 with PostGIS 3.4.2 through `TEST_DATABASE_URL` |
+| `pnpm build` | Passed. `/icon.svg`, `/apple-icon.png` and `/favicon.ico` are served with their content types, and the `<head>` links all three |
+| Contrast, computed from the tokens | Each figure the stylesheet's comments give holds: Ink 16.30:1, text-secondary 6.87:1, text-tertiary 4.35:1 on Paper; Ink on Atlas Light Blue 6.69:1; lightest map band 2.14:1 on Paper, 2.33:1 on night. White on Atlas Blue is 6.66:1. At night the Verified symbol is 2.94:1 (D-020) |
+| Running app on the real register | `pnpm local:setup` with `DERIVE_LIMIT=1500`: the four official files, SHA-256-verified; 408,182 + 420,082 national rows; 598,476 surnames. Home, `/pl/nazwisko/nowak`, `/en/surname/nowak` and `/pl/porownaj?a=nowak&b=kowalski` at 1280px light, 390px light and 390px dark: all 200, mark present, no horizontal overflow, no console errors. The browser loaded Newsreader 500, Inter 400/600 and IBM Plex Mono 500. The compare page draws four maps from the real regional files, a NOWAK/KOWALSKI pair for women and one for men, and KOWALSKI's female side shows its coverage warning (45.0% registered). This is the first run of that page on real regional data |
+| Share card | `/pl/nazwisko/nowak/opengraph-image`: 1200×630 PNG, in Geist, one `og_fonts_missing` |
+
+**Not verified:** the share card in the brand fonts, because the TTFs are not in the
+repository. Nothing was deployed from this branch. The local derive covered only part of
+the register: step 6 derived 1,504 surnames with regional data (722.9s, 0 failed); step 7
+was stopped part-way, at 4,616 surnames with population. When the screenshots were taken,
+the home screen's female list showed 3 entries.

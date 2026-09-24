@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { currentRankClaimKey } from "./rank.js";
+import fc from "fast-check";
+import { buildRankTable, currentRankClaimKey, rankInTable } from "./rank.js";
+import { TruthInvariantError } from "./derive.js";
 import { assessDerivedStatistic, isValidCombination } from "./confidence.js";
 import {
   CURRENT_RANK_METHOD_VERSION,
@@ -29,6 +31,70 @@ describe("currentRankClaimKey", () => {
     // Nothing time-dependent can creep in: same inputs, same key, always.
     expect(currentRankClaimKey("s-1", "sr-1")).toBe(first);
     expect(first).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+  });
+});
+
+/** The definition, written the slow and obvious way. */
+function naiveRank(universe: readonly number[], count: number): number {
+  return universe.filter((c) => c > count).length + 1;
+}
+
+function tableOf(universe: readonly number[]) {
+  const frequency = new Map<number, number>();
+  for (const c of universe) frequency.set(c, (frequency.get(c) ?? 0) + 1);
+  return buildRankTable([...frequency].map(([count, n]) => ({ count, frequency: n })));
+}
+
+describe("rankInTable", () => {
+  it("gives competition ranks: ties share, the next distinct count skips", () => {
+    const table = tableOf([10, 7, 7, 3]);
+    expect([10, 7, 3].map((c) => rankInTable(table, c))).toEqual([1, 2, 4]);
+  });
+
+  it("agrees with the definition for every member of any universe", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 0, max: 50 }), { minLength: 1, maxLength: 200 }),
+        (u) => {
+          const table = tableOf(u);
+          for (const c of u) expect(rankInTable(table, c)).toBe(naiveRank(u, c));
+        },
+      ),
+    );
+  });
+
+  it("agrees with the definition for counts outside the universe too", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 0, max: 50 }), { maxLength: 200 }),
+        fc.integer({ min: -5, max: 60 }),
+        (u, c) => {
+          expect(rankInTable(tableOf(u), c)).toBe(naiveRank(u, c));
+        },
+      ),
+    );
+  });
+
+  it("does not depend on the order the rows arrive in (AC-10)", () => {
+    fc.assert(
+      fc.property(
+        fc.array(fc.integer({ min: 0, max: 50 }), { minLength: 1, maxLength: 100 }),
+        (u) => {
+          const reversed = tableOf([...u].reverse());
+          const forward = tableOf(u);
+          for (const c of u) expect(rankInTable(reversed, c)).toBe(rankInTable(forward, c));
+        },
+      ),
+    );
+  });
+
+  it("refuses a histogram that lists one count twice", () => {
+    expect(() =>
+      buildRankTable([
+        { count: 5, frequency: 1 },
+        { count: 5, frequency: 2 },
+      ]),
+    ).toThrow(TruthInvariantError);
   });
 });
 

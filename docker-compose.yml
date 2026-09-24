@@ -1,0 +1,40 @@
+# Local PostgreSQL for Name Atlas development.
+#
+# The image is the exact tag *and* digest pinned by D-005
+# (docs/DECISIONS_NEEDED.md), which is the same image
+# packages/testing/src/postgres-container.ts starts for Testcontainers and the
+# same one .github/workflows/ci.yml runs as a service. Local, CI and tests
+# therefore run identical bytes. If you change it here, change it in all three.
+#
+# Credentials and database name match the local-development example in
+# .env.example, so DATABASE_URL works unedited:
+#   postgres://postgres:postgres@localhost:5432/name_atlas
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5
+    container_name: name-atlas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: name_atlas
+    ports:
+      - "5432:5432"
+    volumes:
+      - name-atlas-pgdata:/var/lib/postgresql/data
+    # PROGRESS.md, TASK-028: six derivations failed with "could not resize
+    # shared memory segment ... No space left on device" because the container's
+    # default 64 MB /dev/shm starves PostgreSQL's parallel workers. That run
+    # worked around it by setting max_parallel_workers_per_gather = 0; the note
+    # records that a deployment wanting parallel query must raise the shm size
+    # instead. This does that, so `pnpm truth:derive-batch` keeps parallel query.
+    shm_size: 1gb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d name_atlas"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  name-atlas-pgdata:

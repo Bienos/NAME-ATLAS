@@ -45,6 +45,16 @@ export interface ReconciliationReport {
   readonly snapshotsWritten: number;
   readonly valuesWritten: number;
   /**
+   * Rows the official file held that a `--slice` deliberately did not
+   * persist (`packages/sources/src/slice.ts`).
+   *
+   * Its own bucket, never folded into `rowsQuarantined`: a quarantined row is
+   * one this importer could not trust, and an excluded row is one it never
+   * looked at. Reporting a deliberate omission as a data problem would send
+   * the next reader hunting a defect that is not there. Zero on a full import.
+   */
+  readonly rowsExcludedBySlice: number;
+  /**
    * Rows imported with a `MIXED_SCRIPT_REVIEW` finding. Counted inside
    * `rowsImported`, never inside `rowsQuarantined`: they are stored.
    */
@@ -103,6 +113,7 @@ export function emptyReport(resourceId: string): ReconciliationReport {
     surnamesReused: 0,
     snapshotsWritten: 0,
     valuesWritten: 0,
+    rowsExcludedBySlice: 0,
     mixedScriptRows: [],
   };
 }
@@ -122,10 +133,12 @@ export function tallyReasons(rows: readonly QuarantinedRow[]): Record<string, nu
  * than returning a value a caller might ignore.
  */
 export function assertReconciles(report: ReconciliationReport): void {
-  if (report.rowsRead !== report.rowsImported + report.rowsQuarantined) {
+  const accounted = report.rowsImported + report.rowsQuarantined + report.rowsExcludedBySlice;
+  if (report.rowsRead !== accounted) {
     throw new Error(
       `reconciliation failed for ${report.resourceId}: rowsRead=${report.rowsRead} ` +
-        `!= rowsImported=${report.rowsImported} + rowsQuarantined=${report.rowsQuarantined}`,
+        `!= rowsImported=${report.rowsImported} + rowsQuarantined=${report.rowsQuarantined}` +
+        ` + rowsExcludedBySlice=${report.rowsExcludedBySlice}`,
     );
   }
   const tallied = Object.values(report.quarantinedByReason).reduce((a, b) => a + b, 0);

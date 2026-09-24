@@ -35,6 +35,7 @@ import {
   distributionSentence,
   explanationText,
   formatDate,
+  formationWord,
   formatInteger,
   formatPercent,
   populationSentence,
@@ -47,6 +48,8 @@ import {
 } from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
 import { Snapshot } from "./snapshot.js";
+import { VoivodeshipMap } from "./voivodeship-map.js";
+import { mapInputs } from "./voivodeship-map-input.js";
 
 export function href(surname: string, lang: Lang): string {
   const params = new URLSearchParams({ surname });
@@ -209,6 +212,9 @@ function DistributionFact({
   const t = UI[lang];
   const warning = coverageWarning(entry, lang);
   const leading = distributionSentence(entry, 0, surname, lang) ?? "";
+  const input = mapInputs([entry], lang);
+  const map =
+    input === null ? null : { regions: input.maps[0] ?? [], bandLabels: input.bandLabels };
   const evidence: ClaimEvidence = {
     citation: entry.citation,
     scope: entry.coverage_basis,
@@ -234,6 +240,18 @@ function DistributionFact({
           page instead of scrolling its own table. `tabindex` and
           `role="region"` are what make a scrollable area reachable from the
           keyboard when it does scroll. */}
+      {map === null ? null : (
+        <VoivodeshipMap
+          regions={map.regions}
+          labels={{
+            title: t.mapTitle,
+            legendTitle: t.mapLegend,
+            bandLabels: map.bandLabels,
+            notListed: t.mapNotListed,
+            hint: t.mapHint,
+          }}
+        />
+      )}
       <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
         <table>
           <caption>{t.coveredNote}</caption>
@@ -386,7 +404,7 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
                 </>
               )}
               <dt>{t.meaningFormationLabel}</dt>
-              <dd>{interpretation.formation_type}</dd>
+              <dd>{formationWord(interpretation.formation_type, lang)}</dd>
             </dl>
           </Claim>
         );

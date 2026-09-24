@@ -1,38 +1,113 @@
 /*
- * The free result page's only stylesheet (TASK-017).
+ * The web app's only stylesheet (TASK-017; restyled to the Name Atlas Visual
+ * System v1, docs/library/NAME_ATLAS_VISUAL_SYSTEM_v1(1).md).
  *
  * No framework and no dependency. Mobile first, because PRODUCT.md §2's primary
- * user arrives "from search or social, on mobile". Both themes through
- * prefers-color-scheme. Legibility over decoration: this page's job is to make a
- * sourced number and its caveat equally easy to read, so nothing here styles a
- * caveat as small print.
+ * user arrives "from search or social, on mobile". Legibility over decoration:
+ * this page's job is to make a sourced number and its caveat equally easy to
+ * read, so nothing here styles a caveat as small print.
+ *
+ * The custom properties below are the design system's tokens, with the same
+ * names, so a value can be traced from here to the brand book. The three type
+ * voices (--font-display, --font-ui, --font-data) are set by next/font/google
+ * in layout.tsx; the files in apps/web/assets/fonts are for the share card only.
+ *
+ * Atlas Light is the product. The prefers-color-scheme block maps a reader's
+ * dark preference onto Archive Night; the Visual System reserves Archive Night
+ * for narrative moments, so deleting that block is the doc-faithful option
+ * (open as D-020 in docs/DECISIONS_NEEDED.md).
  */
 
 :root {
-  --ink: #16181d;
-  --ink-soft: #4a4f5a;
-  --paper: #fdfdfc;
-  --card: #ffffff;
-  --rule: #e3e4e8;
-  --accent: #1f4d7a;
-  --warn-ink: #6a3a00;
-  --warn-bg: #fff6e6;
-  --warn-rule: #e0b878;
-  --radius: 10px;
-  --measure: 34rem;
+  /* Surfaces and text */
+  --surface-primary: #f3f0e8; /* Paper */
+  --surface-elevated: #f8f7f2;
+  --surface-inverse: #101413;
+  --text-primary: #101413; /* Ink, 16.3:1 on Paper */
+  --text-secondary: #4f534f; /* 6.9:1 on Paper */
+  --text-tertiary: #6e716c; /* 4.35:1 on Paper: marks and 18px+ only */
+  --text-inverse: #f3f0e8;
+
+  /* Rules: soft is decorative; strong is the only one that bounds a control (3:1+) */
+  --border-soft: #d6d2c8;
+  --border-default: #b5b2a9;
+  --border-strong: #6e716c;
+
+  /* Action */
+  --accent: #1e4fd7; /* Atlas Blue */
+  --on-accent: #ffffff;
+  --hover-light: #e8e5dc;
+  --hover-blue: #163da9;
+  --focus-ring: var(--accent);
+
+  /* States — never a confidence level, and never Signal Red */
+  --state-positive: #236a58;
+  --state-warning: #8a6515;
+  --state-error: #b54436;
+
+  /* Confidence: always a symbol and a word, never colour alone */
+  --confidence-verified: #236a58;
+  --confidence-likely: var(--accent);
+  --confidence-possible: #8a6515;
+  --confidence-unconfirmed: #6e716c;
+
+  /* Map ramp, lowest share first: the Visual System's Atlas Blue sequence
+     (map-density-3…6, plus #6890ec between density-3 and 4 for a fifth band;
+     density-1 and 2 are too pale to read on Paper). Checked with the dataviz
+     validator (--ordinal, light, surface #f3f0e8): monotone lightness, every
+     step gap >= 0.06, lightest step 2.14:1 on Paper. */
+  --map-0: #82a5f2;
+  --map-1: #6890ec;
+  --map-2: #4d78e5;
+  --map-3: #1e4fd7;
+  --map-4: #1438a0;
+  --map-no-data: #e8e5dc; /* no data is not zero */
+
+  /* Shape and space */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --space-2: 4px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-9: 64px;
+  --measure: 40rem; /* long-form reading width, 620–720px */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: #e8e9ec;
-    --ink-soft: #a5abb8;
-    --paper: #14161a;
-    --card: #1b1e24;
-    --rule: #2e323b;
-    --accent: #8fb8de;
-    --warn-ink: #f5d9a8;
-    --warn-bg: #2e2416;
-    --warn-rule: #6b5024;
+    /* Archive Night. The source gives the ground, both text colours, Atlas
+       Light Blue and Signal; the rest are mapped from the neutral scale. */
+    --surface-primary: #0f1211;
+    --surface-elevated: #1c211f;
+    --surface-inverse: #f3f0e8;
+    --text-primary: #f3f0e8;
+    --text-secondary: #b5b2a9;
+    --text-tertiary: #8d8c85;
+    --text-inverse: #101413;
+    --border-soft: #303532;
+    --border-default: #4f534f;
+    --border-strong: #8d8c85;
+    --accent: #7197ff;
+    --on-accent: #101413; /* white fails on Atlas Light Blue; Ink is 6.7:1 */
+    --hover-light: #1c211f;
+    --hover-blue: #9bb5ff;
+    /* No night confidence or state colours in the source: the light ones fail
+       as text on night grounds, so the words fall back to text-secondary
+       below and only the symbols keep their colour. */
+    /* Dark map ramp: the same hue, its own steps, low share nearest the
+       surface. Validator (--ordinal, dark, surface #0f1211): all pass,
+       darkest step 2.33:1 on the ground. */
+    --map-0: #224c9f;
+    --map-1: #2f63c8;
+    --map-2: #4d78e5;
+    --map-3: #82a5f2;
+    --map-4: #b5c8fa;
+    --map-no-data: #303532;
   }
 }
 
@@ -46,15 +121,13 @@ html {
 
 body {
   margin: 0;
-  padding: 1.25rem 1rem 3rem;
-  background: var(--paper);
-  color: var(--ink);
-  font:
-    1rem/1.6 system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    sans-serif;
+  padding: var(--space-6) var(--space-5) var(--space-8);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 1rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 main {
@@ -64,36 +137,91 @@ main {
 
 a {
   color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* One focus ring everywhere: 2px Atlas Blue, clear of the element. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* --- header ------------------------------------------------------------ */
 
+/* Centre, not baseline: the h1 is a flex row that starts with the mark, so its
+   baseline is the mark's bottom edge, which set the language switch 10px below
+   the wordmark. Centred, the two baselines land within 2px (measured). */
 .masthead {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.25rem;
+  gap: var(--space-5);
+  margin-bottom: var(--space-2);
 }
 
+/* The wordmark: the name in the display face, beside the Name Print mark. */
 .masthead h1 {
-  font-size: 1.35rem;
   margin: 0;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.masthead h1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* The Name Print mark beside the wordmark (apps/web/assets/brand/README.md). */
+.masthead h1,
+.masthead h1 a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.logo-mark {
+  flex: none;
+  width: 1.35em;
+  height: 1.35em;
+  color: var(--text-primary);
+}
+
+.masthead > a {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.masthead > a:hover {
+  text-decoration: underline;
 }
 
 .tagline {
-  margin: 0 0 1.5rem;
-  color: var(--ink-soft);
-  font-size: 0.95rem;
+  margin: 0 0 var(--space-7);
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
 }
 
-/* --- search ----------------------------------------------------------- */
+/* --- search: an editorial underline, not a boxed form --------------------- */
 
 .search {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
 }
 
 .search label {
@@ -104,56 +232,92 @@ a {
   clip-path: inset(50%);
 }
 
+.combobox {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
 .search input {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 0.7rem 0.8rem;
-  font-size: 1rem;
-  color: var(--ink);
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  min-height: 52px;
+  padding: var(--space-2) 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--border-strong);
+  border-radius: 0;
+}
+
+.search input::placeholder {
+  color: var(--text-tertiary); /* 28px, so the large-text floor applies */
+  opacity: 1;
+}
+
+.search input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.search input:focus-visible {
+  outline: none;
 }
 
 .search button {
   flex: 0 0 auto;
-  min-height: 44px;
-  padding: 0.7rem 1.1rem;
-  font-size: 1rem;
-  color: var(--paper);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: var(--on-accent);
   background: var(--accent);
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+}
+
+.search button:hover {
+  background: var(--hover-blue);
 }
 
 /* --- result ----------------------------------------------------------- */
 
+/* The surname is the hero: display face, never truncated. */
 .surname {
-  font-size: 1.6rem;
-  margin: 0 0 1.5rem;
+  margin: 0 0 var(--space-6);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.25rem, 9vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
   word-break: break-word;
 }
 
+/* Chapters are editorial compositions, not cards: a hairline and space. */
 section {
-  margin: 0 0 1.75rem;
-  padding: 1rem 1.1rem;
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
+  margin: 0 0 var(--space-8);
+  padding: var(--space-6) 0 0;
+  border-top: 1px solid var(--border-soft);
 }
 
 section h3 {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-5);
+  font-size: 0.8125rem;
   font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
 .fact {
-  margin: 0 0 1rem;
+  margin: 0 0 var(--space-5);
 }
 
 .fact:last-child {
@@ -161,39 +325,38 @@ section h3 {
 }
 
 .fact p {
-  margin: 0 0 0.4rem;
+  margin: 0 0 var(--space-3);
 }
 
-/* A caveat is body text, never small print. */
+/* A caveat is body text, never small print. Only the rule carries the warning colour. */
 .warning {
-  margin: 0 0 0.9rem;
-  padding: 0.7rem 0.85rem;
-  color: var(--warn-ink);
-  background: var(--warn-bg);
-  border: 1px solid var(--warn-rule);
-  border-left-width: 4px;
-  border-radius: 6px;
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  color: var(--text-primary);
+  background: var(--surface-elevated);
+  border: 1px solid var(--state-warning);
+  border-radius: var(--radius-xs);
 }
 
 .note,
 .absent {
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--text-secondary);
 }
 
 .provenance {
-  margin: 0.4rem 0 0;
+  margin: var(--space-3) 0 0;
   padding: 0;
   list-style: none;
-  font-size: 0.88rem;
-  color: var(--ink-soft);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 .provenance li {
-  margin: 0.15rem 0;
+  margin: var(--space-2) 0;
 }
 
-/* --- regions ---------------------------------------------------------- */
+/* --- tables ----------------------------------------------------------- */
 
 table {
   width: 100%;
@@ -203,24 +366,37 @@ table {
 
 caption {
   text-align: left;
-  font-size: 0.88rem;
-  color: var(--ink-soft);
-  padding-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding-bottom: var(--space-4);
 }
 
 th,
 td {
   text-align: left;
-  padding: 0.4rem 0.5rem 0.4rem 0;
-  border-bottom: 1px solid var(--rule);
-  font-size: 0.95rem;
+  padding: var(--space-3) var(--space-4) var(--space-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 0.9375rem;
 }
 
 th {
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ink-soft);
+  letter-spacing: 0.035em;
+  color: var(--text-secondary);
+}
+
+thead th {
+  border-bottom-color: var(--border-strong);
+}
+
+tbody th {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-primary);
 }
 
 td:nth-child(2),
@@ -239,78 +415,83 @@ th:nth-child(3) {
 }
 
 .suggestions li {
-  margin: 0.4rem 0;
+  margin: 0;
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .suggestions a {
-  display: inline-block;
+  display: block;
   min-height: 44px;
-  padding: 0.7rem 0.8rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--card);
+  padding: var(--space-4) 0;
   text-decoration: none;
-  font-size: 1.05rem;
+  font-size: 1.0625rem;
+}
+
+.suggestions a:hover {
+  background: var(--hover-light);
+  text-decoration: underline;
 }
 
 .codes {
   display: block;
-  font-size: 0.8rem;
-  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
 }
 
 footer {
   max-width: var(--measure);
-  margin: 2.5rem auto 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--rule);
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  margin: var(--space-9) auto 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-soft);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-/* The meaning section (TASK-022). */
+/* The meaning section (TASK-022): the gloss is an origin statement, set in the display face. */
 .gloss {
-  font-size: 1.05rem;
-  margin: 0 0 0.5rem;
-}
-.caveat {
-  color: var(--ink-soft);
-  font-size: 0.86rem;
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
-/* --- snapshot (TASK-023) ------------------------------------------------ */
+.caveat {
+  margin: 0 0 var(--space-4);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* --- snapshot (TASK-023): the first screen, not a card ------------------- */
 
 .snapshot {
-  margin: 0 0 1.5rem;
-  padding: 1.1rem 1.1rem 1rem;
-  background: var(--card);
-  border: 1px solid var(--rule);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius);
+  margin: 0 0 var(--space-8);
+  padding: 0;
 }
 
 .eyebrow {
-  margin: 0 0 0.2rem;
-  font-size: 0.75rem;
+  margin: 0 0 var(--space-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
+  color: var(--text-secondary);
 }
 
 .snapshot .surname {
-  margin: 0 0 0.9rem;
-  font-size: clamp(1.7rem, 8vw, 2.6rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-6);
+  font-size: clamp(2.5rem, 12vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
   overflow-wrap: anywhere;
 }
 
 .hero {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1.5rem;
-  margin: 0 0 0.75rem;
+  gap: var(--space-5) var(--space-8);
+  margin: 0 0 var(--space-5);
 }
 
 .hero-figure {
@@ -319,40 +500,66 @@ footer {
   min-width: 0;
 }
 
+/* Big emotional numbers stay sans (Visual System §6.1). */
 .hero-number {
-  font-size: clamp(1.9rem, 9vw, 2.8rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 9vw, 3rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
 .hero-label {
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 .hero-line {
-  margin: 0 0 0.35rem;
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
 }
 
 .tally {
-  margin: 0.5rem 0 0;
-  font-size: 0.88rem;
-  color: var(--ink-soft);
+  margin: var(--space-4) 0 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
+/* An editorial CTA: "VIEW EVIDENCE  →", underlined, not a filled button. */
 .hero-actions {
-  margin: 0.5rem 0 0;
-  font-size: 0.95rem;
+  margin: var(--space-6) 0 0;
+}
+
+.hero-actions a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 44px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid var(--text-primary);
+}
+
+.hero-actions a::after {
+  content: "→";
+  font-weight: 400;
+}
+
+.hero-actions a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
 }
 
 /* --- claim unit (TASK-023) ---------------------------------------------- */
 
 .claim {
-  margin: 0 0 1.1rem;
-  padding: 0 0 1rem;
-  border-bottom: 1px solid var(--rule);
+  margin: 0 0 var(--space-6);
+  padding: 0 0 var(--space-6);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .claim:last-of-type {
@@ -362,58 +569,127 @@ footer {
 }
 
 .claim-statement {
-  margin: 0 0 0.45rem;
-  font-size: 1.05rem;
+  margin: 0 0 var(--space-3);
+  font-size: 1.125rem;
+  line-height: 1.55;
 }
 
 .claim-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem 0.6rem;
-  align-items: baseline;
-  margin: 0 0 0.6rem;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+  margin: 0 0 var(--space-4);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
-/* The word is the signal; the tint only helps scanning. Never colour alone. */
+/*
+ * Confidence: a symbol and a word (Visual System §11). The word is the signal;
+ * the symbol and its colour only help scanning. Never colour alone.
+ *   Verified    solid node       Likely       ¾ ring
+ *   Possible    ½ ring           Unconfirmed  dotted ring
+ *   Sources disagree, Insufficient data: not in the Visual System yet; drawn as
+ *   an open ring in the warning colour and a dotted ring, pending a design.
+ */
 .assessment {
-  padding: 0.1rem 0.5rem;
-  border: 1px solid var(--rule);
-  border-radius: 999px;
-  color: var(--ink);
-  background: var(--paper);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8125rem;
   font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
 }
 
-.assessment-verified,
+.assessment::before {
+  content: "";
+  flex: none;
+  width: 11px;
+  height: 11px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.assessment-verified {
+  color: var(--confidence-verified);
+}
+.assessment-verified::before {
+  background: currentColor;
+}
+
 .assessment-likely {
-  border-color: var(--accent);
+  color: var(--confidence-likely);
+}
+.assessment-likely::before {
+  border-top-color: transparent;
+  transform: rotate(45deg);
 }
 
-.assessment-conflicting,
-.assessment-insufficient_data {
-  border-color: var(--warn-rule);
-  background: var(--warn-bg);
-  color: var(--warn-ink);
+.assessment-possible {
+  color: var(--confidence-possible);
+}
+.assessment-possible::before {
+  border-top-color: transparent;
+  border-left-color: transparent;
+  transform: rotate(-45deg);
+}
+
+.assessment-unconfirmed::before,
+.assessment-insufficient_data::before {
+  border-style: dotted;
+  border-color: var(--confidence-unconfirmed);
+}
+
+.assessment-conflicting {
+  color: var(--state-warning);
+}
+.assessment-conflicting::before {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .assessment {
+    color: var(--text-secondary);
+  }
+  .assessment-verified::before {
+    border-color: var(--confidence-verified);
+    background: var(--confidence-verified);
+  }
+  .assessment-likely::before {
+    border-color: var(--confidence-likely);
+    border-top-color: transparent;
+  }
+  .assessment-possible::before {
+    border-color: var(--confidence-possible);
+    border-top-color: transparent;
+    border-left-color: transparent;
+  }
+  .assessment-conflicting::before {
+    border-color: var(--state-warning);
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+  }
 }
 
 .claim-kind::before,
 .claim-scope::before {
   content: "·";
-  margin-right: 0.6rem;
+  margin-right: var(--space-4);
 }
 
 .meaning-facts {
-  margin: 0 0 0.6rem;
+  margin: 0 0 var(--space-4);
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 0.15rem 0.8rem;
-  font-size: 0.92rem;
+  gap: var(--space-2) var(--space-4);
+  font-size: 0.9375rem;
 }
 
 .meaning-facts dt {
-  color: var(--ink-soft);
+  color: var(--text-secondary);
 }
 
 .meaning-facts dd {
@@ -423,10 +699,10 @@ footer {
 /* --- evidence panel (TASK-023) ------------------------------------------ */
 
 .evidence {
-  margin: 0.4rem 0 0;
-  border: 1px solid var(--rule);
-  border-radius: 8px;
-  background: var(--paper);
+  margin: var(--space-3) 0 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--surface-elevated);
 }
 
 .evidence > summary {
@@ -435,40 +711,42 @@ footer {
   min-height: 44px;
   display: flex;
   align-items: center;
-  padding: 0.55rem 0.8rem;
-  font-size: 0.92rem;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: 0 var(--space-5);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
   color: var(--accent);
-  list-style-position: inside;
+  list-style: none;
+}
+
+.evidence > summary::-webkit-details-marker {
+  display: none;
 }
 
 .evidence > summary::after {
-  content: " →";
+  content: "→";
+  font-weight: 400;
 }
 
 .evidence[open] > summary::after {
-  content: " ↓";
-}
-
-.evidence > summary:focus-visible,
-.share button:focus-visible,
-a:focus-visible,
-button:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
+  content: "↓";
 }
 
 .evidence-list {
   margin: 0;
-  padding: 0.5rem 0.8rem 0.8rem;
+  padding: var(--space-3) var(--space-5) var(--space-5);
+  border-top: 1px solid var(--border-soft);
   display: grid;
   grid-template-columns: minmax(7rem, max-content) 1fr;
-  gap: 0.3rem 0.8rem;
-  font-size: 0.9rem;
+  gap: var(--space-2) var(--space-5);
+  font-size: 0.875rem;
 }
 
 .evidence-list dt {
-  color: var(--ink-soft);
+  color: var(--text-secondary);
 }
 
 .evidence-list dd {
@@ -478,22 +756,25 @@ input:focus-visible {
 
 .evidence-list ul {
   margin: 0;
-  padding-left: 1.1rem;
+  padding-left: var(--space-5);
 }
 
+/* IDs and method codes are data: the mono voice. */
 .evidence-list code {
-  font-size: 0.85em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
 @media (max-width: 360px) {
   .evidence-list,
   .meaning-facts {
     grid-template-columns: 1fr;
-    gap: 0.1rem 0;
+    gap: 0;
   }
   .evidence-list dd,
   .meaning-facts dd {
-    margin-bottom: 0.4rem;
+    margin-bottom: var(--space-3);
   }
 }
 
@@ -501,39 +782,47 @@ input:focus-visible {
 
 .sources {
   margin: 0;
-  padding-left: 1.1rem;
-  font-size: 0.92rem;
+  padding-left: var(--space-5);
+  font-size: 0.9375rem;
 }
 
 .sources li {
-  margin: 0.3rem 0;
+  margin: var(--space-3) 0;
 }
 
 .source-kind {
-  color: var(--ink-soft);
+  color: var(--text-secondary);
 }
 
 .share {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem 1rem;
-  margin: 0 0 1rem;
+  gap: var(--space-3) var(--space-5);
+  margin: 0 0 var(--space-5);
 }
 
+/* Secondary: one primary action per view, and that is the search. */
 .share button {
-  padding: 0.6rem 1rem;
-  font-size: 1rem;
-  color: var(--paper);
-  background: var(--accent);
-  border: 1px solid transparent;
-  border-radius: var(--radius);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  min-height: 44px;
+}
+
+.share button:hover {
+  background: var(--hover-light);
 }
 
 .share-url {
-  font-size: 0.88rem;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
   overflow-wrap: anywhere;
 }
 
@@ -541,27 +830,32 @@ input:focus-visible {
   flex-basis: 100%;
   margin: 0;
   min-height: 1.4em;
-  font-size: 0.9rem;
-  color: var(--ink-soft);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 .again {
-  margin: 0 0 1.5rem;
+  margin: 0 0 var(--space-7);
 }
 
 .again a {
-  display: inline-block;
-  padding: 0.6rem 1rem;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--card);
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font-weight: 600;
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-sm);
   text-decoration: none;
-  min-height: 44px;
 }
 
-.masthead h1 a {
-  color: inherit;
-  text-decoration: none;
+.again a:hover {
+  background: var(--hover-light);
+}
+
+.again a + a {
+  margin-left: var(--space-3);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -576,34 +870,80 @@ input:focus-visible {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.2rem 0.4rem;
-  font-size: clamp(1.4rem, 6vw, 2.1rem);
+  gap: var(--space-2) var(--space-3);
+  font-size: clamp(1.75rem, 7vw, 2.75rem);
 }
 
 .versus {
-  color: var(--ink-soft);
-  font-size: 0.6em;
+  color: var(--text-secondary);
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.45em;
   font-weight: 400;
+  letter-spacing: 0;
 }
 
 .compare-row {
-  margin: 0 0 1.1rem;
+  margin: 0 0 var(--space-5);
 }
 
 .compare-row:last-child {
   margin-bottom: 0;
 }
 
+/* The partition ("Female", "Male") is a sub-heading in the display face, so it
+   does not stack a second uppercase label on the table header below it. */
 .compare-group {
-  margin: 0 0 0.3rem;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ink-soft);
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-primary);
 }
 
-.again a + a {
-  margin-left: 0.5rem;
+.compare-group::first-letter {
+  text-transform: uppercase;
+}
+
+/*
+ * Desktop comparison: a wider canvas (Visual System §7, 12-column editorial
+ * grid) so each chapter's partitions sit side by side instead of stacking into
+ * a very long page. Reading text, the disclaimer and the tables keep the
+ * reading measure.
+ */
+@media (min-width: 900px) {
+  main.compare,
+  main.compare + footer {
+    max-width: 60rem;
+  }
+  .compare .compare-heading {
+    font-size: clamp(2.75rem, 4.5vw, 3.75rem);
+  }
+  .compare > .warning,
+  .compare .search,
+  .compare #where .table-scroll,
+  .compare #where .note {
+    max-width: var(--measure);
+  }
+  .compare #today-count,
+  .compare #rarity {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-8);
+    align-items: start;
+  }
+  .compare #today-count > h3,
+  .compare #rarity > h3,
+  .compare #today-count > .absent,
+  .compare #rarity > .absent {
+    grid-column: 1 / -1;
+  }
+  .compare .compare-row {
+    margin-bottom: var(--space-6);
+  }
+  .compare-maps {
+    gap: var(--space-5) var(--space-8);
+  }
 }
 
 /* --- narrow viewports (TASK-023) ---------------------------------------- */
@@ -621,13 +961,12 @@ input:focus-visible {
   -webkit-overflow-scrolling: touch;
 }
 
-.table-scroll:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
-}
-
+/* break-word, not anywhere: a voivodeship name keeps its column wide enough for
+   its longest word, and only breaks if the table cannot fit at all (it then
+   scrolls in its own box). `anywhere` let a narrow table split
+   ZACHODNIOPOMORSKI|E mid-word at 390px. */
 .table-scroll th[scope="row"] {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .claim-statement,
@@ -639,21 +978,216 @@ p {
 
 @media (max-width: 400px) {
   body {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
   }
-  section,
-  .snapshot {
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
-  }
-  .search {
-    flex-wrap: wrap;
-  }
+  /* The field and its button stay on one line: the underline reads as one control. */
   .search input {
-    flex: 1 1 100%;
+    font-size: 1.5rem;
   }
   .search button {
-    flex: 1 1 auto;
+    padding: 0 var(--space-5);
   }
+}
+
+/* --- voivodeship map ----------------------------------------------------- */
+
+.vmap {
+  margin: var(--space-4) 0 var(--space-5);
+}
+
+.vmap > svg {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+}
+
+/* A 1.5px ground-coloured gap between regions, whatever the map's rendered size. */
+.vmap-region {
+  stroke: var(--surface-primary);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+
+.vmap-region:focus {
+  outline: none;
+}
+
+.vmap-highlight {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.vmap-b0 {
+  fill: var(--map-0);
+}
+.vmap-b1 {
+  fill: var(--map-1);
+}
+.vmap-b2 {
+  fill: var(--map-2);
+}
+.vmap-b3 {
+  fill: var(--map-3);
+}
+.vmap-b4 {
+  fill: var(--map-4);
+}
+
+/* Not listed is not "a little": the no-data ground with a hatch, never the palest blue. */
+.vmap-none-bg {
+  fill: var(--map-no-data);
+}
+.vmap-none-line {
+  stroke: var(--text-tertiary);
+  stroke-width: 1.2;
+  opacity: 0.6;
+}
+
+.vmap-readout {
+  margin: var(--space-3) 0 var(--space-3);
+  min-height: 1.5em;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.vmap-legend {
+  margin-bottom: var(--space-6);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.vmap-legend-title {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.vmap-legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vmap-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.vmap-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+}
+
+@media (forced-colors: active) {
+  .vmap-region {
+    stroke: CanvasText;
+  }
+}
+
+/* --- suggest-as-you-type -------------------------------------------------- */
+
+/* A popover: bounded by a strong rule rather than a shadow. */
+.combobox-list {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: var(--space-2) 0;
+  list-style: none;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.combobox-list li a {
+  display: block;
+  min-height: 44px;
+  padding: var(--space-4) var(--space-4);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.combobox-list li.is-active a,
+.combobox-list li a:hover {
+  background: var(--hover-light);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- most common surnames (home) ----------------------------------------- */
+
+.common-lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: var(--space-3) var(--space-7);
+}
+
+.common h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+  color: var(--text-secondary);
+}
+
+.common ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.common li {
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.common-rank {
+  display: inline-block;
+  min-width: 2.2em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* --- comparison: two maps on one scale ------------------------------------ */
+
+.compare-maps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-3) var(--space-6);
+}
+
+.compare-maps h4 {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.compare-maps .vmap {
+  margin-bottom: var(--space-2);
 }

@@ -24,7 +24,7 @@ import type { EffectiveRights } from "./rights.js";
 import { TruthInvariantError } from "./derive.js";
 import { currentRankClaimKey } from "./rank.js";
 import { loadSourceContext, prepareDerivation } from "./universe.js";
-import type { DerivationSourceContext, UniverseCandidate } from "./universe.js";
+import type { DerivationSourceContext, UniverseCandidate, UniverseSizeCache } from "./universe.js";
 import {
   RANK_CONFIDENCE_ASSESSMENT_METHOD,
   RANK_CONFIDENCE_ASSESSMENT_VERSION,
@@ -124,6 +124,8 @@ async function supportingRank(
 export interface DeriveRarityOptions {
   /** Overridable so tests can exercise a restrictive rights posture. */
   readonly rightsOverride?: EffectiveRights;
+  /** Run-scoped memo for the completeness counts. See `UniverseSizeCache`. */
+  readonly universeSizeCache?: UniverseSizeCache;
 }
 
 /**
@@ -138,7 +140,7 @@ export async function deriveRarityContext(
   rawInput: string,
   options: DeriveRarityOptions = {},
 ): Promise<SurnameRarityResult> {
-  const prepared = await prepareDerivation(db, rawInput);
+  const prepared = await prepareDerivation(db, rawInput, options.universeSizeCache);
   if (prepared.kind === "NO_RESULT") {
     return prepared;
   }

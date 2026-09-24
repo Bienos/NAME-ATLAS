@@ -888,3 +888,47 @@ describe("TASK-023: sources section and anchors", () => {
       expect(m).toContain(id);
   });
 });
+
+describe("the voivodeship map", () => {
+  it("draws all 16 voivodeships, the listed ones in the ramp and the rest hatched as not listed", () => {
+    const markup = render(RESOLVED, "pl");
+    expect(markup).toContain('aria-label="Mapa udziałów według województw"');
+    expect(markup.match(/class="vmap-region /gu)).toHaveLength(16);
+    // Two listed regions at 50% each: the top band of a 10-point scale.
+    expect(markup.match(/vmap-region vmap-b4/gu)).toHaveLength(2);
+    expect(markup.match(/vmap-region vmap-none/gu)).toHaveLength(14);
+    expect(markup).toContain("WIELKOPOLSKIE: 50,0% (16\u00a0077)");
+    expect(markup).toContain("brak w zbiorze — nie oznacza zera");
+  });
+
+  it("never draws a not-listed voivodeship in the ramp's palest step", () => {
+    const markup = render(LOW_COVERAGE, "en");
+    // One listed region; every other one is hatched, none is band 0.
+    expect(markup.match(/vmap-region vmap-none/gu)).toHaveLength(15);
+    expect(markup).not.toMatch(/vmap-region vmap-b0/u);
+    expect(markup).toContain("not listed in the dataset — not zero");
+  });
+
+  it("keeps the table, and draws no map when a region has no TERC code", () => {
+    const payload = structuredClone(RESOLVED) as {
+      distribution: { entries: { regions: { terc_code: string | null }[] }[] };
+    };
+    payload.distribution.entries[0]!.regions[0]!.terc_code = null;
+    const markup = render(payload, "pl");
+    expect(markup).not.toContain("vmap-region");
+    expect(markup).toContain("<table>");
+  });
+});
+
+describe("a meaning's formation type is words, never its code", () => {
+  it("renders the type in the page's language", () => {
+    for (const [lang, word] of [
+      ["pl", "od zajęcia lub zawodu"],
+      ["en", "occupational"],
+    ] as const) {
+      const body = text(render(MEANING_AVAILABLE, lang));
+      expect(body).toContain(word);
+      expect(body).not.toContain("OCCUPATIONAL");
+    }
+  });
+});

@@ -1,0 +1,266 @@
+{
+  "format_version": 1,
+  "synthetic": false,
+  "_note": "Real source. Every literal_gloss and quotation is verbatim from the 1933 print (original orthography kept; […] marks omitted list items), checked against the page images of the ZBC scan, not only its OCR. Locators give the printed page and the scan's PDF page. Formation types map Buryan's own section headings: 1 z imion → OTHER, odojcowskie → PATRONYMIC, 3 przydomki → DESCRIPTIVE, 4 zatrudnienie → OCCUPATIONAL, 5 narodowość → OTHER, 6 siedzibowe → TOPONYMIC. Root forms only where Buryan names the base himself.",
+  "work": {
+    "source_key": "buryan_1933_skad_pochodzi",
+    "title": "Skąd pochodzi twoje imię i nazwisko i nazwa miejscowości rodzinnej? (Zwięzły zarys imiennictwa polskiego)",
+    "author_or_publisher": "ks. Józef Buryan",
+    "year": 1933,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "PUBLIC_DOMAIN",
+      "reason": "Author Józef Buryan (1883–1950) died in 1950 (Zielonogórska Biblioteka Cyfrowa record oai:zbc.uz.zgora.pl:82526). Economic rights expire 70 years after the author's death, counted from the end of that year (Polish Copyright Act, art. 36), so the work has been in the public domain since 2021-01-01. The 1933 notice 'Wszelkie prawa zastrzeżone' lapsed with those rights."
+    },
+    "reference_url": "https://www.zbc.uz.zgora.pl/publication/91798",
+    "rights": {
+      "terms_version": "PUBLIC_DOMAIN_ART36",
+      "terms_hash": null,
+      "checked_at": "2026-09-23T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "ALLOWED",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": true,
+      "attribution_text": "ks. Józef Buryan, „Skąd pochodzi twoje imię i nazwisko i nazwa miejscowości rodzinnej?”, Warszawa 1933",
+      "source_owner": "public domain (author d. 1950); scan: Biblioteka Uniwersytetu Zielonogórskiego",
+      "rights_url": "https://www.zbc.uz.zgora.pl/publication/91798",
+      "contact_required": false,
+      "review_status": "LEGAL_REVIEW_REQUIRED",
+      "valid_from": "2021-01-01",
+      "valid_to": null,
+      "notes": "Public domain by the author's death date; no lawyer has reviewed it, hence LEGAL_REVIEW_REQUIRED. Attribution required because authors' moral rights do not expire in Polish law. image_rights UNKNOWN: the scan's own status is not claimed and no image is reproduced. Reliability tier C is this session's classification of a 1933 popular outline by a non-linguist, flagged to the project owner for confirmation; the product always shows author and year beside the reading."
+    }
+  },
+  "entries": [
+    {
+      "surname": "ADAMCZYK",
+      "root_form": "Adam",
+      "root_language": null,
+      "literal_gloss": "Z imienia Adam powstał: […] Adamczyk",
+      "formation_type": "OTHER",
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": null
+    },
+    {
+      "surname": "JANKOWSKI",
+      "root_form": "Jan",
+      "root_language": null,
+      "literal_gloss": "Z imienia Jan wywodzą się nazwiska: […] pochodne: […] Jankowski",
+      "formation_type": "OTHER",
+      "locator": "s. 7 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 9)",
+      "quotation": null
+    },
+    {
+      "surname": "JASIŃSKI",
+      "root_form": "Jan",
+      "root_language": null,
+      "literal_gloss": "Z imienia Jan wywodzą się nazwiska: […] pochodne: […] Jasiński",
+      "formation_type": "OTHER",
+      "locator": "s. 7 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 9)",
+      "quotation": null
+    },
+    {
+      "surname": "PAWŁOWSKI",
+      "root_form": "Paweł",
+      "root_language": null,
+      "literal_gloss": "Z imienia Paweł wywodzą się nazwiska: […] pochodne: […] Pawłowski",
+      "formation_type": "OTHER",
+      "locator": "s. 7–8 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 9–10)",
+      "quotation": null
+    },
+    {
+      "surname": "JAKUBOWSKI",
+      "root_form": "Jakób-Kuba",
+      "root_language": null,
+      "literal_gloss": "Bardzo wżył się w naród polski Jakób-Kuba. Od niego wywodzą swe istnienie nazwiska: […] pochodne: […] Jakubowski",
+      "formation_type": "OTHER",
+      "locator": "s. 9 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 11)",
+      "quotation": null
+    },
+    {
+      "surname": "KUBIAK",
+      "root_form": "Jakób-Kuba",
+      "root_language": null,
+      "literal_gloss": "Bardzo wżył się w naród polski Jakób-Kuba. Od niego wywodzą swe istnienie nazwiska: […] Kubiak",
+      "formation_type": "OTHER",
+      "locator": "s. 9 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 11)",
+      "quotation": null
+    },
+    {
+      "surname": "SZYMAŃSKI",
+      "root_form": "Szymon",
+      "root_language": null,
+      "literal_gloss": "Z Szymona: […] Szymański",
+      "formation_type": "OTHER",
+      "locator": "s. 9 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 11)",
+      "quotation": null
+    },
+    {
+      "surname": "TOMASZEWSKI",
+      "root_form": "Tomasz",
+      "root_language": null,
+      "literal_gloss": "Tomasz również nie ostatni ze swymi agnaty: […] Tomaszewski",
+      "formation_type": "OTHER",
+      "locator": "s. 10 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 12)",
+      "quotation": null
+    },
+    {
+      "surname": "WALCZAK",
+      "root_form": "Walenty",
+      "root_language": null,
+      "literal_gloss": "Z Walentego: […] Walczak",
+      "formation_type": "OTHER",
+      "locator": "s. 10 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 12)",
+      "quotation": null
+    },
+    {
+      "surname": "WÓJCIK",
+      "root_form": "wójt",
+      "root_language": null,
+      "literal_gloss": "syn wójta",
+      "formation_type": "PATRONYMIC",
+      "locator": "s. 10 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 12)",
+      "quotation": "końcówki zdrabniające, szczególnie -ik, -ek, -ak, używane także jako odojcowskie (patronymiczne): Bartosik, Kubalik, Wójcik, Fójcik, (syn wójta, fojta, Kubali, Bartosia)"
+    },
+    {
+      "surname": "KRÓL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "3. Przydomki, przezwiska.",
+      "formation_type": "DESCRIPTIVE",
+      "locator": "s. 14 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 16)",
+      "quotation": "Od przydomków przezwiska: […] Dalsze: […] Szlachcic, Król, Ledwudowicz"
+    },
+    {
+      "surname": "ZAJĄC",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Tu należy włączyć także długi szereg nazwisk z królestwa zwierząt i rodu ptasiego",
+      "formation_type": "DESCRIPTIVE",
+      "locator": "s. 14 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 16)",
+      "quotation": "Tu należy włączyć także długi szereg nazwisk z królestwa zwierząt i rodu ptasiego […] (Zając, Liszka, Niedźwiedź, Lew, Lewek, Bizoń, Turoń, Ryś, Wilk, Kukuczka, Kokotek, Sowa."
+    },
+    {
+      "surname": "WILK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Tu należy włączyć także długi szereg nazwisk z królestwa zwierząt i rodu ptasiego",
+      "formation_type": "DESCRIPTIVE",
+      "locator": "s. 14 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 16)",
+      "quotation": "Tu należy włączyć także długi szereg nazwisk z królestwa zwierząt i rodu ptasiego […] (Zając, Liszka, Niedźwiedź, Lew, Lewek, Bizoń, Turoń, Ryś, Wilk, Kukuczka, Kokotek, Sowa."
+    },
+    {
+      "surname": "KOWALCZYK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "4. Nazwiska od zatrudnienia.",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "s. 15 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 17)",
+      "quotation": null
+    },
+    {
+      "surname": "SZEWCZYK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "4. Nazwiska od zatrudnienia.",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "s. 15 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 17)",
+      "quotation": null
+    },
+    {
+      "surname": "KRAWCZYK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "4. Nazwiska od zatrudnienia.",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "s. 15 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 17)",
+      "quotation": null
+    },
+    {
+      "surname": "KOŁODZIEJ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "4. Nazwiska od zatrudnienia.",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "s. 15 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 17)",
+      "quotation": null
+    },
+    {
+      "surname": "NOWAK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Być może że i kolonistów, nowych osadników zwano Nowakami, Przybyłami, Nowocieniami, Nowotnymi lub Kolondrami.",
+      "formation_type": "OCCUPATIONAL",
+      "locator": "s. 16 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 18)",
+      "quotation": "4. Nazwiska od zatrudnienia. […] Sagitarjus (łucznik), Santarjus, Kowalec, Nowak, Szewieczek, Obuwnik"
+    },
+    {
+      "surname": "MAZUR",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "5. Nazwiska od narodowości i pochodzenia.",
+      "formation_type": "OTHER",
+      "locator": "s. 16 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 18)",
+      "quotation": "Pochodzeniowe: Przybyła, Niemiec, Mazur (s. 19)"
+    },
+    {
+      "surname": "JAWORSKI",
+      "root_form": "Jaworze",
+      "root_language": null,
+      "literal_gloss": "Jaworski z Jaworza",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 16 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 18)",
+      "quotation": "6. Nazwiska siedzibowe. Jaworski z Jaworza (wzór: Jan z Janowa Janowski)"
+    },
+    {
+      "surname": "OSTROWSKI",
+      "root_form": "Ostrów",
+      "root_language": null,
+      "literal_gloss": "Ostrowski (z Ostrowa)",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 16 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 18)",
+      "quotation": null
+    },
+    {
+      "surname": "SOKOŁOWSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "6. Nazwiska siedzibowe.",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 17 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 19)",
+      "quotation": null
+    },
+    {
+      "surname": "WYSOCKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "6. Nazwiska siedzibowe.",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 17 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 19)",
+      "quotation": null
+    },
+    {
+      "surname": "PIOTROWSKI",
+      "root_form": "Piotrowice",
+      "root_language": null,
+      "literal_gloss": "Piotrowice — Piotrowski",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 18 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 20)",
+      "quotation": null
+    },
+    {
+      "surname": "DĄBROWSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Siedzibowe: Dąbrowski",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 19 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 21)",
+      "quotation": "Wzory nazwisk. […] 6. Siedzibowe: Dąbrowski, Kępny, Kałuża, Olszak"
+    }
+  ]
+}

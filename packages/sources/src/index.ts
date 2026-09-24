@@ -89,3 +89,5 @@ export type {
   OnomasticWork,
   ParseOutcome,
 } from "./onomastics.js";
+export { applySlice, filingLetter, parseSliceSpec, SliceSpecError } from "./slice.js";
+export type { LinedRow, SliceSpec } from "./slice.js";

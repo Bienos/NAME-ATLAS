@@ -2,7 +2,7 @@
 /**
  * Batch derivation over the register (TASK-028).
  *
- *   pnpm truth:derive-batch [--limit N] [--concurrency C] [--all]
+ *   pnpm truth:derive-batch [--limit N] [--concurrency C] [--all] [--rank]
  *
  * Derives `CURRENT_POPULATION` and `CURRENT_DISTRIBUTION` for the surnames that
  * can carry both, which is what `docs/canonical/21` §42 needs before a page may
@@ -16,7 +16,18 @@
  * their page better — but it cannot make them indexable, so it is not what this
  * job is for. `--all` derives population for every surname anyway.
  *
- * Resumable: a surname that already carries both claim types is skipped, so an
+ * `--rank` adds `CURRENT_RANK` and `RARITY_CONTEXT`. Both refuse unless the
+ * surname's resource version passes the universe gate, so against a sliced
+ * import the flag costs one refusal per surname and writes nothing. Sharing the
+ * run's `UniverseSizeCache` matters more for these two than for anything else:
+ * the completeness count is the same 379 ms for every surname, and without the
+ * cache each of them pays it again.
+ * The rank has its own run-scoped table for the same reason: one grouped query
+ * per universe, then a lookup, instead of a hash join over the whole universe
+ * for every surname.
+ *
+ * Resumable: a surname already carrying every claim type THIS RUN derives is
+ * skipped, so adding a chain makes processed surnames eligible again, and
  * interrupted run continues rather than restarting. Ordered by `surname_id`, so
  * "where it got to" is a position rather than a guess.
  *
@@ -28,7 +39,10 @@ import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
 import { deriveCurrentPopulation } from "../src/derive.js";
 import { deriveCurrentDistribution } from "../src/distribution.js";
+import { deriveCurrentRank } from "../src/rank.js";
+import { deriveRarityContext } from "../src/rarity.js";
 import type { UniverseSizeCache } from "../src/universe.js";
+import type { RankTableCache } from "../src/rank.js";
 
 function flag(name: string): string | undefined {
   const i = process.argv.indexOf(`--${name}`);
@@ -38,6 +52,7 @@ function flag(name: string): string | undefined {
 const limit = Number(flag("limit") ?? "0") || Number.POSITIVE_INFINITY;
 const concurrency = Math.max(1, Math.min(32, Number(flag("concurrency") ?? "8")));
 const all = process.argv.includes("--all");
+const rank = process.argv.includes("--rank");
 const BATCH = 2_000;
 
 interface Row {
@@ -68,9 +83,20 @@ async function nextBatch(db: Kysely<DB>, after: string | null): Promise<readonly
        AND NOT (
          EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id
                    AND c.claim_type = 'CURRENT_POPULATION' AND c.claim_status = 'ACTIVE')
-         AND
-         EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id
-                   AND c.claim_type = 'CURRENT_DISTRIBUTION' AND c.claim_status = 'ACTIVE')
+         ${
+           all
+             ? sql``
+             : sql`AND EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id
+                     AND c.claim_type = 'CURRENT_DISTRIBUTION' AND c.claim_status = 'ACTIVE')`
+         }
+         ${
+           rank
+             ? sql`AND EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id
+                     AND c.claim_type = 'CURRENT_RANK' AND c.claim_status = 'ACTIVE')
+                   AND EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id
+                     AND c.claim_type = 'RARITY_CONTEXT' AND c.claim_status = 'ACTIVE')`
+             : sql``
+         }
        )
      ORDER BY s.surname_id
      LIMIT ${BATCH}
@@ -84,6 +110,9 @@ async function main(): Promise<void> {
   // real register and identical for every surname; without this the job spends
   // essentially all of its time re-counting the same rows.
   const cache: UniverseSizeCache = new Map();
+  // Likewise the rank: one aggregate per universe, then a lookup per surname,
+  // instead of a hash join over the whole universe for every one of them.
+  const rankTables: RankTableCache = new Map();
   const started = Date.now();
   let done = 0;
   let failed = 0;
@@ -104,6 +133,15 @@ async function main(): Promise<void> {
               });
               if (!all) {
                 await deriveCurrentDistribution(db, row.canonical_display, {
+                  universeSizeCache: cache,
+                });
+              }
+              if (rank) {
+                await deriveCurrentRank(db, row.canonical_display, {
+                  universeSizeCache: cache,
+                  rankTableCache: rankTables,
+                });
+                await deriveRarityContext(db, row.canonical_display, {
                   universeSizeCache: cache,
                 });
               }

@@ -22,6 +22,7 @@ import { readFile } from "node:fs/promises";
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { findPeselResource } from "../src/registry.js";
 import { importPeselResource } from "../src/importer.js";
+import { parseSliceSpec } from "../src/slice.js";
 import type { ReconciliationReport } from "../src/import-result.js";
 
 interface Args {
@@ -29,6 +30,7 @@ interface Args {
   readonly file: string;
   readonly metadata: string;
   readonly sha256: string | undefined;
+  readonly slice: string | undefined;
 }
 
 function parseArgs(argv: readonly string[]): Args {
@@ -50,15 +52,29 @@ function parseArgs(argv: readonly string[]): Args {
   const metadata = values.get("metadata");
   if (!resource || !file || !metadata) {
     throw new Error(
-      "usage: import-pesel --resource <id> --file <csv> --metadata <json> [--sha256 <hex>]",
+      "usage: import-pesel --resource <id> --file <csv> --metadata <json> [--sha256 <hex>] " +
+        "[--slice top:N|prefix:A-F]",
     );
   }
-  return { resource, file, metadata, sha256: values.get("sha256") };
+  return {
+    resource,
+    file,
+    metadata,
+    sha256: values.get("sha256"),
+    slice: values.get("slice"),
+  };
 }
 
 function printReport(report: ReconciliationReport): void {
   console.log(`[import] resource            ${report.resourceId}`);
   console.log(`[import] rows read           ${report.rowsRead}`);
+  if (report.rowsExcludedBySlice > 0) {
+    console.log(`[import] rows excluded       ${report.rowsExcludedBySlice} (by --slice)`);
+    console.log(
+      "[import]   this resource is now an INCOMPLETE universe: counts are true, " +
+        "rank and rarity are withheld",
+    );
+  }
   console.log(`[import] rows imported       ${report.rowsImported}`);
   console.log(`[import] rows quarantined    ${report.rowsQuarantined}`);
   for (const [reason, count] of Object.entries(report.quarantinedByReason)) {
@@ -97,6 +113,7 @@ async function main(): Promise<void> {
       bytes,
       expectedSha256: args.sha256 ?? resource.official_sha256,
       rawPayload,
+      ...(args.slice === undefined ? {} : { slice: parseSliceSpec(args.slice) }),
     });
 
     switch (outcome.kind) {

@@ -27,3 +27,18 @@ pnpm-debug.log*
 # Test artifacts
 coverage/
 .vitest-cache/
+
+# Source data held locally for import (docs/LOCAL_DATABASE.md).
+# The full PESEL national CSVs are ~5 MB each and are NOT fixtures: the small
+# verbatim excerpts in fixtures/pesel/ are, and they share the same file names.
+# Keep the full files here so neither gets committed or overwritten.
+data/
+
+# Agent instruction files that `next dev` generates inside each app
+# (node_modules/next/dist/server/lib/generate-agent-files.js). They are vendor
+# boilerplate, not this project's operating contract — and in a repository where
+# the root AGENTS.md and CLAUDE.md ARE that contract (AGENTS.md §1), a generated
+# file of the same name one directory down is actively misleading. The generated
+# text argues for committing it; that is a tool's output, not a project decision.
+apps/*/AGENTS.md
+apps/*/CLAUDE.md

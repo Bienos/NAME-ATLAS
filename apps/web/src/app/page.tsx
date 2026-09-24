@@ -3,15 +3,20 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createLogger } from "@name-atlas/logging";
-import { querySurnameResult } from "@name-atlas/truth";
+import { mostCommonSurnames, querySurnameResult } from "@name-atlas/truth";
+import { currentSlugsFor } from "@name-atlas/seo";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { htmlLang, parseIntent, parseLang, UI } from "../lib/messages.js";
 import type { Lang } from "../lib/messages.js";
 import { Result } from "../lib/result-view.js";
 import { SearchForm } from "../lib/search-form.js";
+import { CommonSurnames } from "../lib/common-surnames.js";
+import type { CommonList } from "../lib/common-surnames.js";
+import { pathForSlug } from "../lib/slug.js";
 import { surnamePath } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
+import { NamePrint } from "../lib/name-print.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -114,6 +119,41 @@ async function answer(query: string, origin: ReturnType<typeof searchOrigin>): P
   }
 }
 
+/**
+ * The most common surnames for the bare landing page, from rank claims
+ * (`mostCommonSurnames`). A failure here costs the section, never the page.
+ */
+async function commonLists(lang: Lang): Promise<CommonList[]> {
+  try {
+    const db = sharedDb();
+    const lists = await mostCommonSurnames(db, { limit: 10 });
+    const ids = lists.flatMap((l) => l.items.map((i) => i.surname_id));
+    const slugs = await currentSlugsFor(db, lang, ids);
+    return lists.map((l) => ({
+      comparability_group: l.comparability_group,
+      snapshot_date: l.snapshot_date,
+      items: l.items.map((i) => {
+        const slug = slugs.get(i.surname_id);
+        const path = slug === undefined ? null : pathForSlug(slug, lang);
+        const search = new URLSearchParams({
+          surname: i.display_name,
+          ...(lang === "en" ? { lang } : {}),
+        });
+        return {
+          display_name: i.display_name,
+          rank: i.rank,
+          path: path ?? `/?${search.toString()}`,
+        };
+      }),
+    }));
+  } catch (cause: unknown) {
+    createLogger({ service: "web", base: { route: "/" } }).error("common_surnames_failed", {
+      cause,
+    });
+    return [];
+  }
+}
+
 function Body({ answer: given, lang }: { answer: Answer; lang: Lang }) {
   const t = UI[lang];
   switch (given.kind) {
@@ -149,6 +189,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   const origin = searchOrigin(referrerPath(h.get("referer"), requestOrigin(h.get("host"))));
 
   const given = await answer(query, origin);
+  const common = given.kind === "NONE" ? await commonLists(lang) : [];
 
   if (
     given.kind === "RESULT" &&
@@ -174,12 +215,16 @@ export default async function HomePage({ searchParams }: PageProps) {
           English answer says so here (see `layout.tsx`). */}
       <main lang={htmlLang(lang)}>
         <div className="masthead">
-          <h1>{t.title}</h1>
+          <h1>
+            <NamePrint className="logo-mark" size="small" />
+            {t.title}
+          </h1>
           <a href={`/?${switchParams.toString()}`}>{t.langSwitch}</a>
         </div>
         <p className="tagline">{t.tagline}</p>
         <SearchForm lang={lang} query={query} />
         <Body answer={given} lang={lang} />
+        <CommonSurnames lists={common} lang={lang} />
       </main>
       <footer lang={htmlLang(lang)}>{t.footer}</footer>
     </>
