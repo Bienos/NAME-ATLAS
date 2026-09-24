@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-20 — TASK-004 implemented and verified (PESEL ingestion: source/rights registry, immutable source records, surname-scoped national distribution)
+**Last updated:** 2026-09-24 — web preview built and verified (landing page + surname results, owner-requested outside the task sequence; ADR-0003). Previous: 2026-09-20 — TASK-004 implemented and verified.
 
 ## Current state
 
@@ -14,7 +14,8 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | **TASK-002 — PESEL source spike** | **IMPLEMENTED AND VERIFIED — now complete with no residuals.** All 20 acceptance items resolved; the two items previously carried forward (download URLs, portal timestamps) closed 2026-09-19 — `docs/sources/pesel.md`. D-001 **RESOLVED** (`docs/DECISIONS_NEEDED.md`). |
 | **TASK-003 — exact surname resolver** | **IMPLEMENTED AND VERIFIED.** §6.2 approved by the project owner ("do task 003"). `packages/resolver` + migration `0002_identity_core`. All 19 acceptance tests in §8 implemented and passing — see the TASK-003 section below. |
 | **TASK-004 — PESEL ingestion + Source/Rights** | **IMPLEMENTED AND VERIFIED.** §14's U-1, U-2 and U-3 answered by the project owner; U-4 to U-7 decided and recorded in the task file's §7. All 26 acceptance criteria demonstrated by tests that were run — see the TASK-004 section below. |
-| Application source code | `packages/sources` (PESEL CSV schema/parser from TASK-002, plus the `@name-atlas/sources/pesel` registry + importer from TASK-004) and `packages/resolver` (exact resolver, TASK-003). Tables: the three identity tables, `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`. No `EvidenceItem`, `Claim`, `ConfidenceAssessment`, `Citation`, `DigitalAsset`, `Place` or `ResearchRun` table exists. |
+| **Web preview — landing + surname results** | **BUILT AND VERIFIED (2026-09-24).** Owner-requested, outside the task sequence; no task file. Landing page and `/en/surname?name=…` in `apps/web`, to the Name Atlas Visual System v1. Shows stored PESEL figures before the claim chain exists, under ADR-0003. See the section below. |
+| Application source code | `packages/sources` (PESEL CSV schema/parser from TASK-002, plus the `@name-atlas/sources/pesel` registry + importer from TASK-004, plus `readPeselRegister` for the web preview) and `packages/resolver` (exact resolver, TASK-003); `apps/web` landing and results pages (web preview). Tables: the three identity tables, `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`. No `EvidenceItem`, `Claim`, `ConfidenceAssessment`, `Citation`, `DigitalAsset`, `Place` or `ResearchRun` table exists. |
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`), `0002_identity_core` (three identity tables + `resolvable_name_forms` view) and `0003_source_rights_distribution` (five tables + ten enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
 | Next approved task | None. TASK-005 (`CURRENT_POPULATION` truth chain) is the natural next task; it has no task file and was not started (AGENTS.md §8). It is blocked on **D-006** (the unit of `Liczba`). |
@@ -391,9 +392,58 @@ No migration change was needed — `source_record_type` already carries `API_OBJ
 | `pnpm test:integration` | Passed — 54 tests, including the `API_OBJECT` assertion, against local PostgreSQL 16.13 / PostGIS 3.4.2 via the `TEST_DATABASE_URL` fallback. |
 | `pnpm build` | Passed. |
 
+## Web preview — landing page + surname results (2026-09-24)
+
+Requested directly by the project owner: a landing page where a visitor enters a surname and is taken to a page showing what the atlas holds for it now. Designed for desktop and mobile. No task file exists for this work, and TASK-005 was not started.
+
+**Owner decisions taken this session** (asked, answered):
+
+- **Brand:** the Name Atlas Visual System v1 (`docs/library/NAME_ATLAS_VISUAL_SYSTEM_v1(1).md`), not the Sliyd brand kit.
+- **Results data:** "Real data, honestly labelled", meaning the stored PESEL figures are shown before the claim chain exists. Recorded as `docs/adr/0003-web-preview-before-claims.md` (temporary; exit = claim-backed projection after TASK-005).
+
+**What exists now**
+
+- `apps/web` landing (`/`): screen 01 of the visual system. It has a wordmark, the line "Every surname begins somewhere.", the surname field on an editorial underline, and an extremely subtle Atlas Thread lower right. The field's underline is a thread. Its point turns Atlas Blue once there is input, and a blue line draws under the letters. On submit, the typed surname becomes the result heading through a shared-element view transition (React `<ViewTransition>`, names `surname-hero` and `atlas-thread`). Without JavaScript it is a plain GET form to the same page.
+- `apps/web` results (`/en/surname?name=…`): the surname exactly as typed (NFC) as the hero, sized by grapheme count (§6.3). Findings stream in under `<Suspense>`. There is one state per lookup outcome: resolved with figures; resolved with no PESEL data held; unknown; multiple exact; mixed script; empty, over-long or unreadable input; lookup failed; database not configured. A lookup failure never reads as "unknown surname". Pages send `noindex, nofollow`.
+- What a resolved surname shows: the published `Liczba` for each current list, labelled "occurrences" with the list's publisher title (*Nazwiska męskie* / *Nazwiska żeńskie*), scope and date. The lists are never summed or compared. A list that omits the surname says so, and says it is not zero. A "What this number is — and isn't" note covers D-006, the undisambiguated partition and national-only scope. Source cards S01/S02 carry the verbatim publisher title and description, the data date, the retrieval date and a dataset link. "Not yet charted" rows explain the blanks: geography, rarity, meaning/origin, history. No confidence, rank, share, rarity or total appears anywhere.
+- `packages/sources/src/pesel/read.ts` — `readPeselRegister`: read-only (`READ ONLY` transaction, `selectFrom`-only handle), one entry per `ACTIVE` resource record, fails closed on a broken invariant.
+- Tokens, type and motion follow the system: §34 tokens, Newsreader + Inter + IBM Plex Mono via `next/font` (self-hosted at build), 4/8/12-column grid, reduced motion honoured, focus replaced never removed. Measured contrast on Paper: `text-tertiary` #6E716C is 4.35:1, so it carries only large text and marks. All small text uses `text-secondary` (6.87:1).
+
+**Tooling facts**
+
+- `apps/web` now builds with webpack (`next dev --webpack`, `next build --webpack`) plus `experimental.extensionAlias`. Turbopack reported `Module not found` for every `./x.js` import inside the workspace packages (their files are `.ts`), and it ignores `extensionAlias`. Observed, not assumed.
+- `agentRules: false` in `apps/web/next.config.ts`: `next dev` 16.3.5 otherwise writes its own `AGENTS.md`/`CLAUDE.md` into `apps/web`.
+- No third-party dependency added. `apps/web` gained workspace links to `@name-atlas/db`, `@name-atlas/resolver` and `@name-atlas/sources` (lockfile: those links only). `next build` downloads the three fonts from Google Fonts at build time; visitors never contact Google.
+
+**Findings recorded, not resolved**
+
+- **D-007 (new):** the full official PESEL CSVs cannot be imported today. Their checksums match the registry, but `canonical_key_v1` folds `ẞ` to `ss`, so 52 (male) and 119 (female) `SS`/`ẞ` pairs collide and the importer correctly fails closed. The local verification database therefore holds the committed fixture excerpts (22 + 23 rows), not the full lists. On that database, "not in this list" is true of the excerpt, not necessarily of the official file.
+- **Teardown race in `packages/testing` — found and fixed.** `db.destroy()` resolves once pg has asked each client to close, not once the sockets are gone. The forced `DROP DATABASE` (or, on the container path CI uses, the server stopping) could then terminate a closing client. Its late FATAL `57P01` surfaced as an uncaught error attributed to `pesel-import.test.ts`, with all tests still passing. Observed in 3 of 15 runs once the new test file ran alongside; 0 of 6 without it. `stop()` now waits for the pool's connections to close (`trackOpenConnections`, 5 s cap) on both paths. After the fix: 12 of 12 runs clean, and no throwaway database left behind.
+
+### Verification run for the web preview (2026-09-24)
+
+Local PostgreSQL 16 + PostGIS 3.4.2 (apt), as in earlier sessions. Container registries were not tried.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | Passed. Then the three workspace links were added (lockfile +9 lines, links only). |
+| `pnpm typecheck` | Passed — 10 of 10 packages. |
+| `pnpm lint` | Passed — zero errors, zero warnings (after fixing one `react-hooks/set-state-in-effect` error the first run reported). |
+| `pnpm format:check` | Passed. |
+| `pnpm test` | Passed — 194 tests across 9 packages. `apps/web` has 33 (32 new: surname sizing, search-input checks, formatting, the lookup state machine, list copy). |
+| `pnpm test:integration` (`TEST_DATABASE_URL`) | Passed — 62 tests (54 existing + 8 new in `pesel-register-read.test.ts`). After the harness fix, repeated 12 times: 12 of 12 clean, zero `name_atlas_test_%` databases left. |
+| `pnpm build` | Passed. `apps/web` (webpack): `/` static, `/en/surname` dynamic, `/icon.svg`, `/api/health`. |
+| Official CSV download (`api.dane.gov.pl`, both resources) | Checksums and byte sizes identical to the registry. Full import refused with `duplicate_canonical_key` — D-007. Bytes kept outside the repository. |
+| `pnpm import:pesel` on both committed fixtures (local database) | `IMPORTED`, 22 and 23 rows, reconciles. |
+| Real browser (Playwright + Chromium) against `next dev` and `next start` | Typed flow landing → results; `document.startViewTransition` instrumented: `surname-hero` and `atlas-thread` both animate as old→new pairs. Checked at 1440×900, 834×1112 and 390×844 (touch), and with reduced motion (final state at once). NOWAK 98,387 / 99,738, KOWALSKI 66,589 + absent, KOWALCZYK 46,994 / 48,264, WIŚNIEWSKA absent + 54,177, NGUYỄN 3,730 / 2,132 — each equal to its fixture row. Unknown (`Zzyzx`), mixed script (`Nоwak`, Cyrillic о) and a 32-grapheme name render their states. |
+| `next start` states | DB present → figures; `DATABASE_URL` unset → "isn't connected to its data"; unreachable DB (port 5999) → "couldn't reach the atlas", not "unknown"; whitespace-only name → 307 to `/`; `robots: noindex, nofollow`. |
+| `git status` on `docs/canonical/`, `docs/library/`, `docs/archive/`, `docs/reference/`, `docs/review/`, `prompts/` | Empty — untouched. |
+
+**Not verified:** Safari and Firefox (only Chromium was run; browsers without `document.startViewTransition` navigate without the morph); a screen reader pass (semantics reviewed, not tested with assistive technology); the integration suite on the pinned container image; the page against the full national lists (blocked by D-007); CI end to end.
+
 ## Next action
 
-TASK-001, TASK-002, TASK-003 and TASK-004 are implemented and verified. Per `AGENTS.md` §8: **STOP.** This session did not start TASK-005 and did not write `tasks/005-*.md`.
+TASK-001, TASK-002, TASK-003 and TASK-004 are implemented and verified, and the owner-requested web preview is built and verified. TASK-005 has not been started and `tasks/005-*.md` has not been written.
 
 Open for the project owner, none of it work this session may do:
 
@@ -402,3 +452,5 @@ Open for the project owner, none of it work this session may do:
 3. **The `TemporalExtent` omission from TASK-003** still awaits acknowledgement: `name_forms` has no `valid_from_*`/`valid_to_*` columns. Adding them later is a nullable-column migration. TASK-004 performs no temporal logic and did not need them.
 4. **Raw object storage (INF-001)** is still missing, which is why `SourceRecord.raw_text_ref` is null. Recorded as a deviation from `docs/canonical/12` §9.2, acknowledged under §14 U-3.
 5. **D-002, D-003 and D-004** are unchanged by this task. No regional resource was downloaded, parsed or ingested, and no map or regional logic exists.
+6. **D-007 — `SS`/`ẞ` canonical-key collisions** (`docs/DECISIONS_NEEDED.md`). Blocks importing the full official PESEL lists. An identity decision, not an importer fix.
+7. **Legal review of the PESEL rights profile** (`LEGAL_REVIEW_REQUIRED`) before the web preview is deployed publicly — ADR-0003, ARCHITECTURE.md §10 invariant 13.

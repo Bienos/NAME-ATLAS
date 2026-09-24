@@ -144,6 +144,25 @@ No further action needed. Do not revisit unless the pinned digest is deliberatel
 
 ---
 
+## D-007 — Sharp S: `SS` and `ẞ` spellings collide under `canonical_key_v1`
+
+**Status: BLOCKS importing the full official PESEL resources.** Non-blocking for the committed fixtures, which contain no sharp s.
+
+**What was observed (2026-09-24).** Both official national CSVs were downloaded from their pinned `csv_download_url`s; their SHA-256 checksums and byte sizes match the registry exactly (`ce4238fe…`, 5,293,415 bytes; `c508680d…`, 5,592,881 bytes). `pnpm import:pesel` then refused each full file before writing anything, with `duplicate_canonical_key`:
+
+- `1148808`: line 67603 `WEIẞ` (32) collides with line 2426 `WEISS` (1,218) on key `weiss`;
+- `1148811`: line 43966 `WEIẞ` (61) collides with line 2159 `WEISS` (1,369).
+
+**Cause.** `canonical_key_v1` applies full Unicode case folding, which maps U+1E9E LATIN CAPITAL LETTER SHARP S to `ss`. The publisher lists the `ẞ` spelling and the `SS` spelling as separate rows with separate counts, and the importer correctly fails closed when one file repeats a key (TASK-004 AC-19).
+
+**Scale.** A scan of both full files with the repository's own parser and `canonicalKey`: `1148808` has 52 colliding keys (104 rows) and `1148811` has 119 (238 rows). Every collision is an `SS`/`ẞ` pair; there is no other kind. 86 and 203 rows respectively contain a sharp s at all. The bytes were not committed, and nothing was imported from them.
+
+**The decision.** Whether `WEIẞ` and `WEISS` are one surname identity or two. Two identities means `canonical_key` must stop folding `ẞ` (a new key version, and a resolver change — ARCHITECTURE.md §10 invariant 8). One identity means the importer needs a rule for two published rows that meet in one snapshot, and summing them would be a derived value. Neither is decided here, and no code was changed.
+
+*Found while building the web preview; recorded rather than resolved (`AGENTS.md` §2).*
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:
