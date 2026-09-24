@@ -19,6 +19,7 @@ import type { Intent, Lang } from "./messages.js";
 import { Result } from "./result-view.js";
 import { SearchForm } from "./search-form.js";
 import { ShareButton } from "./share-button.js";
+import { NamePrint } from "./name-print.js";
 
 /**
  * The canonical surname page (TASK-024, ADR-0009), shared by
@@ -277,7 +278,10 @@ export function CanonicalSurnamePage({
       <main lang={htmlLang(lang)}>
         <div className="masthead">
           <h1>
-            <a href={lang === "en" ? "/?lang=en" : "/"}>{t.title}</a>
+            <a href={lang === "en" ? "/?lang=en" : "/"}>
+              <NamePrint className="logo-mark" size="small" />
+              {t.title}
+            </a>
           </h1>
           <a href={otherPath}>{t.langSwitch}</a>
         </div>

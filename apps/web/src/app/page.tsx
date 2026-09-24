@@ -16,6 +16,7 @@ import type { CommonList } from "../lib/common-surnames.js";
 import { pathForSlug } from "../lib/slug.js";
 import { surnamePath } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
+import { NamePrint } from "../lib/name-print.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -214,7 +215,10 @@ export default async function HomePage({ searchParams }: PageProps) {
           English answer says so here (see `layout.tsx`). */}
       <main lang={htmlLang(lang)}>
         <div className="masthead">
-          <h1>{t.title}</h1>
+          <h1>
+            <NamePrint className="logo-mark" size="small" />
+            {t.title}
+          </h1>
           <a href={`/?${switchParams.toString()}`}>{t.langSwitch}</a>
         </div>
         <p className="tagline">{t.tagline}</p>

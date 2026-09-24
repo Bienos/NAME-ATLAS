@@ -15,6 +15,7 @@ import { SearchForm } from "./search-form.js";
 import { surnamePath } from "./slug.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
+import { NamePrint } from "./name-print.js";
 
 /**
  * The comparison page (TASK-025, directive §24–§25).
@@ -72,6 +73,18 @@ function groupWords(group: string | null, lang: Lang): string {
  * still render an enormous heading, so it is bounded here. Nothing else on the
  * page echoes a parameter.
  */
+/**
+ * The same comparison in the other language, for the masthead's switch.
+ *
+ * It carries the slugs exactly as the reader gave them, so the other page
+ * resolves them the same way; they are URL-encoded because they come straight
+ * from the query string.
+ */
+export function comparePath(a: string, b: string, lang: Lang): string {
+  const base = lang === "pl" ? "/pl/porownaj" : "/en/compare";
+  return `${base}?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`;
+}
+
 function displayFor(side: ComparisonSide): string {
   if (side.display !== null) return side.display;
   const slug = side.slug.trim();
@@ -96,11 +109,16 @@ export function ComparisonView({
 
   return (
     <>
-      <main lang={htmlLang(lang)}>
+      {/* `compare` widens the canvas on desktop so the two sides sit side by side. */}
+      <main lang={htmlLang(lang)} className="compare">
         <div className="masthead">
           <h1>
-            <a href={lang === "en" ? "/?lang=en" : "/"}>{t.title}</a>
+            <a href={lang === "en" ? "/?lang=en" : "/"}>
+              <NamePrint className="logo-mark" size="small" />
+              {t.title}
+            </a>
           </h1>
+          <a href={comparePath(a.slug, b.slug, lang === "pl" ? "en" : "pl")}>{t.langSwitch}</a>
         </div>
         <h2 className="surname compare-heading">
           {displayFor(a)}
