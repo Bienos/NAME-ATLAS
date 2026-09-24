@@ -76,6 +76,13 @@
   --space-8: 48px;
   --space-9: 64px;
   --measure: 40rem; /* long-form reading width, 620–720px */
+
+  /* Motion (Visual System §23): reveal, connect, travel — nothing else */
+  --duration-instant: 100ms;
+  --duration-fast: 180ms;
+  --duration-standard: 300ms;
+  --duration-narrative: 650ms;
+  --ease-primary: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -260,13 +267,110 @@ summary:focus-visible,
   opacity: 1;
 }
 
+/* Focus darkens the rule to Ink (16:1), so the Atlas Blue thread below reads against it. */
 .search input:focus {
   outline: none;
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--text-primary);
 }
 
 .search input:focus-visible {
   outline: none;
+}
+
+/*
+ * The underline is an Atlas Thread (Visual System §8, §22): a point where the
+ * name begins, and a line in Atlas Blue exactly as long as the typed text.
+ * `--typed` comes from surname-combobox.tsx, which measures a hidden mirror of
+ * the text; without script there is no thread and the field is unchanged.
+ */
+.combobox::before,
+.combobox::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.combobox::after {
+  inset-inline-start: 0;
+  inset-block-end: 0;
+  block-size: 2px;
+  inline-size: min(var(--typed, 0px), 100%);
+  background: var(--accent);
+}
+
+/* Hollow until there is a name to look up, then Atlas Blue (§39: "one node becomes active"). */
+.combobox::before {
+  z-index: 1;
+  inset-inline-start: 0;
+  inset-block-end: -4px;
+  inline-size: 10px;
+  block-size: 10px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface-primary);
+}
+
+.combobox:has(input:not(:placeholder-shown))::before {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* Same box and type as the input, so its width is the typed text's width. */
+.combobox-mirror {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  white-space: pre;
+  color: var(--text-primary);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/*
+ * Submitted: the thread runs on to the button while the request is in flight,
+ * and the mirror, now visible over the input's own text, becomes the "before"
+ * of the page transition below. The result page's heading is its "after".
+ */
+:root[data-searching] .combobox::after {
+  inline-size: 100%;
+}
+
+:root[data-searching] .combobox-mirror {
+  visibility: visible;
+  view-transition-name: surname-hero;
+}
+
+:root[data-searching] .search input {
+  color: transparent;
+  caret-color: transparent;
+}
+
+/* A second search from a result page: only one element may carry the name. */
+:root[data-searching] .snapshot .surname {
+  view-transition-name: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .combobox::after {
+    transition: inline-size var(--duration-fast) var(--ease-primary);
+  }
+
+  .combobox::before {
+    transition:
+      background-color var(--duration-fast) var(--ease-primary),
+      border-color var(--duration-fast) var(--ease-primary);
+  }
+
+  :root[data-searching] .combobox::after {
+    transition: inline-size var(--duration-narrative) var(--ease-primary);
+  }
 }
 
 .search button {
@@ -493,6 +597,12 @@ footer {
   line-height: 0.95;
   letter-spacing: -0.04em;
   overflow-wrap: anywhere;
+  /* The "after" of the search's page transition. It hugs its text so the typed
+     name visibly grows into it; the fit above sizes against the snapshot box,
+     not this one, so it is unaffected. */
+  view-transition-name: surname-hero;
+  inline-size: fit-content;
+  max-inline-size: 100%;
 }
 
 @media (min-width: 900px) {
@@ -872,9 +982,64 @@ footer {
   margin-left: var(--space-3);
 }
 
+/*
+ * Motion (Visual System §23) is opt-in: everything below is inside
+ * `no-preference`, so a reader who asks for reduced motion gets instant state
+ * changes, no page transition and no reveal — and loses no information.
+ */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+
+  /*
+   * The search becomes the result (§23 "Search"): the typed surname grows
+   * into the result page's heading across the GET navigation and its
+   * redirect. surname-combobox.tsx skips every other navigation.
+   */
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-group(surname-hero) {
+    animation-duration: var(--duration-narrative);
+    animation-timing-function: var(--ease-primary);
+  }
+
+  ::view-transition-old(surname-hero),
+  ::view-transition-new(surname-hero) {
+    block-size: 100%;
+    object-fit: contain;
+    object-position: left center;
+    animation-duration: var(--duration-narrative);
+    animation-timing-function: var(--ease-primary);
+  }
+
+  /* The old page steps aside at once; the new one settles in under the name. */
+  ::view-transition-old(root) {
+    animation-duration: var(--duration-instant);
+  }
+
+  ::view-transition-new(root) {
+    animation-duration: var(--duration-standard);
+  }
+
+  /* A figure resolves once, in reading order, within §23's 250–500 ms. The
+     whole number is in the DOM throughout; only its drawing is revealed. */
+  .hero-number {
+    animation: resolve 420ms var(--ease-primary) 60ms both;
+  }
+
+  .hero-figure + .hero-figure .hero-number {
+    animation-delay: 160ms;
+  }
+}
+
+@keyframes resolve {
+  from {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0.4;
+    transform: translateY(0.12em);
   }
 }
 
@@ -996,7 +1161,8 @@ p {
     padding-right: var(--space-4);
   }
   /* The field and its button stay on one line: the underline reads as one control. */
-  .search input {
+  .search input,
+  .combobox-mirror {
     font-size: 1.5rem;
   }
   .search button {

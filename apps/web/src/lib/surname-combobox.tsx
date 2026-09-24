@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
 
 /**
@@ -11,6 +11,45 @@ import type { KeyboardEvent } from "react";
 declare const location: { assign(url: string): void } | undefined;
 interface InputLike {
   readonly value: string;
+  readonly form: EventTargetLike | null;
+}
+interface EventTargetLike {
+  addEventListener(type: string, listener: (event: PageSwapLike) => void): void;
+  removeEventListener(type: string, listener: (event: PageSwapLike) => void): void;
+}
+interface PageSwapLike {
+  readonly viewTransition?: { skipTransition(): void } | null;
+  readonly persisted?: boolean;
+}
+interface MeasurableLike {
+  getBoundingClientRect(): { readonly width: number };
+}
+interface StyleTargetLike {
+  readonly style: { setProperty(name: string, value: string): void };
+}
+declare const window: EventTargetLike | undefined;
+declare const document:
+  | {
+      readonly documentElement: {
+        setAttribute(name: string, value: string): void;
+        removeAttribute(name: string): void;
+      };
+      readonly fonts?: { readonly ready: Promise<unknown> };
+    }
+  | undefined;
+declare const ResizeObserver:
+  | (new (callback: () => void) => { observe(target: unknown): void; disconnect(): void })
+  | undefined;
+
+/** Set on `<html>` while a submitted search is navigating (`globals.css`). */
+const SEARCHING = "data-searching";
+
+/** Publishes the typed text's rendered width as `--typed` on the field's box. */
+function measureTyped(box: unknown, mirror: unknown): void {
+  const target = box as StyleTargetLike | null;
+  const text = mirror as MeasurableLike | null;
+  if (target === null || text === null) return;
+  target.style.setProperty("--typed", `${text.getBoundingClientRect().width.toFixed(1)}px`);
 }
 
 interface Item {
@@ -39,6 +78,15 @@ const MIN_LENGTH = 2;
  * A suggestion is only ever a link to a surname's page (or to the ordinary
  * search when it has no page). Nothing is filled in or resolved on the
  * reader's behalf. A failed, refused (429) or stale request shows nothing.
+ *
+ * The underline is an Atlas Thread (Visual System §8, §22): a hidden mirror of
+ * the typed text measures its width, and `globals.css` draws the thread that
+ * long. On submit, `<html data-searching>` names the mirror as the "before" of
+ * a cross-document view transition whose "after" is the result page's
+ * heading, so the typed surname becomes the heading (§23 "Search") across the
+ * ordinary GET navigation and its redirect. It is CSS only: a browser without
+ * cross-document view transitions simply navigates. The island skips the
+ * transition for any navigation that is not its own submitted search.
  */
 export function SurnameCombobox({
   lang,
@@ -55,6 +103,54 @@ export function SurnameCombobox({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const controller = useRef<AbortController | null>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mirrorRef = useRef<HTMLSpanElement>(null);
+
+  // The thread is as wide as the typed text: re-measured on every keystroke,
+  // on resize (the field's font size is responsive) and once the fonts load.
+  useLayoutEffect(() => {
+    measureTyped(boxRef.current, mirrorRef.current);
+  }, [value]);
+
+  useEffect(() => {
+    const box = boxRef.current;
+    if (box === null || typeof ResizeObserver === "undefined") return;
+    const remeasure = () => measureTyped(boxRef.current, mirrorRef.current);
+    const observer = new ResizeObserver(remeasure);
+    observer.observe(box);
+    void document?.fonts?.ready.then(remeasure);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const form = (inputRef.current as unknown as InputLike | null)?.form ?? null;
+    const root = document?.documentElement;
+    if (form === null || root === undefined || typeof window === "undefined") return;
+    let searching = false;
+    const onSubmit = () => {
+      searching = true;
+      root.setAttribute(SEARCHING, "");
+    };
+    const onPageSwap = (event: PageSwapLike) => {
+      if (!searching) event.viewTransition?.skipTransition();
+    };
+    // Restored from the back/forward cache: the field must not stay mid-flight.
+    const onPageShow = (event: PageSwapLike) => {
+      if (event.persisted === true) {
+        searching = false;
+        root.removeAttribute(SEARCHING);
+      }
+    };
+    form.addEventListener("submit", onSubmit);
+    window.addEventListener("pageswap", onPageSwap);
+    window.addEventListener("pageshow", onPageShow);
+    return () => {
+      form.removeEventListener("submit", onSubmit);
+      window.removeEventListener("pageswap", onPageSwap);
+      window.removeEventListener("pageshow", onPageShow);
+    };
+  }, []);
 
   useEffect(() => {
     const q = value.trim();
@@ -113,8 +209,9 @@ export function SurnameCombobox({
   }
 
   return (
-    <div className="combobox">
+    <div className="combobox" ref={boxRef}>
       <input
+        ref={inputRef}
         id="surname"
         name="surname"
         type="text"
@@ -137,6 +234,9 @@ export function SurnameCombobox({
         aria-controls={listId}
         aria-activedescendant={expanded && active >= 0 ? `${listId}-${String(active)}` : undefined}
       />
+      <span className="combobox-mirror" ref={mirrorRef} aria-hidden="true">
+        {value}
+      </span>
       <ul id={listId} role="listbox" className="combobox-list" hidden={!expanded}>
         {shown.map((item, i) => (
           <li

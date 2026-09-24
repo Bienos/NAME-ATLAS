@@ -5306,3 +5306,42 @@ WÓJCIK redirected there, and the home page's suggestions linked there.
 | Web build under `next start`, with a `DATABASE_URL` that fails on query | Before: `w%C3%B3jcik` (pl, en) refused as no surname while `nowak` reached the database. After: `w%C3%B3jcik` (pl, en) and `wi%C5%9Bniewska` reach the database, twice each (metadata and page); `NOWAK`, `a%2520b`, `w%25C3%25B3jcik` and `100%25` are still refused |
 
 **Not verified:** the three pages on production, which needs this change deployed.
+
+### Motion: the search becomes the result, and a test-teardown race (2026-09-24)
+
+Ported from the draft PR #8 (built on the stale default branch) at the project owner's "go".
+Only the interaction design and one test fix came across. `main`'s pages, copy and data are
+unchanged.
+
+- **The field's underline is an Atlas Thread** (Visual System §8, §22). A point where the name
+  begins is hollow until there is input, then Atlas Blue. A line in `--accent` is exactly as long
+  as the typed text: `surname-combobox.tsx` measures a hidden mirror of the text and publishes
+  `--typed`. Focus now darkens the rule to Ink (was Atlas Blue), so the blue thread reads against
+  it. Without script there is no thread and the field is unchanged.
+- **The typed surname becomes the result heading** (§23 "Search") through a cross-document view
+  transition. It is CSS only, so it works across the plain `GET` navigation and its 307 redirect to
+  `/pl/nazwisko/{slug}`. On submit the island sets `<html data-searching>`, which names the mirror
+  `surname-hero`. `.snapshot .surname` carries the same name on the result page and now hugs its
+  text (`inline-size: fit-content`); its fitting is unchanged, since it sizes against the snapshot
+  box. The island skips the transition on `pageswap` for any navigation that is not its own
+  submitted search. Browsers without cross-document view transitions (Firefox) just navigate.
+- **A figure resolves once** (`.hero-number`: a left-to-right reveal, 420 ms). The whole number
+  stays in the DOM, and the tested markup is unchanged.
+- All motion sits inside `prefers-reduced-motion: no-preference`. The island declares the browser
+  members it uses, as `share-button.tsx` does; `lib` stays `ES2022`.
+- **`packages/testing` teardown race, fixed** (cherry-pick of the draft branch's fix). `stop()`
+  waits for the pool's connections to close before `DROP DATABASE … WITH (FORCE)` or stopping the
+  container. Before, a closing client could get FATAL `57P01` with no listener, and Vitest reported
+  an unhandled error in whichever file was running (3 of 15 runs on the draft branch).
+
+| Check | Result |
+|---|---|
+| `pnpm lint`, `pnpm --filter web typecheck`, Prettier on the changed files | Passed |
+| `pnpm --filter web test` | 203 passed, unchanged |
+| `pnpm --filter ./apps/web build` | Compiled. Its only warnings are Next's own middleware bundle (`process.cwd` in the Edge runtime), also present without this change |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16 + PostGIS 3.4.2), with the fix | 1 run: 24 files, 278 passed, 24 s. The planned 10-vs-10 comparison against the old harness was stopped by the owner before it produced results |
+| `pnpm local:setup` on a fresh database, `DERIVE_LIMIT=3000` | Four files downloaded and verified; national and regional imports `IMPORTED`; slugs backfilled. Derivation stopped by hand at 3,248 surnames with claims |
+| `next start` on that database, Chromium (Playwright), `pagereveal` instrumented | Typing "Nowak" publishes `--typed: 83.3px`. Enter → 307 → `/pl/nazwisko/nowak` with a view transition in which `surname-hero` animates old → new (650 ms group; root 100 ms out, 300 ms in). A common-surname link: no view transition. A second search from `/pl/nazwisko/nowak` → `/pl/nazwisko/kowalski`: transition runs, no duplicate-name abort. Reduced motion: no transition, same destination. Unresolved `Zzyzxq`: renders on `/`, the typed name fades out. 390 px phone and Archive Night (dark): thread visible, transition pairs, `/pl/nazwisko/w%C3%B3jcik` opens. No console errors in any run |
+
+**Not verified:** Safari (cross-document view transitions from 18.2) and Firefox (no transition
+expected); the integration suite on the pinned container image (CI will run it); any deployment.
