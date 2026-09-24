@@ -5247,3 +5247,46 @@ deployment.
 **Found, not fixed (pre-existing):** the English `opengraph-image` route calls `answerSlug(slug,
 null)` without `"en"`, so it resolves in the Polish slug table; a surname whose English slug carries
 a different collision suffix would get a "not found" card.
+
+### Live: the visual system in production (2026-09-24)
+
+On the project owner's "merged go live": #4 and #5 merged into `main` with merge commits, the
+two new migrations applied to the hosted database, and production rebuilt from `main`.
+
+| Step | Result |
+|---|---|
+| Merge #4 | `e0cdce8`; its tree is identical to #4's tested head `d5989c6` |
+| Merge #5 (retargeted to `main` first) | `3ef901b`; its tree is identical to #5's tested head `add96f7` |
+| Migrations `0020`, `0021` on Supabase `xujctkjpvnmcdpximtda` | One `apply_migration` (`name_atlas_0020_0021_prefix_and_rank_indexes`): both files' `up` SQL verbatim, and their two `kysely_migration` rows, so the table holds 21 and `pnpm db:migrate` has nothing pending. `surnames_fold_key_trgm` and `claims_current_rank_value_idx` both `indisvalid`. Security advisors: no new finding |
+| Production deployment | `dpl_69cHVVACK2x3ZBFt6M7GznQ5fnaM`, created explicitly (`target: production`, `main` @ `3ef901b`), since the production branch is still the old default. Ready, region `fra1`, aliased to `name-atlas-two.vercel.app`. The previous one, `dpl_DDMHeViLLdQkTzBsHVQUDkp4UbRa` (`be826d9`), is the rollback candidate |
+
+Verified against `https://name-atlas-two.vercel.app` with `curl` from this environment, whose
+egress now reaches `vercel.app`:
+
+| Check | Result |
+|---|---|
+| `/`, `/en`, `/pl/porownaj?a=nowak&b=kowalski` | 200 |
+| `/pl/nazwisko/nowak` | 200; Name Print mark, `<h2 class="surname" style="--surname-em:3.835">NOWAK</h2>`, 98 387 and 99 738; `x-vercel-id` `iad1:iad1::fra1::…`; `x-ratelimit-limit: 60` |
+| `/icon.svg`, `/apple-icon.png`, `/favicon.ico` | 200 as `image/svg+xml`, `image/png`, `image/vnd.microsoft.icon`; no `x-ratelimit-*` header, so outside the limiter |
+| `/api/v1/surname-prefix` | `kow` → KOWALSKA, KOWALSKI, KOWALCZYK; `wisn` → WIŚNIEWSKA, WIŚNIEWSKI; `x-ratelimit-limit: 120` |
+| Share cards: NOWAK (pl, en), WÓJCIK (pl) | 1200×630 PNG in Newsreader, Inter and IBM Plex Mono, with the real counts (WÓJCIK 47 734 and 48 568) |
+| Runtime logs of the deployment, first 30 minutes | No `error`, `warning` or `fatal` line |
+
+**Found, not fixed: a surname page whose slug has a Polish letter says it does not exist.**
+`/pl/nazwisko/wi%C5%9Bniewska`, `/pl/nazwisko/w%C3%B3jcik` and `/en/surname/w%C3%B3jcik` return
+200 with "Pod tym adresem nie ma nazwiska" / "There is no surname at this address", so three of
+the seven loaded surnames (WIŚNIEWSKA, WIŚNIEWSKI, WÓJCIK) cannot be opened. Searching WÓJCIK
+redirects there, and the home page's suggestions link there. Observed:
+
+- The same response's `<title>` is "WÓJCIK — Name Atlas", with the counts in its description, so
+  `generateMetadata` resolved the slug. The RSC payload carries the page segment as
+  `"slug","w%C3%B3jcik"`: the page component's `params.slug` is still percent-encoded, which
+  `lookupSlug`'s canonical-form check (`packages/seo/src/lookup.ts`) rejects as `INVALID`
+  (no log line). Its comment assumes "Next decodes a dynamic route segment before handing it over".
+- In the runtime logs each such request has one `page_rendered … RESOLVED` line; `/pl/nazwisko/kowalski`
+  has two (metadata and page).
+- The same build under `next start` locally passes the check for `w%C3%B3jcik`, so the encoded
+  segment is specific to the Vercel runtime.
+- Pre-existing, not introduced by this merge: Next.js is 16.3.5 before and after, and the route and
+  slug code are unchanged since 2026-09-21. Not observed on the previous production deployment,
+  whose URL is behind Vercel SSO.
