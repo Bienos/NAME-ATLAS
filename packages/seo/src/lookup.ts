@@ -25,9 +25,11 @@ export async function lookupSlug(
   locale: SlugLocale,
   slug: string,
 ): Promise<SlugLookup> {
-  // Next decodes a dynamic route segment before handing it over, so decoding
-  // again would turn `%2520` into a space and resolve an address nobody asked
-  // for. The value is taken as given.
+  // The caller passes the route segment decoded once: as Next hands it to
+  // `generateMetadata`, or as a page component gets it after undoing the
+  // percent-encoding Next applies to its copy (`pageSlug` in apps/web).
+  // Decoding again would turn `%2520` into a space and resolve an address
+  // nobody asked for. The value is taken as given.
   if (slug === "" || slug !== canonicalSlug(slug)) return { kind: "INVALID" };
 
   const row = await db

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canonicalKey } from "@name-atlas/resolver";
-import { canonicalSlug, surnamePath } from "./slug.js";
+import { canonicalSlug, pageSlug, surnamePath } from "./slug.js";
 
 /** TASK-024 AC-1 — ADR-0009 / docs/canonical/21 §21–§23. Pure. */
 describe("canonicalSlug", () => {
@@ -75,5 +75,29 @@ describe("surnamePath", () => {
     for (const display of ["---", "/", "   "]) {
       expect(surnamePath(display, "pl")).toBeNull();
     }
+  });
+});
+
+describe("pageSlug", () => {
+  it("undoes the percent-encoding Next applies to a page's segment", () => {
+    // What the page component is handed at `/pl/nazwisko/w%C3%B3jcik`.
+    expect(pageSlug("w%C3%B3jcik")).toBe("wójcik");
+    for (const display of ["WIŚNIEWSKA", "ŁUCZAK", "ŻUK", "KOWALSKA-NOWAK", "O'NEIL", "NOWAK"]) {
+      const slug = canonicalSlug(display);
+      expect(pageSlug(encodeURIComponent(slug))).toBe(slug);
+    }
+  });
+
+  it("decodes once, so an encoded percent sign is still refused", () => {
+    // Next decodes `/pl/nazwisko/a%2520b` to `a%20b` and hands the page
+    // `a%2520b`. The lookup must see `a%20b`, which is not a canonical slug,
+    // and never `a b`.
+    expect(pageSlug("a%2520b")).toBe("a%20b");
+    expect(canonicalSlug("a%20b")).not.toBe("a%20b");
+  });
+
+  it("takes a malformed escape as given instead of throwing", () => {
+    expect(pageSlug("100%")).toBe("100%");
+    expect(pageSlug("%E0%A4%A")).toBe("%E0%A4%A");
   });
 });

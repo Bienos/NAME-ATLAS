@@ -5272,21 +5272,37 @@ egress now reaches `vercel.app`:
 | Share cards: NOWAK (pl, en), WÓJCIK (pl) | 1200×630 PNG in Newsreader, Inter and IBM Plex Mono, with the real counts (WÓJCIK 47 734 and 48 568) |
 | Runtime logs of the deployment, first 30 minutes | No `error`, `warning` or `fatal` line |
 
-**Found, not fixed: a surname page whose slug has a Polish letter says it does not exist.**
-`/pl/nazwisko/wi%C5%9Bniewska`, `/pl/nazwisko/w%C3%B3jcik` and `/en/surname/w%C3%B3jcik` return
-200 with "Pod tym adresem nie ma nazwiska" / "There is no surname at this address", so three of
-the seven loaded surnames (WIŚNIEWSKA, WIŚNIEWSKI, WÓJCIK) cannot be opened. Searching WÓJCIK
-redirects there, and the home page's suggestions link there. Observed:
+**Found while verifying, then fixed: a surname page whose slug has a Polish letter said it did not
+exist.** `/pl/nazwisko/wi%C5%9Bniewska`, `/pl/nazwisko/w%C3%B3jcik` and `/en/surname/w%C3%B3jcik`
+returned 200 with "Pod tym adresem nie ma nazwiska" / "There is no surname at this address", so
+three of the seven loaded surnames (WIŚNIEWSKA, WIŚNIEWSKI, WÓJCIK) could not be opened. Searching
+WÓJCIK redirected there, and the home page's suggestions linked there.
 
-- The same response's `<title>` is "WÓJCIK — Name Atlas", with the counts in its description, so
-  `generateMetadata` resolved the slug. The RSC payload carries the page segment as
-  `"slug","w%C3%B3jcik"`: the page component's `params.slug` is still percent-encoded, which
-  `lookupSlug`'s canonical-form check (`packages/seo/src/lookup.ts`) rejects as `INVALID`
-  (no log line). Its comment assumes "Next decodes a dynamic route segment before handing it over".
-- In the runtime logs each such request has one `page_rendered … RESOLVED` line; `/pl/nazwisko/kowalski`
-  has two (metadata and page).
-- The same build under `next start` locally passes the check for `w%C3%B3jcik`, so the encoded
-  segment is specific to the Vercel runtime.
-- Pre-existing, not introduced by this merge: Next.js is 16.3.5 before and after, and the route and
-  slug code are unchanged since 2026-09-21. Not observed on the previous production deployment,
-  whose URL is behind Vercel SSO.
+- **Cause.** Next 16.3.5 hands a page component its dynamic segment percent-encoded:
+  `getParamValue` (`next/dist/shared/lib/router/utils/get-dynamic-param.js`) applies
+  `encodeURIComponent` to what `getDynamicParam` calls "the value that is passed to user code".
+  `generateMetadata` and the image routes get the segment decoded. So the live response's
+  `<title>` was "WÓJCIK — Name Atlas" while its RSC payload carried `"slug","w%C3%B3jcik"`, which
+  `lookupSlug`'s canonical-form check refused as `INVALID`. In the runtime logs each such request
+  had one `page_rendered … RESOLVED` line where `/pl/nazwisko/kowalski` had two. An ASCII slug is
+  unchanged by the encoding, so only these broke.
+- **Not specific to Vercel.** It reproduces under `next start`. A local check needs a
+  `DATABASE_URL` that fails only when queried (`postgres://u:p@127.0.0.1:9/x`): without one, `db()`
+  throws before the slug is checked, every address reads as unavailable, and the difference cannot
+  show. An earlier version of this entry concluded otherwise from exactly such a run.
+- **Pre-existing.** Next.js is 16.3.5 before and after the merge, and the route and slug code are
+  unchanged since 2026-09-21. Not observed on the previous production deployment, whose URL is
+  behind Vercel SSO.
+- **Fix.** Both surname page components pass their segment through `pageSlug`
+  (`apps/web/src/lib/slug.ts`), which decodes it once, undoing exactly Next's encoding.
+  `generateMetadata` and the image routes are unchanged. It is not a second decoding of the request,
+  so `lookupSlug` still refuses `%2520`. The comments in `lookupSlug` and
+  `tests/integration/src/canonical-route.test.ts` that said Next decodes the segment are corrected.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | 694 passed; web 203 (3 new, for `pageSlug`) |
+| Web build under `next start`, with a `DATABASE_URL` that fails on query | Before: `w%C3%B3jcik` (pl, en) refused as no surname while `nowak` reached the database. After: `w%C3%B3jcik` (pl, en) and `wi%C5%9Bniewska` reach the database, twice each (metadata and page); `NOWAK`, `a%2520b`, `w%25C3%25B3jcik` and `100%25` are still refused |
+
+**Not verified:** the three pages on production, which needs this change deployed.
