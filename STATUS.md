@@ -29,21 +29,23 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Next
 
+- **TASK-034**, one section registry and one set of design tokens for the web app: chosen by the project owner on 2026-09-24 as the next cleanup. It starts once #7, #10 and `claude/kind-edison-eod395-main` are merged or dropped, since all three change the result page it refactors, and once GitHub's default branch is `main`. Its task file is written when it starts.
 - **TASK-031**, the Polona source spike (`tasks/031-polona-source-spike.md`): specified 2026-09-23, not started, and needs `polona.pl` to be reachable.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
 
 ## Open pull requests and branches
 
+As of 2026-09-24 19:30 UTC. The three merge into `main` in any order without a conflict. Merged together, they pass typecheck, lint, format, unit, integration, golden and build (a local trial merge).
+
 | | State | Next step |
 |---|---|---|
-| #7 Evidence at the foot of the page (ADR-0012) | on `main`, CI green | project owner reviews and merges or closes it |
-| `claude/kind-edison-eod395-main` (Atlas Thread search field; test pool teardown fix) | on `main`, CI green, no PR yet | open a PR, or drop it |
-| #8 Web preview | targets the stale default branch; superseded by `main`'s visual system and by the branch above | close |
-| #3 Vercel Web Analytics (bot) | 37 commits behind; would send surname URLs to a vendor, against `ARCHITECTURE.md` §7 | close, or redo deliberately |
+| #10 TASK-033: surname links from stored slugs; each section gated on its own rights | on `main`, CI green | project owner reviews and merges it |
+| #7 Evidence at the foot of the page (ADR-0012) | on `main`, CI green; also merged into the branch below | project owner reviews and merges or closes it; merging the branch below also merges it |
+| `claude/kind-edison-eod395-main`: the landing page, D-020 as light only, the surname page redesigned for readers new to statistics, "figures not prepared yet" for a listed surname, the Atlas Thread search field, a test-pool teardown fix, and #7 | on `main`, 7 commits ahead, CI green on `e4bd323`, no PR yet | open a PR, or drop it |
 
 ## Blocked on the project owner
 
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start 102 commits behind (`AGENTS.md` §11).
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **D-020** (dark mode): open, non-blocking. The other decisions in `docs/DECISIONS_NEEDED.md` are resolved.
+- **D-020** (dark mode): open on `main`, non-blocking. `claude/kind-edison-eod395-main` resolves it as light only, so this line goes when that branch merges. The other decisions in `docs/DECISIONS_NEEDED.md` are resolved.
