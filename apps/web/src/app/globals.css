@@ -1515,3 +1515,637 @@ main.landing {
     transform: scale(0.4);
   }
 }
+
+/* --- the surname profile: the result page's editorial layout ------------- */
+
+/*
+ * One screen that answers four questions, in the Visual System's grammar:
+ * large editorial numbers with a plain sentence (§12), a 12-column editorial
+ * grid on desktop with 8/4 "insight + annotation" chapters (§7), the map with
+ * a ranked list beside it (§12, screen 03), and the Atlas Thread — point, line,
+ * tick — as the one graphic language (§8). Everything stacks on a phone.
+ *
+ * Laid out against `.result`'s own width (container queries), so the same
+ * markup reads well wherever it is placed.
+ */
+main.profile {
+  max-width: 76rem;
+}
+
+main.profile + footer {
+  max-width: 76rem;
+}
+
+main.profile .search {
+  max-width: var(--measure);
+}
+
+.result {
+  container-type: inline-size;
+}
+
+/* The first screen: the name, then one column per register list. */
+.result .snapshot {
+  margin: 0;
+  padding: var(--space-7) 0 var(--space-7);
+}
+
+.result .snapshot .surname {
+  margin-bottom: var(--space-4);
+}
+
+/* On a wide profile the name may grow past the compact page's ceiling. */
+@media (min-width: 900px) {
+  .result .snapshot .surname {
+    font-size: max(3.5rem, min(9rem, calc(98cqi / var(--surname-em, 1))));
+  }
+}
+
+.result .snapshot > .tally {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.result .snapshot > .tally::before {
+  content: "";
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--confidence-verified);
+}
+
+.result .hero {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-8) var(--space-8);
+  margin: var(--space-8) 0 var(--space-5);
+}
+
+/* Each list's column starts at a point on its own line (Atlas Thread). */
+.result .hero-figure {
+  position: relative;
+  display: block;
+  padding-top: var(--space-5);
+  border-top: 2px solid var(--text-primary);
+}
+
+.result .hero-figure::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.hero-list,
+.list-label {
+  margin: 0 0 var(--space-3);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.hero-count {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 var(--space-5);
+}
+
+.result .hero-number {
+  font-size: clamp(3rem, 1.4rem + 5vw, 6rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+
+.result .hero-label {
+  margin-top: var(--space-3);
+  font-size: 0.9375rem;
+}
+
+.result .hero-line {
+  margin: 0 0 var(--space-3);
+}
+
+.hero-rarity {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.result .hero-where {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.hero-note {
+  max-width: 62ch;
+  font-size: 0.875rem;
+}
+
+/* The chapters as links: every figure one tap away. It stays in reach while
+   the chapters scroll past on a wide screen. */
+.chapter-nav {
+  margin: var(--space-6) 0 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--surface-primary);
+}
+
+.chapter-nav ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter-nav a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 12px 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.chapter-nav a:hover {
+  color: var(--accent);
+}
+
+.chapter-nav-number {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+
+/* A chapter: the question and how to read it, then the answer. */
+.result section.chapter {
+  display: grid;
+  gap: var(--space-6) var(--space-8);
+  margin: 0;
+  padding: var(--space-9) 0;
+  border-top: 1px solid var(--border-soft);
+  scroll-margin-top: var(--space-9);
+}
+
+.result .chapter-nav + section.chapter {
+  border-top: 0;
+}
+
+/* A chapter with nothing to show states that and takes little room. */
+.result section.chapter-empty {
+  padding: var(--space-7) 0;
+}
+
+.result section.chapter-empty .chapter-rail h3 {
+  margin-bottom: 0;
+  font-size: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+}
+
+.chapter-number {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
+.result .chapter-rail h3 {
+  margin: var(--space-3) 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.625rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.chapter-lede {
+  margin: 0;
+  max-width: 38ch;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* Side by side where there is room, one after the other where there is not. */
+.lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-8);
+}
+
+.list-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.list-label::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.result .claim {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.result .lists + .note {
+  margin-top: var(--space-6);
+}
+
+.claim-more {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* The claim's assessment and kind on one line, its scope and date on the next,
+   so a narrow column never starts a line with a separator. */
+.result .claim-meta {
+  gap: var(--space-2) var(--space-3);
+  font-size: 0.8125rem;
+}
+
+.result .claim-scope {
+  flex-basis: 100%;
+}
+
+.result .claim-scope::before {
+  content: none;
+}
+
+/* Rarity: the figure, where it sits on the scale, and its rank. */
+.figure {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 1.5rem + 1.6vw, 3rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+
+.result #rarity .claim-statement {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.rank {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+}
+
+.rank-number {
+  padding: 2px var(--space-3);
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.rank-caption {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.rscale {
+  margin: var(--space-6) 0 var(--space-6);
+}
+
+.rscale-track {
+  position: relative;
+  height: 2px;
+  margin: 0 0 var(--space-7);
+  background: var(--border-default);
+}
+
+.rscale-fill {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: var(--pos);
+  height: 4px;
+  background: var(--accent);
+}
+
+.rscale-point {
+  position: absolute;
+  top: 1px;
+  left: var(--pos);
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 3px solid var(--surface-primary);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.rscale-tick {
+  position: absolute;
+  top: -5px;
+  left: var(--at);
+  width: 1px;
+  height: 12px;
+  background: var(--border-strong);
+}
+
+.rscale-tick-label {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+}
+
+/* The first label starts at the line's start rather than overhanging it. */
+.rscale-tick:first-child .rscale-tick-label {
+  left: 0;
+  transform: none;
+}
+
+.rscale-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+@container (max-width: 26rem) {
+  .rscale-tick-minor .rscale-tick-label {
+    display: none;
+  }
+}
+
+/* Where: each list's headline sentence, then its map and ranked list. */
+.where-entry + .where-entry {
+  margin-top: var(--space-9);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border-soft);
+}
+
+.result .where-entry .claim-statement {
+  max-width: 52ch;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.375rem);
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.where-grid {
+  display: grid;
+  gap: var(--space-6) var(--space-9);
+  margin-top: var(--space-6);
+}
+
+.where-grid .vmap {
+  margin: 0;
+}
+
+.where-grid .vmap > svg {
+  max-width: 38rem;
+}
+
+.rank-bars {
+  font-size: 0.9375rem;
+}
+
+.rank-bars thead th {
+  padding: 0 0 var(--space-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+/* The global numeric-column rule right-aligns columns 2 and 3; here column 2
+   is the bar, which starts at the left. */
+.rank-bars th:nth-child(2),
+.rank-bars td:nth-child(2) {
+  text-align: left;
+}
+
+.rank-bars thead th:last-child,
+.rb-count {
+  text-align: right;
+}
+
+.rank-bars tbody th,
+.rank-bars tbody td {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+
+.rank-bars tbody th {
+  padding-right: var(--space-4);
+  font-weight: 500;
+}
+
+.rb-share {
+  width: 46%;
+  padding-right: var(--space-4);
+  white-space: nowrap;
+}
+
+.rb-track {
+  display: inline-block;
+  vertical-align: middle;
+  width: calc(100% - 3.75rem);
+  height: 10px;
+  background: var(--hover-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rb-fill {
+  display: block;
+  width: var(--w);
+  height: 100%;
+  background: var(--map-3);
+  transform-origin: left center;
+}
+
+.rb-fill[data-band="0"] {
+  background: var(--map-0);
+}
+.rb-fill[data-band="1"] {
+  background: var(--map-1);
+}
+.rb-fill[data-band="2"] {
+  background: var(--map-2);
+}
+.rb-fill[data-band="3"] {
+  background: var(--map-3);
+}
+.rb-fill[data-band="4"] {
+  background: var(--map-4);
+}
+
+.rb-value {
+  display: inline-block;
+  width: 3.75rem;
+  text-align: right;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+}
+
+.rank-bars td.rb-count {
+  padding-left: var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Sources at the foot, and the page's two actions. */
+.result section.sources-section {
+  display: grid;
+  gap: var(--space-4) var(--space-8);
+  margin: 0;
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-5) var(--space-6);
+  padding: var(--space-7) 0 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.result-actions .share,
+.result-actions .again {
+  margin: 0;
+}
+
+@container (min-width: 56rem) {
+  .chapter-nav {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .result section.chapter {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    padding: 96px 0;
+  }
+
+  .result section.chapter-empty {
+    padding: var(--space-8) 0;
+    align-items: end;
+  }
+
+  /* The map needs the full width: the question sits above it, its reading
+     note beside the question. */
+  .result section.chapter-wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .result section.chapter-wide .chapter-rail {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    column-gap: var(--space-8);
+  }
+
+  .result section.chapter-wide .chapter-lede {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: end;
+  }
+
+  .where-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+  }
+
+  .where-grid-table {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .result section.sources-section {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+
+  .result section.sources-section > h3 {
+    grid-row: 1 / span 2;
+  }
+}
+
+/* Drawn as they come into view, where the browser can tie an animation to
+   scrolling; elsewhere, and with reduced motion, they are simply there. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .rscale-fill {
+      animation: rscale-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+
+    .rscale-point {
+      animation: rscale-travel linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+
+    .rb-fill {
+      animation: rb-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+
+@keyframes rscale-grow {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes rscale-travel {
+  from {
+    left: 0;
+  }
+}
+
+@keyframes rb-grow {
+  from {
+    transform: scaleX(0);
+  }
+}

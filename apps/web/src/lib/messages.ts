@@ -345,7 +345,7 @@ export const UI = {
     title: "Name Atlas",
     tagline: "Uczciwe, udokumentowane odpowiedzi o polskich nazwiskach.",
     landingHeadline: "Każde nazwisko",
-    landingHeadlineEm: "skądś pochodzi.",
+    landingHeadlineEm: "ma swój początek.",
     landingLede:
       "Zobacz, co oficjalny rejestr PESEL zapisuje o nazwisku — ze źródłem i datą przy każdej " +
       "liczbie i z uczciwą luką wszędzie tam, gdzie kończą się dane.",
@@ -398,6 +398,32 @@ export const UI = {
       "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
     heroRightsBlocked: "Liczby nie można pokazać tutaj z powodu licencji źródła.",
     heroStrongestRegion: "Najwięcej zameldowanych",
+    heroInRegister: "osób w rejestrze PESEL",
+    chapterCountTitle: "Ile osób nosi to nazwisko?",
+    chapterCountLede:
+      "Rejestr PESEL publikuje dwie osobne listy nazwisk: męską i żeńską. Każdą liczbę " +
+      "pokazujemy osobno i nigdy ich nie sumujemy.",
+    chapterRarityTitle: "Jak rzadkie jest to nazwisko?",
+    chapterRarityLede:
+      "„1 na X” znaczy, że mniej więcej jedna na X osób z tej listy nosi to nazwisko. Im większe " +
+      "X, tym rzadsze nazwisko. Miejsce liczymy od najczęstszego nazwiska na liście.",
+    chapterWhereTitle: "Gdzie jest najczęściej zameldowane?",
+    chapterWhereLede:
+      "Mapa i lista pokazują, w których województwach osoby o tym nazwisku mają zameldowanie " +
+      "na pobyt stały. Im ciemniejszy kolor i dłuższy pasek, tym większy udział.",
+    chapterMeaningTitle: "Co oznacza to nazwisko?",
+    chapterMeaningLede:
+      "Znaczenie podajemy tylko wtedy, gdy stoi za nim opracowanie naukowe. Nie zgadujemy.",
+    navLabel: "Na tej stronie",
+    navCount: "Liczba osób",
+    navRarity: "Rzadkość",
+    navWhere: "Województwa",
+    navMeaning: "Znaczenie",
+    navSources: "Źródła",
+    rankCaption: "miejsce na liście nazwisk",
+    scaleLabel: "Skala rzadkości",
+    scaleCommon: "częstsze",
+    scaleRare: "rzadsze",
     rarityNotComparable:
       "Każda wartość „1 na X” liczona jest w obrębie własnego zbioru. Zbiory mają różną wielkość, " +
       "więc tych dwóch wartości nie porównujemy ze sobą.",
@@ -501,6 +527,32 @@ export const UI = {
       "The PESEL register lists this surname, but its figures have not been prepared yet.",
     heroRightsBlocked: "The count cannot be shown here because of the source's licence.",
     heroStrongestRegion: "Most registered in",
+    heroInRegister: "people in the PESEL register",
+    chapterCountTitle: "How many people have this surname?",
+    chapterCountLede:
+      "The PESEL register publishes two separate surname lists, male and female. We show each " +
+      "figure on its own and never add them up.",
+    chapterRarityTitle: "How rare is this surname?",
+    chapterRarityLede:
+      "“1 in X” means that roughly one in every X people on this list has this surname. The " +
+      "bigger X, the rarer the name. The rank counts from the most common surname on the list.",
+    chapterWhereTitle: "Where is it most often registered?",
+    chapterWhereLede:
+      "The map and the list show the voivodeships where people with this surname have a " +
+      "registered permanent address. The darker the colour and the longer the bar, the bigger " +
+      "the share.",
+    chapterMeaningTitle: "What does this surname mean?",
+    chapterMeaningLede: "We give a meaning only when a scholarly work supports it. We don't guess.",
+    navLabel: "On this page",
+    navCount: "Count",
+    navRarity: "Rarity",
+    navWhere: "Voivodeships",
+    navMeaning: "Meaning",
+    navSources: "Sources",
+    rankCaption: "rank on the surname list",
+    scaleLabel: "Rarity scale",
+    scaleCommon: "more common",
+    scaleRare: "rarer",
     rarityNotComparable:
       "Each 1-in-X is computed within its own dataset. The datasets are different sizes, so these " +
       "two figures are not compared with each other.",

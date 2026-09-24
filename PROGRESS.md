@@ -5453,3 +5453,50 @@ Night, asked why it was not the one they saw and why the page could not be white
 | `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium (Playwright) | Landing at 1440 px with a dark colour scheme renders Paper; 1280 px English; 820 px (no field graphic); 390 px phone, field and button on one row. Typing "Kowalczyk" turns the lead node blue. Search "Nowak" → `/pl/nazwisko/nowak` with the `surname-hero` transition (650 ms). Second search, reduced motion, unresolved query, phone and dark scheme: same results as before this change. No console errors |
 
 **Not verified:** Safari and Firefox; CI.
+
+### The surname page redesigned: one column per list, question chapters, scale and ranked bars (2026-09-24)
+
+The project owner asked for the result page to be redesigned so that readers new to statistics can
+take in the data at a glance, on desktop as well as on a phone. It was one 40rem column of claim
+sentences, each followed by the same source line, 4,712 px tall for WINIECKI at 1440 px.
+
+What changed (presentation only; no fact is derived, and every existing honesty test still holds):
+
+- **Wider page.** The canonical surname page is 76rem wide. Chapters are laid out against the result's
+  own width (container queries): from 56rem, a 4/8 editorial grid (Visual System §7); below it, one
+  column.
+- **The snapshot** is the name (up to 9rem on desktop), the claim tally, then **one column per register
+  list**: its label, its count as a large number ("osób w rejestrze PESEL" and the date), its 1 in X and
+  its strongest voivodeship. Figures are matched to a column by the list their claim belongs to, never
+  by position; a figure whose list has no column keeps its own line. The not-compared note stays.
+- **A row of chapter links** under the snapshot (sticky on a wide screen), numbered in page order.
+- **Four chapters, each a question** with a short "how to read this" note in its rail: *Ile osób nosi to
+  nazwisko?*, *Jak rzadkie jest to nazwisko?*, *Gdzie jest najczęściej zameldowane?*, *Co oznacza to
+  nazwisko?* (and English). Numbering follows the intent order. A chapter with no figures is compact
+  and carries no reading note.
+- **Rarity:** per list, the 1-in-X figure, `rarity-scale.tsx` (the figure as a point on a fixed log
+  axis from 1 in 100 to past 1 in 10 million, ticks per power of ten, no categories), the rank the
+  claim carries as `#N`, then the claim.
+- **Voivodeships:** per list, the claim sentence as the headline, then the map beside a ranked table
+  whose share cell carries a bar: its length is the share against the entry's largest, its colour the
+  region's map band. The coverage warning still leads the claim.
+- **Claim meta** puts the assessment and source kind on one line and the scope and date on the next.
+- The scale and the bars draw as they come into view where the browser supports scroll-driven
+  animations, only under `prefers-reduced-motion: no-preference`; otherwise they are drawn.
+- The landing's Polish headline is now *"Każde nazwisko / ma swój początek."*: the previous wording
+  said *pochodzi*, which the result pages' honesty guard forbids.
+
+Two existing tests were rescoped to the new markup, with the same assertions: the meaning test now
+slices from `id="meaning"` (the chapter links also say "Meaning"), and the no-TERC test looks for
+`<table class="rank-bars">`. Six tests were added (list matching, scale position and absence, rank,
+bar length and shade, chapter numbering in intent order, empty chapters).
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 211 (205 + 6) |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 files, 279 passed |
+| `next start` on the local database, Chromium (Playwright) | WINIECKI, NOWAK (English) and KOWALSKI at 1440/1280 px, WINIECKI at 390 px, DETTLAFF (not derived): each chapter captured, no horizontal overflow, no console errors. Search "Nowak" → `surname-hero` transition (650 ms); second search, reduced motion, unresolved query, phone and dark scheme as before |
+
+**Not verified:** Safari and Firefox (scroll-driven animation is Chromium-only today; elsewhere the
+scale and bars are simply drawn); CI.
