@@ -932,3 +932,11 @@ describe("a meaning's formation type is words, never its code", () => {
     }
   });
 });
+
+describe("the snapshot surname is measured for fitting", () => {
+  it("carries its width in em for the stylesheet, and nothing else changes", () => {
+    const markup = render(RESOLVED, "pl");
+    // NOWAK: 4.035 em of advances, less 5 × 0.04 em of tracking (surname-fit.ts).
+    expect(markup).toContain('<h2 class="surname" style="--surname-em:3.835">NOWAK</h2>');
+  });
+});

@@ -96,8 +96,11 @@ export function middleware(request: NextRequest): NextResponse {
  * `robots.txt`, `sitemap.xml` and the sitemap pages are **excluded on purpose**:
  * they are how a crawler discovers what it may read, and rate-limiting the map
  * while publishing the territory would be self-defeating. Static assets are
- * excluded because they never reach the database.
+ * excluded because they never reach the database — the three icons included,
+ * which every page asks for.
  */
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|robots.txt|sitemap).*)",
+  ],
 };
