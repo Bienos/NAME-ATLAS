@@ -13,7 +13,17 @@ import type { SlugLocale } from "./slug.js";
  * `COLLISION` is therefore gone as an outcome: it cannot happen.
  */
 export type SlugLookup =
-  | { readonly kind: "RESOLVED"; readonly surname_id: string; readonly display_name: string }
+  | {
+      readonly kind: "RESOLVED";
+      readonly surname_id: string;
+      readonly display_name: string;
+      /**
+       * The stored current address that matched. Links to this surname are built
+       * from this, never recomputed from `display_name`: a surname that lost a
+       * slug collision holds a suffixed address the display form cannot produce.
+       */
+      readonly slug: string;
+    }
   /** A retired address. The caller answers 301 with `current_slug` (§26). */
   | { readonly kind: "MOVED"; readonly current_slug: string }
   | { readonly kind: "UNKNOWN" }
@@ -37,6 +47,7 @@ export async function lookupSlug(
     .innerJoin("surnames", "surnames.surname_id", "surname_slugs.surname_id")
     .select([
       "surname_slugs.surname_id as surname_id",
+      "surname_slugs.slug as slug",
       "surname_slugs.is_current as is_current",
       "surnames.canonical_display as canonical_display",
       "surnames.entity_status as entity_status",
@@ -54,6 +65,7 @@ export async function lookupSlug(
       kind: "RESOLVED",
       surname_id: row.surname_id,
       display_name: row.canonical_display,
+      slug: row.slug,
     };
   }
 

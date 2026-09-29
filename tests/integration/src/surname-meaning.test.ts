@@ -294,6 +294,45 @@ describe("SURNAME_MEANING against a real PostgreSQL", () => {
       expect(JSON.stringify(parsed)).not.toContain("PLACEHOLDER");
     });
 
+    // Two agreeing works support KOWALCZYK, so the claim has two citations with
+    // two rights profiles. Publishing the claim publishes both works' readings,
+    // so blocking *either* must close the section. A gate that read only the
+    // display citation would publish in one of these two cases, whichever work
+    // that citation happened to be.
+    it.each(["synthetic_test_onomastic_work_a", "synthetic_test_onomastic_work_b"])(
+      "omits every interpretation when one of two supporting works is blocked (%s)",
+      async (blockedSourceKey) => {
+        await importOnomasticSource(db(), { bytes: WORK_A, allowSynthetic: true });
+        await importOnomasticSource(db(), { bytes: WORK_B, allowSynthetic: true });
+        await deriveSurnameMeaning(db(), "KOWALCZYK");
+
+        await sql`
+          UPDATE rights_profiles rp SET review_status = 'BLOCKED'
+           FROM sources src
+          WHERE src.default_rights_profile_id = rp.rights_profile_id
+            AND src.source_key = ${blockedSourceKey}
+        `.execute(db());
+        // Exactly one of the two citations is now under a blocked profile.
+        const blocked = await sql<{ n: string }>`
+          SELECT count(*)::text AS n
+            FROM citations cit
+            JOIN claims c          ON c.claim_id = cit.claim_id
+            JOIN rights_profiles rp ON rp.rights_profile_id = cit.rights_profile_id
+           WHERE c.claim_type = 'SURNAME_MEANING' AND c.claim_status = 'ACTIVE'
+           GROUP BY rp.review_status = 'BLOCKED'
+           ORDER BY rp.review_status = 'BLOCKED'
+        `.execute(db());
+        expect(blocked.rows.map((r) => r.n)).toEqual(["1", "1"]);
+
+        const outcome = await querySurnameResult(db(), "KOWALCZYK", { surface: "FREE" });
+        if (outcome.kind !== "OK") throw new Error("expected OK");
+        const parsed = surnameResultResponseSchema.parse(outcome.response);
+        expect(parsed.meaning?.state).toBe("RIGHTS_BLOCKED");
+        expect(parsed.meaning?.interpretations).toEqual([]);
+        expect(JSON.stringify(parsed)).not.toContain("PLACEHOLDER");
+      },
+    );
+
     it("keeps the meaning's rights independent of the register's", async () => {
       await importOnomasticSource(db(), { bytes: WORK_A, allowSynthetic: true });
       await deriveCurrentPopulation(db(), "KOWALCZYK");

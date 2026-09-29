@@ -12,7 +12,6 @@ import {
 } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SearchForm } from "./search-form.js";
-import { surnamePath } from "./slug.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { NamePrint } from "./name-print.js";
@@ -37,6 +36,8 @@ export interface ComparisonSide {
   readonly slug: string;
   readonly display: string | null;
   readonly response: SurnameResultResponse | null;
+  /** The surname's stored address in the page's language, when it has one. */
+  readonly path: string | null;
 }
 
 function reasonWords(reason: NotComparable, lang: Lang): string {
@@ -283,14 +284,13 @@ export function ComparisonView({
         )}
 
         <p className="again">
-          {[a, b].map((side) => {
-            const path = side.display === null ? null : surnamePath(side.display, lang);
-            return path === null ? null : (
-              <a key={side.slug} href={path}>
+          {[a, b].map((side) =>
+            side.path === null || side.display === null ? null : (
+              <a key={side.slug} href={side.path}>
                 {side.display}
               </a>
-            );
-          })}
+            ),
+          )}
         </p>
         <SearchForm lang={lang} query="" />
       </main>

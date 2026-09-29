@@ -562,7 +562,14 @@ export interface PersistedSurnameMeaning {
   readonly source_type: string;
   readonly attribution_text: string | null;
   readonly terms_version: string | null;
+  /** The rights in force for the display citation (the first). */
   readonly rights: EffectiveRights;
+  /**
+   * The rights in force for every citation, one per supporting work. Publishing
+   * the claim publishes all of its evidence, so the section is gated on all of
+   * them, not on the display citation alone.
+   */
+  readonly citation_rights: readonly EffectiveRights[];
 }
 
 interface MeaningReadRow {
@@ -646,8 +653,21 @@ export async function readSurnameMeaning(
   `.execute(db);
 
   const byClaim = new Map<string, PersistedSurnameMeaning>();
+  const rightsByClaim = new Map<string, EffectiveRights[]>();
   for (const row of result.rows) {
-    if (byClaim.has(row.claim_id)) continue;
+    const rights: EffectiveRights = {
+      automated_access: row.automated_access,
+      commercial_use: row.commercial_use,
+      redistribution: row.redistribution,
+      metadata_rights: row.metadata_rights,
+      review_status: row.review_status,
+    };
+    const seen = rightsByClaim.get(row.claim_id);
+    if (seen) {
+      seen.push(rights);
+      continue;
+    }
+    rightsByClaim.set(row.claim_id, [rights]);
     byClaim.set(row.claim_id, {
       claim_id: row.claim_id,
       claim_key: row.claim_key,
@@ -669,14 +689,12 @@ export async function readSurnameMeaning(
       source_type: row.source_type,
       attribution_text: row.attribution_text,
       terms_version: row.terms_version,
-      rights: {
-        automated_access: row.automated_access,
-        commercial_use: row.commercial_use,
-        redistribution: row.redistribution,
-        metadata_rights: row.metadata_rights,
-        review_status: row.review_status,
-      },
+      rights,
+      citation_rights: [],
     });
   }
-  return [...byClaim.values()];
+  return [...byClaim.values()].map((claim) => ({
+    ...claim,
+    citation_rights: rightsByClaim.get(claim.claim_id) ?? [claim.rights],
+  }));
 }

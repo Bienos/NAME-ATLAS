@@ -6,7 +6,7 @@ import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { assessIndexability, indexingEnabled } from "./seo.js";
 import { seoGatesFor } from "./seo-surface.js";
-import { resolveSlug, surnamePath } from "./slug.js";
+import { currentPathFor, pathForSlug, resolveSlug } from "./slug.js";
 import {
   formatDate,
   formatInteger,
@@ -51,6 +51,10 @@ export type PageAnswer =
       readonly kind: "RESULT";
       readonly response: SurnameResultResponse;
       readonly display: string;
+      /** The stored address that resolved, in the page's language. Links use it. */
+      readonly slug: string;
+      /** The same surname's stored address in the other language, if it has one. */
+      readonly otherLangPath: string | null;
       /** §40's SEO-surface and privacy gates, evaluated where the database is. */
       readonly gates: { readonly seoSurfaceAllowed: boolean; readonly privacyPublic: boolean };
     };
@@ -108,10 +112,17 @@ export async function answerSlug(
       ms: Date.now() - startedAt,
     });
     const gates = await seoGatesFor(db, resolved.surname_id);
+    const otherLangPath = await currentPathFor(
+      db,
+      resolved.surname_id,
+      lang === "pl" ? "en" : "pl",
+    );
     return {
       kind: "RESULT",
       response: parsed.data,
       display: resolved.display_name,
+      slug: resolved.slug,
+      otherLangPath,
       gates: { seoSurfaceAllowed: gates.seoSurfaceAllowed, privacyPublic: gates.privacyPublic },
     };
   } catch (cause: unknown) {
@@ -177,14 +188,16 @@ export function requestOrigin(host: string | null, protocol = "https"): string |
 /**
  * The canonical path for an answer.
  *
- * Derived from the **resolved** surname where there is one, never echoed from
- * the request: a differently-encoded address must still declare the one
- * canonical URL, which is the whole point of the tag. Only an unresolved
- * address falls back to what was asked for, and that address is `noindex`.
+ * Taken from the **resolved** surname's stored address where there is one, never
+ * echoed from the request: a differently-encoded address must still declare the
+ * one canonical URL, which is the whole point of the tag. Nor is it recomputed
+ * from the display form, which cannot produce a collision suffix
+ * (`currentPathFor`). Only an unresolved address falls back to what was asked
+ * for, and that address is `noindex`.
  */
 export function canonicalPathFor(answer: PageAnswer, lang: Lang, slug: string): string {
   if (answer.kind === "RESULT") {
-    const path = surnamePath(answer.display, lang);
+    const path = pathForSlug(answer.slug, lang);
     if (path !== null) return path;
   }
   const encoded = encodeURIComponent(slug);
@@ -270,7 +283,7 @@ export function CanonicalSurnamePage({
   const shareUrl = origin === null ? null : `${origin}${path}`;
   const otherLang: Lang = lang === "pl" ? "en" : "pl";
   const otherPath =
-    (answer.kind === "RESULT" ? surnamePath(answer.display, otherLang) : null) ??
+    (answer.kind === "RESULT" ? answer.otherLangPath : null) ??
     (otherLang === "en" ? "/?lang=en" : "/");
 
   return (

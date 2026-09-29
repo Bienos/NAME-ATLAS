@@ -18,6 +18,6 @@ interface Props {
 
 export default async function Page({ searchParams }: Props) {
   const params = await searchParams;
-  const { a, b } = await loadComparison(firstParam(params["a"]), firstParam(params["b"]));
+  const { a, b } = await loadComparison(firstParam(params["a"]), firstParam(params["b"]), "en");
   return <ComparisonView a={a} b={b} lang="en" />;
 }

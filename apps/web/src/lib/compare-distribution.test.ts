@@ -89,8 +89,8 @@ const B = response("BETA", [
 const render = (a: SurnameResultResponse, b: SurnameResultResponse, lang: "pl" | "en" = "pl") =>
   renderToStaticMarkup(
     createElement(ComparisonView, {
-      a: { slug: "alfa", display: "ALFA", response: a },
-      b: { slug: "beta", display: "BETA", response: b },
+      a: { slug: "alfa", display: "ALFA", response: a, path: "/pl/nazwisko/alfa" },
+      b: { slug: "beta", display: "BETA", response: b, path: "/pl/nazwisko/beta" },
       lang,
     }),
   );

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { canonicalKey } from "@name-atlas/resolver";
-import { canonicalSlug, pageSlug, surnamePath } from "./slug.js";
+import { canonicalSlug, pageSlug, pathForSlug } from "./slug.js";
 
 /** TASK-024 AC-1 — ADR-0009 / docs/canonical/21 §21–§23. Pure. */
 describe("canonicalSlug", () => {
@@ -63,18 +63,24 @@ describe("canonicalSlug", () => {
   });
 });
 
-describe("surnamePath", () => {
-  it("builds the locale-prefixed canonical path, percent-encoded", () => {
-    expect(surnamePath("KOWALCZYK", "pl")).toBe("/pl/nazwisko/kowalczyk");
-    expect(surnamePath("ŁUCZAK", "pl")).toBe("/pl/nazwisko/%C5%82uczak");
-    expect(surnamePath("KOWALCZYK", "en")).toBe("/en/surname/kowalczyk");
+describe("pathForSlug", () => {
+  it("builds the locale-prefixed path for a stored slug, percent-encoded", () => {
+    expect(pathForSlug("kowalczyk", "pl")).toBe("/pl/nazwisko/kowalczyk");
+    expect(pathForSlug("łuczak", "pl")).toBe("/pl/nazwisko/%C5%82uczak");
+    expect(pathForSlug("kowalczyk", "en")).toBe("/en/surname/kowalczyk");
+  });
+
+  it("keeps a collision suffix, which no display form can produce", () => {
+    // ADR-0010 §2: of two surnames that share a slug, one gets a suffix derived
+    // from its id. Links must carry the stored slug, suffix included.
+    expect(pathForSlug("test-collision-0a1b2c3d", "pl")).toBe(
+      "/pl/nazwisko/test-collision-0a1b2c3d",
+    );
   });
 
   it("returns null rather than an address with an empty segment", () => {
     // `/pl/nazwisko/` is not a surname's address; it is no address at all.
-    for (const display of ["---", "/", "   "]) {
-      expect(surnamePath(display, "pl")).toBeNull();
-    }
+    expect(pathForSlug("", "pl")).toBeNull();
   });
 });
 

@@ -96,6 +96,34 @@ export function evaluateAllSurfaces(rights: EffectiveRights): readonly SurfaceEl
   return SURFACES.map((surface) => evaluateSurface(rights, surface));
 }
 
+const DECISION_SEVERITY: Readonly<Record<SurfaceDecision, number>> = {
+  ALLOWED: 0,
+  CONDITIONAL: 1,
+  BLOCKED: 2,
+};
+
+/**
+ * The surface decision for one section of a result.
+ *
+ * It starts from `base`, the decision already in force for the result, and
+ * each of the section's own claims can only tighten it. The most restrictive
+ * decision wins, and ties keep the earlier reason. A claim therefore never
+ * appears on a surface its own rights forbid, even when another section's
+ * rights allow that surface. A section with no claims keeps `base`.
+ */
+export function sectionEligibility(
+  base: SurfaceEligibility,
+  rights: readonly EffectiveRights[],
+  surface: Surface,
+): SurfaceEligibility {
+  return rights.reduce<SurfaceEligibility>((strictest, claimRights) => {
+    const own = evaluateSurface(claimRights, surface);
+    return DECISION_SEVERITY[own.decision] > DECISION_SEVERITY[strictest.decision]
+      ? own
+      : strictest;
+  }, base);
+}
+
 // ---------------------------------------------------------------------------
 // Per-asset rights (ADR-0007, resolving D-003)
 // ---------------------------------------------------------------------------
