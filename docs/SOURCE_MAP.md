@@ -68,6 +68,15 @@ Binding for product and UX intent, not for engineering structure. Read only the 
 | `NAME_ATLAS_09_PROMPT_LIBRARY(1).md` | Prompt library used to produce the corpus; not a runtime artifact |
 | `NAME_ATLAS_MD_MANIFEST_2026-09-17.md` | Manifest of the original 2026-09-17 document set |
 
+## Supporting research — `reports/` and `research_notes/`
+
+Same authority as `docs/library/` supporting research: background, not specification. Read only when a task names the file. Items marked UNVERIFIED or "needs counsel" are open questions, not source verification.
+
+| Document | Owns |
+|---|---|
+| `reports/Name Atlas moat and data sources.md` | Differentiation research as of 2026-09-29: competitors (Polish and diaspora), which moats are real versus copyable, and candidate lawful data sources with their stated licences |
+| `research_notes/Name Atlas moat and data sources/` | The six research notes behind that report |
+
 ## Reference — `docs/reference/`
 
 | Document | Owns |

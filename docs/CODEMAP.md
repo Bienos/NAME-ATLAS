@@ -29,6 +29,7 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/sources/pesel.md` | PESEL source-verification record — complete for the national production pair; D-001 resolved; TASK-004's §14 answers and the partition observation recorded at the end | active |
 | `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (done). One file per task — the second, superseded TASK-004 draft was deleted, its one unique contribution having been adopted first (`AGENTS.md` §3) | active |
 | `prompts/` | Session prompts as delivered | reference |
+| `reports/`, `research_notes/` | Supporting research (2026-09-29): `reports/Name Atlas moat and data sources.md` and its six notes in `research_notes/Name Atlas moat and data sources/`. Not specification; classified in `docs/SOURCE_MAP.md` | reference, on demand |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
 | `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Single lint/format configuration for the whole workspace (`AGENTS.md` §6) | stable (TASK-001) |
