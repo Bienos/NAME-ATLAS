@@ -63,7 +63,10 @@ Rate, measured on the same local database holding the complete register, by coun
 | Run | Rate |
 |---|---|
 | Before: `derive-batch --rank`, 8 workers | 5 surnames a second (`CURRENT_POPULATION` 128 → 432 in 60 s) |
-| After: the same command with the fix | 65 surnames a second (`RARITY_CONTEXT` 880 → 4,887 in 61 s) |
+| After, first minute | 65 surnames a second (`RARITY_CONTEXT` 880 → 4,887 in 61 s) |
+| After, sustained, with nothing else running on the machine | 35 surnames a second (`RARITY_CONTEXT` 13,818 → 18,100 in 120 s), load average 5.9 on 4 CPUs |
+
+The sustained figure is the one to plan with: about 7× faster, and bound by CPU rather than by one repeated query.
 
 ## Not verified
 
