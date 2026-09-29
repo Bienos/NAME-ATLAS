@@ -93,3 +93,8 @@ The number is presented as a count with its scope, never as an estimate — the 
 templates in English and Polish are recorded in `docs/contracts/surname-result.md`. A publisher
 confirmation, if one is ever obtained, is recorded here and changes nothing unless it contradicts
 this reading.
+
+**Publisher confirmation, recorded 2026-09-29.** Ministerstwo Cyfryzacji's communiqué "Nic nowego – Nowak znowu
+pierwszy" (gov.pl, 10.02.2021) states dataset 1681's counts as people: *"Nowak – tak na nazwisko ma 102 503 kobiet i
+100 617 mężczyzn"*. All five of its figures are exact `Liczba` values in the 2021 national resources. It concerns the
+2021 edition and agrees with this reading, so nothing changes. Evidence: `docs/sources/acquisition/2026-09-29-pesel-unit/`.
