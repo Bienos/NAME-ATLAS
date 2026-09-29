@@ -8,6 +8,37 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-022 — *Onomastica*: may Name Atlas rely on the licence the journal declares for vol. 64 (2020) onward?
+
+**Status:** BLOCKS any *Onomastica* ingestion task, which is not written. NON-BLOCKING for everything else. Open.
+**Owner:** project owner. The rights holder is Instytut Języka Polskiego PAN. The journal's site gives the address `onomastica@ijppan.pl`.
+**Raised by:** TASK-032, 2026-09-29. Evidence: `docs/sources/onomastica.md` §6–§9, §12 and §14.
+
+**The statements, as read on 2026-09-29.** All but the last are on the journal's own site or in its DOAJ record:
+
+- **"Essential facts"** is the page DOAJ records as the journal's licence terms. Its "Copyright and Licensing Policy" says: "From vol. 64 (2020) the articles published in Onomastica are available under a Creative Commons licence Attribution-NoDerivatives 4.0 International (CC BY-ND 4.0)". DOAJ's record gives the same licence.
+- **The articles:** 174 of the 177 article PDFs of vols 64–69 print the same licence on page 1, with the `by-nd/4.0/` URL. Three one-page notes print nothing.
+- **The Guidelines page says otherwise:** "The content published in the journal is fully protected by the copyright law. The Editors are currently working on introducing a specified type of the Creative Commons license in the future."
+- **The agreement template** linked from Guidelines names "Creative Commons Attribution - No Derivative Works 3.0" and links `http://creativecommons.org/licenses/by-sa/3.0/`.
+- **Every page** shows an unlinked BY-ND 3.0 badge.
+- **The OJS article metadata** carries a copyright line and an empty licence URL.
+- **journals.pan.pl serves different files for the same articles.** Its 23 vol. 64 copies print "Creative Commons Attribution-NoDerivatives 4.0 Poland (CC BY-ND 4.0)" with the URL `https://creativecommons.org/licenses/by-nc-nd/4.0/deed.pl`, a non-commercial licence, and link the BY-ND legal code.
+
+**What follows today:**
+
+- TASK-032's fail-closed rule keeps every permission `UNKNOWN` while the statements conflict (§12). ADR-0008 §4's condition 4 is therefore `UNRESOLVED`, and no *Onomastica* article is admissible.
+- Vols 56–63 (2012–2019) state no licence at all. Only a licence from the rights holder would admit them; this decision does not.
+
+**Options:**
+
+- (a) ask IJP PAN to confirm the licence per volume before any ingestion. The questions are drafted as N1–N9 in `docs/sources/onomastica.md` §13.
+- (b) rely on the declared policy and each article's own statement for vols 64–69, as the project owner's judgement recorded as such, as D-007 did for PESEL. Vols 56–63 stay out.
+- (c) leave *Onomastica* out of Path B, and look for other attributed sources.
+
+**Consequence if unresolved:** no *Onomastica* article can support a meaning claim. ADR-0008's "no sourced meaning" stays the result for any surname only this journal discusses.
+
+---
+
 ## D-021 — Polona: may a connector query it automatically, and what is its source default? (items 2 and 3 RESOLVED by ADR-0014)
 
 **Status:** BLOCKS the Polona connector task (M3), which is not written. NON-BLOCKING for everything else. Items 1 and 4 are open.

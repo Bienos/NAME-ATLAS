@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://onomastica.ijppan.pl/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T14:15:06Z</responseDate>
+	<request verb="GetRecord" metadataPrefix="jats" identifier="oai:ojs2.onomastica.ijppan.pl:article/400">https://onomastica.ijppan.pl/index.php/ONOM/oai</request>
+	<GetRecord>
+		<record>
+			<header>
+				<identifier>oai:ojs2.onomastica.ijppan.pl:article/400</identifier>
+				<datestamp>2023-03-13T14:30:03Z</datestamp>
+				<setSpec>ONOM:ART</setSpec>
+			</header>
+			<metadata>
+<article xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jats.nlm.nih.gov/publishing/1.1/" xml:lang="pl" dtd-version="1.1" specific-use="eps-0.1">
+			<front>
+			<journal-meta>
+				<journal-id journal-id-type="publisher">ONOM</journal-id><journal-id journal-id-type="ojs">ONOM</journal-id>
+				<journal-title-group>
+			<journal-title xml:lang="en">Onomastica</journal-title><trans-title-group xml:lang="pl"><trans-title>Onomastica</trans-title></trans-title-group>
+</journal-title-group>			<contrib-group><contrib contrib-type="jmanager"><name><surname>admin</surname><given-names>admin</given-names></name></contrib><contrib contrib-type="editor"><name><surname></surname><given-names>Onomastica</given-names></name></contrib><contrib contrib-type="editor"><name><surname>Bijak</surname><given-names>Urszula</given-names></name></contrib><contrib contrib-type="editor"><name><surname>Dunikowski</surname><given-names>Mikołaj</given-names></name></contrib><contrib contrib-type="editor"><name><surname>Górny</surname><given-names>Halszka</given-names></name></contrib><contrib contrib-type="editor"><name><surname>Skowronek</surname><given-names>Katarzyna</given-names></name></contrib><contrib contrib-type="editor"><name><surname>Walkowiak</surname><given-names>Justyna</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname></surname><given-names>Onomastica</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Bijak</surname><given-names>Urszula</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Górny</surname><given-names>Halszka</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Ostrowski</surname><given-names>Bogumił</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Skowronek</surname><given-names>Katarzyna</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Swoboda</surname><given-names>Paweł</given-names></name></contrib><contrib contrib-type="secteditor"><name><surname>Walkowiak</surname><given-names>Justyna</given-names></name></contrib></contrib-group><issn pub-type="epub">2658-2783</issn>			<issn pub-type="ppub">0078-4648</issn>			<publisher><publisher-name>Instytut Języka Polskiego Polskiej Akademii Nauk</publisher-name></publisher>
+		</journal-meta>
+		<article-meta>
+			<article-id pub-id-type="doi">10.17651/ONOMAST.66.20</article-id><article-id pub-id-type="publisher-id">400</article-id>
+			<article-categories><subj-group subj-group-type="heading" xml:lang="en"><subject>Articles</subject></subj-group><subj-group subj-group-type="heading" xml:lang="pl"><subject>Artykuły i rozprawy</subject></subj-group></article-categories>
+			<title-group><article-title xml:lang="pl">Markonimy jako operatory taksonomiczne w terminologii (chremat)onomastycznej</article-title><trans-title-group xml:lang="en"><trans-title>Markonyms as taxonomic operators in (chremat)onomastic terminology</trans-title></trans-title-group></title-group>
+			<contrib-group content-type="author">
+				<contrib corresp="yes">
+					<contrib-id contrib-id-type="orcid">https://orcid.org/0000-0003-2471-0886</contrib-id>
+					<name name-style="western">
+						<surname>Gałkowski</surname>
+						<given-names>Artur</given-names>
+					</name>
+					<xref ref-type="aff" rid="aff-1"/>
+					<email>artur.galkowski@uni.lodz.pl</email>
+				</contrib>
+			</contrib-group>
+			<aff id="aff-1"><institution content-type="orgname">University of Łódź</institution></aff>
+			<pub-date date-type="collection"><year>2022</year></pub-date><pub-date date-type="pub" publication-format="epub"><day>31</day><month>12</month><year>2022</year></pub-date>
+				<volume seq="19">66</volume><issue-id>13</issue-id><issue-title xml:lang="pl">Onomastica LXVI</issue-title><issue-title xml:lang="en">Onomastica 66</issue-title><fpage>299</fpage>
+				<lpage>311</lpage>
+			<permissions>
+				<copyright-statement>Copyright (c) 2022 Onomastica</copyright-statement>
+				<copyright-year>2022</copyright-year>
+				<copyright-holder>Onomastica</copyright-holder>
+			</permissions>
+			
+			<self-uri xlink:href="https://onomastica.ijppan.pl/index.php/ONOM/article/view/400/579" content-type="application/octet-stream"/><self-uri xlink:href="https://onomastica.ijppan.pl/index.php/ONOM/article/view/400/551" content-type="application/epub+zip"/><self-uri xlink:href="https://onomastica.ijppan.pl/index.php/ONOM/article/view/400/519" content-type="application/pdf"/><self-uri xlink:href="https://onomastica.ijppan.pl/index.php/ONOM/article/view/400"/>
+			<abstract><p>Zarówno ogólna teoria nazw własnych, jak i poszczególne subdyscypliny onomastyki stosują właściwą dla swoich celów badawczych i metodologii terminologię. Podstawowe terminy naukowe w onomastyce, poczynając od „nazwy własnej”/„onimu”, można uznać za operatory taksonomiczne, które pozwalają porządkować fakty onomastyczne. Potrzebę zastosowania odpowiedniej terminologii badawczej zaspokaja się także w jednym z najmłodszych działów nazewnictwa, tj. chrematonomastyce. Do zestawu operatorów taksonomicznych w obszarze chrematonimii włącza się termin „markonim” utożsamiany z „chrematonimem marketingowym” i konfrontowany z innymi konceptami terminologicznymi, takimi jak „firmonim”, „logonim” czy też „ergonim” i „pragmatonim”, a wreszcie opisowo ujęta „nazwa handlowa” oraz „znak towarowy”. Markonim uznany zostaje za uniwersalny operator taksonomiczny nazewnictwa gospodarczego, odnosząc się zarówno do nazw firm, jak i produktów/usług. Treść i zakres markonimu nawiązuje do szeroko pojętej idei marki, pozostając strukturą językową, która skupia na sobie właściwości komunikacyjno-marketingowe.</p></abstract><trans-abstract xml:lang="en"><p>Both the general theory of proper names and the individual sub-disciplines of onomastics use terminology appropriate to their research objectives and methodology. The basic scientific terms in onomastics, starting with proper name/onym, can be regarded as taxonomic operators, which allow the ordering of onomastic facts. The need for appropriate research terminology is also met in one of the youngest branches of nomenclature, i.e. chrematonomastics. The set of taxonomic operators in the field of chrematonymy includes the term markonym ‘brand name’ identified with marketing chrematonym and confronted with other terminological concepts such as firmonym, logonym or ergonym and pragmatonym, and, finally, descriptively included trade name or trademark. The markonym is recognised as the universal taxonomic operator of business naming, referring to both company and product/service names. The content and scope of the markonym relates to the broad idea of a brand, remaining a linguistic structure that focuses interdisciplinary, especially communicative and marketing properties.</p></trans-abstract><kwd-group xml:lang="pl"><title>Słowa kluczowe</title><kwd>terminologia onomastyczna</kwd><kwd>chrematonimia marketingowa</kwd><kwd>markonim</kwd><kwd>firmonim</kwd><kwd>nazwa handlowa</kwd></kwd-group><kwd-group xml:lang="en"><title>Keywords</title><kwd>onomastic terminology</kwd><kwd>marketing chrematonymy</kwd><kwd>markonym</kwd><kwd>brand name</kwd><kwd>trade name</kwd></kwd-group><kwd-group xml:lang="pl">
+				<kwd>terminologia onomastyczna</kwd>
+				<kwd>chrematonimia marketingowa</kwd>
+				<kwd>markonim</kwd>
+				<kwd>firmonim</kwd>
+				<kwd>nazwa handlowa</kwd>
+			</kwd-group>
+			<counts><page-count count="13"/></counts>
+		<custom-meta-group><custom-meta><meta-name>issue-cover</meta-name><meta-value><inline-graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://onomastica.ijppan.pl/public/journals/1/cover_issue_13_en_US.png"/></meta-value></custom-meta></custom-meta-group></article-meta>
+	</front>
+	<body><p/></body>
+	<back>
+		<ref-list>
+			<ref id="R1"><mixed-citation>Bakarădzheva, G. (2012). Tărgovskata marka — pravni normi i rečeva upotreba (vărhu material ot bălgarski ezik) [Trademarks — Legal norms and usage in language (Based on Bulgarian language material)]. W: Z. Rudnik-Karwatowa (red.), Specyfika leksyki i słowotwórstwa języków słowiańskich na przełomie XX i XXI wieku (s. 9–34). Warszawa: Slawistyczny Ośrodek Wydawniczy.</mixed-citation></ref>
+			<ref id="R2"><mixed-citation>Beley, O.O. (1999). Sučasna ukrayn’ska ergonimija: vlasni nazvi pidpriemstv Zakarpattja [Modern Ukrainian ergonymy: Proper names of Transcarpathian enterprises]. Uzhgorod: Uzhgorods’kij derzhavnij universitet.</mixed-citation></ref>
+			<ref id="R3"><mixed-citation>Biolik, M. (2011). Modele strukturalne nazw własnych przedsiębiorstw i lokali branży gastronomicznej w województwie warmińsko-mazurskim [Structural models of proper names of companies</mixed-citation></ref>
+			<ref id="R4"><mixed-citation>and establishments in the gastronomy sector in the Warmińsko-Mazurskie Voivodeship]. W: M. Biolik (red.), Chrematonimia jako fenomen współczesności (s. 59–78). Olsztyn: Wydawnictwo UWM.</mixed-citation></ref>
+			<ref id="R5"><mixed-citation>Blackett, T. (2003). What is a brand? W: R. Clifton i J. Simmons (red.), Brands and Branding (s. 13–25). Princeton, New Jersey: Bloomberg Press. Blythe, J. (2002). Komunikacja marketingowa [Marketing communications]. Przeł. G. Górska. Warszawa: Polskie Wydawnictwo Ekonomiczne. [Praca oryginalna opublikowana w 2000 r.].</mixed-citation></ref>
+			<ref id="R6"><mixed-citation>Borowiak, P. (2021). Polskie i bułgarskie firmonimy w perspektywie komunikacyjno-wizualnej [Polish and Bulgarian firmonyms in the communicative-visual perspective]. Poznań: Wydawnictwo Naukowe UAM.</mixed-citation></ref>
+			<ref id="R7"><mixed-citation>Caffarelli, E. (2018a). Brand, marca, marchio, marchionimo [Brand, marca, marchio, marchionimo]. Rivista Italiana di Onomastica, 24(2), 996–997.</mixed-citation></ref>
+			<ref id="R8"><mixed-citation>Caffarelli, E. (2018b). Logonimi e altri doppioni: la confusione è dietro l’angolo [Logonyms and other duplicates: confusion is just around the corner]. Rivista Italiana di Onomastica, 24(2), 997–999.</mixed-citation></ref>
+			<ref id="R9"><mixed-citation>Caffarelli, E. i Gagliardi, C. (2018). Terminologia onomastica [Onomastic Terminology]. Archivio per il vocabolario storico italiano AVSI, 1, 11–54. https://doi.org/10.30453/042</mixed-citation></ref>
+			<ref id="R10"><mixed-citation>Caprini, R. (1976). Etimologia e storia di marca, marco, marchio, marcare, marchiare [Etymology and history of marca, marco, marchio, marcare, marchiare]. Lingua nostra, 37, 74–76.</mixed-citation></ref>
+			<ref id="R11"><mixed-citation>Caprini, R. (2001). Nomi propri [Proper names]. Alessandria: Edizioni dell’Orso.</mixed-citation></ref>
+			<ref id="R12"><mixed-citation>Castiglione, M. i Sottile, R. (2010). Fitonimia e caratteri popolari in Sicilia, fra traslati e saperi popolari [Phytonymy and popular characters in Sicily, between translations and popular knowledge]. W: N. Prantera, A. Mendicino i C. Citraro (red.), Parole. Il lessico come strumento per organizzare e trasmettere gli etnosaperi [Words. The lexicon as a tool for organising and transmitting ethno-knowledge] (s. 187–206). Rende: Centro Editoriale e Librario, Università della Calabria.</mixed-citation></ref>
+			<ref id="R13"><mixed-citation>Clankie, S.M. (2002). A Theory of Genericization on Brand Name Change. Lewiston–Queenston–Lampeter: The Edwin Mellen Press.</mixed-citation></ref>
+			<ref id="R14"><mixed-citation>Clifton, R. i Simmons, J. (red.). (2003). Brands and Branding. Princeton, New Jersey: Bloomberg Press.</mixed-citation></ref>
+			<ref id="R15"><mixed-citation>Coletti, V. (2010). Marchionimi e nomi commerciali in terminologia [Markonyms and trade names in terminology]. Publifarum, 12, 1–10. http://www.farum.it/publifarum/ezine_articles.php?art_id=162</mixed-citation></ref>
+			<ref id="R16"><mixed-citation>Cotticelli Kurras, P., Trovato, A. i Vigolo , V. (2012). Brand name and brand image between linguistics and marketing. W: R. Boerrigter i H. Nijboer (red.), Names as Language and Capital (s. 13–31). Amsterdam: Meertens Instituut. https://www.meertens.knaw.nl/nite/images/pdf/Proceedings_NitE_III.pdf</mixed-citation></ref>
+			<ref id="R17"><mixed-citation>Czyżewski, F. i Urban, D. (2006). Flora i fitonimy na pograniczu polsko-ukraińskim. Lublin: b.w.</mixed-citation></ref>
+			<ref id="R18"><mixed-citation>Danesi, M. (2006). Brands. New York–London: Routledge.</mixed-citation></ref>
+			<ref id="R19"><mixed-citation>Danesi, M. (2008). Why It Sells. Lanham itd.: Rowman &amp; Littlefield Publishers.</mixed-citation></ref>
+			<ref id="R20"><mixed-citation>Eckkrammer, E.M. (2013). Die Ergonymie als namenkundliche Subdisziplin. Beobachtungen zur Terminologie und zum aktuellen Forschungsstand. W: E.M. Eckkrammer i V. Thaler (red.), Kontrastive Ergonymie: Romanistische Studien zu Produkt- und Warennamen (s. 7–53). Berlin: Frank &amp; Thimme.</mixed-citation></ref>
+			<ref id="R21"><mixed-citation>Fischer, F. (2008). Ergonimi, crematonimi e affini. Un’analisi e una discussione sulla terminologia in uso [Ergonyms, crematonyms and related. An analysis and discussion of terminology in use]. W: P. D’Achille i E. Caffarelli (red.), Lessicografia e onomastica 2. Quaderni Internazionali di RIOn 3 (s. 131–140). Roma: Società Editrice Romana.</mixed-citation></ref>
+			<ref id="R22"><mixed-citation>Frankowska-Kozak, B. (2009). Logonimy podmiotów gospodarczych w północno-zachodniej Polsce w ostatnim dziesięcioleciu XX wieku [Logonyms of business entities in North-Western Poland in the last decade of the 20th century]. Szczecin: Print Group.</mixed-citation></ref>
+			<ref id="R23"><mixed-citation>Frigerio, A. i Tenchini, M.P. (2017). Marchionimi: nomi propri o nomi comuni? [Markonyms: Proper Names or Common Names?]. Lingue e Linguaggi, 22, 97–111.</mixed-citation></ref>
+			<ref id="R24"><mixed-citation>Gabrielli, A. (2020). Glottonimo. W: Grande dizionario Italiano. Ed. 4. Milano: Hoepli. https://www.grandidizionari.it/Dizionario_Italiano/parola/G/glottonimo.aspx</mixed-citation></ref>
+			<ref id="R25"><mixed-citation>Gabrielli, V. (2012). Il brand [Brand]. Bologna: il Mulino.</mixed-citation></ref>
+			<ref id="R26"><mixed-citation>Gabrielli, V. (2014). Brand communication. Bologna: il Mulino.</mixed-citation></ref>
+			<ref id="R27"><mixed-citation>Gałkowski, A. (2010). Problemi di terminologia onomastica. Contributi per un dibattito [Onomastic terminology issues. Contributions for a debate]. Rivista Italiana di Onomastica, 16(2), 604–624.</mixed-citation></ref>
+			<ref id="R28"><mixed-citation>Gałkowski, A. (2011). Chrematonimy w funkcji kulturowo-użytkowej. Onomastyczne studium porównawcze na materiale polskim, włoskim, francuskim [Chrematonyms in the cultural and utility function. Onomastic comparative study on Polish, Italian and French material]. Wyd. 2. Łódź: Wydawnictwo UŁ.</mixed-citation></ref>
+			<ref id="R29"><mixed-citation>Gałkowski, A. (2017). Chrematonimia w kulturze współczesnej [Chrematonymy in contemporary culture]. Onomastica, 61(1), 55–71. https://doi.org/10.17651/ONOMAST.61.1.4</mixed-citation></ref>
+			<ref id="R30"><mixed-citation>Gałkowski, A. (2019). La terminologie de la chrématonymie de marketing: Fondements historiques, conceptions, discussions [The Terminology of marketing chrematonymy: Historical foundations, conceptions, discussions]. W: J. Altmanova i G. Le Tallec (red.), Lexicalisation de l’onomastique commerciale. Créer, diffuser, intégrer (s. 91–105). Bruxelles: Peter Lang.</mixed-citation></ref>
+			<ref id="R31"><mixed-citation>Gložančev, A. (2000). Imena podjetij kot jezikovnokulturno vprašanje [Company Names as a Linguistic-Cultural Issue]. Ljubljana: ROKUS.</mixed-citation></ref>
+			<ref id="R32"><mixed-citation>Grodziński, E. (1973). Zarys ogólnej teorii nazw własnych [Outline of a general theory of proper names]. Warszawa: PWN.</mixed-citation></ref>
+			<ref id="R33"><mixed-citation>Horecký, J. (1994). Logonomastika ako onomastická disciplína [Logonomastics as an Onomastic Discipline]. W: E. Krošlákova (red.), Jazyková a mimojazyková stránka vlastných mien (s. 76–78). Bratislava: Jazykovedný ústav L’. Štúra SAV.</mixed-citation></ref>
+			<ref id="R34"><mixed-citation>Imríchová, M. (2002). Logonymá v systéme slovenčiny [Logonyms in the Slovak language system]. Prešov: Prešovská univerzita.</mixed-citation></ref>
+			<ref id="R35"><mixed-citation>Jadanowska, K. (2014). Czy nazwy firm są chrematonimami? [Are company names chrematonyms?]. Onomastica, 58, 321–330.</mixed-citation></ref>
+			<ref id="R36"><mixed-citation>Janner, M.C. (2017). Sguardi linguistici sulla marca. Analisi morfosintattica dei nomi commerciali in italiano [Linguistic insights on the brand. Morphosyntactic analysis of trade names in Italian]. Bern: Peter Lang.</mixed-citation></ref>
+			<ref id="R37"><mixed-citation>Knappová, M. (2017). Obchodní jméno [Commercial name]. W: P. Karlík, M. Nekula i J. Pleskalová (red.), CzechEncy — Nový encyklopedický slovník češtiny. https://www.czechency.org/slovnik/OBCHODN%C3%8D%20JM%C3%89NO</mixed-citation></ref>
+			<ref id="R38"><mixed-citation>Koß, G. (1999). Was ist ‘Ökonymie’? Vom Einzug der Globalisierung in die Onomastik. Beiträge zur Namenforschung, 34, 373–444.</mixed-citation></ref>
+			<ref id="R39"><mixed-citation>Lewandowski, A. (1992). Współczesne polskie nazwy firmowe [Contemporary Polish business names]. Zielona Góra: Wydawnictwo WSP.</mixed-citation></ref>
+			<ref id="R40"><mixed-citation>Lewi, G. i Desprez, P.-L. (2013). La marque. Fondamentaux du branding [The brand. Fundamentals of branding]. Paris: Magnard-Vuibert.</mixed-citation></ref>
+			<ref id="R41"><mixed-citation>Martin, M. (2013). From car brands to their legends. W: P. Sjöblom, T. Ainiala i U. Hakala (red.), Names in the Economy: Cultural Prospects (s. 300–310). Newcastle upon Tyne: Cambridge Scholars Publishing.</mixed-citation></ref>
+			<ref id="R42"><mixed-citation>Minestroni, L. (2010). Il manuale della marca. Consumatore. Cultura. Società [The brand handbook. Consumer. Culture. Society]. Bologna: Fausto Lupetti.</mixed-citation></ref>
+			<ref id="R43"><mixed-citation>Odaloš, P. (2019). Sústava slovenskej onomastickej terminológie (vznik, existencia, variantné možnosti vývoja a štandardizácie) [The System of Slovak onomastic terminology (origin, existence, variant possibilities of development and standardization)]. W: A. Chomová, J. Krško i I. Valentová (red.), Konvergencie a divergencie v propriálnej sfére. 20. slovenská onomastická konferencia, Banská Bystrica 26. — 28. júna 2017. Zborník referátov (s. 53–70). Bratislava: Veda.</mixed-citation></ref>
+			<ref id="R44"><mixed-citation>Odaloš, P. i Vallová, E. (2020). Sústava slovanskej onomastickej terminológie (vznik, existencia, neuralgické miesta, aktualizácia) [The system of Slavic onomastic terminology (origin, existence, neuralgic points, updating)]. Folia onomastica Croatica, 29, 169–202. https://dx.doi.org/10.21857/yl4okflgq9</mixed-citation></ref>
+			<ref id="R45"><mixed-citation>Odaloš, P. (2021). Jazyková krajina Banskej Bystrice (Kontinuita textov a križovatka etník) [The linguistic landscape of Banská Bystrica (Continuity of texts and crossroads of ethnicities)]. Slavia Meridionalis, 21, 2–15. https://doi.org/10.11649/sm.2425</mixed-citation></ref>
+			<ref id="R46"><mixed-citation>Omel’janenko, V. (2019). Pragmatonimy v natsjonalno-orjentirovannoj reklame Rossiji [Pragmatonyms in Russian nationally-oriented advertising]. W: L. Janovec (red.), Propria a apelativa — aktuální otázky (s. 255–274). Praha: Univerzita Karlova, Pedagogická fakulta.</mixed-citation></ref>
+			<ref id="R47"><mixed-citation>Platen, Ch. (1997). „Ökonymie“. Zur Produktnamen-Linguistik im Europäischen Binnenmarkt. Tübingen: Max Niemeyer Verlag.</mixed-citation></ref>
+			<ref id="R48"><mixed-citation>Podolʹskaâ, N.V. (1988). Slovar’ russkoj onomastičeskoj terminologii [Dictionary of Russian onomastic terminology] (Wyd. 2). Moskva: Nauka.</mixed-citation></ref>
+			<ref id="R49"><mixed-citation>Rada Języka Polskiego (b.d.). Definicje pojęć „nazwa własna”, „nazwa handlowa” [Definitions of the terms „proper name”, „trade name”]. https://rjp.pan.pl/dokumenty-rady?view=article&amp;id=93:definicje-poj-nazwa-wasnaq-nazwa-handlowaq&amp;catid=45</mixed-citation></ref>
+			<ref id="R50"><mixed-citation>Rak, M. (2009). Kwiatki Matki Bożej: góralskie fitonimy odwołujące się do świętych i Matki Bożej [Flowers of the Virgin Mary: Highland phytonyms referring to saints and the Virgin Mary]. W: A. Jackowski, F. Mróz i I. Hodorowicz (red.), Turystyka religijna na obszarach górskich (s. 447–457). Nowy Targ: PPWSZ.</mixed-citation></ref>
+			<ref id="R51"><mixed-citation>Silvestri, D. (2000). Lògos e logonimi [Lògos and logonyms]. W: C. Vallini (red.), Le parole per le parole. I logonimi nelle lingue e nel metalinguaggio. Atti del Convegno, Napoli, Istituto Universitario Orientale, 18–20 dicembre 1997 (s. 2–37). Roma: Il Calamo.</mixed-citation></ref>
+			<ref id="R52"><mixed-citation>Siwiec, A. (2003). Nazwy handlowe i ich uwarunkowania społeczno-komunikacyjne (od kultury zideologizowanej do kultury skomercjalizowanej i reklamy) [Trade names and their sociocommunicative conditions (from ideologised culture to commercialised culture and advertising)]. W: M. Biolik (red.), Metodologia badań onomastycznych (s. 543–555). Olsztyn: Ośrodek Badań Naukowych im. Wojciecha Kętrzyńskiego.</mixed-citation></ref>
+			<ref id="R53"><mixed-citation>Soboleva, T.A. i Superanskaâ, A.V. (1986). Tovarnyje znaki [Trademarks]. Moskva: Nauka.</mixed-citation></ref>
+			<ref id="R54"><mixed-citation>Stopczyńska, K. (2016). Kreowanie wizerunku marki przy wykorzystaniu nowoczesnych form komunikacji marketingowej [Creating a brand image using modern forms of marketing communication]. Łódź: Wydawnictwo SIZ.</mixed-citation></ref>
+			<ref id="R55"><mixed-citation>Superanskaâ, A.V. (2003). Tovarnyje znaki i znaki osbluzhivanja v Rossiji [Trademarks and service marks in Russia]. W: M. Biolik (red.), Metodologia badań onomastycznych (s. 527–542). Olsztyn: Ośrodek Badań Naukowych im. Wojciecha Kętrzyńskiego.</mixed-citation></ref>
+			<ref id="R56"><mixed-citation>Szelewski, M. (2010). Ergonimy komercyjne w polskiej i rosyjskiej przestrzeni językowej [Commercial ergonyms in the Polish and Russian language areas]. Zielona Góra: Wydawnictwo UZG.</mixed-citation></ref>
+			<ref id="R57"><mixed-citation>Šrámek, R. (1999). Úvod do obecné onomastiky [Introduction to general onomastics]. Brno: Masarykova univerzita.</mixed-citation></ref>
+		</ref-list>
+	</back>
+</article>			</metadata>
+		</record>
+	</GetRecord>
+</OAI-PMH>

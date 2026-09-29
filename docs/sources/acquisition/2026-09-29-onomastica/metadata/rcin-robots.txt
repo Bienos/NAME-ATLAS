@@ -1,0 +1,20 @@
+User-agent: *
+
+Disallow: /demo/*
+Disallow: /c3po/*
+
+Disallow: /Content/*/zip*
+Disallow: /Content/*/download*
+Disallow: /dlibra/ajax.xml*
+Disallow: /dlibra/sec-ajax.xml*
+
+Disallow: /dlibra/results*
+Disallow: /dlibra/similarobjects*
+Disallow: /dlibra/recommended*
+Disallow: /dlibra/latest*
+Disallow: /dlibra/planned*
+Disallow: /dlibra/popular*
+Disallow: /dlibra/valuesearch*
+Disallow: /dlibra/metadatasearch*
+Disallow: /dlibra/indexsearch*
+Sitemap: http://rcin.org.pl/sitemapindex.xml
