@@ -1,0 +1,421 @@
+showcase,fact,metric,value,scope,reference_date,source_files,method,proposed_confidence
+NOWAK,A1,entries_M_list,98387,"M list, form NOWAK",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+NOWAK,A1,entries_F_list,99738,"F list, form NOWAK",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+NOWAK,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+NOWAK,A1,paired_total,198125,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+NOWAK,A1,rank_paired,1,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+NOWAK,A1,share_of_all_entries_pct,0.4634,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+NOWAK,A1,one_in_x_entries,216,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+NOWAK,A1,rank_in_M_list,1,"M list, form NOWAK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+NOWAK,A1,rank_in_F_list,1,"F list, form NOWAK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+NOWAK,A10,letters,5,masculine/base form,-,-,character count,VERIFIED
+NOWAK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+NOWAK,A10,first_letter_share_of_entries_pct,N: 2.47,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+NOWAK,A11,masc_gen,Nowaka,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+NOWAK,A11,family_plural_nom,Nowakowie,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+NOWAK,A11,feminine_gen,Nowak,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+NOWAK,A11,feminine_declines,no (indeclinable for a woman),SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+NOWAK,A2,change_2019_2026_abs_M,-3086,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+NOWAK,A2,change_2019_2026_pct_M,-3.04,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+NOWAK,A2,change_2019_2026_abs_F,-3701,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+NOWAK,A2,change_2019_2026_pct_F,-3.58,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+NOWAK,A2,change_2019_2026_abs_paired,-6787,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+NOWAK,A2,change_2019_2026_pct_paired,-3.31,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+NOWAK,A2,rank_paired_2019,1,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+NOWAK,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+NOWAK,A2,change_2025_2026_pct_paired,-0.53,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+NOWAK,A2,share_change_2019_2026_pp,-0.0475,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+NOWAK,A3,spelling_class,-AK,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+NOWAK,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+NOWAK,A6,F_per_M_2019,1.0194,F list NOWAK / M list NOWAK,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+NOWAK,A6,F_per_M_2026,1.0137,F list NOWAK / M list NOWAK,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+NOWAK,A7,hyphenated_forms_with_component_M,102,"M list, component key NOWAK",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+NOWAK,A7,hyphenated_entries_with_component_M,249,"M list, component key NOWAK",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+NOWAK,A7,hyphenated_forms_with_component_F,1185,"F list, component key NOWAK",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+NOWAK,A7,hyphenated_entries_with_component_F,3451,"F list, component key NOWAK",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+NOWAK,A8,recorded_deceased_entries_2024,89649,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_2024,30.93,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_2024,289865,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+NOWAK,A8,recorded_deceased_entries_2025,91898,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_2025,31.57,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_2025,291076,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+NOWAK,A8,ageing_index_pct_F_2026,30.66,"F list, form NOWAK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+NOWAK,A9,equals_lowercase_sjp_base_form,N,'nowak',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+KOWALSKI/KOWALSKA,A1,entries_M_list,66589,"M list, form KOWALSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+KOWALSKI/KOWALSKA,A1,entries_F_list,67308,"F list, form KOWALSKA",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+KOWALSKI/KOWALSKA,A1,other_form_entries,538,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+KOWALSKI/KOWALSKA,A1,paired_total,134435,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+KOWALSKI/KOWALSKA,A1,rank_paired,2,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+KOWALSKI/KOWALSKA,A1,share_of_all_entries_pct,0.3144,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+KOWALSKI/KOWALSKA,A1,one_in_x_entries,318,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+KOWALSKI/KOWALSKA,A1,rank_in_M_list,2,"M list, form KOWALSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+KOWALSKI/KOWALSKA,A1,rank_in_F_list,2,"F list, form KOWALSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KOWALSKI/KOWALSKA,A10,letters,8,masculine/base form,-,-,character count,VERIFIED
+KOWALSKI/KOWALSKA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+KOWALSKI/KOWALSKA,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KOWALSKI/KOWALSKA,A11,masc_gen,Kowalskiego,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOWALSKI/KOWALSKA,A11,family_plural_nom,Kowalscy,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOWALSKI/KOWALSKA,A11,feminine_gen,Kowalskiej,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOWALSKI/KOWALSKA,A11,feminine_declines,yes (adjectival declension),SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_abs_M,-2103,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_pct_M,-3.06,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_abs_F,-2612,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_pct_F,-3.74,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_abs_paired,-4557,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,change_2019_2026_pct_paired,-3.28,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,rank_paired_2019,2,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+KOWALSKI/KOWALSKA,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+KOWALSKI/KOWALSKA,A2,change_2025_2026_pct_paired,-0.51,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A2,share_change_2019_2026_pp,-0.0321,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+KOWALSKI/KOWALSKA,A3,spelling_class,-SKI/-SKA,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+KOWALSKI/KOWALSKA,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+KOWALSKI/KOWALSKA,A6,F_per_M_2019,1.0179,F list KOWALSKA / M list KOWALSKI,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KOWALSKI/KOWALSKA,A6,F_per_M_2026,1.0108,F list KOWALSKA / M list KOWALSKI,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KOWALSKI/KOWALSKA,A7,hyphenated_forms_with_component_M,66,"M list, component key KOWALSKI",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KOWALSKI/KOWALSKA,A7,hyphenated_entries_with_component_M,157,"M list, component key KOWALSKI",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A7,hyphenated_forms_with_component_F,594,"F list, component key KOWALSKI",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KOWALSKI/KOWALSKA,A7,hyphenated_entries_with_component_F,1524,"F list, component key KOWALSKI",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_2024,52012,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_2024,27.67,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_2024,187939,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_2025,53591,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_2025,28.40,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_2025,188720,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_F_2026,27.63,"F list, form KOWALSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+KOWALSKI/KOWALSKA,A9,equals_lowercase_sjp_base_form,Y,'kowalski',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,entries_M_list,53079,"M list, form WIŚNIEWSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A1,entries_F_list,54177,"F list, form WIŚNIEWSKA",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A1,other_form_entries,203,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A1,paired_total,107459,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+WIŚNIEWSKI/WIŚNIEWSKA,A1,rank_paired,3,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,share_of_all_entries_pct,0.2513,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,one_in_x_entries,398,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,rank_in_M_list,3,"M list, form WIŚNIEWSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,rank_in_F_list,3,"F list, form WIŚNIEWSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A10,letters,10,masculine/base form,-,-,character count,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A10,polish_diacritic_letters,Ś,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A10,first_letter_share_of_entries_pct,W: 6.30,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A11,masc_gen,Wiśniewskiego,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+WIŚNIEWSKI/WIŚNIEWSKA,A11,family_plural_nom,Wiśniewscy,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+WIŚNIEWSKI/WIŚNIEWSKA,A11,feminine_gen,Wiśniewskiej,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+WIŚNIEWSKI/WIŚNIEWSKA,A11,feminine_declines,yes (adjectival declension),SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_abs_M,-1480,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_pct_M,-2.71,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_abs_F,-1639,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_pct_F,-2.94,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_abs_paired,-3071,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2019_2026_pct_paired,-2.78,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,rank_paired_2019,3,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,change_2025_2026_pct_paired,-0.50,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A2,share_change_2019_2026_pp,-0.0243,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A3,spelling_class,-SKI/-SKA,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+WIŚNIEWSKI/WIŚNIEWSKA,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A6,F_per_M_2019,1.0230,F list WIŚNIEWSKA / M list WIŚNIEWSKI,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+WIŚNIEWSKI/WIŚNIEWSKA,A6,F_per_M_2026,1.0207,F list WIŚNIEWSKA / M list WIŚNIEWSKI,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+WIŚNIEWSKI/WIŚNIEWSKA,A7,hyphenated_forms_with_component_M,24,"M list, component key WIŚNIEWSKI",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+WIŚNIEWSKI/WIŚNIEWSKA,A7,hyphenated_entries_with_component_M,57,"M list, component key WIŚNIEWSKI",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A7,hyphenated_forms_with_component_F,327,"F list, component key WIŚNIEWSKI",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+WIŚNIEWSKI/WIŚNIEWSKA,A7,hyphenated_entries_with_component_F,772,"F list, component key WIŚNIEWSKI",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_2024,39272,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_2024,26.57,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_2024,147787,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_2025,40461,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_2025,27.25,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_2025,148458,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_F_2026,26.21,"F list, form WIŚNIEWSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A9,equals_lowercase_sjp_base_form,Y,'wiśniewski',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+KACZMAREK,A1,entries_M_list,29820,"M list, form KACZMAREK",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+KACZMAREK,A1,entries_F_list,30240,"F list, form KACZMAREK",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+KACZMAREK,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+KACZMAREK,A1,paired_total,60060,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+KACZMAREK,A1,rank_paired,18,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+KACZMAREK,A1,share_of_all_entries_pct,0.1405,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+KACZMAREK,A1,one_in_x_entries,712,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+KACZMAREK,A1,rank_in_M_list,18,"M list, form KACZMAREK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+KACZMAREK,A1,rank_in_F_list,18,"F list, form KACZMAREK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KACZMAREK,A10,letters,9,masculine/base form,-,-,character count,VERIFIED
+KACZMAREK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+KACZMAREK,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KACZMAREK,A11,masc_gen,Kaczmarka,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KACZMAREK,A11,family_plural_nom,Kaczmarkowie,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KACZMAREK,A11,feminine_gen,Kaczmarek,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KACZMAREK,A11,feminine_declines,no (indeclinable for a woman),SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KACZMAREK,A2,change_2019_2026_abs_M,-956,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KACZMAREK,A2,change_2019_2026_pct_M,-3.11,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KACZMAREK,A2,change_2019_2026_abs_F,-1026,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KACZMAREK,A2,change_2019_2026_pct_F,-3.28,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KACZMAREK,A2,change_2019_2026_abs_paired,-1982,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KACZMAREK,A2,change_2019_2026_pct_paired,-3.19,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KACZMAREK,A2,rank_paired_2019,18,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+KACZMAREK,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+KACZMAREK,A2,change_2025_2026_pct_paired,-0.53,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+KACZMAREK,A2,share_change_2019_2026_pp,-0.0142,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+KACZMAREK,A3,spelling_class,-EK,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+KACZMAREK,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+KACZMAREK,A6,F_per_M_2019,1.0159,F list KACZMAREK / M list KACZMAREK,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KACZMAREK,A6,F_per_M_2026,1.0141,F list KACZMAREK / M list KACZMAREK,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KACZMAREK,A7,hyphenated_forms_with_component_M,17,"M list, component key KACZMAREK",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KACZMAREK,A7,hyphenated_entries_with_component_M,39,"M list, component key KACZMAREK",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+KACZMAREK,A7,hyphenated_forms_with_component_F,168,"F list, component key KACZMAREK",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KACZMAREK,A7,hyphenated_entries_with_component_F,394,"F list, component key KACZMAREK",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+KACZMAREK,A8,recorded_deceased_entries_2024,22715,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_2024,27.23,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_2024,83413,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+KACZMAREK,A8,recorded_deceased_entries_2025,23432,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_2025,27.96,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_2025,83809,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KACZMAREK,A8,ageing_index_pct_F_2026,27.08,"F list, form KACZMAREK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+KACZMAREK,A9,equals_lowercase_sjp_base_form,N,'kaczmarek',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,entries_M_list,16419,"M list, form SZCZEPAŃSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,entries_F_list,16778,"F list, form SZCZEPAŃSKA",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,other_form_entries,62,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,paired_total,33259,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,rank_paired,63,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,share_of_all_entries_pct,0.0778,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,one_in_x_entries,1286,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,rank_in_M_list,63,"M list, form SZCZEPAŃSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,rank_in_F_list,63,"F list, form SZCZEPAŃSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A10,letters,11,masculine/base form,-,-,character count,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A10,polish_diacritic_letters,Ń,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A10,first_letter_share_of_entries_pct,S: 11.95,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A11,masc_gen,Szczepańskiego,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A11,family_plural_nom,Szczepańscy,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A11,feminine_gen,Szczepańskiej,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A11,feminine_declines,yes (adjectival declension),SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_abs_M,-475,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_pct_M,-2.81,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_abs_F,-615,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_pct_F,-3.54,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_abs_paired,-1065,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2019_2026_pct_paired,-3.10,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,rank_paired_2019,63,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,change_2025_2026_pct_paired,-0.54,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A2,share_change_2019_2026_pp,-0.0078,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A3,spelling_class,-SKI/-SKA,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A6,F_per_M_2019,1.0295,F list SZCZEPAŃSKA / M list SZCZEPAŃSKI,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+SZCZEPAŃSKI/SZCZEPAŃSKA,A6,F_per_M_2026,1.0219,F list SZCZEPAŃSKA / M list SZCZEPAŃSKI,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+SZCZEPAŃSKI/SZCZEPAŃSKA,A7,hyphenated_forms_with_component_M,5,"M list, component key SZCZEPAŃSKI",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A7,hyphenated_entries_with_component_M,11,"M list, component key SZCZEPAŃSKI",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A7,hyphenated_forms_with_component_F,53,"F list, component key SZCZEPAŃSKI",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A7,hyphenated_entries_with_component_F,118,"F list, component key SZCZEPAŃSKI",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_2024,12130,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_2024,26.53,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_2024,45724,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_2025,12504,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_2025,27.22,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_2025,45943,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_F_2026,26.31,"F list, form SZCZEPAŃSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A9,equals_lowercase_sjp_base_form,N,'szczepański',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+GRZEGORCZYK,A1,entries_M_list,5128,"M list, form GRZEGORCZYK",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+GRZEGORCZYK,A1,entries_F_list,5334,"F list, form GRZEGORCZYK",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+GRZEGORCZYK,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+GRZEGORCZYK,A1,paired_total,10462,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+GRZEGORCZYK,A1,rank_paired,364,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+GRZEGORCZYK,A1,share_of_all_entries_pct,0.0245,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+GRZEGORCZYK,A1,one_in_x_entries,4087,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+GRZEGORCZYK,A1,rank_in_M_list,370,"M list, form GRZEGORCZYK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+GRZEGORCZYK,A1,rank_in_F_list,362,"F list, form GRZEGORCZYK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+GRZEGORCZYK,A10,letters,11,masculine/base form,-,-,character count,VERIFIED
+GRZEGORCZYK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+GRZEGORCZYK,A10,first_letter_share_of_entries_pct,G: 5.60,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+GRZEGORCZYK,A11,masc_gen,Grzegorczyka,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+GRZEGORCZYK,A11,family_plural_nom,Grzegorczykowie,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+GRZEGORCZYK,A11,feminine_gen,Grzegorczyk,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+GRZEGORCZYK,A11,feminine_declines,no (indeclinable for a woman),SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+GRZEGORCZYK,A2,change_2019_2026_abs_M,-147,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,change_2019_2026_pct_M,-2.79,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,change_2019_2026_abs_F,-179,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,change_2019_2026_pct_F,-3.25,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,change_2019_2026_abs_paired,-326,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,change_2019_2026_pct_paired,-3.02,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,rank_paired_2019,362,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+GRZEGORCZYK,A2,rank_change_2019_2026,-2,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+GRZEGORCZYK,A2,change_2025_2026_pct_paired,-0.59,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+GRZEGORCZYK,A2,share_change_2019_2026_pp,-0.0024,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+GRZEGORCZYK,A3,spelling_class,-CZYK,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+GRZEGORCZYK,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+GRZEGORCZYK,A6,F_per_M_2019,1.0451,F list GRZEGORCZYK / M list GRZEGORCZYK,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+GRZEGORCZYK,A6,F_per_M_2026,1.0402,F list GRZEGORCZYK / M list GRZEGORCZYK,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+GRZEGORCZYK,A7,hyphenated_forms_with_component_M,2,"M list, component key GRZEGORCZYK",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+GRZEGORCZYK,A7,hyphenated_entries_with_component_M,6,"M list, component key GRZEGORCZYK",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+GRZEGORCZYK,A7,hyphenated_forms_with_component_F,7,"F list, component key GRZEGORCZYK",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+GRZEGORCZYK,A7,hyphenated_entries_with_component_F,15,"F list, component key GRZEGORCZYK",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+GRZEGORCZYK,A8,recorded_deceased_entries_2024,3883,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_2024,26.81,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_2024,14481,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+GRZEGORCZYK,A8,recorded_deceased_entries_2025,4001,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_2025,27.55,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_2025,14525,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+GRZEGORCZYK,A8,ageing_index_pct_F_2026,26.06,"F list, form GRZEGORCZYK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+GRZEGORCZYK,A9,equals_lowercase_sjp_base_form,N,'grzegorczyk',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+CZEKIERDA,A1,entries_M_list,217,"M list, form CZEKIERDA",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+CZEKIERDA,A1,entries_F_list,212,"F list, form CZEKIERDA",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+CZEKIERDA,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+CZEKIERDA,A1,paired_total,429,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+CZEKIERDA,A1,rank_paired,15129,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+CZEKIERDA,A1,share_of_all_entries_pct,0.0010,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+CZEKIERDA,A1,one_in_x_entries,99669,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+CZEKIERDA,A1,rank_in_M_list,14932,"M list, form CZEKIERDA",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+CZEKIERDA,A1,rank_in_F_list,15540,"F list, form CZEKIERDA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+CZEKIERDA,A10,letters,9,masculine/base form,-,-,character count,VERIFIED
+CZEKIERDA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+CZEKIERDA,A10,first_letter_share_of_entries_pct,C: 3.93,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+CZEKIERDA,A11,masc_gen,Czekierdy,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+CZEKIERDA,A11,family_plural_nom,Czekierdowie,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+CZEKIERDA,A11,feminine_gen,Czekierdy,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+CZEKIERDA,A11,feminine_declines,yes,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+CZEKIERDA,A2,change_2019_2026_abs_M,-8,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+CZEKIERDA,A2,change_2019_2026_pct_M,-3.56,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+CZEKIERDA,A2,change_2019_2026_abs_F,-20,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+CZEKIERDA,A2,change_2019_2026_pct_F,-8.62,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+CZEKIERDA,A2,change_2019_2026_abs_paired,-28,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+CZEKIERDA,A2,change_2019_2026_pct_paired,-6.13,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+CZEKIERDA,A2,rank_paired_2019,13655,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+CZEKIERDA,A2,rank_change_2019_2026,-1474,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+CZEKIERDA,A2,change_2025_2026_pct_paired,-1.83,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+CZEKIERDA,A2,share_change_2019_2026_pp,-0.0001,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+CZEKIERDA,A3,spelling_class,OTHER,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+CZEKIERDA,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+CZEKIERDA,A6,F_per_M_2019,1.0311,F list CZEKIERDA / M list CZEKIERDA,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+CZEKIERDA,A6,F_per_M_2026,0.9770,F list CZEKIERDA / M list CZEKIERDA,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+CZEKIERDA,A7,hyphenated_forms_with_component_M,0,"M list, component key CZEKIERDA",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+CZEKIERDA,A7,hyphenated_entries_with_component_M,0,"M list, component key CZEKIERDA",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+CZEKIERDA,A7,hyphenated_forms_with_component_F,0,"F list, component key CZEKIERDA",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+CZEKIERDA,A7,hyphenated_entries_with_component_F,0,"F list, component key CZEKIERDA",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+CZEKIERDA,A8,recorded_deceased_entries_2024,190,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_2024,30.16,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_2024,630,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+CZEKIERDA,A8,recorded_deceased_entries_2025,195,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_2025,30.85,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_2025,632,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+CZEKIERDA,A8,ageing_index_pct_F_2026,32.48,"F list, form CZEKIERDA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+CZEKIERDA,A9,equals_lowercase_sjp_base_form,N,'czekierda',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+MAZUR,A1,entries_M_list,34576,"M list, form MAZUR",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+MAZUR,A1,entries_F_list,35206,"F list, form MAZUR",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+MAZUR,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+MAZUR,A1,paired_total,69782,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+MAZUR,A1,rank_paired,13,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+MAZUR,A1,share_of_all_entries_pct,0.1632,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+MAZUR,A1,one_in_x_entries,613,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+MAZUR,A1,rank_in_M_list,13,"M list, form MAZUR",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+MAZUR,A1,rank_in_F_list,13,"F list, form MAZUR",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+MAZUR,A10,letters,5,masculine/base form,-,-,character count,VERIFIED
+MAZUR,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+MAZUR,A10,first_letter_share_of_entries_pct,M: 8.06,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+MAZUR,A11,masc_gen,Mazura,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+MAZUR,A11,family_plural_nom,Mazurowie,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+MAZUR,A11,feminine_gen,Mazur,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+MAZUR,A11,feminine_declines,no (indeclinable for a woman),SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+MAZUR,A2,change_2019_2026_abs_M,543,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+MAZUR,A2,change_2019_2026_pct_M,1.60,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+MAZUR,A2,change_2019_2026_abs_F,1022,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+MAZUR,A2,change_2019_2026_pct_F,2.99,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+MAZUR,A2,change_2019_2026_abs_paired,1565,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+MAZUR,A2,change_2019_2026_pct_paired,2.29,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+MAZUR,A2,rank_paired_2019,14,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+MAZUR,A2,rank_change_2019_2026,1,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+MAZUR,A2,change_2025_2026_pct_paired,-0.12,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+MAZUR,A2,share_change_2019_2026_pp,-0.0069,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+MAZUR,A3,spelling_class,OTHER,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+MAZUR,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+MAZUR,A6,F_per_M_2019,1.0044,F list MAZUR / M list MAZUR,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+MAZUR,A6,F_per_M_2026,1.0182,F list MAZUR / M list MAZUR,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+MAZUR,A7,hyphenated_forms_with_component_M,22,"M list, component key MAZUR",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+MAZUR,A7,hyphenated_entries_with_component_M,53,"M list, component key MAZUR",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+MAZUR,A7,hyphenated_forms_with_component_F,279,"F list, component key MAZUR",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+MAZUR,A7,hyphenated_entries_with_component_F,692,"F list, component key MAZUR",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+MAZUR,A8,recorded_deceased_entries_2024,23389,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_2024,25.09,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_2024,93224,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+MAZUR,A8,recorded_deceased_entries_2025,24048,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_2025,25.61,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_2025,93912,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+MAZUR,A8,ageing_index_pct_F_2026,24.37,"F list, form MAZUR",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+MAZUR,A9,equals_lowercase_sjp_base_form,Y,'mazur',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+KRASKA,A1,entries_M_list,2446,"M list, form KRASKA",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+KRASKA,A1,entries_F_list,2495,"F list, form KRASKA",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+KRASKA,A1,paired_total,4941,M+F lists,2026-01-20,1681 r1148808+r1148811,invariant override: same form in both lists,VERIFIED (arithmetic on file values); pairing = method
+KRASKA,A1,rank_paired,1023,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals ; position with colliding KRASKI unit removed,LIKELY (derived; depends on PAIR-V1)
+KRASKA,A1,share_of_all_entries_pct,0.0116,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+KRASKA,A1,one_in_x_entries,8654,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+KRASKA,A1,rank_in_M_list,1035,"M list, form KRASKA",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+KRASKA,A1,rank_in_F_list,1017,"F list, form KRASKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KRASKA,A10,letters,6,masculine/base form,-,-,character count,VERIFIED
+KRASKA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+KRASKA,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KRASKA,A11,masc_gen,Kraski,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KRASKA,A11,family_plural_nom,Kraskowie,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KRASKA,A11,feminine_gen,Kraski,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KRASKA,A11,feminine_declines,yes,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KRASKA,A2,change_2019_2026_abs_M,-49,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KRASKA,A2,change_2019_2026_pct_M,-1.96,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KRASKA,A2,change_2019_2026_abs_F,-67,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KRASKA,A2,change_2019_2026_pct_F,-2.62,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KRASKA,A2,change_2019_2026_abs_paired,-116,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KRASKA,A2,change_2019_2026_pct_paired,-2.29,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KRASKA,A2,rank_paired_2019,1014,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+KRASKA,A2,rank_change_2019_2026,-9,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+KRASKA,A2,change_2025_2026_pct_paired,-0.50,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+KRASKA,A2,share_change_2019_2026_pp,-0.0010,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+KRASKA,A3,spelling_class,-SKI/-SKA,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+KRASKA,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+KRASKA,A6,F_per_M_2019,1.0269,F list KRASKA / M list KRASKA,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KRASKA,A6,F_per_M_2026,1.0200,F list KRASKA / M list KRASKA,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KRASKA,A7,hyphenated_forms_with_component_M,0,"M list, component key KRASKA",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KRASKA,A7,hyphenated_entries_with_component_M,0,"M list, component key KRASKA",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+KRASKA,A7,hyphenated_forms_with_component_F,0,"F list, component key KRASKA",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KRASKA,A7,hyphenated_entries_with_component_F,0,"F list, component key KRASKA",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+KRASKA,A8,recorded_deceased_entries_2024,1767,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, invariant override (same form, both lists)",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_2024,26.10,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, invariant override (same form, both lists)",LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_2024,6769,M+F lists,2024-01-19,568 2024 M/F,"invariant override (same form, both lists)",VERIFIED
+KRASKA,A8,recorded_deceased_entries_2025,1824,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, invariant override (same form, both lists)",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_2025,26.86,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, invariant override (same form, both lists)",LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_2025,6790,M+F lists,2025-01-22,568 2025 M/F,"invariant override (same form, both lists)",VERIFIED
+KRASKA,A8,ageing_index_pct_F_2026,25.68,"F list, form KRASKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+KRASKA,A9,equals_lowercase_sjp_base_form,Y,'kraska',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
+KOZIOŁ,A1,entries_M_list,11991,"M list, form KOZIOŁ",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
+KOZIOŁ,A1,entries_F_list,11573,"F list, form KOZIOŁ",2026-01-20,1681 r1148811,raw Liczba,VERIFIED
+KOZIOŁ,A1,other_form_entries,0,F-list entries written in the masculine form + M-list entries in the feminine form (not in paired total headline),2026-01-20,1681 r1148808+r1148811,PAIR-V1,VERIFIED
+KOZIOŁ,A1,paired_total,23564,M+F lists,2026-01-20,1681 r1148808+r1148811,PAIR-V1 (all forms mapping to the key),VERIFIED (arithmetic on file values); pairing = method
+KOZIOŁ,A1,rank_paired,111,among all PAIR-V1 units,2026-01-20,1681 r1148808+r1148811,RANK-V1 (1224) on paired totals,LIKELY (derived; depends on PAIR-V1)
+KOZIOŁ,A1,share_of_all_entries_pct,0.0551,denominator 42757839 = sum of both 2026 lists,2026-01-20,1681 r1148808+r1148811,SHARE-V1,LIKELY (derived)
+KOZIOŁ,A1,one_in_x_entries,1815,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
+KOZIOŁ,A1,rank_in_M_list,103,"M list, form KOZIOŁ",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
+KOZIOŁ,A1,rank_in_F_list,118,"F list, form KOZIOŁ",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KOZIOŁ,A10,letters,6,masculine/base form,-,-,character count,VERIFIED
+KOZIOŁ,A10,polish_diacritic_letters,Ł,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
+KOZIOŁ,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KOZIOŁ,A11,masc_gen,Kozioła/Kozła,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOZIOŁ,A11,family_plural_nom,Koziołowie/Kozłowie,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOZIOŁ,A11,feminine_gen,Kozioł,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOZIOŁ,A11,feminine_declines,no (indeclinable for a woman),SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOZIOŁ,A11,variant_slots,pl.acc=Koziołów/Kozłów; pl.dat=Koziołom/Kozłom; pl.gen=Koziołów/Kozłów; pl.inst=Koziołami/Kozłami; pl.loc=Koziołach/Kozłach; pl.nom=Koziołowie/Kozłowie; sg.acc=Kozioła/Kozła; sg.dat=Koziołowi/Kozłowi; sg.gen=Kozioła/Kozła; sg.inst=Koziołem/Kozłem; sg.loc=Koziole/Koźle,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
+KOZIOŁ,A2,change_2019_2026_abs_M,-330,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOZIOŁ,A2,change_2019_2026_pct_M,-2.68,M list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOZIOŁ,A2,change_2019_2026_abs_F,-528,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOZIOŁ,A2,change_2019_2026_pct_F,-4.36,F list,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOZIOŁ,A2,change_2019_2026_abs_paired,-858,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,difference of raw/paired values,VERIFIED (arithmetic)
+KOZIOŁ,A2,change_2019_2026_pct_paired,-3.51,M+F lists,2019-06-30 -> 2026-01-20,1681 2019 & 2026 files,(b-a)/a,VERIFIED (arithmetic)
+KOZIOŁ,A2,rank_paired_2019,111,PAIR-V1 units,2019-06-30,1681 r18990+r18988,RANK-V1,LIKELY (derived)
+KOZIOŁ,A2,rank_change_2019_2026,0,positive = moved up,2019-06-30 -> 2026-01-20,1681,RANK-V1 difference,LIKELY (derived)
+KOZIOŁ,A2,change_2025_2026_pct_paired,-0.45,M+F lists,2025-01-22 -> 2026-01-20,1681 r63892+r63888 / 1681 r1148808+r1148811,(b-a)/a,VERIFIED (arithmetic)
+KOZIOŁ,A2,share_change_2019_2026_pp,-0.0058,"share of all entries, percentage points",2019-06-30 -> 2026-01-20,1681,SHARE-V1 difference,LIKELY (derived)
+KOZIOŁ,A3,spelling_class,OTHER,SUFFIX-V1 (spelling pattern only),2026-01-20,-,first matching ending rule,VERIFIED (string rule)
+KOZIOŁ,A5,published_2019_and_2026,M2019=Y F2019=Y M2026=Y F2026=Y,exact forms,2019-06-30 / 2026-01-20,1681,presence in list,VERIFIED
+KOZIOŁ,A6,F_per_M_2019,0.9821,F list KOZIOŁ / M list KOZIOŁ,2019-06-30,1681 2019 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KOZIOŁ,A6,F_per_M_2026,0.9651,F list KOZIOŁ / M list KOZIOŁ,2026-01-20,1681 2026 M/F,ratio of list entries (GENDER-V1),LIKELY (derived); causes INSUFFICIENT_DATA
+KOZIOŁ,A7,hyphenated_forms_with_component_M,7,"M list, component key KOZIOŁ",2026-01-20,1681 2026 M,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KOZIOŁ,A7,hyphenated_entries_with_component_M,15,"M list, component key KOZIOŁ",2026-01-20,1681 2026 M,sum of entries,VERIFIED (arithmetic)
+KOZIOŁ,A7,hyphenated_forms_with_component_F,69,"F list, component key KOZIOŁ",2026-01-20,1681 2026 F,component match after PAIR-V1 key,VERIFIED (count of file rows)
+KOZIOŁ,A7,hyphenated_entries_with_component_F,162,"F list, component key KOZIOŁ",2026-01-20,1681 2026 F,sum of entries,VERIFIED (arithmetic)
+KOZIOŁ,A8,recorded_deceased_entries_2024,8835,M+F lists,2024-01-19,568 + 1681 2024 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_2024,27.07,M+F lists,2024-01-19,568 + 1681 2024 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_2024,32639,M+F lists,2024-01-19,568 2024 M/F,PAIR-V1 units,VERIFIED
+KOZIOŁ,A8,recorded_deceased_entries_2025,9099,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_2025,27.77,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_2025,32770,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KOZIOŁ,A8,ageing_index_pct_F_2026,27.43,"F list, form KOZIOŁ",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
+KOZIOŁ,A9,equals_lowercase_sjp_base_form,Y,'kozioł',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)

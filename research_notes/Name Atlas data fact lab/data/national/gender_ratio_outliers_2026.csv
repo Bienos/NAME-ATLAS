@@ -1,0 +1,106 @@
+unit_type,list,position,unit_key,female_list_form,M_entries,F_entries,F_per_M
+ski_pair,highest_F_per_M,1,WALEWSKI,WALEWSKA,1115,1292,1.159
+ski_pair,highest_F_per_M,2,WORONIECKI,WORONIECKA,669,775,1.158
+ski_pair,highest_F_per_M,3,GROCHULSKI,GROCHULSKA,598,686,1.147
+ski_pair,highest_F_per_M,4,STRASZEWSKI,STRASZEWSKA,634,723,1.140
+ski_pair,highest_F_per_M,5,KOSSOWSKI,KOSSOWSKA,1008,1148,1.139
+ski_pair,highest_F_per_M,6,PILICHOWSKI,PILICHOWSKA,536,610,1.138
+ski_pair,highest_F_per_M,7,RUSZCZYŃSKI,RUSZCZYŃSKA,469,532,1.134
+ski_pair,highest_F_per_M,8,RZEWUSKI,RZEWUSKA,525,595,1.133
+ski_pair,highest_F_per_M,9,STOKOWSKI,STOKOWSKA,889,1004,1.129
+ski_pair,highest_F_per_M,10,SANECKI,SANECKA,712,803,1.128
+ski_pair,highest_F_per_M,11,WĘGŁOWSKI,WĘGŁOWSKA,500,562,1.124
+ski_pair,highest_F_per_M,12,NIWIŃSKI,NIWIŃSKA,563,632,1.123
+ski_pair,highest_F_per_M,13,BRATKOWSKI,BRATKOWSKA,581,652,1.122
+ski_pair,highest_F_per_M,14,ROGIŃSKI,ROGIŃSKA,778,873,1.122
+ski_pair,highest_F_per_M,15,WOJEWÓDZKI,WOJEWÓDZKA,1025,1149,1.121
+ski_pair,lowest_F_per_M,1,NISKI,NISKA,560,493,0.880
+ski_pair,lowest_F_per_M,2,GROBELSKI,GROBELSKA,531,471,0.887
+ski_pair,lowest_F_per_M,3,PAŁUCKI,PAŁUCKA,614,560,0.912
+ski_pair,lowest_F_per_M,4,MORDARSKI,MORDARSKA,1067,976,0.915
+ski_pair,lowest_F_per_M,5,PACHUCKI,PACHUCKA,604,555,0.919
+ski_pair,lowest_F_per_M,6,GROŃSKI,GROŃSKA,631,580,0.919
+ski_pair,lowest_F_per_M,7,KOŁACKI,KOŁACKA,648,597,0.921
+ski_pair,lowest_F_per_M,8,SŁOMCZEWSKI,SŁOMCZEWSKA,526,486,0.924
+ski_pair,lowest_F_per_M,9,BROŃSKI,BROŃSKA,521,483,0.927
+ski_pair,lowest_F_per_M,10,PŁOMIŃSKI,PŁOMIŃSKA,608,564,0.928
+ski_pair,lowest_F_per_M,11,CZUPRYŃSKI,CZUPRYŃSKA,992,921,0.928
+ski_pair,lowest_F_per_M,12,WĘSIERSKI,WĘSIERSKA,1065,989,0.929
+ski_pair,lowest_F_per_M,13,OLEWIŃSKI,OLEWIŃSKA,701,651,0.929
+ski_pair,lowest_F_per_M,14,BLADOWSKI,BLADOWSKA,564,524,0.929
+ski_pair,lowest_F_per_M,15,GAJDZIŃSKI,GAJDZIŃSKA,593,551,0.929
+invariant,highest_F_per_M,1,BIAŁA,BIAŁA,2,2374,1187.000
+invariant,highest_F_per_M,2,POPOVA,POPOVA,2,2373,1186.500
+invariant,highest_F_per_M,3,NADOLNA,NADOLNA,3,2402,800.667
+invariant,highest_F_per_M,4,VOLOSHYNA,VOLOSHYNA,2,1412,706.000
+invariant,highest_F_per_M,5,CHORNA,CHORNA,3,1907,635.667
+invariant,highest_F_per_M,6,BILA,BILA,15,1084,72.267
+invariant,highest_F_per_M,7,CHUDA,CHUDA,22,1505,68.409
+invariant,highest_F_per_M,8,BOROWA,BOROWA,50,1365,27.300
+invariant,highest_F_per_M,9,ŁAKOMA,ŁAKOMA,142,1562,11.000
+invariant,highest_F_per_M,10,BURA,BURA,473,1388,2.934
+invariant,highest_F_per_M,11,KUSA,KUSA,317,732,2.309
+invariant,highest_F_per_M,12,RUDA,RUDA,655,1477,2.255
+invariant,highest_F_per_M,13,DYKA,DYKA,398,712,1.789
+invariant,highest_F_per_M,14,SMITH,SMITH,505,775,1.535
+invariant,highest_F_per_M,15,HAVRYLENKO,HAVRYLENKO,473,696,1.471
+invariant,lowest_F_per_M,1,NOVIKOV,NOVIKOV,1066,4,0.004
+invariant,lowest_F_per_M,2,CHORNYI,CHORNYI,1516,6,0.004
+invariant,lowest_F_per_M,3,SOKOLOV,SOKOLOV,1037,8,0.008
+invariant,lowest_F_per_M,4,ALIEV,ALIEV,1147,11,0.010
+invariant,lowest_F_per_M,5,FEDOROV,FEDOROV,1011,10,0.010
+invariant,lowest_F_per_M,6,PAVLOV,PAVLOV,1074,11,0.010
+invariant,lowest_F_per_M,7,MAMEDOV,MAMEDOV,1707,18,0.011
+invariant,lowest_F_per_M,8,VOLKOV,VOLKOV,1240,18,0.015
+invariant,lowest_F_per_M,9,IVANOV,IVANOV,3856,64,0.017
+invariant,lowest_F_per_M,10,POPOV,POPOV,2054,39,0.019
+invariant,lowest_F_per_M,11,SKONIECZNY,SKONIECZNY,2781,71,0.026
+invariant,lowest_F_per_M,12,PETROV,PETROV,1592,41,0.026
+invariant,lowest_F_per_M,13,ZADROŻNY,ZADROŻNY,1882,55,0.029
+invariant,lowest_F_per_M,14,SKONECZNY,SKONECZNY,1076,32,0.030
+invariant,lowest_F_per_M,15,NADOLNY,NADOLNY,2469,113,0.046
+invariant_consonant_final,highest_F_per_M,1,SMITH,SMITH,505,775,1.535
+invariant_consonant_final,highest_F_per_M,2,HORVAT,HORVAT,439,630,1.435
+invariant_consonant_final,highest_F_per_M,3,SERDIUK,SERDIUK,765,1019,1.332
+invariant_consonant_final,highest_F_per_M,4,SYDORCHUK,SYDORCHUK,451,596,1.322
+invariant_consonant_final,highest_F_per_M,5,MATVIICHUK,MATVIICHUK,777,1001,1.288
+invariant_consonant_final,highest_F_per_M,6,KOLOMIIETS,KOLOMIIETS,974,1249,1.282
+invariant_consonant_final,highest_F_per_M,7,MÜLLER,MÜLLER,1462,1874,1.282
+invariant_consonant_final,highest_F_per_M,8,SCHNEIDER,SCHNEIDER,1155,1475,1.277
+invariant_consonant_final,highest_F_per_M,9,POLISHCHUK,POLISHCHUK,2645,3353,1.268
+invariant_consonant_final,highest_F_per_M,10,ZHURAVEL,ZHURAVEL,499,629,1.261
+invariant_consonant_final,highest_F_per_M,11,FISCHER,FISCHER,938,1181,1.259
+invariant_consonant_final,highest_F_per_M,12,KRÜGER,KRÜGER,461,579,1.256
+invariant_consonant_final,highest_F_per_M,13,BONDARCHUK,BONDARCHUK,943,1184,1.256
+invariant_consonant_final,highest_F_per_M,14,DENYSIUK,DENYSIUK,708,883,1.247
+invariant_consonant_final,highest_F_per_M,15,KOLESNYK,KOLESNYK,1086,1352,1.245
+invariant_consonant_final,lowest_F_per_M,1,ISLAM,ISLAM,965,87,0.090
+invariant_consonant_final,lowest_F_per_M,2,GURUNG,GURUNG,1077,257,0.239
+invariant_consonant_final,lowest_F_per_M,3,KUMAR,KUMAR,1116,291,0.261
+invariant_consonant_final,lowest_F_per_M,4,SINGH,SINGH,3597,1182,0.329
+invariant_consonant_final,lowest_F_per_M,5,PATEL,PATEL,1237,425,0.344
+invariant_consonant_final,lowest_F_per_M,6,AHMED,AHMED,1119,403,0.360
+invariant_consonant_final,lowest_F_per_M,7,TAMANG,TAMANG,941,359,0.382
+invariant_consonant_final,lowest_F_per_M,8,KHAN,KHAN,1237,519,0.420
+invariant_consonant_final,lowest_F_per_M,9,TRẦN,TRẦN,770,410,0.532
+invariant_consonant_final,lowest_F_per_M,10,LÊ,LÊ,756,409,0.541
+invariant_consonant_final,lowest_F_per_M,11,NGUYỄN,NGUYỄN,3730,2132,0.572
+invariant_consonant_final,lowest_F_per_M,12,PHAM,PHAM,669,418,0.625
+invariant_consonant_final,lowest_F_per_M,13,PARK,PARK,759,481,0.634
+invariant_consonant_final,lowest_F_per_M,14,ZHANG,ZHANG,1132,759,0.670
+invariant_consonant_final,lowest_F_per_M,15,KIM,KIM,2400,1612,0.672
+invariant,one_side_unpublished_ge500,,KONIECZNA,KONIECZNA,<2 or absent,11693,
+invariant,one_side_unpublished_ge500,,SZCZĘSNA,SZCZĘSNA,<2 or absent,6294,
+invariant,one_side_unpublished_ge500,,GÓRNA,GÓRNA,<2 or absent,5623,
+invariant,one_side_unpublished_ge500,,IVANOVA,IVANOVA,<2 or absent,4603,
+invariant,one_side_unpublished_ge500,,KAŁUŻNA,KAŁUŻNA,<2 or absent,4091,
+invariant,one_side_unpublished_ge500,,CICHA,CICHA,<2 or absent,2916,
+invariant,one_side_unpublished_ge500,,WOLNA,WOLNA,<2 or absent,2829,
+invariant,one_side_unpublished_ge500,,SKONIECZNA,SKONIECZNA,<2 or absent,2769,
+invariant,one_side_unpublished_ge500,,WOŹNA,WOŹNA,<2 or absent,2626,
+invariant,one_side_unpublished_ge500,,ZIMNA,ZIMNA,<2 or absent,2413,
+invariant,one_side_unpublished_ge500,,GROBELNA,GROBELNA,<2 or absent,2250,
+invariant,one_side_unpublished_ge500,,MAŁOLEPSZA,MAŁOLEPSZA,<2 or absent,1984,
+invariant,one_side_unpublished_ge500,,ZADROŻNA,ZADROŻNA,<2 or absent,1859,
+invariant,one_side_unpublished_ge500,,MĄDRA,MĄDRA,<2 or absent,1766,
+invariant,one_side_unpublished_ge500,,PETROVA,PETROVA,<2 or absent,1761,

@@ -1,0 +1,8 @@
+reference_date,list,living_file,incl_deceased_file,living_entries,incl_entries,difference_recorded_deceased,difference_pct_of_incl,living_forms,incl_forms,forms_in_incl_only,entries_of_incl_only_forms,negative_differences,living_forms_missing_from_incl,negative_examples_or_note,missing_examples
+2024-01-19,F,1681_F_2024-01-19_r54098.csv,568_F_2024-01-19_r54120.csv,21479386,28230772,6751386,23.915,400764,424278,23514,58001,0,0,,
+2024-01-19,M,1681_M_2024-01-19_r54097.csv,568_M_2024-01-19_r54119.csv,20976785,28704799,7728014,26.922,379712,398945,19233,49386,0,0,,
+2025-01-22,F,1681_F_2025-01-22_r63888.csv,568_F_2025-01-22_r63883.csv,21535515,28490327,6954812,24.411,411012,435275,24265,60068,0,2,,BRAK NAZWISKA:161; 5A5:2
+2025-01-22,M,1681_M_2025-01-22_r63892.csv,568_M_2025-01-22_r63886.csv,21096170,29045826,7949656,27.369,395127,414949,19822,51204,0,0,,
+2026-01-20,F,1681_F_2026-01-20_r1148811.csv,568_F_2026-01-20_r1148815.csv,21560302,28715275,7154973,24.917,420082,445143,25061,62301,0,0,,
+2024-01-19,M+F (PAIR-V1),both living lists,both incl. lists,42456171,56935571,14479400,25.431,518920,541949,,,,,units>=1000 incl: 8759; median index 26.86%; index>=50%: 0; index<10%: 241,
+2025-01-22,M+F (PAIR-V1),both living lists,both incl. lists,42631685,57536153,14904468,25.905,539284,563083,,,,,units>=1000 incl: 8814; median index 27.52%; index>=50%: 0; index<10%: 268,

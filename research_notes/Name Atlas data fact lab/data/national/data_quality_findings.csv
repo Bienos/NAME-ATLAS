@@ -1,0 +1,100 @@
+finding,file,value,count,note
+DQ-01,1681_F_2021-02-02_r35279.csv + 1681_F_2022-01-27_r38772.csv,(whole file),,Byte-identical files (same SHA-256): the portal's 2022 female resource is a copy of 2021. No female 2022 snapshot exists; 2022 paired values are n/a.
+DQ-02,1681_F_2019-06-30_r18988.csv,-,2,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2019-06-30_r18988.csv,.,8,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-04,1681_F_2019-06-30_r18988.csv,5A5,2,Digit inside a surname value.
+DQ-05,1681_F_2019-06-30_r18988.csv,A,2,Single-character surname value (unverifiable; may be real).
+DQ-02,1681_F_2019-06-30_r18988.csv,BRAK DANYCH,216,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2019-06-30_r18988.csv,BRAK NAZWISKA,118,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2019-06-30_r18988.csv,NN,5,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,1681_F_2019-06-30_r18988.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2019-06-30_r18988.csv,DOG̈AN; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_F_2020-01-22_r22815.csv,BRAK DANYCH,335,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2020-01-22_r22815.csv,BRAK NAZWISKA,117,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2020-01-22_r22815.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-03,1681_F_2020-01-22_r22815.csv,True,285,Non-uppercase value; 'True' replaces the surname PRAWDA (PRAWDA is the Polish spreadsheet keyword for TRUE) - a publisher-side conversion artefact.
+DQ-06,1681_F_2020-01-22_r22815.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2020-01-22_r22815.csv,DOG̈AN; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-03b,1681_F_2020-01-22_r22815.csv,PRAWDA,absent,PRAWDA missing while 'True' has 285 entries.
+DQ-02,1681_F_2021-02-02_r35279.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-03,1681_F_2021-02-02_r35279.csv,True,284,Non-uppercase value; 'True' replaces the surname PRAWDA (PRAWDA is the Polish spreadsheet keyword for TRUE) - a publisher-side conversion artefact.
+DQ-06,1681_F_2021-02-02_r35279.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2021-02-02_r35279.csv,DOG̈AN; GA̋BEL; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,7,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-03b,1681_F_2021-02-02_r35279.csv,PRAWDA,absent,PRAWDA missing while 'True' has 284 entries.
+DQ-02,1681_F_2023-01-30_r44646.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,1681_F_2023-01-30_r44646.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2023-01-30_r44646.csv,GA̋BEL; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_F_2024-01-19_r54098.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,1681_F_2024-01-19_r54098.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2024-01-19_r54098.csv,GA̋BEL; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-04,1681_F_2025-01-22_r63888.csv,5A5,2,Digit inside a surname value.
+DQ-02,1681_F_2025-01-22_r63888.csv,BRAK NAZWISKA,161,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_F_2025-01-22_r63888.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,1681_F_2025-01-22_r63888.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2025-01-22_r63888.csv,GA̋BEL; GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_F_2026-01-20_r1148811.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,1681_F_2026-01-20_r1148811.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,1681_F_2026-01-20_r1148811.csv,GLA̋SSNER; JA̋GER; SCHA̋FER; WEISSGA̋RBER; YAG̈IZ,5,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_M_2019-06-30_r18990.csv,.,23,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2019-06-30_r18990.csv,BRAK DANYCH,847,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2019-06-30_r18990.csv,BRAK NAZWISKA,326,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2019-06-30_r18990.csv,NN,11,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-05,1681_M_2019-06-30_r18990.csv,O,6,Single-character surname value (unverifiable; may be real).
+DQ-05,1681_M_2019-06-30_r18990.csv,Q,2,Single-character surname value (unverifiable; may be real).
+DQ-02,1681_M_2019-06-30_r18990.csv,XXX,2,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2019-06-30_r18990.csv,DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,5,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-05,1681_M_2020-01-22_r22817.csv,B,2,Single-character surname value (unverifiable; may be real).
+DQ-02,1681_M_2020-01-22_r22817.csv,BRAK DANYCH,1095,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2020-01-22_r22817.csv,BRAK NAZWISKA,327,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2020-01-22_r22817.csv,NN,11,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-05,1681_M_2020-01-22_r22817.csv,O,6,Single-character surname value (unverifiable; may be real).
+DQ-05,1681_M_2020-01-22_r22817.csv,Q,2,Single-character surname value (unverifiable; may be real).
+DQ-03,1681_M_2020-01-22_r22817.csv,True,291,Non-uppercase value; 'True' replaces the surname PRAWDA (PRAWDA is the Polish spreadsheet keyword for TRUE) - a publisher-side conversion artefact.
+DQ-02,1681_M_2020-01-22_r22817.csv,XXX,2,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2020-01-22_r22817.csv,BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-03b,1681_M_2020-01-22_r22817.csv,PRAWDA,absent,PRAWDA missing while 'True' has 291 entries.
+DQ-05,1681_M_2021-02-01_r28052.csv,B,2,Single-character surname value (unverifiable; may be real).
+DQ-02,1681_M_2021-02-01_r28052.csv,NN,10,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-05,1681_M_2021-02-01_r28052.csv,O,6,Single-character surname value (unverifiable; may be real).
+DQ-05,1681_M_2021-02-01_r28052.csv,Q,2,Single-character surname value (unverifiable; may be real).
+DQ-03,1681_M_2021-02-01_r28052.csv,True,284,Non-uppercase value; 'True' replaces the surname PRAWDA (PRAWDA is the Polish spreadsheet keyword for TRUE) - a publisher-side conversion artefact.
+DQ-02,1681_M_2021-02-01_r28052.csv,XXX,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2021-02-01_r28052.csv,BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-03b,1681_M_2021-02-01_r28052.csv,PRAWDA,absent,PRAWDA missing while 'True' has 284 entries.
+DQ-02,1681_M_2022-01-27_r36401.csv,BRAK DANYCH,2427,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2022-01-27_r36401.csv,BRAK NAZWISKA,326,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2022-01-27_r36401.csv,NN,10,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-03,1681_M_2022-01-27_r36401.csv,True,282,Non-uppercase value; 'True' replaces the surname PRAWDA (PRAWDA is the Polish spreadsheet keyword for TRUE) - a publisher-side conversion artefact.
+DQ-02,1681_M_2022-01-27_r36401.csv,XXX,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2022-01-27_r36401.csv,BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-03b,1681_M_2022-01-27_r36401.csv,PRAWDA,absent,PRAWDA missing while 'True' has 282 entries.
+DQ-02,1681_M_2023-01-30_r44647.csv,NN,9,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2023-01-30_r44647.csv,XXX,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2023-01-30_r44647.csv,BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,6,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_M_2024-01-19_r54097.csv,NN,9,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2024-01-19_r54097.csv,XXX,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2024-01-19_r54097.csv,AKDOG̈AN; BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,7,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_M_2025-01-22_r63892.csv,NN,8,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2025-01-22_r63892.csv,XXX,4,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2025-01-22_r63892.csv,AKDOG̈AN; BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,7,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,1681_M_2026-01-20_r1148808.csv,NN,8,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,1681_M_2026-01-20_r1148808.csv,XXX,4,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,1681_M_2026-01-20_r1148808.csv,AKDOG̈AN; BA̋CK; DOG̈AN; GLA̋SSNER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,7,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,568_F_2024-01-19_r54120.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,568_F_2024-01-19_r54120.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,568_F_2024-01-19_r54120.csv,EICHSTA̋DT; GA̋BEL; GLA̋SSNER; HA̋MMERL; HA̋USLER; JA̋GER; SCHA̋FER; SCHA̋FFER,10,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,568_F_2025-01-22_r63883.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,568_F_2025-01-22_r63883.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,568_F_2025-01-22_r63883.csv,EICHSTA̋DT; GA̋BEL; GLA̋SSNER; HA̋MMERL; HA̋USLER; JA̋GER; SCHA̋FER; SCHA̋FFER,10,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,568_F_2026-01-20_r1148815.csv,NN,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-06,568_F_2026-01-20_r1148815.csv,'SCHIED ',,Surrounding whitespace in the raw value; stripped for analysis (no collision created).
+DQ-07,568_F_2026-01-20_r1148815.csv,EICHSTA̋DT; GLA̋SSNER; HA̋MMERL; HA̋USLER; JA̋GER; SCHA̋FER; SCHA̋FFER; WEISSGA̋RBER,9,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,568_M_2024-01-19_r54119.csv,NN,9,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,568_M_2024-01-19_r54119.csv,XXX,3,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,568_M_2024-01-19_r54119.csv,AKDOG̈AN; BA̋CK; DOG̈AN; GLA̋SSNER; JA̋GER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,8,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-02,568_M_2025-01-22_r63886.csv,NN,8,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-02,568_M_2025-01-22_r63886.csv,XXX,4,"Placeholder-like value published as a surname (BRAK DANYCH = 'no data', BRAK NAZWISKA = 'no surname'; NN/XXX probable placeholders). Kept in raw sums, excluded from editorial lists."
+DQ-07,568_M_2025-01-22_r63886.csv,AKDOG̈AN; BA̋CK; DOG̈AN; GLA̋SSNER; JA̋GER; MA̋KELA̋; SCHA̋FER; WEISSGA̋RBER,8,Values containing a standalone Unicode combining mark (kept verbatim).
+DQ-08,1681 2026 M+F,MÜLLER / MŰLLER / MULLER / MUELLER,,Diacritic/spelling variants recorded as separate surname values: MÜLLER=1462M/1874F; MŰLLER=382M/479F; MULLER=50M/66F; MUELLER=440M/486F
+DQ-08,1681 2026 M+F,SCHRÖDER / SCHRŐDER,,Diacritic/spelling variants recorded as separate surname values: SCHRÖDER=257M/354F; SCHRŐDER=79M/97F
+DQ-09,1681 2026 M,225 keys,129102,"PAIR-V1 collision: -SKA/-CKA/-DZKA forms published in the MALE list with >=20 entries (invariant surnames such as KRASKA, GĄSKA, KLUSKA). Count = PAIR-V1 unit total entries affected."
