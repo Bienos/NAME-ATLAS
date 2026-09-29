@@ -6,7 +6,7 @@ This is a research prototype. It tests which "abroad" and "100 years ago" facts 
 - **100 years ago:** the German First World War casualty lists, 1914–1919.
 - **Today:** the PESEL register of living persons, 20 Jan 2026.
 
-Every number below was printed by the scripts in `scripts/diaspora_history/`, run on the files listed here. Nothing was estimated or filled in from memory. The session was resumed after a container restart. The finished US outputs were re-run first and came out byte-identical. Three issues were then fixed; see items 1–3 of "Data-quality findings". Finally the whole pipeline was re-run from the repo copies of the scripts with `run_all.py`; see the "Rerun order" paragraph for the check.
+Every number below was printed by the scripts in `scripts/diaspora_history/`, run on the files listed here. Nothing was estimated or filled in from memory. The session was resumed after a container restart. The finished US outputs were re-run first and came out byte-identical. Three issues were then fixed; see items 1–3 of "Data-quality findings". Finally the whole pipeline was re-run from the repo copies of the scripts with `run_all.py`; the check is described under "Rerun order" below.
 
 ## Files, versions, licences, methods
 
@@ -57,7 +57,7 @@ The race and Hispanic-origin columns of both US files were never loaded (`usecol
 8. `c7_showcase_wwi.py`
 9. `z_notes_numbers.py`, which prints the derived numbers quoted in these notes.
 
-`prng_cache.py` builds the PRNG point cache once. A final `run_all.py` pass (8–9 minutes) from the repo copies reproduced every CSV in `data/diaspora_history/` byte for byte; see the end of "Data-quality findings" for the check. All data paths are absolute. Intermediates stay in the scratchpad, for example the row-aligned `wwi_entry_loc.parquet` and `wwi_keys.parquet`, which never go into the repo. The repo gets only CSVs of 200 KB or less, and none of them has a person-level row.
+`prng_cache.py` builds the PRNG point cache once. **Check:** after the last edit, a final `run_all.py` pass from the repo copies took 8 min 56 s. All 19 CSVs in `data/diaspora_history/` came out byte-identical (`cmp`) to the copies made before the run. All data paths are absolute. Intermediates stay in the scratchpad, for example the row-aligned `wwi_entry_loc.parquet` and `wwi_keys.parquet`, which never go into the repo. The repo gets only CSVs of 200 KB or less, and none of them has a person-level row.
 
 **Voivodeship denominators.** Voivodeship shares are shares of the entries that *have* a published voivodeship cell. Example: of the 98,387 male-file NOWAK entries, 86,969 are in published voivodeship cells.
 
@@ -167,7 +167,7 @@ Under them, one line: "9.2 people in the US census per 100 Polish register entri
 >
 > **PL:** „Wśród nazwisk na -SKI/-CKI/-DZKI mających co najmniej 1000 osób w spisie USA i 1000 wpisów w PESEL, pisownia DOMBROWSKI jest najbardziej nadreprezentowana w USA względem Polski: 6 176 osób w 2020 r. wobec 2 476 wpisów w PESEL (rejestry mężczyzn i kobiet razem), czyli 249,4 na 100. Standardowa pisownia DĄBROWSKI (w spisie USA: DABROWSKI) ma tylko 3,0 osoby w USA na 100 wpisów w Polsce (2 515 osób wobec 84 979 wpisów)."
 
-> **EN:** "Among the 169 -SKI/-CKI/-DZKI surnames with at least 1,000 people in both US censuses, not one kept pace with US population growth from 2000 to 2020. The best, PIASECKI, grew by 8.6% in count (1,951 → 2,119) but still lost 1.5% of its population share."
+> **EN:** "Among the 169 -SKI/-CKI/-DZKI surnames with at least 1,000 people in both US censuses (and at least 1,000 PESEL entries; spellings that fold ambiguously excluded), not one kept pace with US population growth from 2000 to 2020. The best, PIASECKI, grew by 8.6% in count (1,951 → 2,119) but still lost 1.5% of its population share."
 
 ### Where it's used
 Editorial "did you know" lists and the diaspora section of premium reports. These are never used as a ranking of families.
@@ -373,10 +373,10 @@ The documentation's abbreviations (Kr. = Kreis, A.-H. = Amtshauptmannschaft, B.-
 
 | Route | Share of entries | Entries |
 |---|---|---|
-| point | 45.61% | |
-| district | 22.36% | |
-| postcode | 9.89% | |
-| text | 5.21% | |
+| point | 45.61% | 3,900,304 |
+| district | 22.36% | 1,912,572 |
+| postcode | 9.89% | 845,734 |
+| text | 5.21% | 445,898 |
 | not located | 16.92% | 1,447,250 |
 
 The unlocated entries break down into: district unresolved 13.50%, no Ort 2.70%, border-straddling subsquare 0.72%.
@@ -400,13 +400,13 @@ The unlocated entries break down into: district unresolved 13.50%, no Ort 2.70%,
 |---|---|---|
 | Dolnośląskie | 258,714 | 19.97% |
 | Wielkopolskie | 243,352 | 18.79% |
-| Warmińsko-mazurskie | 154,079 | |
-| Pomorskie | 153,834 | |
-| Zachodniopomorskie | 150,649 | |
-| Kujawsko-pomorskie | 137,720 | |
-| Lubuskie | 77,909 | |
-| Opolskie | 57,827 | |
-| Śląskie | 56,200 | |
+| Warmińsko-mazurskie | 154,079 | 11.89% |
+| Pomorskie | 153,834 | 11.88% |
+| Zachodniopomorskie | 150,649 | 11.63% |
+| Kujawsko-pomorskie | 137,720 | 10.63% |
+| Lubuskie | 77,909 | 6.01% |
+| Opolskie | 57,827 | 4.46% |
+| Śląskie | 56,200 | 4.34% |
 | The other seven together | 5,152 | 0.40% |
 
 58,488 point entries (4.51% of Poland-located) sit in subsquares that straddle a voivodeship border. They keep the nearest-locality voivodeship.
@@ -549,7 +549,7 @@ The strongest Wielkopolska signatures are -AK forms. For each, the share of loca
   - The register side is the voivodeship of permanent registered residence of living entries.
   - Neither is "origin".
 - R9 only: the lists hardly cover the Russian and Austrian partitions.
-- Śląskie and Opolskie are under-located. The variant without them gives the same result.
+- Śląskie and Opolskie are under-located. The variant without them points the same way (0.6151 vs 0.4510).
 - The male file is primary because the list entries are soldiers. The paired variant is given. User-facing sentences give the male and female figures separately, e.g. KACZMAREK 53.9% vs 53.0%.
 - **Cause: INSUFFICIENT_DATA.** The zero overlap in three voivodeships is a data fact. Any historical explanation needs its own cited source.
 
@@ -578,7 +578,7 @@ The sentences are generated by code from the CSV (`showcase_wwi_summary.csv`, co
 >
 > **PL:** „…nazwisko LEWANDOWSKI pojawia się w 2 312 wpisach; w 49,0% z nich podane miejsce urodzenia leży dziś w województwie kujawsko-pomorskim. W 2026 r. … 24,0% wpisów LEWANDOWSKI w rejestrze mężczyzn i 23,8% wpisów LEWANDOWSKA w rejestrze kobiet."
 
-> **KREFT. EN:** "…609 entries carry the surname KREFT. For 51.4% the place of birth lies in today's Pomorskie (87.7% could be placed; of the located entries, 36.9% lie in today's Germany). In 2026, 85.7% of male-register and 84.5% of female-register KREFT entries are in Pomorskie."
+> **KREFT. EN:** "…609 entries carry the surname KREFT. For 51.4% the place of birth lies in today's Pomorskie (87.7% could be placed; of the located entries, 36.9% lie in today's Germany). In 2026, 85.7% of male-register and 84.5% of female-register KREFT entries with a voivodeship of permanent registered residence are in Pomorskie."
 
 ### Card table (`showcase_wwi_summary.csv`)
 

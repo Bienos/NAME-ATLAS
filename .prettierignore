@@ -17,3 +17,7 @@ packages/db/src/generated/
 # These are evidence: reformatting them would destroy the property that makes
 # them useful — that they are byte-for-byte what the publisher served.
 docs/sources/acquisition/**/metadata/
+
+# Research artefacts (notes, result tables, prototype demo sources) are not
+# product code and are kept exactly as produced.
+research_notes/
