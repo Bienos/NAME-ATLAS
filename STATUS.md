@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, after the go-live of #9, #10, #7 and #11 (`docs/progress/2026-09-29-go-live.md`).
+**Last rewritten:** 2026-09-29, by TASK-031, the Polona source spike (`docs/progress/2026-09-29-polona-source-spike.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030 and 033, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030, 031 and 033, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -30,20 +30,20 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Next
 
-- **TASK-034**, one section registry and one set of design tokens for the web app: chosen by the project owner on 2026-09-24 as the next cleanup. The branches it waited for were merged on 2026-09-29. It still waits for GitHub's default branch to be `main`. Its task file is written when it starts.
-- **TASK-031**, the Polona source spike (`tasks/031-polona-source-spike.md`): specified 2026-09-23, not started, and needs `polona.pl` to be reachable.
+- **TASK-034**, one section registry and one set of design tokens for the web app: implemented, in pull request #14.
+- **The Polona connector task**: not written, and blocked on D-021. TASK-031's record (`docs/sources/polona.md`) holds what it needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
 
 ## Open pull requests and branches
 
-No pull request is open. One unmerged branch has work in progress:
+Four pull requests are open (checked 2026-09-29), each on its own branch from `main` @ `83d38c2`:
 
-- **`claude/procent-continuation-7c2e00`** was started from the stale default branch and is 117 commits behind `main`. Its commits of 2026-09-28 and 2026-09-29 redo what `main` already has:
-  - they specify and start TASK-005, which is implemented and verified on `main`;
-  - they resolve D-006, which `main` resolved on 2026-09-19;
-  - they add an ADR-0003 and an ADR-0004, numbers `main` gives to other decisions.
+- **#13**, TASK-036: batch derivation fast enough for the real register (`claude/cache-rarity-denominator`).
+- **#14**, TASK-034: the section registry and design tokens (`claude/procent-continuation-7c2e00`). That branch was reset onto `main` on 2026-09-29, so its earlier commits, which redid TASK-005, are gone from it.
+- **#15**, TASK-035: load the real PESEL register into production (`claude/jolly-ramanujan-din7m6`).
+- **TASK-031's**, the Polona source spike (`claude/task-031-polona-spike`).
 
-  Do not merge it.
+#14 and TASK-031's both rewrite lines of this file. Whichever merges second resolves the conflict.
 
 ## Blocked on the project owner
 
@@ -55,7 +55,7 @@ No pull request is open. One unmerged branch has work in progress:
   - `claude/fix-surname-links-and-section-rights`
   - `claude/hopeful-cannon-uc9h18`
   - `claude/inspiring-johnson-x88mbo`
-  - `claude/jolly-ramanujan-din7m6`
+  - `claude/jolly-ramanujan-din7m6`: not now, because it carries the open #15 (TASK-035)
   - `claude/kind-edison-eod395-main`
   - `claude/lucid-goodall-t2ai7d`
   - `claude/sharp-bohr-ld17v3`
@@ -70,4 +70,4 @@ No pull request is open. One unmerged branch has work in progress:
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **Decisions.** None is open: every entry in `docs/DECISIONS_NEEDED.md` is resolved. D-020 was resolved as light only and shipped in #11.
+- **Decisions.** One is open: **D-021**, raised by TASK-031. It asks whether a connector may query Polona automatically and keep what it retrieves, and it raises three places where Polona's rights values do not fit ADR-0007. It blocks only the Polona connector task. Every other entry is resolved.

@@ -83,3 +83,11 @@ Supplied by the project owner as a five-part archive on 2026-09-21 and extracted
 scratch space, which is **ephemeral**. Nothing outside this repository survives the session. Keeping
 the archive is the owner's; re-acquiring from `dane.gov.pl` and the other publishers is possible for
 anyone with network egress, and the committed checksums make the result verifiable.
+
+## 6. Captured by source spikes
+
+Not part of the 2026-09-18 run. These are small, real captures committed as fixtures, each with its own manifest.
+
+| Source | Files | In the product? |
+|---|---|---|
+| **Polona** (Biblioteka Narodowa's digital library): search, object records, OCR | `fixtures/polona/`: 10 search responses, 125 object records and 1 OCR page, captured 2026-09-29 by TASK-031; digests in `source-manifest.json` | **No.** A spike only. There is no connector, no `Source` or `RightsProfile`, and no claim. `automated_access` is `UNKNOWN` (D-021). Record: `docs/sources/polona.md`. |

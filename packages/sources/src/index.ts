@@ -91,3 +91,7 @@ export type {
 } from "./onomastics.js";
 export { applySlice, filingLetter, parseSliceSpec, SliceSpecError } from "./slice.js";
 export type { LinedRow, SliceSpec } from "./slice.js";
+
+// Polona (Biblioteka Cyfrowa Polona) — TASK-031 source spike: a pure,
+// fail-closed parser for the captured response shapes. No database, no network.
+export * from "./polona/index.js";

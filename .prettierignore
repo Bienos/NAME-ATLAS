@@ -17,3 +17,9 @@ packages/db/src/generated/
 # These are evidence: reformatting them would destroy the property that makes
 # them useful — that they are byte-for-byte what the publisher served.
 docs/sources/acquisition/**/metadata/
+
+# Raw Polona responses (TASK-031), for the same reason. Their sha256 values are
+# pinned in fixtures/polona/source-manifest.json, which is itself formatted.
+fixtures/polona/search/
+fixtures/polona/objects/
+fixtures/polona/ocr/
