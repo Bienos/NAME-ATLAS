@@ -8,37 +8,36 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-021 — Polona: automated access is not addressed by its terms, and two of its rights values do not fit ADR-0007
+## D-021 — Polona: may a connector query it automatically, and what is its source default? (items 2 and 3 RESOLVED by ADR-0014)
 
-**Status:** BLOCKS the Polona connector task (M3), which is not written. NON-BLOCKING for everything else.
+**Status:** BLOCKS the Polona connector task (M3), which is not written. NON-BLOCKING for everything else. Items 1 and 4 are open.
 **Owner:** project owner. For confirmation from the rights holder, Polona's FAQ names Biblioteka Narodowa's Pracownia Praw Autorskich, `ppa@bn.org.pl`.
 **Raised by:** TASK-031, 2026-09-29. Evidence: `docs/sources/polona.md` §4, §11 and §12, and `packages/truth/src/polona-rights.test.ts`.
 
-1. **May a connector query Polona automatically, and may it keep what it retrieves?**
+1. **May a connector query Polona automatically, and may it keep what it retrieves?** Open.
    - Polona's terms ("Regulamin e-usługi Biblioteka Cyfrowa Polona", read 2026-09-29) never mention automated querying, request rates or caching.
    - Its user manual calls the search API an "otwarte API" (open API) and links developer instructions. Those instructions state no licence, rate or caching rule.
    - The object-metadata, IIIF and OCR-download endpoints a connector also needs are documented nowhere; they are the web app's own requests.
-   - The spike therefore records `automated_access = UNKNOWN` and `local_cache = UNKNOWN`. ADR-0007 §1 already makes `UNKNOWN` a refusal on every public surface.
+   - The spike therefore records `automated_access = UNKNOWN` and `local_cache = UNKNOWN`. ADR-0007 §1, as amended by ADR-0014, already refuses text and scans whose permission is `UNKNOWN` on every public surface.
    - It does not stop the connector itself. `connectorExecutable()` implements `docs/canonical/12` §6.4's gate literally and refuses only `PROHIBITED`.
+   - On 2026-09-29 the project owner chose to decide this later.
 
    Options:
    - (a) obtain Biblioteka Narodowa's confirmation before any automated run;
    - (b) allow the documented search API only, at a stated polite rate, until confirmed;
    - (c) treat the published "otwarte API" as permission for search, and decide separately for object metadata and OCR downloads.
 
-2. **Which part of ADR-0007 governs metadata whose rights are `UNKNOWN`?**
-   - Polona states no licence for its catalogue records, so every Polona object has `metadata_rights = UNKNOWN`.
-   - ADR-0007 §1 says `UNKNOWN` is refused on public surfaces "on every dimension".
-   - ADR-0007 §4 has the metadata row reproduce `evaluateSurface`, which refuses metadata only on `PROHIBITED`. So a public-domain Polona object's metadata is `ALLOWED_WITH_ATTRIBUTION` on `FREE`, `PAID` and `SEO` today.
-   - Polona is the first source for which the two sentences disagree in practice. PESEL's `metadata_rights` is `ALLOWED`, so choosing §1 would not move PESEL.
-   - Decide which sentence wins, and record it in an ADR superseding the other.
+2. **RESOLVED 2026-09-29 by ADR-0014 §1.** The question was which part of ADR-0007 governs metadata whose rights are `UNKNOWN`.
+   - The project owner kept §4: metadata follows the metadata row, which refuses only `PROHIBITED`.
+   - ADR-0007 §1's refusal of `UNKNOWN` on public surfaces now applies to transcription and image.
+   - A public-domain Polona object's catalogue record may therefore be cited, while its text and scan follow their own permissions.
+   - No code changed, because `rights.ts` already behaved this way.
 
-3. **What attribution does a public-domain Polona object carry?**
-   - Polona's FAQ: "wykorzystując te utwory zawsze wskazywać imię i nazwisko autora oraz tytuł dzieła (o ile te informacje są dostępne)" (always name the author and the work's title, where known).
-   - Polona supplies no attribution text. ADR-0007 §5 then derives "owner — rights URL", which for the traced object is "Biblioteka Narodowa — https://creativecommons.org/publicdomain/mark/1.0/".
-   - Decide whether the connector composes a per-object `attribution_text` from the object's creator and title (a derived text ADR-0007 §5 does not describe), or ADR-0007 §5 gains a rule for it.
+3. **RESOLVED 2026-09-29 by ADR-0014 §2.** The question was what attribution a public-domain Polona object carries.
+   - The connector stores a per-object `attribution_text`: the creator when Polona names one, the title, then "Polona, Biblioteka Narodowa", with values as Polona serves them.
+   - ADR-0007 §5 displays it verbatim.
 
-4. **What is Polona's source-level default?**
+4. **What is Polona's source-level default?** Open.
    - Polona states rights per object and states no source-wide default.
    - ADR-0007 §6 lets an object layer only tighten its source. Under a `Source` default of `UNKNOWN`, even a public-domain object stays `UNKNOWN`, as the test pins.
    - The connector's `RightsProfile` default therefore decides whether per-object rights can have any effect. It must be chosen deliberately, not left to `completeRights`' defaults.
@@ -46,8 +45,6 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 Consequence if unresolved:
 
 - the connector task cannot be specified lawfully (item 1);
-- Polona metadata would surface under a rule ADR-0007 §1 says it should not (item 2);
-- a public-domain attribution would not meet Polona's own rule (item 3);
 - no Polona object could ever surface (item 4).
 
 ---

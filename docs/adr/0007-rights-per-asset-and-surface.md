@@ -7,6 +7,7 @@
 - **Implements:** `docs/canonical/12` §6.1 (precedence), §6.2 (dimensions), §6.3 (decision matrix), §6.4 (hard gates), §16.4 (Polona object-level rights), §16.5 (OCR)
 - **Deviates from canonical:** nothing. This ADR chooses among options canonical 12 leaves open; it contradicts no canonical statement
 - **Implemented by:** `packages/truth/src/rights.ts`, `packages/truth/src/rights-load.ts`
+- **Amended by:** ADR-0014 (2026-09-29). §1's refusal of `UNKNOWN` on public surfaces applies to transcription and image; metadata follows §4. §5 gains a composition rule for Polona attributions.
 
 ## Context
 

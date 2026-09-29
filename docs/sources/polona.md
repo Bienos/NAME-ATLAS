@@ -21,7 +21,7 @@ The verification record for Polona (Biblioteka Cyfrowa Polona, operated by Bibli
 | 9. Hand classification | 90 hits: 72 surname, 18 not a surname, 0 cannot tell. This is a sample, not a precision figure. |
 | 10. Rights fields | A licence per object (four names exist; three observed on objects), `copyrightProtected`, and a free-text statement (many variants). §10. |
 | 11. Mapping | §11 table. `ALLOWED` only for the public-domain licence. Metadata is `UNKNOWN` everywhere. |
-| 12. `rights.ts` | Public-domain object evaluated: every asset opens on every surface with attribution. Two misfits → D-021 (§12). |
+| 12. `rights.ts` | Public-domain object evaluated: every asset opens on every surface with attribution. Two misfits → D-021, decided by ADR-0014 on 2026-09-29 (§12). |
 | 13. OCR | Per page, ALTO v2 (ABBYY Recognition Server 4.0), pixel word boxes, **no confidence**. |
 | 14. Dedupe ids | Object UUID, catalogue record number, call number, old-system id, page content id (§14). |
 | 15. Paper trace | `WIŚNIEWSKI` → casualty-list page → word box → the three canonical records (§15). |
@@ -342,6 +342,10 @@ In English:
 2. **The attribution is not the one Polona asks for.**
    - ADR-0007 §5 derives "Biblioteka Narodowa — https://creativecommons.org/publicdomain/mark/1.0/" when no `attribution_text` is stored.
    - Polona asks for the author's name and the work's title, and supplies no text to store.
+
+**Update 2026-09-29: both decided by ADR-0014.**
+- Metadata follows the metadata row (ADR-0007 §4), and §1's refusal of `UNKNOWN` covers text and scans only. The first item is therefore the intended behaviour.
+- A Polona attribution is composed per object: the creator, the title, then "Polona, Biblioteka Narodowa". The connector task implements it.
 
 **Two consequences the test also pins:**
 

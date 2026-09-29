@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by TASK-031, the Polona source spike (`docs/progress/2026-09-29-polona-source-spike.md`). It merges after TASK-034 (#14, `docs/progress/2026-09-29-web-section-registry-and-design-tokens.md`).
+**Last rewritten:** 2026-09-29, by ADR-0014, the project owner's decisions on D-021 items 2 and 3 (`docs/progress/2026-09-29-adr-0014-polona-metadata-and-attribution.md`). It merges after TASK-031 (#16) and TASK-034 (#14).
 
 ## Production
 
@@ -26,11 +26,11 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
   - the landing page and the surname page redesigned for readers new to statistics (#11).
-- On `main`, CI was green on `83d38c2` (run #183, Merge #12). Each pull request merged since was green on its own head before it merged.
+- On `main`, CI was green on `9b9f87a` (run #201, Merge #14). Each pull request merged since was green on its own head before it merged.
 
 ## Next
 
-- **The Polona connector task**: not written, and blocked on D-021. TASK-031's record (`docs/sources/polona.md`) holds what it needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
+- **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
 
 ## Open pull requests and branches
@@ -44,6 +44,8 @@ Two pull requests are open (checked 2026-09-29), each from another session and e
 
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
+  - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
+  - `claude/procent-continuation-7c2e00` (#14, then the ADR-0014 pull request).
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
@@ -72,4 +74,4 @@ Two pull requests are open (checked 2026-09-29), each from another session and e
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **Decisions.** One is open: **D-021**, raised by TASK-031. It asks whether a connector may query Polona automatically and keep what it retrieves, and it raises three places where Polona's rights values do not fit ADR-0007. It blocks only the Polona connector task. Every other entry is resolved.
+- **Decisions.** One is open: **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default. Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task. Every other entry is resolved.
