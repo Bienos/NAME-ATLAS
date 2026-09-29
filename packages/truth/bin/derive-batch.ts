@@ -24,7 +24,8 @@
  * cache each of them pays it again.
  * The rank has its own run-scoped table for the same reason: one grouped query
  * per universe, then a lookup, instead of a hash join over the whole universe
- * for every surname.
+ * for every surname. The rarity's denominator, the sum of every published count
+ * in the universe, is likewise computed once per universe (`UniverseSumCache`).
  *
  * Resumable: a surname already carrying every claim type THIS RUN derives is
  * skipped, so adding a chain makes processed surnames eligible again, and
@@ -41,6 +42,7 @@ import { deriveCurrentPopulation } from "../src/derive.js";
 import { deriveCurrentDistribution } from "../src/distribution.js";
 import { deriveCurrentRank } from "../src/rank.js";
 import { deriveRarityContext } from "../src/rarity.js";
+import type { UniverseSumCache } from "../src/rarity.js";
 import type { UniverseSizeCache } from "../src/universe.js";
 import type { RankTableCache } from "../src/rank.js";
 
@@ -113,6 +115,9 @@ async function main(): Promise<void> {
   // Likewise the rank: one aggregate per universe, then a lookup per surname,
   // instead of a hash join over the whole universe for every one of them.
   const rankTables: RankTableCache = new Map();
+  // And the rarity's denominator: a sum over the whole universe that is
+  // 0.4–1.3 s against the real register and the same for every surname in it.
+  const universeSums: UniverseSumCache = new Map();
   const started = Date.now();
   let done = 0;
   let failed = 0;
@@ -143,6 +148,7 @@ async function main(): Promise<void> {
                 });
                 await deriveRarityContext(db, row.canonical_display, {
                   universeSizeCache: cache,
+                  universeSumCache: universeSums,
                 });
               }
             } catch (cause: unknown) {

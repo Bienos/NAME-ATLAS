@@ -77,8 +77,23 @@ export function shareOf(count: number, denominator: number): number {
   return Number((count / denominator).toFixed(9));
 }
 
+/**
+ * A run-scoped memo of published universe sums by source record. Scoped to the
+ * run for the same reason as `UniverseSizeCache`: the sum is only true once an
+ * import has finished, and `deriveRarityContext` asks for it only after the
+ * completeness gate has said the import is complete. Against the real register
+ * the sum takes 0.4–1.3 s and is identical for every surname in the resource.
+ */
+export type UniverseSumCache = Map<string, number>;
+
 /** The published universe: the sum of every national value on this source record. */
-async function publishedUniverseSum(db: Kysely<DB>, sourceRecordId: string): Promise<number> {
+export async function publishedUniverseSum(
+  db: Kysely<DB>,
+  sourceRecordId: string,
+  cache?: UniverseSumCache,
+): Promise<number> {
+  const cached = cache?.get(sourceRecordId);
+  if (cached !== undefined) return cached;
   const row = await db
     .selectFrom("distribution_snapshots as s")
     .innerJoin(
@@ -97,6 +112,7 @@ async function publishedUniverseSum(db: Kysely<DB>, sourceRecordId: string): Pro
       `published universe sum for source record ${sourceRecordId} is ${row.total}`,
     );
   }
+  cache?.set(sourceRecordId, total);
   return total;
 }
 
@@ -126,6 +142,8 @@ export interface DeriveRarityOptions {
   readonly rightsOverride?: EffectiveRights;
   /** Run-scoped memo for the completeness counts. See `UniverseSizeCache`. */
   readonly universeSizeCache?: UniverseSizeCache;
+  /** Run-scoped memo for the denominator. See {@link UniverseSumCache}. */
+  readonly universeSumCache?: UniverseSumCache;
 }
 
 /**
@@ -151,7 +169,11 @@ export async function deriveRarityContext(
 
   const claims: RarityContextClaimResult[] = [];
   for (const { candidate, verdict } of complete) {
-    const denominator = await publishedUniverseSum(db, candidate.source_record_id);
+    const denominator = await publishedUniverseSum(
+      db,
+      candidate.source_record_id,
+      options.universeSumCache,
+    );
     const rank = await supportingRank(db, surname.surname_id, candidate.source_record_id);
     claims.push(
       await db
@@ -259,6 +281,7 @@ async function deriveOneRarity(
     .where("evidence_type", "=", "AUTHORITATIVE_INDEX")
     .where("subject_entity_id", "is", null)
     .orderBy("created_at")
+    .limit(1)
     .executeTakeFirst();
   let universeEvidenceId = priorUniverse?.evidence_item_id;
   if (!universeEvidenceId) {
