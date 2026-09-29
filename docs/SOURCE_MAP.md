@@ -76,6 +76,8 @@ Same authority as `docs/library/` supporting research: background, not specifica
 |---|---|
 | `reports/Name Atlas moat and data sources.md` | Differentiation research as of 2026-09-29: competitors (Polish and diaspora), which moats are real versus copyable, and candidate lawful data sources with their stated licences |
 | `research_notes/Name Atlas moat and data sources/` | The six research notes behind that report |
+| `reports/Name Atlas data fact lab.md` | Fact playbook as of 2026-09-29: which surname facts official open data supports, with real computed examples, methods, confidence labels, facts that must not be published, and data-quality findings in the PESEL, PRNG, US Census and WWI casualty-list files |
+| `research_notes/Name Atlas data fact lab/` | The three analysis notes behind that playbook, their scripts and result tables, the download URLs and checksums of the source files (`sources/`), and the builder of the published Polish demo page (`scripts/demo/`) |
 
 ## Reference — `docs/reference/`
 
