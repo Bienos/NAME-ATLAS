@@ -9,7 +9,7 @@
 >
 > §2's exploratory observations are kept as written on 2026-09-24.
 
-- **Status:** IMPLEMENTED 2026-09-29, approved the same day by the project owner after the reconciliation below. The record is `docs/sources/onomastica.md`. The evidence is `docs/sources/acquisition/2026-09-29-onomastica/`. The progress record is `docs/progress/2026-09-29-onomastica-source-spike.md`. The spike raised D-022.
+- **Status:** IMPLEMENTED 2026-09-29, approved the same day by the project owner after the reconciliation below. The record is `docs/sources/onomastica.md`. The evidence is `docs/sources/acquisition/2026-09-29-onomastica/`. The progress record is `docs/progress/2026-09-29-onomastica-source-spike.md`. The spike raised D-022, which the project owner resolved the same day: *Onomastica* is dropped as a meaning source.
 - **Milestone:** none assigned. Serves ADR-0008's Path B (D-002, resolved 2026-09-21): meaning comes from attributed sources, or it is a stated gap, and it launched at zero coverage. Also serves `PLAN.md`'s parallel track "onomastics licence/partnership outreach".
 - **Depends on:**
   - TASK-004: the `Source`/`RightsProfile` model, `packages/db/migrations/0003_source_rights_distribution.ts`. As of 2026-09-29, no later migration changes those tables or their enums.

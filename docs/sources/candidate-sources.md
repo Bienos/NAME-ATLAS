@@ -105,6 +105,7 @@ Working list of documents and datasets that could supply the data the product ne
 - **Rights — VERIFIED 2026-09-24 (vol. 6 page on RCIN):** "Prawa: *Prawa zastrzeżone - dostęp nieograniczony*"; "Zasady wykorzystania: *Zasób wyłączony spod ochrony prawa autorskiego. Korzystanie dozwolone bez ograniczeń wynikających z autorskich praw majątkowych.*"; access "Otwarty"; format DjVu. The two statements contradict each other ("rights reserved" vs "excluded from copyright protection"), and the editor died in 1979. Legal review before any reuse beyond citation. The other volumes were not checked (RCIN browser check).
 
 ### 6. *Onomastica* (IJP PAN, annual since 1955, open access)
+- **2026-09-29: dropped.** TASK-032 checked it (`docs/sources/onomastica.md`), and the project owner dropped it as a meaning source (D-022). The notes below are kept as they were.
 - **Data sought:** articles discussing specific surnames or surname groups; the licence of each article; bibliography.
 - **Feeds:** `SCHOLARLY_ONOMASTIC_STATEMENT` evidence for `ROOT_MEANING`, `SURNAME_CLASSIFICATION`, `GEOGRAPHIC_ORIGIN`, `LINGUISTIC_ORIGIN`.
 - **Links:** [journal site (OJS) — issue archive](https://onomastica.ijppan.pl/index.php/ONOM/issue/archive) · [page supplied by the project owner (113382)](https://journals.pan.pl/onomastica/113382?language=pl) — not readable here (`journals.pan.pl` answers with a browser check), so its content is still unconfirmed.

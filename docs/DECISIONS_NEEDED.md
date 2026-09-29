@@ -8,9 +8,19 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-022 — *Onomastica*: may Name Atlas rely on the licence the journal declares for vol. 64 (2020) onward?
+## D-022 — RESOLVED (2026-09-29): *Onomastica* is dropped as a meaning source
 
-**Status:** BLOCKS any *Onomastica* ingestion task, which is not written. NON-BLOCKING for everything else. Open.
+**Resolution**, decided by the project owner on 2026-09-29: option (c), "Drop Onomastica".
+
+- *Onomastica* is not a source for meaning claims. No ingestion task is written, and none is blocked on this entry.
+- TASK-032's record (`docs/sources/onomastica.md`) and its acquisition record stay as evidence of what was found.
+- D-002 and ADR-0008 are unchanged. Meaning still comes from attributed Path B sources, or it is a stated gap. It needs no ADR: nothing in the code or the model changes.
+
+**Original record, for reference**
+
+### D-022 (original record) — *Onomastica*: may Name Atlas rely on the licence the journal declares for vol. 64 (2020) onward?
+
+**Status (when raised):** BLOCKS any *Onomastica* ingestion task, which is not written. NON-BLOCKING for everything else.
 **Owner:** project owner. The rights holder is Instytut Języka Polskiego PAN. The journal's site gives the address `onomastica@ijppan.pl`.
 **Raised by:** TASK-032, 2026-09-29. Evidence: `docs/sources/onomastica.md` §6–§9, §12 and §14.
 
