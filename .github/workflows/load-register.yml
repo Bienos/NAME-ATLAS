@@ -1,0 +1,168 @@
+name: Load the register into production
+
+# TASK-035. Manual only.
+#
+# Builds the complete 2026-01-20 PESEL register on the runner from the four
+# official files (`pnpm local:setup`: download and SHA-256-verify, import,
+# slugs, derive), then, in `production` mode, copies its data into the
+# production database:
+#   1. migrate production,
+#   2. clear its data tables (the seven-surname fixture seed),
+#   3. restore the build's data,
+#   4. compare every table's row count with the build.
+# `build` mode stops after the build and reports it; it never connects to
+# production.
+#
+# A Claude Code web session cannot open a PostgreSQL connection to Supabase
+# (its egress proxy carries HTTPS only), so this runs here instead.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "build: build and report only. production: also replace production's data."
+        type: choice
+        options:
+          - build
+          - production
+        default: build
+      confirm:
+        description: "For production: type the Supabase project ref (xujctkjpvnmcdpximtda)."
+        required: false
+        default: ""
+
+concurrency:
+  group: load-register
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # The data tables the importers and the derivation write. Not the migration
+  # bookkeeping, not PostGIS's spatial_ref_sys, not the runtime outbox.
+  DATA_TABLES: >-
+    rights_profiles sources source_records knowledge_entities surnames name_forms
+    surname_slugs places place_names entity_external_ids research_runs
+    distribution_snapshots distribution_values evidence_items evidence_dependencies
+    claims claim_evidence confidence_assessments citations
+
+jobs:
+  load:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+
+    services:
+      postgres:
+        # The pinned image CI and Testcontainers use (ADR-0002, D-005).
+        image: postgis/postgis:16-3.4@sha256:44126d872ac91993766c341e369c539e8196614321765d36a6f1bab0419a5fa5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: name_atlas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/name_atlas
+      BUILD_PSQL: postgresql://postgres:postgres@localhost:5432/name_atlas
+
+    steps:
+      - name: Refuse production without confirmation and a connection string
+        if: inputs.mode == 'production'
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: |
+          if [ "$CONFIRM" != "xujctkjpvnmcdpximtda" ]; then
+            echo "::error::Type the Supabase project ref in 'confirm' to replace production's data."
+            exit 1
+          fi
+          if [ -z "$PROD_DATABASE_URL" ]; then
+            echo "::error::The repository secret PROD_DATABASE_URL is not set."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the register (download and verify, import, slugs, derive)
+        run: pnpm local:setup
+
+      - name: Check the build against the register before anything else
+        run: |
+          q() { psql "$BUILD_PSQL" -v ON_ERROR_STOP=1 -tAc "$1"; }
+          surnames=$(q "select count(*) from surnames")
+          national=$(q "select count(*) from distribution_values where place_id is null")
+          records=$(q "select count(*) from source_records")
+          duplicates=$(q "select count(*) from (select 1 from claims where claim_status = 'ACTIVE' group by subject_entity_id, claim_type having count(*) > 1) d")
+          echo "surnames=$surnames national_values=$national source_records=$records duplicate_active_claims=$duplicates"
+          [ "$surnames" = "598476" ] || { echo "::error::expected 598,476 surnames"; exit 1; }
+          [ "$national" = "828264" ] || { echo "::error::expected 408,182 + 420,082 national values"; exit 1; }
+          [ "$records" = "4" ] || { echo "::error::expected four source records"; exit 1; }
+          [ "$duplicates" = "0" ] || { echo "::error::duplicate ACTIVE claims"; exit 1; }
+          # The four official SHA-256s pinned in packages/sources/src/registry.ts, sorted.
+          hashes=$(q "select string_agg(content_hash, ',' order by content_hash) from source_records")
+          expected="0eb31d19955fbbb0a04c7693fb3e2515bc821515c31486851215f1482bee1b51,c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6,cd0c100e9205cffef594a16129e65c4a8373b62c49dcbb5fd7ed3ae27f7b6989,ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4"
+          [ "$hashes" = "$expected" ] || { echo "::error::source records do not carry the four official SHA-256 values"; exit 1; }
+          q "select claim_type, count(*) from claims where claim_status = 'ACTIVE' group by 1 order by 1"
+          q "select pg_size_pretty(pg_database_size(current_database()))"
+
+      - name: Dump the build's data
+        run: |
+          tables=""
+          for t in $DATA_TABLES; do tables="$tables --table=public.$t"; done
+          pg_dump "$BUILD_PSQL" --data-only --format=custom --no-owner --no-privileges $tables -f register.dump
+          ls -lh register.dump
+
+      - name: Migrate production
+        if: inputs.mode == 'production'
+        env:
+          DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: pnpm db:migrate
+
+      - name: Replace production's data
+        if: inputs.mode == 'production'
+        env:
+          PROD_DATABASE_URL: ${{ secrets.PROD_DATABASE_URL }}
+        run: |
+          # libpq refuses node-postgres's `uselibpqcompat` parameter; keep the rest.
+          PROD_PSQL=$(python3 -c 'import os, urllib.parse as u; p = u.urlsplit(os.environ["PROD_DATABASE_URL"]); q = [(k, v) for k, v in u.parse_qsl(p.query) if k != "uselibpqcompat"]; print(u.urlunsplit(p._replace(query=u.urlencode(q))))')
+          echo "::add-mask::$PROD_PSQL"
+          tables=$(echo $DATA_TABLES | tr ' ' ',')
+          psql "$PROD_PSQL" -v ON_ERROR_STOP=1 -c "TRUNCATE $tables"
+          pg_restore --data-only --no-owner --no-privileges --exit-on-error --jobs 4 -d "$PROD_PSQL" register.dump
+          psql "$PROD_PSQL" -v ON_ERROR_STOP=1 -c "ANALYZE"
+          echo "PROD_PSQL=$PROD_PSQL" >> "$RUNNER_TEMP/prod.env"
+
+      - name: Compare production with the build, table by table
+        if: inputs.mode == 'production'
+        run: |
+          . "$RUNNER_TEMP/prod.env"
+          mismatch=0
+          for t in $DATA_TABLES; do
+            a=$(psql "$BUILD_PSQL" -tAc "select count(*) from $t")
+            b=$(psql "$PROD_PSQL" -tAc "select count(*) from $t")
+            echo "$t build=$a production=$b"
+            [ "$a" = "$b" ] || mismatch=1
+          done
+          psql "$PROD_PSQL" -tAc "select claim_type, count(*) from claims where claim_status = 'ACTIVE' group by 1 order by 1"
+          psql "$PROD_PSQL" -tAc "select pg_size_pretty(pg_database_size(current_database()))"
+          [ "$mismatch" = "0" ] || { echo "::error::production differs from the build"; exit 1; }
