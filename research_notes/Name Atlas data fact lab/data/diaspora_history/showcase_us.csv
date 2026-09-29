@@ -1,0 +1,8 @@
+method,key_fold,pl_spelling,pl_spellings_detail,pl_rank_folded,pl_total,pl_m,pl_f,us2020,us2020_rank,us2000,us2000_rank,us_change_pct,us_share_change_pct,us2020_per_100_pl,us2020_status,us2000_status
+fold-v1+pair-v1+usmatch-v1,NOWAK,NOWAK,NOWAK 198125,1,198125,98387,99738,18297,1929,18515,1777,-1.2,-10.8,9.2,listed,listed
+fold-v1+pair-v1+usmatch-v1,KOWALSKI,KOWALSKI,KOWALSKI 133897,2,133897,66589,67308,16721,2102,18134,1817,-7.8,-16.8,12.5,listed,listed
+fold-v1+pair-v1+usmatch-v1,WISNIEWSKI,WIŚNIEWSKI,WIŚNIEWSKI 107256 | WISNIEWSKI 191,3,107447,53184,54263,11873,2964,12760,2602,-7.0,-16.0,11.1,listed,listed
+fold-v1+pair-v1+usmatch-v1,KACZMAREK,KACZMAREK,KACZMAREK 60060,18,60060,29820,30240,3806,8328,3937,7782,-3.3,-12.8,6.3,listed,listed
+fold-v1+pair-v1+usmatch-v1,SZCZEPANSKI,SZCZEPAŃSKI,SZCZEPAŃSKI 33197 | SZCZEPANSKI 74,63,33271,16458,16813,2012,14307,2011,13802,0.0,-10.2,6.0,listed,listed
+fold-v1+pair-v1+usmatch-v1,GRZEGORCZYK,GRZEGORCZYK,GRZEGORCZYK 10462,373,10462,5128,5334,393,56219,320,59147,22.8,9.6,3.8,listed,listed
+fold-v1+pair-v1+usmatch-v1,CZEKIERDA,CZEKIERDA,CZEKIERDA 429,15210,429,217,212,,,,,,,,not listed (<100 or absent),not listed (<100 or absent)

@@ -1,0 +1,141 @@
+method,list,list_rank,key_fold,pl_spelling,form_class,pl_total,us2020,us2000,us_change_pct,us_share_change_pct,us2020_per_100_pl
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,1,SMITH,SMITH,other,1280,2369644,2376206,-0.3,-10.0,185128.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,2,THOMAS,THOMAS,other,1441,734345,710696,3.3,-6.7,50960.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,3,MARTIN,MARTIN,other,1450,678691,672711,0.9,-8.9,46806.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,4,LEE,LEE,other,2723,695657,605860,14.8,3.6,25547.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,5,PATEL,PATEL,other,1662,309327,145066,113.2,92.4,18611.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,6,MILLER,MILLER,other,6642,1129186,1127803,0.1,-9.6,17000.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,7,YANG,YANG,other,1000,139210,72627,91.7,73.0,13921.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,8,JORDAN,JORDAN,other,1466,200984,197212,1.9,-8.0,13709.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,9,LE,LE,other,1120,138532,77453,78.9,61.4,12368.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,10,TRAN,TRAN,other,1807,223440,136095,64.2,48.2,12365.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,11,CHEN,CHEN,other,2069,233798,105544,121.5,99.9,11300.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,12,NGUYEN,NGUYEN,other,5667,531404,310125,71.4,54.7,9377.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,13,PHAM,PHAM,other,1089,101083,59949,68.6,52.2,9282.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,14,PARK,PARK,other,1240,111265,81890,35.9,22.6,8973.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,15,LIU,LIU,other,1435,127257,47665,167.0,140.9,8868.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,16,LI,LI,other,2111,165790,57786,186.9,158.9,7853.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,17,WANG,WANG,other,2306,169987,67570,151.6,127.0,7371.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,18,KIM,KIM,other,4012,274068,194067,41.2,27.5,6831.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,19,ZHANG,ZHANG,other,1891,122053,33202,267.6,231.7,6454.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,20,HOFFMAN,HOFFMAN,other,1934,124557,132645,-6.1,-15.2,6440.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,21,MEYER,MEYER,other,2463,147096,149664,-1.7,-11.3,5972.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,22,KHAN,KHAN,other,1756,101770,46713,117.9,96.6,5795.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,23,ALI,ALI,other,1508,84529,36079,134.3,111.5,5605.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,24,SIMON,SIMON,other,1432,78701,74839,5.2,-5.1,5495.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_all_forms,25,LANG,LANG,other,1095,59955,59843,0.2,-9.6,5475.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,1,STEPIEN,STĘPIEŃ,other,45336,1087,858,26.7,13.6,2.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,2,DABROWSKI,DĄBROWSKI,adjectival -ski/-cki/-dzki,84979,2515,2699,-6.8,-15.9,3.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,3,ZAWADZKI,ZAWADZKI,adjectival -ski/-cki/-dzki,36310,1260,1248,1.0,-8.4,3.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,4,SZEWCZYK,SZEWCZYK,other,40679,1886,1823,3.5,-7.2,4.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,5,MIKOLAJCZYK,MIKOŁAJCZYK,other,23973,1118,1076,3.9,-6.5,4.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,6,KACZMARCZYK,KACZMARCZYK,other,25856,1256,1154,8.8,-2.3,4.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,7,WAWRZYNIAK,WAWRZYNIAK,other,21247,1036,1110,-6.7,-15.5,4.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,8,PIETRZAK,PIETRZAK,other,37599,1861,2055,-9.4,-18.1,4.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,9,LESZCZYNSKI,LESZCZYŃSKI,adjectival -ski/-cki/-dzki,24530,1223,1191,2.7,-7.0,5.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,10,DOMANSKI,DOMAŃSKI,adjectival -ski/-cki/-dzki,22259,1162,1236,-6.0,-15.5,5.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,11,MADEJ,MADEJ,other,18842,1007,901,11.8,2.1,5.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,12,KRAWCZYK,KRAWCZYK,other,61637,3326,3415,-2.6,-12.4,5.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,13,KOWALCZYK,KOWALCZYK,other,95258,5356,5425,-1.3,-10.9,5.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,14,BEDNARCZYK,BEDNARCZYK,other,17906,1021,1069,-4.5,-14.6,5.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_all_forms,15,ADAMCZYK,ADAMCZYK,other,45662,2681,2741,-2.2,-12.1,5.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,1,DOMBROWSKI,DOMBROWSKI,adjectival -ski/-cki/-dzki,2476,6176,6873,-10.1,-19.0,249.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,2,PIETROWSKI,PIETROWSKI,adjectival -ski/-cki/-dzki,2176,1100,1093,0.6,-10.2,50.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,3,SOBIESKI,SOBIESKI,adjectival -ski/-cki/-dzki,2546,1269,1274,-0.4,-9.7,49.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,4,DEMBOWSKI,DEMBOWSKI,adjectival -ski/-cki/-dzki,2416,1123,1181,-4.9,-14.6,46.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,5,GAPINSKI,GAPIŃSKI,adjectival -ski/-cki/-dzki,2675,1022,882,15.9,3.6,38.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,6,LEMANSKI,LEMAŃSKI,adjectival -ski/-cki/-dzki,4935,1627,1825,-10.8,-20.0,33.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,7,GLINSKI,GLIŃSKI,adjectival -ski/-cki/-dzki,4723,1350,1295,4.2,-5.9,28.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,8,WASIELEWSKI,WASIELEWSKI,adjectival -ski/-cki/-dzki,5566,1557,1503,3.6,-7.0,28.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,9,OSOWSKI,OSOWSKI,adjectival -ski/-cki/-dzki,5465,1489,1533,-2.9,-12.6,27.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,10,GUTOWSKI,GUTOWSKI,adjectival -ski/-cki/-dzki,9132,2370,2702,-12.3,-20.7,26.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,11,MROZINSKI,MROZIŃSKI,adjectival -ski/-cki/-dzki,4120,1036,1131,-8.4,-17.5,25.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,12,PERKOWSKI,PERKOWSKI,adjectival -ski/-cki/-dzki,5714,1242,1269,-2.1,-11.6,21.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,13,KULIKOWSKI,KULIKOWSKI,adjectival -ski/-cki/-dzki,4958,1073,1210,-11.3,-20.2,21.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,14,MURAWSKI,MURAWSKI,adjectival -ski/-cki/-dzki,13621,2868,3081,-6.9,-15.8,21.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,15,BIELSKI,BIELSKI,adjectival -ski/-cki/-dzki,6676,1332,1428,-6.7,-15.9,20.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,16,LAPINSKI,ŁAPIŃSKI,adjectival -ski/-cki/-dzki,9422,1879,2303,-18.4,-26.0,19.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,17,BUKOWSKI,BUKOWSKI,adjectival -ski/-cki/-dzki,16461,3093,3409,-9.3,-17.9,18.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,18,KUJAWSKI,KUJAWSKI,adjectival -ski/-cki/-dzki,6612,1186,1222,-2.9,-11.8,17.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,19,ZUKOWSKI,ŻUKOWSKI,adjectival -ski/-cki/-dzki,14313,2544,2988,-14.9,-23.3,17.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,20,BUDZINSKI,BUDZIŃSKI,adjectival -ski/-cki/-dzki,6927,1223,1485,-17.6,-25.6,17.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,21,PAPROCKI,PAPROCKI,adjectival -ski/-cki/-dzki,5943,1033,1030,0.3,-9.1,17.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,22,KOLAKOWSKI,KOŁAKOWSKI,adjectival -ski/-cki/-dzki,7461,1290,1372,-6.0,-15.4,17.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,23,PILARSKI,PILARSKI,adjectival -ski/-cki/-dzki,8955,1519,1482,2.5,-7.6,17.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,24,RAKOWSKI,RAKOWSKI,adjectival -ski/-cki/-dzki,11129,1876,2072,-9.5,-18.5,16.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",ratio_adjectival_forms,25,ZAGORSKI,ZAGÓRSKI,adjectival -ski/-cki/-dzki,8280,1393,1399,-0.4,-10.4,16.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,1,DABROWSKI,DĄBROWSKI,adjectival -ski/-cki/-dzki,84979,2515,2699,-6.8,-15.9,3.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,2,ZAWADZKI,ZAWADZKI,adjectival -ski/-cki/-dzki,36310,1260,1248,1.0,-8.4,3.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,3,LESZCZYNSKI,LESZCZYŃSKI,adjectival -ski/-cki/-dzki,24530,1223,1191,2.7,-7.0,5.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,4,DOMANSKI,DOMAŃSKI,adjectival -ski/-cki/-dzki,22259,1162,1236,-6.0,-15.5,5.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,5,DOBROWOLSKI,DOBROWOLSKI,adjectival -ski/-cki/-dzki,17649,1065,1125,-5.3,-15.2,6.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,6,SZCZEPANSKI,SZCZEPAŃSKI,adjectival -ski/-cki/-dzki,33271,2012,2011,0.0,-10.2,6.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,7,CHOJNACKI,CHOJNACKI,adjectival -ski/-cki/-dzki,24296,1529,1531,-0.1,-10.3,6.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,8,SLIWINSKI,ŚLIWIŃSKI,adjectival -ski/-cki/-dzki,18057,1186,1216,-2.5,-11.8,6.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,9,CIESIELSKI,CIESIELSKI,adjectival -ski/-cki/-dzki,21471,1500,1472,1.9,-8.8,7.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,10,KUCHARSKI,KUCHARSKI,adjectival -ski/-cki/-dzki,31811,2244,2432,-7.7,-16.6,7.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,11,ANDRZEJEWSKI,ANDRZEJEWSKI,adjectival -ski/-cki/-dzki,24020,1711,1723,-0.7,-10.6,7.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,12,BIELECKI,BIELECKI,adjectival -ski/-cki/-dzki,19152,1365,1468,-7.0,-15.4,7.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,13,ZAKRZEWSKI,ZAKRZEWSKI,adjectival -ski/-cki/-dzki,27180,1952,2039,-4.3,-14.1,7.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,14,NOWACKI,NOWACKI,adjectival -ski/-cki/-dzki,21982,1587,1691,-6.2,-15.7,7.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",lowest_ratio_adjectival_forms,15,BRZOZOWSKI,BRZOZOWSKI,adjectival -ski/-cki/-dzki,22398,1618,1651,-2.0,-11.3,7.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,1,HOSSAIN,HOSSAIN,other,1116,12599,2932,329.7,286.7,1128.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,2,ZHANG,ZHANG,other,1891,122053,33202,267.6,231.7,6454.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,3,SHARMA,SHARMA,other,1304,46467,14870,212.5,182.1,3563.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,4,ISLAM,ISLAM,other,1052,17534,5967,193.8,165.4,1666.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,5,LI,LI,other,2111,165790,57786,186.9,158.9,7853.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,6,RAJ,RAJ,other,1600,4063,1437,182.7,156.5,253.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,7,AHMED,AHMED,other,1522,74458,26607,179.8,152.6,4892.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,8,LIU,LIU,other,1435,127257,47665,167.0,140.9,8868.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,9,KUMAR,KUMAR,other,1407,37459,14517,158.0,132.9,2662.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,10,WANG,WANG,other,2306,169987,67570,151.6,127.0,7371.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,11,ALI,ALI,other,1508,84529,36079,134.3,111.5,5605.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,12,SINGH,SINGH,other,4779,163612,72642,125.2,103.3,3423.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,13,CHEN,CHEN,other,2069,233798,105544,121.5,99.9,11300.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,14,KHAN,KHAN,other,1756,101770,46713,117.9,96.6,5795.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_all_forms,15,PATEL,PATEL,other,1662,309327,145066,113.2,92.4,18611.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,1,BARA,BARA,other,1595,1308,2257,-42.0,-47.9,82.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,2,LAPINSKI,ŁAPIŃSKI,adjectival -ski/-cki/-dzki,9422,1879,2303,-18.4,-26.0,19.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,3,BUDZINSKI,BUDZIŃSKI,adjectival -ski/-cki/-dzki,6927,1223,1485,-17.6,-25.6,17.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,4,BILSKI,BILSKI,adjectival -ski/-cki/-dzki,8506,1114,1330,-16.2,-23.9,13.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,5,BAGINSKI,BAGIŃSKI,adjectival -ski/-cki/-dzki,11104,1323,1556,-15.0,-23.7,11.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,6,ZUKOWSKI,ŻUKOWSKI,adjectival -ski/-cki/-dzki,14313,2544,2988,-14.9,-23.3,17.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,7,WASKO,WAŚKO,other,2411,1551,1815,-14.5,-22.6,64.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,8,BOZEK,BOŻEK,other,8001,1343,1556,-13.7,-22.5,16.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,9,ROSINSKI,ROSIŃSKI,adjectival -ski/-cki/-dzki,13193,1697,1966,-13.7,-22.2,12.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,10,KOHUT,KOHUT,other,2515,1808,2093,-13.6,-22.5,71.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,11,ROZANSKI,RÓŻAŃSKI,adjectival -ski/-cki/-dzki,12526,1378,1592,-13.4,-21.9,11.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,12,KLIMA,KLIMA,other,2093,1782,2054,-13.2,-21.6,85.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,13,WILCZYNSKI,WILCZYŃSKI,adjectival -ski/-cki/-dzki,16965,1238,1422,-12.9,-21.9,7.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,14,KULAS,KULAS,other,4866,1556,1787,-12.9,-21.1,32.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_all_forms,15,MARKOWSKI,MARKOWSKI,adjectival -ski/-cki/-dzki,23056,2921,3345,-12.7,-21.2,12.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,1,PIASECKI,PIASECKI,adjectival -ski/-cki/-dzki,19735,2119,1951,8.6,-1.5,10.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,2,GLINSKI,GLIŃSKI,adjectival -ski/-cki/-dzki,4723,1350,1295,4.2,-5.9,28.6
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,3,GAWRONSKI,GAWROŃSKI,adjectival -ski/-cki/-dzki,10387,1075,1034,4.0,-5.4,10.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,4,KUROWSKI,KUROWSKI,adjectival -ski/-cki/-dzki,16616,1735,1672,3.8,-6.4,10.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,5,WASIELEWSKI,WASIELEWSKI,adjectival -ski/-cki/-dzki,5566,1557,1503,3.6,-7.0,28.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,6,RADOMSKI,RADOMSKI,adjectival -ski/-cki/-dzki,10320,1233,1195,3.2,-6.2,11.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,7,PUCHALSKI,PUCHALSKI,adjectival -ski/-cki/-dzki,7436,1098,1068,2.8,-8.2,14.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,8,LESZCZYNSKI,LESZCZYŃSKI,adjectival -ski/-cki/-dzki,24530,1223,1191,2.7,-7.0,5.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,9,PILARSKI,PILARSKI,adjectival -ski/-cki/-dzki,8955,1519,1482,2.5,-7.6,17.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,10,MASLOWSKI,MASŁOWSKI,adjectival -ski/-cki/-dzki,9128,1380,1349,2.3,-7.7,15.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,11,CIESIELSKI,CIESIELSKI,adjectival -ski/-cki/-dzki,21471,1500,1472,1.9,-8.8,7.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,12,LIPSKI,LIPSKI,adjectival -ski/-cki/-dzki,9946,1161,1141,1.8,-7.5,11.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,13,BURZYNSKI,BURZYŃSKI,adjectival -ski/-cki/-dzki,9313,1424,1401,1.6,-8.4,15.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,14,MANKOWSKI,MAŃKOWSKI,adjectival -ski/-cki/-dzki,7506,1128,1112,1.4,-8.0,15.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",growth_adjectival_forms,15,PODGORSKI,PODGÓRSKI,adjectival -ski/-cki/-dzki,13338,1088,1073,1.4,-9.0,8.2
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,1,LAPINSKI,ŁAPIŃSKI,adjectival -ski/-cki/-dzki,9422,1879,2303,-18.4,-26.0,19.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,2,BUDZINSKI,BUDZIŃSKI,adjectival -ski/-cki/-dzki,6927,1223,1485,-17.6,-25.6,17.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,3,BILSKI,BILSKI,adjectival -ski/-cki/-dzki,8506,1114,1330,-16.2,-23.9,13.1
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,4,BAGINSKI,BAGIŃSKI,adjectival -ski/-cki/-dzki,11104,1323,1556,-15.0,-23.7,11.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,5,ZUKOWSKI,ŻUKOWSKI,adjectival -ski/-cki/-dzki,14313,2544,2988,-14.9,-23.3,17.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,6,ROSINSKI,ROSIŃSKI,adjectival -ski/-cki/-dzki,13193,1697,1966,-13.7,-22.2,12.9
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,7,ROZANSKI,RÓŻAŃSKI,adjectival -ski/-cki/-dzki,12526,1378,1592,-13.4,-21.9,11.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,8,WILCZYNSKI,WILCZYŃSKI,adjectival -ski/-cki/-dzki,16965,1238,1422,-12.9,-21.9,7.3
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,9,MARKOWSKI,MARKOWSKI,adjectival -ski/-cki/-dzki,23056,2921,3345,-12.7,-21.2,12.7
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,10,RYBICKI,RYBICKI,adjectival -ski/-cki/-dzki,10249,1589,1814,-12.4,-20.7,15.5
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,11,BOROWSKI,BOROWSKI,adjectival -ski/-cki/-dzki,25046,3456,3943,-12.4,-20.8,13.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,12,GUTOWSKI,GUTOWSKI,adjectival -ski/-cki/-dzki,9132,2370,2702,-12.3,-20.7,26.0
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,13,WYSOCKI,WYSOCKI,adjectival -ski/-cki/-dzki,31226,4320,4920,-12.2,-20.6,13.8
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,14,WOLSKI,WOLSKI,adjectival -ski/-cki/-dzki,21023,1766,2008,-12.1,-20.2,8.4
+"fold-v1+pair-v1+usmatch-v1; min PL 1000, min US 1000 per year used; fold-ambiguous excluded",decline_adjectival_forms,15,OSINSKI,OSIŃSKI,adjectival -ski/-cki/-dzki,14446,1066,1209,-11.8,-20.7,7.4
