@@ -1,0 +1,116 @@
+import type { SurnameResultResponse } from "@name-atlas/contracts";
+import type { UI } from "./messages.js";
+
+/**
+ * The surname page's sections, declared once (TASK-034).
+ *
+ * Each of the four chapters goes by four names:
+ *
+ *   - the contract field that carries it;
+ *   - the view's key, which the page orders by;
+ *   - the anchor, which is its element id and its URL fragment;
+ *   - the presentation intent that moves it first (TASK-023 §2.5).
+ *
+ * Before this file each list was written out separately in `result-view.tsx`,
+ * `compare-view.tsx` and `messages.ts`. `globals.css` also selects three anchors
+ * by id. Renaming one in one place silently broke the chapter links or the
+ * compare layout. `sections.test.ts` now holds the rest of the web app to this
+ * list.
+ *
+ * Anchors are public. They are URL fragments (`docs/canonical/21` §34's stable
+ * ids) that shared links can carry, so they are recorded here, not redesigned.
+ */
+
+type MessageKey = keyof (typeof UI)["pl"] & keyof (typeof UI)["en"];
+
+interface SectionEntry {
+  /** The view's key: how the page orders and renders its chapters. */
+  readonly key: string;
+  /** The field of the result contract that carries this section. */
+  readonly field: keyof SurnameResultResponse;
+  /** The element id, and so the URL fragment. */
+  readonly anchor: string;
+  /** The `?intent=` value that moves this section first, if one does. */
+  readonly intent: string | null;
+  /** Message keys: the chapter link, the chapter's question and its reading note. */
+  readonly nav: MessageKey;
+  readonly title: MessageKey;
+  readonly lede: MessageKey;
+}
+
+/** The chapters, in their default order (directive §17). */
+export const SECTIONS = [
+  {
+    key: "count",
+    field: "population",
+    anchor: "today-count",
+    intent: null,
+    nav: "navCount",
+    title: "chapterCountTitle",
+    lede: "chapterCountLede",
+  },
+  {
+    key: "rarity",
+    field: "rarity",
+    anchor: "rarity",
+    intent: "rarity",
+    nav: "navRarity",
+    title: "chapterRarityTitle",
+    lede: "chapterRarityLede",
+  },
+  {
+    key: "map",
+    field: "distribution",
+    anchor: "where",
+    intent: "map",
+    nav: "navWhere",
+    title: "chapterWhereTitle",
+    lede: "chapterWhereLede",
+  },
+  {
+    key: "meaning",
+    field: "meaning",
+    anchor: "meaning",
+    intent: "meaning",
+    nav: "navMeaning",
+    title: "chapterMeaningTitle",
+    lede: "chapterMeaningLede",
+  },
+] as const satisfies readonly SectionEntry[];
+
+export type Section = (typeof SECTIONS)[number];
+export type SectionKey = Section["key"];
+
+/**
+ * Presentation intent (TASK-023 §2.5; directive §17). It changes only the order
+ * of sections. The payload and the canonical URL are unaffected
+ * (`docs/canonical/21` §35).
+ */
+export type Intent = "default" | NonNullable<Section["intent"]>;
+
+/** The evidence at the foot of the page (ADR-0012). Always last; no intent moves it. */
+export const SOURCES_ANCHOR = "sources";
+
+export function sectionOf(key: SectionKey): Section {
+  const section = SECTIONS.find((entry) => entry.key === key);
+  if (section === undefined) {
+    throw new Error(`unknown section ${key}`);
+  }
+  return section;
+}
+
+export function anchorOf(key: SectionKey): string {
+  return sectionOf(key).anchor;
+}
+
+export function parseIntent(value: string | null | undefined): Intent {
+  const section = SECTIONS.find((entry) => entry.intent !== null && entry.intent === value);
+  return section?.intent ?? "default";
+}
+
+/** The default order, or the intent's section first and the rest as they were. Presentation only. */
+export function sectionOrder(intent: Intent): readonly SectionKey[] {
+  const base = SECTIONS.map((entry) => entry.key);
+  const first = SECTIONS.find((entry) => entry.intent === intent)?.key;
+  return first === undefined ? base : [first, ...base.filter((key) => key !== first)];
+}

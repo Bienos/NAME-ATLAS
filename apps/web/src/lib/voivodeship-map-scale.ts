@@ -1,3 +1,5 @@
+import { MAP_BANDS } from "./design-tokens.js";
+
 /**
  * The map's colour classes: five equal-width bands of `share_of_covered`,
  * starting at zero, with a round band width.
@@ -10,7 +12,7 @@
  * the largest share, so the darkest shade is always in use and a legend label
  * reads "4–8%" rather than "3.7–7.4%".
  */
-export const MAP_CLASS_COUNT = 5;
+export const MAP_CLASS_COUNT = MAP_BANDS.length;
 
 /** Candidate band widths, in percentage points. */
 const NICE_STEPS = [0.5, 1, 2, 3, 4, 5, 10, 15, 20] as const;

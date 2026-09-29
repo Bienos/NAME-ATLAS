@@ -15,6 +15,7 @@ import { SearchForm } from "./search-form.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { NamePrint } from "./name-print.js";
+import { anchorOf } from "./sections.js";
 
 /**
  * The comparison page (TASK-025, directive §24–§25).
@@ -146,7 +147,7 @@ export function ComparisonView({
           </section>
         ) : (
           <>
-            <section id="today-count">
+            <section id={anchorOf("count")}>
               <h3>{t.sectionPopulation}</h3>
               {populationPairs.length === 0 ? (
                 <p className="absent">{t.compareNothingToCompare}</p>
@@ -201,7 +202,7 @@ export function ComparisonView({
               )}
             </section>
 
-            <section id="rarity">
+            <section id={anchorOf("rarity")}>
               <h3>{t.sectionRarity}</h3>
               {rarityPairs.length === 0 ? (
                 <p className="absent">{t.compareNothingToCompare}</p>
@@ -257,7 +258,7 @@ export function ComparisonView({
               )}
             </section>
 
-            <section id="where">
+            <section id={anchorOf("map")}>
               <h3>{t.sectionDistribution}</h3>
               {distributionPairs.length === 0 ? (
                 <p className="absent">{t.compareNothingToCompare}</p>
