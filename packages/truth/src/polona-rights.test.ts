@@ -25,9 +25,9 @@ import type { AssetEligibility, FullRights } from "./rights.js";
  * The rights values come from committed Polona responses
  * (`fixtures/polona/`), read by the fail-closed parser and mapped by the
  * table in `docs/sources/polona.md` §11. Nothing here is synthetic except
- * where a test says so. The decisions asserted are what `rights.ts` returns
- * today; two of them are recorded in `docs/DECISIONS_NEEDED.md` D-021 as
- * places where Polona's values and ADR-0007 do not fit.
+ * where a test says so. The decisions asserted are what `rights.ts` returns.
+ * Two of them were D-021's items 2 and 3, where Polona's values did not fit
+ * ADR-0007. The project owner decided both on 2026-09-29 (ADR-0014).
  *
  * This file lives in `packages/truth` because `truth` depends on
  * `@name-atlas/sources`; the reverse import would be a cycle.
@@ -81,10 +81,10 @@ describe("a public-domain Polona object (the paper-trace object)", () => {
 
   it("opens every asset on every surface, with attribution", () => {
     expect(decisions(evaluateRightsMatrix(rights))).toEqual({
-      // D-021 (1): metadata_rights is UNKNOWN, yet the metadata row opens the
-      // public surfaces, because it reproduces evaluateSurface (ADR-0007 §4),
-      // which blocks metadata only on PROHIBITED; ADR-0007 §1 says UNKNOWN is
-      // blocked on public surfaces.
+      // metadata_rights is UNKNOWN, and the metadata row still opens the public
+      // surfaces: ADR-0014 §1 has metadata follow ADR-0007 §4 (evaluateSurface,
+      // which refuses metadata only on PROHIBITED), and keeps §1's refusal of
+      // UNKNOWN for text and scans.
       "METADATA INTERNAL": "ALLOWED INTERNAL_USE",
       "METADATA FREE": "ALLOWED_WITH_ATTRIBUTION RIGHTS_PERMIT_FREE_SURFACE",
       "METADATA PAID": "ALLOWED_WITH_ATTRIBUTION COMMERCIAL_USE_ALLOWED",
@@ -100,10 +100,10 @@ describe("a public-domain Polona object (the paper-trace object)", () => {
     });
   });
 
-  it("attributes the library and the licence, not the author and title Polona asks for", () => {
-    // D-021 (2): Polona's public-domain rule is to name the author and the
-    // work's title. ADR-0007 §5 derives "owner — rights URL" when no
-    // attribution_text is set, and Polona supplies no text to set.
+  it("derives the library and the licence while no attribution text is stored", () => {
+    // Polona supplies no attribution text, so ADR-0007 §5 derives "owner —
+    // rights URL". Under ADR-0014 §2 the connector stores one instead,
+    // naming the creator and the title before "Polona, Biblioteka Narodowa".
     const free = evaluateRightsMatrix(rights).find(
       (cell) => cell.asset === "TRANSCRIPTION" && cell.surface === "FREE",
     );
@@ -202,8 +202,8 @@ describe("what the spike's source-level findings mean under ADR-0007", () => {
   });
 
   it("does not stop the connector: the §6.4 gate refuses only PROHIBITED", () => {
-    // D-021: whether automated access that Polona's terms never mention may
-    // run at all is the owner's decision, not this gate's.
+    // D-021 item 1: whether automated access that Polona's terms never
+    // mention may run at all is the owner's decision, not this gate's.
     expect(connectorExecutable(completeRights(sourceAsFound))).toBe(true);
   });
 });
