@@ -107,11 +107,13 @@ def main():
             summ.append([f"{a}->{b}", lst, "in_later_not_earlier", len(new), sum(new.values()),
                          f"{100 * sum(new.values()) / sum(db.values()):.3f}",
                          sum(1 for v in new.values() if v >= 20)]
-                        + [sum(1 for v in new.values() if band(v) == band(lo)) for lo, hi in BANDS])
+                        + [sum(1 for v in new.values() if band(v) == band(lo)) for lo, hi in BANDS]
+                        + [max(new.values()) if new else "", len(da), len(db)])
             summ.append([f"{a}->{b}", lst, "in_earlier_not_later", len(gone), sum(gone.values()),
                          f"{100 * sum(gone.values()) / sum(da.values()):.3f}",
                          sum(1 for v in gone.values() if v >= 20)]
-                        + [sum(1 for v in gone.values() if band(v) == band(lo)) for lo, hi in BANDS])
+                        + [sum(1 for v in gone.values() if band(v) == band(lo)) for lo, hi in BANDS]
+                        + [max(gone.values()) if gone else "", len(da), len(db)])
             if (a, b) == ("2019", "2026"):
                 for k in sorted(new, key=lambda k: (-new[k], k))[:30]:
                     if new[k] >= 20:
@@ -122,7 +124,9 @@ def main():
     with open(os.path.join(OUT, "entry_exit_summary.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["period", "list", "direction", "forms", "entries_in_the_date_where_present",
-                    "pct_of_that_dates_entries", "forms_ge20"] + [f"forms_band_{band(lo)}" for lo, hi in BANDS])
+                    "pct_of_that_dates_entries", "forms_ge20"] + [f"forms_band_{band(lo)}" for lo, hi in BANDS]
+                   + ["max_entries_of_a_form_in_this_group", "forms_in_earlier_list_excl_placeholders",
+                      "forms_in_later_list_excl_placeholders"])
         w.writerows(summ)
     with open(os.path.join(OUT, "entry_exit_examples.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)

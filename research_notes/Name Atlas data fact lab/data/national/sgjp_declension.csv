@@ -1,13 +1,13 @@
-showcase,masc_nom,masc_gen,family_plural_nom,depr_plural_excluded,feminine_form,feminine_gen,feminine_declines,variant_slots,odmezowskie_odojcowskie,sgjp_lemma_ids
-NOWAK,Nowak,Nowaka,Nowakowie,Nowaki,Nowak (same form),Nowak,no (indeclinable for a woman),,Nowakowa,Nowak:Sf; Nowak:Sm1
-KOWALSKI/KOWALSKA,Kowalski,Kowalskiego,Kowalscy,Kowalskie,Kowalska,Kowalskiej,yes (adjectival declension),,,Kowalski:Sf; Kowalski:Sm1
-WIŚNIEWSKI/WIŚNIEWSKA,Wiśniewski,Wiśniewskiego,Wiśniewscy,Wiśniewskie,Wiśniewska,Wiśniewskiej,yes (adjectival declension),,,Wiśniewski:Sf; Wiśniewski:Sm1
-KACZMAREK,Kaczmarek,Kaczmarka,Kaczmarkowie,Kaczmarki,Kaczmarek (same form),Kaczmarek,no (indeclinable for a woman),,,Kaczmarek:Sf; Kaczmarek:Sm1
-SZCZEPAŃSKI/SZCZEPAŃSKA,Szczepański,Szczepańskiego,Szczepańscy,Szczepańskie,Szczepańska,Szczepańskiej,yes (adjectival declension),,,Szczepański
-GRZEGORCZYK,Grzegorczyk,Grzegorczyka,Grzegorczykowie,Grzegorczyki,Grzegorczyk (same form),Grzegorczyk,no (indeclinable for a woman),,Grzegorczykowa,Grzegorczyk:Sf; Grzegorczyk:Sm1
-CZEKIERDA,Czekierda,Czekierdy,Czekierdowie,Czekierdy,Czekierda (same form),Czekierdy,yes,,,Czekierda:Sf; Czekierda:Sm1
-MAZUR,Mazur,Mazura,Mazurowie,Mazury,Mazur (same form),Mazur,no (indeclinable for a woman),,,Mazur:Sf; Mazur:Sm1~owie
-KRASKA,Kraska,Kraski,Kraskowie,Kraski,Kraska (same form),Kraski,yes,,,Kraska:Sf; Kraska:Sm1
-KOZIOŁ,Kozioł,Kozioła/Kozła,Koziołowie/Kozłowie,Kozioły/Kozły,Kozioł (same form),Kozioł,no (indeclinable for a woman),pl.acc=Koziołów/Kozłów; pl.dat=Koziołom/Kozłom; pl.gen=Koziołów/Kozłów; pl.inst=Koziołami/Kozłami; pl.loc=Koziołach/Kozłach; pl.nom=Koziołowie/Kozłowie; sg.acc=Kozioła/Kozła; sg.dat=Koziołowi/Kozłowi; sg.gen=Kozioła/Kozła; sg.inst=Koziołem/Kozłem; sg.loc=Koziole/Koźle,,Kozioł:Sf; Kozioł:Sm1
+showcase,masc_nom,masc_gen,family_plural_nom,depr_form_in_sgjp,feminine_form,feminine_gen,feminine_declines,variant_slots,odmezowskie_odojcowskie,sgjp_lemma_ids
+NOWAK,Nowak,Nowaka,Nowakowie,"yes (pejorative form excluded, not shown)",Nowak (same form),Nowak,no (indeclinable for a woman),,Nowakowa,Nowak:Sf; Nowak:Sm1
+KOWALSKI/KOWALSKA,Kowalski,Kowalskiego,Kowalscy,"yes (pejorative form excluded, not shown)",Kowalska,Kowalskiej,yes (adjectival declension),,,Kowalski:Sf; Kowalski:Sm1
+WIŚNIEWSKI/WIŚNIEWSKA,Wiśniewski,Wiśniewskiego,Wiśniewscy,"yes (pejorative form excluded, not shown)",Wiśniewska,Wiśniewskiej,yes (adjectival declension),,,Wiśniewski:Sf; Wiśniewski:Sm1
+KACZMAREK,Kaczmarek,Kaczmarka,Kaczmarkowie,"yes (pejorative form excluded, not shown)",Kaczmarek (same form),Kaczmarek,no (indeclinable for a woman),,,Kaczmarek:Sf; Kaczmarek:Sm1
+SZCZEPAŃSKI/SZCZEPAŃSKA,Szczepański,Szczepańskiego,Szczepańscy,"yes (pejorative form excluded, not shown)",Szczepańska,Szczepańskiej,yes (adjectival declension),,,Szczepański
+GRZEGORCZYK,Grzegorczyk,Grzegorczyka,Grzegorczykowie,"yes (pejorative form excluded, not shown)",Grzegorczyk (same form),Grzegorczyk,no (indeclinable for a woman),,Grzegorczykowa,Grzegorczyk:Sf; Grzegorczyk:Sm1
+CZEKIERDA,Czekierda,Czekierdy,Czekierdowie,"yes (pejorative form excluded, not shown)",Czekierda (same form),Czekierdy,yes,,,Czekierda:Sf; Czekierda:Sm1
+MAZUR,Mazur,Mazura,Mazurowie,"yes (pejorative form excluded, not shown)",Mazur (same form),Mazur,no (indeclinable for a woman),,,Mazur:Sf; Mazur:Sm1~owie
+KRASKA,Kraska,Kraski,Kraskowie,"yes (pejorative form excluded, not shown)",Kraska (same form),Kraski,yes,,,Kraska:Sf; Kraska:Sm1
+KOZIOŁ,Kozioł,Kozioła/Kozła,Koziołowie/Kozłowie,"yes (pejorative form excluded, not shown)",Kozioł (same form),Kozioł,no (indeclinable for a woman),pl.acc=Koziołów/Kozłów; pl.dat=Koziołom/Kozłom; pl.gen=Koziołów/Kozłów; pl.inst=Koziołami/Kozłami; pl.loc=Koziołach/Kozłach; pl.nom=Koziołowie/Kozłowie; sg.acc=Kozioła/Kozła; sg.dat=Koziołowi/Kozłowi; sg.gen=Kozioła/Kozła; sg.inst=Koziołem/Kozłem; sg.loc=Koziole/Koźle,,Kozioł:Sf; Kozioł:Sm1
 
 SUMMARY top-1000 PAIR-V1 units 2026,masc/base form is an SGJP surname lemma: 986/1000,-SKI/-CKI/-DZKI units whose feminine is an SGJP surname lemma: 353/353,>=2 accepted forms in one non-vocative slot: 57,masculine lemmas with depr plural: 983,,,,,,

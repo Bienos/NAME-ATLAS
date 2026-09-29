@@ -1,0 +1,227 @@
+section,key,value,source,method
+A2,interval_2019-06-30_to_2026-01-20_days,2396,-,calendar arithmetic
+A2,interval_2019-06-30_to_2026-01-20_years,6.56,-,days/365.25
+A2,interval_2020-01-22_to_2026-01-20_years,6.00,-,days/365.25
+A4,M_list_entries_change_pct_2019_2026,6.74,yearly_totals.csv,(b-a)/a
+A4,M_list_distinct_forms_change_pct_2019_2026,47.3,yearly_totals.csv,"(b-a)/a, file rows"
+A4,M_list_entries_change_pct_2020_2026,6.63,yearly_totals.csv,(b-a)/a
+A4,M_list_distinct_forms_change_pct_2020_2026,44.1,yearly_totals.csv,"(b-a)/a, file rows"
+A4,M_list_entries_change_pct_2025_2026,0.48,yearly_totals.csv,(b-a)/a
+A4,M_list_distinct_forms_change_pct_2025_2026,3.3,yearly_totals.csv,"(b-a)/a, file rows"
+A4,F_list_entries_change_pct_2019_2026,6.47,yearly_totals.csv,(b-a)/a
+A4,F_list_distinct_forms_change_pct_2019_2026,41.2,yearly_totals.csv,"(b-a)/a, file rows"
+A4,F_list_entries_change_pct_2020_2026,6.63,yearly_totals.csv,(b-a)/a
+A4,F_list_distinct_forms_change_pct_2020_2026,40.2,yearly_totals.csv,"(b-a)/a, file rows"
+A4,F_list_entries_change_pct_2025_2026,0.12,yearly_totals.csv,(b-a)/a
+A4,F_list_distinct_forms_change_pct_2025_2026,2.2,yearly_totals.csv,"(b-a)/a, file rows"
+A4,M_2026_placeholder_values,NN=8; XXX=4,1681 2026,PLACEHOLDERS set
+A4,M_2026_distinct_forms_excl_placeholders,408180,1681 2026,file rows minus placeholder rows
+A4,F_2026_placeholder_values,NN=3,1681 2026,PLACEHOLDERS set
+A4,F_2026_distinct_forms_excl_placeholders,420081,1681 2026,file rows minus placeholder rows
+A2,NOWAK|M_pct_2025_2026,-0.48,showcase_yearly_series.csv,(b-a)/a
+A2,NOWAK|M_rank_2019_to_2026,1 -> 1,showcase_yearly_series.csv,RANK-V1 within list
+A2,NOWAK|M_pct_2020_2026,-2.62,showcase_yearly_series.csv,(b-a)/a
+A2,NOWAK|F_pct_2025_2026,-0.58,showcase_yearly_series.csv,(b-a)/a
+A2,NOWAK|F_rank_2019_to_2026,1 -> 1,showcase_yearly_series.csv,RANK-V1 within list
+A2,NOWAK|F_pct_2020_2026,-3.11,showcase_yearly_series.csv,(b-a)/a
+A2,NOWAK|M_year_of_max,2019 (101473),showcase_yearly_series.csv,max over published years
+A2,NOWAK|F_year_of_max,2019 (103439),showcase_yearly_series.csv,max over published years
+A2,KOWALSKI/KOWALSKA|M_pct_2025_2026,-0.45,showcase_yearly_series.csv,(b-a)/a
+A2,KOWALSKI/KOWALSKA|M_rank_2019_to_2026,2 -> 2,showcase_yearly_series.csv,RANK-V1 within list
+A2,KOWALSKI/KOWALSKA|M_pct_2020_2026,-2.66,showcase_yearly_series.csv,(b-a)/a
+A2,KOWALSKI/KOWALSKA|F_pct_2025_2026,-0.61,showcase_yearly_series.csv,(b-a)/a
+A2,KOWALSKI/KOWALSKA|F_rank_2019_to_2026,2 -> 2,showcase_yearly_series.csv,RANK-V1 within list
+A2,KOWALSKI/KOWALSKA|F_pct_2020_2026,-3.27,showcase_yearly_series.csv,(b-a)/a
+A2,KOWALSKI/KOWALSKA|M_year_of_max,2019 (68692),showcase_yearly_series.csv,max over published years
+A2,KOWALSKI/KOWALSKA|F_year_of_max,2019 (69920),showcase_yearly_series.csv,max over published years
+A2,WIŚNIEWSKI/WIŚNIEWSKA|M_pct_2025_2026,-0.56,showcase_yearly_series.csv,(b-a)/a
+A2,WIŚNIEWSKI/WIŚNIEWSKA|M_rank_2019_to_2026,3 -> 3,showcase_yearly_series.csv,RANK-V1 within list
+A2,WIŚNIEWSKI/WIŚNIEWSKA|M_pct_2020_2026,-2.33,showcase_yearly_series.csv,(b-a)/a
+A2,WIŚNIEWSKI/WIŚNIEWSKA|F_pct_2025_2026,-0.45,showcase_yearly_series.csv,(b-a)/a
+A2,WIŚNIEWSKI/WIŚNIEWSKA|F_rank_2019_to_2026,3 -> 3,showcase_yearly_series.csv,RANK-V1 within list
+A2,WIŚNIEWSKI/WIŚNIEWSKA|F_pct_2020_2026,-2.48,showcase_yearly_series.csv,(b-a)/a
+A2,WIŚNIEWSKI/WIŚNIEWSKA|M_year_of_max,2019 (54559),showcase_yearly_series.csv,max over published years
+A2,WIŚNIEWSKI/WIŚNIEWSKA|F_year_of_max,2019 (55816),showcase_yearly_series.csv,max over published years
+A2,KACZMAREK|M_pct_2025_2026,-0.38,showcase_yearly_series.csv,(b-a)/a
+A2,KACZMAREK|M_rank_2019_to_2026,18 -> 18,showcase_yearly_series.csv,RANK-V1 within list
+A2,KACZMAREK|M_pct_2020_2026,-2.58,showcase_yearly_series.csv,(b-a)/a
+A2,KACZMAREK|F_pct_2025_2026,-0.67,showcase_yearly_series.csv,(b-a)/a
+A2,KACZMAREK|F_rank_2019_to_2026,18 -> 18,showcase_yearly_series.csv,RANK-V1 within list
+A2,KACZMAREK|F_pct_2020_2026,-2.82,showcase_yearly_series.csv,(b-a)/a
+A2,KACZMAREK|M_year_of_max,2019 (30776),showcase_yearly_series.csv,max over published years
+A2,KACZMAREK|F_year_of_max,2019 (31266),showcase_yearly_series.csv,max over published years
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|M_pct_2025_2026,-0.62,showcase_yearly_series.csv,(b-a)/a
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|M_rank_2019_to_2026,63 -> 63,showcase_yearly_series.csv,RANK-V1 within list
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|M_pct_2020_2026,-2.52,showcase_yearly_series.csv,(b-a)/a
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|F_pct_2025_2026,-0.47,showcase_yearly_series.csv,(b-a)/a
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|F_rank_2019_to_2026,63 -> 63,showcase_yearly_series.csv,RANK-V1 within list
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|F_pct_2020_2026,-3.01,showcase_yearly_series.csv,(b-a)/a
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|M_year_of_max,2019 (16894),showcase_yearly_series.csv,max over published years
+A2,SZCZEPAŃSKI/SZCZEPAŃSKA|F_year_of_max,2019 (17393),showcase_yearly_series.csv,max over published years
+A2,GRZEGORCZYK|M_pct_2025_2026,-0.60,showcase_yearly_series.csv,(b-a)/a
+A2,GRZEGORCZYK|M_rank_2019_to_2026,370 -> 370,showcase_yearly_series.csv,RANK-V1 within list
+A2,GRZEGORCZYK|M_pct_2020_2026,-2.64,showcase_yearly_series.csv,(b-a)/a
+A2,GRZEGORCZYK|F_pct_2025_2026,-0.58,showcase_yearly_series.csv,(b-a)/a
+A2,GRZEGORCZYK|F_rank_2019_to_2026,359 -> 362,showcase_yearly_series.csv,RANK-V1 within list
+A2,GRZEGORCZYK|F_pct_2020_2026,-2.86,showcase_yearly_series.csv,(b-a)/a
+A2,GRZEGORCZYK|M_year_of_max,2019 (5275),showcase_yearly_series.csv,max over published years
+A2,GRZEGORCZYK|F_year_of_max,2019 (5513),showcase_yearly_series.csv,max over published years
+A2,CZEKIERDA|M_pct_2025_2026,-0.91,showcase_yearly_series.csv,(b-a)/a
+A2,CZEKIERDA|M_rank_2019_to_2026,13725 -> 14932,showcase_yearly_series.csv,RANK-V1 within list
+A2,CZEKIERDA|M_pct_2020_2026,-3.98,showcase_yearly_series.csv,(b-a)/a
+A2,CZEKIERDA|F_pct_2025_2026,-2.75,showcase_yearly_series.csv,(b-a)/a
+A2,CZEKIERDA|F_rank_2019_to_2026,13562 -> 15540,showcase_yearly_series.csv,RANK-V1 within list
+A2,CZEKIERDA|F_pct_2020_2026,-7.42,showcase_yearly_series.csv,(b-a)/a
+A2,CZEKIERDA|M_year_of_max,2021 (227),showcase_yearly_series.csv,max over published years
+A2,CZEKIERDA|F_year_of_max,2019 (232),showcase_yearly_series.csv,max over published years
+A2,MAZUR|M_pct_2025_2026,-0.05,showcase_yearly_series.csv,(b-a)/a
+A2,MAZUR|M_rank_2019_to_2026,14 -> 13,showcase_yearly_series.csv,RANK-V1 within list
+A2,MAZUR|M_pct_2020_2026,1.72,showcase_yearly_series.csv,(b-a)/a
+A2,MAZUR|F_pct_2025_2026,-0.18,showcase_yearly_series.csv,(b-a)/a
+A2,MAZUR|F_rank_2019_to_2026,14 -> 13,showcase_yearly_series.csv,RANK-V1 within list
+A2,MAZUR|F_pct_2020_2026,3.16,showcase_yearly_series.csv,(b-a)/a
+A2,MAZUR|M_year_of_max,2025 (34595),showcase_yearly_series.csv,max over published years
+A2,MAZUR|F_year_of_max,2025 (35269),showcase_yearly_series.csv,max over published years
+A2,KRASKA|M_pct_2025_2026,-0.24,showcase_yearly_series.csv,(b-a)/a
+A2,KRASKA|M_rank_2019_to_2026,1020 -> 1035,showcase_yearly_series.csv,RANK-V1 within list
+A2,KRASKA|M_pct_2020_2026,-1.73,showcase_yearly_series.csv,(b-a)/a
+A2,KRASKA|F_pct_2025_2026,-0.76,showcase_yearly_series.csv,(b-a)/a
+A2,KRASKA|F_rank_2019_to_2026,1001 -> 1017,showcase_yearly_series.csv,RANK-V1 within list
+A2,KRASKA|F_pct_2020_2026,-2.12,showcase_yearly_series.csv,(b-a)/a
+A2,KRASKA|M_year_of_max,2019 (2495),showcase_yearly_series.csv,max over published years
+A2,KRASKA|F_year_of_max,2019 (2562),showcase_yearly_series.csv,max over published years
+A2,KOZIOŁ|M_pct_2025_2026,-0.33,showcase_yearly_series.csv,(b-a)/a
+A2,KOZIOŁ|M_rank_2019_to_2026,104 -> 103,showcase_yearly_series.csv,RANK-V1 within list
+A2,KOZIOŁ|M_pct_2020_2026,-2.38,showcase_yearly_series.csv,(b-a)/a
+A2,KOZIOŁ|F_pct_2025_2026,-0.58,showcase_yearly_series.csv,(b-a)/a
+A2,KOZIOŁ|F_rank_2019_to_2026,114 -> 118,showcase_yearly_series.csv,RANK-V1 within list
+A2,KOZIOŁ|F_pct_2020_2026,-4.15,showcase_yearly_series.csv,(b-a)/a
+A2,KOZIOŁ|M_year_of_max,2019 (12321),showcase_yearly_series.csv,max over published years
+A2,KOZIOŁ|F_year_of_max,2019 (12101),showcase_yearly_series.csv,max over published years
+A2,M_list_top100_2019_riser_MAZUR,rank 14 in M list 2019; rank 14 in F list 2019,1681 2019/2026,RANK-V1 within list
+A2,M_list_top100_2019_riser_KOZAK,rank 99 in M list 2019; rank 109 in F list 2019,1681 2019/2026,RANK-V1 within list
+A2,F_list_top100_2019_riser_MAZUR,rank 14 in F list 2019; rank 14 in M list 2019,1681 2019/2026,RANK-V1 within list
+A2,CZEKIERDA|M_forms_above_2026_decomposition,14931 above in 2026: 0 not published in 2019; 1293 overtook (<= CZEKIERDA in 2019); 13638 already above in 2019,1681 2019/2026,"set comparison, placeholders excluded"
+A2,CZEKIERDA|F_forms_above_2026_decomposition,15539 above in 2026: 1 not published in 2019; 1988 overtook (<= CZEKIERDA in 2019); 13550 already above in 2019,1681 2019/2026,"set comparison, placeholders excluded"
+A1,KOWALSKI/KOWALSKA|cross_forms_2026,KOWALSKI in F list: 535; KOWALSKA in M list: 3,1681 2026 M/F,exact forms
+A1,KOWALSKI/KOWALSKA|M_form_plus_F_form_internal_sum_2026,133897,1681 2026 M/F,INTERNAL ONLY (reconciliation with the regional notes' paired figure; never user-facing)
+A1,WIŚNIEWSKI/WIŚNIEWSKA|cross_forms_2026,WIŚNIEWSKI in F list: 203; WIŚNIEWSKA in M list: <2 or absent,1681 2026 M/F,exact forms
+A1,WIŚNIEWSKI/WIŚNIEWSKA|M_form_plus_F_form_internal_sum_2026,107256,1681 2026 M/F,INTERNAL ONLY (reconciliation with the regional notes' paired figure; never user-facing)
+A1,SZCZEPAŃSKI/SZCZEPAŃSKA|cross_forms_2026,SZCZEPAŃSKI in F list: 62; SZCZEPAŃSKA in M list: <2 or absent,1681 2026 M/F,exact forms
+A1,SZCZEPAŃSKI/SZCZEPAŃSKA|M_form_plus_F_form_internal_sum_2026,33197,1681 2026 M/F,INTERNAL ONLY (reconciliation with the regional notes' paired figure; never user-facing)
+A3,M_list_forms_ge500_in_2019_and_published_2026,6258,1681 2019/2026,base >= 500 entries
+A3,M_list_of_those_rose,497,1681 2019/2026,count b>a
+A3,M_list_of_those_fell,5715,1681 2019/2026,count b<a
+A3,F_list_forms_ge500_in_2019_and_published_2026,6350,1681 2019/2026,base >= 500 entries
+A3,F_list_of_those_rose,609,1681 2019/2026,count b>a
+A3,F_list_of_those_fell,5702,1681 2019/2026,count b<a
+A3,M_-SKI/-SKA_share_2019_2020_2026_pct,27.4673 / 27.3273 / 25.0921,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-SKI/-SKA_forms_2019_2026,36195 -> 37896,suffix_classes_by_year.csv,distinct forms in class
+A3,M_-CKI/-CKA_share_2019_2020_2026_pct,4.5006 / 4.4774 / 4.0962,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-CKI/-CKA_forms_2019_2026,6547 -> 6510,suffix_classes_by_year.csv,distinct forms in class
+A3,M_-UK_share_2019_2020_2026_pct,1.6652 / 1.7145 / 2.3505,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-UK_forms_2019_2026,8360 -> 13536,suffix_classes_by_year.csv,distinct forms in class
+A3,M_-ENKO_share_2019_2020_2026_pct,0.2523 / 0.3052 / 0.9817,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-ENKO_forms_2019_2026,3368 -> 7395,suffix_classes_by_year.csv,distinct forms in class
+A3,M_-AK_share_2019_2020_2026_pct,8.1297 / 8.1059 / 7.6405,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-AK_forms_2019_2026,10091 -> 12485,suffix_classes_by_year.csv,distinct forms in class
+A3,M_-EK_share_2019_2020_2026_pct,6.0510 / 6.0243 / 5.5186,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_-EK_forms_2019_2026,6890 -> 7192,suffix_classes_by_year.csv,distinct forms in class
+A3,M_OTHER_share_2019_2020_2026_pct,44.4988 / 44.6791 / 47.4492,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_OTHER_forms_2019_2026,173414 -> 282722,suffix_classes_by_year.csv,distinct forms in class
+A3,M_SPACE_SEPARATED_share_2019_2020_2026_pct,0.1022 / 0.1012 / 0.2134,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,M_SPACE_SEPARATED_forms_2019_2026,5860 -> 14558,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-SKI/-SKA_share_2019_2020_2026_pct,27.9327 / 27.8734 / 26.1564,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-SKI/-SKA_forms_2019_2026,43200 -> 53013,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-CKI/-CKA_share_2019_2020_2026_pct,4.5573 / 4.5436 / 4.1515,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-CKI/-CKA_forms_2019_2026,7257 -> 7394,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-UK_share_2019_2020_2026_pct,1.5776 / 1.6105 / 2.4083,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-UK_forms_2019_2026,7485 -> 13655,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-ENKO_share_2019_2020_2026_pct,0.1925 / 0.2313 / 1.2063,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-ENKO_forms_2019_2026,2867 -> 8271,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-AK_share_2019_2020_2026_pct,8.1004 / 8.0860 / 7.6249,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-AK_forms_2019_2026,9741 -> 12351,suffix_classes_by_year.csv,distinct forms in class
+A3,F_-EK_share_2019_2020_2026_pct,6.0107 / 5.9960 / 5.4679,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_-EK_forms_2019_2026,7065 -> 7301,suffix_classes_by_year.csv,distinct forms in class
+A3,F_OTHER_share_2019_2020_2026_pct,43.9147 / 44.0102 / 45.8815,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_OTHER_forms_2019_2026,171796 -> 263543,suffix_classes_by_year.csv,distinct forms in class
+A3,F_SPACE_SEPARATED_share_2019_2020_2026_pct,0.1007 / 0.1002 / 0.1520,suffix_classes_by_year.csv,SUFFIX-V1 share of list entries
+A3,F_SPACE_SEPARATED_forms_2019_2026,5907 -> 10554,suffix_classes_by_year.csv,distinct forms in class
+A4,M_2019_forms_with_exactly_2_pct_of_forms,22.8,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,M_2019_forms_ge20_pct_of_forms,28.0,concentration_by_year.csv,forms_ge20 / distinct_forms
+A4,F_2019_forms_with_exactly_2_pct_of_forms,26.5,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,F_2019_forms_ge20_pct_of_forms,26.3,concentration_by_year.csv,forms_ge20 / distinct_forms
+A4,M_2020_forms_with_exactly_2_pct_of_forms,22.8,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,M_2020_forms_ge20_pct_of_forms,27.6,concentration_by_year.csv,forms_ge20 / distinct_forms
+A4,F_2020_forms_with_exactly_2_pct_of_forms,26.4,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,F_2020_forms_ge20_pct_of_forms,26.3,concentration_by_year.csv,forms_ge20 / distinct_forms
+A4,M_2026_forms_with_exactly_2_pct_of_forms,26.2,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,M_2026_forms_ge20_pct_of_forms,22.4,concentration_by_year.csv,forms_ge20 / distinct_forms
+A4,F_2026_forms_with_exactly_2_pct_of_forms,28.3,concentration_by_year.csv,forms_with_exactly_2 / distinct_forms
+A4,F_2026_forms_ge20_pct_of_forms,21.8,concentration_by_year.csv,forms_ge20 / distinct_forms
+A5,F_leavers_2019_2026_still_in_incl_deceased_list_2026,5362 of 14949,1681 F + 568 F 2026-01-20,form published in the including-deceased female list at the same date
+A5,F_leavers_2020_2026_still_in_incl_deceased_list_2026,5001 of 8730,1681 F + 568 F 2026-01-20,form published in the including-deceased female list at the same date
+A5,F_leavers_2025_2026_still_in_incl_deceased_list_2026,982 of 2290,1681 F + 568 F 2026-01-20,form published in the including-deceased female list at the same date
+A6,ski_pair_units_ge1000_both_lists_published,1796,1681 2026 M/F,"PAIR-V1, conflict-free"
+A6,ski_pair_median_F_per_M,1.0257,1681 2026 M/F,median of F/M
+A6,ski_pair_F_gt_M,1403,1681 2026 M/F,count F/M>1
+A6,ski_pair_within_0.9_1.1,1745,1681 2026 M/F,count 0.9<=F/M<=1.1
+A6,invariant_consonant_final_units_ge1000_both_lists_published,3152,1681 2026 M/F,"PAIR-V1, conflict-free"
+A6,invariant_consonant_final_median_F_per_M,1.0143,1681 2026 M/F,median of F/M
+A6,invariant_consonant_final_F_gt_M,2006,1681 2026 M/F,count F/M>1
+A6,invariant_consonant_final_within_0.9_1.1,2924,1681 2026 M/F,count 0.9<=F/M<=1.1
+A6,F_list_adjectival_pairs_Y_vs_A_living_2019_2026,Y 52569 -> 53463 (1.70%); A 105437 -> 100903 (-4.30%),adjectival_forms_female_list.csv,(b-a)/a
+A7,M_hyphenated_entries_change_pct_2020_2026,18.29,hyphenated_by_year.csv,(b-a)/a
+A7,M_hyphenated_forms_change_pct_2020_2026,28.08,hyphenated_by_year.csv,(b-a)/a
+A7,F_hyphenated_entries_change_pct_2020_2026,21.01,hyphenated_by_year.csv,(b-a)/a
+A7,F_hyphenated_forms_change_pct_2020_2026,25.01,hyphenated_by_year.csv,(b-a)/a
+A7,F_share_over_M_share_2026,2.16,hyphenated_by_year.csv,ratio of shares
+A8,F_2024-01-19_forms_ge1000_incl,4174,568/1681 2024-01-19,"incl-deceased entries >= 1000, living published"
+A8,F_2024-01-19_median_ageing_index_pct,25.33,568/1681 2024-01-19,AGE-V1 median
+A8,F_2024-01-19_incl_only_forms_ge10,28,568/1681 2024-01-19,"forms in incl-deceased list, living <2 or absent"
+A8,F_2024-01-19_incl_only_forms_ge10_that_are_diacritic_variants_of_a_larger_living_form,22,568/1681 2024-01-19,diacritic-folded form equals a folded living-list form with more entries
+A8,F_2024-01-19_incl_only_top5,JÓŻWIK=15; KUŻMA=15; SLESZYŃSKA=15; FLIŚKIEWICZ=14; MOŻDZEŃ=13,568 2024-01-19,largest forms absent from the living list
+A8,F_2025-01-22_forms_ge1000_incl,4205,568/1681 2025-01-22,"incl-deceased entries >= 1000, living published"
+A8,F_2025-01-22_median_ageing_index_pct,25.97,568/1681 2025-01-22,AGE-V1 median
+A8,F_2025-01-22_incl_only_forms_ge10,29,568/1681 2025-01-22,"forms in incl-deceased list, living <2 or absent"
+A8,F_2025-01-22_incl_only_forms_ge10_that_are_diacritic_variants_of_a_larger_living_form,23,568/1681 2025-01-22,diacritic-folded form equals a folded living-list form with more entries
+A8,F_2025-01-22_incl_only_top5,JÓŻWIK=15; KUŻMA=15; FLIŚKIEWICZ=14; SLESZYŃSKA=14; SMIECHOWSKA=14,568 2025-01-22,largest forms absent from the living list
+A8,F_2026-01-20_forms_ge1000_incl,4235,568/1681 2026-01-20,"incl-deceased entries >= 1000, living published"
+A8,F_2026-01-20_median_ageing_index_pct,26.63,568/1681 2026-01-20,AGE-V1 median
+A8,F_2026-01-20_incl_only_forms_ge10,33,568/1681 2026-01-20,"forms in incl-deceased list, living <2 or absent"
+A8,F_2026-01-20_incl_only_forms_ge10_that_are_diacritic_variants_of_a_larger_living_form,24,568/1681 2026-01-20,diacritic-folded form equals a folded living-list form with more entries
+A8,F_2026-01-20_incl_only_top5,JÓŻWIK=15; KUŻMA=15; FLIŚKIEWICZ=14; SLESZYŃSKA=14; MOŻDZEŃ=13,568 2026-01-20,largest forms absent from the living list
+A8,M_2024-01-19_forms_ge1000_incl,4265,568/1681 2024-01-19,"incl-deceased entries >= 1000, living published"
+A8,M_2024-01-19_median_ageing_index_pct,28.52,568/1681 2024-01-19,AGE-V1 median
+A8,M_2024-01-19_incl_only_forms_ge10,22,568/1681 2024-01-19,"forms in incl-deceased list, living <2 or absent"
+A8,M_2024-01-19_incl_only_forms_ge10_that_are_diacritic_variants_of_a_larger_living_form,18,568/1681 2024-01-19,diacritic-folded form equals a folded living-list form with more entries
+A8,M_2024-01-19_incl_only_top5,WOŻNIAK=73; SWIĄTKOWSKI=18; CELINSKI=15; DUŻNIAK=15; SWIECH=15,568 2024-01-19,largest forms absent from the living list
+A8,M_2025-01-22_forms_ge1000_incl,4300,568/1681 2025-01-22,"incl-deceased entries >= 1000, living published"
+A8,M_2025-01-22_median_ageing_index_pct,29.19,568/1681 2025-01-22,AGE-V1 median
+A8,M_2025-01-22_incl_only_forms_ge10,27,568/1681 2025-01-22,"forms in incl-deceased list, living <2 or absent"
+A8,M_2025-01-22_incl_only_forms_ge10_that_are_diacritic_variants_of_a_larger_living_form,21,568/1681 2025-01-22,diacritic-folded form equals a folded living-list form with more entries
+A8,M_2025-01-22_incl_only_top5,WOŻNIAK=72; SWIĄTKOWSKI=18; SWIĘTOCHOWSKI=17; CELINSKI=15; DUŻNIAK=15,568 2025-01-22,largest forms absent from the living list
+A9,M list_top100_noun_matches_excluding_sensitive,19,words_summary_by_list_2026.csv,noun matches minus SENSITIVE_WORD_MATCHES
+A9,F list_top100_noun_matches_excluding_sensitive,19,words_summary_by_list_2026.csv,noun matches minus SENSITIVE_WORD_MATCHES
+A9,M_top100_adjective_matches_ending_SKI_CKI_DZKI,30 of 31,words_top1000_2026.csv,adjective-only matches among M-list top 100
+A10,M_2026_forms_starting_Ą,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,M_2026_forms_starting_Ę,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,M_2026_forms_starting_Ń,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,M_2026_forms_starting_Ó,9 forms / 32 entries; max 7,1681 2026,published forms (each >= 2 entries)
+A10,F_2026_forms_starting_Ą,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,F_2026_forms_starting_Ę,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,F_2026_forms_starting_Ń,0 forms / 0 entries; max -,1681 2026,published forms (each >= 2 entries)
+A10,F_2026_forms_starting_Ó,8 forms / 23 entries; max 6,1681 2026,published forms (each >= 2 entries)
+A10,M_letter_Q_share_2019_2026,0.0103 -> 0.0245,rare_letters_by_year.csv,share of list entries
+A10,M_letter_V_share_2019_2026,0.8189 -> 3.6992,rare_letters_by_year.csv,share of list entries
+A10,M_letter_X_share_2019_2026,0.0128 -> 0.0191,rare_letters_by_year.csv,share of list entries
+A10,F_letter_Q_share_2019_2026,0.0105 -> 0.0167,rare_letters_by_year.csv,share of list entries
+A10,F_letter_V_share_2019_2026,0.6427 -> 3.6892,rare_letters_by_year.csv,share of list entries
+A10,F_letter_X_share_2019_2026,0.0145 -> 0.0189,rare_letters_by_year.csv,share of list entries
+A11,top1000_units_without_sgjp_surname_lemma,14,words_top1000_2026.csv,count of blank flags
+A11,top1000_units_with_two_accepted_genitive_singular_forms,8: STĘPIEŃ (Stępienia/Stępnia); KOZIOŁ (Kozioła/Kozła); GAWEŁ (Gaweła/Gawła); BOBER (Bobera/Bobra); MAJCHER (Majchera/Majchra); GOŁĄB (Gołąba/Gołębia); ORZEŁ (Orzeła/Orła); STENCEL (Stencela/Stencla),sgjp.tab.gz,"SGJP m1 surname lemma, subst sg.gen forms (depr excluded)"
+A11,F_2026_NOWAKOWA,<2 or absent,1681 F 2026,exact form
+A11,F_2026_GRZEGORCZYKOWA,<2 or absent,1681 F 2026,exact form
+A11,F_2026_KACZMARKOWA,<2 or absent,1681 F 2026,exact form
+A11,F_2026_MAZUROWA,2,1681 F 2026,exact form
+A11,F_2026_KOWALOWA,13,1681 F 2026,exact form

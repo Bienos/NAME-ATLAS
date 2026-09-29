@@ -15,12 +15,15 @@ def main():
     part = []
     m19, f19 = c.living("M", "2019"), c.living("F", "2019")
     m26, f26 = c.living("M", "2026"), c.living("F", "2026")
-    u26 = c.paired("2026")
-    first_letter_share = {}
-    tot_all = sum(v["total"] for k, v in u26.items() if not c.is_placeholder(k))
-    for k, v in u26.items():
-        if not c.is_placeholder(k):
-            first_letter_share[k[0]] = first_letter_share.get(k[0], 0) + v["total"]
+    # first-letter shares per list (placeholders excluded); the M+F version is not user-facing (rule 10)
+    fl = {}
+    for s, d in (("M", m26), ("F", f26)):
+        cnt, tot_s = {}, 0
+        for k, n in d.items():
+            if not c.is_placeholder(k):
+                cnt[k[0]] = cnt.get(k[0], 0) + n
+                tot_s += n
+        fl[s] = (cnt, tot_s)
     for key, label in c.SHOWCASE:
         inv = key in c.INVARIANT_OVERRIDE
         mform, fform = key, (key if inv else c.feminine_of(key))
@@ -45,9 +48,11 @@ def main():
         part.append([label, "A10", "letters", len(key), "masculine/base form", "-", "-", "character count", "VERIFIED"])
         part.append([label, "A10", "polish_diacritic_letters", "".join(ch for ch in key if ch in PL_DIACRITICS) or "none",
                      "masculine/base form", "-", "-", "Ą Ć Ę Ł Ń Ó Ś Ź Ż", "VERIFIED"])
-        part.append([label, "A10", "first_letter_share_of_entries_pct",
-                     f"{key[0]}: {100 * first_letter_share[key[0]] / tot_all:.2f}", "all PAIR-V1 units, placeholders excluded",
-                     rd, "1681 2026 M+F", "share of entries by first letter", "LIKELY (derived)"])
+        for s in "MF":
+            cnt, tot_s = fl[s]
+            part.append([label, "A10", f"first_letter_share_of_{s}_list_entries_pct",
+                         f"{key[0]}: {100 * cnt.get(key[0], 0) / tot_s:.2f}", f"{s} list, all forms, placeholders excluded",
+                         rd, f"1681 2026 {s}", "share of list entries whose surname starts with this letter", "LIKELY (derived)"])
     with open(os.path.join(PARTS, "showcase_a12.csv"), "w", newline="", encoding="utf-8") as fh:
         csv.writer(fh).writerows(part)
     for r in part:

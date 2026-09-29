@@ -16,11 +16,16 @@ MIN_BASE_REL = 500   # minimum base-year entries for % lists
 TOPN = 25
 
 CLASSES = ["HYPHENATED", "SPACE_SEPARATED", "-SKI/-SKA", "-CKI/-CKA", "-DZKI/-DZKA",
-           "-OWICZ/-EWICZ", "-ICZ (other)", "-CZYK", "-UK", "-ENKO", "-AK", "-EK", "OTHER"]
+           "-OWICZ/-EWICZ", "-ICZ (other)", "-CZYK", "-UK", "-ENKO", "-AK", "-EK", "OTHER",
+           "PLACEHOLDER (not a surname)"]
 
 
 def suffix_class(form: str) -> str:
-    """SUFFIX-V1: first matching rule wins (order as in CLASSES)."""
+    """SUFFIX-V1: first matching rule wins (order as in CLASSES).
+    Placeholder values (BRAK DANYCH, BRAK NAZWISKA, '.', '-', NN, XXX) get their own class; before this fix
+    'BRAK DANYCH'/'BRAK NAZWISKA' were counted as SPACE_SEPARATED and '-' as HYPHENATED."""
+    if c.is_placeholder(form):
+        return "PLACEHOLDER (not a surname)"
     if "-" in form:
         return "HYPHENATED"
     if " " in form:

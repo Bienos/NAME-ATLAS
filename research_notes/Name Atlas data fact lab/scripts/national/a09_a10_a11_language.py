@@ -6,10 +6,14 @@ sjp.pl odm.txt (CC BY 4.0 / Apache 2.0), SGJP 2026-08-24 (BSD-2).
 A9 is a LEXICAL match (surname string == lowercase base form in sjp.pl), not an etymology claim.
 
 Outputs (repo data/national/):
-  words_top1000_2026.csv     top-1000 PAIR-V1 units with word-match flag and SGJP part of speech
-  letters_trivia_2026.csv    longest / most-diacritics / Q-V-X / palindromes / consonant runs (>= 20 entries)
-  first_letter_2026.csv      share of entries and units by first letter
-  rare_letters_by_year.csv   entries containing Q, V or X per year
+  words_top1000_2026.csv     top-1000 PAIR-V1 units (internal ordering) with word-match flag, SGJP part of speech,
+                             and the M-list / F-list entries and ranks (user-facing figures)
+  words_summary_by_list_2026.csv  word matches among the top 100 / top 1000 forms of EACH list (user-facing form)
+  letters_trivia_2026.csv    longest / most-diacritics / Q-V-X / palindromes / consonant runs. Eligibility (rule 7,
+                             per list): the masculine/base form has >= 20 entries in the M list OR its feminine
+                             form has >= 20 entries in the F list. Ties and frequency lists use per-list counts.
+  first_letter_2026.csv      share of entries by first letter: M list, F list (user-facing) and PAIR-V1 units (internal)
+  rare_letters_by_year.csv   entries containing Q, V or X per year: M list, F list and M+F (internal)
   sgjp_declension.csv        showcase declension table + top-1000 coverage summary rows
   adjectival_forms_female_list.csv  -Y vs -A forms in the female list (SGJP-confirmed adjectives)
 Part file: parts/showcase_a09_a11.csv
@@ -159,6 +163,25 @@ def main():
     rank = c.competition_rank(tot)
     m26, f26 = c.living("M", y), c.living("F", y)
     inf26 = c.deceased_incl("F", y)
+    mrank, frank = c.competition_rank(m26), c.competition_rank(f26)
+
+    def per_list(k):
+        """User-facing figures for PAIR-V1 key k: (M-list entries of form k, F-list entries of its feminine form,
+        M-list rank, F-list rank). None = fewer than 2 entries or absent."""
+        ff = c.feminine_of(k)
+        return m26.get(k), f26.get(ff), mrank.get(k), frank.get(ff)
+
+    def show(v):
+        return v if v is not None else "<2 or absent"
+
+    def eligible(k):
+        mm, ff_, _, _ = per_list(k)
+        return (mm or 0) >= MIN_ED or (ff_ or 0) >= MIN_ED
+
+    list_top = {}
+    for s_, d_ in (("M", m26), ("F", f26)):
+        forms = [k for k in d_ if not c.is_placeholder(k)]
+        list_top[s_] = sorted(forms, key=lambda k: (-d_[k], k))[:1000]
 
     # female-list adjectival -Y / -A pairs (candidates; SGJP confirms the adjective below)
     adj_pairs = []
@@ -178,6 +201,7 @@ def main():
     target_title |= {title(k) + "owa" for k, _ in c.SHOWCASE} | {title(k) + "ówna" for k, _ in c.SHOWCASE}
     target_title |= {title(f) for f in conflict_forms}
     target_lower |= {w.lower() for w in CALENDAR}
+    target_lower |= {c.pair_key(k).lower() for s_ in "MF" for k in list_top[s_]}
     sur, sur_bases, pos, odm_bases = parse_sgjp(target_title, target_lower)
     print("SGJP surname-qualified lemma bases:", len(sur_bases))
 
@@ -188,13 +212,36 @@ def main():
         is_word = w in lower
         p = pos.get(w)
         pos_s = "/".join(sorted(p)) if p else ""
+        mm, ff_, mr, fr = per_list(k)
         rows.append([rank[k], k, tot[k], "Y" if is_word else "", pos_s,
-                     "Y" if title(k) in sur_bases else ""])
+                     "Y" if title(k) in sur_bases else "", c.feminine_of(k), show(mm), show(ff_), mr or "", fr or ""])
     with open(os.path.join(OUT, "words_top1000_2026.csv"), "w", newline="", encoding="utf-8") as fh:
         w_ = csv.writer(fh)
         w_.writerow(["rank_2026", "unit_key", "paired_total_2026", "equals_lowercase_sjp_base_form",
-                     "sgjp_common_word_pos", "sgjp_has_surname_lemma"])
+                     "sgjp_common_word_pos", "sgjp_has_surname_lemma", "female_list_form", "M_list_entries_2026",
+                     "F_list_entries_2026", "rank_in_M_list_2026", "rank_in_F_list_2026"])
         w_.writerows(rows)
+    # per-list word-match summary (user-facing form; F-list forms are matched through their PAIR-V1 key)
+    wsum = []
+    for s_, d_ in (("M", m26), ("F", f26)):
+        for n in (100, 1000):
+            sub = list_top[s_][:n]
+            hits = [k for k in sub if c.pair_key(k).lower() in lower]
+            posc = Counter()
+            for k in hits:
+                p_ = pos.get(c.pair_key(k).lower(), {})
+                posc["noun" if "noun" in p_ else ("adjective" if "adjective" in p_ else "other/not in SGJP common words")] += 1
+            wsum.append([f"{s_} list", n, len(hits), posc["noun"], posc["adjective"], posc["other/not in SGJP common words"],
+                         sum(d_[k] for k in hits), sum(d_[k] for k in sub),
+                         f"{100 * sum(d_[k] for k in hits) / sum(d_[k] for k in sub):.2f}",
+                         "; ".join(k for k in hits if "noun" in pos.get(c.pair_key(k).lower(), {}))[:2000]])
+    with open(os.path.join(OUT, "words_summary_by_list_2026.csv"), "w", newline="", encoding="utf-8") as fh:
+        w_ = csv.writer(fh)
+        w_.writerow(["list", "top_n_forms", "word_matches", "of_which_noun", "of_which_adjective", "of_which_other",
+                     "entries_of_matches", "entries_of_top_n", "matches_share_of_top_n_entries_pct", "noun_matches_in_rank_order"])
+        w_.writerows(wsum)
+    for r in wsum:
+        print("A9 BY LIST", r[:9])
     for n in (100, 1000):
         sub = rows[:n]
         hits = [r for r in sub if r[3] == "Y"]
@@ -210,24 +257,30 @@ def main():
     for theme, items in EDITORIAL_THEMES.items():
         for sname, gloss in items:
             r = top_set.get(sname)
-            ok = r is not None and r[3] == "Y" and "noun" in r[4] and sname not in SENSITIVE_WORD_MATCHES
+            ok = r is not None and r[3] == "Y" and "noun" in r[4] and sname not in SENSITIVE_WORD_MATCHES and eligible(sname)
+            mm, ff_, mr, fr = per_list(sname)
             ed.append([theme, sname, gloss, r[0] if r else "", r[2] if r else "", "Y" if ok else "CHECK",
-                       "EDITORIAL theme+gloss by analyst; lexical match only (not etymology)"])
+                       "EDITORIAL theme+gloss by analyst; lexical match only (not etymology)",
+                       show(mm), show(ff_), mr or "", fr or ""])
     sens = [(r[0], r[1]) for r in rows if r[1] in SENSITIVE_WORD_MATCHES and r[3] == "Y"]
     cal = []
     for wd in CALENDAR:
         mm, ff = m26.get(wd), f26.get(wd)
         t_ = tot.get(wd)
         cal.append(["calendar", wd, "", rank.get(wd, ""), t_ if t_ else "<2 or absent (both lists)",
-                    "Y" if (t_ or 0) >= MIN_ED else "below editorial minimum", f"M={mm if mm else '<2/absent'} F={ff if ff else '<2/absent'}"])
+                    "Y" if eligible(wd) else "below editorial minimum", "lexical match only (not etymology)",
+                    show(mm), show(ff), mrank.get(wd, ""), frank.get(wd, "")])
     with open(os.path.join(OUT, "words_editorial_examples.csv"), "w", newline="", encoding="utf-8") as fh:
         w_ = csv.writer(fh)
-        w_.writerow(["theme", "unit_key", "analyst_gloss_or_note", "rank_2026", "paired_total_2026",
-                     "usable_editorially", "label"])
+        w_.writerow(["theme", "unit_key", "analyst_gloss_or_note", "rank_2026_paired_internal", "paired_total_2026_internal",
+                     "usable_editorially", "label", "M_list_entries_2026", "F_list_entries_2026", "rank_in_M_list_2026",
+                     "rank_in_F_list_2026"])
         w_.writerows(ed)
         w_.writerows(cal)
         for rk, k in sens:
-            w_.writerow(["EXCLUDED (sensitive word match)", k, "", rk, tot[k], "N", "ethnonym/demonym/slur/rank or office title"])
+            mm, ff_, mr, fr = per_list(k)
+            w_.writerow(["EXCLUDED (sensitive word match)", k, "", rk, tot[k], "N", "ethnonym/demonym/slur/rank or office title",
+                         show(mm), show(ff_), mr or "", fr or ""])
     print("EDITORIAL examples:", [(e[0], e[1], e[3], e[4], e[5]) for e in ed])
     print("CALENDAR:", cal)
     print("SENSITIVE matches in top1000:", sens)
@@ -240,21 +293,31 @@ def main():
 
     # ---------------- A10 ----------------
     trivia = []
-    units20 = {k: t for k, t in tot.items() if t >= MIN_ED}
+    # per-list eligibility (rule 7 applied to each list; paired totals are kept only as an internal column)
+    units20 = {k: t for k, t in tot.items() if eligible(k)}
+
+    def tie(k):  # tie-break by M-list count, then F-list count (never by the M+F sum)
+        mm, ff_, _, _ = per_list(k)
+        return (-(mm or 0), -(ff_ or 0), k)
+
+    def trow(lab, i, k, val, note=""):
+        mm, ff_, _, _ = per_list(k)
+        return [lab, i, k, val, tot[k], note, c.feminine_of(k), show(mm), show(ff_)]
+
     single = {k: t for k, t in units20.items() if k.isalpha()}  # letters only: no hyphen/space/apostrophe
     for lab, pool in (("longest_single_word_any_script", single),
                       ("longest_single_word_polish_alphabet", {k: t for k, t in single.items() if set(k) <= PL_ALPHABET})):
-        for i, k in enumerate(sorted(pool, key=lambda k: (-len(k), -pool[k], k))[:15], 1):
-            trivia.append([lab, i, k, len(k), pool[k], ""])
+        for i, k in enumerate(sorted(pool, key=lambda k: (-len(k),) + tie(k))[:15], 1):
+            trivia.append(trow(lab, i, k, len(k)))
     polish = {k: t for k, t in single.items() if set(k) <= PL_ALPHABET}
     ndia = {k: len(set(k) & PL_DIACRITICS) for k in polish}
     mx = max(ndia.values())
-    for i, k in enumerate(sorted([k for k in polish if ndia[k] >= mx - 1], key=lambda k: (-ndia[k], -polish[k], k))[:15], 1):
-        trivia.append(["most_distinct_polish_diacritics", i, k, ndia[k], polish[k], "".join(sorted(set(k) & PL_DIACRITICS))])
+    for i, k in enumerate(sorted([k for k in polish if ndia[k] >= mx - 1], key=lambda k: (-ndia[k],) + tie(k))[:15], 1):
+        trivia.append(trow("most_distinct_polish_diacritics", i, k, ndia[k], "".join(sorted(set(k) & PL_DIACRITICS))))
     alld = [k for k in polish if len(k) >= 3 and all(ch in PL_DIACRITICS for ch in k)]
     share_d = {k: sum(ch in PL_DIACRITICS for ch in k) / len(k) for k in polish if len(k) >= 4}
-    for i, k in enumerate(sorted(share_d, key=lambda k: (-share_d[k], -polish[k], k))[:10], 1):
-        trivia.append(["highest_share_of_diacritic_letters_len4plus", i, k, f"{share_d[k]:.2f}", polish[k], ""])
+    for i, k in enumerate(sorted(share_d, key=lambda k: (-share_d[k],) + tie(k))[:10], 1):
+        trivia.append(trow("highest_share_of_diacritic_letters_len4plus", i, k, f"{share_d[k]:.2f}"))
     print("A10 all-diacritic forms (>=3 letters, >=20 entries):", alld)
     # consonant runs (letters of the Polish alphabet; digraphs counted as letters)
     def run(k):
@@ -264,24 +327,30 @@ def main():
             best = max(best, cur)
         return best
     runs = {k: run(k) for k in polish}
-    for i, k in enumerate(sorted(polish, key=lambda k: (-runs[k], -polish[k], k))[:12], 1):
-        trivia.append(["longest_consonant_letter_run", i, k, runs[k], polish[k], ""])
-    for i, k in enumerate(sorted(polish, key=lambda k: (len(k), -polish[k], k))[:12], 1):
-        trivia.append(["shortest_polish_alphabet", i, k, len(k), polish[k], ""])
-    pal = [k for k in single if len(k) >= 3 and k == k[::-1]]
-    for i, k in enumerate(sorted(pal, key=lambda k: (-single[k], k)), 1):
-        trivia.append(["palindrome", i, k, len(k), single[k], ""])
+    for i, k in enumerate(sorted(polish, key=lambda k: (-runs[k],) + tie(k))[:12], 1):
+        trivia.append(trow("longest_consonant_letter_run", i, k, runs[k]))
+    for i, k in enumerate(sorted(polish, key=lambda k: (len(k),) + tie(k))[:12], 1):
+        trivia.append(trow("shortest_polish_alphabet", i, k, len(k)))
+    # palindromes: the M-list form or the F-list form reads the same backwards (checked per form)
+    pal = [k for k in single if len(k) >= 3 and (k == k[::-1] or c.feminine_of(k) == c.feminine_of(k)[::-1])]
+    for i, k in enumerate(sorted(pal, key=tie), 1):
+        trivia.append(trow("palindrome", i, k, len(k)))
+    # frequency lists are built separately for each list (never ranked on M+F sums)
     for letter in "QVX":
-        pool = {k: t for k, t in units20.items() if letter in k}
-        for i, k in enumerate(sorted(pool, key=lambda k: (-pool[k], k))[:10], 1):
-            trivia.append([f"contains_{letter}", i, k, "", pool[k], ""])
+        for s_, d_ in (("M", m26), ("F", f26)):
+            pool = {k: n for k, n in d_.items() if letter in k and n >= MIN_ED and not c.is_placeholder(k)}
+            for i, k in enumerate(sorted(pool, key=lambda k: (-pool[k], k))[:10], 1):
+                trivia.append([f"contains_{letter}_{s_}_list", i, k, "", "", f"{s_}-list form",
+                               k, pool[k] if s_ == "M" else "", pool[k] if s_ == "F" else ""])
     with open(os.path.join(OUT, "letters_trivia_2026.csv"), "w", newline="", encoding="utf-8") as fh:
         w_ = csv.writer(fh)
-        w_.writerow(["list", "position", "unit_key", "metric_value", "paired_total_2026", "note"])
+        w_.writerow(["list", "position", "unit_key", "metric_value", "paired_total_2026_internal", "note",
+                     "female_list_form", "M_list_entries_2026", "F_list_entries_2026"])
         w_.writerows(trivia)
     for r in trivia:
         print("A10", r)
-    print("A10 counts: units>=20", len(units20), "single-word", len(single), "polish-alphabet single-word", len(polish),
+    print("A10 counts: eligible units (>=20 in M or F list)", len(units20), "(paired total >=20:",
+          sum(1 for t in tot.values() if t >= MIN_ED), ") single-word", len(single), "polish-alphabet single-word", len(polish),
           "max distinct diacritics", mx, "palindromes", len(pal))
 
     # first letter
@@ -290,13 +359,31 @@ def main():
         fl_e[k[0]] += t
         fl_u[k[0]] += 1
     te, tu = sum(fl_e.values()), sum(fl_u.values())
+    fl_l = {}
+    for s_, d_ in (("M", m26), ("F", f26)):
+        ce, cf_ = Counter(), Counter()
+        for k, n in d_.items():
+            if not c.is_placeholder(k):
+                ce[k[0]] += n
+                cf_[k[0]] += 1
+        fl_l[s_] = (ce, cf_, sum(ce.values()), sum(cf_.values()))
     with open(os.path.join(OUT, "first_letter_2026.csv"), "w", newline="", encoding="utf-8") as fh:
         w_ = csv.writer(fh)
-        w_.writerow(["first_letter", "entries", "share_of_entries_pct", "units", "share_of_units_pct"])
+        w_.writerow(["first_letter", "M_list_entries", "M_list_share_of_entries_pct", "M_list_forms", "M_list_share_of_forms_pct",
+                     "F_list_entries", "F_list_share_of_entries_pct", "F_list_forms", "F_list_share_of_forms_pct",
+                     "paired_units_entries_internal", "paired_share_of_entries_pct_internal", "paired_units_internal",
+                     "paired_share_of_units_pct_internal"])
         for L, e in sorted(fl_e.items(), key=lambda kv: -kv[1]):
             if e / te >= 0.0001 or L in "QVXĆŁŚŹŻ":
-                w_.writerow([L, e, f"{100 * e / te:.3f}", fl_u[L], f"{100 * fl_u[L] / tu:.3f}"])
+                row = []
+                for s_ in "MF":
+                    ce, cf_, se, sf = fl_l[s_]
+                    row += [ce[L], f"{100 * ce[L] / se:.3f}", cf_[L], f"{100 * cf_[L] / sf:.3f}"]
+                w_.writerow([L] + row + [e, f"{100 * e / te:.3f}", fl_u[L], f"{100 * fl_u[L] / tu:.3f}"])
     print("A10 first letters (entries):", [(L, f"{100 * e / te:.2f}") for L, e in fl_e.most_common(8)])
+    for s_ in "MF":
+        ce, cf_, se, sf = fl_l[s_]
+        print(f"A10 first letters {s_} list (entries):", [(L, f"{100 * e / se:.2f}") for L, e in ce.most_common(8)])
     print("A10 first letters (units):", [(L, f"{100 * n / tu:.2f}") for L, n in fl_u.most_common(8)])
     for L in "ĄĘŃÓ":
         print("  starts with", L, fl_e.get(L, 0), fl_u.get(L, 0))
@@ -313,10 +400,20 @@ def main():
         for letter in "QVX":
             e = sum(n for k, n in allf.items() if letter in k)
             f_ = sum(1 for k in allf if letter in k)
-            rl.append([yy, c.ref_date("M", yy), letter, e, f"{100 * e / T:.4f}", f_])
+            rl.append([yy, c.ref_date("M", yy), "M+F (internal)", letter, e, f"{100 * e / T:.4f}", f_])
+    for yy in c.YEARS:
+        for s_ in "MF":
+            if (s_, yy) not in c.LIVING:
+                continue
+            d_ = {k: n for k, n in c.living(s_, yy).items() if not c.is_placeholder(k)}
+            T = sum(d_.values())
+            for letter in "QVX":
+                e = sum(n for k, n in d_.items() if letter in k)
+                rl.append([yy, c.ref_date(s_, yy), f"{s_} list", letter, e, f"{100 * e / T:.4f}",
+                           sum(1 for k in d_ if letter in k)])
     with open(os.path.join(OUT, "rare_letters_by_year.csv"), "w", newline="", encoding="utf-8") as fh:
         w_ = csv.writer(fh)
-        w_.writerow(["year_label", "reference_date", "letter", "entries_M_plus_F_forms_containing", "share_of_entries_pct",
+        w_.writerow(["year_label", "reference_date", "list", "letter", "entries_of_forms_containing", "share_of_list_entries_pct",
                      "distinct_forms_containing"])
         w_.writerows(rl)
     print("A10 rare letters:", rl)
@@ -356,7 +453,7 @@ def main():
         lemmas = sur.get(t, {})
         m_lem = {lid: e for lid, e in lemmas.items() if any(":m1" in tg for _, tg, _ in e)}
         f_lem = {lid: e for lid, e in lemmas.items() if all(":f" in tg for _, tg, _ in e)}
-        row = {"showcase": label, "masc_nom": "", "masc_gen": "", "family_plural_nom": "", "depr_plural_excluded": "",
+        row = {"showcase": label, "masc_nom": "", "masc_gen": "", "family_plural_nom": "", "depr_form_in_sgjp": "",
                "feminine_form": "", "feminine_gen": "", "feminine_declines": "", "variant_slots": "",
                "odmezowskie_odojcowskie": "", "sgjp_lemma_ids": "; ".join(sorted(lemmas))}
         for lid, e in m_lem.items():
@@ -364,7 +461,7 @@ def main():
             row["masc_nom"] = "/".join(sorted(table.get(("sg", "nom"), [])))
             row["masc_gen"] = "/".join(sorted(table.get(("sg", "gen"), [])))
             row["family_plural_nom"] = "/".join(sorted(table.get(("pl", "nom"), [])))
-            row["depr_plural_excluded"] = "/".join(sorted(depr))
+            row["depr_form_in_sgjp"] = "yes (pejorative form excluded, not shown)" if depr else "no"
             row["variant_slots"] = "; ".join(f"{a}.{b}={'/'.join(sorted(v))}" for (a, b), v in sorted(table.items())
                                              if len(v) >= 2 and b != "voc")
         if key.endswith(("SKI", "CKI", "DZKI")) and key not in c.INVARIANT_OVERRIDE:

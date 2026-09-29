@@ -4,6 +4,8 @@ Outputs (repo data/national/):
   yearly_totals.csv          national entry sums and distinct forms per list and date
   top_units_2026.csv         top 200 PAIR-V1 units at 2026-01-20 with rank/share/1-in-X and 2019 comparison
   showcase_yearly_series.csv chart-ready yearly series for the showcase surnames
+  topn_direction_2019_2026.csv how many of the top 10/100/1000 forms of 2019 (and of 2020) declined or rose by 2026,
+                             per list (M, F) and for PAIR-V1 units (internal)
 Part file (scratch parts/): showcase_a01_a02.csv -> merged by z_assemble_showcase.py
 """
 import csv
@@ -90,6 +92,27 @@ def main():
     print("TOP-N of 2019 (PAIR-V1): n, declined, increased, increased examples")
     for s in summary:
         print(" ", s)
+    # same question per list (the user-facing form) and from the January 2020 baseline as well
+    tdir = []
+    for base in ("2019", "2020"):
+        scopes = [("M list", c.living("M", base), c.living("M", "2026")),
+                  ("F list", c.living("F", base), c.living("F", "2026")),
+                  ("PAIRED (internal)", tot[base], t26)]
+        for scope, a, b in scopes:
+            a = {k: v for k, v in a.items() if not c.is_placeholder(k)}
+            for n in (10, 100, 1000):
+                topa = sorted(a, key=lambda k: (-a[k], k))[:n]
+                dec = [k for k in topa if b.get(k, 0) < a[k]]
+                inc = [k for k in topa if b.get(k, 0) > a[k]]
+                same = [k for k in topa if b.get(k, 0) == a[k]]
+                tdir.append([f"{base}->2026", scope, n, len(dec), len(inc), len(same),
+                             "; ".join(f"{k}={a[k]}->{b.get(k, '<2 or absent')}" for k in inc[:30])])
+    with open(os.path.join(OUT, "topn_direction_2019_2026.csv"), "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["period", "list", "top_n_of_base_year", "declined", "increased", "unchanged", "increased_forms"])
+        w.writerows(tdir)
+    for r in tdir:
+        print("TOPN", r[:6], r[6][:200])
     d19, d26 = date(2019, 6, 30), date(2026, 1, 20)
     print("interval 2019-06-30 -> 2026-01-20 days:", (d26 - d19).days, "years:", round((d26 - d19).days / 365.25, 3))
     print("national sums:", {y: denom[y] for y in c.PAIRED_YEARS})
@@ -153,6 +176,15 @@ def main():
         fform = key if key in c.INVARIANT_OVERRIDE else c.feminine_of(key)
         add(label, "A1", "rank_in_M_list", sexrank[("M", y)].get(mform), f"M list, form {mform}", rd, src(y, "M"), "RANK-V1 within list", "VERIFIED (ordering of file values)")
         add(label, "A1", "rank_in_F_list", sexrank[("F", y)].get(fform), f"F list, form {fform}", rd, src(y, "F"), "RANK-V1 within list", "VERIFIED (ordering of file values)")
+        # sex-specific share and 1-in-X (SHARE-V1 / ONEIN-V1 with the one-list denominator): the user-facing form
+        for s, form, val in (("M", mform, mv), ("F", fform, fv)):
+            if isinstance(val, int):
+                add(label, "A1", f"share_of_{s}_list_pct", f"{100 * val / sexden[(s, y)]:.4f}",
+                    f"{s} list, form {form}; denominator {sexden[(s, y)]} = all published entries in the {s} list",
+                    rd, src(y, s), "SHARE-V1 (sex-specific)", "LIKELY (derived)")
+                add(label, "A1", f"one_in_x_{s}_list", round(sexden[(s, y)] / val),
+                    f"{s} list, form {form}; denominator {sexden[(s, y)]}", rd, src(y, s), "ONEIN-V1 (sex-specific, rounded)",
+                    "LIKELY (derived)")
         # A2 trend
         first = next(r for r in series if r[0] == label and r[1] == "2019")
         last = s_last

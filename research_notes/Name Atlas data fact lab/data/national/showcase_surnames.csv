@@ -8,9 +8,14 @@ NOWAK,A1,share_of_all_entries_pct,0.4634,denominator 42757839 = sum of both 2026
 NOWAK,A1,one_in_x_entries,216,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 NOWAK,A1,rank_in_M_list,1,"M list, form NOWAK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 NOWAK,A1,rank_in_F_list,1,"F list, form NOWAK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+NOWAK,A1,share_of_M_list_pct,0.4641,"M list, form NOWAK; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+NOWAK,A1,one_in_x_M_list,215,"M list, form NOWAK; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+NOWAK,A1,share_of_F_list_pct,0.4626,"F list, form NOWAK; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+NOWAK,A1,one_in_x_F_list,216,"F list, form NOWAK; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 NOWAK,A10,letters,5,masculine/base form,-,-,character count,VERIFIED
 NOWAK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-NOWAK,A10,first_letter_share_of_entries_pct,N: 2.47,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+NOWAK,A10,first_letter_share_of_M_list_entries_pct,N: 2.47,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+NOWAK,A10,first_letter_share_of_F_list_entries_pct,N: 2.47,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 NOWAK,A11,masc_gen,Nowaka,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 NOWAK,A11,family_plural_nom,Nowakowie,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 NOWAK,A11,feminine_gen,Nowak,SGJP lemma(s): Nowak:Sf; Nowak:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -39,6 +44,18 @@ NOWAK,A8,entries_incl_deceased_2024,289865,M+F lists,2024-01-19,568 2024 M/F,PAI
 NOWAK,A8,recorded_deceased_entries_2025,91898,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 NOWAK,A8,ageing_index_pct_2025,31.57,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 NOWAK,A8,entries_incl_deceased_2025,291076,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+NOWAK,A8,recorded_deceased_entries_M_2024,47655,"M list, form NOWAK",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_M_2024,32.43,"M list, form NOWAK",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_M_2024,146965,"M list, form NOWAK",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+NOWAK,A8,recorded_deceased_entries_F_2024,41994,"F list, form NOWAK",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_F_2024,29.39,"F list, form NOWAK",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_F_2024,142900,"F list, form NOWAK",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+NOWAK,A8,recorded_deceased_entries_M_2025,48813,"M list, form NOWAK",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_M_2025,33.06,"M list, form NOWAK",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_M_2025,147672,"M list, form NOWAK",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+NOWAK,A8,recorded_deceased_entries_F_2025,43085,"F list, form NOWAK",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+NOWAK,A8,ageing_index_pct_F_2025,30.04,"F list, form NOWAK",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+NOWAK,A8,entries_incl_deceased_F_2025,143404,"F list, form NOWAK",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 NOWAK,A8,ageing_index_pct_F_2026,30.66,"F list, form NOWAK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 NOWAK,A9,equals_lowercase_sjp_base_form,N,'nowak',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 KOWALSKI/KOWALSKA,A1,entries_M_list,66589,"M list, form KOWALSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -50,9 +67,14 @@ KOWALSKI/KOWALSKA,A1,share_of_all_entries_pct,0.3144,denominator 42757839 = sum 
 KOWALSKI/KOWALSKA,A1,one_in_x_entries,318,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 KOWALSKI/KOWALSKA,A1,rank_in_M_list,2,"M list, form KOWALSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 KOWALSKI/KOWALSKA,A1,rank_in_F_list,2,"F list, form KOWALSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KOWALSKI/KOWALSKA,A1,share_of_M_list_pct,0.3141,"M list, form KOWALSKI; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+KOWALSKI/KOWALSKA,A1,one_in_x_M_list,318,"M list, form KOWALSKI; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+KOWALSKI/KOWALSKA,A1,share_of_F_list_pct,0.3122,"F list, form KOWALSKA; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+KOWALSKI/KOWALSKA,A1,one_in_x_F_list,320,"F list, form KOWALSKA; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 KOWALSKI/KOWALSKA,A10,letters,8,masculine/base form,-,-,character count,VERIFIED
 KOWALSKI/KOWALSKA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-KOWALSKI/KOWALSKA,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KOWALSKI/KOWALSKA,A10,first_letter_share_of_M_list_entries_pct,K: 14.37,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+KOWALSKI/KOWALSKA,A10,first_letter_share_of_F_list_entries_pct,K: 14.38,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 KOWALSKI/KOWALSKA,A11,masc_gen,Kowalskiego,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KOWALSKI/KOWALSKA,A11,family_plural_nom,Kowalscy,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KOWALSKI/KOWALSKA,A11,feminine_gen,Kowalskiej,SGJP lemma(s): Kowalski:Sf; Kowalski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -81,6 +103,18 @@ KOWALSKI/KOWALSKA,A8,entries_incl_deceased_2024,187939,M+F lists,2024-01-19,568 
 KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_2025,53591,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 KOWALSKI/KOWALSKA,A8,ageing_index_pct_2025,28.40,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 KOWALSKI/KOWALSKA,A8,entries_incl_deceased_2025,188720,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_M_2024,27831,"M list, form KOWALSKI",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_M_2024,29.28,"M list, form KOWALSKI",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_M_2024,95049,"M list, form KOWALSKI",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_F_2024,24168,"F list, form KOWALSKA",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_F_2024,26.16,"F list, form KOWALSKA",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_F_2024,92391,"F list, form KOWALSKA",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_M_2025,28620,"M list, form KOWALSKI",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_M_2025,29.97,"M list, form KOWALSKI",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_M_2025,95511,"M list, form KOWALSKI",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+KOWALSKI/KOWALSKA,A8,recorded_deceased_entries_F_2025,24957,"F list, form KOWALSKA",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOWALSKI/KOWALSKA,A8,ageing_index_pct_F_2025,26.93,"F list, form KOWALSKA",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOWALSKI/KOWALSKA,A8,entries_incl_deceased_F_2025,92680,"F list, form KOWALSKA",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 KOWALSKI/KOWALSKA,A8,ageing_index_pct_F_2026,27.63,"F list, form KOWALSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 KOWALSKI/KOWALSKA,A9,equals_lowercase_sjp_base_form,Y,'kowalski',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 WIŚNIEWSKI/WIŚNIEWSKA,A1,entries_M_list,53079,"M list, form WIŚNIEWSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -92,9 +126,14 @@ WIŚNIEWSKI/WIŚNIEWSKA,A1,share_of_all_entries_pct,0.2513,denominator 42757839 
 WIŚNIEWSKI/WIŚNIEWSKA,A1,one_in_x_entries,398,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 WIŚNIEWSKI/WIŚNIEWSKA,A1,rank_in_M_list,3,"M list, form WIŚNIEWSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 WIŚNIEWSKI/WIŚNIEWSKA,A1,rank_in_F_list,3,"F list, form WIŚNIEWSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,share_of_M_list_pct,0.2504,"M list, form WIŚNIEWSKI; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,one_in_x_M_list,399,"M list, form WIŚNIEWSKI; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,share_of_F_list_pct,0.2513,"F list, form WIŚNIEWSKA; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A1,one_in_x_F_list,398,"F list, form WIŚNIEWSKA; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 WIŚNIEWSKI/WIŚNIEWSKA,A10,letters,10,masculine/base form,-,-,character count,VERIFIED
 WIŚNIEWSKI/WIŚNIEWSKA,A10,polish_diacritic_letters,Ś,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-WIŚNIEWSKI/WIŚNIEWSKA,A10,first_letter_share_of_entries_pct,W: 6.30,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A10,first_letter_share_of_M_list_entries_pct,W: 6.27,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+WIŚNIEWSKI/WIŚNIEWSKA,A10,first_letter_share_of_F_list_entries_pct,W: 6.33,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 WIŚNIEWSKI/WIŚNIEWSKA,A11,masc_gen,Wiśniewskiego,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 WIŚNIEWSKI/WIŚNIEWSKA,A11,family_plural_nom,Wiśniewscy,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 WIŚNIEWSKI/WIŚNIEWSKA,A11,feminine_gen,Wiśniewskiej,SGJP lemma(s): Wiśniewski:Sf; Wiśniewski:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -123,6 +162,18 @@ WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_2024,147787,M+F lists,2024-01-1
 WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_2025,40461,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_2025,27.25,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_2025,148458,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_M_2024,21105,"M list, form WIŚNIEWSKI",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_M_2024,28.25,"M list, form WIŚNIEWSKI",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_M_2024,74721,"M list, form WIŚNIEWSKI",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_F_2024,18159,"F list, form WIŚNIEWSKA",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_F_2024,24.92,"F list, form WIŚNIEWSKA",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_F_2024,72869,"F list, form WIŚNIEWSKA",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_M_2025,21759,"M list, form WIŚNIEWSKI",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_M_2025,28.96,"M list, form WIŚNIEWSKI",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_M_2025,75139,"M list, form WIŚNIEWSKI",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+WIŚNIEWSKI/WIŚNIEWSKA,A8,recorded_deceased_entries_F_2025,18694,"F list, form WIŚNIEWSKA",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_F_2025,25.57,"F list, form WIŚNIEWSKA",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+WIŚNIEWSKI/WIŚNIEWSKA,A8,entries_incl_deceased_F_2025,73114,"F list, form WIŚNIEWSKA",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 WIŚNIEWSKI/WIŚNIEWSKA,A8,ageing_index_pct_F_2026,26.21,"F list, form WIŚNIEWSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 WIŚNIEWSKI/WIŚNIEWSKA,A9,equals_lowercase_sjp_base_form,Y,'wiśniewski',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 KACZMAREK,A1,entries_M_list,29820,"M list, form KACZMAREK",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -134,9 +185,14 @@ KACZMAREK,A1,share_of_all_entries_pct,0.1405,denominator 42757839 = sum of both 
 KACZMAREK,A1,one_in_x_entries,712,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 KACZMAREK,A1,rank_in_M_list,18,"M list, form KACZMAREK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 KACZMAREK,A1,rank_in_F_list,18,"F list, form KACZMAREK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KACZMAREK,A1,share_of_M_list_pct,0.1407,"M list, form KACZMAREK; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+KACZMAREK,A1,one_in_x_M_list,711,"M list, form KACZMAREK; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+KACZMAREK,A1,share_of_F_list_pct,0.1403,"F list, form KACZMAREK; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+KACZMAREK,A1,one_in_x_F_list,713,"F list, form KACZMAREK; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 KACZMAREK,A10,letters,9,masculine/base form,-,-,character count,VERIFIED
 KACZMAREK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-KACZMAREK,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KACZMAREK,A10,first_letter_share_of_M_list_entries_pct,K: 14.37,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+KACZMAREK,A10,first_letter_share_of_F_list_entries_pct,K: 14.38,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 KACZMAREK,A11,masc_gen,Kaczmarka,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KACZMAREK,A11,family_plural_nom,Kaczmarkowie,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KACZMAREK,A11,feminine_gen,Kaczmarek,SGJP lemma(s): Kaczmarek:Sf; Kaczmarek:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -165,6 +221,18 @@ KACZMAREK,A8,entries_incl_deceased_2024,83413,M+F lists,2024-01-19,568 2024 M/F,
 KACZMAREK,A8,recorded_deceased_entries_2025,23432,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 KACZMAREK,A8,ageing_index_pct_2025,27.96,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 KACZMAREK,A8,entries_incl_deceased_2025,83809,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KACZMAREK,A8,recorded_deceased_entries_M_2024,12153,"M list, form KACZMAREK",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_M_2024,28.79,"M list, form KACZMAREK",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_M_2024,42218,"M list, form KACZMAREK",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+KACZMAREK,A8,recorded_deceased_entries_F_2024,10562,"F list, form KACZMAREK",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_F_2024,25.64,"F list, form KACZMAREK",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_F_2024,41195,"F list, form KACZMAREK",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+KACZMAREK,A8,recorded_deceased_entries_M_2025,12517,"M list, form KACZMAREK",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_M_2025,29.49,"M list, form KACZMAREK",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_M_2025,42451,"M list, form KACZMAREK",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+KACZMAREK,A8,recorded_deceased_entries_F_2025,10915,"F list, form KACZMAREK",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KACZMAREK,A8,ageing_index_pct_F_2025,26.39,"F list, form KACZMAREK",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+KACZMAREK,A8,entries_incl_deceased_F_2025,41358,"F list, form KACZMAREK",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 KACZMAREK,A8,ageing_index_pct_F_2026,27.08,"F list, form KACZMAREK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 KACZMAREK,A9,equals_lowercase_sjp_base_form,N,'kaczmarek',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A1,entries_M_list,16419,"M list, form SZCZEPAŃSKI",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -176,9 +244,14 @@ SZCZEPAŃSKI/SZCZEPAŃSKA,A1,share_of_all_entries_pct,0.0778,denominator 4275783
 SZCZEPAŃSKI/SZCZEPAŃSKA,A1,one_in_x_entries,1286,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A1,rank_in_M_list,63,"M list, form SZCZEPAŃSKI",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A1,rank_in_F_list,63,"F list, form SZCZEPAŃSKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,share_of_M_list_pct,0.0775,"M list, form SZCZEPAŃSKI; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,one_in_x_M_list,1291,"M list, form SZCZEPAŃSKI; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,share_of_F_list_pct,0.0778,"F list, form SZCZEPAŃSKA; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A1,one_in_x_F_list,1285,"F list, form SZCZEPAŃSKA; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A10,letters,11,masculine/base form,-,-,character count,VERIFIED
 SZCZEPAŃSKI/SZCZEPAŃSKA,A10,polish_diacritic_letters,Ń,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-SZCZEPAŃSKI/SZCZEPAŃSKA,A10,first_letter_share_of_entries_pct,S: 11.95,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A10,first_letter_share_of_M_list_entries_pct,S: 11.92,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A10,first_letter_share_of_F_list_entries_pct,S: 11.97,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A11,masc_gen,Szczepańskiego,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A11,family_plural_nom,Szczepańscy,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A11,feminine_gen,Szczepańskiej,SGJP lemma(s): Szczepański,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -207,6 +280,18 @@ SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_2024,45724,M+F lists,2024-01-
 SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_2025,12504,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_2025,27.22,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_2025,45943,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_M_2024,6494,"M list, form SZCZEPAŃSKI",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_M_2024,28.14,"M list, form SZCZEPAŃSKI",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_M_2024,23079,"M list, form SZCZEPAŃSKI",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_F_2024,5634,"F list, form SZCZEPAŃSKA",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_F_2024,24.94,"F list, form SZCZEPAŃSKA",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_F_2024,22586,"F list, form SZCZEPAŃSKA",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_M_2025,6677,"M list, form SZCZEPAŃSKI",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_M_2025,28.78,"M list, form SZCZEPAŃSKI",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_M_2025,23198,"M list, form SZCZEPAŃSKI",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,recorded_deceased_entries_F_2025,5825,"F list, form SZCZEPAŃSKA",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_F_2025,25.68,"F list, form SZCZEPAŃSKA",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+SZCZEPAŃSKI/SZCZEPAŃSKA,A8,entries_incl_deceased_F_2025,22682,"F list, form SZCZEPAŃSKA",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 SZCZEPAŃSKI/SZCZEPAŃSKA,A8,ageing_index_pct_F_2026,26.31,"F list, form SZCZEPAŃSKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 SZCZEPAŃSKI/SZCZEPAŃSKA,A9,equals_lowercase_sjp_base_form,N,'szczepański',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 GRZEGORCZYK,A1,entries_M_list,5128,"M list, form GRZEGORCZYK",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -218,9 +303,14 @@ GRZEGORCZYK,A1,share_of_all_entries_pct,0.0245,denominator 42757839 = sum of bot
 GRZEGORCZYK,A1,one_in_x_entries,4087,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 GRZEGORCZYK,A1,rank_in_M_list,370,"M list, form GRZEGORCZYK",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 GRZEGORCZYK,A1,rank_in_F_list,362,"F list, form GRZEGORCZYK",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+GRZEGORCZYK,A1,share_of_M_list_pct,0.0242,"M list, form GRZEGORCZYK; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+GRZEGORCZYK,A1,one_in_x_M_list,4134,"M list, form GRZEGORCZYK; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+GRZEGORCZYK,A1,share_of_F_list_pct,0.0247,"F list, form GRZEGORCZYK; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+GRZEGORCZYK,A1,one_in_x_F_list,4042,"F list, form GRZEGORCZYK; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 GRZEGORCZYK,A10,letters,11,masculine/base form,-,-,character count,VERIFIED
 GRZEGORCZYK,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-GRZEGORCZYK,A10,first_letter_share_of_entries_pct,G: 5.60,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+GRZEGORCZYK,A10,first_letter_share_of_M_list_entries_pct,G: 5.65,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+GRZEGORCZYK,A10,first_letter_share_of_F_list_entries_pct,G: 5.56,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 GRZEGORCZYK,A11,masc_gen,Grzegorczyka,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 GRZEGORCZYK,A11,family_plural_nom,Grzegorczykowie,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 GRZEGORCZYK,A11,feminine_gen,Grzegorczyk,SGJP lemma(s): Grzegorczyk:Sf; Grzegorczyk:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -249,6 +339,18 @@ GRZEGORCZYK,A8,entries_incl_deceased_2024,14481,M+F lists,2024-01-19,568 2024 M/
 GRZEGORCZYK,A8,recorded_deceased_entries_2025,4001,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 GRZEGORCZYK,A8,ageing_index_pct_2025,27.55,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 GRZEGORCZYK,A8,entries_incl_deceased_2025,14525,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+GRZEGORCZYK,A8,recorded_deceased_entries_M_2024,2110,"M list, form GRZEGORCZYK",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_M_2024,28.89,"M list, form GRZEGORCZYK",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_M_2024,7304,"M list, form GRZEGORCZYK",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+GRZEGORCZYK,A8,recorded_deceased_entries_F_2024,1773,"F list, form GRZEGORCZYK",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_F_2024,24.70,"F list, form GRZEGORCZYK",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_F_2024,7177,"F list, form GRZEGORCZYK",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+GRZEGORCZYK,A8,recorded_deceased_entries_M_2025,2178,"M list, form GRZEGORCZYK",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_M_2025,29.69,"M list, form GRZEGORCZYK",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_M_2025,7337,"M list, form GRZEGORCZYK",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+GRZEGORCZYK,A8,recorded_deceased_entries_F_2025,1823,"F list, form GRZEGORCZYK",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+GRZEGORCZYK,A8,ageing_index_pct_F_2025,25.36,"F list, form GRZEGORCZYK",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+GRZEGORCZYK,A8,entries_incl_deceased_F_2025,7188,"F list, form GRZEGORCZYK",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 GRZEGORCZYK,A8,ageing_index_pct_F_2026,26.06,"F list, form GRZEGORCZYK",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 GRZEGORCZYK,A9,equals_lowercase_sjp_base_form,N,'grzegorczyk',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 CZEKIERDA,A1,entries_M_list,217,"M list, form CZEKIERDA",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -260,9 +362,14 @@ CZEKIERDA,A1,share_of_all_entries_pct,0.0010,denominator 42757839 = sum of both 
 CZEKIERDA,A1,one_in_x_entries,99669,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 CZEKIERDA,A1,rank_in_M_list,14932,"M list, form CZEKIERDA",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 CZEKIERDA,A1,rank_in_F_list,15540,"F list, form CZEKIERDA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+CZEKIERDA,A1,share_of_M_list_pct,0.0010,"M list, form CZEKIERDA; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+CZEKIERDA,A1,one_in_x_M_list,97685,"M list, form CZEKIERDA; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+CZEKIERDA,A1,share_of_F_list_pct,0.0010,"F list, form CZEKIERDA; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+CZEKIERDA,A1,one_in_x_F_list,101700,"F list, form CZEKIERDA; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 CZEKIERDA,A10,letters,9,masculine/base form,-,-,character count,VERIFIED
 CZEKIERDA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-CZEKIERDA,A10,first_letter_share_of_entries_pct,C: 3.93,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+CZEKIERDA,A10,first_letter_share_of_M_list_entries_pct,C: 3.94,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+CZEKIERDA,A10,first_letter_share_of_F_list_entries_pct,C: 3.91,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 CZEKIERDA,A11,masc_gen,Czekierdy,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 CZEKIERDA,A11,family_plural_nom,Czekierdowie,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 CZEKIERDA,A11,feminine_gen,Czekierdy,SGJP lemma(s): Czekierda:Sf; Czekierda:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -291,6 +398,18 @@ CZEKIERDA,A8,entries_incl_deceased_2024,630,M+F lists,2024-01-19,568 2024 M/F,PA
 CZEKIERDA,A8,recorded_deceased_entries_2025,195,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 CZEKIERDA,A8,ageing_index_pct_2025,30.85,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 CZEKIERDA,A8,entries_incl_deceased_2025,632,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+CZEKIERDA,A8,recorded_deceased_entries_M_2024,94,"M list, form CZEKIERDA",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_M_2024,29.75,"M list, form CZEKIERDA",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_M_2024,316,"M list, form CZEKIERDA",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+CZEKIERDA,A8,recorded_deceased_entries_F_2024,96,"F list, form CZEKIERDA",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_F_2024,30.57,"F list, form CZEKIERDA",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_F_2024,314,"F list, form CZEKIERDA",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+CZEKIERDA,A8,recorded_deceased_entries_M_2025,97,"M list, form CZEKIERDA",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_M_2025,30.70,"M list, form CZEKIERDA",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_M_2025,316,"M list, form CZEKIERDA",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+CZEKIERDA,A8,recorded_deceased_entries_F_2025,98,"F list, form CZEKIERDA",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+CZEKIERDA,A8,ageing_index_pct_F_2025,31.01,"F list, form CZEKIERDA",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+CZEKIERDA,A8,entries_incl_deceased_F_2025,316,"F list, form CZEKIERDA",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 CZEKIERDA,A8,ageing_index_pct_F_2026,32.48,"F list, form CZEKIERDA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 CZEKIERDA,A9,equals_lowercase_sjp_base_form,N,'czekierda',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 MAZUR,A1,entries_M_list,34576,"M list, form MAZUR",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -302,9 +421,14 @@ MAZUR,A1,share_of_all_entries_pct,0.1632,denominator 42757839 = sum of both 2026
 MAZUR,A1,one_in_x_entries,613,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 MAZUR,A1,rank_in_M_list,13,"M list, form MAZUR",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 MAZUR,A1,rank_in_F_list,13,"F list, form MAZUR",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+MAZUR,A1,share_of_M_list_pct,0.1631,"M list, form MAZUR; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+MAZUR,A1,one_in_x_M_list,613,"M list, form MAZUR; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+MAZUR,A1,share_of_F_list_pct,0.1633,"F list, form MAZUR; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+MAZUR,A1,one_in_x_F_list,612,"F list, form MAZUR; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 MAZUR,A10,letters,5,masculine/base form,-,-,character count,VERIFIED
 MAZUR,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-MAZUR,A10,first_letter_share_of_entries_pct,M: 8.06,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+MAZUR,A10,first_letter_share_of_M_list_entries_pct,M: 8.06,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+MAZUR,A10,first_letter_share_of_F_list_entries_pct,M: 8.06,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 MAZUR,A11,masc_gen,Mazura,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 MAZUR,A11,family_plural_nom,Mazurowie,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 MAZUR,A11,feminine_gen,Mazur,SGJP lemma(s): Mazur:Sf; Mazur:Sm1~owie,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -333,6 +457,18 @@ MAZUR,A8,entries_incl_deceased_2024,93224,M+F lists,2024-01-19,568 2024 M/F,PAIR
 MAZUR,A8,recorded_deceased_entries_2025,24048,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 MAZUR,A8,ageing_index_pct_2025,25.61,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 MAZUR,A8,entries_incl_deceased_2025,93912,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+MAZUR,A8,recorded_deceased_entries_M_2024,12693,"M list, form MAZUR",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_M_2024,26.85,"M list, form MAZUR",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_M_2024,47282,"M list, form MAZUR",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+MAZUR,A8,recorded_deceased_entries_F_2024,10696,"F list, form MAZUR",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_F_2024,23.28,"F list, form MAZUR",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_F_2024,45942,"F list, form MAZUR",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+MAZUR,A8,recorded_deceased_entries_M_2025,13031,"M list, form MAZUR",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_M_2025,27.36,"M list, form MAZUR",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_M_2025,47626,"M list, form MAZUR",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+MAZUR,A8,recorded_deceased_entries_F_2025,11017,"F list, form MAZUR",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+MAZUR,A8,ageing_index_pct_F_2025,23.80,"F list, form MAZUR",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+MAZUR,A8,entries_incl_deceased_F_2025,46286,"F list, form MAZUR",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 MAZUR,A8,ageing_index_pct_F_2026,24.37,"F list, form MAZUR",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 MAZUR,A9,equals_lowercase_sjp_base_form,Y,'mazur',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 KRASKA,A1,entries_M_list,2446,"M list, form KRASKA",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -343,9 +479,14 @@ KRASKA,A1,share_of_all_entries_pct,0.0116,denominator 42757839 = sum of both 202
 KRASKA,A1,one_in_x_entries,8654,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 KRASKA,A1,rank_in_M_list,1035,"M list, form KRASKA",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 KRASKA,A1,rank_in_F_list,1017,"F list, form KRASKA",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KRASKA,A1,share_of_M_list_pct,0.0115,"M list, form KRASKA; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+KRASKA,A1,one_in_x_M_list,8666,"M list, form KRASKA; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+KRASKA,A1,share_of_F_list_pct,0.0116,"F list, form KRASKA; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+KRASKA,A1,one_in_x_F_list,8641,"F list, form KRASKA; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 KRASKA,A10,letters,6,masculine/base form,-,-,character count,VERIFIED
 KRASKA,A10,polish_diacritic_letters,none,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-KRASKA,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KRASKA,A10,first_letter_share_of_M_list_entries_pct,K: 14.37,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+KRASKA,A10,first_letter_share_of_F_list_entries_pct,K: 14.38,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 KRASKA,A11,masc_gen,Kraski,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KRASKA,A11,family_plural_nom,Kraskowie,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KRASKA,A11,feminine_gen,Kraski,SGJP lemma(s): Kraska:Sf; Kraska:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -374,6 +515,18 @@ KRASKA,A8,entries_incl_deceased_2024,6769,M+F lists,2024-01-19,568 2024 M/F,"inv
 KRASKA,A8,recorded_deceased_entries_2025,1824,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, invariant override (same form, both lists)",VERIFIED (arithmetic on file values)
 KRASKA,A8,ageing_index_pct_2025,26.86,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, invariant override (same form, both lists)",LIKELY (derived; register time-depth unverified)
 KRASKA,A8,entries_incl_deceased_2025,6790,M+F lists,2025-01-22,568 2025 M/F,"invariant override (same form, both lists)",VERIFIED
+KRASKA,A8,recorded_deceased_entries_M_2024,952,"M list, form KRASKA",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_M_2024,27.85,"M list, form KRASKA",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_M_2024,3418,"M list, form KRASKA",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+KRASKA,A8,recorded_deceased_entries_F_2024,815,"F list, form KRASKA",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_F_2024,24.32,"F list, form KRASKA",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_F_2024,3351,"F list, form KRASKA",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+KRASKA,A8,recorded_deceased_entries_M_2025,982,"M list, form KRASKA",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_M_2025,28.60,"M list, form KRASKA",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_M_2025,3434,"M list, form KRASKA",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+KRASKA,A8,recorded_deceased_entries_F_2025,842,"F list, form KRASKA",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KRASKA,A8,ageing_index_pct_F_2025,25.09,"F list, form KRASKA",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+KRASKA,A8,entries_incl_deceased_F_2025,3356,"F list, form KRASKA",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 KRASKA,A8,ageing_index_pct_F_2026,25.68,"F list, form KRASKA",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 KRASKA,A9,equals_lowercase_sjp_base_form,Y,'kraska',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)
 KOZIOŁ,A1,entries_M_list,11991,"M list, form KOZIOŁ",2026-01-20,1681 r1148808,raw Liczba,VERIFIED
@@ -385,9 +538,14 @@ KOZIOŁ,A1,share_of_all_entries_pct,0.0551,denominator 42757839 = sum of both 20
 KOZIOŁ,A1,one_in_x_entries,1815,denominator 42757839,2026-01-20,1681 r1148808+r1148811,ONEIN-V1 (rounded),LIKELY (derived)
 KOZIOŁ,A1,rank_in_M_list,103,"M list, form KOZIOŁ",2026-01-20,1681 r1148808,RANK-V1 within list,VERIFIED (ordering of file values)
 KOZIOŁ,A1,rank_in_F_list,118,"F list, form KOZIOŁ",2026-01-20,1681 r1148811,RANK-V1 within list,VERIFIED (ordering of file values)
+KOZIOŁ,A1,share_of_M_list_pct,0.0566,"M list, form KOZIOŁ; denominator 21197537 = all published entries in the M list",2026-01-20,1681 r1148808,SHARE-V1 (sex-specific),LIKELY (derived)
+KOZIOŁ,A1,one_in_x_M_list,1768,"M list, form KOZIOŁ; denominator 21197537",2026-01-20,1681 r1148808,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
+KOZIOŁ,A1,share_of_F_list_pct,0.0537,"F list, form KOZIOŁ; denominator 21560302 = all published entries in the F list",2026-01-20,1681 r1148811,SHARE-V1 (sex-specific),LIKELY (derived)
+KOZIOŁ,A1,one_in_x_F_list,1863,"F list, form KOZIOŁ; denominator 21560302",2026-01-20,1681 r1148811,"ONEIN-V1 (sex-specific, rounded)",LIKELY (derived)
 KOZIOŁ,A10,letters,6,masculine/base form,-,-,character count,VERIFIED
 KOZIOŁ,A10,polish_diacritic_letters,Ł,masculine/base form,-,-,Ą Ć Ę Ł Ń Ó Ś Ź Ż,VERIFIED
-KOZIOŁ,A10,first_letter_share_of_entries_pct,K: 14.38,"all PAIR-V1 units, placeholders excluded",2026-01-20,1681 2026 M+F,share of entries by first letter,LIKELY (derived)
+KOZIOŁ,A10,first_letter_share_of_M_list_entries_pct,K: 14.37,"M list, all forms, placeholders excluded",2026-01-20,1681 2026 M,share of list entries whose surname starts with this letter,LIKELY (derived)
+KOZIOŁ,A10,first_letter_share_of_F_list_entries_pct,K: 14.38,"F list, all forms, placeholders excluded",2026-01-20,1681 2026 F,share of list entries whose surname starts with this letter,LIKELY (derived)
 KOZIOŁ,A11,masc_gen,Kozioła/Kozła,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KOZIOŁ,A11,family_plural_nom,Koziołowie/Kozłowie,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
 KOZIOŁ,A11,feminine_gen,Kozioł,SGJP lemma(s): Kozioł:Sf; Kozioł:Sm1,SGJP 2026-08-24,sgjp.tab.gz,"SGJP forms, depr excluded",VERIFIED (dictionary says X)
@@ -417,5 +575,17 @@ KOZIOŁ,A8,entries_incl_deceased_2024,32639,M+F lists,2024-01-19,568 2024 M/F,PA
 KOZIOŁ,A8,recorded_deceased_entries_2025,9099,M+F lists,2025-01-22,568 + 1681 2025 M/F,"incl.-deceased minus living, PAIR-V1 units",VERIFIED (arithmetic on file values)
 KOZIOŁ,A8,ageing_index_pct_2025,27.77,M+F lists,2025-01-22,568 + 1681 2025 M/F,"AGE-V1 = (incl-living)/incl, PAIR-V1 units",LIKELY (derived; register time-depth unverified)
 KOZIOŁ,A8,entries_incl_deceased_2025,32770,M+F lists,2025-01-22,568 2025 M/F,PAIR-V1 units,VERIFIED
+KOZIOŁ,A8,recorded_deceased_entries_M_2024,4705,"M list, form KOZIOŁ",2024-01-19,568 r54119 + 1681 r54097,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_M_2024,28.02,"M list, form KOZIOŁ",2024-01-19,568 r54119 + 1681 r54097,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_M_2024,16789,"M list, form KOZIOŁ",2024-01-19,568 r54119 + 1681 r54097,raw Liczba of the including-deceased list,VERIFIED
+KOZIOŁ,A8,recorded_deceased_entries_F_2024,4130,"F list, form KOZIOŁ",2024-01-19,568 r54120 + 1681 r54098,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_F_2024,26.06,"F list, form KOZIOŁ",2024-01-19,568 r54120 + 1681 r54098,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_F_2024,15850,"F list, form KOZIOŁ",2024-01-19,568 r54120 + 1681 r54098,raw Liczba of the including-deceased list,VERIFIED
+KOZIOŁ,A8,recorded_deceased_entries_M_2025,4848,"M list, form KOZIOŁ",2025-01-22,568 r63886 + 1681 r63892,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_M_2025,28.72,"M list, form KOZIOŁ",2025-01-22,568 r63886 + 1681 r63892,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_M_2025,16879,"M list, form KOZIOŁ",2025-01-22,568 r63886 + 1681 r63892,raw Liczba of the including-deceased list,VERIFIED
+KOZIOŁ,A8,recorded_deceased_entries_F_2025,4251,"F list, form KOZIOŁ",2025-01-22,568 r63883 + 1681 r63888,"incl.-deceased minus living, same form, same list",VERIFIED (arithmetic on file values)
+KOZIOŁ,A8,ageing_index_pct_F_2025,26.75,"F list, form KOZIOŁ",2025-01-22,568 r63883 + 1681 r63888,AGE-V1,LIKELY (derived; register time-depth unverified)
+KOZIOŁ,A8,entries_incl_deceased_F_2025,15891,"F list, form KOZIOŁ",2025-01-22,568 r63883 + 1681 r63888,raw Liczba of the including-deceased list,VERIFIED
 KOZIOŁ,A8,ageing_index_pct_F_2026,27.43,"F list, form KOZIOŁ",2026-01-20,568 r1148815 + 1681 r1148811,AGE-V1,LIKELY (derived)
 KOZIOŁ,A9,equals_lowercase_sjp_base_form,Y,'kozioł',sjp.pl odm.txt 2026-09-01,sjp_odm.zip,"exact string match, lowercase base form",VERIFIED (lexical match only; not etymology)

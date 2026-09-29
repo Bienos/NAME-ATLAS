@@ -1,224 +1,221 @@
-list,position,unit_key,metric_value,paired_total_2026,note
-longest_single_word_any_script,1,CZERLUNCZAKIEWICZ,17,41,
-longest_single_word_any_script,2,PIRTSKHALAISHVILI,17,31,
-longest_single_word_any_script,3,KOTCHLAMAZASHVILI,17,23,
-longest_single_word_any_script,4,PRZEWIĘŹLIKOWSKI,16,254,
-longest_single_word_any_script,5,SZACHOGŁUCHOWICZ,16,136,
-longest_single_word_any_script,6,OCHENDUSZKIEWICZ,16,94,
-longest_single_word_any_script,7,SIESTRZEWITOWSKI,16,78,
-longest_single_word_any_script,8,NIESPODZIEWAŃSKI,16,74,
-longest_single_word_any_script,9,ŁUKASZCZYKIEWICZ,16,70,
-longest_single_word_any_script,10,ANDRUSHCHAKEVYCH,16,65,
-longest_single_word_any_script,11,NIEDOSTATKIEWICZ,16,63,
-longest_single_word_any_script,12,PRZYSZCZYPKOWSKI,16,62,
-longest_single_word_any_script,13,DZIEMIESZKIEWICZ,16,56,
-longest_single_word_any_script,14,SZCZUBIAŁKIEWICZ,16,46,
-longest_single_word_any_script,15,GRZEBIELICHOWSKI,16,44,
-longest_single_word_polish_alphabet,1,CZERLUNCZAKIEWICZ,17,41,
-longest_single_word_polish_alphabet,2,PRZEWIĘŹLIKOWSKI,16,254,
-longest_single_word_polish_alphabet,3,SZACHOGŁUCHOWICZ,16,136,
-longest_single_word_polish_alphabet,4,OCHENDUSZKIEWICZ,16,94,
-longest_single_word_polish_alphabet,5,SIESTRZEWITOWSKI,16,78,
-longest_single_word_polish_alphabet,6,NIESPODZIEWAŃSKI,16,74,
-longest_single_word_polish_alphabet,7,ŁUKASZCZYKIEWICZ,16,70,
-longest_single_word_polish_alphabet,8,NIEDOSTATKIEWICZ,16,63,
-longest_single_word_polish_alphabet,9,PRZYSZCZYPKOWSKI,16,62,
-longest_single_word_polish_alphabet,10,DZIEMIESZKIEWICZ,16,56,
-longest_single_word_polish_alphabet,11,SZCZUBIAŁKIEWICZ,16,46,
-longest_single_word_polish_alphabet,12,GRZEBIELICHOWSKI,16,44,
-longest_single_word_polish_alphabet,13,WOŁOSZCZAKIEWICZ,16,43,
-longest_single_word_polish_alphabet,14,KOŚCIELNIAKOWSKI,16,39,
-longest_single_word_polish_alphabet,15,ZWIERZCHONIEWSKI,16,39,
-most_distinct_polish_diacritics,1,ŻOŁĄDŹ,4,1001,ĄŁŹŻ
-most_distinct_polish_diacritics,2,ŻÓŁTAŃSKI,4,653,ÓŁŃŻ
-most_distinct_polish_diacritics,3,ŻÓŁCIŃSKI,4,363,ÓŁŃŻ
-most_distinct_polish_diacritics,4,ŻÓŁKOŚ,4,237,ÓŁŚŻ
-most_distinct_polish_diacritics,5,ŻOŁĘDŹ,4,122,ĘŁŹŻ
-most_distinct_polish_diacritics,6,ŻÓŁĆ,4,122,ÓĆŁŻ
-most_distinct_polish_diacritics,7,ŁĄŻYŃSKI,4,34,ĄŁŃŻ
-most_distinct_polish_diacritics,8,ŻÓŁWIŃSKI,4,34,ÓŁŃŻ
-most_distinct_polish_diacritics,9,PÓŁZIĘĆ,4,30,ÓĆĘŁ
-most_distinct_polish_diacritics,10,ŻÓŁCZYŃSKI,4,30,ÓŁŃŻ
-most_distinct_polish_diacritics,11,RÓŻAŃSKI,3,12437,ÓŃŻ
-most_distinct_polish_diacritics,12,ŻÓŁTOWSKI,3,2907,ÓŁŻ
-most_distinct_polish_diacritics,13,ŻĄDŁO,3,2730,ĄŁŻ
-most_distinct_polish_diacritics,14,ŻOŁĄDEK,3,1884,ĄŁŻ
-most_distinct_polish_diacritics,15,KOŚCIÓŁEK,3,1876,ÓŁŚ
-highest_share_of_diacritic_letters_len4plus,1,ŻÓŁĆ,1.00,122,
-highest_share_of_diacritic_letters_len4plus,2,ŻÓŁW,0.75,73,
-highest_share_of_diacritic_letters_len4plus,3,KŁÓŚ,0.75,45,
-highest_share_of_diacritic_letters_len4plus,4,ŻŁÓB,0.75,31,
-highest_share_of_diacritic_letters_len4plus,5,ŻOŁĄDŹ,0.67,1001,
-highest_share_of_diacritic_letters_len4plus,6,ŻÓŁKOŚ,0.67,237,
-highest_share_of_diacritic_letters_len4plus,7,ŻOŁĘDŹ,0.67,122,
-highest_share_of_diacritic_letters_len4plus,8,GÓŹDŹ,0.60,2831,
-highest_share_of_diacritic_letters_len4plus,9,ŻĄDŁO,0.60,2730,
-highest_share_of_diacritic_letters_len4plus,10,ŻÓŁTY,0.60,381,
-longest_consonant_letter_run,1,JENDRSZCZOK,7,37,
-longest_consonant_letter_run,2,SCHACHTSCHNEIDER,7,24,
-longest_consonant_letter_run,3,NIMPTSCHKE,7,22,
-longest_consonant_letter_run,4,MKRTCHYAN,6,364,
-longest_consonant_letter_run,5,JĘDRSZCZYK,6,299,
-longest_consonant_letter_run,6,CHRZCZON,6,120,
-longest_consonant_letter_run,7,GOTTSCHLING,6,112,
-longest_consonant_letter_run,8,CHRZCZONOWSKI,6,90,
-longest_consonant_letter_run,9,MKRTCHIAN,6,76,
-longest_consonant_letter_run,10,CHRZCZONOWICZ,6,71,
-longest_consonant_letter_run,11,GOLDSCHMIDT,6,60,
-longest_consonant_letter_run,12,WOLLSCHLAEGER,6,52,
-shortest_polish_alphabet,1,LI,2,2111,
-shortest_polish_alphabet,2,LE,2,1120,
-shortest_polish_alphabet,3,WU,2,798,
-shortest_polish_alphabet,4,YE,2,556,
-shortest_polish_alphabet,5,YU,2,520,
-shortest_polish_alphabet,6,DO,2,488,
-shortest_polish_alphabet,7,HU,2,367,
-shortest_polish_alphabet,8,LU,2,345,
-shortest_polish_alphabet,9,MA,2,344,
-shortest_polish_alphabet,10,HE,2,314,
-shortest_polish_alphabet,11,US,2,306,
-shortest_polish_alphabet,12,HO,2,269,
-palindrome,1,SAS,3,3512,
-palindrome,2,OTTO,4,2087,
-palindrome,3,SUS,3,1596,
-palindrome,4,KUK,3,1118,
-palindrome,5,KIK,3,896,
-palindrome,6,KASAK,5,798,
-palindrome,7,KOZOK,5,707,
-palindrome,8,KAZAK,5,617,
-palindrome,9,PILIP,5,609,
-palindrome,10,KAJAK,5,602,
-palindrome,11,OKO,3,534,
-palindrome,12,LAL,3,525,
-palindrome,13,POP,3,508,
-palindrome,14,REDER,5,488,
-palindrome,15,KUDUK,5,421,
-palindrome,16,STETS,5,418,
-palindrome,17,KANAK,5,379,
-palindrome,18,KAK,3,359,
-palindrome,19,KYRYK,5,289,
-palindrome,20,CYC,3,256,
-palindrome,21,TABAT,5,256,
-palindrome,22,KABAK,5,241,
-palindrome,23,KOTOK,5,229,
-palindrome,24,SURUS,5,216,
-palindrome,25,KOK,3,194,
-palindrome,26,KALAK,5,173,
-palindrome,27,LUL,3,170,
-palindrome,28,REJER,5,164,
-palindrome,29,KACAK,5,159,
-palindrome,30,PYLYP,5,135,
-palindrome,31,REMER,5,134,
-palindrome,32,SYS,3,134,
-palindrome,33,REWER,5,126,
-palindrome,34,ARORA,5,123,
-palindrome,35,RENNER,6,123,
-palindrome,36,PAP,3,118,
-palindrome,37,KOSOK,5,108,
-palindrome,38,NOCON,5,108,
-palindrome,39,NESEN,5,107,
-palindrome,40,VITIV,5,104,
-palindrome,41,LEPEL,5,103,
-palindrome,42,KILIK,5,99,
-palindrome,43,CAZAC,5,94,
-palindrome,44,ANIKINA,7,91,
-palindrome,45,SOBOS,5,76,
-palindrome,46,SÓS,3,75,
-palindrome,47,EZE,3,74,
-palindrome,48,KÜÇÜK,5,72,
-palindrome,49,TIT,3,71,
-palindrome,50,SEGES,5,68,
-palindrome,51,BÓB,3,66,
-palindrome,52,ODO,3,61,
-palindrome,53,AFFA,4,60,
-palindrome,54,KIZIK,5,60,
-palindrome,55,OJO,3,59,
-palindrome,56,STATS,5,58,
-palindrome,57,EFE,3,56,
-palindrome,58,DYMYD,5,55,
-palindrome,59,KOSSOK,6,55,
-palindrome,60,DOD,3,53,
-palindrome,61,KAAK,4,50,
-palindrome,62,MELLEM,6,50,
-palindrome,63,LAWAL,5,48,
-palindrome,64,LUPUL,5,47,
-palindrome,65,KINIK,5,46,
-palindrome,66,REYER,5,46,
-palindrome,67,NATAN,5,45,
-palindrome,68,KASSAK,6,44,
-palindrome,69,ALA,3,42,
-palindrome,70,BOB,3,42,
-palindrome,71,ATA,3,40,
-palindrome,72,LEBEL,5,40,
-palindrome,73,PUP,3,40,
-palindrome,74,AFA,3,39,
-palindrome,75,KUKUK,5,39,
-palindrome,76,ALLA,4,38,
-palindrome,77,SALAS,5,38,
-palindrome,78,KAŻAK,5,37,
-palindrome,79,KUCUK,5,36,
-palindrome,80,SOS,3,36,
-palindrome,81,KUHUK,5,35,
-palindrome,82,ROR,3,34,
-palindrome,83,MUM,3,33,
-palindrome,84,STAATS,6,32,
-palindrome,85,WITIW,5,32,
-palindrome,86,APPA,4,31,
-palindrome,87,ENE,3,31,
-palindrome,88,KIRIK,5,29,
-palindrome,89,KAPAK,5,28,
-palindrome,90,KITIK,5,28,
-palindrome,91,KUKKUK,6,28,
-palindrome,92,KÖK,3,28,
-palindrome,93,BIB,3,27,
-palindrome,94,KAVAK,5,27,
-palindrome,95,NELEN,5,27,
-palindrome,96,SES,3,27,
-palindrome,97,AZZA,4,24,
-palindrome,98,LEL,3,24,
-palindrome,99,SERES,5,24,
-palindrome,100,ZYZ,3,24,
-palindrome,101,SAŁAS,5,23,
-palindrome,102,VELEV,5,23,
-palindrome,103,AGA,3,22,
-palindrome,104,KÜTÜK,5,22,
-palindrome,105,ONO,3,22,
-palindrome,106,REBER,5,22,
-palindrome,107,ZELEZ,5,22,
-palindrome,108,AKA,3,21,
-palindrome,109,APA,3,21,
-palindrome,110,EKE,3,21,
-palindrome,111,KYZYK,5,21,
-palindrome,112,TALAT,5,21,
-palindrome,113,TOT,3,21,
-palindrome,114,EGE,3,20,
-contains_Q,1,IQBAL,,258,
-contains_Q,2,HAQUE,,159,
-contains_Q,3,QIU,,156,
-contains_Q,4,MARQUARDT,,147,
-contains_Q,5,KRASNIQI,,121,
-contains_Q,6,HOQUE,,115,
-contains_Q,7,QUINN,,106,
-contains_Q,8,QIN,,98,
-contains_Q,9,FAROOQ,,90,
-contains_Q,10,SIDDIQUI,,82,
-contains_V,1,KOVALCHUK,,9929,
-contains_V,2,SHEVCHENKO,,9293,
-contains_V,3,KOVALENKO,,7708,
-contains_V,4,SHEVCHUK,,7433,
-contains_V,5,KOVAL,,7125,
-contains_V,6,KRAVCHENKO,,6358,
-contains_V,7,KRAVCHUK,,5046,
-contains_V,8,SAVCHUK,,4619,
-contains_V,9,IVANOVA,,4603,
-contains_V,10,IVANOV,,3920,
-contains_X,1,XU,,833,
-contains_X,2,FOX,,331,
-contains_X,3,ALEXANDER,,182,
-contains_X,4,XIE,,182,
-contains_X,5,FELIX,,169,
-contains_X,6,MARX,,163,
-contains_X,7,XIA,,163,
-contains_X,8,COX,,158,
-contains_X,9,XIAO,,135,
-contains_X,10,HOXHA,,120,
+list,position,unit_key,metric_value,paired_total_2026_internal,note,female_list_form,M_list_entries_2026,F_list_entries_2026
+longest_single_word_any_script,1,PIRTSKHALAISHVILI,17,31,,PIRTSKHALAISHVILI,22,9
+longest_single_word_any_script,2,KOTCHLAMAZASHVILI,17,23,,KOTCHLAMAZASHVILI,20,3
+longest_single_word_any_script,3,CZERLUNCZAKIEWICZ,17,41,,CZERLUNCZAKIEWICZ,17,24
+longest_single_word_any_script,4,PRZEWIĘŹLIKOWSKI,16,254,,PRZEWIĘŹLIKOWSKA,128,126
+longest_single_word_any_script,5,SZACHOGŁUCHOWICZ,16,136,,SZACHOGŁUCHOWICZ,64,72
+longest_single_word_any_script,6,OCHENDUSZKIEWICZ,16,94,,OCHENDUSZKIEWICZ,50,44
+longest_single_word_any_script,7,SIESTRZEWITOWSKI,16,78,,SIESTRZEWITOWSKA,41,37
+longest_single_word_any_script,8,ŁUKASZCZYKIEWICZ,16,70,,ŁUKASZCZYKIEWICZ,38,32
+longest_single_word_any_script,9,NIESPODZIEWAŃSKI,16,74,,NIESPODZIEWAŃSKA,35,39
+longest_single_word_any_script,10,PRZYSZCZYPKOWSKI,16,62,,PRZYSZCZYPKOWSKA,32,30
+longest_single_word_any_script,11,ANDRUSHCHAKEVYCH,16,65,,ANDRUSHCHAKEVYCH,30,35
+longest_single_word_any_script,12,NIEDOSTATKIEWICZ,16,63,,NIEDOSTATKIEWICZ,29,34
+longest_single_word_any_script,13,DZIEMIESZKIEWICZ,16,56,,DZIEMIESZKIEWICZ,25,31
+longest_single_word_any_script,14,SZCZUBIAŁKIEWICZ,16,46,,SZCZUBIAŁKIEWICZ,23,23
+longest_single_word_any_script,15,POTSKHVERASHVILI,16,28,,POTSKHVERASHVILI,22,6
+longest_single_word_polish_alphabet,1,CZERLUNCZAKIEWICZ,17,41,,CZERLUNCZAKIEWICZ,17,24
+longest_single_word_polish_alphabet,2,PRZEWIĘŹLIKOWSKI,16,254,,PRZEWIĘŹLIKOWSKA,128,126
+longest_single_word_polish_alphabet,3,SZACHOGŁUCHOWICZ,16,136,,SZACHOGŁUCHOWICZ,64,72
+longest_single_word_polish_alphabet,4,OCHENDUSZKIEWICZ,16,94,,OCHENDUSZKIEWICZ,50,44
+longest_single_word_polish_alphabet,5,SIESTRZEWITOWSKI,16,78,,SIESTRZEWITOWSKA,41,37
+longest_single_word_polish_alphabet,6,ŁUKASZCZYKIEWICZ,16,70,,ŁUKASZCZYKIEWICZ,38,32
+longest_single_word_polish_alphabet,7,NIESPODZIEWAŃSKI,16,74,,NIESPODZIEWAŃSKA,35,39
+longest_single_word_polish_alphabet,8,PRZYSZCZYPKOWSKI,16,62,,PRZYSZCZYPKOWSKA,32,30
+longest_single_word_polish_alphabet,9,NIEDOSTATKIEWICZ,16,63,,NIEDOSTATKIEWICZ,29,34
+longest_single_word_polish_alphabet,10,DZIEMIESZKIEWICZ,16,56,,DZIEMIESZKIEWICZ,25,31
+longest_single_word_polish_alphabet,11,SZCZUBIAŁKIEWICZ,16,46,,SZCZUBIAŁKIEWICZ,23,23
+longest_single_word_polish_alphabet,12,WOŁOSZCZAKIEWICZ,16,43,,WOŁOSZCZAKIEWICZ,21,22
+longest_single_word_polish_alphabet,13,ZWIERZCHONIEWSKI,16,39,,ZWIERZCHONIEWSKA,19,20
+longest_single_word_polish_alphabet,14,GRZEBIELICHOWSKI,16,44,,GRZEBIELICHOWSKA,16,28
+longest_single_word_polish_alphabet,15,KOŚCIELNIAKOWSKI,16,39,,KOŚCIELNIAKOWSKA,15,24
+most_distinct_polish_diacritics,1,ŻOŁĄDŹ,4,1001,ĄŁŹŻ,ŻOŁĄDŹ,515,486
+most_distinct_polish_diacritics,2,ŻÓŁTAŃSKI,4,653,ÓŁŃŻ,ŻÓŁTAŃSKA,326,327
+most_distinct_polish_diacritics,3,ŻÓŁCIŃSKI,4,363,ÓŁŃŻ,ŻÓŁCIŃSKA,187,176
+most_distinct_polish_diacritics,4,ŻÓŁKOŚ,4,237,ÓŁŚŻ,ŻÓŁKOŚ,118,119
+most_distinct_polish_diacritics,5,ŻOŁĘDŹ,4,122,ĘŁŹŻ,ŻOŁĘDŹ,63,59
+most_distinct_polish_diacritics,6,ŻÓŁĆ,4,122,ÓĆŁŻ,ŻÓŁĆ,51,71
+most_distinct_polish_diacritics,7,RÓŻAŃSKI,3,12437,ÓŃŻ,RÓŻAŃSKA,6122,6287
+most_distinct_polish_diacritics,8,ŻÓŁTOWSKI,3,2907,ÓŁŻ,ŻÓŁTOWSKA,1425,1479
+most_distinct_polish_diacritics,9,ŻĄDŁO,3,2730,ĄŁŻ,ŻĄDŁO,1385,1345
+most_distinct_polish_diacritics,10,KOŚCIÓŁEK,3,1876,ÓŁŚ,KOŚCIÓŁEK,950,926
+most_distinct_polish_diacritics,11,ŻOŁĄDEK,3,1884,ĄŁŻ,ŻOŁĄDEK,948,936
+most_distinct_polish_diacritics,12,ŁĄCZYŃSKI,3,1819,ĄŁŃ,ŁĄCZYŃSKA,901,916
+most_distinct_polish_diacritics,13,STRÓŻYŃSKI,3,1787,ÓŃŻ,STRÓŻYŃSKA,898,886
+most_distinct_polish_diacritics,14,ŁABĘDŹ,3,1696,ĘŁŹ,ŁABĘDŹ,822,874
+most_distinct_polish_diacritics,15,ŚWIĘTOŃ,3,1229,ĘŃŚ,ŚWIĘTOŃ,601,628
+highest_share_of_diacritic_letters_len4plus,1,ŻÓŁĆ,1.00,122,,ŻÓŁĆ,51,71
+highest_share_of_diacritic_letters_len4plus,2,ŻÓŁW,0.75,73,,ŻÓŁW,31,42
+highest_share_of_diacritic_letters_len4plus,3,KŁÓŚ,0.75,45,,KŁÓŚ,23,22
+highest_share_of_diacritic_letters_len4plus,4,ŻOŁĄDŹ,0.67,1001,,ŻOŁĄDŹ,515,486
+highest_share_of_diacritic_letters_len4plus,5,ŻÓŁKOŚ,0.67,237,,ŻÓŁKOŚ,118,119
+highest_share_of_diacritic_letters_len4plus,6,ŻOŁĘDŹ,0.67,122,,ŻOŁĘDŹ,63,59
+highest_share_of_diacritic_letters_len4plus,7,GÓŹDŹ,0.60,2831,,GÓŹDŹ,1392,1439
+highest_share_of_diacritic_letters_len4plus,8,ŻĄDŁO,0.60,2730,,ŻĄDŁO,1385,1345
+highest_share_of_diacritic_letters_len4plus,9,ŻÓŁTY,0.60,381,,ŻÓŁTY,222,159
+highest_share_of_diacritic_letters_len4plus,10,GŁÓDŹ,0.60,354,,GŁÓDŹ,188,166
+longest_consonant_letter_run,1,MKRTCHYAN,6,364,,MKRTCHYAN,230,134
+longest_consonant_letter_run,2,JĘDRSZCZYK,6,299,,JĘDRSZCZYK,141,158
+longest_consonant_letter_run,3,CHRZCZON,6,120,,CHRZCZON,65,55
+longest_consonant_letter_run,4,GOTTSCHLING,6,112,,GOTTSCHLING,55,57
+longest_consonant_letter_run,5,CHRZCZONOWSKI,6,90,,CHRZCZONOWSKA,49,41
+longest_consonant_letter_run,6,MKRTCHIAN,6,76,,MKRTCHIAN,48,28
+longest_consonant_letter_run,7,CHRZCZONOWICZ,6,71,,CHRZCZONOWICZ,41,30
+longest_consonant_letter_run,8,GOLDSCHMIDT,6,60,,GOLDSCHMIDT,32,28
+longest_consonant_letter_run,9,AJCHSZTET,6,51,,AJCHSZTET,29,22
+longest_consonant_letter_run,10,SZACHTSZNAJDER,6,47,,SZACHTSZNAJDER,28,19
+longest_consonant_letter_run,11,WOLLSCHLAEGER,6,52,,WOLLSCHLAEGER,22,30
+longest_consonant_letter_run,12,CHRZCZANOWICZ,6,45,,CHRZCZANOWICZ,20,25
+shortest_polish_alphabet,1,LI,2,2111,,LI,1148,963
+shortest_polish_alphabet,2,LE,2,1120,,LE,667,453
+shortest_polish_alphabet,3,WU,2,798,,WU,447,351
+shortest_polish_alphabet,4,YE,2,556,,YE,316,240
+shortest_polish_alphabet,5,YU,2,520,,YU,287,233
+shortest_polish_alphabet,6,DO,2,488,,DO,267,221
+shortest_polish_alphabet,7,HU,2,367,,HU,226,141
+shortest_polish_alphabet,8,MA,2,344,,MA,203,141
+shortest_polish_alphabet,9,LU,2,345,,LU,197,148
+shortest_polish_alphabet,10,HE,2,314,,HE,179,135
+shortest_polish_alphabet,11,HO,2,269,,HO,157,112
+shortest_polish_alphabet,12,OH,2,234,,OH,140,94
+palindrome,1,SAS,3,3512,,SAS,1747,1765
+palindrome,2,OTTO,4,2087,,OTTO,995,1092
+palindrome,3,SUS,3,1596,,SUS,808,788
+palindrome,4,KUK,3,1118,,KUK,563,555
+palindrome,5,KIK,3,896,,KIK,428,468
+palindrome,6,KASAK,5,798,,KASAK,383,415
+palindrome,7,KAZAK,5,617,,KAZAK,356,261
+palindrome,8,KOZOK,5,707,,KOZOK,331,376
+palindrome,9,KAJAK,5,602,,KAJAK,301,301
+palindrome,10,PILIP,5,609,,PILIP,299,310
+palindrome,11,OKO,3,534,,OKO,283,251
+palindrome,12,LAL,3,525,,LAL,279,246
+palindrome,13,POP,3,508,,POP,245,263
+palindrome,14,REDER,5,488,,REDER,222,266
+palindrome,15,STETS,5,418,,STETS,213,205
+palindrome,16,KUDUK,5,421,,KUDUK,204,217
+palindrome,17,KAK,3,359,,KAK,185,174
+palindrome,18,KANAK,5,379,,KANAK,184,195
+palindrome,19,CYC,3,256,,CYC,144,112
+palindrome,20,TABAT,5,256,,TABAT,139,117
+palindrome,21,KYRYK,5,289,,KYRYK,138,151
+palindrome,22,KABAK,5,241,,KABAK,122,119
+palindrome,23,KOTOK,5,229,,KOTOK,108,121
+palindrome,24,SURUS,5,216,,SURUS,99,117
+palindrome,25,KOK,3,194,,KOK,94,100
+palindrome,26,KALAK,5,173,,KALAK,90,83
+palindrome,27,LUL,3,170,,LUL,88,82
+palindrome,28,ARORA,5,123,,ARORA,82,41
+palindrome,29,REJER,5,164,,REJER,75,89
+palindrome,30,KACAK,5,159,,KACAK,74,85
+palindrome,31,PYLYP,5,135,,PYLYP,74,61
+palindrome,32,REMER,5,134,,REMER,70,64
+palindrome,33,SYS,3,134,,SYS,64,70
+palindrome,34,REWER,5,126,,REWER,64,62
+palindrome,35,CAZAC,5,94,,CAZAC,62,32
+palindrome,36,KOSOK,5,108,,KOSOK,57,51
+palindrome,37,PAP,3,118,,PAP,56,62
+palindrome,38,RENNER,6,123,,RENNER,54,69
+palindrome,39,NOCON,5,108,,NOCON,54,54
+palindrome,40,VITIV,5,104,,VITIV,54,50
+palindrome,41,KILIK,5,99,,KILIK,49,50
+palindrome,42,NESEN,5,107,,NESEN,48,59
+palindrome,43,LEPEL,5,103,,LEPEL,47,56
+palindrome,44,KÜÇÜK,5,72,,KÜÇÜK,46,26
+palindrome,45,EZE,3,74,,EZE,44,30
+palindrome,46,SÓS,3,75,,SÓS,42,33
+palindrome,47,TIT,3,71,,TIT,37,34
+palindrome,48,BÓB,3,66,,BÓB,37,29
+palindrome,49,EFE,3,56,,EFE,37,19
+palindrome,50,AFFA,4,60,,AFFA,36,24
+palindrome,51,SEGES,5,68,,SEGES,35,33
+palindrome,52,STATS,5,58,,STATS,34,24
+palindrome,53,SOBOS,5,76,,SOBOS,32,44
+palindrome,54,OJO,3,59,,OJO,32,27
+palindrome,55,ALA,3,42,,ALA,31,11
+palindrome,56,ODO,3,61,,ODO,30,31
+palindrome,57,KIZIK,5,60,,KIZIK,30,30
+palindrome,58,DYMYD,5,55,,DYMYD,29,26
+palindrome,59,KOSSOK,6,55,,KOSSOK,27,28
+palindrome,60,KAAK,4,50,,KAAK,26,24
+palindrome,61,ENE,3,31,,ENE,26,5
+palindrome,62,DOD,3,53,,DOD,25,28
+palindrome,63,NATAN,5,45,,NATAN,25,20
+palindrome,64,ATA,3,40,,ATA,25,15
+palindrome,65,ALLA,4,38,,ALLA,25,13
+palindrome,66,BOB,3,42,,BOB,24,18
+palindrome,67,PUP,3,40,,PUP,24,16
+palindrome,68,KUCUK,5,36,,KUCUK,24,12
+palindrome,69,MELLEM,6,50,,MELLEM,23,27
+palindrome,70,KINIK,5,46,,KINIK,23,23
+palindrome,71,REYER,5,46,,REYER,23,23
+palindrome,72,LAWAL,5,48,,LAWAL,22,26
+palindrome,73,KÖK,3,28,,KÖK,22,6
+palindrome,74,KASSAK,6,44,,KASSAK,21,23
+palindrome,75,LEBEL,5,40,,LEBEL,21,19
+palindrome,76,KUKUK,5,39,,KUKUK,21,18
+palindrome,77,LUPUL,5,47,,LUPUL,20,27
+palindrome,78,AFA,3,39,,AFA,20,19
+palindrome,79,SALAS,5,38,,SALAS,20,18
+palindrome,80,ROR,3,34,,ROR,10,24
+palindrome,81,ANIKINA,7,91,,ANIKINA,<2 or absent,91
+contains_Q_M_list,1,IQBAL,,,M-list form,IQBAL,188,
+contains_Q_M_list,2,HAQUE,,,M-list form,HAQUE,135,
+contains_Q_M_list,3,HOQUE,,,M-list form,HOQUE,89,
+contains_Q_M_list,4,QIU,,,M-list form,QIU,88,
+contains_Q_M_list,5,KRASNIQI,,,M-list form,KRASNIQI,70,
+contains_Q_M_list,6,MARQUARDT,,,M-list form,MARQUARDT,67,
+contains_Q_M_list,7,FAROOQ,,,M-list form,FAROOQ,65,
+contains_Q_M_list,8,QIN,,,M-list form,QIN,57,
+contains_Q_M_list,9,QURBONOV,,,M-list form,QURBONOV,54,
+contains_Q_M_list,10,QUINN,,,M-list form,QUINN,50,
+contains_Q_F_list,1,MARQUARDT,,,F-list form,MARQUARDT,,80
+contains_Q_F_list,2,IQBAL,,,F-list form,IQBAL,,70
+contains_Q_F_list,3,QIU,,,F-list form,QIU,,68
+contains_Q_F_list,4,QUINN,,,F-list form,QUINN,,56
+contains_Q_F_list,5,KRASNIQI,,,F-list form,KRASNIQI,,51
+contains_Q_F_list,6,QIN,,,F-list form,QIN,,41
+contains_Q_F_list,7,QUANDT,,,F-list form,QUANDT,,36
+contains_Q_F_list,8,SIDDIQUI,,,F-list form,SIDDIQUI,,33
+contains_Q_F_list,9,QI,,,F-list form,QI,,32
+contains_Q_F_list,10,QURESHI,,,F-list form,QURESHI,,31
+contains_V_M_list,1,KOVALCHUK,,,M-list form,KOVALCHUK,4547,
+contains_V_M_list,2,SHEVCHENKO,,,M-list form,SHEVCHENKO,4076,
+contains_V_M_list,3,IVANOV,,,M-list form,IVANOV,3856,
+contains_V_M_list,4,SHEVCHUK,,,M-list form,SHEVCHUK,3492,
+contains_V_M_list,5,KOVALENKO,,,M-list form,KOVALENKO,3439,
+contains_V_M_list,6,KOVAL,,,M-list form,KOVAL,3333,
+contains_V_M_list,7,KRAVCHENKO,,,M-list form,KRAVCHENKO,2783,
+contains_V_M_list,8,KRAVCHUK,,,M-list form,KRAVCHUK,2303,
+contains_V_M_list,9,SAVCHUK,,,M-list form,SAVCHUK,2170,
+contains_V_M_list,10,POPOV,,,M-list form,POPOV,2054,
+contains_V_F_list,1,KOVALCHUK,,,F-list form,KOVALCHUK,,5382
+contains_V_F_list,2,SHEVCHENKO,,,F-list form,SHEVCHENKO,,5217
+contains_V_F_list,3,IVANOVA,,,F-list form,IVANOVA,,4603
+contains_V_F_list,4,KOVALENKO,,,F-list form,KOVALENKO,,4269
+contains_V_F_list,5,SHEVCHUK,,,F-list form,SHEVCHUK,,3941
+contains_V_F_list,6,KOVAL,,,F-list form,KOVAL,,3792
+contains_V_F_list,7,KRAVCHENKO,,,F-list form,KRAVCHENKO,,3575
+contains_V_F_list,8,KRAVCHUK,,,F-list form,KRAVCHUK,,2743
+contains_V_F_list,9,SAVCHUK,,,F-list form,SAVCHUK,,2449
+contains_V_F_list,10,POPOVA,,,F-list form,POPOVA,,2373
+contains_X_M_list,1,XU,,,M-list form,XU,502,
+contains_X_M_list,2,FOX,,,M-list form,FOX,144,
+contains_X_M_list,3,XIE,,,M-list form,XIE,101,
+contains_X_M_list,4,XIA,,,M-list form,XIA,95,
+contains_X_M_list,5,ALEXANDER,,,M-list form,ALEXANDER,89,
+contains_X_M_list,6,XIAO,,,M-list form,XIAO,82,
+contains_X_M_list,7,HOXHA,,,M-list form,HOXHA,70,
+contains_X_M_list,8,FELIX,,,M-list form,FELIX,69,
+contains_X_M_list,9,COX,,,M-list form,COX,62,
+contains_X_M_list,10,MARX,,,M-list form,MARX,61,
+contains_X_F_list,1,XU,,,F-list form,XU,,331
+contains_X_F_list,2,FOX,,,F-list form,FOX,,187
+contains_X_F_list,3,MARX,,,F-list form,MARX,,102
+contains_X_F_list,4,FELIX,,,F-list form,FELIX,,100
+contains_X_F_list,5,COX,,,F-list form,COX,,96
+contains_X_F_list,6,ALEXANDER,,,F-list form,ALEXANDER,,93
+contains_X_F_list,7,XIE,,,F-list form,XIE,,81
+contains_X_F_list,8,DIXON,,,F-list form,DIXON,,72
+contains_X_F_list,9,XIA,,,F-list form,XIA,,68
+contains_X_F_list,10,LUX,,,F-list form,LUX,,56

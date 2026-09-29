@@ -62,6 +62,26 @@ def main():
     rows.append(["DQ-09", "1681 2026 M", f"{len(ck)} keys", sum(c.paired('2026')[k]['total'] for k in ck),
                  "PAIR-V1 collision: -SKA/-CKA/-DZKA forms published in the MALE list with >=20 entries "
                  "(invariant surnames such as KRASKA, GĄSKA, KLUSKA). Count = PAIR-V1 unit total entries affected."])
+    ska_all = {k: v for k, v in m.items() if k.endswith(("SKA", "CKA", "DZKA"))}
+    ska_single = {k: v for k, v in ska_all.items() if " " not in k and "-" not in k}
+    rows.append(["DQ-09b", "1681 2026 M", f"{len(ska_all)} forms ({len(ska_single)} single-word)", sum(ska_all.values()),
+                 f"All MALE-list forms ending in -SKA/-CKA/-DZKA, any count (single-word: {sum(ska_single.values())} entries; "
+                 f"with >=20 entries: {sum(1 for v in ska_all.values() if v >= c.CONFLICT_MIN_M)} forms). "
+                 "Naive -SKI/-SKA pairing would merge these with unrelated -SKI surnames."])
+    # 2019 -> 2020 discontinuity in hyphenated forms (June 2019 vs January 2020 files)
+    for s in "MF":
+        a, b = c.living(s, "2019"), c.living(s, "2020")
+        ha = {k: v for k, v in a.items() if "-" in k and not c.is_placeholder(k)}
+        gone = {k: v for k, v in ha.items() if k not in b}
+        new = {k: v for k, v in b.items() if "-" in k and not c.is_placeholder(k) and k not in a}
+        spaced19 = sum(1 for k in a if re.search(r"\s-|-\s", k))
+        spaced20 = sum(1 for k in b if re.search(r"\s-|-\s", k))
+        rows.append(["DQ-10", f"1681 {s} 2019-06-30 vs 2020-01-22", f"{len(gone)} of {len(ha)} hyphenated forms", sum(gone.values()),
+                     f"Hyphenated forms published in June 2019 but not in January 2020 (7 months later): {len(gone)} forms / "
+                     f"{sum(gone.values())} entries, {sum(1 for v in gone.values() if v <= 3)} of them with 2-3 entries; only "
+                     f"{len(new)} hyphenated forms ({sum(new.values())} entries) appear in the other direction. Forms written "
+                     f"with a space next to the hyphen: {spaced19} in 2019, {spaced20} in 2020. Probable change in how the "
+                     "2019 extract was compiled or cleaned (cause not documented): start hyphen trends in 2020."])
     with open(os.path.join(OUT, "data_quality_findings.csv"), "w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh)
         w.writerow(["finding", "file", "value", "count", "note"])

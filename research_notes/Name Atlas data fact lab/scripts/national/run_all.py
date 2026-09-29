@@ -1,10 +1,11 @@
-"""Run the national fact-lab scripts in order (python3 run_all.py). Output: data/national/*.csv"""
+"""Run the national fact-lab scripts in order (python3 run_all.py). Output: data/national/*.csv
+(z_notes_numbers.py last: derived numbers quoted in national_trends_trivia.md)."""
 import importlib
 import time
 
 STEPS = ["a00_data_quality", "a01_a02_baseline_trends", "a03_movers_suffix", "a04_a05_diversity_entry_exit",
          "a06_a07_gender_hyphen", "a08_deceased", "a09_a10_a11_language", "a12_showcase_extra", "a13_diacritic_variants",
-         "z_assemble_showcase"]
+         "z_assemble_showcase", "z_notes_numbers"]
 
 if __name__ == "__main__":
     for name in STEPS:

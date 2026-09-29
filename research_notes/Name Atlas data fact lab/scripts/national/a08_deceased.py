@@ -7,6 +7,8 @@ Dates with both lists: 2024-01-19 (M, F), 2025-01-22 (M, F), 2026-01-20 (F only)
 Outputs (repo data/national/):
   deceased_national.csv       national sums, differences, consistency checks per sex/date
   deceased_index_extremes.csv highest/lowest ageing index (>= 1,000 entries incl. deceased), per sex/date and PAIR-V1 2025
+  deceased_consistency_checks.csv  year-on-year checks: forms whose (incl - living) difference FELL between dates
+                              (should not happen if the difference only accumulated deceased entries)
 Part file: parts/showcase_a08.csv
 """
 import csv
@@ -105,6 +107,43 @@ def main():
                              f"568 + 1681 {y} M/F", "AGE-V1 = (incl-living)/incl, " + meth, "LIKELY (derived; register time-depth unverified)"])
                 part.append([label, "A8", f"entries_incl_deceased_{y}", i_n, "M+F lists", rd,
                              f"568 {y} M/F", meth, "VERIFIED"])
+    # per-sex showcase values (the user-facing form: M list and F list side by side, never summed)
+    for y in ("2024", "2025"):
+        rd = c.ref_date("M", y)
+        for key, label in c.SHOWCASE:
+            for s in "MF":
+                form = key if (s == "M" or key in c.INVARIANT_OVERRIDE) else c.feminine_of(key)
+                liv, inc = c.living(s, y).get(form), c.deceased_incl(s, y).get(form)
+                if liv and inc:
+                    src_ = f"568 r{c.DECEASED_INCL[(s, y)][1].split('_r')[1][:-4]} + 1681 r{c.LIVING[(s, y)][1].split('_r')[1][:-4]}"
+                    part.append([label, "A8", f"recorded_deceased_entries_{s}_{y}", inc - liv, f"{s} list, form {form}", rd,
+                                 src_, "incl.-deceased minus living, same form, same list", "VERIFIED (arithmetic on file values)"])
+                    part.append([label, "A8", f"ageing_index_pct_{s}_{y}", f"{100 * (inc - liv) / inc:.2f}", f"{s} list, form {form}",
+                                 rd, src_, "AGE-V1", "LIKELY (derived; register time-depth unverified)"])
+                    part.append([label, "A8", f"entries_incl_deceased_{s}_{y}", inc, f"{s} list, form {form}", rd, src_,
+                                 "raw Liczba of the including-deceased list", "VERIFIED"])
+    # year-on-year consistency: the recorded-deceased difference of a form should not fall between two dates
+    cons = []
+    for s, y0, y1 in (("M", "2024", "2025"), ("F", "2024", "2025"), ("F", "2025", "2026")):
+        d0 = {k: v[2] for k, v in per[(s, y0)].items() if v[2] is not None}
+        d1 = {k: v[2] for k, v in per[(s, y1)].items() if v[2] is not None}
+        common_ = [k for k in d0 if k in d1 and not c.is_placeholder(k)]
+        fell = sorted(((k, d0[k], d1[k]) for k in common_ if d1[k] < d0[k]), key=lambda t: t[2] - t[1])
+        rose = sum(1 for k in common_ if d1[k] > d0[k])
+        n_tot0 = sum(v[0] for v in per[(s, y0)].values()) - sum(c.living(s, y0).values())
+        n_tot1 = sum(v[0] for v in per[(s, y1)].values()) - sum(c.living(s, y1).values())
+        big = [t for t in fell if t[1] >= 20]
+        cons.append([s, f"{c.ref_date(s, y0)} -> {c.ref_date(s, y1)}", len(common_), rose, len(fell),
+                     sum(t[1] - t[2] for t in fell), len(big), n_tot1 - n_tot0,
+                     "; ".join(f"{k}:{a}->{b}" for k, a, b in fell[:8])])
+    with open(os.path.join(OUT, "deceased_consistency_checks.csv"), "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["list", "period", "forms_in_both_lists_at_both_dates", "forms_difference_rose",
+                    "forms_difference_fell", "sum_of_falls_entries", "forms_fell_with_base_difference_ge20",
+                    "national_change_in_difference_entries", "largest_falls_examples"])
+        w.writerows(cons)
+    for r in cons:
+        print("CONS", r)
     # F 2026 showcase
     lf26, if26 = c.living("F", "2026"), c.deceased_incl("F", "2026")
     for key, label in c.SHOWCASE:
