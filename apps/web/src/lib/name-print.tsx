@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { TOKENS } from "./design-tokens.js";
 
 /**
  * Name Print — the Name Atlas mark (chosen 2026-09-24).
@@ -69,7 +70,7 @@ export function NamePrint({
         cx={NAME_PRINT_DOT.cx}
         cy={NAME_PRINT_DOT.cy}
         r={small ? 8.5 : NAME_PRINT_DOT.r}
-        style={{ fill: "var(--accent, #1e4fd7)" }}
+        style={{ fill: `var(--accent, ${TOKENS.accent})` }}
       />
     </svg>
   );

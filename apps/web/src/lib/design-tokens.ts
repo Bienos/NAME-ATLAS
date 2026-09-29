@@ -1,0 +1,101 @@
+/**
+ * The Visual System v1 tokens, declared once for the web app (TASK-034).
+ *
+ * `globals.css` declares the same custom properties in its `:root` block,
+ * because CSS cannot import this file. `design-tokens.test.ts` fails when the
+ * two differ by one name or one value. The notes on each value (contrast
+ * ratios, why the map ramp starts where it does) stay beside it in the CSS.
+ *
+ * The web app's TypeScript takes these values from here, never as a hex
+ * literal. That matters for code that cannot read CSS: the share card
+ * (`next/og` renders with no stylesheet), the Name Print mark's fallback, and
+ * the number of map bands.
+ */
+export const TOKENS = {
+  // Surfaces and text
+  "surface-primary": "#f3f0e8",
+  "surface-elevated": "#f8f7f2",
+  "surface-inverse": "#101413",
+  "text-primary": "#101413",
+  "text-secondary": "#4f534f",
+  "text-tertiary": "#6e716c",
+  "text-inverse": "#f3f0e8",
+
+  // Rules
+  "border-soft": "#d6d2c8",
+  "border-default": "#b5b2a9",
+  "border-strong": "#6e716c",
+
+  // Action
+  accent: "#1e4fd7",
+  "on-accent": "#ffffff",
+  "hover-light": "#e8e5dc",
+  "hover-blue": "#163da9",
+  "focus-ring": "var(--accent)",
+
+  // States
+  "state-positive": "#236a58",
+  "state-warning": "#8a6515",
+  "state-error": "#b54436",
+
+  // Confidence
+  "confidence-verified": "#236a58",
+  "confidence-likely": "var(--accent)",
+  "confidence-possible": "#8a6515",
+  "confidence-unconfirmed": "#6e716c",
+
+  // Map ramp, lowest share first
+  "map-0": "#82a5f2",
+  "map-1": "#6890ec",
+  "map-2": "#4d78e5",
+  "map-3": "#1e4fd7",
+  "map-4": "#1438a0",
+  "map-no-data": "#e8e5dc",
+
+  // Shape and space
+  "radius-xs": "2px",
+  "radius-sm": "4px",
+  "radius-md": "6px",
+  "space-2": "4px",
+  "space-3": "8px",
+  "space-4": "12px",
+  "space-5": "16px",
+  "space-6": "24px",
+  "space-7": "32px",
+  "space-8": "48px",
+  "space-9": "64px",
+  measure: "40rem",
+
+  // Motion
+  "duration-instant": "100ms",
+  "duration-fast": "180ms",
+  "duration-standard": "300ms",
+  "duration-narrative": "650ms",
+  "ease-primary": "cubic-bezier(0.22, 1, 0.36, 1)",
+} as const;
+
+export type TokenName = keyof typeof TOKENS;
+
+/**
+ * The map's colour bands, lowest share first. The count of bands is their
+ * number (`voivodeship-map-scale.ts`), and `globals.css` styles each one twice
+ * (`.vmap-bN` on the map, `.rb-fill[data-band]` on the compare bars).
+ */
+export const MAP_BANDS = [
+  "map-0",
+  "map-1",
+  "map-2",
+  "map-3",
+  "map-4",
+] as const satisfies readonly TokenName[];
+
+/**
+ * The three type voices (Visual System v1 §6) by family name. The page sets
+ * them with `next/font/google` in `layout.tsx`. The share card loads the files
+ * in `assets/fonts/` under these names.
+ */
+export const TYPE_FAMILIES = {
+  display: "Newsreader",
+  ui: "Inter",
+  data: "IBM Plex Mono",
+} as const;

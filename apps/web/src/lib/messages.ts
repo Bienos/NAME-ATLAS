@@ -257,23 +257,10 @@ export function htmlLang(lang: Lang): string {
   return lang === "en" ? "en-GB" : "pl";
 }
 
-/**
- * Presentation intent (TASK-023 §2.5; directive §17). Changes only the order
- * of sections; the payload and the canonical URL are unaffected
- * (`docs/canonical/21` §35).
- */
-export type Intent = "default" | "rarity" | "map" | "meaning";
-
-export function parseIntent(value: string | null | undefined): Intent {
-  switch (value) {
-    case "rarity":
-    case "map":
-    case "meaning":
-      return value;
-    default:
-      return "default";
-  }
-}
+// Intents are section aliases, so they live in the section registry (TASK-034).
+// Re-exported so every importer of this module is unchanged.
+export { parseIntent } from "./sections.js";
+export type { Intent } from "./sections.js";
 
 /**
  * Polish plural forms: 1 → singular, 2–4 (but not 12–14) → paucal, else genitive
