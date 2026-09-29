@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { UI } from "./messages.js";
 import { ogFacts } from "./og-facts.js";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 
@@ -175,6 +176,38 @@ describe("ogFacts", () => {
     expect(f.lines).toEqual([]);
     expect(f.caveat).toMatch(/withheld by licence/u);
     expect(JSON.stringify(f)).not.toMatch(/\d{2,}/u);
+  });
+
+  /** A resolved surname with no population claim, as `querySurnameResult` answers it. */
+  function unavailable(reason: string): SurnameResultResponse {
+    const empty = { state: "UNAVAILABLE", reason_code: reason, surface: SURFACE };
+    return {
+      ...RESOLVED,
+      population: { ...empty, observations: [] },
+      rarity: { ...empty, entries: [] },
+      distribution: { ...empty, entries: [] },
+    } as unknown as SurnameResultResponse;
+  }
+
+  it("says a listed surname's figures are not prepared yet, in the page's words (TASK-037)", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const f = ogFacts(unavailable("NOT_DERIVED_YET"), lang);
+      expect(f.caveat).toBe(UI[lang].heroNotDerived);
+      // The register does list it: "the dataset publishes no count" would be false.
+      expect(f.caveat).not.toMatch(/nie podaje liczby|publishes no count/u);
+      expect(f.lines).toEqual([]);
+      expect(JSON.stringify(f)).not.toMatch(/\d{2,}/u);
+    }
+    expect(ogFacts(unavailable("NOT_DERIVED_YET"), "en").caveat).toContain("not been prepared yet");
+  });
+
+  it("still says the dataset publishes no count when it lists none", () => {
+    const en = ogFacts(unavailable("NO_APPLICABLE_EVIDENCE"), "en");
+    expect(en.caveat).toBe("The dataset publishes no count for this surname");
+    expect(ogFacts(unavailable("NO_APPLICABLE_EVIDENCE"), "pl").caveat).toBe(
+      "Zbiór nie podaje liczby dla tego nazwiska",
+    );
+    expect(JSON.stringify(en)).not.toMatch(/\d{2,}/u);
   });
 
   it("states absence for an unresolved input and names nothing", () => {
