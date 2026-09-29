@@ -242,7 +242,9 @@ export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metad
           })
           .filter((s): s is string => s !== null)
           .join(" · ")
-      : t.heroNoCount;
+      : r.population?.reason_code === "NOT_DERIVED_YET"
+        ? t.heroNotDerived
+        : t.heroNoCount;
   return {
     ...base,
     title: `${answer.display} — ${t.title}`,
@@ -288,7 +290,7 @@ export function CanonicalSurnamePage({
 
   return (
     <>
-      <main lang={htmlLang(lang)}>
+      <main lang={htmlLang(lang)} className="profile">
         <div className="masthead">
           <h1>
             <a href={lang === "en" ? "/?lang=en" : "/"}>
@@ -312,12 +314,14 @@ export function CanonicalSurnamePage({
         ) : answer.kind === "RESULT" ? (
           <>
             <Result response={answer.response} lang={lang} intent={intent} />
-            {shareUrl === null ? null : (
-              <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
-            )}
-            <p className="again">
-              <a href="#surname">{t.searchAnother}</a>
-            </p>
+            <div className="result-actions">
+              {shareUrl === null ? null : (
+                <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
+              )}
+              <p className="again">
+                <a href="#surname">{t.searchAnother}</a>
+              </p>
+            </div>
           </>
         ) : // `MOVED`. The route answers a permanent redirect before rendering, so
         // this branch exists only to keep the union exhaustive.

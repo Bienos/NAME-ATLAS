@@ -14,7 +14,9 @@ import "./globals.css";
 const display = Newsreader({
   subsets: ["latin", "latin-ext"],
   weight: ["500"],
-  style: ["normal"],
+  // Italic for the landing headline's second line, which would otherwise be a
+  // synthesised slant.
+  style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
   fallback: ["Georgia", "serif"],

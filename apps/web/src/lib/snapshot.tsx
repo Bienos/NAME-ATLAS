@@ -1,5 +1,10 @@
 import type { CSSProperties } from "react";
-import type { PlaceStat, SurnameResultResponse } from "@name-atlas/contracts";
+import type {
+  DistributionEntry,
+  PlaceStat,
+  RarityEntry,
+  SurnameResultResponse,
+} from "@name-atlas/contracts";
 import {
   assessmentWord,
   formatDate,
@@ -119,6 +124,21 @@ export function Snapshot({
     .filter((r) => r.top !== undefined && (r.second === undefined || r.second.count < r.top.count))
     .map((r) => ({ entry: r.entry, top: r.top as PlaceStat }));
 
+  const rarityEntries = rarity?.state === "READY" ? rarity.entries : [];
+  const observations = population?.state === "READY" ? population.observations : [];
+  const listOf = (group: string | null): string | null => partitionLabel(group, lang);
+  const columns = observations.map((o) => listOf(o.comparability_group));
+  const hasColumn = (label: string | null): boolean => label !== null && columns.includes(label);
+
+  const oneIn = (entry: RarityEntry): string => {
+    const x = formatInteger(entry.primary.value, lang);
+    return lang === "pl" ? `około 1 na ${x}` : `about 1 in ${x}`;
+  };
+  // The date travels with the share: no count or share without it
+  // (ARCHITECTURE.md §10 invariant 5).
+  const regionText = ({ entry, top }: { entry: DistributionEntry; top: PlaceStat }): string =>
+    `${top.display_name} (${formatPercent(top.share_of_covered, lang)}, ${formatDate(entry.snapshot_date, lang)})`;
+
   return (
     <header className="snapshot" id="today">
       <p className="eyebrow">{t.searchLabel}</p>
@@ -129,69 +149,86 @@ export function Snapshot({
       >
         {surname}
       </h2>
+      {line !== null ? <p className="tally">{line}</p> : null}
 
+      {/* One column per register list: its count, its 1 in X and its strongest
+          voivodeship, matched to the column by the list each claim belongs to,
+          never by position. The columns stand side by side and are never
+          added up; the lists' 1-in-X figures are never joined on one line,
+          because each is computed within its own list's universe and the two
+          universes are different sizes (review 2026-09-21). */}
       {population?.state === "READY" ? (
         <div className="hero" role="group" aria-label={t.sectionPopulation}>
-          {population.observations.map((o, index) => (
-            <div className="hero-figure" key={`${o.comparability_group ?? "g"}-${String(index)}`}>
-              <span className="hero-number">
-                {o.value.value === null ? "—" : formatInteger(o.value.value, lang)}
-              </span>
-              <span className="hero-label">
-                {t.heroPeople}
-                {partitionLabel(o.comparability_group, lang) === null
-                  ? ""
-                  : ` · ${partitionLabel(o.comparability_group, lang)!}`}
-                {` · ${formatDate(o.snapshot_date, lang)}`}
-              </span>
-            </div>
-          ))}
+          {observations.map((o, index) => {
+            const label = listOf(o.comparability_group);
+            const entry =
+              label === null
+                ? undefined
+                : rarityEntries.find((e) => listOf(e.comparability_group) === label);
+            const region =
+              label === null
+                ? undefined
+                : strongest.find((r) => listOf(r.entry.comparability_group) === label);
+            return (
+              <div className="hero-figure" key={`${o.comparability_group ?? "g"}-${String(index)}`}>
+                {label === null ? null : <p className="hero-list">{label}</p>}
+                <p className="hero-count">
+                  <span className="hero-number">
+                    {o.value.value === null ? "—" : formatInteger(o.value.value, lang)}
+                  </span>
+                  <span className="hero-label">
+                    {`${t.heroInRegister} · ${formatDate(o.snapshot_date, lang)}`}
+                  </span>
+                </p>
+                {entry === undefined ? null : (
+                  <p className="hero-line hero-rarity">{oneIn(entry)}</p>
+                )}
+                {region === undefined ? null : (
+                  <p className="hero-line hero-where">
+                    {t.heroStrongestRegion}: {regionText(region)}
+                  </p>
+                )}
+              </div>
+            );
+          })}
         </div>
       ) : (
         <p className="absent">
-          {population?.state === "RIGHTS_BLOCKED" ? t.heroRightsBlocked : t.heroNoCount}
+          {population?.state === "RIGHTS_BLOCKED"
+            ? t.heroRightsBlocked
+            : population?.reason_code === "NOT_DERIVED_YET"
+              ? t.heroNotDerived
+              : t.heroNoCount}
         </p>
       )}
 
-      {/* One line per entry, never joined with a separator.
-          Each `1 in X` is computed within its **own** resource version's
-          published universe, and the two partitions' universes are different
-          sizes — so setting them side by side would invite exactly the
-          cross-denominator comparison `compare.ts` refuses to make. They are
-          stacked, and a second one says in words that they are not comparable.
-          (Caught by review 2026-09-21.) */}
-      {rarity?.state === "READY"
-        ? rarity.entries.map((e, index) => {
-            const sex = partitionLabel(e.comparability_group, lang);
-            const x = formatInteger(e.primary.value, lang);
-            const core = lang === "pl" ? `około 1 na ${x}` : `about 1 in ${x}`;
-            return (
-              <p className="hero-line" key={`${e.comparability_group ?? "g"}-${String(index)}`}>
-                {sex === null ? core : `${core} · ${sex}`}
-              </p>
-            );
-          })
-        : null}
-      {rarity?.state === "READY" && rarity.entries.length > 1 ? (
-        <p className="tally">{t.rarityNotComparable}</p>
-      ) : null}
-
-      {strongest.length > 0 ? (
-        <p className="hero-line">
-          {t.heroStrongestRegion}:{" "}
-          {strongest
-            .map(({ entry, top }) => {
-              const sex = partitionLabel(entry.comparability_group, lang);
-              // The date travels with the figure: no count or share without it
-              // (ARCHITECTURE.md §10 invariant 5).
-              const core = `${top.display_name} (${formatPercent(top.share_of_covered, lang)}, ${formatDate(entry.snapshot_date, lang)})`;
-              return sex === null ? core : `${core} — ${sex}`;
-            })
-            .join(" · ")}
-        </p>
-      ) : null}
-
-      {line !== null ? <p className="tally">{line}</p> : null}
+      {/* A figure whose list has no column above — an unrecognised list, or a
+          rarity figure without its count — still gets its own line. */}
+      {rarityEntries
+        .filter((e) => !hasColumn(listOf(e.comparability_group)))
+        .map((e, index) => {
+          const sex = listOf(e.comparability_group);
+          return (
+            <p className="hero-line" key={`r-${e.comparability_group ?? "g"}-${String(index)}`}>
+              {sex === null ? oneIn(e) : `${oneIn(e)} · ${sex}`}
+            </p>
+          );
+        })}
+      {strongest
+        .filter((r) => !hasColumn(listOf(r.entry.comparability_group)))
+        .map((r, index) => {
+          const sex = listOf(r.entry.comparability_group);
+          return (
+            <p
+              className="hero-line"
+              key={`w-${r.entry.comparability_group ?? "g"}-${String(index)}`}
+            >
+              {t.heroStrongestRegion}: {regionText(r)}
+              {sex === null ? "" : ` — ${sex}`}
+            </p>
+          );
+        })}
+      {rarityEntries.length > 1 ? <p className="note hero-note">{t.rarityNotComparable}</p> : null}
     </header>
   );
 }

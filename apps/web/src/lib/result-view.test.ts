@@ -667,8 +667,8 @@ describe("AC-10: an available meaning renders its work and its caveat", () => {
     // Scoped to the meaning section: the distribution section legitimately
     // renders percentages, and they are shares, not confidence.
     const markup = render(MEANING_CONFLICTING, "en");
-    const full = text(markup);
-    const section = full.slice(full.indexOf("Meaning"));
+    // From the section's own anchor: the chapter links above also say "Meaning".
+    const section = text(markup.slice(markup.indexOf('id="meaning"')));
     expect(section).not.toMatch(/\d+\s*%/u);
     expect(section).not.toMatch(/0\.\d+/u);
     expect(section).toContain("Sources disagree");
@@ -950,7 +950,7 @@ describe("the voivodeship map", () => {
     payload.distribution.entries[0]!.regions[0]!.terc_code = null;
     const markup = render(payload, "pl");
     expect(markup).not.toContain("vmap-region");
-    expect(markup).toContain("<table>");
+    expect(markup).toContain('<table class="rank-bars">');
   });
 });
 
@@ -972,5 +972,71 @@ describe("the snapshot surname is measured for fitting", () => {
     const markup = render(RESOLVED, "pl");
     // NOWAK: 4.035 em of advances, less 5 × 0.04 em of tracking (surname-fit.ts).
     expect(markup).toContain('<h2 class="surname" style="--surname-em:3.835">NOWAK</h2>');
+  });
+});
+
+/**
+ * The profile layout (2026-09-24): one column per register list in the
+ * snapshot, question chapters numbered in page order, the rarity scale and the
+ * ranked bars. Presentation, asserted so that it cannot drift into deriving a
+ * fact or pairing one list's figure with the other's.
+ */
+describe("the profile layout", () => {
+  it("puts each list's 1 in X in its own list's column, matched by list and not by position", () => {
+    // Female first in the payload: pairing by position would put 216 under 98,387.
+    const swapped = structuredClone(RESOLVED) as { rarity: { entries: unknown[] } };
+    swapped.rarity.entries.reverse();
+    const markup = render(swapped, "en");
+    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    const male = snapshot.indexOf("98,387");
+    const x215 = snapshot.indexOf("about 1 in 215");
+    const female = snapshot.indexOf("99,738");
+    const x216 = snapshot.indexOf("about 1 in 216");
+    expect(male).toBeGreaterThan(-1);
+    expect(male).toBeLessThan(x215);
+    expect(x215).toBeLessThan(female);
+    expect(female).toBeLessThan(x216);
+  });
+
+  it("draws the rarity scale only for a READY figure, at the figure's own place", () => {
+    const markup = render(RESOLVED, "pl");
+    expect(markup.match(/class="rscale"/gu)).toHaveLength(2);
+    // 1 in 215 on a log axis from 1 in 100 (0%) to 10^7.2 (100%): (log10 215 − 2) / 5.2.
+    expect(markup).toContain("--pos:6.39%");
+    expect(markup).toContain('aria-label="Skala rzadkości: około 1 na 215"');
+    expect(render(RIGHTS_BLOCKED, "pl")).not.toContain("rscale");
+  });
+
+  it("shows the rank the claim carries, and no rank where it carries none", () => {
+    expect(text(render(RESOLVED, "en"))).toContain("#1 rank on the surname list");
+    const noRank = structuredClone(RESOLVED) as {
+      rarity: { entries: { supporting: unknown[] }[] };
+    };
+    for (const entry of noRank.rarity.entries) entry.supporting = [];
+    expect(render(noRank, "en")).not.toContain('class="rank"');
+  });
+
+  it("gives each region a bar as long as its share against the largest, in its map shade", () => {
+    const markup = render(RESOLVED, "pl");
+    // Two regions at 50% each: both the largest, both full length, both the top band.
+    expect(markup.match(/class="rb-fill" data-band="4" style="--w:100.0%"/gu)).toHaveLength(2);
+  });
+
+  it("numbers the chapters, and their links, in the order the page shows them", () => {
+    const parsed = surnameResultResponseSchema.parse(RESOLVED) as SurnameResultResponse;
+    const mapFirst = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "map" }),
+    );
+    expect(mapFirst.slice(mapFirst.indexOf('id="where"'))).toMatch(
+      /^id="where"[^>]*><div class="chapter-rail"><p class="chapter-number">01<\/p>/u,
+    );
+    const nav = mapFirst.slice(mapFirst.indexOf('class="chapter-nav"'), mapFirst.indexOf("</nav>"));
+    expect(nav.indexOf('href="#where"')).toBeLessThan(nav.indexOf('href="#today-count"'));
+  });
+
+  it("keeps a chapter with no figures to its absence, without a reading note", () => {
+    const blocked = render(RIGHTS_BLOCKED, "en");
+    expect(blocked).toContain('<section id="today-count" class="chapter chapter-empty">');
+    expect(blocked).not.toContain("The PESEL register publishes two separate surname lists");
   });
 });

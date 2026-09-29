@@ -172,6 +172,31 @@ export async function readCurrentPopulation(
   }));
 }
 
+/**
+ * Whether the register publishes a national count for this surname, whether
+ * or not a claim has been derived from it.
+ *
+ * Only for telling two absences apart when `readCurrentPopulation` returns
+ * `[]`: a surname the register lists whose figures have not been derived yet,
+ * and one it does not list. It returns no count — a claim remains the only way
+ * a number reaches a reader.
+ */
+export async function hasNationalRegisterCount(
+  db: Kysely<DB>,
+  surnameId: string,
+): Promise<boolean> {
+  const result = await sql<{ found: number }>`
+    SELECT 1 AS found
+    FROM distribution_snapshots s
+    JOIN distribution_values v ON v.distribution_snapshot_id = s.distribution_snapshot_id
+    WHERE s.surname_id = ${surnameId}::uuid
+      AND v.place_id IS NULL
+      AND v.count IS NOT NULL
+    LIMIT 1
+  `.execute(db);
+  return result.rows.length > 0;
+}
+
 /** One persisted `RARITY_CONTEXT` claim, joined to what the projection needs. */
 export interface PersistedRarityContext {
   readonly claim_id: string;

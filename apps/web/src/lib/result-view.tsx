@@ -18,7 +18,8 @@
  * contract validation. No script is rendered here; the one client island lives
  * on the canonical page, outside this view.
  */
-import type { ReactNode } from "react";
+import { Fragment } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type {
   CitationDto,
   DistributionEntry,
@@ -41,6 +42,7 @@ import {
   formationWord,
   formatInteger,
   formatPercent,
+  partitionLabel,
   populationSentence,
   rankSentence,
   raritySentence,
@@ -53,6 +55,7 @@ import type { Intent, Lang } from "./messages.js";
 import { Snapshot } from "./snapshot.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
+import { RarityScale } from "./rarity-scale.js";
 
 export function href(surname: string, lang: Lang): string {
   const params = new URLSearchParams({ surname });
@@ -60,112 +63,172 @@ export function href(surname: string, lang: Lang): string {
   return `/?${params.toString()}`;
 }
 
-function Absent({
-  heading,
+/**
+ * One chapter: the question it answers and how to read the answer in the rail,
+ * the figures beside it (Visual System §7 "8/4 main insight + annotation"; on a
+ * wide chapter the rail sits above a full-width body, as the map needs).
+ * Numbered in the order the page shows them, which an intent may change.
+ */
+function Chapter({
   id,
-  state,
-  reason,
-  lang,
+  number,
+  title,
+  lede,
+  wide = false,
+  empty = false,
+  children,
 }: {
-  heading: string;
   id: string;
-  state: string;
-  reason: string | null;
-  lang: Lang;
+  number: number;
+  title: string;
+  lede: string;
+  wide?: boolean;
+  /** No figures to read: the absence is stated, compactly, and there is nothing to explain. */
+  empty?: boolean;
+  children: ReactNode;
 }) {
-  const t = UI[lang];
+  const className = empty ? "chapter chapter-empty" : wide ? "chapter chapter-wide" : "chapter";
   return (
-    <section id={id}>
-      <h3>{heading}</h3>
-      <p className="absent">
-        {state === "RIGHTS_BLOCKED"
-          ? rightsBlockedText(lang)
-          : (reasonText(reason, lang) ?? t.noFigures)}
-      </p>
+    <section id={id} className={className}>
+      <div className="chapter-rail">
+        <p className="chapter-number">{String(number).padStart(2, "0")}</p>
+        <h3>{title}</h3>
+        {empty ? null : <p className="chapter-lede">{lede}</p>}
+      </div>
+      <div className="chapter-body">{children}</div>
     </section>
   );
+}
+
+function Absent({ state, reason, lang }: { state: string; reason: string | null; lang: Lang }) {
+  const t = UI[lang];
+  return (
+    <p className="absent">
+      {state === "RIGHTS_BLOCKED"
+        ? rightsBlockedText(lang)
+        : (reasonText(reason, lang) ?? t.noFigures)}
+    </p>
+  );
+}
+
+/** Which register list a column belongs to, above its figures. Nothing when the group is unknown. */
+function ListLabel({ group, lang }: { group: string | null; lang: Lang }) {
+  const label = partitionLabel(group, lang);
+  return label === null ? null : <p className="list-label">{label}</p>;
 }
 
 function Population({
   section,
   surname,
+  number,
   lang,
 }: {
   section: PopulationSection;
   surname: string;
+  number: number;
   lang: Lang;
 }) {
   const t = UI[lang];
-  if (section.state !== "READY") {
-    return (
-      <Absent
-        heading={t.sectionPopulation}
-        id="today-count"
-        state={section.state}
-        reason={section.reason_code}
-        lang={lang}
-      />
-    );
-  }
   const several = section.observations.length > 1;
   return (
-    <section id="today-count">
-      <h3>{t.sectionPopulation}</h3>
-      {section.observations.map((observation, index) => {
-        return (
-          <Claim
-            key={`${observation.comparability_group ?? "group"}-${String(index)}`}
-            statement={populationSentence(observation, surname, lang)}
-            evidence={populationEvidence(observation, several, lang)}
-            country_code={observation.country_code}
-            lang={lang}
-          />
-        );
-      })}
-      {several ? <p className="note">{t.notSummed}</p> : null}
-    </section>
+    <Chapter
+      id="today-count"
+      number={number}
+      title={t.chapterCountTitle}
+      lede={t.chapterCountLede}
+      empty={section.state !== "READY"}
+    >
+      {section.state !== "READY" ? (
+        <Absent state={section.state} reason={section.reason_code} lang={lang} />
+      ) : (
+        <>
+          {/* One column per register list, side by side and never added up. */}
+          <div className="lists">
+            {section.observations.map((observation, index) => (
+              <div
+                className="list"
+                key={`${observation.comparability_group ?? "group"}-${String(index)}`}
+              >
+                <ListLabel group={observation.comparability_group} lang={lang} />
+                <Claim
+                  statement={populationSentence(observation, surname, lang)}
+                  evidence={populationEvidence(observation, several, lang)}
+                  country_code={observation.country_code}
+                  lang={lang}
+                />
+              </div>
+            ))}
+          </div>
+          {several ? <p className="note">{t.notSummed}</p> : null}
+        </>
+      )}
+    </Chapter>
   );
 }
 
 function Rarity({
   section,
   surname,
+  number,
   lang,
 }: {
   section: RaritySection;
   surname: string;
+  number: number;
   lang: Lang;
 }) {
   const t = UI[lang];
-  if (section.state !== "READY") {
-    return (
-      <Absent
-        heading={t.sectionRarity}
-        id="rarity"
-        state={section.state}
-        reason={section.reason_code}
-        lang={lang}
-      />
-    );
-  }
   return (
-    <section id="rarity">
-      <h3>{t.sectionRarity}</h3>
-      {section.entries.map((entry, index) => {
-        const rank = rankSentence(entry, surname, lang);
-        return (
-          <Claim
-            key={`${entry.comparability_group ?? "group"}-${String(index)}`}
-            statement={raritySentence(entry, surname, lang)}
-            evidence={rarityEvidence(entry, lang)}
-            country_code={entry.country_code}
-            lang={lang}
-          >
-            {rank !== null ? <p>{rank}</p> : null}
-          </Claim>
-        );
-      })}
-    </section>
+    <Chapter
+      id="rarity"
+      number={number}
+      title={t.chapterRarityTitle}
+      lede={t.chapterRarityLede}
+      empty={section.state !== "READY"}
+    >
+      {section.state !== "READY" ? (
+        <Absent state={section.state} reason={section.reason_code} lang={lang} />
+      ) : (
+        <div className="lists">
+          {section.entries.map((entry, index) => {
+            const rank = entry.supporting.find((metric) => metric.metric === "RANK");
+            const rankText = rankSentence(entry, surname, lang);
+            const oneIn = entry.primary.metric === "ONE_IN_X" ? entry.primary.value : null;
+            const x = oneIn === null ? null : formatInteger(oneIn, lang);
+            const figure =
+              x === null ? null : lang === "pl" ? `około 1 na ${x}` : `about 1 in ${x}`;
+            return (
+              <div
+                className="list"
+                key={`${entry.comparability_group ?? "group"}-${String(index)}`}
+              >
+                <ListLabel group={entry.comparability_group} lang={lang} />
+                {oneIn === null || figure === null ? null : (
+                  <>
+                    <p className="figure">{figure}</p>
+                    <RarityScale oneIn={oneIn} figure={figure} lang={lang} />
+                  </>
+                )}
+                {rank === undefined ? null : (
+                  <p className="rank">
+                    <span className="rank-number">#{formatInteger(rank.value, lang)}</span>{" "}
+                    <span className="rank-caption">{t.rankCaption}</span>
+                  </p>
+                )}
+                <Claim
+                  statement={raritySentence(entry, surname, lang)}
+                  evidence={rarityEvidence(entry, lang)}
+                  country_code={entry.country_code}
+                  lang={lang}
+                >
+                  {rankText !== null ? <p className="claim-more">{rankText}</p> : null}
+                </Claim>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Chapter>
   );
 }
 
@@ -173,6 +236,11 @@ function Rarity({
  * One regional entry. The coverage warning is rendered **before** any figure,
  * which is the order a reader must take them in and why it is the claim's
  * lead rather than a footnote (TASK-012 §3).
+ *
+ * The map and a ranked list share the row (Visual System §12: "Primary: map.
+ * Secondary: ranked textual list. Never require map alone"). Each row's bar is
+ * its share against the entry's largest, and takes that region's map shade, so
+ * the list reads as the map's key; the exact share and count sit beside it.
  */
 function DistributionFact({
   entry,
@@ -189,95 +257,110 @@ function DistributionFact({
   const input = mapInputs([entry], lang);
   const map =
     input === null ? null : { regions: input.maps[0] ?? [], bandLabels: input.bandLabels };
+  const largest = Math.max(...entry.regions.map((region) => region.share_of_covered));
   return (
-    <Claim
-      statement={leading}
-      lead={warning === null ? null : <p className="warning">{warning}</p>}
-      evidence={distributionEvidence(entry, lang)}
-      country_code={entry.country_code}
-      lang={lang}
-    >
-      {/* Its own scroll container, so a table can never widen the document.
-          Sixteen rows of voivodeship names — `ZACHODNIOPOMORSKIE`,
-          `WARMIŃSKO-MAZURSKIE` — beside two numeric columns is the widest
-          thing on the page. Verified at a true 320px viewport: the names wrap
-          inside the first column and nothing overflows, so this container does
-          not scroll today; it is what keeps a longer name from clipping the
-          page instead of scrolling its own table. `tabindex` and
-          `role="region"` are what make a scrollable area reachable from the
-          keyboard when it does scroll. */}
-      {map === null ? null : (
-        <VoivodeshipMap
-          regions={map.regions}
-          labels={{
-            title: t.mapTitle,
-            legendTitle: t.mapLegend,
-            bandLabels: map.bandLabels,
-            notListed: t.mapNotListed,
-            hint: t.mapHint,
-          }}
-        />
-      )}
-      <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
-        <table>
-          <caption>{t.coveredNote}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{t.regionColumn}</th>
-              <th scope="col">{t.countColumn}</th>
-              <th scope="col">{t.shareColumn}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entry.regions.map((region) => (
-              <tr key={region.place_id}>
-                <th scope="row">{region.display_name}</th>
-                <td>{formatInteger(region.count, lang)}</td>
-                <td>{formatPercent(region.share_of_covered, lang)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Claim>
+    <div className="where-entry">
+      <ListLabel group={entry.comparability_group} lang={lang} />
+      <Claim
+        statement={leading}
+        lead={warning === null ? null : <p className="warning">{warning}</p>}
+        evidence={distributionEvidence(entry, lang)}
+        country_code={entry.country_code}
+        lang={lang}
+      >
+        <div className={map === null ? "where-grid where-grid-table" : "where-grid"}>
+          {map === null ? null : (
+            <VoivodeshipMap
+              regions={map.regions}
+              labels={{
+                title: t.mapTitle,
+                legendTitle: t.mapLegend,
+                bandLabels: map.bandLabels,
+                notListed: t.mapNotListed,
+                hint: t.mapHint,
+              }}
+            />
+          )}
+          {/* Its own scroll container, so a table can never widen the document.
+              Verified at a true 320px viewport: the names wrap inside the first
+              column and nothing overflows. `tabindex` and `role="region"` make
+              the area reachable from the keyboard when it does scroll. */}
+          <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
+            <table className="rank-bars">
+              <caption>{t.coveredNote}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t.regionColumn}</th>
+                  <th scope="col">{t.shareColumn}</th>
+                  <th scope="col">{t.countColumn}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entry.regions.map((region, index) => {
+                  const band = map?.regions[index]?.band;
+                  const width = largest > 0 ? (region.share_of_covered / largest) * 100 : 0;
+                  return (
+                    <tr key={region.place_id}>
+                      <th scope="row">{region.display_name}</th>
+                      <td className="rb-share">
+                        <span className="rb-track">
+                          <span
+                            className="rb-fill"
+                            data-band={band === undefined ? undefined : String(band)}
+                            style={{ "--w": `${width.toFixed(1)}%` } as CSSProperties}
+                          />
+                        </span>
+                        <span className="rb-value">
+                          {formatPercent(region.share_of_covered, lang)}
+                        </span>
+                      </td>
+                      <td className="rb-count">{formatInteger(region.count, lang)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </Claim>
+    </div>
   );
 }
 
 function Distribution({
-  response,
+  section,
   surname,
+  number,
   lang,
 }: {
-  response: SurnameResultResponse;
+  section: NonNullable<SurnameResultResponse["distribution"]>;
   surname: string;
+  number: number;
   lang: Lang;
 }) {
   const t = UI[lang];
-  const section = response.distribution;
-  if (section === null) return null;
-  if (section.state !== "READY") {
-    return (
-      <Absent
-        heading={t.sectionDistribution}
-        id="where"
-        state={section.state}
-        reason={section.reason_code}
-        lang={lang}
-      />
-    );
-  }
   return (
-    <section id="where">
-      <h3>{t.sectionDistribution}</h3>
-      {section.entries.map((entry, index) => (
-        <DistributionFact
-          key={`${entry.comparability_group ?? "group"}-${String(index)}`}
-          entry={entry}
-          surname={surname}
-          lang={lang}
-        />
-      ))}
-    </section>
+    <Chapter
+      id="where"
+      number={number}
+      title={t.chapterWhereTitle}
+      lede={t.chapterWhereLede}
+      wide
+      empty={section.state !== "READY"}
+    >
+      {section.state !== "READY" ? (
+        <Absent state={section.state} reason={section.reason_code} lang={lang} />
+      ) : (
+        section.entries.map((entry, index) => (
+          <DistributionFact
+            key={`${entry.comparability_group ?? "group"}-${String(index)}`}
+            entry={entry}
+            surname={surname}
+            lang={lang}
+          />
+        ))
+      )}
+    </Chapter>
   );
 }
 
@@ -308,7 +391,15 @@ function workCitation(interpretation: MeaningSection["interpretations"][number])
  * table. On a conflict every reading is shown, and the notes at the foot of the
  * page list the readings that disagree (ADR-0012).
  */
-function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
+function Meaning({
+  section,
+  number,
+  lang,
+}: {
+  section: MeaningSection;
+  number: number;
+  lang: Lang;
+}) {
   const t = UI[lang];
   if (section.state !== "AVAILABLE") {
     const body =
@@ -318,16 +409,19 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
           ? t.meaningBlocked
           : t.meaningUnavailable;
     return (
-      <section id="meaning">
-        <h3>{t.sectionMeaning}</h3>
+      <Chapter
+        id="meaning"
+        number={number}
+        title={t.chapterMeaningTitle}
+        lede={t.chapterMeaningLede}
+      >
         <p className="absent">{body}</p>
-      </section>
+      </Chapter>
     );
   }
   const conflicting = section.confidence === "CONFLICTING";
   return (
-    <section id="meaning">
-      <h3>{t.sectionMeaning}</h3>
+    <Chapter id="meaning" number={number} title={t.chapterMeaningTitle} lede={t.chapterMeaningLede}>
       {/* Before the readings, not after: a reader must know these are
           interpretations before they read one as a fact. */}
       <p className="caveat">{t.meaningInterpretationNote}</p>
@@ -360,7 +454,7 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
           </Claim>
         );
       })}
-    </section>
+    </Chapter>
   );
 }
 
@@ -506,7 +600,7 @@ function Sources({ response, lang }: { response: SurnameResultResponse; lang: La
   }
   const notes = [...new Set(evidence.flatMap((e) => e.notes))];
   return (
-    <section id="sources">
+    <section id="sources" className="sources-section">
       <h3>{t.sectionSourcesAll}</h3>
       <ul className="sources">
         {[...sources].map(([key, c]) => (
@@ -584,6 +678,51 @@ export function sectionOrder(intent: Intent): readonly SectionKey[] {
   return [first, ...base.filter((k) => k !== first)];
 }
 
+const CHAPTER_ANCHOR: Record<SectionKey, string> = {
+  count: "today-count",
+  rarity: "rarity",
+  map: "where",
+  meaning: "meaning",
+};
+
+/** The page's chapters as links, numbered as they appear. Anchors only; no script. */
+function ChapterNav({
+  order,
+  sources,
+  lang,
+}: {
+  order: readonly SectionKey[];
+  sources: boolean;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const label: Record<SectionKey, string> = {
+    count: t.navCount,
+    rarity: t.navRarity,
+    map: t.navWhere,
+    meaning: t.navMeaning,
+  };
+  return (
+    <nav className="chapter-nav" aria-label={t.navLabel}>
+      <ol>
+        {order.map((key, index) => (
+          <li key={key}>
+            <a href={`#${CHAPTER_ANCHOR[key]}`}>
+              <span className="chapter-nav-number">{String(index + 1).padStart(2, "0")}</span>
+              {label[key]}
+            </a>
+          </li>
+        ))}
+        {sources ? (
+          <li>
+            <a href="#sources">{t.navSources}</a>
+          </li>
+        ) : null}
+      </ol>
+    </nav>
+  );
+}
+
 export function Result({
   response,
   lang,
@@ -597,27 +736,33 @@ export function Result({
 
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
-    const sections: Record<SectionKey, ReactNode> = {
+    const { population, rarity, distribution, meaning } = response;
+    const chapters: Record<SectionKey, ((number: number) => ReactNode) | null> = {
       count:
-        response.population !== null ? (
-          <Population section={response.population} surname={surname} lang={lang} />
-        ) : null,
+        population === null
+          ? null
+          : (n) => <Population section={population} surname={surname} number={n} lang={lang} />,
       rarity:
-        response.rarity !== null ? (
-          <Rarity section={response.rarity} surname={surname} lang={lang} />
-        ) : null,
-      map: <Distribution response={response} surname={surname} lang={lang} />,
+        rarity === null
+          ? null
+          : (n) => <Rarity section={rarity} surname={surname} number={n} lang={lang} />,
+      map:
+        distribution === null
+          ? null
+          : (n) => <Distribution section={distribution} surname={surname} number={n} lang={lang} />,
       meaning:
-        response.meaning !== null ? <Meaning section={response.meaning} lang={lang} /> : null,
+        meaning === null ? null : (n) => <Meaning section={meaning} number={n} lang={lang} />,
     };
+    const order = sectionOrder(intent).filter((key) => chapters[key] !== null);
     return (
-      <>
+      <div className="result">
         <Snapshot response={{ ...response, status: "RESOLVED" }} lang={lang} />
-        {sectionOrder(intent).map((key) => (
-          <div key={key}>{sections[key]}</div>
+        <ChapterNav order={order} sources={pageEvidence(response, lang).length > 0} lang={lang} />
+        {order.map((key, index) => (
+          <Fragment key={key}>{chapters[key]?.(index + 1)}</Fragment>
         ))}
         <Sources response={response} lang={lang} />
-      </>
+      </div>
     );
   }
 

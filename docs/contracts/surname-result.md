@@ -40,7 +40,8 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
   },
   "population": {                 // null unless RESOLVED
     "state": "READY",             // | "UNAVAILABLE" | "RIGHTS_BLOCKED"
-    "reason_code": null,
+    "reason_code": null,          // with no claim: "NOT_DERIVED_YET" when the register publishes a count
+                                  // not yet derived, else "NO_APPLICABLE_EVIDENCE" (also on rarity, distribution)
     "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" },
     "observations": [
       {

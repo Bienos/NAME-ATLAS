@@ -26,7 +26,10 @@ SHA-256 differs from `packages/sources/src/registry.ts`, migrates, imports all f
 assigns page addresses, and derives every claim — first for the surnames with
 regional data, then (`--all --rank`) population, rank and rarity for the rest. It is idempotent — re-run it after
 a failure and it continues. Set `DERIVE_LIMIT=1000` to derive only the first 1,000
-surnames for a quick look. The sections below are the same steps by hand.
+surnames for a quick look. Every other surname's page then says the register lists it but its
+figures are not prepared yet. To prepare one, run `pnpm demo:surname`, `demo:surname-distribution`,
+`demo:surname-rank` and `demo:surname-rarity` with the surname (about 30 s together); to prepare
+the rest, run `pnpm local:setup` again without the limit. The sections below are the same steps by hand.
 
 ## What you need
 

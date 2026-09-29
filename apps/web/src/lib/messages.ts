@@ -344,6 +344,12 @@ export const UI = {
   pl: {
     title: "Name Atlas",
     tagline: "Uczciwe, udokumentowane odpowiedzi o polskich nazwiskach.",
+    landingHeadline: "Każde nazwisko",
+    landingHeadlineEm: "ma swój początek.",
+    landingLede:
+      "Zobacz, co oficjalny rejestr PESEL zapisuje o nazwisku — ze źródłem i datą przy każdej " +
+      "liczbie i z uczciwą luką wszędzie tam, gdzie kończą się dane.",
+    landingHint: "Wpisz dokładnie tak, jak się pisze — z polskimi znakami.",
     searchLabel: "Nazwisko",
     searchPlaceholder: "np. Nowak",
     searchAction: "Szukaj",
@@ -388,8 +394,36 @@ export const UI = {
     searchAnother: "Sprawdź inne nazwisko",
     heroPeople: "osób",
     heroNoCount: "Ten zbiór nie podaje liczby osób o tym nazwisku.",
+    heroNotDerived:
+      "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
     heroRightsBlocked: "Liczby nie można pokazać tutaj z powodu licencji źródła.",
     heroStrongestRegion: "Najwięcej zameldowanych",
+    heroInRegister: "osób w rejestrze PESEL",
+    chapterCountTitle: "Ile osób nosi to nazwisko?",
+    chapterCountLede:
+      "Rejestr PESEL publikuje dwie osobne listy nazwisk: męską i żeńską. Każdą liczbę " +
+      "pokazujemy osobno i nigdy ich nie sumujemy.",
+    chapterRarityTitle: "Jak rzadkie jest to nazwisko?",
+    chapterRarityLede:
+      "„1 na X” znaczy, że mniej więcej jedna na X osób z tej listy nosi to nazwisko. Im większe " +
+      "X, tym rzadsze nazwisko. Miejsce liczymy od najczęstszego nazwiska na liście.",
+    chapterWhereTitle: "Gdzie jest najczęściej zameldowane?",
+    chapterWhereLede:
+      "Mapa i lista pokazują, w których województwach osoby o tym nazwisku mają zameldowanie " +
+      "na pobyt stały. Im ciemniejszy kolor i dłuższy pasek, tym większy udział.",
+    chapterMeaningTitle: "Co oznacza to nazwisko?",
+    chapterMeaningLede:
+      "Znaczenie podajemy tylko wtedy, gdy stoi za nim opracowanie naukowe. Nie zgadujemy.",
+    navLabel: "Na tej stronie",
+    navCount: "Liczba osób",
+    navRarity: "Rzadkość",
+    navWhere: "Województwa",
+    navMeaning: "Znaczenie",
+    navSources: "Źródła",
+    rankCaption: "miejsce na liście nazwisk",
+    scaleLabel: "Skala rzadkości",
+    scaleCommon: "częstsze",
+    scaleRare: "rzadsze",
     rarityNotComparable:
       "Każda wartość „1 na X” liczona jest w obrębie własnego zbioru. Zbiory mają różną wielkość, " +
       "więc tych dwóch wartości nie porównujemy ze sobą.",
@@ -446,6 +480,12 @@ export const UI = {
   en: {
     title: "Name Atlas",
     tagline: "Honest, sourced answers about Polish surnames.",
+    landingHeadline: "Every surname",
+    landingHeadlineEm: "begins somewhere.",
+    landingLede:
+      "See what Poland's official register records about a surname — with the source and date " +
+      "behind every figure, and an honest blank wherever the evidence runs out.",
+    landingHint: "Exactly as it's written — Polish letters welcome.",
     searchLabel: "Surname",
     searchPlaceholder: "e.g. Nowak",
     searchAction: "Search",
@@ -483,8 +523,36 @@ export const UI = {
     searchAnother: "Search another surname",
     heroPeople: "people",
     heroNoCount: "This dataset publishes no count for this surname.",
+    heroNotDerived:
+      "The PESEL register lists this surname, but its figures have not been prepared yet.",
     heroRightsBlocked: "The count cannot be shown here because of the source's licence.",
     heroStrongestRegion: "Most registered in",
+    heroInRegister: "people in the PESEL register",
+    chapterCountTitle: "How many people have this surname?",
+    chapterCountLede:
+      "The PESEL register publishes two separate surname lists, male and female. We show each " +
+      "figure on its own and never add them up.",
+    chapterRarityTitle: "How rare is this surname?",
+    chapterRarityLede:
+      "“1 in X” means that roughly one in every X people on this list has this surname. The " +
+      "bigger X, the rarer the name. The rank counts from the most common surname on the list.",
+    chapterWhereTitle: "Where is it most often registered?",
+    chapterWhereLede:
+      "The map and the list show the voivodeships where people with this surname have a " +
+      "registered permanent address. The darker the colour and the longer the bar, the bigger " +
+      "the share.",
+    chapterMeaningTitle: "What does this surname mean?",
+    chapterMeaningLede: "We give a meaning only when a scholarly work supports it. We don't guess.",
+    navLabel: "On this page",
+    navCount: "Count",
+    navRarity: "Rarity",
+    navWhere: "Voivodeships",
+    navMeaning: "Meaning",
+    navSources: "Sources",
+    rankCaption: "rank on the surname list",
+    scaleLabel: "Rarity scale",
+    scaleCommon: "more common",
+    scaleRare: "rarer",
     rarityNotComparable:
       "Each 1-in-X is computed within its own dataset. The datasets are different sizes, so these " +
       "two figures are not compared with each other.",
@@ -547,6 +615,10 @@ export const UI = {
  * in this table, and the reader should still be told something true.
  */
 const REASON_CODES: Record<string, { pl: string; en: string }> = {
+  NOT_DERIVED_YET: {
+    pl: "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
+    en: "The PESEL register lists this surname, but its figures have not been prepared yet.",
+  },
   NO_APPLICABLE_EVIDENCE: {
     pl: "Ten zbiór nie zawiera tego nazwiska. Nie znaczy to, że nikt go nie nosi — nazwiska występujące raz nie są publikowane.",
     en: "This dataset does not list this surname. That does not mean nobody bears it: surnames occurring once are not published.",

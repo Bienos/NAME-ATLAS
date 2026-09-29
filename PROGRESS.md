@@ -5338,3 +5338,165 @@ supersedes TASK-023's per-claim evidence panel (§2 item 2, AC-2).
 
 **Not verified:** a meaning with a real locator on real data, because no local surname tested here
 has an `AVAILABLE` meaning; the fixture case passes.
+
+### Motion: the search becomes the result, and a test-teardown race (2026-09-24)
+
+Ported from the draft PR #8 (built on the stale default branch) at the project owner's "go".
+Only the interaction design and one test fix came across. `main`'s pages, copy and data are
+unchanged.
+
+- **The field's underline is an Atlas Thread** (Visual System §8, §22). A point where the name
+  begins is hollow until there is input, then Atlas Blue. A line in `--accent` is exactly as long
+  as the typed text: `surname-combobox.tsx` measures a hidden mirror of the text and publishes
+  `--typed`. Focus now darkens the rule to Ink (was Atlas Blue), so the blue thread reads against
+  it. Without script there is no thread and the field is unchanged.
+- **The typed surname becomes the result heading** (§23 "Search") through a cross-document view
+  transition. It is CSS only, so it works across the plain `GET` navigation and its 307 redirect to
+  `/pl/nazwisko/{slug}`. On submit the island sets `<html data-searching>`, which names the mirror
+  `surname-hero`. `.snapshot .surname` carries the same name on the result page and now hugs its
+  text (`inline-size: fit-content`); its fitting is unchanged, since it sizes against the snapshot
+  box. The island skips the transition on `pageswap` for any navigation that is not its own
+  submitted search. Browsers without cross-document view transitions (Firefox) just navigate.
+- **A figure resolves once** (`.hero-number`: a left-to-right reveal, 420 ms). The whole number
+  stays in the DOM, and the tested markup is unchanged.
+- All motion sits inside `prefers-reduced-motion: no-preference`. The island declares the browser
+  members it uses, as `share-button.tsx` does; `lib` stays `ES2022`.
+- **`packages/testing` teardown race, fixed** (cherry-pick of the draft branch's fix). `stop()`
+  waits for the pool's connections to close before `DROP DATABASE … WITH (FORCE)` or stopping the
+  container. Before, a closing client could get FATAL `57P01` with no listener, and Vitest reported
+  an unhandled error in whichever file was running (3 of 15 runs on the draft branch).
+
+| Check | Result |
+|---|---|
+| `pnpm lint`, `pnpm --filter web typecheck`, Prettier on the changed files | Passed |
+| `pnpm --filter web test` | 203 passed, unchanged |
+| `pnpm --filter ./apps/web build` | Compiled. Its only warnings are Next's own middleware bundle (`process.cwd` in the Edge runtime), also present without this change |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16 + PostGIS 3.4.2), with the fix | 1 run: 24 files, 278 passed, 24 s. The planned 10-vs-10 comparison against the old harness was stopped by the owner before it produced results |
+| `pnpm local:setup` on a fresh database, `DERIVE_LIMIT=3000` | Four files downloaded and verified; national and regional imports `IMPORTED`; slugs backfilled. Derivation stopped by hand at 3,248 surnames with claims |
+| `next start` on that database, Chromium (Playwright), `pagereveal` instrumented | Typing "Nowak" publishes `--typed: 83.3px`. Enter → 307 → `/pl/nazwisko/nowak` with a view transition in which `surname-hero` animates old → new (650 ms group; root 100 ms out, 300 ms in). A common-surname link: no view transition. A second search from `/pl/nazwisko/nowak` → `/pl/nazwisko/kowalski`: transition runs, no duplicate-name abort. Reduced motion: no transition, same destination. Unresolved `Zzyzxq`: renders on `/`, the typed name fades out. 390 px phone and Archive Night (dark): thread visible, transition pairs, `/pl/nazwisko/w%C3%B3jcik` opens. No console errors in any run |
+
+**Not verified:** Safari (cross-document view transitions from 18.2) and Firefox (no transition
+expected); the integration suite on the pinned container image (CI will run it); any deployment.
+
+### A surname the register lists is no longer called absent (2026-09-24)
+
+Observed on a local database set up with `DERIVE_LIMIT=3000`: 6,468 of 598,476 surnames had
+`CURRENT_POPULATION` claims. For every other surname the page said *"Ten zbiór nie zawiera tego
+nazwiska"*, which is false: WINIECKI's page said it, and the register lists 940 men and 7 women with
+that surname. After `pnpm demo:surname`, `demo:surname-distribution`, `demo:surname-rank` and
+`demo:surname-rarity` for WINIECKI (29 s together), its page showed both counts, rarity and the top
+voivodeship.
+
+- `querySurnameResult`, when a resolved surname has no `CURRENT_POPULATION` claim, now checks
+  whether the register publishes a national count for it (`hasNationalRegisterCount` in
+  `packages/truth/src/read.ts`: one `SELECT … LIMIT 1`, no count returned). If it does, all three
+  fact sections are `UNAVAILABLE` with `reason_code = NOT_DERIVED_YET`; otherwise
+  `NO_APPLICABLE_EVIDENCE`, as before. It is still read-only: derivation stays off the read path
+  (TASK-006 AC-03).
+- The page says *"Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze
+  opracowane."* / *"The PESEL register lists this surname, but its figures have not been prepared
+  yet."* in each section, in the snapshot header and in the meta description.
+- `reason_code` is a string and the contract lists new values as non-breaking, so the schema
+  version is unchanged; `docs/contracts/surname-result.md` names both codes.
+- The loaded files are the newest the publisher has: `api.dane.gov.pl` dataset 1681, queried
+  2026-09-24, lists 2026-01-20 as the latest `data_date`; before that, 2025-01-22 (national) and
+  2025-02-24 (regional).
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 203 (the reason-code test now covers `NOT_DERIVED_YET`) |
+| `vitest run src/surname-result-api.test.ts` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 passed, including the new test: an imported, underived fixture surname answers `NOT_DERIVED_YET` on all three sections, carries no value, and writes nothing. A `57P01` is logged by the pool's idle-client handler at teardown; the run passes |
+| `pnpm test:integration` (same server) | 24 files, 279 passed (278 before, plus the new test) |
+| `next start` on the local database | `/pl/nazwisko/dettlaff` and `/en/surname/homa` show the new sentence; `/pl/nazwisko/winiecki` shows figures after it is derived |
+
+**Not verified:** CI for this change.
+
+### PR #7 merged into this branch (2026-09-24)
+
+At the project owner's request, `claude/awesome-archimedes-t6hb55` (PR #7, ADR-0012, `6340182`) is
+merged into this branch so that one local server shows both changes. Only `PROGRESS.md` conflicted;
+both entries are kept, PR #7's first.
+
+| Check (on the merge) | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 205, `packages/contracts` 48 |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 files, 279 passed |
+| `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium | `/pl/nazwisko/nowak`: no "Zobacz dowody"; "Źródła na tej stronie" with a `dane.gov.pl` link and "Jak czytać te liczby" at the foot. A search for "Nowak" runs the `surname-hero` view transition (650 ms). `/pl/nazwisko/dettlaff` shows the `NOT_DERIVED_YET` sentence |
+
+**Not verified:** CI on the merge.
+
+### The landing composition on `/`, light only, and accents in the field (2026-09-24)
+
+The project owner, shown the draft branch's landing (PR #8) beside `main`'s home page in Archive
+Night, asked why it was not the one they saw and why the page could not be white.
+
+- **The bare `/` is now the landing** (Visual System §39 screen 01), ported from the draft branch
+  and fitted to `main`'s page: a two-line display headline (*"Każde nazwisko / skądś pochodzi."*,
+  *"Every surname / begins somewhere."*), a lede, the search field shown with its label and set
+  larger (up to 48px, the mirror matching), a hint under it, and `atlas-field.tsx`, the draft's
+  decorative Atlas Thread in the lower right from 900px wide. Its lead node turns Atlas Blue while a
+  name is typed and its thread fills on submit, by CSS alone (`:has()`, `data-searching`); its
+  drawing runs once and only under `prefers-reduced-motion: no-preference`. It carries no data.
+  The most common surnames stay below. Any answered query (unresolved, ambiguous, invalid) keeps the
+  compact search and the tagline. `layout.tsx` also loads Newsreader italic for the headline.
+- **Light only (D-020 resolved, option 1).** Both `prefers-color-scheme: dark` blocks are deleted.
+- **Polish capitals in the search field.** At `line-height: normal` the input clipped the accents of
+  Ż, Ó and Ć, so a result page's field read "WOJCIK" for WÓJCIK (seen in a 2x screenshot). The input
+  and its mirror now use `line-height: 1.45`; the same screenshot shows the accents.
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 205 |
+| `pnpm --filter ./apps/web build`, `next start` on the local database, Chromium (Playwright) | Landing at 1440 px with a dark colour scheme renders Paper; 1280 px English; 820 px (no field graphic); 390 px phone, field and button on one row. Typing "Kowalczyk" turns the lead node blue. Search "Nowak" → `/pl/nazwisko/nowak` with the `surname-hero` transition (650 ms). Second search, reduced motion, unresolved query, phone and dark scheme: same results as before this change. No console errors |
+
+**Not verified:** Safari and Firefox; CI.
+
+### The surname page redesigned: one column per list, question chapters, scale and ranked bars (2026-09-24)
+
+The project owner asked for the result page to be redesigned so that readers new to statistics can
+take in the data at a glance, on desktop as well as on a phone. It was one 40rem column of claim
+sentences, each followed by the same source line, 4,712 px tall for WINIECKI at 1440 px.
+
+What changed (presentation only; no fact is derived, and every existing honesty test still holds):
+
+- **Wider page.** The canonical surname page is 76rem wide. Chapters are laid out against the result's
+  own width (container queries): from 56rem, a 4/8 editorial grid (Visual System §7); below it, one
+  column.
+- **The snapshot** is the name (up to 9rem on desktop), the claim tally, then **one column per register
+  list**: its label, its count as a large number ("osób w rejestrze PESEL" and the date), its 1 in X and
+  its strongest voivodeship. Figures are matched to a column by the list their claim belongs to, never
+  by position; a figure whose list has no column keeps its own line. The not-compared note stays.
+- **A row of chapter links** under the snapshot (sticky on a wide screen), numbered in page order.
+- **Four chapters, each a question** with a short "how to read this" note in its rail: *Ile osób nosi to
+  nazwisko?*, *Jak rzadkie jest to nazwisko?*, *Gdzie jest najczęściej zameldowane?*, *Co oznacza to
+  nazwisko?* (and English). Numbering follows the intent order. A chapter with no figures is compact
+  and carries no reading note.
+- **Rarity:** per list, the 1-in-X figure, `rarity-scale.tsx` (the figure as a point on a fixed log
+  axis from 1 in 100 to past 1 in 10 million, ticks per power of ten, no categories), the rank the
+  claim carries as `#N`, then the claim.
+- **Voivodeships:** per list, the claim sentence as the headline, then the map beside a ranked table
+  whose share cell carries a bar: its length is the share against the entry's largest, its colour the
+  region's map band. The coverage warning still leads the claim.
+- **Claim meta** puts the assessment and source kind on one line and the scope and date on the next.
+- The scale and the bars draw as they come into view where the browser supports scroll-driven
+  animations, only under `prefers-reduced-motion: no-preference`; otherwise they are drawn.
+- The landing's Polish headline is now *"Każde nazwisko / ma swój początek."*: the previous wording
+  said *pochodzi*, which the result pages' honesty guard forbids.
+
+Two existing tests were rescoped to the new markup, with the same assertions: the meaning test now
+slices from `id="meaning"` (the chapter links also say "Meaning"), and the no-TERC test looks for
+`<table class="rank-bars">`. Six tests were added (list matching, scale position and absence, rank,
+bar length and shade, chapter numbering in intent order, empty chapters).
+
+| Check | Result |
+|---|---|
+| `pnpm typecheck`, `pnpm lint`, `pnpm format:check` | Passed |
+| `pnpm test` | All packages passed; `apps/web` 211 (205 + 6) |
+| `pnpm test:integration` (`TEST_DATABASE_URL`, local PostgreSQL 16) | 24 files, 279 passed |
+| `next start` on the local database, Chromium (Playwright) | WINIECKI, NOWAK (English) and KOWALSKI at 1440/1280 px, WINIECKI at 390 px, DETTLAFF (not derived): each chapter captured, no horizontal overflow, no console errors. Search "Nowak" → `surname-hero` transition (650 ms); second search, reduced motion, unresolved query, phone and dark scheme as before |
+
+**Not verified:** Safari and Firefox (scroll-driven animation is Chromium-only today; elsewhere the
+scale and bars are simply drawn); CI.
