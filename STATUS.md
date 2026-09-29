@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by re-verifying TASK-023, TASK-024 and TASK-025 on today's `main` (`docs/progress/2026-09-29-verify-task-023-025.md`). It merges after the record of the project owner's answer to D-022: *Onomastica* is dropped as a meaning source (`docs/progress/2026-09-29-d-022-onomastica-dropped.md`).
+**Last rewritten:** 2026-09-29, by recording the project owner's amendment of TASK-023's AC-1 and AC-8 (`docs/progress/2026-09-29-task-023-rules-amended.md`). It merges after #21, the re-verification of TASK-023, TASK-024 and TASK-025 (`docs/progress/2026-09-29-verify-task-023-025.md`).
 
 ## Production
 
@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-None besides #21, which re-verifies TASK-023, TASK-024 and TASK-025 and carries this rewrite (checked 2026-09-29).
+None besides the one from `claude/task-023-rules-amended`, which records the amended TASK-023 criteria and carries this rewrite. It merges after #21 (checked 2026-09-29).
 
 ## Blocked on the project owner
 
@@ -44,7 +44,8 @@ None besides #21, which re-verifies TASK-023, TASK-024 and TASK-025 and carries 
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
   - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
-  - `claude/verify-task-023-025`, once #21 is merged
+  - `claude/verify-task-023-025` (#21)
+  - `claude/task-023-rules-amended`, once its pull request is merged
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
@@ -73,7 +74,6 @@ None besides #21, which re-verifies TASK-023, TASK-024 and TASK-025 and carries 
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
-- **TASK-023's AC-1 and AC-8.** Re-verified on 2026-09-29, neither holds as written. Since #11, the rarity chapter shows „1 na X” and the rank outside their claim. The page also ships three client components where AC-8 allows none: the share button, suggest-as-you-type and the map. For each, amend the criterion or change the page (`docs/progress/2026-09-29-verify-task-023-025.md`).
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** One is open.
   - **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default? Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task.

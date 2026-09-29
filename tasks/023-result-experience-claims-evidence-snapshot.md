@@ -1,16 +1,14 @@
 # TASK-023 — the result experience: claim display, inline evidence, snapshot, second search
 
-- **Status:** IMPLEMENTED 2026-09-21. **Re-verified 2026-09-29** on `main` @ `5636e95`: AC-2 to AC-7
-  hold, AC-2 in the form ADR-0012 gave it. **AC-1 and AC-8 do not hold as written.** Later changes
-  to the page did not update them:
-  - AC-1: since #11 (`e4bd323`), the rarity chapter shows each list's „1 na X” and its rank above the
-    claim that states them, outside it.
-  - AC-8: the page ships three client components, not none: the share button (TASK-024), the
-    suggest-as-you-type search (`2312f7e`) and the voivodeship map (`f5d858d`). It still works with
-    JavaScript off.
+- **Status:** IMPLEMENTED 2026-09-21, and **VERIFIED 2026-09-29** on `main` @ `5636e95`. All eight
+  criteria hold:
+  - AC-2 in the form ADR-0012 gave it;
+  - AC-1 and AC-8 as the project owner amended them on 2026-09-29.
 
-  For each, the project owner decides whether to amend the criterion or change the page. The record
-  is `docs/progress/2026-09-29-verify-task-023-025.md`.
+  As first written, those two did not hold: #11 and two client components added on 2026-09-23 had
+  changed the page. The owner chose to amend them rather than change the page. The records are
+  `docs/progress/2026-09-29-verify-task-023-025.md` and
+  `docs/progress/2026-09-29-task-023-rules-amended.md`.
 - **Priority:** P0 (directive §72: P0-2, P0-3, P0-4, P0-5; §12–§17, §20).
 - **Milestone:** M2 — excellent free result + truth UX.
 - **Depends on:** TASK-017 (the page), TASK-022 (schema 1.4).
@@ -57,6 +55,10 @@ Client-side JavaScript of any kind (TASK-024 adds the one share island). A map. 
 
 - **AC-1** Every rendered figure sits inside a `Claim` that shows its assessment word, source kind,
   scope and date; no figure appears outside one.
+  *Amended by the project owner on 2026-09-29. A figure may also appear outside a claim, but only as
+  a copy of a figure that a claim on the same page states with its assessment word, source kind,
+  scope and date. That covers the snapshot at the top, and the rarity chapter's „1 na X” and rank
+  directly above their own claim (#11).*
 - **AC-2** Every claim's evidence panel names the source title, provider, dataset date, retrieved
   date and method, and carries no confidence number or percentage.
   *Replaced by ADR-0012 (2026-09-24). There is no per-claim panel. Each source is listed once under
@@ -71,6 +73,11 @@ Client-side JavaScript of any kind (TASK-024 adds the one share island). A map. 
 - **AC-7** The contract accepts and requires `retrieved_at` on every citation; existing fixtures
   updated, no assertion weakened.
 - **AC-8** The page renders no `onclick`/`onchange` attributes and ships no client bundle.
+  *Amended by the project owner on 2026-09-29. The page renders no inline event-handler attribute.
+  Its client-side JavaScript is limited to three components: the share button (TASK-024), the
+  suggest-as-you-type search (`2312f7e`) and the voivodeship map (`f5d858d`). The page works fully
+  without JavaScript: the search form submits, the regional table renders, and the share link is
+  visible as text.*
 
 ## 5. Verification
 
