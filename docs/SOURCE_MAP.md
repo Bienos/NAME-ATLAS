@@ -7,7 +7,7 @@ What each document in this repository is, what it owns, and how much authority i
 ```text
 current task file  (tasks/NNN-*.md)
 → accepted ADRs (docs/adr/) and contracts (docs/contracts/)
-→ PRODUCT.md / ARCHITECTURE.md / PLAN.md / PROGRESS.md
+→ PRODUCT.md / ARCHITECTURE.md / PLAN.md / STATUS.md
 → docs/canonical/10–23
 → docs/library/
 → docs/archive/
@@ -79,16 +79,17 @@ Binding for product and UX intent, not for engineering structure. Read only the 
 | Document | Note |
 |---|---|
 | `docs/archive/NAME_ATLAS_MASTER_COMBINED_2026-09-17.md` | ~1.7 MB concatenation duplicating much of `docs/library/`. Kept for provenance. Never read in bulk; if a passage is needed, `grep -n` for it and read the line range. |
-| `docs/review/NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Byte-identical copy of the reviewed plan at the repository root. Duplicate retained as delivered. |
+| `docs/review/NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | The reviewed plan as delivered. The byte-identical root copy was deleted on 2026-09-24. |
 
-## Process documents — reference only
+## Process documents — historical, reference only
+
+None of these describe the current state or the next step. For those, read `STATUS.md`.
 
 | Document | Note |
 |---|---|
-| `00_READ_THIS_FIRST.md` | Package orientation and the corrections this control plane formalises |
-| `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | The review that mandated this control plane (FIX-01…FIX-08) and the TASK-001…TASK-018 sequence |
-| `PACKAGE_MANIFEST.md` | File inventory with SHA-256 checksums for the delivered corpus |
-| `FIRST_PROMPT_TO_COPY.md` / `prompts/00_FIRST_CLAUDE_PROMPT_CONTROL_PLANE.md` | The control-plane session prompt (identical files) |
+| `docs/review/NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | The review that mandated this control plane (FIX-01…FIX-08). Its TASK-001…TASK-018 sequence is **not** the numbering of `tasks/`: from TASK-006 on, the same numbers name different tasks |
+| `docs/history/` | Superseded orientation and status files, moved out of the root and `docs/implementation/` on 2026-09-24: `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md` (still the SHA-256 reference for `docs/canonical/`, `docs/library/` and `docs/archive/`), and a 2026-09-21 handoff note and task index. See `docs/history/README.md` |
+| `prompts/00_FIRST_CLAUDE_PROMPT_CONTROL_PLANE.md` | The control-plane session prompt (its root copy `FIRST_PROMPT_TO_COPY.md` was deleted as a duplicate) |
 | `prompts/01_IMPLEMENT_TASK_001_FOUNDATION.md` | The prompt for the TASK-001 implementation session |
 
 ## Stack evolution — explicit note
@@ -110,6 +111,6 @@ docs/adr/0001-stack.md    — P0 decision: TypeScript/Node.js + Next.js + Postgr
 
 ## Control plane — owned and maintained here
 
-`AGENTS.md` · `CLAUDE.md` · `PRODUCT.md` · `ARCHITECTURE.md` · `PLAN.md` · `PROGRESS.md` · `docs/SOURCE_MAP.md` · `docs/CODEMAP.md` · `docs/DECISIONS_NEEDED.md` · `docs/adr/` · `docs/contracts/` · `tasks/`
+`AGENTS.md` · `CLAUDE.md` · `PRODUCT.md` · `ARCHITECTURE.md` · `PLAN.md` · `STATUS.md` · `docs/progress/` · `PROGRESS.md` (frozen log to 2026-09-24) · `docs/SOURCE_MAP.md` · `docs/CODEMAP.md` · `docs/DECISIONS_NEEDED.md` · `docs/adr/` · `docs/contracts/` · `tasks/`
 
 Ownership per file is listed in `AGENTS.md` §1.

@@ -7,7 +7,8 @@ it. Missing data is stated as missing, never as zero.
 
 This repository is the implementation. The rules it is built under are in **`AGENTS.md`** (read that
 first if you are going to change anything) and the product it is building is defined in
-**`PRODUCT.md`**. `PROGRESS.md` records what actually exists and what was actually verified.
+**`PRODUCT.md`**. `STATUS.md` says what is live, what is next and what is blocked, and
+`docs/progress/` records each verified change.
 
 ## Requirements
 
@@ -19,15 +20,21 @@ first if you are going to change anything) and the product it is building is def
 
 ```bash
 pnpm install
-cp .env.example .env          # then set DATABASE_URL
+docker compose up -d          # the pinned PostgreSQL 16 + PostGIS image, or any equivalent server
+export DATABASE_URL=postgres://postgres:postgres@localhost:5432/name_atlas
 pnpm db:migrate               # applies packages/db/migrations in order
-pnpm dev                      # the public app on http://localhost:3000
+pnpm --filter web dev         # the public app on http://localhost:3000
 ```
 
-The app answers nothing until a source is ingested. To load the committed excerpt fixtures:
+Export variables in the shell. Nothing in this repository reads a `.env` file (no dotenv, no
+`--env-file`); `.env.example` only lists the variables and the file that reads each one.
+
+The app answers nothing until a source is ingested. To load the committed excerpt fixtures, run
+this from the repository root. `pnpm --filter … run` would run the CLI inside `packages/sources`,
+where these relative paths do not exist (`docs/LOCAL_DATABASE.md`):
 
 ```bash
-pnpm --filter @name-atlas/sources run import-pesel \
+pnpm exec tsx packages/sources/bin/import-pesel.ts \
   --resource 1148808 \
   --file fixtures/pesel/national-male-2026-01-20.csv \
   --metadata docs/sources/acquisition/2026-09-18/metadata/pesel_national_2026_male_1148808.official_resource.json \

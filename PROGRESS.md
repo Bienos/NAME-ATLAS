@@ -1,10 +1,10 @@
-# PROGRESS.md — observed state
+# PROGRESS.md — the log up to 2026-09-24 (frozen)
 
-Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
+> **This is not the current state. Read [`STATUS.md`](STATUS.md) for that.** This file is the append-only log that sessions kept from 2026-09-18 to 2026-09-24: about 5,300 lines, far too long to read whole. `grep -n` it for the entry you need. New records go in their own file under [`docs/progress/`](docs/progress/README.md), so parallel branches stop colliding at the end of one file (`AGENTS.md` §8, §11). The "state" table directly below was last true on 2026-09-19.
 
-**Last updated:** 2026-09-19 — three parallel branches consolidated onto this one and the merged tree verified end to end (193 unit tests, 113 integration tests, migrations, build, and the chain through a real HTTP server). TASK-001 through TASK-006 implemented and verified; M1 complete, M2 begun. TASK-008 (PESEL regional source spike) specified and attempted; blocked on source supply.
+**Last updated as a status page:** 2026-09-19 — three parallel branches consolidated onto this one and the merged tree verified end to end (193 unit tests, 113 integration tests, migrations, build, and the chain through a real HTTP server). TASK-001 through TASK-006 implemented and verified; M1 complete, M2 begun. TASK-008 (PESEL regional source spike) specified and attempted; blocked on source supply.
 
-## Current state
+## State on 2026-09-19 (historical — see `STATUS.md`)
 
 | | |
 |---|---|

@@ -190,3 +190,15 @@ The archive additionally contains PESEL national data for 2019–2025, regional 
 **RESOLVED** (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 now have a verified answer sourced above — including items 3 and 7, which were previously carried forward as residuals and are closed by the evidence in the section above. Nothing was guessed.
 
 One item from D-001's original "what is not settled" list remains open by design: the **rarity/`1-in-X` denominator** question is a TASK-004/TASK-005 modelling decision, not a source-verification fact, and was never part of TASK-002 §8's 20 items. It belongs to whichever task designs `RARITY_CONTEXT`.
+
+## Unit of `Liczba` — the publisher's communiqué, and an enquiry ready to send (recorded 2026-09-20 on an unmerged branch)
+
+> **Provenance.** Recorded as "D-006" on branch `claude/optimistic-pasteur-mqtblr`, which was based on an old commit and never merged. On `main` the same question is TASK-004 §14 **U-4**. The project owner decided it on 2026-09-20 under D-007 as unit `PEOPLE`, on the field's definition, and `docs/DECISIONS_NEEDED.md` records that as "a judgement … none a publisher confirmation" (ADR-0004 amendment). This section carries across the two things that branch had and `main` lacks, so the branch can be deleted. Nothing here changes a decision.
+
+**A publisher statement, confirmed by the project owner but not yet captured.** The Ministry's own communiqué "Nic nowego – Nowak znowu pierwszy" (Ministerstwo Cyfryzacji, `https://www.gov.pl/web/cyfryzacja/nowak-znowu-pierwszy`) describes this dataset's counts as numbers of persons bearing a surname. According to that branch's record, the project owner read the page on 2026-09-20 and confirmed it says so. The page was unreachable from that session, so its verbatim sentences and publication date are **not** in this repository. Pasting them here, with the URL and date, would turn U-4 from a judgement into the publisher's own published reading of its dataset. Web-search summaries attribute to the same series a figure from an earlier edition than the 2026 resources, so quote the sentences, not a number.
+
+**The enquiry, drafted verbatim so a reply can be matched to it.** Question 1 is U-4 (the unit). Question 2 is TASK-004 §14 U-1 (the male/female partition basis). Question 3 is the resource-level licence gap that D-007 accepted rather than closed. Where to send it: `docs/sources/candidate-sources.md` item 1.
+
+> 1. Czy w zbiorze „Nazwiska występujące w rejestrze PESEL” (dane.gov.pl, zbiór nr 1681; zasoby „Nazwiska męskie – stan na 2026-01-20” i „Nazwiska żeńskie – stan na 2026-01-20”) wartość w kolumnie „Liczba” oznacza liczbę żyjących osób, których nazwisko aktualne w rejestrze PESEL ma daną postać (jedna osoba = jedno wystąpienie), czy też liczbę rekordów/wpisów w rejestrze, która może różnić się od liczby osób?
+> 2. Czy podział na zasoby „męskie” i „żeńskie” odpowiada płci osoby noszącej nazwisko, czy formie gramatycznej (rodzajowi) nazwiska?
+> 3. Czy licencja CC0 1.0 wskazana na poziomie zbioru danych obejmuje każdy z jego zasobów (plików)?

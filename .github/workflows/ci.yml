@@ -57,10 +57,16 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
+      # On a pull request this runs on the merge with main, so it refuses a
+      # branch that reuses a task, ADR, migration or decision number already
+      # on main (AGENTS.md §11).
+      - name: Unique task, ADR, migration and decision numbers
+        run: pnpm check:ids
+
       - name: Unit tests
         run: pnpm test
 
-      - name: Apply bootstrap migration
+      - name: Apply migrations
         run: pnpm db:migrate
 
       - name: Verify generated types are current

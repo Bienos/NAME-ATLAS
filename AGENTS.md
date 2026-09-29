@@ -12,7 +12,8 @@ Each kind of truth has exactly one owner. Never duplicate truth across files.
 | Product definition, scope, promises, non-goals | `PRODUCT.md` |
 | System shape, boundaries, invariants | `ARCHITECTURE.md` |
 | Milestones (coarse) | `PLAN.md` |
-| What is actually built right now | `PROGRESS.md` |
+| Current state: what is live, what is next, what is blocked | `STATUS.md`, rewritten in place and never appended to |
+| Record of each verified change | `docs/progress/YYYY-MM-DD-<slug>.md`, one file per change (`PROGRESS.md` is the frozen log up to 2026-09-24) |
 | Binding technical decisions | `docs/adr/` |
 | API/data contracts | `docs/contracts/` |
 | Scope of the work in front of you | the current `tasks/NNN-*.md` file |
@@ -36,12 +37,12 @@ Each kind of truth has exactly one owner. Never duplicate truth across files.
 ## 4. Reading order for a task session
 
 1. `tasks/NNN-*.md` (the assigned task)
-2. `PROGRESS.md`
+2. `STATUS.md`
 3. ADRs and contracts **referenced by that task**
 4. `ARCHITECTURE.md` sections relevant to the task
 5. Canonical documents **only** where the task names them
 
-Do not read the canonical corpus, `docs/library/` or `docs/archive/` in bulk. They are large and will crowd out the work.
+Do not read the canonical corpus, `docs/library/`, `docs/archive/`, `PROGRESS.md` (a 373 KB log) or `docs/progress/` in bulk. `grep` them for what the task needs. They are large and will crowd out the work.
 
 ## 5. Preflight before editing
 
@@ -70,12 +71,12 @@ No generic repo-wide exploration. No "let me understand the whole codebase first
 1. Inspect the complete diff, file by file.
 2. Remove accidental changes, debug code, stray files.
 3. Update `docs/CODEMAP.md` if the repository structure changed.
-4. Update `PROGRESS.md` with facts only: what exists, what was verified, what is blocked.
+4. Record facts only in a new `docs/progress/YYYY-MM-DD-<slug>.md`: what changed, the exact verification commands with their real results, and what was not verified. Then rewrite whatever lines of `STATUS.md` your change made untrue.
 5. **STOP after the current task.** Do not start the next task, do not create the next task file, do not "get a head start".
 
 ## 9. Facts only
 
-- `PROGRESS.md` records observed state, not intentions and not narrative.
+- `STATUS.md` and `docs/progress/` record observed state, not intentions and not narrative.
 - Never invent data values, counts, licence terms, source metadata or test results.
 - `INSUFFICIENT_DATA` and "not verified" are valid, preferred outcomes over plausible fabrication.
 
@@ -87,3 +88,12 @@ These hold in every task and may not be traded away for convenience:
 - Suppressed or absent source data is not zero.
 - `DistributionSnapshot` is surname-scoped.
 - Presentation layers never derive facts; they render validated claims.
+
+## 11. One trunk: branches and numbers
+
+`main` is the only line of development. Parallel sessions that built on other bases have repeated work `main` already had, and have given the same number to different things.
+
+- **Start from the latest `origin/main`.** Run `git fetch origin main` and `git merge-base --is-ancestor origin/main HEAD`. If that fails and the session has committed nothing, move the branch onto `origin/main`. If the session has commits of its own, rebase them onto `origin/main` or stop and ask. Build on another branch only when the task says so. In Claude Code on the web, `.claude/hooks/session-start.sh` prints a warning when this check fails.
+- **One task, one branch, one pull request into `main`.** When it is merged or closed, delete the branch.
+- **Numbers come from `main`.** A new `TASK-NNN`, ADR, `D-NNN` or migration takes the next number that is free on `origin/main` *and* in open pull requests. Numbers that live inside a task (`U-n`, `AC-nn`) are cited with their task: `TASK-004 §14 U-1`. CI runs `pnpm check:ids`, which fails when two files or decisions share a number.
+- **Found it already on `main`? Stop.** If the work in front of you already exists on `main`, report that instead of building it again.
