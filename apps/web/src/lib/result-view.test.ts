@@ -904,6 +904,20 @@ describe("TASK-023 AC-5: intent changes order only", () => {
     // The snapshot is always first.
     expect(mapFirst.indexOf('class="snapshot"')).toBeLessThan(mapFirst.indexOf('id="where"'));
   });
+
+  // Added by TASK-034: the fourth intent was never rendered by any test.
+  it("moves the meaning chapter first for ?intent=meaning, and its link with it", () => {
+    const parsed = surnameResultResponseSchema.parse(RESOLVED) as SurnameResultResponse;
+    const meaningFirst = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "meaning" }),
+    );
+    expect(meaningFirst.indexOf('id="meaning"')).toBeLessThan(
+      meaningFirst.indexOf('id="today-count"'),
+    );
+    expect(meaningFirst.indexOf('href="#meaning"')).toBeLessThan(
+      meaningFirst.indexOf('href="#today-count"'),
+    );
+  });
 });
 
 describe("TASK-023: sources section and anchors", () => {

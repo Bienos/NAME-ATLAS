@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by TASK-031, the Polona source spike (`docs/progress/2026-09-29-polona-source-spike.md`).
+**Last rewritten:** 2026-09-29, by TASK-031, the Polona source spike (`docs/progress/2026-09-29-polona-source-spike.md`). It merges after TASK-034 (#14, `docs/progress/2026-09-29-web-section-registry-and-design-tokens.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030, 031 and 033, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030, 031, 033 and 034, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -26,28 +26,23 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
   - the landing page and the surname page redesigned for readers new to statistics (#11).
-- On `main`, CI is green: run #179, on `0eb4814`.
+- On `main`, CI was green on `83d38c2` (run #183, Merge #12). Each pull request merged since was green on its own head before it merged.
 
 ## Next
 
-- **TASK-034**, one section registry and one set of design tokens for the web app: implemented, in pull request #14.
 - **The Polona connector task**: not written, and blocked on D-021. TASK-031's record (`docs/sources/polona.md`) holds what it needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
 
 ## Open pull requests and branches
 
-Four pull requests are open (checked 2026-09-29), each on its own branch from `main` @ `83d38c2`:
+Two pull requests are open (checked 2026-09-29), each from another session and each on its own branch from `main` @ `83d38c2`:
 
 - **#13**, TASK-036: batch derivation fast enough for the real register (`claude/cache-rarity-denominator`).
-- **#14**, TASK-034: the section registry and design tokens (`claude/procent-continuation-7c2e00`). That branch was reset onto `main` on 2026-09-29, so its earlier commits, which redid TASK-005, are gone from it.
-- **#15**, TASK-035: load the real PESEL register into production (`claude/jolly-ramanujan-din7m6`).
-- **TASK-031's**, the Polona source spike (`claude/task-031-polona-spike`).
-
-#14 and TASK-031's both rewrite lines of this file. Whichever merges second resolves the conflict.
+- **#15**, TASK-035: load the real PESEL register into production (`claude/jolly-ramanujan-din7m6`). It depends on #13.
 
 ## Blocked on the project owner
 
-- **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start 117 commits behind (`AGENTS.md` §11). `claude/procent-continuation-7c2e00` is one that did.
+- **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
@@ -66,6 +61,13 @@ Four pull requests are open (checked 2026-09-29), each on its own branch from `m
   - `claude/relaxed-meitner-s6445i`
   - `claude/quirky-babbage-7ps0xa`
   - `claude/optimistic-pasteur-mqtblr`
+
+  These were surveyed on 2026-09-29, and nothing on them is missing from `main`:
+  - `claude/kind-edison-eod395`: #8, closed. Its useful parts shipped in #11, and its ẞ/SS finding was fixed by ADR-0005.
+  - `vercel/install-and-configure-vercel-w-m59vuh`: #3, closed. Vercel Analytics would send surname URLs to a vendor.
+  - `claude/laughing-mccarthy-12i9h9`: a parallel TASK-004/005 line, retired by the project owner. The two ideas its note names exist on `main` in its own form: TASK-009's completeness gate, and confidence taking no rights input.
+  - `claude/serene-gauss-6inrf3`: the stale default branch's own commit.
+  - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.

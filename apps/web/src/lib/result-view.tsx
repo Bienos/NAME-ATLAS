@@ -52,6 +52,8 @@ import {
   UI,
 } from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
+import { SOURCES_ANCHOR, anchorOf, sectionOf, sectionOrder } from "./sections.js";
+import type { SectionKey } from "./sections.js";
 import { Snapshot } from "./snapshot.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
@@ -70,30 +72,31 @@ export function href(surname: string, lang: Lang): string {
  * Numbered in the order the page shows them, which an intent may change.
  */
 function Chapter({
-  id,
+  chapter,
   number,
-  title,
-  lede,
+  lang,
   wide = false,
   empty = false,
   children,
 }: {
-  id: string;
+  /** Which chapter: its anchor, question and reading note come from the registry. */
+  chapter: SectionKey;
   number: number;
-  title: string;
-  lede: string;
+  lang: Lang;
   wide?: boolean;
   /** No figures to read: the absence is stated, compactly, and there is nothing to explain. */
   empty?: boolean;
   children: ReactNode;
 }) {
+  const t = UI[lang];
+  const { anchor, title, lede } = sectionOf(chapter);
   const className = empty ? "chapter chapter-empty" : wide ? "chapter chapter-wide" : "chapter";
   return (
-    <section id={id} className={className}>
+    <section id={anchor} className={className}>
       <div className="chapter-rail">
         <p className="chapter-number">{String(number).padStart(2, "0")}</p>
-        <h3>{title}</h3>
-        {empty ? null : <p className="chapter-lede">{lede}</p>}
+        <h3>{t[title]}</h3>
+        {empty ? null : <p className="chapter-lede">{t[lede]}</p>}
       </div>
       <div className="chapter-body">{children}</div>
     </section>
@@ -131,13 +134,7 @@ function Population({
   const t = UI[lang];
   const several = section.observations.length > 1;
   return (
-    <Chapter
-      id="today-count"
-      number={number}
-      title={t.chapterCountTitle}
-      lede={t.chapterCountLede}
-      empty={section.state !== "READY"}
-    >
+    <Chapter chapter="count" number={number} lang={lang} empty={section.state !== "READY"}>
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -179,13 +176,7 @@ function Rarity({
 }) {
   const t = UI[lang];
   return (
-    <Chapter
-      id="rarity"
-      number={number}
-      title={t.chapterRarityTitle}
-      lede={t.chapterRarityLede}
-      empty={section.state !== "READY"}
-    >
+    <Chapter chapter="rarity" number={number} lang={lang} empty={section.state !== "READY"}>
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -338,16 +329,8 @@ function Distribution({
   number: number;
   lang: Lang;
 }) {
-  const t = UI[lang];
   return (
-    <Chapter
-      id="where"
-      number={number}
-      title={t.chapterWhereTitle}
-      lede={t.chapterWhereLede}
-      wide
-      empty={section.state !== "READY"}
-    >
+    <Chapter chapter="map" number={number} lang={lang} wide empty={section.state !== "READY"}>
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -409,19 +392,14 @@ function Meaning({
           ? t.meaningBlocked
           : t.meaningUnavailable;
     return (
-      <Chapter
-        id="meaning"
-        number={number}
-        title={t.chapterMeaningTitle}
-        lede={t.chapterMeaningLede}
-      >
+      <Chapter chapter="meaning" number={number} lang={lang}>
         <p className="absent">{body}</p>
       </Chapter>
     );
   }
   const conflicting = section.confidence === "CONFLICTING";
   return (
-    <Chapter id="meaning" number={number} title={t.chapterMeaningTitle} lede={t.chapterMeaningLede}>
+    <Chapter chapter="meaning" number={number} lang={lang}>
       {/* Before the readings, not after: a reader must know these are
           interpretations before they read one as a fact. */}
       <p className="caveat">{t.meaningInterpretationNote}</p>
@@ -600,7 +578,7 @@ function Sources({ response, lang }: { response: SurnameResultResponse; lang: La
   }
   const notes = [...new Set(evidence.flatMap((e) => e.notes))];
   return (
-    <section id="sources" className="sources-section">
+    <section id={SOURCES_ANCHOR} className="sources-section">
       <h3>{t.sectionSourcesAll}</h3>
       <ul className="sources">
         {[...sources].map(([key, c]) => (
@@ -668,23 +646,6 @@ function Suggestions({ section, lang }: { section: SuggestionsSection; lang: Lan
   );
 }
 
-type SectionKey = "count" | "rarity" | "map" | "meaning";
-
-/** Default order per directive §17; an intent moves one section first. Presentation only. */
-export function sectionOrder(intent: Intent): readonly SectionKey[] {
-  const base: SectionKey[] = ["count", "rarity", "map", "meaning"];
-  if (intent === "default") return base;
-  const first: SectionKey = intent === "rarity" ? "rarity" : intent === "map" ? "map" : "meaning";
-  return [first, ...base.filter((k) => k !== first)];
-}
-
-const CHAPTER_ANCHOR: Record<SectionKey, string> = {
-  count: "today-count",
-  rarity: "rarity",
-  map: "where",
-  meaning: "meaning",
-};
-
 /** The page's chapters as links, numbered as they appear. Anchors only; no script. */
 function ChapterNav({
   order,
@@ -696,26 +657,20 @@ function ChapterNav({
   lang: Lang;
 }) {
   const t = UI[lang];
-  const label: Record<SectionKey, string> = {
-    count: t.navCount,
-    rarity: t.navRarity,
-    map: t.navWhere,
-    meaning: t.navMeaning,
-  };
   return (
     <nav className="chapter-nav" aria-label={t.navLabel}>
       <ol>
         {order.map((key, index) => (
           <li key={key}>
-            <a href={`#${CHAPTER_ANCHOR[key]}`}>
+            <a href={`#${anchorOf(key)}`}>
               <span className="chapter-nav-number">{String(index + 1).padStart(2, "0")}</span>
-              {label[key]}
+              {t[sectionOf(key).nav]}
             </a>
           </li>
         ))}
         {sources ? (
           <li>
-            <a href="#sources">{t.navSources}</a>
+            <a href={`#${SOURCES_ANCHOR}`}>{t.navSources}</a>
           </li>
         ) : null}
       </ol>

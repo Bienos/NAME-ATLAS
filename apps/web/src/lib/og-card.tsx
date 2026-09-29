@@ -4,6 +4,7 @@ import { ImageResponse } from "next/og";
 import { createLogger } from "@name-atlas/logging";
 import type { OgFacts } from "./og-facts.js";
 import { NAME_PRINT_DOT, NAME_PRINT_RINGS_SMALL, NAME_PRINT_VIEWBOX } from "./name-print.js";
+import { TOKENS, TYPE_FAMILIES } from "./design-tokens.js";
 
 /**
  * The share card itself (TASK-024, restyled to the Name Atlas Visual System v1).
@@ -22,13 +23,13 @@ import { NAME_PRINT_DOT, NAME_PRINT_RINGS_SMALL, NAME_PRINT_VIEWBOX } from "./na
  * warning is logged — a share card must never 500 because of typography.
  */
 
-/** Visual System v1 tokens, as literal values: `next/og` cannot read CSS. */
+/** Visual System v1 tokens, as values: `next/og` cannot read CSS (TASK-034). */
 const C = {
-  paper: "#f3f0e8", // surface-primary
-  ink: "#101413", // text-primary
-  secondary: "#4f534f", // text-secondary (6.9:1 on paper)
-  atlas: "#1e4fd7", // color-brand-atlas
-  rule: "#6e716c", // border-strong
+  paper: TOKENS["surface-primary"],
+  ink: TOKENS["text-primary"],
+  secondary: TOKENS["text-secondary"],
+  atlas: TOKENS.accent,
+  rule: TOKENS["border-strong"],
 } as const;
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -47,10 +48,10 @@ interface BrandFont {
 
 /** The files `assets/fonts/README.md` asks for. */
 export const FONT_FILES = [
-  { name: "Newsreader", file: "Newsreader-Medium.ttf", weight: 500 },
-  { name: "Inter", file: "Inter-Regular.ttf", weight: 400 },
-  { name: "Inter", file: "Inter-SemiBold.ttf", weight: 600 },
-  { name: "IBM Plex Mono", file: "IBMPlexMono-Medium.ttf", weight: 500 },
+  { name: TYPE_FAMILIES.display, file: "Newsreader-Medium.ttf", weight: 500 },
+  { name: TYPE_FAMILIES.ui, file: "Inter-Regular.ttf", weight: 400 },
+  { name: TYPE_FAMILIES.ui, file: "Inter-SemiBold.ttf", weight: 600 },
+  { name: TYPE_FAMILIES.data, file: "IBMPlexMono-Medium.ttf", weight: 500 },
 ] as const;
 
 let fonts: Promise<BrandFont[]> | null = null;
@@ -122,7 +123,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
         padding: `${PAD_Y}px ${PAD_X}px`,
         background: C.paper,
         color: C.ink,
-        fontFamily: "Inter",
+        fontFamily: TYPE_FAMILIES.ui,
       }}
     >
       {/* Eyebrow, then the mark and the wordmark. */}
@@ -155,7 +156,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
           </svg>
           <div
             style={{
-              fontFamily: "Newsreader",
+              fontFamily: TYPE_FAMILIES.display,
               fontWeight: 500,
               fontSize: 34,
               letterSpacing: -0.7,
@@ -171,7 +172,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div
           style={{
-            fontFamily: "Newsreader",
+            fontFamily: TYPE_FAMILIES.display,
             fontWeight: 500,
             fontSize: size,
             lineHeight: 0.95,
@@ -255,7 +256,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
         <div
           style={{
             display: "flex",
-            fontFamily: "IBM Plex Mono",
+            fontFamily: TYPE_FAMILIES.data,
             fontWeight: 500,
             fontSize: 22,
             letterSpacing: 0.6,
