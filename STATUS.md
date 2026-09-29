@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by ADR-0014, the project owner's decisions on D-021 items 2 and 3 (`docs/progress/2026-09-29-adr-0014-polona-metadata-and-attribution.md`). It merges after TASK-031 (#16) and TASK-034 (#14).
+**Last rewritten:** 2026-09-29, by parking TASK-035, the real register in production (`docs/progress/2026-09-29-register-load-parked.md`).
 
 ## Production
 
@@ -10,13 +10,13 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
 | Deployed commit | `main` @ `0eb4814` (Merge #11), deployment `dpl_H55YeqWUjCg34F4F3wcufMym6sM6`, created by hand with target production. The previous one, `dpl_33fKu5ryMHRuNfvnMNMgiF262uLG` (`4d605e5`), is the rollback candidate |
-| Database | Supabase project `xujctkjpvnmcdpximtda` (EU), all 21 migrations applied, a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
+| Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 22 migrations applied (not `0022`, TASK-036's index, which only the derivation uses), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
 | Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
 
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030, 031, 033 and 034, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030, 031, 033, 034 and 036, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -32,13 +32,11 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
+- **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
 
 ## Open pull requests and branches
 
-Two pull requests are open (checked 2026-09-29), each from another session and each on its own branch from `main` @ `83d38c2`:
-
-- **#13**, TASK-036: batch derivation fast enough for the real register (`claude/cache-rarity-denominator`).
-- **#15**, TASK-035: load the real PESEL register into production (`claude/jolly-ramanujan-din7m6`). It depends on #13.
+None besides #15, which parks TASK-035 and carries this rewrite (checked 2026-09-29).
 
 ## Blocked on the project owner
 
@@ -52,7 +50,8 @@ Two pull requests are open (checked 2026-09-29), each from another session and e
   - `claude/fix-surname-links-and-section-rights`
   - `claude/hopeful-cannon-uc9h18`
   - `claude/inspiring-johnson-x88mbo`
-  - `claude/jolly-ramanujan-din7m6`: not now, because it carries the open #15 (TASK-035)
+  - `claude/cache-rarity-denominator` (#13, TASK-036)
+  - `claude/jolly-ramanujan-din7m6`, once #15 is merged
   - `claude/kind-edison-eod395-main`
   - `claude/lucid-goodall-t2ai7d`
   - `claude/sharp-bohr-ld17v3`

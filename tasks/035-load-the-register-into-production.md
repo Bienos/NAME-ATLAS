@@ -1,10 +1,28 @@
 # TASK-035 — Load the real PESEL register into production
 
-- **Status:** SPECIFIED 2026-09-29. The local rehearsal is recorded in `docs/progress/2026-09-29-register-rehearsal.md`.
+- **Status:** PARKED 2026-09-29 by the project owner, who will not move Supabase off the free plan (§0). What was measured before stopping is in `docs/progress/2026-09-29-register-load-parked.md`.
 - **Requested by:** the project owner, who chose "load the real register" on 2026-09-29, after the go-live of #9, #10, #7 and #11. They then chose a GitHub Actions workflow for the transfer.
 - **Milestone:** launch. `PROGRESS.md` (2026-09-21): "A launch needs the full register imported, which is what makes rank, rarity and geography answer instead of refusing."
 - **Numbering:** TASK-034 is reserved in `STATUS.md` for the section registry; this takes the next number.
-- **Depends on:** TASK-036 (#13). Without it `derive-batch --rank` needs days.
+- **Depends on:** TASK-036 (#13, merged). Without it `derive-batch --rank` needs days.
+
+## 0. Parked
+
+The complete register cannot go into production on the free plan. Derived, it is about 16 GB; the free plan stops at a 500 MB database. The project owner will not move to a paid plan, so production keeps the seven-surname slice.
+
+**What exists:**
+- The four official files download and verify.
+- A local build of the whole register reached step 7 of `pnpm local:setup` before it was stopped. The record gives its size and rates.
+- The load workflow is **not on `main`**. It is `.github/workflows/load-register.yml` at commit `945e98f`, in this task's history. Its load step's script was rehearsed locally, at small scale, for success, a truncated dump and a failing statement. Nothing else of it ran to completion.
+
+**What would unpark it:**
+1. **Population only, on the free plan.** A national `--slice top:N` fits.
+   - Rank, rarity and the map do not fit. Each needs its complete universe: the derivation refuses a partial one, with no bypass. The regional importer has no slice, and the complete regional import, with the surnames it brings, is estimated at about 680 MB on its own.
+   - N has not been measured.
+   - The transfer still has to run from a GitHub runner: it needs the `PROD_DATABASE_URL` secret and `main` as the default branch.
+2. **A paid plan.** Supabase Pro with the Spend Cap off, and the disk raised by hand to at least 24 GB before the load. Then §3–§7 as written.
+3. **A compact projection** of the published figures for every surname. It is estimated, not measured, at 300–400 MB. It needs an ADR first, because the pages would read a projection of validated claims instead of the claim tables.
+4. **Less storage per claim.** A task of its own, which would help options 1 to 3. Today there is one research run per claim, and one pair of universe evidence items per ranked surname. At the stop, the pairs numbered 310,527 and 310,524, nearly identical.
 
 ## 1. Goal
 
