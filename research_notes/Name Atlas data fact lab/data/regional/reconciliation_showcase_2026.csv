@@ -1,0 +1,8 @@
+surname,national_M,voiv_sum_M,cells_M,national_F,voiv_sum_F,cells_F,national_paired,voiv_sum_paired,gap,gap_pct,unattributed_lower_bound,dataset
+NOWAK,98387,86969,16,99738,89385,16,198125,176354,21771,11.0,21771,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+KOWALSKI/KOWALSKA,66589,59425,16,67308,61741,16,133897,121166,12731,9.5,12731,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+WIŚNIEWSKI/WIŚNIEWSKA,53079,47126,16,54177,49645,16,107256,96771,10485,9.8,10485,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+KACZMAREK,29820,26857,16,30240,27743,16,60060,54600,5460,9.1,5460,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+SZCZEPAŃSKI/SZCZEPAŃSKA,16419,14797,16,16778,15555,16,33197,30352,2845,8.6,2845,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+GRZEGORCZYK,5128,4680,16,5334,4930,16,10462,9610,852,8.1,852,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
+CZEKIERDA,217,197,14,212,195,13,429,392,37,8.6,32,"PESEL 1681 national vs 1681woj (permanent registered residence), both 2026-01-20"
