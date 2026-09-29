@@ -1,0 +1,50 @@
+method,check,subset,route,entries_tested,resolved_share_pct,country_agree_pct,voiv_agree_pct_PL,placed_outside_PL_pct,note
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 0,text,2087513,0.13,96.32,86.84,,resolved to PL 113; false-PL share 32.74%
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 0,district,2087513,67.88,99.0,97.56,,resolved to PL 258379; false-PL share 1.86%
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 0,text+district,2087513,68.01,99.0,97.56,,resolved to PL 258492; false-PL share 1.87%
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 1,text,1812791,0.14,92.52,79.76,,resolved to PL 112; false-PL share 25.0%
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 1,district,1812791,72.86,98.42,97.84,,resolved to PL 224714; false-PL share 2.99%
+loc-v1 validation,V1 internal out-of-sample (GOV-Id halves),train half 1,text+district,1812791,73.0,98.4,97.84,,resolved to PL 224826; false-PL share 3.0%
+loc-v1 validation,"V2 text route, random entry halves (optimistic bound)",train half 0,text,1948930,78.82,99.99,99.99,,
+loc-v1 validation,"V2 text route, random entry halves (optimistic bound)",train half 1,text,1951373,78.89,99.99,99.99,,
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,wielkopolskie,ALL routes,102624,100.0,99.81,99.24,0.19,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,wielkopolskie,point,102624,77.67,99.87,99.03,0.13,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,wielkopolskie,text,102624,0.24,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,wielkopolskie,district,102624,22.0,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,kujawsko-pomorskie,ALL routes,78587,98.68,99.65,94.83,0.35,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,kujawsko-pomorskie,point,78587,81.17,99.64,93.74,0.36,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,kujawsko-pomorskie,text,78587,0.2,99.35,91.5,0.65,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,kujawsko-pomorskie,district,78587,17.26,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,pomorskie,ALL routes,65455,96.71,99.67,97.3,0.33,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,pomorskie,point,65455,86.43,99.67,96.99,0.33,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,pomorskie,text,65455,0.23,100.0,96.62,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,pomorskie,district,65455,10.02,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,warmińsko-mazurskie,ALL routes,87994,87.87,98.72,96.41,1.28,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,warmińsko-mazurskie,point,87994,60.06,98.33,94.75,1.67,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,warmińsko-mazurskie,text,87994,0.16,100.0,95.86,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,warmińsko-mazurskie,district,87994,27.52,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,śląskie,ALL routes,74214,44.11,99.41,99.57,0.59,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,śląskie,point,74214,4.54,94.69,95.68,5.31,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,śląskie,text,74214,1.96,99.79,99.93,0.21,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,śląskie,district,74214,37.59,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,opolskie,ALL routes,62101,56.21,98.59,97.54,1.41,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,opolskie,point,62101,20.3,97.62,93.13,2.38,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,opolskie,text,62101,0.06,97.22,97.14,2.78,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,opolskie,district,62101,35.55,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,dolnośląskie,ALL routes,139523,87.96,98.48,98.7,1.52,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,dolnośląskie,point,139523,43.76,98.1,97.39,1.9,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,dolnośląskie,text,139523,0.33,99.35,98.92,0.65,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,dolnośląskie,district,139523,43.37,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,lubuskie,ALL routes,47485,80.34,98.11,90.73,1.89,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,lubuskie,point,47485,56.3,97.51,86.71,2.49,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,lubuskie,text,47485,0.14,98.53,89.55,1.47,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,lubuskie,district,47485,23.78,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,zachodniopomorskie,ALL routes,92100,76.67,99.65,94.64,0.35,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,zachodniopomorskie,point,92100,70.11,99.75,94.15,0.25,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,zachodniopomorskie,text,92100,0.38,100.0,98.31,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,zachodniopomorskie,district,92100,6.08,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,ALL,ALL routes,750083,82.65,99.16,96.91,0.84,country_agree = share of located entries placed in today's Poland; 111 district keys
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,ALL,point,750083,56.16,99.08,95.46,0.92,country_agree = share of located entries placed in today's Poland; 111 district keys
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,ALL,text,750083,0.41,99.71,98.56,0.29,country_agree = share of located entries placed in today's Poland; 111 district keys
+loc-v1 validation,V3 external: listed Prussian district names -> voivodeship of district seat,ALL,district,750083,25.9,100.0,100.0,0.0,country_agree = share of located entries placed in today's Poland; 111 district keys
+loc-v1 validation,V4 plausibility: placed in a voivodeship outside the German Empire of 1914,"lubelskie, łódzkie, małopolskie, mazowieckie, podkarpackie, podlaskie, świętokrzyskie",ALL routes,1295436,,,,,5152 entries = 0.4% of Poland-located entries with voivodeship (genuine births outside Germany or errors)

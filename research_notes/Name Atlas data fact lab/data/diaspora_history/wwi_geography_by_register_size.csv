@@ -1,0 +1,7 @@
+method,male_file_2026_size_class,entries,located_pct,poland_pct_of_located,germany_pct_of_located,other_pct_of_located,ruhr_box_pct_of_point
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1",">= 1,000",810515,80.6,33.3,63.3,3.5,2.94
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1",100-999,1543209,81.2,24.9,71.5,3.6,2.92
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1",20-99,1309089,82.4,19.2,77.2,3.6,3.64
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1",2-19,1803941,83.9,14.6,81.8,3.6,4.68
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1","not in 2026 male file (<2, absent or other spelling)",3041025,84.6,12.9,82.5,4.6,6.13
+"wwimatch-v1 size classes (2026 national male file, fold-v1 pooled); loc-v1",surname excluded by cleaning,43979,77.6,16.2,80.7,3.1,9.69

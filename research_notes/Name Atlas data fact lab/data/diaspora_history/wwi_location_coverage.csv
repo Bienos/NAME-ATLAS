@@ -1,0 +1,47 @@
+method,section,item,entries,share_pct,denominator,note
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,route,point,3900304,45.61,8551758,GOV-Id Maidenhead locator (subsquare inside one country)
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,route,text,445898,5.21,8551758,exact Ort text seen >= 5x with agreeing point locations
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,route,district,1912572,22.36,8551758,district key (text after last comma) seen >= 20x with agreeing point locations
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,route,postcode,845734,9.89,8551758,GOV-Id built from a German postal code -> today's Germany
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,route,none,1447250,16.92,8551758,not located
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,located,located to a present-day country (any route),7104508,83.08,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,located,in today's Poland,1295436,15.15,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,located,in today's Poland with a voivodeship,1295436,15.15,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,located,"in today's Poland, voivodeship not resolved",0,0.0,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,located,point entries whose subsquare straddles a voivodeship border (kept; nearest-locality voivodeship),58488,4.51,1295436,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,not located (reason),district unresolved,1154801,13.5,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,not located (reason),no Ort,231106,2.7,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,not located (reason),border-straddling subsquare,61343,0.72,8551758,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Germany,5528718,77.82,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Poland,1295436,18.23,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),France,108711,1.53,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Russia,91431,1.29,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Denmark,17421,0.25,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Czechia,15179,0.21,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Austria,13209,0.19,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Lithuania,8770,0.12,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Belgium,6322,0.09,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Netherlands,2905,0.04,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),outside Europe box,2348,0.03,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Romania,2082,0.03,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Ukraine,1905,0.03,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Sweden,1867,0.03,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),Italy,1578,0.02,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,present-day country (share of located),all other countries / sea / outside box,6626,0.09,7104508,
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),dolnośląskie,258714,19.97,1295436,"by route: point 117938, text 46286, district 94490"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),kujawsko-pomorskie,137720,10.63,1295436,"by route: point 111079, text 277, district 26364"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),lubelskie,236,0.02,1295436,"by route: point 233, text 1, district 2; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),lubuskie,77909,6.01,1295436,"by route: point 55684, text 487, district 21738"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),łódzkie,1969,0.15,1295436,"by route: point 1960, text 8, district 1; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),małopolskie,318,0.02,1295436,"by route: point 312, text 2, district 4; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),mazowieckie,1387,0.11,1295436,"by route: point 1385, text 2, district 0; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),opolskie,57827,4.46,1295436,"by route: point 22485, text 298, district 35044"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),podkarpackie,136,0.01,1295436,"by route: point 135, text 1, district 0; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),podlaskie,987,0.08,1295436,"by route: point 979, text 8, district 0; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),pomorskie,153834,11.88,1295436,"by route: point 139382, text 317, district 14135"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),śląskie,56200,4.34,1295436,"by route: point 7198, text 2940, district 46062"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),świętokrzyskie,119,0.01,1295436,"by route: point 119, text 0, district 0; outside German Empire in 1914"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),warmińsko-mazurskie,154079,11.89,1295436,"by route: point 106952, text 283, district 46844"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),wielkopolskie,243352,18.79,1295436,"by route: point 191802, text 10833, district 40717"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,today's voivodeship (share of Poland-located with voivodeship),zachodniopomorskie,150649,11.63,1295436,"by route: point 118712, text 17568, district 14369"
+loc-v1 (c5a/c5b); PRNG 2026-09-28 voivodeships; Natural Earth 1:10m countries,Ruhr-area box (diagnostic),point entries in the Ruhr-area box 51.35-51.70N 6.60-7.80E,178244,4.57,3900304,share of point entries

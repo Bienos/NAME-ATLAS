@@ -1,0 +1,21 @@
+method,pl_male_rank_2026,surname,key_fold,pesel_m_2026_national_folded,wwi_entries,wwi_entries_per_100_male_file_entries,wwi_located_pct,wwi_poland_pct_of_located,wwi_germany_pct_of_located,wwi_top_voivodeship,wwi_top_voiv_pct_of_poland_located,persist_overlap,persist_chance_overlap
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",1,NOWAK,NOWAK,98387,4999,5.1,62.7,88.6,9.8,wielkopolskie,57.6,0.667,0.513
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",2,KOWALSKI,KOWALSKI,66589,2465,3.7,75.4,86.3,11.6,wielkopolskie,37.6,0.631,0.503
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",3,WIŚNIEWSKI,WISNIEWSKI,53184,965,1.8,84.7,94.4,4.4,kujawsko-pomorskie,50.2,0.61,0.417
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",4,WÓJCIK,WOJCIK,47886,35,0.1,65.7,82.6,17.4,wielkopolskie,63.2,,
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",5,KOWALCZYK,KOWALCZYK,46994,337,0.7,65.9,88.7,8.6,wielkopolskie,53.8,0.4,0.401
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",6,KAMIŃSKI,KAMINSKI,46423,2152,4.6,77.7,79.6,16.6,warmińsko-mazurskie,31.4,0.612,0.439
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",7,LEWANDOWSKI,LEWANDOWSKI,44466,2312,5.2,83.7,90.8,7.8,kujawsko-pomorskie,64.4,0.707,0.372
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",8,ZIELIŃSKI,ZIELINSKI,44324,1635,3.7,79.8,89.8,8.9,kujawsko-pomorskie,45.9,0.63,0.44
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",9,WOŹNIAK,WOZNIAK,42613,857,2.0,83.3,92.3,7.1,wielkopolskie,71.6,0.454,0.362
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",10,SZYMAŃSKI,SZYMANSKI,42510,1074,2.5,80.8,89.2,9.8,wielkopolskie,69.0,0.506,0.413
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",11,DĄBROWSKI,DABROWSKI,41621,110,0.3,88.2,77.3,22.7,wielkopolskie,69.3,0.302,0.37
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",12,KOZŁOWSKI,KOZLOWSKI,36323,381,1.0,84.0,94.7,4.7,wielkopolskie,68.6,0.413,0.388
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",13,MAZUR,MAZUR,34579,388,1.1,51.5,81.5,16.5,opolskie,30.7,0.532,0.488
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",14,JANKOWSKI,JANKOWSKI,33109,1860,5.6,81.9,85.5,11.0,wielkopolskie,41.5,0.71,0.492
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",15,KWIATKOWSKI,KWIATKOWSKI,31900,887,2.8,84.6,91.9,7.1,kujawsko-pomorskie,65.5,0.549,0.342
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",16,WOJCIECHOWSKI,WOJCIECHOWSKI,31551,700,2.2,85.0,91.3,7.9,wielkopolskie,69.8,0.563,0.394
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",17,KRAWCZYK,KRAWCZYK,30308,384,1.3,63.8,90.2,9.4,wielkopolskie,64.3,0.458,0.434
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",18,KACZMAREK,KACZMAREK,29820,2297,7.7,79.7,89.0,9.8,wielkopolskie,81.0,0.708,0.371
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",19,PIOTROWSKI,PIOTROWSKI,29304,842,2.9,83.3,87.4,10.4,kujawsko-pomorskie,37.7,0.589,0.445
+"wwiname-v1+fold-v1+wwimatch-v1, loc-v1; rank = 2026 national male file (fold-v1 pooled); entries are list entries",20,GRABOWSKI,GRABOWSKI,27980,1550,5.5,77.0,81.4,14.7,warmińsko-mazurskie,29.4,0.613,0.439

@@ -1,0 +1,50 @@
+dataset,section,item,entries,share_pct,denominator,note
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",dataset,all list entries,8551758,100.0,8551758,"list entries, not unique people (lists include corrections and follow-ups)"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",dataset,distinct raw lastname strings,586112,6.85,8551758,"count of distinct strings, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",dataset,distinct Ort strings,1196235,13.99,8551758,"count of distinct strings, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",dataset,distinct GOV-Id values,153594,1.8,8551758,"count of distinct IDs, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Preußen (Prussia),6614853,77.35,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Bayern (Bavaria),829744,9.7,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Sachsen (Saxony),607002,7.1,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Württemberg,337831,3.95,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Marine (Imperial Navy),104501,1.22,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),"special lists (returned/exchanged/interned POWs, missing-person notices, unidentified)",49891,0.58,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),Schutztruppen (colonial troops),7622,0.09,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",list (army contingent),other or unparsed,314,0.0,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1914,881541,10.31,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1915,2015878,23.57,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1916,1704718,19.93,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1917,1525020,17.83,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1918,1866738,21.83,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),1919,537810,6.29,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),no date,20053,0.23,8551758,"date of the list issue (Datum), not date of the event"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",issue date (year),range 1914-09-11 to 1919-10-14,8531705,99.77,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),verwundet,4538708,53.07,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),tot,1794554,20.98,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),vermisst,1297340,15.17,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),gefangen,696156,8.14,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),zurückgekehrt,216460,2.53,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",status (dataset-level aggregate only),empty or other,8540,0.1,8551758,never shown per person; causes not in data (INSUFFICIENT_DATA)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",place fields,Ort (place) present,8320651,97.3,8551758,documentation: the place given is the Geburtsort (place of birth)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",place fields,Ort contains a comma qualifier (district/region),5366736,62.76,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",place fields,GOV-Id present,7697428,90.01,8551758,link to the GOV historical gazetteer (genealogy.net)
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",place fields,Ort present but GOV-Id empty,623229,7.29,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",place fields,GOV-Id present but Ort empty,6,0.0,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",surname cleaning wwiname-v1,single-token surname (kept),8507779,99.49,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",surname cleaning wwiname-v1,"multi-token / particle "", v."" / other complex form (excluded)",29833,0.35,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",surname cleaning wwiname-v1,"nobiliary particle tail, e.g. "", von"" / "", de"" (excluded)",13758,0.16,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",surname cleaning wwiname-v1,"illegible ""{}"" or ""{korr."" correction (excluded)",295,0.0,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",surname cleaning wwiname-v1,empty (excluded),93,0.0,8551758,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,matched: cleaned surname = fold of a 2026 male-file surname,5466754,63.93,8551758,denominator = all entries
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,matched (share of kept single-token entries),5466754,64.26,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,"matched, 2026 male-file entries >= 1,000",810515,9.53,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,"matched, 2026 male-file entries 100-999",1543209,18.14,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,"matched, 2026 male-file entries 20-99",1309089,15.39,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,"matched, 2026 male-file entries 2-19",1803941,21.2,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,not in male file but cleaned surname = fold of a 2026 female-file surname,552985,6.5,8507779,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,"not matched (not in 2026 file with >= 2 entries; may be absent, single, or spelled differently)",2488040,29.24,8507779,not matched is not zero bearers
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,matched to a fold-ambiguous key (dominant PESEL spelling < 95%),86753,1.59,5466754,
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,distinct cleaned surname forms (kept),462284,100.0,462284,"forms, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,distinct cleaned surname forms matched,56601,12.24,462284,"forms, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,distinct matched forms with >= 20 WWI entries,18817,33.24,56601,"forms, not entries"
+"Verlustlisten 1. Weltkrieg (VfCG, status 2025-10-14, CC0); PESEL 1681 M/F 2026-01-20",PESEL match wwimatch-v1,distinct matched forms with >= 20 WWI entries and >= 20 male-file entries,8388,14.82,56601,"forms, not entries"
