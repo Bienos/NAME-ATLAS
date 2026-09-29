@@ -141,4 +141,27 @@ describe("the universe-size cache", () => {
       expect(cached).toBe(Number(direct.rows[0]?.total));
     });
   });
+
+  it("serves the universe-evidence lookup from its partial index (0022)", async () => {
+    // The lookup `deriveRarityContext` and `deriveCurrentDistribution` run for
+    // every surname: the earliest subject-less AUTHORITATIVE_INDEX item on a
+    // source record. Without the index it reads every such item, one per ranked
+    // surname. SET LOCAL inside one transaction, so the setting cannot leak.
+    const plan = await db()
+      .transaction()
+      .execute(async (trx) => {
+        await sql`SET LOCAL enable_seqscan = off`.execute(trx);
+        return sql<{ "QUERY PLAN": string }>`
+          EXPLAIN SELECT evidence_item_id FROM evidence_items
+          WHERE source_record_id = ${sourceRecordId}
+            AND evidence_type = 'AUTHORITATIVE_INDEX'
+            AND subject_entity_id IS NULL
+          ORDER BY created_at
+          LIMIT 1
+        `.execute(trx);
+      });
+    expect(plan.rows.map((r) => r["QUERY PLAN"]).join("\n")).toContain(
+      "evidence_items_universe_lookup_idx",
+    );
+  });
 });

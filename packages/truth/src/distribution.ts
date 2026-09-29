@@ -383,6 +383,7 @@ async function deriveOneDistribution(
     .where("evidence_type", "=", "AUTHORITATIVE_INDEX")
     .where("subject_entity_id", "is", null)
     .orderBy("created_at")
+    .limit(1)
     .executeTakeFirst();
   let universeEvidenceId = priorUniverse?.evidence_item_id;
   if (!universeEvidenceId) {

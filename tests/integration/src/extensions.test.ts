@@ -71,6 +71,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0019_snapshot_profile_to_source_record",
       "0020_surname_fold_prefix_index",
       "0021_current_rank_top_index",
+      "0022_universe_evidence_lookup_index",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);

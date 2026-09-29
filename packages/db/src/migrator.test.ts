@@ -30,6 +30,7 @@ describe("MIGRATIONS_DIR", () => {
       "0019_snapshot_profile_to_source_record.ts", // TASK-030 — 1 GB of repeated text, normalised
       "0020_surname_fold_prefix_index.ts", // suggest-as-you-type — diacritic-folded prefix search
       "0021_current_rank_top_index.ts", // home page — the most common surnames, from rank claims
+      "0022_universe_evidence_lookup_index.ts", // TASK-036 — the universe evidence item, without a scan
     ]);
   });
 });
