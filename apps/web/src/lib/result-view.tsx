@@ -9,8 +9,9 @@
  * and that no score or percentage of confidence is anywhere on the page.
  *
  * Since TASK-023 every figure is rendered through one `Claim` unit — statement,
- * assessment word, source kind, scope and date, inline evidence — and the page
- * opens with a `Snapshot`. Sections carry `docs/canonical/21` §34's stable ids.
+ * assessment word, source kind, scope and date — and the page opens with a
+ * `Snapshot`. The evidence behind the claims is one section at the foot of the
+ * page (ADR-0012). Sections carry `docs/canonical/21` §34's stable ids.
  *
  * Pure in the sense that matters: given a validated response it returns markup,
  * and it derives no fact. The pages keep the request, the database and the
@@ -22,7 +23,9 @@ import type {
   CitationDto,
   DistributionEntry,
   MeaningSection,
+  PopulationObservation,
   PopulationSection,
+  RarityEntry,
   RaritySection,
   SurnameResultResponse,
   SuggestionsSection,
@@ -109,28 +112,11 @@ function Population({
     <section id="today-count">
       <h3>{t.sectionPopulation}</h3>
       {section.observations.map((observation, index) => {
-        const evidence: ClaimEvidence = {
-          citation: observation.citation,
-          scope: observation.source_population_scope,
-          underlying_date: observation.snapshot_date,
-          confidence: observation.confidence,
-          limitations: [
-            t.limitationSuppressed,
-            // The partition ambiguity TASK-004 §14 U-1 records, localised. The
-            // stored `coverage_notes` says it too, but in this project's own
-            // English prose — not a publisher quotation — so rendering it
-            // verbatim would put untranslated internal text on a Polish page.
-            // It stays internal, where the admin inspector shows it.
-            ...(observation.comparability_group === null ? [] : [t.limitationPartition]),
-            ...(several ? [t.limitationNotSummed] : []),
-          ],
-          contradictions: [],
-        };
         return (
           <Claim
             key={`${observation.comparability_group ?? "group"}-${String(index)}`}
             statement={populationSentence(observation, surname, lang)}
-            evidence={evidence}
+            evidence={populationEvidence(observation, several, lang)}
             country_code={observation.country_code}
             lang={lang}
           />
@@ -167,23 +153,11 @@ function Rarity({
       <h3>{t.sectionRarity}</h3>
       {section.entries.map((entry, index) => {
         const rank = rankSentence(entry, surname, lang);
-        const denominator = formatInteger(entry.denominator, lang);
-        const evidence: ClaimEvidence = {
-          citation: entry.citation,
-          scope:
-            lang === "pl"
-              ? `Mianownik: ${denominator} osób ujętych w rejestrze PESEL — suma opublikowanych liczb w tym zbiorze, nie ludność Polski.`
-              : `Denominator: ${denominator} people counted in the PESEL register — the sum of the published counts in this dataset, not Poland's population.`,
-          underlying_date: entry.snapshot_date,
-          confidence: entry.confidence,
-          limitations: [t.limitationRounded, t.limitationSuppressed],
-          contradictions: [],
-        };
         return (
           <Claim
             key={`${entry.comparability_group ?? "group"}-${String(index)}`}
             statement={raritySentence(entry, surname, lang)}
-            evidence={evidence}
+            evidence={rarityEvidence(entry, lang)}
             country_code={entry.country_code}
             lang={lang}
           >
@@ -215,19 +189,11 @@ function DistributionFact({
   const input = mapInputs([entry], lang);
   const map =
     input === null ? null : { regions: input.maps[0] ?? [], bandLabels: input.bandLabels };
-  const evidence: ClaimEvidence = {
-    citation: entry.citation,
-    scope: entry.coverage_basis,
-    underlying_date: entry.snapshot_date,
-    confidence: entry.confidence,
-    limitations: [t.limitationRegistered, t.coveredNote, ...(warning === null ? [] : [warning])],
-    contradictions: [],
-  };
   return (
     <Claim
       statement={leading}
       lead={warning === null ? null : <p className="warning">{warning}</p>}
-      evidence={evidence}
+      evidence={distributionEvidence(entry, lang)}
       country_code={entry.country_code}
       lang={lang}
     >
@@ -315,7 +281,7 @@ function Distribution({
   );
 }
 
-/** A work as a citation, so a meaning claim's evidence panel has the same rows as every other. */
+/** A work as a citation, so a meaning claim is cited at the foot of the page like every other. */
 function workCitation(interpretation: MeaningSection["interpretations"][number]): CitationDto {
   const { author_or_publisher, title, year } = interpretation.work;
   return {
@@ -330,6 +296,7 @@ function workCitation(interpretation: MeaningSection["interpretations"][number])
     attribution: null,
     terms: null,
     retrieved_at: null,
+    source_page_url: null,
   };
 }
 
@@ -338,8 +305,8 @@ function workCitation(interpretation: MeaningSection["interpretations"][number])
  *
  * The gap is rendered as a sentence, not as an absence. Nothing here composes
  * a gloss: every string either comes from the claim verbatim or from the `UI`
- * table. On a conflict every reading is shown and each one's evidence lists
- * the others as contradictions.
+ * table. On a conflict every reading is shown, and the notes at the foot of the
+ * page list the readings that disagree (ADR-0012).
  */
 function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
   const t = UI[lang];
@@ -366,27 +333,11 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
       <p className="caveat">{t.meaningInterpretationNote}</p>
       {conflicting ? <p className="caveat">{t.meaningConflictNote}</p> : null}
       {section.interpretations.map((interpretation, index) => {
-        const others = section.interpretations.filter((_, i) => i !== index);
-        const evidence: ClaimEvidence = {
-          citation: workCitation(interpretation),
-          scope: `${interpretation.work.author_or_publisher}, ${interpretation.work.title} (${String(interpretation.work.year)})`,
-          underlying_date: String(interpretation.work.year),
-          confidence: {
-            status: section.confidence ?? "INSUFFICIENT_DATA",
-            methodology_code: section.methodology_code ?? "—",
-          },
-          limitations: [t.limitationInterpretation],
-          contradictions: conflicting
-            ? others.map(
-                (o) => `${o.work.author_or_publisher} (${String(o.work.year)}): ${o.literal_gloss}`,
-              )
-            : [],
-        };
         return (
           <Claim
             key={`${interpretation.work.title}-${String(index)}`}
             statement={interpretation.literal_gloss}
-            evidence={evidence}
+            evidence={meaningEvidence(section, interpretation, lang)}
             country_code="PL"
             lang={lang}
           >
@@ -413,39 +364,180 @@ function Meaning({ section, lang }: { section: MeaningSection; lang: Lang }) {
   );
 }
 
-/** Every distinct citation on the page, once (`#sources`). */
+/*
+ * The evidence behind each kind of claim. The claim uses it for its assessment,
+ * source kind and date; the foot of the page uses it for its source and notes.
+ * One builder per kind, so the two can never disagree.
+ */
+
+function populationEvidence(
+  observation: PopulationObservation,
+  several: boolean,
+  lang: Lang,
+): ClaimEvidence {
+  const t = UI[lang];
+  return {
+    citation: observation.citation,
+    underlying_date: observation.snapshot_date,
+    confidence: observation.confidence,
+    notes: [
+      // The publisher's own wording of what the dataset covers.
+      observation.source_population_scope,
+      t.limitationSuppressed,
+      // The partition ambiguity TASK-004 §14 U-1 records, localised. The
+      // stored `coverage_notes` says it too, but in this project's own
+      // English prose — not a publisher quotation — so rendering it
+      // verbatim would put untranslated internal text on a Polish page.
+      // It stays internal, where the admin inspector shows it.
+      ...(observation.comparability_group === null ? [] : [t.limitationPartition]),
+      ...(several ? [t.limitationNotSummed] : []),
+    ],
+  };
+}
+
+function rarityEvidence(entry: RarityEntry, lang: Lang): ClaimEvidence {
+  const t = UI[lang];
+  const denominator = formatInteger(entry.denominator, lang);
+  return {
+    citation: entry.citation,
+    underlying_date: entry.snapshot_date,
+    confidence: entry.confidence,
+    notes: [
+      lang === "pl"
+        ? `Mianownik: ${denominator} osób ujętych w rejestrze PESEL — suma opublikowanych liczb w tym zbiorze, nie ludność Polski.`
+        : `Denominator: ${denominator} people counted in the PESEL register — the sum of the published counts in this dataset, not Poland's population.`,
+      t.limitationRounded,
+      t.limitationSuppressed,
+    ],
+  };
+}
+
+/**
+ * `coverage_basis` is not one of the notes: it is this project's own English
+ * methodology prose (`DISTRIBUTION_COVERAGE_BASIS`), and the localised notes
+ * below already say what a reader needs from it.
+ */
+function distributionEvidence(entry: DistributionEntry, lang: Lang): ClaimEvidence {
+  const t = UI[lang];
+  const warning = coverageWarning(entry, lang);
+  return {
+    citation: entry.citation,
+    underlying_date: entry.snapshot_date,
+    confidence: entry.confidence,
+    notes: [t.limitationRegistered, t.coveredNote, ...(warning === null ? [] : [warning])],
+  };
+}
+
+function meaningEvidence(
+  section: MeaningSection,
+  interpretation: MeaningSection["interpretations"][number],
+  lang: Lang,
+): ClaimEvidence {
+  const t = UI[lang];
+  const others = section.interpretations.filter((o) => o !== interpretation);
+  return {
+    citation: workCitation(interpretation),
+    underlying_date: String(interpretation.work.year),
+    confidence: {
+      status: section.confidence ?? "INSUFFICIENT_DATA",
+      methodology_code: section.methodology_code ?? "—",
+    },
+    notes: [
+      t.limitationInterpretation,
+      ...(section.confidence === "CONFLICTING"
+        ? others.map(
+            (o) => `${o.work.author_or_publisher} (${String(o.work.year)}): ${o.literal_gloss}`,
+          )
+        : []),
+    ],
+  };
+}
+
+/** The evidence of every claim the page renders, in the page's default order. */
+function pageEvidence(response: SurnameResultResponse, lang: Lang): ClaimEvidence[] {
+  const observations = response.population?.observations ?? [];
+  const meaning = response.meaning;
+  return [
+    ...observations.map((o) => populationEvidence(o, observations.length > 1, lang)),
+    ...(response.rarity?.entries ?? []).map((e) => rarityEvidence(e, lang)),
+    ...(response.distribution?.entries ?? []).map((e) => distributionEvidence(e, lang)),
+    ...(meaning === null
+      ? []
+      : meaning.interpretations.map((i) => meaningEvidence(meaning, i, lang))),
+  ];
+}
+
+/** A website named by its host, which is where the reader will land. */
+function siteName(url: string, fallback: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./u, "");
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * The evidence behind every claim on the page, once, at its foot (`#sources`,
+ * ADR-0012). Each source is listed once and linked to the website the data was
+ * taken from (`source_page_url`), never to the file we retrieved. A source with
+ * no public page — a printed work — is cited by its locator instead (page and
+ * entry), which is where a reader finds it. The notes the claims carry follow,
+ * each once, one disclosure away, as they were inside the per-claim panels.
+ */
 function Sources({ response, lang }: { response: SurnameResultResponse; lang: Lang }) {
   const t = UI[lang];
-  const seen = new Map<string, CitationDto>();
-  for (const o of response.population?.observations ?? []) seen.set(o.citation.id, o.citation);
-  for (const e of response.rarity?.entries ?? []) seen.set(e.citation.id, e.citation);
-  for (const e of response.distribution?.entries ?? []) seen.set(e.citation.id, e.citation);
-  for (const i of response.meaning?.interpretations ?? []) {
-    const c = workCitation(i);
-    seen.set(c.id, c);
+  const evidence = pageEvidence(response, lang);
+  if (evidence.length === 0) return null;
+  // One line per source as a reader sees it: the same page, title, publisher,
+  // date, licence and attribution are one source, however many claims cite it.
+  // Without a page, each locator is its own line: two entries in one book are
+  // two places to look.
+  const sources = new Map<string, CitationDto>();
+  for (const { citation: c } of evidence) {
+    const key = JSON.stringify([
+      c.source_page_url ?? [c.id, c.locator],
+      c.title,
+      c.publisher,
+      c.publication_date,
+      c.terms,
+      c.attribution,
+    ]);
+    if (!sources.has(key)) sources.set(key, c);
   }
-  if (seen.size === 0) return null;
+  const notes = [...new Set(evidence.flatMap((e) => e.notes))];
   return (
     <section id="sources">
       <h3>{t.sectionSourcesAll}</h3>
       <ul className="sources">
-        {[...seen.values()].map((c) => (
-          <li key={c.id}>
+        {[...sources].map(([key, c]) => (
+          <li key={key}>
             <span className="source-kind">{sourceKindWord(c.source_type, lang)}</span>{" "}
             {c.publisher === null ? c.title : `${c.publisher} — ${c.title}`}
             {c.publication_date === null ? "" : ` · ${formatDate(c.publication_date, lang)}`}
+            {c.source_page_url === null && c.locator !== null ? ` · ${c.locator}` : ""}
             {c.terms === null ? "" : ` · ${c.terms}`}
-            {c.url === null ? null : (
+            {c.attribution === null ? "" : ` · ${c.attribution}`}
+            {c.source_page_url === null ? null : (
               <>
                 {" · "}
-                <a href={c.url} rel="noopener noreferrer">
-                  {t.evidenceRecordLink}
+                <a href={c.source_page_url} rel="noopener noreferrer">
+                  {siteName(c.source_page_url, t.sourceSiteLink)}
                 </a>
               </>
             )}
           </li>
         ))}
       </ul>
+      {notes.length === 0 ? null : (
+        <details className="notes">
+          <summary>{t.notesSummary}</summary>
+          <ul>
+            {notes.map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
+        </details>
+      )}
     </section>
   );
 }

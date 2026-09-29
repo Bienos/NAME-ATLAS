@@ -29,6 +29,8 @@ const VALID_CITATION = {
   attribution: null,
   terms: "CC0 1.0",
   retrieved_at: "2026-09-18T17:40:00Z",
+  source_page_url:
+    "https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
 };
 
 /** An empty suggestions section, which every non-RESOLVED response carries. */
@@ -144,6 +146,25 @@ describe("population observation", () => {
     expect(withRationale.success).toBe(true);
     if (!withRationale.success) return;
     expect(withRationale.data.confidence).not.toHaveProperty("rationale");
+  });
+});
+
+describe("citation source page (1.6, ADR-0012)", () => {
+  it("requires source_page_url, so a producer cannot silently leave it out", () => {
+    const { source_page_url: _omitted, ...withoutPage } = VALID_CITATION;
+    expect(
+      populationObservationSchema.safeParse({ ...VALID_OBSERVATION, citation: withoutPage })
+        .success,
+    ).toBe(false);
+  });
+
+  it("accepts null for a source with no public page", () => {
+    expect(
+      populationObservationSchema.safeParse({
+        ...VALID_OBSERVATION,
+        citation: { ...VALID_CITATION, source_page_url: null },
+      }).success,
+    ).toBe(true);
   });
 });
 

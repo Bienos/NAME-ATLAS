@@ -15,6 +15,7 @@ const citation = {
   attribution: null,
   terms: null,
   retrieved_at: null,
+  source_page_url: null,
 };
 const confidence = { status: "VERIFIED" as const, methodology_code: "m@1" };
 
@@ -49,7 +50,7 @@ function rarity(x: number, group: string, denominator = 21_197_537, date = "2026
 }
 function side(observations: unknown[], rarities: unknown[] = []): SurnameResultResponse {
   return {
-    schema_version: "1.5",
+    schema_version: "1.6",
     status: "RESOLVED",
     surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "X", script: "Latn" },
     population: {

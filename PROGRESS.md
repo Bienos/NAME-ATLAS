@@ -5306,3 +5306,35 @@ WÓJCIK redirected there, and the home page's suggestions linked there.
 | Web build under `next start`, with a `DATABASE_URL` that fails on query | Before: `w%C3%B3jcik` (pl, en) refused as no surname while `nowak` reached the database. After: `w%C3%B3jcik` (pl, en) and `wi%C5%9Bniewska` reach the database, twice each (metadata and page); `NOWAK`, `a%2520b`, `w%25C3%25B3jcik` and `100%25` are still refused |
 
 **Not verified:** the three pages on production, which needs this change deployed.
+
+### Evidence at the foot of the page, linked to the source's website (ADR-0012) (2026-09-24)
+
+The project owner asked for "Zobacz dowody" to be removed, with the evidence moved to the bottom or
+out of the way and pointing only at the website the data was taken from. Recorded as ADR-0012, which
+supersedes TASK-023's per-claim evidence panel (§2 item 2, AC-2).
+
+- **Page:** no evidence panel on any claim, and no "Zobacz dowody" link under the snapshot. `#sources`
+  lists each source once, grouped by page, title, publisher, date, licence and attribution, and links
+  it to the source's own website by host name. For PESEL that is `dane.gov.pl`, the dataset page. The
+  CSV that `citation.url` points to is linked nowhere. A source with no public page, a printed work,
+  is cited by its locator. Below the list, one "Jak czytać te liczby" disclosure holds the notes the
+  panels carried, each once.
+- **Contract 1.6:** `citation.source_page_url`, required and nullable, from
+  `sources.homepage_or_reference_url` (the three citation reads in `packages/truth/src/read.ts`, the
+  three projections in `query.ts`). `schema_version` fixtures and integration pins moved from 1.5 to
+  1.6.
+- **Off the public page:** the method code, a web source's record identifier and the retrieval date.
+  They remain in the payload and the admin inspector.
+- `ClaimEvidence` carries `notes` in place of `scope`, `limitations` and `contradictions`. Eighteen
+  panel-only message keys were removed, in Polish and English.
+
+| Check | Result |
+|---|---|
+| `pnpm -r --no-bail run typecheck`, `pnpm lint`, `pnpm format:check` | Pass |
+| `pnpm test` | 698 passed across 13 packages on `main` at `4d605e5` plus this change (contracts 48, including 2 new; web 205, 2 net new). With `DATABASE_URL` exported at a loaded local database, `surname-prefix/route.test.ts` fails, because its forced-failure case gets a 200. It passes with the variable unset, which is how CI runs it (before migrations). That route is unchanged |
+| `pnpm test:integration`, `pnpm test:golden` | 278 passed (24 files); 364 passed (4 files) |
+| `pnpm build` | Pass |
+| `/pl/nazwisko/nowak` on the local register | 0 × "Zobacz dowody", one `<details>` (the notes), 0 links to `api.dane.gov.pl`. One source line linking to `https://dane.gov.pl/pl/dataset/1681,…` as "dane.gov.pl". 10 distinct notes, all Polish |
+
+**Not verified:** a meaning with a real locator on real data, because no local surname tested here
+has an `AVAILABLE` meaning; the fixture case passes.

@@ -35,6 +35,8 @@ const CITATION = {
   attribution: null,
   terms: "CC0 1.0",
   retrieved_at: "2026-09-18T17:40:00Z",
+  source_page_url:
+    "https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel",
 };
 
 const CONFIDENCE = { status: "VERIFIED" as const, methodology_code: "rule@1" };
