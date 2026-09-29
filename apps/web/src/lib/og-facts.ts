@@ -1,5 +1,5 @@
 import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { formatDate, formatInteger, partitionLabel } from "./messages.js";
+import { formatDate, formatInteger, partitionLabel, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -7,9 +7,9 @@ import type { Lang } from "./messages.js";
  *
  * Pure, and the whole vocabulary of the card: a surname, a count per partition,
  * `1 in X` only when the rarity section is READY, and the dataset date. A
- * rights-blocked, suppressed or unresolved surname yields a card that says
- * so and carries no number. Nothing here is a template that could write a
- * fact the payload does not carry.
+ * rights-blocked, suppressed, not-yet-derived or unresolved surname yields a
+ * card that says so and carries no number. Nothing here is a template that
+ * could write a fact the payload does not carry.
  */
 export interface OgFacts {
   readonly eyebrow: string;
@@ -58,6 +58,11 @@ export function ogFacts(response: SurnameResultResponse | null, lang: Lang): OgF
     else if (shown.length > 0) footer = "PESEL";
   } else if (population?.state === "RIGHTS_BLOCKED") {
     caveat = lang === "pl" ? "Liczby niedostępne z powodu licencji" : "Figures withheld by licence";
+  } else if (population?.reason_code === "NOT_DERIVED_YET") {
+    // The register lists this surname; its figures are simply not prepared.
+    // "The dataset publishes no count" would be false here (TASK-037), so the
+    // card says what the page's snapshot says, in the page's own words.
+    caveat = UI[lang].heroNotDerived;
   } else {
     caveat =
       lang === "pl"

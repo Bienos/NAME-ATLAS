@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by recording the project owner's amendment of TASK-023's AC-1 and AC-8 (`docs/progress/2026-09-29-task-023-rules-amended.md`). It merges after #21, the re-verification of TASK-023, TASK-024 and TASK-025 (`docs/progress/2026-09-29-verify-task-023-025.md`).
+**Last rewritten:** 2026-09-29, by TASK-037: the share card now says a listed surname's figures are not prepared yet, instead of that the dataset publishes no count (`docs/progress/2026-09-29-share-card-not-derived-wording.md`).
 
 ## Production
 
@@ -32,11 +32,10 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
-- **The share card's wording for a surname not yet derived.** For a listed surname whose figures are not derived, the Open Graph card says the dataset publishes no count (`apps/web/src/lib/og-facts.ts`). The page says, correctly, that the figures are not prepared yet. Production is not affected while every loaded surname is derived. The 2026-09-29 re-verification found it.
 
 ## Open pull requests and branches
 
-None besides the one from `claude/task-023-rules-amended`, which records the amended TASK-023 criteria and carries this rewrite. It merges after #21 (checked 2026-09-29).
+None besides the one from `claude/share-card-not-derived-wording`, which carries TASK-037 and this rewrite (checked 2026-09-29).
 
 ## Blocked on the project owner
 
@@ -45,7 +44,8 @@ None besides the one from `claude/task-023-rules-amended`, which records the ame
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
   - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
   - `claude/verify-task-023-025` (#21)
-  - `claude/task-023-rules-amended`, once its pull request is merged
+  - `claude/task-023-rules-amended` (#22)
+  - `claude/share-card-not-derived-wording`, once its pull request is merged
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
