@@ -1,0 +1,23 @@
+User-agent: *
+
+Disallow: /Content/*/zip*
+Disallow: /Content/*/download*
+Disallow: /dlibra/ajax.xml*
+Disallow: /dlibra/sec-ajax.xml*
+
+Disallow: /dlibra/results*
+Disallow: /dlibra/similarobjects*
+Disallow: /dlibra/recommended*
+Disallow: /dlibra/latest*
+Disallow: /dlibra/planned*
+Disallow: /dlibra/popular*
+Disallow: /dlibra/valuesearch*
+Disallow: /dlibra/metadatasearch*
+Disallow: /dlibra/indexsearch*
+Disallow: /dlibra/journals-index*
+
+Disallow: /dlibra/report-problem*
+Disallow: /dlibra/dlibra.bib*
+Disallow: /dlibra/dlibra.ris*
+
+Sitemap: http://journals.pan.pl/sitemapindex.xml

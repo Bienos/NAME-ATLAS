@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://onomastica.ijppan.pl/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T14:14:56Z</responseDate>
+	<request verb="GetRecord" metadataPrefix="oai_marc" identifier="oai:ojs2.onomastica.ijppan.pl:article/400">https://onomastica.ijppan.pl/index.php/ONOM/oai</request>
+	<GetRecord>
+		<record>
+			<header>
+				<identifier>oai:ojs2.onomastica.ijppan.pl:article/400</identifier>
+				<datestamp>2023-03-13T14:30:03Z</datestamp>
+				<setSpec>ONOM:ART</setSpec>
+			</header>
+			<metadata>
+<oai_marc status="c" type="a" level="m" encLvl="3" catForm="u"
+	xmlns="http://www.openarchives.org/OAI/1.1/oai_marc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/oai_marc http://www.openarchives.org/OAI/1.1/oai_marc.xsd">
+			<fixfield id="008">"221231 2022                        eng  "</fixfield>
+				<varfield id="022" i1="#" i2="#">
+			<subfield label="$a">2658-2783</subfield>
+		</varfield>
+				<varfield id="022" i1="#" i2="#">
+			<subfield label="$a">0078-4648</subfield>
+		</varfield>
+		<varfield id="042" i1=" " i2=" ">
+		<subfield label="a">dc</subfield>
+	</varfield>
+	<varfield id="245" i1="0" i2="0">
+		<subfield label="a">Markonyms as taxonomic operators in (chremat)onomastic terminology</subfield>
+	</varfield>
+
+				<varfield id="100" i1="1" i2=" ">
+			<subfield label="a">Gałkowski, Artur</subfield>
+						<subfield label="u">University of Łódź</subfield>						<subfield label="0">https://orcid.org/0000-0003-2471-0886</subfield>		</varfield>
+			<varfield id="520" i1=" " i2=" ">
+		<subfield label="a">
+Zarówno ogólna teoria nazw własnych, jak i poszczególne subdyscypliny onomastyki stosują właściwą dla swoich celów badawczych i metodologii terminologię. Podstawowe terminy naukowe w onomastyce, poczynając od „nazwy własnej”/„onimu”, można uznać za operatory taksonomiczne, które pozwalają porządkować fakty onomastyczne. Potrzebę zastosowania odpowiedniej terminologii badawczej zaspokaja się także w jednym z najmłodszych działów nazewnictwa, tj. chrematonomastyce. Do zestawu operatorów taksonomicznych w obszarze chrematonimii włącza się termin „markonim” utożsamiany z „chrematonimem marketingowym” i konfrontowany z innymi konceptami terminologicznymi, takimi jak „firmonim”, „logonim” czy też „ergonim” i „pragmatonim”, a wreszcie opisowo ujęta „nazwa handlowa” oraz „znak towarowy”. Markonim uznany zostaje za uniwersalny operator taksonomiczny nazewnictwa gospodarczego, odnosząc się zarówno do nazw firm, jak i produktów/usług. Treść i zakres markonimu nawiązuje do szeroko pojętej idei marki, pozostając strukturą językową, która skupia na sobie właściwości komunikacyjno-marketingowe.
+</subfield>
+	</varfield>
+						<varfield id="260" i1=" " i2=" ">
+		<subfield label="b">Instytut Języka Polskiego Polskiej Akademii Nauk</subfield>
+	</varfield>
+	<varfield id="260" i1=" " i2=" ">
+		<subfield label="c">2022-12-31 00:00:00</subfield>
+	</varfield>
+
+		
+			<varfield id="856" i1=" " i2=" ">
+			<subfield label="q">application/pdf</subfield>
+		</varfield>
+			<varfield id="856" i1=" " i2=" ">
+			<subfield label="q">application/epub+zip</subfield>
+		</varfield>
+			<varfield id="856" i1=" " i2=" ">
+			<subfield label="q">application/octet-stream</subfield>
+		</varfield>
+		<varfield id="856" i1="4" i2="0">
+		<subfield label="u">https://onomastica.ijppan.pl/index.php/ONOM/article/view/400</subfield>
+	</varfield>
+
+	<varfield id="786" i1="0" i2=" ">
+		<subfield label="n">Onomastica; Vol. 66 (2022): Onomastica 66</subfield>
+	</varfield>
+
+	<varfield id="546" i1=" " i2=" ">
+		<subfield label="a">pol</subfield>
+	</varfield>
+
+	
+	<varfield id="540" i1=" " i2=" ">
+		<subfield label="a">##submission.copyrightStatement##</subfield>
+	</varfield>
+</oai_marc>
+			</metadata>
+		</record>
+	</GetRecord>
+</OAI-PMH>

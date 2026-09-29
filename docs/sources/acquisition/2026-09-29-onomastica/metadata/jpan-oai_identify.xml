@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://journals.pan.pl/style/common/xsl/oai-style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T15:36:17Z</responseDate>
+	<request verb="Identify">
+	https://journals.pan.pl/oai-pmh-repository.xml</request>
+	<Identify>
+	  <repositoryName><![CDATA[PAS Journals]]></repositoryName>
+  <baseURL>https://journals.pan.pl/oai-pmh-repository.xml</baseURL>
+  <protocolVersion>2.0</protocolVersion>
+  <adminEmail>dlibra-techhelp@man.poznan.pl</adminEmail>
+  <earliestDatestamp>2016-09-05T14:29:53Z</earliestDatestamp>
+  <deletedRecord>persistent</deletedRecord>
+  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>
+    <description>
+	<friends
+          xmlns="http://www.openarchives.org/OAI/2.0/friends/"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/friends/
+         http://www.openarchives.org/OAI/2.0/friends.xsd">
+		 		 <baseURL>http://dlibra.psnc.pl/biblioteka/dlibra/oai-pmh-repository.xml</baseURL>
+		      </friends>
+  </description>
+    <description>
+	 <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
+		http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
+		<scheme>oai</scheme>
+		<repositoryIdentifier>journals.pan.pl</repositoryIdentifier>
+		<delimiter>:</delimiter>
+		<sampleIdentifier>oai:journals.pan.pl:1234</sampleIdentifier>
+	 </oai-identifier>
+  </description>
+  <description>
+	<toolkit xmlns="http://oai.dlib.vt.edu/OAI/metadata/toolkit"
+		xsi:schemaLocation="http://oai.dlib.vt.edu/OAI/metadata/toolkit
+		https://journals.pan.pl/toolkit.xsd">
+		<title>dLibra Digital Library Framework</title>
+		<author>
+			<email>dlibra@man.poznan.pl</email>
+			<institution>PSNC (http://www.man.poznan.pl)</institution>
+		</author>
+		<version>6.3.18-SNAPSHOT</version>
+		<toolkitIcon>http://dlibra.psnc.pl/images/dlibra_stamp.jpg</toolkitIcon>
+		<URL>http://dlibra.psnc.pl/</URL>
+	</toolkit>
+  </description>
+	</Identify>
+</OAI-PMH>

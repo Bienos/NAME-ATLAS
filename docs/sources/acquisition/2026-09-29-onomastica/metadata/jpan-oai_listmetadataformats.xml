@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://journals.pan.pl/style/common/xsl/oai-style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T15:36:20Z</responseDate>
+	<request verb="ListMetadataFormats">
+	https://journals.pan.pl/oai-pmh-repository.xml</request>
+	<ListMetadataFormats>
+	
+  <metadataFormat>
+    <metadataPrefix>oai_dc</metadataPrefix>
+    <schema>http://www.openarchives.org/OAI/2.0/oai_dc.xsd</schema>
+    <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+  </metadataFormat>
+  <metadataFormat>
+    <metadataPrefix>dlibra_avs</metadataPrefix>
+    <schema>http://journals.pan.pl/dlibra/attribute-schema.xsd</schema>
+    <metadataNamespace>http://journals.pan.pl/</metadataNamespace>
+  </metadataFormat>
+  <metadataFormat>
+    <metadataPrefix>mets</metadataPrefix>
+    <schema>http://www.loc.gov/mets/mets.xsd</schema>
+    <metadataNamespace>http://www.loc.gov/METS/</metadataNamespace>
+  </metadataFormat>
+  <metadataFormat>
+    <metadataPrefix>oai_qdc</metadataPrefix>
+    <schema>http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</schema>
+    <metadataNamespace>urn:dc:qdc:container</metadataNamespace>
+  </metadataFormat>
+  <metadataFormat>
+    <metadataPrefix>oai_etdms</metadataPrefix>
+    <schema>http://www.ndltd.org/standards/metadata/etdms/1.0/etdms.xsd</schema>
+    <metadataNamespace>http://www.ndltd.org/standards/metadata/etdms/1.0/</metadataNamespace>
+  </metadataFormat>
+	</ListMetadataFormats>
+</OAI-PMH>

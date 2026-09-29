@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://journals.pan.pl/style/common/xsl/oai-style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T16:13:28Z</responseDate>
+	<request resumptionToken="B46E57C566D2D459B303CD3E22340A1FListRecords1790690126686_DL_LAST_ITEM_180_DL_METADATA_oai_dc" verb="ListRecords">
+	https://journals.pan.pl/oai-pmh-repository.xml</request>
+	<ListRecords>
+	
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98502</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Onomastyka w „Studiach Wschodniosłowiańskich” Uniwersytetu w Białymstoku (t. 12, 13, 2012, 2013)]]></dc:title>
+<dc:creator><![CDATA[Wójcik, Urszula]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98502/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98502]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98495</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Komentarz do kilku toponimów z okolic Nowogrodu Wielkiego]]></dc:title>
+<dc:creator><![CDATA[Janczulewicz, Paweł]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98495/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98495]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98497</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[„Nazwiska nowych obywateli poznańskich na podstawie ksiąg przyjęć do prawa miejskiego (1575–1793)” na tle wybranych monografii regionalnych Polski okresu średniopolskiego]]></dc:title>
+<dc:creator><![CDATA[Magda-Czekaj, Małgorzata]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98497/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98497]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98508</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Významné životné jubileum PhDr. Milana Majtána, DrSc]]></dc:title>
+<dc:creator><![CDATA[Valentová, I.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98508/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98508]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98516</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Nazwy własne w „Słowniku mimicznym dla głuchoniemych i osób z nimi styczność mających”]]></dc:title>
+<dc:creator><![CDATA[Ruta, Karolina]]></dc:creator>
+<dc:creator><![CDATA[Wrześniewska-Pietrzak, Marta]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98516/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98516]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98514</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Trójelementowy model znaczenia onimicznego i pojęciowy model onomastykonu]]></dc:title>
+<dc:creator><![CDATA[Włoskowicz, Wojciech]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98514/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98514]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98518</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Kulturowe przyczyny zmian w polskim imiennictwie osobowym (w ujęciu diachronicznym)]]></dc:title>
+<dc:creator><![CDATA[Malec, Maria]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98518/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98518]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98515</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Nazwy własne jako nośnik wartościowania w tekstach reklamowych]]></dc:title>
+<dc:creator><![CDATA[Łuc, Izabela]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98515/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98515]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98498</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Francuskie toponimy pochodzące od nazw zwierząt]]></dc:title>
+<dc:creator><![CDATA[Zierhoffer, Karol]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98498/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98498]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98499</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Karol Zierhoffer, Pochodzenie nazw miejscowych we Francji w świetlepracy Stéphana Gendrona, L’origine des noms de lieux en France. Essai de toponymie]]></dc:title>
+<dc:creator><![CDATA[Malec, M.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98499/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98499]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98500</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Rudolf Šrámek, Retrográdní slovník místních jmen Moravya Slezska]]></dc:title>
+<dc:creator><![CDATA[Jakus-Borkowa, E.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98500/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98500]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98501</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Elżbieta Rudnicka-Fira, Imiennictwo krakowian od XVI do XVII wieku na tle historii i kultury]]></dc:title>
+<dc:creator><![CDATA[Janiga, Magdalena]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98501/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98501]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98503</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Acta onomastica, ročník LIII, red. Milan Harvalík, Praha 2012, 441 s.]]></dc:title>
+<dc:creator><![CDATA[Jakus-Borkowa, Ewa]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98503/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98503]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98511</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[19. Slovenská Onomastická Konferencia (Bratysława,28–30 IV 2014)]]></dc:title>
+<dc:creator><![CDATA[Domaciuk-Czarny, Izabela]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98511/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98511]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98512</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Synchroniczno-diachroniczna perspektywa kategorialnych zróżnicowań językowej funkcjonalności onimicznej]]></dc:title>
+<dc:creator><![CDATA[Mrózek, Robert]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98512/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98512]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98504</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Rivista Italiana di Onomastica, vol. XIX, no 1–2]]></dc:title>
+<dc:creator><![CDATA[Gałkowski, A.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98504/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98504]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98510</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Posiedzenie Komisji Onomastyki Słowiańskiej przy MiędzynarodowymKomitecie Slawistów i XV Międzynarodowy Kongres Slawistów]]></dc:title>
+<dc:creator><![CDATA[Gałkowski, A.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98510/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98510]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98513</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Funkcia proprií v procese mediálnej kolokvializácie]]></dc:title>
+<dc:creator><![CDATA[Patráš, Vladimír]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2015]]></dc:date>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98513/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98513]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2015; NO 59]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98505</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Voprosy Onomastiki, nr 1 (14), 2 (15)]]></dc:title>
+<dc:creator><![CDATA[Bijak, Urszula]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98505/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98505]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:98507</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Folia onomastica Croatica, knj. 21, 22]]></dc:title>
+<dc:creator><![CDATA[Swoboda, P.]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2014]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/98507/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:98507]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2014; No 58]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <resumptionToken completeListSize="298" cursor="180" expirationDate="2026-09-29T16:43:28Z">B46E57C566D2D459B303CD3E22340A1FListRecords1790690126686_DL_LAST_ITEM_200_DL_METADATA_oai_dc</resumptionToken>		</ListRecords>
+</OAI-PMH>

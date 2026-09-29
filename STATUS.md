@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by parking TASK-035, the real register in production (`docs/progress/2026-09-29-register-load-parked.md`).
+**Last rewritten:** 2026-09-29, by parking TASK-035, the real register in production (`docs/progress/2026-09-29-register-load-parked.md`). It merges after TASK-032, the *Onomastica* source spike (`docs/progress/2026-09-29-onomastica-source-spike.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030, 031, 033, 034 and 036, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -26,12 +26,12 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
   - the landing page and the surname page redesigned for readers new to statistics (#11).
-- On `main`, CI was green on `9b9f87a` (run #201, Merge #14). Each pull request merged since was green on its own head before it merged.
+- On `main`, CI was green on `5f21045` (run #220, Merge #13).
 
 ## Next
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
-- **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
+- **An *Onomastica* ingestion task**: not written, and blocked on D-022: may Name Atlas rely on the licence the journal declares for vol. 64 (2020) onward? TASK-032's record (`docs/sources/onomastica.md`) holds what the task needs. No article is admissible under ADR-0008 §4 today.
 - **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
 
 ## Open pull requests and branches
@@ -43,7 +43,7 @@ None besides #15, which parks TASK-035 and carries this rewrite (checked 2026-09
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
-  - `claude/procent-continuation-7c2e00` (#14, then the ADR-0014 pull request).
+  - `claude/procent-continuation-7c2e00` (#14, the ADR-0014 pull request, then TASK-032).
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
@@ -73,4 +73,8 @@ None besides #15, which parks TASK-035 and carries this rewrite (checked 2026-09
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **Decisions.** One is open: **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default. Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task. Every other entry is resolved.
+- **Decisions.** Two are open.
+  - **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default? Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task.
+  - **D-022**, raised by TASK-032: may Name Atlas rely on the CC BY-ND 4.0 licence *Onomastica* declares for vol. 64 (2020) onward, while its Guidelines page, agreement template and badge say otherwise, and journals.pan.pl's copies of vol. 64 print a non-commercial URL? It blocks only an *Onomastica* ingestion task.
+
+  Every other entry is resolved.
