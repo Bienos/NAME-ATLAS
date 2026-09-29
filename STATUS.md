@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by TASK-034 (`docs/progress/2026-09-29-web-section-registry-and-design-tokens.md`), after the go-live of #9, #10, #7 and #11 (`docs/progress/2026-09-29-go-live.md`).
+**Last rewritten:** 2026-09-29, by TASK-031, the Polona source spike (`docs/progress/2026-09-29-polona-source-spike.md`). It merges after TASK-034 (#14, `docs/progress/2026-09-29-web-section-registry-and-design-tokens.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030, 033 and 034, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030, 031, 033 and 034, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -26,16 +26,19 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
   - the landing page and the surname page redesigned for readers new to statistics (#11).
-- On `main`, CI is green: run #179, on `0eb4814`.
+- On `main`, CI was green on `83d38c2` (run #183, Merge #12). Each pull request merged since was green on its own head before it merged.
 
 ## Next
 
-- **TASK-031**, the Polona source spike (`tasks/031-polona-source-spike.md`): specified 2026-09-23, not started. `polona.pl` answered HTTP 200 from the cloud environment on 2026-09-29, so the network no longer blocks it. The project owner asked for it after TASK-034.
+- **The Polona connector task**: not written, and blocked on D-021. TASK-031's record (`docs/sources/polona.md`) holds what it needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-032**, the Onomastica source spike: carried over from an unmerged branch, not approved. Read its rebase note first.
 
 ## Open pull requests and branches
 
-TASK-034's pull request, from `claude/procent-continuation-7c2e00`. That branch had been started from the stale default branch, and its earlier commits redid what `main` already had (TASK-005, D-006). The project owner chose to reset it onto `main` on 2026-09-29. Its old head, `1c44746`, is off the branch, and nothing on it was missing from `main`.
+Two pull requests are open (checked 2026-09-29), each from another session and each on its own branch from `main` @ `83d38c2`:
+
+- **#13**, TASK-036: batch derivation fast enough for the real register (`claude/cache-rarity-denominator`).
+- **#15**, TASK-035: load the real PESEL register into production (`claude/jolly-ramanujan-din7m6`). It depends on #13.
 
 ## Blocked on the project owner
 
@@ -47,7 +50,7 @@ TASK-034's pull request, from `claude/procent-continuation-7c2e00`. That branch 
   - `claude/fix-surname-links-and-section-rights`
   - `claude/hopeful-cannon-uc9h18`
   - `claude/inspiring-johnson-x88mbo`
-  - `claude/jolly-ramanujan-din7m6`
+  - `claude/jolly-ramanujan-din7m6`: not now, because it carries the open #15 (TASK-035)
   - `claude/kind-edison-eod395-main`
   - `claude/lucid-goodall-t2ai7d`
   - `claude/sharp-bohr-ld17v3`
@@ -69,4 +72,4 @@ TASK-034's pull request, from `claude/procent-continuation-7c2e00`. That branch 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **Decisions.** None is open: every entry in `docs/DECISIONS_NEEDED.md` is resolved. D-020 was resolved as light only and shipped in #11.
+- **Decisions.** One is open: **D-021**, raised by TASK-031. It asks whether a connector may query Polona automatically and keep what it retrieves, and it raises three places where Polona's rights values do not fit ADR-0007. It blocks only the Polona connector task. Every other entry is resolved.

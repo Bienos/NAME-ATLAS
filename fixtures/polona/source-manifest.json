@@ -1,0 +1,2846 @@
+{
+  "$comment": "Raw Polona responses captured by TASK-031 (docs/sources/polona.md). Every committed byte is what Polona served. The only change is to two full-text search responses, from which whole hits were removed by byte-level excision (see trimming). Nothing else was trimmed, reformatted or re-encoded. `fixtures/polona/` is excluded from Prettier for that reason. Verify with: cd fixtures/polona && sha256sum -c <(jq -r '.files[] | \"\\(.sha256)  \\(.path)\"' source-manifest.json)",
+  "source": {
+    "name": "Polona (Biblioteka Cyfrowa Polona)",
+    "operator": "Biblioteka Narodowa",
+    "site": "https://polona.pl",
+    "api_gateway": "https://polona.pl/api"
+  },
+  "capture": {
+    "task": "TASK-031",
+    "date": "2026-09-29",
+    "client": "curl 8.5.0 (default User-Agent curl/8.5.0)",
+    "pacing": "one request at a time; 1.5 s between search requests, 1.2 s between object requests",
+    "authentication": "none (no cookie, token or key sent)"
+  },
+  "query_set": [
+    {
+      "id": 1,
+      "query": "NOWAK",
+      "chosen_as": "common surname"
+    },
+    {
+      "id": 2,
+      "query": "KOWALSKI",
+      "chosen_as": "common surname"
+    },
+    {
+      "id": 3,
+      "query": "WIŚNIEWSKI",
+      "chosen_as": "common surname with a diacritic"
+    },
+    {
+      "id": 4,
+      "query": "ABADŻIJEW",
+      "chosen_as": "rare surname with a diacritic, from fixtures/pesel/regional-male-2026-01-20.csv"
+    },
+    {
+      "id": 5,
+      "query": "WILK",
+      "chosen_as": "surname that is also an ordinary Polish word (wolf)"
+    }
+  ],
+  "trimming": {
+    "rule": "A full-text hit carries OCR snippets (`highlights`). A full-text hit is kept only when its attributes.licenseName is \"Domena Publiczna\", Polona's own public-domain statement. Every other full-text hit was removed whole. Metadata-search hits carry no OCR text and were all kept.",
+    "method": "Byte-level excision of the hit's exact span and one separating comma. Every other byte, including numberOfElements, is as served, so a trimmed file has fewer hits than its numberOfElements says. Its as_served.sha256 is the digest of the untrimmed response.",
+    "ocr_text_sha256_definition": "SHA-256 of the UTF-8 encoding of the hit's `highlights` strings, as JSON-decoded, joined with a single \"\\n\"",
+    "hit_bytes_sha256_definition": "SHA-256 of the hit's exact bytes as served, without the separating comma"
+  },
+  "files": [
+    {
+      "path": "search/simple-1-nowak.json",
+      "sha256": "dc5db8f89227311e4426a2b2e68129ec80dd2a2ab5251371b077042d7fd06467",
+      "bytes": 60921,
+      "kind": "search_simple",
+      "query_id": 1,
+      "retrieved_at": "2026-09-29T11:12:56Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/search/simple?query=NOWAK&page=0&pageSize=10&sort=RELEVANCE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/fulltext-1-nowak.json",
+      "sha256": "c075b4355378d2420e2a9b9a9ea7f0fcc6d22eb9ba7e6a07a5b488987c385521",
+      "bytes": 53712,
+      "kind": "search_fulltext",
+      "query_id": 1,
+      "retrieved_at": "2026-09-29T11:12:58Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/fulltext/polona/fulltext/0/10?sort=RELEVANCE&query=NOWAK",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{\"filters\": {\"keywordFilters\": {\"copyright\": [\"false\"]}, \"temporalFilters\": null}}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/simple-2-kowalski.json",
+      "sha256": "a926d1fca0628949196440e4fa3d67910ec5fc0860b0557d865ce460d99d1213",
+      "bytes": 63552,
+      "kind": "search_simple",
+      "query_id": 2,
+      "retrieved_at": "2026-09-29T11:13:01Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/search/simple?query=KOWALSKI&page=0&pageSize=10&sort=RELEVANCE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/fulltext-2-kowalski.json",
+      "sha256": "ffc16ff877f7fb356aa2b37971b617ecead25c2d8228e40316d79bb89e964baa",
+      "bytes": 53685,
+      "kind": "search_fulltext",
+      "query_id": 2,
+      "retrieved_at": "2026-09-29T11:13:03Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/fulltext/polona/fulltext/0/10?sort=RELEVANCE&query=KOWALSKI",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{\"filters\": {\"keywordFilters\": {\"copyright\": [\"false\"]}, \"temporalFilters\": null}}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/simple-3-wisniewski.json",
+      "sha256": "63f205421788496cbd8e3919b9199cde43041cea82732adb2bf924f253929da6",
+      "bytes": 62483,
+      "kind": "search_simple",
+      "query_id": 3,
+      "retrieved_at": "2026-09-29T11:13:06Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/search/simple?query=WI%C5%9ANIEWSKI&page=0&pageSize=10&sort=RELEVANCE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/fulltext-3-wisniewski.json",
+      "sha256": "ebdc29d3911078a6bbd5f873a904150851eca8d20e142af7c5f9606a68a8de45",
+      "bytes": 53587,
+      "kind": "search_fulltext",
+      "query_id": 3,
+      "retrieved_at": "2026-09-29T11:13:08Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/fulltext/polona/fulltext/0/10?sort=RELEVANCE&query=WI%C5%9ANIEWSKI",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{\"filters\": {\"keywordFilters\": {\"copyright\": [\"false\"]}, \"temporalFilters\": null}}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/simple-4-abadzijew.json",
+      "sha256": "697d2e805217b07a2cba780e515df130d3a54aa0666431ddb26617c668d0d011",
+      "bytes": 3022,
+      "kind": "search_simple",
+      "query_id": 4,
+      "retrieved_at": "2026-09-29T11:13:11Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/search/simple?query=ABAD%C5%BBIJEW&page=0&pageSize=10&sort=RELEVANCE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/fulltext-4-abadzijew.json",
+      "sha256": "75ebfb8176d691fdf1adfbbb8eb0b61d04c04a642331dd9cd5a0a9f4f18b57d0",
+      "bytes": 32500,
+      "kind": "search_fulltext",
+      "query_id": 4,
+      "retrieved_at": "2026-09-29T11:13:13Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/fulltext/polona/fulltext/0/10?sort=RELEVANCE&query=ABAD%C5%BBIJEW",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{\"filters\": {\"keywordFilters\": {\"copyright\": [\"false\"]}, \"temporalFilters\": null}}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      },
+      "as_served": {
+        "bytes": 36202,
+        "sha256": "7c743e228e97c0651a6c2cbd4757f30f275e3b24e87c6f0721ea93d22e284aae"
+      },
+      "withheld_hit_indexes_as_served": [2]
+    },
+    {
+      "path": "search/simple-5-wilk.json",
+      "sha256": "6bd8fbb7834f7bf2d8b0ea8a8a85abc609dc1bd58c590190af4c905e76daa24a",
+      "bytes": 63273,
+      "kind": "search_simple",
+      "query_id": 5,
+      "retrieved_at": "2026-09-29T11:13:15Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/search/simple?query=WILK&page=0&pageSize=10&sort=RELEVANCE",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "search/fulltext-5-wilk.json",
+      "sha256": "e871c0576cfb23cee3679eb471c04cff9984e79492351fe3b4012729e92693ab",
+      "bytes": 42366,
+      "kind": "search_fulltext",
+      "query_id": 5,
+      "retrieved_at": "2026-09-29T11:13:17Z",
+      "request": {
+        "method": "POST",
+        "url": "https://polona.pl/api/search-service/fulltext/polona/fulltext/0/10?sort=RELEVANCE&query=WILK",
+        "headers": {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        "body": "{\"filters\": {\"keywordFilters\": {\"copyright\": [\"false\"]}, \"temporalFilters\": null}}"
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      },
+      "as_served": {
+        "bytes": 54916,
+        "sha256": "d10fc5457a481e02f993e44d0f818d72a05a252630df19f70831696f30de55e8"
+      },
+      "withheld_hit_indexes_as_served": [2, 3, 4]
+    },
+    {
+      "path": "objects/virtual-objects/4c68543c-6f7d-439a-a502-f537795b0f7f.front-office-details.json",
+      "sha256": "836f983e7019ee34f9ba58eaca014d0a142e279f807bda2278d0952adc3c90f7",
+      "bytes": 858,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:07Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/4c68543c-6f7d-439a-a502-f537795b0f7f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/1ce3f090-fb62-4302-8a11-96c2ed791c16.front-office-details.json",
+      "sha256": "18b214969a7a3d72120cc1ff3cb7f1e5c76971b4007bfc4fdeedfe42baecbfc3",
+      "bytes": 794,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:09Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/1ce3f090-fb62-4302-8a11-96c2ed791c16/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/607c0d91-cfe4-4325-be3d-39320f78bdd5.front-office-details.json",
+      "sha256": "4263883edebb894ee37a38185f599108600aa1864a78f1f27ad09b86c48efaa3",
+      "bytes": 971,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:10Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/607c0d91-cfe4-4325-be3d-39320f78bdd5/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/56f55a6b-5fde-46b9-918c-25e4d95b009f.front-office-details.json",
+      "sha256": "e54d7e6ef81cd992fcf3394705f14c53f642b23ebbae4b9c6969b50a4aad92cd",
+      "bytes": 895,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:12Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/56f55a6b-5fde-46b9-918c-25e4d95b009f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/c6a7d991-c595-4bb8-bf94-98960ef22e02.details.json",
+      "sha256": "f9882199484b312eb69b5555bc262683db59a10ac001c9d601134bf39df44ac4",
+      "bytes": 898,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:14Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/c6a7d991-c595-4bb8-bf94-98960ef22e02/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/c6a7d991-c595-4bb8-bf94-98960ef22e02.front-office-details.json",
+      "sha256": "c2bbbf0c02a0e86342b733e6d0fb305259e998796568cb5ec3e5c450a8a19c3a",
+      "bytes": 720,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:16Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/c6a7d991-c595-4bb8-bf94-98960ef22e02/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/cb24c0a3-2c8c-4595-8a6c-165da2c51bb0.front-office-details.json",
+      "sha256": "8162a80f7668658a19121218ff992e5372ef9c81df9e7a20f0b02e053ca49642",
+      "bytes": 931,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:18Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/cb24c0a3-2c8c-4595-8a6c-165da2c51bb0/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3ef64096-fbec-4c73-a4f1-235b8ccb5d3b.details.json",
+      "sha256": "6f94dd2704caf8c30d80c6b5644b389e0444ed2e0fa375e1e167e467a6266f18",
+      "bytes": 1082,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:19Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3ef64096-fbec-4c73-a4f1-235b8ccb5d3b/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3ef64096-fbec-4c73-a4f1-235b8ccb5d3b.front-office-details.json",
+      "sha256": "659a484f7cc5c5887aa0e38c7a2d7811ed74e4cd16d07e595e56bdfa283e0b1c",
+      "bytes": 818,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:21Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3ef64096-fbec-4c73-a4f1-235b8ccb5d3b/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/c44d4d44-43e0-4fab-9bc5-2176cc797a60.front-office-details.json",
+      "sha256": "73fbd2c0b08bde15dcd7b247a34c20f825dad30afe05e6e8f5d06a013e27cec4",
+      "bytes": 1021,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:23Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/c44d4d44-43e0-4fab-9bc5-2176cc797a60/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/92680ab3-975d-4e83-a7a6-bc7fbb76a579.front-office-details.json",
+      "sha256": "3246f0eda1b8d9703bae9e0138e83e449d34e457498f33bdc4345cb122ac38aa",
+      "bytes": 840,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:25Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/92680ab3-975d-4e83-a7a6-bc7fbb76a579/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/06aed979-1063-4059-b0b6-f52ba0e36f22.front-office-details.json",
+      "sha256": "96b8d0de11f9a6e150d4872b04aaee709ba932f78b0fe0dac8b0b8efe0da42da",
+      "bytes": 951,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:27Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/06aed979-1063-4059-b0b6-f52ba0e36f22/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6e5e5841-7c64-484f-9fb6-e2f34904e4a1.details.json",
+      "sha256": "f05446a21ade753dfbd836e25a9823ab6dfae461f3360e1892c1ed347506475e",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:28Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6e5e5841-7c64-484f-9fb6-e2f34904e4a1/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6e5e5841-7c64-484f-9fb6-e2f34904e4a1.front-office-details.json",
+      "sha256": "0e77dc1713bc13f9c3e2407bf776f73ad8a766104309e1aa2e679ed062a79fb0",
+      "bytes": 856,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6e5e5841-7c64-484f-9fb6-e2f34904e4a1/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/603f1413-42b7-48b8-afd4-4976b4f5040d.front-office-details.json",
+      "sha256": "6e7549ed3602e7f3bb20d7def89d95a4af7c0a4b8ae6746ab3a6abb915b1748a",
+      "bytes": 970,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:32Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/603f1413-42b7-48b8-afd4-4976b4f5040d/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/76be050f-c38b-4e02-80b8-f2d5e0cdf8e3.front-office-details.json",
+      "sha256": "f943406a63705bb8068a9a3a34b1ef71e939caeebdb56214da74d62a607adda5",
+      "bytes": 950,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:34Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/76be050f-c38b-4e02-80b8-f2d5e0cdf8e3/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/9c7d23bb-2f88-47fd-87ca-ac7cf3cf0c12.front-office-details.json",
+      "sha256": "871874e3d0cba30f77f0ca34ce65da7a5bfd2a825e1b87212aff35ab1c807e9c",
+      "bytes": 768,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:36Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/9c7d23bb-2f88-47fd-87ca-ac7cf3cf0c12/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/5c3b49f1-04f5-42d5-aec5-cbacdf06e2e9.front-office-details.json",
+      "sha256": "48f552cb6f91c8aa51440a925f9ec34d27fb8d6da86a3174545fd9f974a0a1d2",
+      "bytes": 949,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:37Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/5c3b49f1-04f5-42d5-aec5-cbacdf06e2e9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/f2a594d2-df54-4d60-b79d-cd40874a6552.front-office-details.json",
+      "sha256": "13db5b3a584f52d6706d20bf4dd8f95a24f423b306be0bafbd52a79f3fc693b4",
+      "bytes": 776,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:39Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/f2a594d2-df54-4d60-b79d-cd40874a6552/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/4981f57d-cce0-4057-912d-38f039a68e65.front-office-details.json",
+      "sha256": "044010e225217e1de3409213661928939d0c98962e72860616580902f36048c6",
+      "bytes": 913,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:41Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/4981f57d-cce0-4057-912d-38f039a68e65/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/1c35274a-8cbc-44d5-99c6-ad9e56fd37fb.front-office-details.json",
+      "sha256": "c368e99351e5d1d28ec9ce280a1c4206dddcd70df365be10ac9933c7a3a6cd0f",
+      "bytes": 942,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:43Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/1c35274a-8cbc-44d5-99c6-ad9e56fd37fb/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/853a7c1b-0b3d-4d50-ad2c-68c95bf4480d.front-office-details.json",
+      "sha256": "1fde6d9cce004ee3c0bb802aa62c8a67c5032c1e887a163eb55cbc013b4d0e42",
+      "bytes": 788,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:44Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/853a7c1b-0b3d-4d50-ad2c-68c95bf4480d/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/caa7ef30-e184-4a8a-9d31-86e4add10714.details.json",
+      "sha256": "6cd488bfc596085b6f0dcd73a8b0bbb43283198a0d7381d016da1062abec495d",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:46Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/caa7ef30-e184-4a8a-9d31-86e4add10714/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/caa7ef30-e184-4a8a-9d31-86e4add10714.front-office-details.json",
+      "sha256": "fd5a93bdf7bd7ada8d480b48fb8a61b1318c58aa4fc4615758d6328e84064606",
+      "bytes": 808,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:48Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/caa7ef30-e184-4a8a-9d31-86e4add10714/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/a88d95e7-284c-4c69-999e-1d37c577d308.front-office-details.json",
+      "sha256": "4ee9b962ae22f140343358efcc49bed6bd2e99c1132c9bdebd4c15c4e2c4ace5",
+      "bytes": 831,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:50Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/a88d95e7-284c-4c69-999e-1d37c577d308/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/d03d2d87-5739-487b-aa55-4e491eec28d9.front-office-details.json",
+      "sha256": "8a647116832938e180fb9293c186ecd1e45f9ee00940f7c2888a6145b91123e7",
+      "bytes": 801,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:51Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/d03d2d87-5739-487b-aa55-4e491eec28d9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/621d6ce3-7123-4a20-b2af-8e4c0f5b4cfa.details.json",
+      "sha256": "6b29a21c5fd7533d573629eab907bdaddf3c90327164097108f79d1afe2d8334",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:53Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/621d6ce3-7123-4a20-b2af-8e4c0f5b4cfa/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/621d6ce3-7123-4a20-b2af-8e4c0f5b4cfa.front-office-details.json",
+      "sha256": "2b2984e1f68b6b2901e1a0462693e78d2b61108872302a65845212697956e353",
+      "bytes": 856,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:55Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/621d6ce3-7123-4a20-b2af-8e4c0f5b4cfa/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b770f642-3790-42c5-b58d-c8782246d7fc.details.json",
+      "sha256": "72fd927b93d96a9eb0052b150d7e01a4e8401a90c1faf30dfae174bd7f6973fa",
+      "bytes": 896,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:57Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b770f642-3790-42c5-b58d-c8782246d7fc/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b770f642-3790-42c5-b58d-c8782246d7fc.front-office-details.json",
+      "sha256": "352ff13812670bbc2117e629a622f0342507e47f3812783c5fc93896f69b22ce",
+      "bytes": 772,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:28:58Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b770f642-3790-42c5-b58d-c8782246d7fc/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e46127ea-906e-4883-b66e-10ffd462d356.details.json",
+      "sha256": "e883b8b9613af2e6ebde89a50e108b7b19b6eaa3982ac1a44ecf35cec4405188",
+      "bytes": 900,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:00Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e46127ea-906e-4883-b66e-10ffd462d356/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e46127ea-906e-4883-b66e-10ffd462d356.front-office-details.json",
+      "sha256": "526b9f82f60d8ded6e9dcafda11c616ecae417a2419a0d4fe2987c9be2347a45",
+      "bytes": 755,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:02Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e46127ea-906e-4883-b66e-10ffd462d356/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/c6bb6a3a-fa7b-4998-8fd0-e60404dc8387.front-office-details.json",
+      "sha256": "6c870990bdf075d0ff17a5490f33c90ad848a3b199effce3438db780fdea800b",
+      "bytes": 824,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:04Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/c6bb6a3a-fa7b-4998-8fd0-e60404dc8387/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/a171c792-f30c-4618-b2f6-2d8ab929833a.details.json",
+      "sha256": "c1d6edf75d47e8faf615f65b75b49fb769fe5846d6680d1c745857e1b93b5437",
+      "bytes": 896,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:05Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/a171c792-f30c-4618-b2f6-2d8ab929833a/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/a171c792-f30c-4618-b2f6-2d8ab929833a.front-office-details.json",
+      "sha256": "1cbdd24a6369a83d7f47ff1742ce70269ae75ba4f9c31be0802930f6cc320d03",
+      "bytes": 685,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:07Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/a171c792-f30c-4618-b2f6-2d8ab929833a/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/edea8592-2d94-4b0d-baa0-f73916cba23b.details.json",
+      "sha256": "653706980cf19452991ae1902a1e986a7d92ee6ee25f0eb355335af74685597f",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:09Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/edea8592-2d94-4b0d-baa0-f73916cba23b/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/edea8592-2d94-4b0d-baa0-f73916cba23b.front-office-details.json",
+      "sha256": "379ed938e59ac6fd68c72ce8f1e20c0312f8e312dae9d665a10e2a94e3015a81",
+      "bytes": 653,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:11Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/edea8592-2d94-4b0d-baa0-f73916cba23b/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/a9549da3-9fb6-4264-b2a3-8294f67d5b81.front-office-details.json",
+      "sha256": "cf320bf53173a1a0d75dc0bab54e0803e60e0edcfcf3225fcb81444093a3268e",
+      "bytes": 1193,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:12Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/a9549da3-9fb6-4264-b2a3-8294f67d5b81/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/10e27b97-22be-41cb-afd6-22a9fd225902.front-office-details.json",
+      "sha256": "e81272d1e60ea401ae93adb5715b1d6772d553d98328b4f43a6ba654c8166bd5",
+      "bytes": 922,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:14Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/10e27b97-22be-41cb-afd6-22a9fd225902/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3deba6b9-2857-4823-9cad-9b403812ddd8.details.json",
+      "sha256": "d3c53c6434f760b2b4aaeaee7cbb5ab0c6e3c975b26313002ac1376ff0e7ef8c",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:16Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3deba6b9-2857-4823-9cad-9b403812ddd8/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3deba6b9-2857-4823-9cad-9b403812ddd8.front-office-details.json",
+      "sha256": "f5453a0dd1ab518a548d9e9f53d94c5c94d939793cb64a7d2393dc3f4d431fd0",
+      "bytes": 935,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:18Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3deba6b9-2857-4823-9cad-9b403812ddd8/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/e18c61e5-aa71-49be-9210-b128c74cf3a9.front-office-details.json",
+      "sha256": "a4f787736f6a9139cce118574170bb166593bdfc572f4f397ac523c5fc661960",
+      "bytes": 902,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:19Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/e18c61e5-aa71-49be-9210-b128c74cf3a9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b51fe811-5c4b-4a8d-b9d7-623b21354148.details.json",
+      "sha256": "1a8a955c1a11b510b1b5416d6871179a10a5be365e848b32ea62ff59179d7a19",
+      "bytes": 829,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:21Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b51fe811-5c4b-4a8d-b9d7-623b21354148/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b51fe811-5c4b-4a8d-b9d7-623b21354148.front-office-details.json",
+      "sha256": "263b29d26299877081e33c19e194b6b5797fddd503d5eca08270fa21cb6316f7",
+      "bytes": 616,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:23Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b51fe811-5c4b-4a8d-b9d7-623b21354148/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/03b249c4-fa3f-437b-9300-eb68735cdf6a.details.json",
+      "sha256": "0f627ee7c955361a5b7dd874d1f192363cec86eb76cf46f3b4fb68608e65346e",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:25Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/03b249c4-fa3f-437b-9300-eb68735cdf6a/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/03b249c4-fa3f-437b-9300-eb68735cdf6a.front-office-details.json",
+      "sha256": "045c2cf2dfda2ea36da57d18f9fc05e6ca83e57935cd28eda1c9b9bcdb094f89",
+      "bytes": 864,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:26Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/03b249c4-fa3f-437b-9300-eb68735cdf6a/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e5584929-eac8-4e73-9d3c-85b9aff4e505.details.json",
+      "sha256": "e00dd361e309d0f3a8b575b63016c101d38983670f40cb6f44a196cecee57494",
+      "bytes": 829,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:28Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e5584929-eac8-4e73-9d3c-85b9aff4e505/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e5584929-eac8-4e73-9d3c-85b9aff4e505.front-office-details.json",
+      "sha256": "40f2674293ef4a1f8548fc6fab3b8e4dc70f104795697fa7456b63486e3e7470",
+      "bytes": 770,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e5584929-eac8-4e73-9d3c-85b9aff4e505/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e2ff2984-e242-4626-ba89-fc2d444d1e9f.details.json",
+      "sha256": "e22b66a773aba3767f83881c468ff6efb8e662f0a9bfc6625ae79cb313b6e25c",
+      "bytes": 1083,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:31Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e2ff2984-e242-4626-ba89-fc2d444d1e9f/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/e2ff2984-e242-4626-ba89-fc2d444d1e9f.front-office-details.json",
+      "sha256": "87b784ab295c8f58f386f4f1385029792b8cdd335c7f0db5be0ed368172b1ab5",
+      "bytes": 907,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:33Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/e2ff2984-e242-4626-ba89-fc2d444d1e9f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/a7a8a34c-9d17-44ef-9841-3d09563fc9ad.front-office-details.json",
+      "sha256": "b8fb2255f6b45274ffa01ba5b8ce46a8141c8638c70d94c3b852d2fdc3a44a50",
+      "bytes": 965,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:35Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/a7a8a34c-9d17-44ef-9841-3d09563fc9ad/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/b0a1296f-0fa0-4dc0-a860-3db7d95a29d7.front-office-details.json",
+      "sha256": "1f29ad0c4704ff0175d97a3725b968b28b9b2e2a63a16cfd975f0167635dc162",
+      "bytes": 1073,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:37Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/b0a1296f-0fa0-4dc0-a860-3db7d95a29d7/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/9f4627d2-48e5-4949-9523-e91797e8a6a6.details.json",
+      "sha256": "b8067f484cb126b882b1ba253f265840c2090becba5877c30fd8f8031df9ea47",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:38Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/9f4627d2-48e5-4949-9523-e91797e8a6a6/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/9f4627d2-48e5-4949-9523-e91797e8a6a6.front-office-details.json",
+      "sha256": "8435b5ce95743dbbf877eca4a98351562139b929c138ed6dc397dd473fa2d24a",
+      "bytes": 897,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:40Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/9f4627d2-48e5-4949-9523-e91797e8a6a6/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/virtual-objects/146d5468-227d-4615-8691-fe217b7b32dd.front-office-details.json",
+      "sha256": "5cdcef3a0b5b1acbc461392cc560e286d2c3cd0183ede693c67c4b4e86575ddf",
+      "bytes": 992,
+      "kind": "virtual_object_front_office_details",
+      "object_type": "VIRTUAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:42Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/virtual-objects/146d5468-227d-4615-8691-fe217b7b32dd/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/2bacac7f-6315-4b1e-8cf3-b1930dcf608c.details.json",
+      "sha256": "e8f15590a4964513c539dc05c0d8888295ccddd079c08708984bbaa9b25f83c2",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:44Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/2bacac7f-6315-4b1e-8cf3-b1930dcf608c/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/2bacac7f-6315-4b1e-8cf3-b1930dcf608c.front-office-details.json",
+      "sha256": "228f1706b75b719d18dfd2c8dcafa9806ec6c98d4c9f18aa5b30f19c96b83924",
+      "bytes": 1039,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:45Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/2bacac7f-6315-4b1e-8cf3-b1930dcf608c/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/563fdb10-dbff-4581-9f28-42afb679c02d.details.json",
+      "sha256": "31163ec79bf334ff76dc1ed4b02ce43ff4d5b41c5b7cde2521c1047e92707578",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:47Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/563fdb10-dbff-4581-9f28-42afb679c02d/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/563fdb10-dbff-4581-9f28-42afb679c02d.front-office-details.json",
+      "sha256": "e4d61fd886e7969a569366e7752d4cd5e366fdee498135c8b900696e72559e46",
+      "bytes": 748,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:49Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/563fdb10-dbff-4581-9f28-42afb679c02d/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/5e56a44c-8433-40dd-8688-021d0d5549da.details.json",
+      "sha256": "969ef59d7e8aca5a9dd3a560e6693dc441ca10085fe75afc8061b0f08288615c",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:51Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/5e56a44c-8433-40dd-8688-021d0d5549da/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/5e56a44c-8433-40dd-8688-021d0d5549da.front-office-details.json",
+      "sha256": "4b142839c53b42c3b0c8777867420a89b822f64b1179905d3238adc1bce89a8b",
+      "bytes": 1064,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:53Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/5e56a44c-8433-40dd-8688-021d0d5549da/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6586e748-7362-4956-8bd2-96fa53970072.details.json",
+      "sha256": "ea84da1fa7a8d5c22050571b27bf44af9e3f8a82530654e296f72fe7d549cd2c",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:54Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6586e748-7362-4956-8bd2-96fa53970072/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6586e748-7362-4956-8bd2-96fa53970072.front-office-details.json",
+      "sha256": "c9ea016dc23da4434ae6be107958182b0face6baa2bab493b5c2f04008e82f8a",
+      "bytes": 797,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:57Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6586e748-7362-4956-8bd2-96fa53970072/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/7e2633df-bbc4-4222-beed-b380bd3280f6.details.json",
+      "sha256": "c027fc7511f67cf4852e9393edeb1ad0a6473dd606e73050ed232aa54333a040",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:29:59Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/7e2633df-bbc4-4222-beed-b380bd3280f6/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/7e2633df-bbc4-4222-beed-b380bd3280f6.front-office-details.json",
+      "sha256": "1829ba0395287afaa0bfcbfed74a68f4c34e3ec71803251460311179ff1fb225",
+      "bytes": 982,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:00Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/7e2633df-bbc4-4222-beed-b380bd3280f6/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/88a537b7-5f16-49c5-a58a-59d9b0a1af12.details.json",
+      "sha256": "081280f888a96cfc705b9a68f14b4a86c0879256e73ccda134c69585e8621cd0",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:02Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/88a537b7-5f16-49c5-a58a-59d9b0a1af12/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/88a537b7-5f16-49c5-a58a-59d9b0a1af12.front-office-details.json",
+      "sha256": "005f0a7a81d4eba23d99e1fe886127c40770e3e189bde2d3c84624535143a2bd",
+      "bytes": 1039,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:04Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/88a537b7-5f16-49c5-a58a-59d9b0a1af12/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67.details.json",
+      "sha256": "5628e1c967c96acb17fdc71a49f762323f9e5000a537cd53483dbd4614cb841b",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:06Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67.front-office-details.json",
+      "sha256": "d8b6bd51222751124e7cb05c40641c99450fc72da79d67d1c7984a0eb592140c",
+      "bytes": 1129,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:07Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b4dd4da7-f832-4885-8a33-5e13799da86e.details.json",
+      "sha256": "38bd0b7cdbe2366fa09a03d76e8d1e50399a55c8fa83ab2f3ca92b15164adad7",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:09Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b4dd4da7-f832-4885-8a33-5e13799da86e/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b4dd4da7-f832-4885-8a33-5e13799da86e.front-office-details.json",
+      "sha256": "331bb7922dc37961f1068627d78651a55cb827d33eed239ba93b42d42c604342",
+      "bytes": 1177,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:11Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b4dd4da7-f832-4885-8a33-5e13799da86e/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/c241d3b5-00d1-4e9e-a5e1-b04a3b65dfcf.details.json",
+      "sha256": "80fc55217bd5c73d16a2bdceea3139e22a266bcb2744fc6eccf00a831dc188ed",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:13Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/c241d3b5-00d1-4e9e-a5e1-b04a3b65dfcf/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/c241d3b5-00d1-4e9e-a5e1-b04a3b65dfcf.front-office-details.json",
+      "sha256": "4ac98c20394be5dfe9d35cdfc51b4e3204d5680b6405158347e1b7d74d1322af",
+      "bytes": 753,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:14Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/c241d3b5-00d1-4e9e-a5e1-b04a3b65dfcf/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/fdde72f6-661c-403a-ad88-2ca30f31df2b.details.json",
+      "sha256": "793be7ea85a2baf63d683a1971554256b40f6ef55f7669db405fd3656cc5ae3c",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:16Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/fdde72f6-661c-403a-ad88-2ca30f31df2b/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/fdde72f6-661c-403a-ad88-2ca30f31df2b.front-office-details.json",
+      "sha256": "057e2057b0466024cbce67c39308b0cfae623a0b15fccbc9d4ba3ce5766f90f1",
+      "bytes": 1040,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:18Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/fdde72f6-661c-403a-ad88-2ca30f31df2b/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3678b410-ebfd-4aa0-88eb-51fd3fb62c7a.details.json",
+      "sha256": "f17f17d8b30d5e73b7f72deed7f29bfb02a948dea0bc9d4bcc81b70201b0133f",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:20Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3678b410-ebfd-4aa0-88eb-51fd3fb62c7a/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/3678b410-ebfd-4aa0-88eb-51fd3fb62c7a.front-office-details.json",
+      "sha256": "0c7c95c94a66e8f1d128704973bba36154c6d5e0963ea51b4d0868dcece26c0d",
+      "bytes": 1030,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:22Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/3678b410-ebfd-4aa0-88eb-51fd3fb62c7a/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/59d65866-b841-42f9-b13c-6b8eb115154c.details.json",
+      "sha256": "75a1de19d5f51ff44c18f43da014a3fd2dc9468e94cc06baebfebae002e77489",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:23Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/59d65866-b841-42f9-b13c-6b8eb115154c/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/59d65866-b841-42f9-b13c-6b8eb115154c.front-office-details.json",
+      "sha256": "c26bbae706b4e113af1e5b765291ff84de1fa58453ef9c385951e32695cc6866",
+      "bytes": 777,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:25Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/59d65866-b841-42f9-b13c-6b8eb115154c/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/60d6a56c-afda-4a02-9dc1-e07dcbf8362f.details.json",
+      "sha256": "7fd0eec56e4d6852a4915a4c8bdad91ed850a66d251612c727e1f0fe085d764d",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:27Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/60d6a56c-afda-4a02-9dc1-e07dcbf8362f/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/60d6a56c-afda-4a02-9dc1-e07dcbf8362f.front-office-details.json",
+      "sha256": "c0214b7c3bcb890166a17f3b0910fe3e887077e13ac360f4b61e84d682218ea4",
+      "bytes": 1053,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:29Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/60d6a56c-afda-4a02-9dc1-e07dcbf8362f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/7f7ff6a7-b01d-490e-8b23-3d697ec20814.details.json",
+      "sha256": "3aaff26815262f44cbd7fba5ddab6c3065fd8f80e3b46fdf67df6673335f5fd2",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/7f7ff6a7-b01d-490e-8b23-3d697ec20814/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/7f7ff6a7-b01d-490e-8b23-3d697ec20814.front-office-details.json",
+      "sha256": "6fe3db093b03b49e3a871a4aecd4243844f6cd8e3189ac66940f37e03a8d31bb",
+      "bytes": 1287,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:32Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/7f7ff6a7-b01d-490e-8b23-3d697ec20814/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b79668fb-89dd-4505-8599-47647b9509d9.details.json",
+      "sha256": "161497746c897a01be2d93f808753f40d67dc8a1d6c42f48facacdfa0f041ab8",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:34Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b79668fb-89dd-4505-8599-47647b9509d9/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b79668fb-89dd-4505-8599-47647b9509d9.front-office-details.json",
+      "sha256": "33584b5de289ddbdedf4b17f31c06ce50fc0e1611190be8ffad3b5c7ee6c9dca",
+      "bytes": 1045,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:36Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b79668fb-89dd-4505-8599-47647b9509d9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/dffbf2ec-5bca-4305-bc7f-7a9c6ef85dc2.details.json",
+      "sha256": "02eef362006b8f7cd289ac0ccfa807ecae0f7e4f243ef144954deeebec468d1a",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:37Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/dffbf2ec-5bca-4305-bc7f-7a9c6ef85dc2/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/dffbf2ec-5bca-4305-bc7f-7a9c6ef85dc2.front-office-details.json",
+      "sha256": "08cb0047ffa476a7cf0554501210df930218c8164672a12d98655d40e24d75f2",
+      "bytes": 1056,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:39Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/dffbf2ec-5bca-4305-bc7f-7a9c6ef85dc2/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f8aa1d5f-aefb-4f55-980a-ac224fdaf8d2.details.json",
+      "sha256": "94e5da5b896481668705e7a00763a4695201913862faecf654e5adccb500ad2b",
+      "bytes": 876,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:41Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f8aa1d5f-aefb-4f55-980a-ac224fdaf8d2/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f8aa1d5f-aefb-4f55-980a-ac224fdaf8d2.front-office-details.json",
+      "sha256": "1a9362c2a8537c7650261bce2b65cc321414277aafd48a47209b75fcba9022a6",
+      "bytes": 805,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:43Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f8aa1d5f-aefb-4f55-980a-ac224fdaf8d2/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/56777d00-4028-4132-805c-d7f00c638aa6.details.json",
+      "sha256": "1cc9f4b5f4808c7fd89bfa4af75c28e7934763e2a777e0719c131f3570537200",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:44Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/56777d00-4028-4132-805c-d7f00c638aa6/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/56777d00-4028-4132-805c-d7f00c638aa6.front-office-details.json",
+      "sha256": "558b1a94668d32e06c084b7233916ed5459d0d3adf8190613a0ce0521d2bfe0c",
+      "bytes": 993,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:46Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/56777d00-4028-4132-805c-d7f00c638aa6/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/8f7cf574-b074-4313-b274-ca53e9459587.details.json",
+      "sha256": "d77442f7368ca7dba78dbd7684f97b81991b814c915bc6ffb0ac44e6128c1c94",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:48Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/8f7cf574-b074-4313-b274-ca53e9459587/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/8f7cf574-b074-4313-b274-ca53e9459587.front-office-details.json",
+      "sha256": "328e6aadc1aba172e534508c5a5b4f749cd9ac6c91563ee4c1ac243921c02130",
+      "bytes": 981,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:50Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/8f7cf574-b074-4313-b274-ca53e9459587/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b8a2226d-0ccb-4589-9f9b-6c77d4721906.details.json",
+      "sha256": "9f48bd79354f8fcbc7b23b4c08469fce4faf3158c065a3341f12ad31b568df79",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:51Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b8a2226d-0ccb-4589-9f9b-6c77d4721906/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b8a2226d-0ccb-4589-9f9b-6c77d4721906.front-office-details.json",
+      "sha256": "92f888cc7dc4573fc868190ba1bce9caf7e4464fbee3c6fe7ad6bff055a2ffcd",
+      "bytes": 1002,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:53Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b8a2226d-0ccb-4589-9f9b-6c77d4721906/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/bdcad89b-4a54-404c-9af3-0c87987dc46f.details.json",
+      "sha256": "4a3fca7d6d3147e2c40efc7d3a91e9bd4b6c2eb1c2182101737700700c4db90e",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:55Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/bdcad89b-4a54-404c-9af3-0c87987dc46f/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/bdcad89b-4a54-404c-9af3-0c87987dc46f.front-office-details.json",
+      "sha256": "7bb5f1d82d1a5586e111ef3a6bd4fb52c8c2cb93e93ead9886588107cf77167e",
+      "bytes": 1225,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:56Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/bdcad89b-4a54-404c-9af3-0c87987dc46f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f73a018d-c319-4c7c-9139-0d5a636e8db9.details.json",
+      "sha256": "d7fdcb0318e977a88fca7fed819937c36eac23a1134c2b9cba125a42782b6567",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:30:58Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f73a018d-c319-4c7c-9139-0d5a636e8db9/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f73a018d-c319-4c7c-9139-0d5a636e8db9.front-office-details.json",
+      "sha256": "bb01aadd0eff0eaba36983caa894ee42e3fddc6247f941af94814d6357ed47bf",
+      "bytes": 1447,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:00Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f73a018d-c319-4c7c-9139-0d5a636e8db9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/0b342fa7-d4fd-4f96-b490-8476936c7841.details.json",
+      "sha256": "6ecf083f13b67eb186bfcfd4b994f1a1e4e58de68739688d65a9d40cde30e1ed",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:02Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/0b342fa7-d4fd-4f96-b490-8476936c7841/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/0b342fa7-d4fd-4f96-b490-8476936c7841.front-office-details.json",
+      "sha256": "79489e8b3ed6656cba1f9f2e17d86d56c3e34054fa1d7c1ab19f2c2cb1b5dfc2",
+      "bytes": 1056,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:03Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/0b342fa7-d4fd-4f96-b490-8476936c7841/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/9553fb75-215e-402a-842c-ee9cd2693b13.details.json",
+      "sha256": "45dc710651c1be359ece794fda3e64817794e06f757c4183d7bc680407412639",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:05Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/9553fb75-215e-402a-842c-ee9cd2693b13/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/9553fb75-215e-402a-842c-ee9cd2693b13.front-office-details.json",
+      "sha256": "8935f0b0dfce0cb3dec4a112cae6826e8f071cc86319c2c220cbcea17f51e51b",
+      "bytes": 1064,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:07Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/9553fb75-215e-402a-842c-ee9cd2693b13/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/ac62acde-83b4-43d3-8bb2-aba0bf61248f.details.json",
+      "sha256": "f593a95bacfe5f6205df1a2efd8d1c737ab5f59e204627a1c672f5d111ddd1f0",
+      "bytes": 906,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:09Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/ac62acde-83b4-43d3-8bb2-aba0bf61248f/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/ac62acde-83b4-43d3-8bb2-aba0bf61248f.front-office-details.json",
+      "sha256": "dedfa7bb4c8fbd68102905bb2a9382991f11bbe6c1d1cd12a709763b36a63dcf",
+      "bytes": 5491,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:10Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/ac62acde-83b4-43d3-8bb2-aba0bf61248f/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/2323af46-372d-45cf-a313-182e95deb8d9.details.json",
+      "sha256": "9509e0530e1d78416f9c5fdf2d56758a7d22cd522208e1d8bf1f4f7352d2c670",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:12Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/2323af46-372d-45cf-a313-182e95deb8d9/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/2323af46-372d-45cf-a313-182e95deb8d9.front-office-details.json",
+      "sha256": "797dc78e746692645a05ac81b6713e84eac68a2c31e6deae65112a153fe9e122",
+      "bytes": 1013,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:14Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/2323af46-372d-45cf-a313-182e95deb8d9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/54bb4cdc-b86d-4b1b-b793-48564dbc48aa.details.json",
+      "sha256": "629417fcf6e3dfd850f7ebd5d885bf08a4944415a3931f8b636f172b2fed4018",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:16Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/54bb4cdc-b86d-4b1b-b793-48564dbc48aa/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/54bb4cdc-b86d-4b1b-b793-48564dbc48aa.front-office-details.json",
+      "sha256": "afa3574e3089eb1bdd602b0603d339e1412f0a14b508411fc9c611fa9d7e0424",
+      "bytes": 1077,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:17Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/54bb4cdc-b86d-4b1b-b793-48564dbc48aa/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/8e4209df-7cd2-4332-ba01-5f5868ba81a9.details.json",
+      "sha256": "71564dc2b20cd66cd88915de1e9608cc12ad2849e519dfa0fbffac5aae014236",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:19Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/8e4209df-7cd2-4332-ba01-5f5868ba81a9/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/8e4209df-7cd2-4332-ba01-5f5868ba81a9.front-office-details.json",
+      "sha256": "519fa16fbe68baf1011488d47b8b6c27a10c729a3a7eee46a629fe2aaccc35f2",
+      "bytes": 1021,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:21Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/8e4209df-7cd2-4332-ba01-5f5868ba81a9/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f53f6513-b170-4851-8a39-3753632b4522.details.json",
+      "sha256": "a5140006992b0f22a8c639b684e7707480fea2b71dbe00687d029108d0a763dc",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:23Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f53f6513-b170-4851-8a39-3753632b4522/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/f53f6513-b170-4851-8a39-3753632b4522.front-office-details.json",
+      "sha256": "484e9aea4b22085bd3888c43cc68759af93474795628822ea91d9190739f46c0",
+      "bytes": 772,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:24Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/f53f6513-b170-4851-8a39-3753632b4522/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/21db7ff3-aecc-4cef-ac0d-e5ccde7b178b.details.json",
+      "sha256": "31b6fff5ca6725a26bb6d77d4f97cf5eb5816b04c20cc8c48fd749ee331eb5a5",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:26Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/21db7ff3-aecc-4cef-ac0d-e5ccde7b178b/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/21db7ff3-aecc-4cef-ac0d-e5ccde7b178b.front-office-details.json",
+      "sha256": "4f94d8b97449edecccbb7b8a887999c2771d9e000c19fe54958b27f8175b56b4",
+      "bytes": 656,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:28Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/21db7ff3-aecc-4cef-ac0d-e5ccde7b178b/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/4d3c6ddb-2169-4d1b-ab20-fd2ce33df5ab.details.json",
+      "sha256": "b2dc51ec033e9d1e2fcaac0dd50b31802aeba0604be57825cd1d2b1ff92cb1e2",
+      "bytes": 877,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/4d3c6ddb-2169-4d1b-ab20-fd2ce33df5ab/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/4d3c6ddb-2169-4d1b-ab20-fd2ce33df5ab.front-office-details.json",
+      "sha256": "25d0180d8209fce8dec732e819da99d644b02a03b4a3c7e9a62e4c8f8eb58ebe",
+      "bytes": 965,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:31Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/4d3c6ddb-2169-4d1b-ab20-fd2ce33df5ab/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/5bcee4be-439b-45c1-93bb-1120465ac746.details.json",
+      "sha256": "4d5942989764319d4fbd8f09e7267e451743e49954b3fbdef8892c4f658ed0e1",
+      "bytes": 906,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:33Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/5bcee4be-439b-45c1-93bb-1120465ac746/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/5bcee4be-439b-45c1-93bb-1120465ac746.front-office-details.json",
+      "sha256": "b6cb7be6f46ec31fe25c6c27fb61a0dc44a361afb7f4e0c08add813b41258f96",
+      "bytes": 669,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:35Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/5bcee4be-439b-45c1-93bb-1120465ac746/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6d5dcc26-0280-460a-acbb-9521cdec3b84.details.json",
+      "sha256": "0086a3090a852039c3ace3384f70f267abd79d24b4c50c4b90c92a69a540d964",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:36Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6d5dcc26-0280-460a-acbb-9521cdec3b84/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/6d5dcc26-0280-460a-acbb-9521cdec3b84.front-office-details.json",
+      "sha256": "77a2b0c6edf0a3e5df64d14238ce78c7e975263a0c5240d2385fe4b2d746bc64",
+      "bytes": 940,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:38Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/6d5dcc26-0280-460a-acbb-9521cdec3b84/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/79bfbc28-2448-4011-9802-c658f076e893.details.json",
+      "sha256": "74ebad1a3bc3d210d60dfdeb39fa62b717de12415438132ea4b94c1212dd0c22",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:40Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/79bfbc28-2448-4011-9802-c658f076e893/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/79bfbc28-2448-4011-9802-c658f076e893.front-office-details.json",
+      "sha256": "19e0494a4beae03164e4ba3dbedcb54659a435fcfdbcc41e696c95ec6a6d54e2",
+      "bytes": 927,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:42Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/79bfbc28-2448-4011-9802-c658f076e893/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b882277d-9940-4358-999e-a7b24d447ab1.details.json",
+      "sha256": "6be1d6d7ae23daf308b7eeeaf83441465cd522988c41f842e500d65c513dff6b",
+      "bytes": 878,
+      "kind": "digital_object_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:43Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b882277d-9940-4358-999e-a7b24d447ab1/details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "objects/digital-objects/b882277d-9940-4358-999e-a7b24d447ab1.front-office-details.json",
+      "sha256": "320429b9f31254eb1c8be64a1672ed8edd84dd896c4dd8d2c9bdb6c06cc72064",
+      "bytes": 1085,
+      "kind": "digital_object_front_office_details",
+      "object_type": "DIGITAL_OBJECT",
+      "retrieved_at": "2026-09-29T11:31:45Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/library-object-query/digital-objects/b882277d-9940-4358-999e-a7b24d447ab1/front-office-details",
+        "headers": {
+          "Accept": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/json"
+      }
+    },
+    {
+      "path": "ocr/8802e7b5-bf41-4ed1-bf44-1eee464fbb0a.alto.xml",
+      "sha256": "1c4c8bfe2009bb82fe85b019efd1c20c3f48192343d28695bb1f34437d6bb5e9",
+      "bytes": 58535,
+      "kind": "ocr_alto_page",
+      "retrieved_at": "2026-09-29T11:20:30Z",
+      "request": {
+        "method": "GET",
+        "url": "https://polona.pl/api/download/digital-content/8802e7b5-bf41-4ed1-bf44-1eee464fbb0a",
+        "headers": {},
+        "body": null
+      },
+      "response": {
+        "http_status": 200,
+        "content_type": "application/xml",
+        "content_disposition_filename": "BN_2015242_1006_alto.xml"
+      },
+      "located_by": {
+        "from": "search/fulltext-3-wisniewski.json",
+        "objectId": "8f7cf574-b074-4313-b274-ca53e9459587",
+        "contentId": "f8be2733-9661-43ac-b7a2-01acbe08747b",
+        "pageNumber": "1005",
+        "resourceUrl": "/download/digital-content/8802e7b5-bf41-4ed1-bf44-1eee464fbb0a"
+      }
+    }
+  ],
+  "withheld_hits": [
+    {
+      "from": "search/fulltext-4-abadzijew.json",
+      "hit_index_as_served": 2,
+      "objectId": "ac62acde-83b4-43d3-8bb2-aba0bf61248f",
+      "contentId": "d501ab43-2f55-405b-b047-2757ac799804",
+      "pageNumber": "33",
+      "resourceUrl": "/download/digital-content/2592346f-008f-4e01-8e78-dedaad7497e4",
+      "licenseName": "Zawartość chroniona - licencja ograniczona",
+      "copyrightProtected": false,
+      "ocr_text_sha256": "7ae874284cd8ea25d86d72f18c2c199681ad89191899cec975dc48172059642f",
+      "hit_bytes_sha256": "2db71407a85f3d6a7087d8e28ff9c5ac8339f756231db31867b197274146d1ba"
+    },
+    {
+      "from": "search/fulltext-5-wilk.json",
+      "hit_index_as_served": 2,
+      "objectId": "5bcee4be-439b-45c1-93bb-1120465ac746",
+      "contentId": "87816201-5f37-4e2d-b359-0c8b80e92ef3",
+      "pageNumber": "503",
+      "resourceUrl": "/download/digital-content/1fa62e3a-dbc1-4263-b236-a27d0582b5ee",
+      "licenseName": "Zawartość chroniona - licencja ograniczona",
+      "copyrightProtected": false,
+      "ocr_text_sha256": "7f99ba5c1bc9244b6d6cd10ba6772262f1d00950e9ed1a514f92a7584db977c9",
+      "hit_bytes_sha256": "507cdbfd995db2ba821db563fa1e000665ca53241fae2c6111dfa858a9fb2322"
+    },
+    {
+      "from": "search/fulltext-5-wilk.json",
+      "hit_index_as_served": 3,
+      "objectId": "5bcee4be-439b-45c1-93bb-1120465ac746",
+      "contentId": "f905ad5f-ce5e-43ae-b932-490bdba9b085",
+      "pageNumber": "504",
+      "resourceUrl": "/download/digital-content/9b9183dc-aac8-4b4e-a77f-2aab6b8c5ec1",
+      "licenseName": "Zawartość chroniona - licencja ograniczona",
+      "copyrightProtected": false,
+      "ocr_text_sha256": "4a59cf4f075f6dfb53775f90c3d6d246260472924a736873f5421f46dd1f1492",
+      "hit_bytes_sha256": "aab5dc12cb4031da6eafc4eb8d0c7bcc22b201e7c1502f7766559b4eb2f9a448"
+    },
+    {
+      "from": "search/fulltext-5-wilk.json",
+      "hit_index_as_served": 4,
+      "objectId": "5bcee4be-439b-45c1-93bb-1120465ac746",
+      "contentId": "d9abee47-5d3a-4142-b369-62d30ac30d39",
+      "pageNumber": "505",
+      "resourceUrl": "/download/digital-content/357ca824-90e4-458a-a22c-d42a43d13760",
+      "licenseName": "Zawartość chroniona - licencja ograniczona",
+      "copyrightProtected": false,
+      "ocr_text_sha256": "2179a01df748e943819d21ac64d54be2802eaf99a9601794a43292e6c6553d2a",
+      "hit_bytes_sha256": "d0033b7060e03afa78a31644109d8a6ee6ac4a7496213de37cfd0daf8891e235"
+    }
+  ]
+}

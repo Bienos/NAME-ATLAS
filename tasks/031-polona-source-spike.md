@@ -1,6 +1,6 @@
 # TASK-031 — Polona source spike
 
-- **Status:** SPECIFIED, NOT STARTED. Written 2026-09-23 at the project owner's request ("please do whats needed") as the first M3 task.
+- **Status:** IMPLEMENTED 2026-09-29. The deliverables are the record (`docs/sources/polona.md`), the fixtures and the parser; there is no connector. `polona.pl` was reachable. D-021 is raised. Verification is in `docs/progress/2026-09-29-polona-source-spike.md`. Written 2026-09-23 at the project owner's request ("please do whats needed") as the first M3 task.
 - **Milestone:** M3 — historical discovery / Polona (`PLAN.md`)
 - **Canonical epic:** SPIKE-03 — historical source (`docs/canonical/23` §SPIKE-03)
 - **Depends on:** TASK-021 / ADR-0007 (rights per asset kind and surface — resolves D-003, the decision that blocked M3). Both done.
