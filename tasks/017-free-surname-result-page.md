@@ -122,6 +122,9 @@ is M8. A `lang` value that is neither falls back to Polish rather than erroring.
 - **AC-8** Every state in §4 item 4 has distinct rendered text, in both languages, asserted by table.
 - **AC-9** No confidence probability, percentage, similarity or score appears in the rendered output.
 - **AC-10** `pnpm build` passes and the page renders server-side with no client component.
+  *Amended by the project owner on 2026-09-29, together with TASK-023 AC-8. The page still renders
+  server-side. Its only client components are the share button, the suggest-as-you-type search and
+  the voivodeship map, and it works fully without JavaScript.*
 
 ## 7. Verification
 
