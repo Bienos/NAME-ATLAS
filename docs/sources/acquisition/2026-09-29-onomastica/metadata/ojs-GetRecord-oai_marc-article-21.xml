@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://onomastica.ijppan.pl/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T14:14:54Z</responseDate>
+	<request verb="GetRecord" metadataPrefix="oai_marc" identifier="oai:ojs2.onomastica.ijppan.pl:article/21">https://onomastica.ijppan.pl/index.php/ONOM/oai</request>
+	<GetRecord>
+		<record>
+			<header>
+				<identifier>oai:ojs2.onomastica.ijppan.pl:article/21</identifier>
+				<datestamp>2020-01-17T15:42:58Z</datestamp>
+				<setSpec>ONOM:ART</setSpec>
+			</header>
+			<metadata>
+<oai_marc status="c" type="a" level="m" encLvl="3" catForm="u"
+	xmlns="http://www.openarchives.org/OAI/1.1/oai_marc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/oai_marc http://www.openarchives.org/OAI/1.1/oai_marc.xsd">
+				<varfield id="022" i1="#" i2="#">
+			<subfield label="$a">2658-2783</subfield>
+		</varfield>
+				<varfield id="022" i1="#" i2="#">
+			<subfield label="$a">0078-4648</subfield>
+		</varfield>
+		<varfield id="042" i1=" " i2=" ">
+		<subfield label="a">dc</subfield>
+	</varfield>
+	<varfield id="245" i1="0" i2="0">
+		<subfield label="a">A Name in a Buttonhole — Onymy in Poetic Texts (Based on the Example of Bruno Jasieński’s Poetry)</subfield>
+	</varfield>
+
+				<varfield id="720" i1="1" i2=" ">
+			<subfield label="a">Graf, Magdalena</subfield>
+						<subfield label="u">Uniwersytet im. Adama Mickiewicza w Poznaniu</subfield>								</varfield>
+			<varfield id="720" i1="1" i2=" ">
+			<subfield label="a">Graf, Paweł</subfield>
+						<subfield label="u">Uniwersytet im. Adama Mickiewicza w Poznaniu</subfield>								</varfield>
+			<varfield id="520" i1=" " i2=" ">
+		<subfield label="a">
+A Name in a Buttonhole — Onymy in Poetic Texts (Based on the Example of Bruno Jasieński’s Poetry)
+
+This article addresses the issue of the interpretation of proper names in poetry. The state of research on the functions of proper names in literature is well described, but it is possible to note the lack of a fixed interpretation strategy in poetry which means that, despite little interest in poetry, its researchers often try to propose their own methods of analysis. The authors of the article, who tackle onyms in the poetry of Bruno Jasieński, present their own methodological approach to the matter, based on B. Waldenfels’ concept of the “phenomenology of the alien”.
+</subfield>
+	</varfield>
+						<varfield id="260" i1=" " i2=" ">
+		<subfield label="b">Instytut Języka Polskiego Polskiej Akademii Nauk</subfield>
+	</varfield>
+	<varfield id="260" i1=" " i2=" ">
+		<subfield label="c">2018-11-10 00:00:00</subfield>
+	</varfield>
+
+		
+			<varfield id="856" i1=" " i2=" ">
+			<subfield label="q">application/pdf</subfield>
+		</varfield>
+		<varfield id="856" i1="4" i2="0">
+		<subfield label="u">https://onomastica.ijppan.pl/index.php/ONOM/article/view/21</subfield>
+	</varfield>
+
+	<varfield id="786" i1="0" i2=" ">
+		<subfield label="n">Onomastica; Vol. 62 (2018):  Onomastica LXII</subfield>
+	</varfield>
+
+	<varfield id="546" i1=" " i2=" ">
+		<subfield label="a">eng</subfield>
+	</varfield>
+
+	
+	<varfield id="540" i1=" " i2=" ">
+		<subfield label="a">##submission.copyrightStatement##</subfield>
+	</varfield>
+</oai_marc>
+			</metadata>
+		</record>
+	</GetRecord>
+</OAI-PMH>

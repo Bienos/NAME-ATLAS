@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://journals.pan.pl/style/common/xsl/oai-style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T18:36:28Z</responseDate>
+	<request metadataPrefix="oai_dc" verb="ListIdentifiers" set="pan:journals:onomastica">
+	https://journals.pan.pl/oai-pmh-repository.xml</request>
+	<ListIdentifiers>
+	
+	<header>
+		<identifier>oai:journals.pan.pl:109405</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98410</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109409</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108473</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:111852</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109448</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98419</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109460</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119114</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98530</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119129</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119130</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119131</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119133</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119134</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109407</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119135</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119136</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119121</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119122</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119123</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119124</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119126</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119127</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119137</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119116</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119118</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119119</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119120</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108470</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119125</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119117</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:111867</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109434</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108474</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98428</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98452</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98489</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:98490</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108475</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108486</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108488</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108491</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:108493</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109403</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:109453</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:115450</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:115451</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119108</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+	<header>
+		<identifier>oai:journals.pan.pl:119109</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+  <resumptionToken completeListSize="298" cursor="0" expirationDate="2026-09-29T19:06:29Z">2087555311D49866EC7601AD879EB9B2ListIdentifiers1790699789040_DL_LAST_ITEM_50_DL_METADATA_oai_dc</resumptionToken>	</ListIdentifiers>
+</OAI-PMH>

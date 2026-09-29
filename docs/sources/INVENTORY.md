@@ -86,8 +86,9 @@ anyone with network egress, and the committed checksums make the result verifiab
 
 ## 6. Captured by source spikes
 
-Not part of the 2026-09-18 run. These are small, real captures committed as fixtures, each with its own manifest.
+Not part of the 2026-09-18 run. These are small, real captures, each with its own manifest or checksum list. Polona's are committed as fixtures, and *Onomastica*'s as an acquisition record.
 
 | Source | Files | In the product? |
 |---|---|---|
 | **Polona** (Biblioteka Narodowa's digital library): search, object records, OCR | `fixtures/polona/`: 10 search responses, 125 object records and 1 OCR page, captured 2026-09-29 by TASK-031; digests in `source-manifest.json` | **No.** A spike only. There is no connector, no `Source` or `RightsProfile`, and no claim. `automated_access` is `UNKNOWN` (D-021). Record: `docs/sources/polona.md`. |
+| ***Onomastica*** (IJP PAN's journal): the OJS site, journals.pan.pl and RCIN | `docs/sources/acquisition/2026-09-29-onomastica/`, captured 2026-09-29 by TASK-032. `metadata/` holds verbatim OAI-PMH, DOAJ and Crossref responses and three `robots.txt` files. `inventory.csv` has one row per item per channel. `SHA256SUMS.txt` covers every byte retrieved. **No article bytes:** the 511 PDFs (383 from the OJS site, 128 from journals.pan.pl) and all HTML pages are listed by digest only. | **No.** A spike only. There is no `Source`, `RightsProfile`, source file or claim. The licence statements conflict, so no article is admissible under ADR-0008 §4 (D-022). Record: `docs/sources/onomastica.md`. |

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://onomastica.ijppan.pl/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T14:15:01Z</responseDate>
+	<request verb="GetRecord" metadataPrefix="marcxml" identifier="oai:ojs2.onomastica.ijppan.pl:article/400">https://onomastica.ijppan.pl/index.php/ONOM/oai</request>
+	<GetRecord>
+		<record>
+			<header>
+				<identifier>oai:ojs2.onomastica.ijppan.pl:article/400</identifier>
+				<datestamp>2023-03-13T14:30:03Z</datestamp>
+				<setSpec>ONOM:ART</setSpec>
+			</header>
+			<metadata>
+<record
+	xmlns="http://www.loc.gov/MARC21/slim"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd">
+	<leader>     nmb a2200000Iu 4500</leader>
+			<controlfield tag="008">"221231 2022                        eng  "</controlfield>
+				<datafield tag="022" ind1="#" ind2="#">
+			<subfield code="$a">2658-2783</subfield>
+		</datafield>
+				<datafield tag="022" ind1="#" ind2="#">
+			<subfield code="$a">0078-4648</subfield>
+		</datafield>
+		<datafield tag="042" ind1=" " ind2=" ">
+		<subfield code="a">dc</subfield>
+	</datafield>
+	<datafield tag="245" ind1="0" ind2="0">
+		<subfield code="a">Markonyms as taxonomic operators in (chremat)onomastic terminology</subfield>
+	</datafield>
+
+				<datafield tag="100" ind1="1" ind2=" ">
+			<subfield code="a">Gałkowski, Artur</subfield>
+						<subfield code="u">University of Łódź</subfield>						<subfield code="0">https://orcid.org/0000-0003-2471-0886</subfield>		</datafield>
+			<datafield tag="520" ind1=" " ind2=" ">
+		<subfield code="a">
+Zarówno ogólna teoria nazw własnych, jak i poszczególne subdyscypliny onomastyki stosują właściwą dla swoich celów badawczych i metodologii terminologię. Podstawowe terminy naukowe w onomastyce, poczynając od „nazwy własnej”/„onimu”, można uznać za operatory taksonomiczne, które pozwalają porządkować fakty onomastyczne. Potrzebę zastosowania odpowiedniej terminologii badawczej zaspokaja się także w jednym z najmłodszych działów nazewnictwa, tj. chrematonomastyce. Do zestawu operatorów taksonomicznych w obszarze chrematonimii włącza się termin „markonim” utożsamiany z „chrematonimem marketingowym” i konfrontowany z innymi konceptami terminologicznymi, takimi jak „firmonim”, „logonim” czy też „ergonim” i „pragmatonim”, a wreszcie opisowo ujęta „nazwa handlowa” oraz „znak towarowy”. Markonim uznany zostaje za uniwersalny operator taksonomiczny nazewnictwa gospodarczego, odnosząc się zarówno do nazw firm, jak i produktów/usług. Treść i zakres markonimu nawiązuje do szeroko pojętej idei marki, pozostając strukturą językową, która skupia na sobie właściwości komunikacyjno-marketingowe.
+</subfield>
+	</datafield>
+						<datafield tag="260" ind1=" " ind2=" ">
+		<subfield code="b">Instytut Języka Polskiego Polskiej Akademii Nauk</subfield>
+	</datafield>
+	<dataField tag="260" ind1=" " ind2=" ">
+		<subfield code="c">2022-12-31 00:00:00</subfield>
+	</dataField>
+
+		
+			<datafield tag="856" ind1=" " ind2=" ">
+			<subfield code="q">application/pdf</subfield>
+		</datafield>
+			<datafield tag="856" ind1=" " ind2=" ">
+			<subfield code="q">application/epub+zip</subfield>
+		</datafield>
+			<datafield tag="856" ind1=" " ind2=" ">
+			<subfield code="q">application/octet-stream</subfield>
+		</datafield>
+		<datafield tag="856" ind1="4" ind2="0">
+		<subfield code="u">https://onomastica.ijppan.pl/index.php/ONOM/article/view/400</subfield>
+	</datafield>
+
+	<datafield tag="786" ind1="0" ind2=" ">
+		<subfield code="n">Onomastica; Vol. 66 (2022): Onomastica 66</subfield>
+	</datafield>
+
+	<datafield tag="546" ind1=" " ind2=" ">
+		<subfield code="a">pol</subfield>
+	</datafield>
+
+	
+	<datafield tag="540" ind1=" " ind2=" ">
+		<subfield code="a">##submission.copyrightStatement##</subfield>
+	</datafield>
+</record>
+			</metadata>
+		</record>
+	</GetRecord>
+</OAI-PMH>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://onomastica.ijppan.pl/lib/pkp/xml/oai2.xsl" ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+		http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T14:14:52Z</responseDate>
+	<request verb="GetRecord" metadataPrefix="rfc1807" identifier="oai:ojs2.onomastica.ijppan.pl:article/400">https://onomastica.ijppan.pl/index.php/ONOM/oai</request>
+	<GetRecord>
+		<record>
+			<header>
+				<identifier>oai:ojs2.onomastica.ijppan.pl:article/400</identifier>
+				<datestamp>2023-03-13T14:30:03Z</datestamp>
+				<setSpec>ONOM:ART</setSpec>
+			</header>
+			<metadata>
+<rfc1807
+	xmlns="http://info.internet.isi.edu:80/in-notes/rfc/files/rfc1807.txt"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://info.internet.isi.edu:80/in-notes/rfc/files/rfc1807.txt
+	http://www.openarchives.org/OAI/1.1/rfc1807.xsd">
+	<bib-version>v2</bib-version>
+	<id>https://onomastica.ijppan.pl/index.php/ONOM/article/view/400</id>
+	<entry>2023-03-13T14:30:03Z</entry>
+	<organization>Onomastica</organization>
+	<organization>Vol. 66 (2022): Onomastica 66; 299-311</organization>
+	<title>Markonyms as taxonomic operators in (chremat)onomastic terminology</title>
+	<type></type>
+	<author>Gałkowski, Artur; University of Łódź</author>
+	<date>2022-12-31 05:31:17</date>
+	<copyright></copyright>
+	<other_access>url:https://onomastica.ijppan.pl/index.php/ONOM/article/view/400</other_access>
+	<keyword></keyword>
+	<period></period>
+	<monitoring></monitoring>
+	<language>pl</language>
+	<abstract>Both the general theory of proper names and the individual sub-disciplines of onomastics use terminology appropriate to their research objectives and methodology. The basic scientific terms in onomastics, starting with proper name/onym, can be regarded as taxonomic operators, which allow the ordering of onomastic facts. The need for appropriate research terminology is also met in one of the youngest branches of nomenclature, i.e. chrematonomastics. The set of taxonomic operators in the field of chrematonymy includes the term markonym ‘brand name’ identified with marketing chrematonym and confronted with other terminological concepts such as firmonym, logonym or ergonym and pragmatonym, and, finally, descriptively included trade name or trademark. The markonym is recognised as the universal taxonomic operator of business naming, referring to both company and product/service names. The content and scope of the markonym relates to the broad idea of a brand, remaining a linguistic structure that focuses interdisciplinary, especially communicative and marketing properties.</abstract>
+</rfc1807>
+			</metadata>
+		</record>
+	</GetRecord>
+</OAI-PMH>

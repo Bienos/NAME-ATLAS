@@ -1,0 +1,596 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="https://journals.pan.pl/style/common/xsl/oai-style.xsl"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/
+         http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+	<responseDate>2026-09-29T15:56:57Z</responseDate>
+	<request resumptionToken="B46E57C566D2D459B303CD3E22340A1FListRecords1790690126686_DL_LAST_ITEM_40_DL_METADATA_oai_dc" verb="ListRecords">
+	https://journals.pan.pl/oai-pmh-repository.xml</request>
+	<ListRecords>
+	
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109403</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Witold Mańczak (12 VIII 1924–12 I 2016)]]></dc:title>
+<dc:creator><![CDATA[Dębowiak, Przemysław]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Nekrologi / Nécrologie / Obituary]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109403/PDF-MASTER/60.00.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109403/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109403]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 5-10]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:108470</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Spoločenská hodnota vlastného mena]]></dc:title>
+<dc:creator><![CDATA[Hladký Juraj]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[proper name]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[onomastics]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[company]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[cultural and social relations]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2017]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/108470/PDF/01.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/108470/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:108470]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2017; No 61]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:108491</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Izabela Łuc, Słownik nazwisk mieszkańców południowego Śląska XIX wieku, Wydawnictwo Uniwersytetu Śląskiego, Katowice 2016, 448 s.]]></dc:title>
+<dc:creator><![CDATA[Bortliczek, Małgorzata]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2017]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/108491/PDF-MASTER/13C.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/108491/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:108491]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2017; No 61]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:119125</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Names of the stations in the Way of the Cross service (changes in their structure and function in the 20th century)]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Nazwy stacji drogi krzyżowej (przemiany struktury i funkcji w XX wieku)]]></dc:title>
+<dc:creator><![CDATA[Sieradzka-Mruk, Agnieszka]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[ideonyms]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[Stations of the Cross]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[Vatican II]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[religious language]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[ideonimy]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[droga krzyżowa]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Sobór Watykański II]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[zmiany języka religijnego]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2020]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/119125/PDF-MASTER/Onomastica%2064%20strony%20179-192%20Sieradzka-Mruk.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/119125/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:119125]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2020; No 64; 179-192]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2020; No 64; 179-192]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:115476</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Onomastyka w dorobku naukowym profesora Józefa Bubaka]]></dc:title>
+<dc:creator><![CDATA[Malec, Maria]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2019]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuł biograficzny / Biographical article]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/115476/PDF-MASTER/Strony%20od%20Onomastica63-23.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/115476/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:115476]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2019; No 63; 343-350]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:108486</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Słowiańskie imiona dwuczłonowe zachowane w najstarszych polskich toponimach (rekonesans)]]></dc:title>
+<dc:creator><![CDATA[Górny, Halszka]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[imiona złożone]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[toponimy odimienne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[relacje transonimizacyjne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2017]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/108486/PDF-MASTER/12%20S%C5%81OWIA%C5%83SKIE%20IMIONA%20DWUCZ%C5%81ONOWE%20ZACHOWANE.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/108486/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:108486]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2017; No 61]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:119117</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[The lexeme świnia and related forms as motivating words in Polish onymy]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Leksem świnia i formy pokrewne jako wyrazy motywujące w polskiej onimii]]></dc:title>
+<dc:creator><![CDATA[Wójcik, Urszula]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[historical anthropology]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[lexeme świnia]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[lexical field]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[motivation]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[proper names]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[antropologia historyczna]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[leksem świnia]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[pole leksykalne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[motywacja]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[onimia]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2020]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/119117/PDF-MASTER/Onomastica%2064%20strony%2053-67%20Wojcik.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/119117/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:119117]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2020; No 64; 53-67]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2020; No 64; 53-67]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:115470</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Recenzje: Irena Mytnik, Imiennictwo ziemi chełmskiej w XVI–XVII wieku, Warszawa: Sowa 2017, 320 s.]]></dc:title>
+<dc:creator><![CDATA[Kosmeda, Tetyana]]></dc:creator>
+<dc:creator><![CDATA[Janczura, Dominika]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2019]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/115470/PDF-MASTER/Strony%20od%20Onomastica63-18.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/115470/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:115470]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2019; No 63; 323-328]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:119112</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Karol Zierhoffer (1924–2019)]]></dc:title>
+<dc:creator><![CDATA[Sarnowska-Giefing, Irena]]></dc:creator>
+<dc:creator><![CDATA[Graf, Magdalena]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2020]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuł biograficzny / Biographical article]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/119112/PDF-MASTER/Onomastica%2064%20strony%207-11%20Sarnowska-Giefing%20Graf.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/119112/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:119112]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2020; No 64; 7-11]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109449</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Changes of Geographical Names in the Kłodzko Land after World War II]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Zmiany nazw geograficznych na ziemi kłodzkiej po drugiej wojnie światowej]]></dc:title>
+<dc:creator><![CDATA[Kołodziejczyk, Krzysztof]]></dc:creator>
+<dc:creator><![CDATA[Szmytkie, Robert]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[geographical names]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[population displacement]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[depopulation]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[space accustoming]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[Kłodzko Land]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[nazwy geograficzne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[wysiedlenie ludności]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[wyludnienie]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[oswajanie przestrzeni]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[ziemia kłodzka]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109449/PDF-MASTER/60.24%20Ko%C5%82odziejczyk,%20Szmytkie.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109449/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109449]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2016; No 60; 361-410]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 361-410]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109440</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Expansion of the Slavic Tribes from an Onomastic and Pedological Point of View]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Expansion slavischer Stämme aus namenkundlicher und bodenkundlicher Sicht]]></dc:title>
+<dc:creator><![CDATA[Udolph, Jürgen]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[place names]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[water names]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[the homeland of Slavs]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[expansion of Slavic tribes]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[hydrographical terms]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[Old-European hydronymy]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[type of grounds]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[loess soil]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Ortsnamen]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Gewässernamen]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[slavische Urheimat]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Expansion slavischer Stämme]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Wasserwörter]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[alteuropäische Hydronymie]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Bodenqualität]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Lössböden]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109440/PDF-MASTER/60.15%20Udolph.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109440/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109440]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2016; No 60; 215-231]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 215-231]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:108472</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Лікі і лічбы ў славянскай урбананіміі: набор, сімволіка, асаблівасці функцыянавання]]></dc:title>
+<dc:creator><![CDATA[Mезенка, Ганна]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[number]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[figure]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Slavic urbanonymy]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[symbols]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[toponymy]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2017]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/108472/PDF-MASTER/02%20%D0%9B%D0%86%D0%9A%D0%86%20%D0%86%20%D0%9B%D0%86%D0%A7%D0%91%D0%AB%20%D0%8E%20%D0%A1%D0%9B%D0%90%D0%92%D0%AF%D0%9D%D0%A1%D0%9A%D0%90%D0%99%20%D0%A3%D0%A0%D0%91%D0%90%D0%9D%D0%90%D0%9D%D0%86%D0%9C%D0%86%D0%86%20%D0%9D%D0%90%D0%91%D0%9E%D0%A0,%20%D0%A1%D0%86%D0%9C%D0%92%D0%9E%D0%9B%D0%86%D0%9A%D0%90,%20%D0%90%D0%A1%D0%90%D0%91%D0%9B%D0%86%D0%92%D0%90%D0%A1%D0%A6%D0%86%20%D0%A4%D0%A3%D0%9D%D0%9A%D0%A6%D0%AB%D0%AF%D0%9D%D0%90%D0%92%D0%90%D0%9D%D0%9D%D0%AF.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/108472/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:108472]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2017; No 61]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:111867</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Ukrainian Oeconyms in the Context of Decommunization Processes in Central and Eastern Europe at the End of the 20th and Beginning of the 21st Centuries]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Ojkonimia ukraińska w kontekście procesów dekomunizacyjnych Europy środkowo-wschodniej końca XX–początku XXI wieku]]></dc:title>
+<dc:creator><![CDATA[Belej, Oleg]]></dc:creator>
+<dc:creator><![CDATA[Sojka-Masztalerz, Helena]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[toponyms]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[geographic names]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[Ukraine]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[decommunization]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[toponimy]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[nazwy geograficzne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Ukraina]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[dekomunizacja]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2018]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/111867/PDF-MASTER/13%20Masztalerz.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/111867/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:111867]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2018; No 62; 259-272]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2018; No 62; 259-272]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:111856</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Proper Names from the (Literary) Backstage. Onomastic Aspects of the Prose of Marek Słyk on the Basis of his Novel “In the Borsch of Adventures”]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Nazwy własne od (literackiej) kuchni. Onomastyczne aspekty pisarstwa Marka Słyka na przykładzie powieści „W barszczu przygód”]]></dc:title>
+<dc:creator><![CDATA[Siwiec, Adam]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[proper names]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[onomopoetics]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[mechanims of literary creation]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[postmodernism]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[nonmimetic fiction]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[nazwy własne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[onomapoetyka utworu]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[mechanizmy kreacji literackiej]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[postmodernizm]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[fikcja niemimetyczna]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2018]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/111856/PDF/02%20Siwiec.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/111856/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:111856]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2018; No 62; 33-55]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2018; No 62; 33-55]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109434</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Folk Image of Human Existence Recorded in Surnames]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Ludowy obraz egzystencji człowieka utrwalony w nazwiskach]]></dc:title>
+<dc:creator><![CDATA[Górny, Halszka]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[dialectal lexeme]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[folk culture]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[dialectal feature]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[proprial structure]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[leksem gwarowy]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[kultura ludowa]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[cecha dialektalna]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[struktura proprialna]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109434/PDF/60.9%20G%C3%B3rny.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109434/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109434]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2016; No 60; 137-150]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 137-150]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:108474</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA["Dziewczyna w typie Kendall Jenner". Antroponimy żeńskie w prasie „kobiecej” na tle koncepcji genderowych]]></dc:title>
+<dc:creator><![CDATA[Skowronek, Katarzyna]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[gender]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[konstruktywizm]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[wzory kobiecości]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[antroponimia]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[polska prasa dla kobiet]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2017]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/108474/PDF-MASTER/04%20DZIEWCZYNA%20W%20TYPIE%20KENDALL%20JENNER.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/108474/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:108474]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2017; No 61]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:119110</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Spis treści]]></dc:title>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2020]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Spis treści / Contents]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/119110/PDF-MASTER/Onomastica%2064%20spis.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/119110/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:119110]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2020; No 64]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109453</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Omówienie: Rivista Italiana di Onomastica XXI (2015), 1–2, direttore Enzo Caffarelli (Roma), 1008 s.]]></dc:title>
+<dc:creator><![CDATA[Gałkowski, Artur]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Recenzje / Book Reviews]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109453/PDF-MASTER/60.28.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109453/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109453]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 430-433]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:109436</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="en"><![CDATA[Polish Surnames Motivated by the Lexicon of the Salt Mining Field]]></dc:title>
+<dc:title xml:lang="pl"><![CDATA[Polskie nazwiska motywowane leksyką z zakresu górnictwa solnego]]></dc:title>
+<dc:creator><![CDATA[Horyń, Ewa]]></dc:creator>
+<dc:subject xml:lang="en"><![CDATA[onomastics]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[anthroponymy]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[appellative surnames]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[lexis from the field of salt mining]]></dc:subject>
+<dc:subject xml:lang="en"><![CDATA[onymization]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[onomastyka]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[nazwiska odapelatywne]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[leksyka z zakresu górnictwa solnego]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[onimizacja]]></dc:subject>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2016]]></dc:date>
+<dc:type xml:lang="en"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:type xml:lang="pl"><![CDATA[Artykuły / Articles]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/109436/PDF-MASTER/60.11%20Hory%C5%84.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/109436/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:109436]]></dc:identifier>
+<dc:source xml:lang="en"><![CDATA[Onomastica; 2016; No 60; 163-174]]></dc:source>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2016; No 60; 163-174]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <record>
+	<header>
+		<identifier>oai:journals.pan.pl:119111</identifier>
+	    <datestamp>2021-02-15T22:32:50Z</datestamp>
+		  <setSpec>pan:journals:onomastica</setSpec> 	      <setSpec>pan:journals</setSpec> 	      <setSpec>pan</setSpec> 	    </header>
+		<metadata>
+	<oai_dc:dc xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+<dc:title xml:lang="pl"><![CDATA[Barbara Czopek-Kopciuch (1952–2020)]]></dc:title>
+<dc:creator><![CDATA[Redakcja]]></dc:creator>
+<dc:subject xml:lang="pl"><![CDATA[Nauki Humanistyczne i Społeczne]]></dc:subject>
+<dc:publisher><![CDATA[Komitet Językoznawstwa PAN]]></dc:publisher>
+<dc:publisher><![CDATA[Instytut Języka Polskiego PAN]]></dc:publisher>
+<dc:date><![CDATA[2020]]></dc:date>
+<dc:type xml:lang="pl"><![CDATA[Nekrologi / Nécrologie / Obituary]]></dc:type>
+<dc:identifier><![CDATA[ISSN 0078-4648]]></dc:identifier>
+<dc:identifier><![CDATA[http://journals.pan.pl/Content/119111/PDF-MASTER/Onomastica%2064%20Barbara%20Czopek-Kopciuch.pdf]]></dc:identifier>
+<dc:identifier><![CDATA[https://journals.pan.pl/dlibra/publication/edition/119111/content]]></dc:identifier>
+<dc:identifier><![CDATA[oai:journals.pan.pl:119111]]></dc:identifier>
+<dc:source xml:lang="pl"><![CDATA[Onomastica; 2020; No 64]]></dc:source>
+</oai_dc:dc>
+
+</metadata>
+	  </record>
+  <resumptionToken completeListSize="298" cursor="40" expirationDate="2026-09-29T16:26:57Z">B46E57C566D2D459B303CD3E22340A1FListRecords1790690126686_DL_LAST_ITEM_60_DL_METADATA_oai_dc</resumptionToken>		</ListRecords>
+</OAI-PMH>
