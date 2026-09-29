@@ -37,8 +37,14 @@ export {
   rankInTable,
 } from "./rank.js";
 export type { DeriveRankOptions, RankTable, RankTableCache } from "./rank.js";
-export { deriveRarityContext, rarityContextClaimKey, oneInX, shareOf } from "./rarity.js";
-export type { DeriveRarityOptions } from "./rarity.js";
+export {
+  deriveRarityContext,
+  rarityContextClaimKey,
+  oneInX,
+  shareOf,
+  publishedUniverseSum,
+} from "./rarity.js";
+export type { DeriveRarityOptions, UniverseSumCache } from "./rarity.js";
 export {
   coverageRatio,
   coverageState,

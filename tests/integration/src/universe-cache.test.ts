@@ -5,8 +5,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import { importPeselResource, PESEL_NATIONAL_MALE_2026, sha256Hex } from "@name-atlas/sources";
-import { regionalUniverseSize, universeSize } from "@name-atlas/truth";
-import type { UniverseSizeCache } from "@name-atlas/truth";
+import { publishedUniverseSum, regionalUniverseSize, universeSize } from "@name-atlas/truth";
+import type { UniverseSizeCache, UniverseSumCache } from "@name-atlas/truth";
 import { sql } from "kysely";
 
 /**
@@ -25,6 +25,10 @@ import { sql } from "kysely";
  *   1. one call **populates** the cache — the missing write;
  *   2. a poisoned entry is **returned** — proving the read is consulted rather
  *      than the database being asked again and happening to agree.
+ *
+ * TASK-036 adds the same two assertions for the rarity's denominator, the
+ * published-universe sum. It had no cache at all, so against the real register
+ * `derive-batch --rank` ran at 5 surnames a second.
  */
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const MALE_BYTES = readFileSync(path.join(repoRoot, "fixtures/pesel/national-male-2026-01-20.csv"));
@@ -107,5 +111,34 @@ describe("the universe-size cache", () => {
     expect(await universeSize(db(), sourceRecordId, cache)).toBe(
       await universeSize(db(), sourceRecordId),
     );
+  });
+
+  describe("the published-universe-sum cache (the rarity's denominator)", () => {
+    it("populates the cache on the first call", async () => {
+      const cache: UniverseSumCache = new Map();
+      const total = await publishedUniverseSum(db(), sourceRecordId, cache);
+      expect(total).toBeGreaterThan(0);
+      expect(cache.get(sourceRecordId)).toBe(total);
+    });
+
+    it("returns what the cache holds rather than summing again", async () => {
+      const cache: UniverseSumCache = new Map();
+      const real = await publishedUniverseSum(db(), sourceRecordId, cache);
+      cache.set(sourceRecordId, real + 12_345);
+      expect(await publishedUniverseSum(db(), sourceRecordId, cache)).toBe(real + 12_345);
+    });
+
+    it("sums the same as an uncached call and as the national values themselves", async () => {
+      const cache: UniverseSumCache = new Map();
+      const cached = await publishedUniverseSum(db(), sourceRecordId, cache);
+      expect(cached).toBe(await publishedUniverseSum(db(), sourceRecordId));
+      const direct = await sql<{ total: string }>`
+        SELECT sum(v.count)::text AS total
+          FROM distribution_snapshots s
+          JOIN distribution_values v ON v.distribution_snapshot_id = s.distribution_snapshot_id
+         WHERE s.source_record_id = ${sourceRecordId} AND v.place_id IS NULL
+      `.execute(db());
+      expect(cached).toBe(Number(direct.rows[0]?.total));
+    });
   });
 });
