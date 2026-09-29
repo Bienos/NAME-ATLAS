@@ -1,6 +1,9 @@
 # TASK-024 — the canonical surname route, sharing and the Open Graph image
 
-- **Status:** IMPLEMENTED_UNVERIFIED 2026-09-21.
+- **Status:** IMPLEMENTED 2026-09-21, and **VERIFIED 2026-09-29** on `main` @ `5636e95`. All seven
+  criteria hold, AC-3 in the form ADR-0010 gave it. The check found one defect outside the criteria:
+  for a listed surname whose figures are not derived yet, the Open Graph card says the dataset
+  publishes no count. The record is `docs/progress/2026-09-29-verify-task-023-025.md`.
 - **Priority:** P0 (directive §72: P0-6; §21–§23, §50) and P1-4.
 - **Milestone:** M2.5 — share; M3.5 — SEO-ready profile pilot (route only, noindex).
 - **Depends on:** TASK-023; ADR-0009.
@@ -48,6 +51,9 @@ Turning indexing on. Any analytics vendor.
 - **AC-2** `/pl/nazwisko/kowalczyk` renders the same sections as `/?surname=KOWALCZYK`; the query
   form redirects to it.
 - **AC-3** A slug matching two entities renders the collision state and no figures.
+  *Replaced by ADR-0010 (2026-09-21). Slugs are persisted under `UNIQUE (locale, slug)`, and a
+  colliding surname gets a suffix derived from its id. No address can match two surnames, so the
+  collision state no longer exists.*
 - **AC-4** Every canonical page's metadata carries `robots: noindex, follow` while
   `SEO_INDEXING_ENABLED` is unset; `assessIndexability` returns `INDEX` for a fixture with two value
   families and two citations only when the flag is set.

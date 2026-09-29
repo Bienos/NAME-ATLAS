@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by recording the project owner's answer to D-022: *Onomastica* is dropped as a meaning source (`docs/progress/2026-09-29-d-022-onomastica-dropped.md`).
+**Last rewritten:** 2026-09-29, by re-verifying TASK-023, TASK-024 and TASK-025 on today's `main` (`docs/progress/2026-09-29-verify-task-023-025.md`). It merges after the record of the project owner's answer to D-022: *Onomastica* is dropped as a meaning source (`docs/progress/2026-09-29-d-022-onomastica-dropped.md`).
 
 ## Production
 
@@ -32,17 +32,19 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
+- **The share card's wording for a surname not yet derived.** For a listed surname whose figures are not derived, the Open Graph card says the dataset publishes no count (`apps/web/src/lib/og-facts.ts`). The page says, correctly, that the figures are not prepared yet. Production is not affected while every loaded surname is derived. The 2026-09-29 re-verification found it.
 
 ## Open pull requests and branches
 
-None besides the one from `claude/procent-continuation-7c2e00`, which records D-022's resolution and carries this rewrite (checked 2026-09-29).
+None besides #21, which re-verifies TASK-023, TASK-024 and TASK-025 and carries this rewrite (checked 2026-09-29).
 
 ## Blocked on the project owner
 
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
-  - `claude/procent-continuation-7c2e00` (#14, #17, #18 and #19), once the pull request that records D-022's resolution is merged.
+  - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
+  - `claude/verify-task-023-025`, once #21 is merged
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
@@ -71,6 +73,7 @@ None besides the one from `claude/procent-continuation-7c2e00`, which records D-
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
+- **TASK-023's AC-1 and AC-8.** Re-verified on 2026-09-29, neither holds as written. Since #11, the rarity chapter shows „1 na X” and the rank outside their claim. The page also ships three client components where AC-8 allows none: the share button, suggest-as-you-type and the map. For each, amend the criterion or change the page (`docs/progress/2026-09-29-verify-task-023-025.md`).
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** One is open.
   - **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default? Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task.

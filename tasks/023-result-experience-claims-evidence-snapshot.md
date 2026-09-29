@@ -1,6 +1,16 @@
 # TASK-023 — the result experience: claim display, inline evidence, snapshot, second search
 
-- **Status:** IMPLEMENTED_UNVERIFIED 2026-09-21.
+- **Status:** IMPLEMENTED 2026-09-21. **Re-verified 2026-09-29** on `main` @ `5636e95`: AC-2 to AC-7
+  hold, AC-2 in the form ADR-0012 gave it. **AC-1 and AC-8 do not hold as written.** Later changes
+  to the page did not update them:
+  - AC-1: since #11 (`e4bd323`), the rarity chapter shows each list's „1 na X” and its rank above the
+    claim that states them, outside it.
+  - AC-8: the page ships three client components, not none: the share button (TASK-024), the
+    suggest-as-you-type search (`2312f7e`) and the voivodeship map (`f5d858d`). It still works with
+    JavaScript off.
+
+  For each, the project owner decides whether to amend the criterion or change the page. The record
+  is `docs/progress/2026-09-29-verify-task-023-025.md`.
 - **Priority:** P0 (directive §72: P0-2, P0-3, P0-4, P0-5; §12–§17, §20).
 - **Milestone:** M2 — excellent free result + truth UX.
 - **Depends on:** TASK-017 (the page), TASK-022 (schema 1.4).
@@ -49,6 +59,9 @@ Client-side JavaScript of any kind (TASK-024 adds the one share island). A map. 
   scope and date; no figure appears outside one.
 - **AC-2** Every claim's evidence panel names the source title, provider, dataset date, retrieved
   date and method, and carries no confidence number or percentage.
+  *Replaced by ADR-0012 (2026-09-24). There is no per-claim panel. Each source is listed once under
+  `#sources`, linked to the source's own website. The retrieval date and method code stay in the API
+  and the admin inspector. No confidence number or percentage appears anywhere.*
 - **AC-3** The snapshot never renders a sum of the two partitions; asserted against markup.
 - **AC-4** The snapshot omits rarity when the section is not `READY`, and omits the strongest
   voivodeship unless an entry's `coverage_state` is `READY`.

@@ -1,6 +1,7 @@
 # TASK-025 — surname comparison
 
-- **Status:** IMPLEMENTED_UNVERIFIED 2026-09-21.
+- **Status:** IMPLEMENTED 2026-09-21, and **VERIFIED 2026-09-29** on `main` @ `5636e95`. All five
+  criteria hold. The record is `docs/progress/2026-09-29-verify-task-023-025.md`.
 - **Priority:** P1 (directive §72: P1-1; §24–§25).
 - **Depends on:** TASK-024.
 
