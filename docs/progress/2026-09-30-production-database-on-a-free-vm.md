@@ -1,6 +1,6 @@
 # 2026-09-30 — TASK-040: the free-VM database is scripted and rehearsed; nothing has run on the VM yet
 
-Scope authority: `tasks/040-production-database-on-a-free-vm.md`. Decision: ADR-0015. It was written and implemented in this change. It was numbered TASK-038, then TASK-039, on a branch cut before #25 and #26 merged different tasks under those numbers (the source registry, the TERYT import), and renumbered to TASK-040 when the branch moved onto `main`. The owner created the Oracle VM, gave its public address and set `VM_SSH_KEY` and `VM_HOST`. The workflow's `check` step has reached the VM (below). The VM has 1 OCPU and 5.9 GB, not the 2 and 12 GB the task needs, so `provision` waits for a resize.
+Scope authority: `tasks/040-production-database-on-a-free-vm.md`. Decision: ADR-0015. It was written and implemented in this change. It was numbered TASK-038, then TASK-039, on a branch cut before #25 and #26 merged different tasks under those numbers (the source registry, the TERYT import), and renumbered to TASK-040 when the branch moved onto `main`. The owner created the Oracle VM, gave its public address and set `VM_SSH_KEY` and `VM_HOST`. The workflow's `check` and `provision` steps have run on the VM (below). The build, `status` and `finalize` have not, and the VM's port 6432 is not open from the internet yet.
 
 ## Changed
 
@@ -58,7 +58,7 @@ Four reviewers (security, the real VM, the workflow, the documents) reported 15 
 | The workflow's first-contact `ssh-keyscan` failure now prints the reason and a TCP test | `actionlint` clean; not run |
 | ADR-0015: the description of production's seven-surname slice (other surnames are "not found", not "not prepared") and Render's free tier (1 GB, expiring) corrected; README: keep the password, the marker, the upgrades; STATUS's "Last rewritten" no longer carries the previous entry | reviewed against production: `curl https://name-atlas-two.vercel.app/pl/nazwisko/adamczyk` returns 200 with "Nie znaleziono takiego nazwiska" |
 
-### On the VM (workflow `Register VM`, run 36658375900)
+### On the VM (workflow `Register VM`, runs 36658375900, 36659258532, 36660157009, 36660342514 and 36660458190)
 
 | Step | Result |
 |---|---|
@@ -70,9 +70,15 @@ Four reviewers (security, the real VM, the workflow, the documents) reported 15 
 | run 36659258532, `check`, after the owner edited the shape | success in 8 s, and "Set up SSH with the VM's pinned host key" passed with `StrictHostKeyChecking yes`, so the pinned key matches after the restart. It printed **5 CPUs and 50,082 MB**: the owner typed more than the allowance (2 OCPUs and 12 GB is free; the console offers up to 41 and 277). The guard now refuses any size but 2 CPUs and 10,000 to 13,000 MB. The owner is asked to set 2 and 12. Rehearsal machine (4 CPUs) now fails that guard too, which is why the guard was checked only against the numbers, below. |
 | the guard's condition, on numbers only: (1, 5903), (5, 50082), (2, 5903), (2, 11900), (2, 30000) | refuse, refuse, refuse, ok, refuse |
 
+| run 36659258532, `check` | 5 CPUs, 50,082 MB (the owner had typed more than the allowance) |
+| run 36660157009, `check`, after the owner corrected it | **2 CPUs, 11,927 MB**, the pinned host key accepted, same INPUT chain |
+| run 36660342514, `provision` | stopped at the workflow's own password check, before the VM: `VM_DB_WEB_PASSWORD` was set but had 9 characters (rule: 24 to 128 letters and digits) |
+| run 36660458190 attempt 2, `provision` (secret replaced) | the step succeeded in 51 s. Installed on aarch64: `postgresql-17` 17.11-1.pgdg24.04+2, `postgresql-17-postgis-3` 3.6.4+dfsg-2.pgdg24.04+1, `pgbouncer` 1.26.0-1.pgdg24.04+1. Cluster 17/main UTF8, `en_US.UTF-8`; database `name_atlas` owned by `nameatlas`; extensions postgis 3.6.4, pg_trgm 1.6, pg_prewarm 1.2; `nameatlas_web`'s password set. INPUT chain after it: 5 `REJECT … tcp dpt:6432 … #conn src/32 > 200 reject-with tcp-reset`, 6 `ACCEPT … state NEW tcp dpt:6432`, 7 `REJECT … icmp-host-prohibited`. `postgresql@17-main` and `pgbouncer` active; listening on 127.0.0.1:5432 and 0.0.0.0:6432; Node v22.22.2. |
+| same run, the step "Connect as the web app does" | **failed**: `psql: error: connection to server … port 6432 failed: timeout expired`. The host firewall accepts 6432, so the block is upstream: Oracle's security list has no ingress rule for TCP 6432 (the owner's TASK-040 §3 item 3). The workflow now probes the port first and says so. |
+
 ## Not verified
 
-- `provision`, `build`, `status` and `finalize` on the Oracle VM and on arm64. Only `check` has run there, twice. `build.sh` was not run, nor was its systemd unit, `finalize.sh`'s passing path, or the parts of `provision.sh` that need systemd: this machine does not run it as PID 1. The steps were run by hand above.
+- `build`, `status` and `finalize` on the Oracle VM. `provision` ran there once to its last line; the connection from outside (TLS, SCRAM, read-only, the refused write) has not been shown from the internet, because port 6432 is closed at Oracle. `build.sh` was not run, nor was its systemd unit, `finalize.sh`'s passing path, or the parts of `provision.sh` that need systemd: this machine does not run it as PID 1. The steps were run by hand above.
 - The `Register VM` workflow beyond `actionlint`: it has not run against a VM.
 - The full build: its duration on 2 A1 cores, its final size, and `finalize.sh`'s passing path, prewarm and dump.
 - Whether a filled `shared_buffers` keeps Oracle's memory metric above its 20% idle line.

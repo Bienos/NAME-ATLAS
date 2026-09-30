@@ -1,4 +1,4 @@
 # The step the Register VM workflow runs when a push changes this file (TASK-040).
 # One word on the first non-comment line: check, provision, build, status or finalize.
-# provision, again: the workflow now reports why it rejects VM_DB_WEB_PASSWORD
-provision
+# build: provision succeeded on the VM (run 36660458190 attempt 2)
+build

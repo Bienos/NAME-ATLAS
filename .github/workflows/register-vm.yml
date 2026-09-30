@@ -176,6 +176,15 @@ jobs:
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
+          PGPASSWORD=$(printf '%s' "$PGPASSWORD" | tr -d '[:space:]')
+          export PGPASSWORD
+          if ! nc -z -w 10 "$VM_HOST" 6432; then
+            echo "::error::TCP port 6432 on the VM does not answer from the internet. The host's" \
+              "firewall was opened by provision; a timeout here means Oracle's network blocks it." \
+              "In the console: the instance's subnet > Default Security List > Add Ingress Rules:" \
+              "source 0.0.0.0/0, TCP, destination port 6432, stateless not ticked."
+            exit 1
+          fi
           conn="host=$VM_HOST port=6432 dbname=name_atlas user=nameatlas_web sslmode=require connect_timeout=15"
           p() { psql "$conn" -X -v ON_ERROR_STOP=1 -tA "$@"; }
           p -c '\conninfo'
