@@ -15,6 +15,7 @@ import { SearchForm } from "./search-form.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { NamePrint } from "./name-print.js";
+import { ReportLink } from "./report-link.js";
 import { anchorOf } from "./sections.js";
 import { SiteFooter } from "./site-footer.js";
 
@@ -100,10 +101,13 @@ export function ComparisonView({
   a,
   b,
   lang,
+  origin = null,
 }: {
   a: ComparisonSide;
   b: ComparisonSide;
   lang: Lang;
+  /** `SITE_ORIGIN`, for the report link's absolute address; else the path alone. */
+  origin?: string | null;
 }) {
   const t = UI[lang];
   const bothResolved = a.response !== null && b.response !== null;
@@ -294,6 +298,11 @@ export function ComparisonView({
             ),
           )}
         </p>
+        <ReportLink
+          surnames={[a.display, b.display].filter((d): d is string => d !== null)}
+          pageUrl={`${origin ?? ""}${comparePath(a.slug, b.slug, lang)}`}
+          lang={lang}
+        />
         <SearchForm lang={lang} query="" />
       </main>
       <SiteFooter lang={lang} />

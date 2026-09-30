@@ -46,6 +46,7 @@ export function ContactView({ lang }: { readonly lang: Lang }) {
               <li key={topic}>{topic}</li>
             ))}
           </ul>
+          <p>{t.contactReportHint}</p>
           <p>{t.contactNoPromise}</p>
         </section>
       </main>

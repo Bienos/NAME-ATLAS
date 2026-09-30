@@ -5,6 +5,7 @@ import {
   firstParam,
   loadComparison,
 } from "../../../lib/compare-page.js";
+import { siteOrigin } from "../../../lib/surname-page.js";
 
 /** `/pl/porownaj?a={slug}&b={slug}` — surname comparison (TASK-025). Never indexed. */
 
@@ -19,5 +20,5 @@ interface Props {
 export default async function Page({ searchParams }: Props) {
   const params = await searchParams;
   const { a, b } = await loadComparison(firstParam(params["a"]), firstParam(params["b"]), "pl");
-  return <ComparisonView a={a} b={b} lang="pl" />;
+  return <ComparisonView a={a} b={b} lang="pl" origin={siteOrigin()} />;
 }

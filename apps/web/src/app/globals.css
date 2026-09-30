@@ -3647,3 +3647,13 @@ span.lf-alt {
   color: var(--text-secondary);
   font-size: 0.875rem;
 }
+
+/* TASK-050: the report-a-problem link, quiet beside the page's actions. */
+.report {
+  margin: 0 0 var(--space-7);
+  font-size: 0.875rem;
+}
+.result-actions .report {
+  margin: 0;
+  align-self: center;
+}

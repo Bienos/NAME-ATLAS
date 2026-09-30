@@ -885,6 +885,11 @@ export const UI = {
       "zmieniło, nie dlaczego.",
     contactLink: "Kontakt",
     privacyLink: "Prywatność",
+    reportLink: "Zgłoś błąd",
+    reportSubject: "Name Atlas, zgłoszenie",
+    reportBodyPage: "Strona",
+    reportBodyWhat: "Co jest nie tak albo czego brakuje",
+    reportBodySource: "Źródło, jeśli je znasz",
     termsLink: "Regulamin",
     contactHeading: "Kontakt",
     contactIntro: "Name Atlas prowadzi jedna osoba. Napisz na adres:",
@@ -894,6 +899,8 @@ export const UI = {
       "chcesz skorzystać z praw dotyczących danych osobowych albo zgłosić naruszenie praw do źródła;",
       "znalazłeś problem z bezpieczeństwem strony.",
     ],
+    contactReportHint:
+      "Na każdej stronie nazwiska i na stronie porównania jest link „Zgłoś błąd”, który przygotowuje taką wiadomość z nazwiskiem i adresem strony.",
     contactNoPromise:
       "Czytamy każdą wiadomość, ale nie obiecujemy terminu odpowiedzi. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.",
     footer:
@@ -1243,6 +1250,11 @@ export const UI = {
       "definition. We show what changed, not why.",
     contactLink: "Contact",
     privacyLink: "Privacy",
+    reportLink: "Report a problem",
+    reportSubject: "Name Atlas, report",
+    reportBodyPage: "Page",
+    reportBodyWhat: "What is wrong or missing",
+    reportBodySource: "Source, if you know one",
     termsLink: "Terms",
     contactHeading: "Contact",
     contactIntro: "Name Atlas is run by one person. Write to:",
@@ -1252,6 +1264,8 @@ export const UI = {
       "you want to exercise your rights over personal data, or report a breach of a source's rights;",
       "you have found a security problem with the site.",
     ],
+    contactReportHint:
+      "Every surname page and the comparison page has a “Report a problem” link that prepares such a message with the surname and the page address.",
     contactNoPromise:
       "Every message is read, but no reply time is promised. A report of an error does not change the page at once: the source is checked first.",
     footer:
