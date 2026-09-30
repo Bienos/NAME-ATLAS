@@ -9,6 +9,8 @@
   (`AGENTS.md` §1 — binding technical decisions live here).
 - **Relates to:** ADR-0002 (Kysely over `pg`, `DATABASE_URL` as the only coupling),
   `docs/LOCAL_DATABASE.md`.
+- **Superseded in part by:** ADR-0015 (2026-09-30). The database runs on a free Oracle Cloud VM, not
+  Neon. The app half of §2 stands.
 
 ## 1. Context
 

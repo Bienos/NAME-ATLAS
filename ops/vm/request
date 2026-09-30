@@ -1,0 +1,4 @@
+# The step the Register VM workflow runs when a push changes this file (TASK-040).
+# One word on the first non-comment line: check, provision, build, status or finalize.
+# provision: the VM is 2 OCPUs and 11,927 MB (Register VM run 36660157009)
+provision

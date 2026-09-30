@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, by TASK-040 (in progress): ADR-0015 moves production's database to a free Oracle Cloud VM. The scripts and the workflow that build it are written and rehearsed, and the workflow's `check` step has reached the VM (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`).
 
 ## Production
 
@@ -31,11 +31,11 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Next
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
-- **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
+- **TASK-040**, the complete register in production on a free Oracle Cloud VM (ADR-0015): **in progress**. The scripts (`ops/vm/`) and the `Register VM` workflow are written and rehearsed on Ubuntu 24.04 x86_64: provisioning, the full imports and the web app through PgBouncer. On the VM, only the workflow's `check` step has run (`Register VM` run 36658375900): SSH works, and the host key is pinned. The VM was 1 OCPU and 5.9 GB, and after the owner's resize it reports 5 OCPUs and 50 GB (run 36659258532): more than Always Free's 2 and 12 GB, so it must be set to exactly 2 and 12. `provision` refuses any other size. Then the port and the third secret. It supersedes TASK-035, parked because Supabase's free plan stops at 500 MB.
 
 ## Open pull requests and branches
 
-One: #26 from `claude/teryt-localities-import`, which carries TASK-039 and this rewrite (checked 2026-09-30). TASK-038 was merged in #25.
+`claude/eager-brown-s2u6qh` carries TASK-040 and this rewrite. Its pull request is not opened yet. TASK-039 was merged in #26 (checked 2026-09-30).
 
 ## Blocked on the project owner
 
@@ -74,7 +74,7 @@ One: #26 from `claude/teryt-localities-import`, which carries TASK-039 and this 
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
-- **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
+- **The database VM** (TASK-040 §3): an Oracle Cloud account with Frankfurt as its home region, the A1 VM, TCP 6432 open on its subnet, and the GitHub secrets `VM_HOST`, `VM_SSH_KEY` and `VM_DB_WEB_PASSWORD`. After the build, Vercel's production `DATABASE_URL`. `ops/vm/README.md` gives each step.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
   - **D-023**, raised by TASK-039 and non-blocking: should TERC ids stay under `provider_key = 'TERYT'`, as they have since TASK-011, or move to `docs/canonical/12` §11.3's `TERYT_TERC`?

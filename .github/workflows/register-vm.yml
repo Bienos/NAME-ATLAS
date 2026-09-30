@@ -1,0 +1,182 @@
+name: Register VM
+
+# Operates the production database VM (ADR-0015, TASK-040) over SSH: the Claude
+# session that drives it has HTTPS-only egress, so this runner does the work and
+# the run log is how the session sees it. It never runs on an ordinary push. A
+# push runs it only when the push changes ops/vm/request on the branch below,
+# and the step it runs is that file's first word. workflow_dispatch runs a step
+# by name once this file is on the default branch.
+#
+#   check      the machine, before anything is installed; pins nothing, prints the host key
+#   provision  ops/vm/provision.sh: PostgreSQL, PostGIS, PgBouncer, roles, firewall, Node
+#   build      ops/vm/build.sh: starts the register build on the VM and returns
+#   status     ops/vm/status.sh: the build, the database, the services, the machine
+#   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
+#
+# provision, status and finalize end by connecting the way the web app does.
+
+on:
+  push:
+    branches: [claude/eager-brown-s2u6qh]
+    paths: [ops/vm/request]
+  workflow_dispatch:
+    inputs:
+      step:
+        description: Which step to run
+        required: true
+        type: choice
+        options: [check, provision, build, status, finalize]
+
+concurrency:
+  group: register-vm
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  vm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      VM_HOST: ${{ secrets.VM_HOST }}
+      VM_SSH_USER: ubuntu
+      PINNED_HOST_KEY: ops/vm/ssh_host_ed25519_key.pub
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Choose the step
+        id: step
+        env:
+          INPUT_STEP: ${{ inputs.step }}
+        run: |
+          step="${INPUT_STEP:-}"
+          if [ -z "$step" ]; then
+            step=$(awk 'NF && $1 !~ /^#/ { print $1; exit }' ops/vm/request)
+          fi
+          case "$step" in
+            "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
+            check | provision | build | status | finalize) echo "::notice::step: $step" ;;
+            *) echo "::error::unknown step '$step'"; exit 1 ;;
+          esac
+          echo "step=$step" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse without the VM's secrets
+        if: steps.step.outputs.step != ''
+        env:
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+        run: |
+          [ -n "$VM_HOST" ] || { echo "::error::repository secret VM_HOST is not set"; exit 1; }
+          [ -n "$VM_SSH_KEY" ] || { echo "::error::repository secret VM_SSH_KEY is not set"; exit 1; }
+
+      - name: Set up SSH with the VM's pinned host key
+        if: steps.step.outputs.step != ''
+        env:
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+          STEP: ${{ steps.step.outputs.step }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VM_SSH_KEY" > ~/.ssh/id_vm
+          chmod 600 ~/.ssh/id_vm
+          if [ -s "$PINNED_HOST_KEY" ]; then
+            printf '%s %s\n' "$VM_HOST" "$(awk '{ print $1" "$2; exit }' "$PINNED_HOST_KEY")" \
+              > ~/.ssh/known_hosts
+          else
+            # First contact only: every other step refuses an unpinned host.
+            if [ "$STEP" != check ]; then
+              echo "::error::pin the VM's host key in $PINNED_HOST_KEY first (the check step prints it)"
+              exit 1
+            fi
+            scanned=$(ssh-keyscan -t ed25519 -T 20 "$VM_HOST" 2> keyscan.err |
+              awk '$2 == "ssh-ed25519" { print $2" "$3; exit }') || true
+            if [ -z "$scanned" ]; then
+              cat keyscan.err >&2
+              nc -zv -w 20 "$VM_HOST" 22 || true
+              echo "::error::no ed25519 host key from the VM on port 22. In the connection test" \
+                "above, 'timed out' means a firewall, the security list or a wrong or private IP;" \
+                "'refused' means sshd is not listening."
+              exit 1
+            fi
+            echo "Host key to pin in $PINNED_HOST_KEY (first contact, trusted on first use):"
+            echo "$scanned"
+            printf '%s %s\n' "$VM_HOST" "$scanned" > ~/.ssh/known_hosts
+          fi
+          cat > ~/.ssh/config <<EOF
+          Host vm
+            HostName $VM_HOST
+            User $VM_SSH_USER
+            IdentityFile ~/.ssh/id_vm
+            IdentitiesOnly yes
+            BatchMode yes
+            StrictHostKeyChecking yes
+            ServerAliveInterval 30
+            ServerAliveCountMax 10
+            ConnectTimeout 20
+          EOF
+          ssh vm true
+          # Staged in the SSH user's own home, which no other user on the VM can
+          # write to, and run from there with sudo.
+          ssh vm 'install -m 700 -d ~/name-atlas-ops'
+
+      - name: check
+        if: steps.step.outputs.step == 'check'
+        run: |
+          ssh vm '. /etc/os-release; echo "$PRETTY_NAME"; uname -mr; nproc; free -m; df -h /;
+            lsblk -o NAME,SIZE,TYPE,MOUNTPOINT; locale -a | head -n 20;
+            sudo iptables -L INPUT --line-numbers -n'
+
+      - name: provision
+        if: steps.step.outputs.step == 'provision'
+        env:
+          VM_DB_WEB_PASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
+        run: |
+          [ -n "$VM_DB_WEB_PASSWORD" ] ||
+            { echo "::error::repository secret VM_DB_WEB_PASSWORD is not set"; exit 1; }
+          scp -q ops/vm/provision.sh vm:name-atlas-ops/provision.sh
+          # The password goes to the script's stdin, never into a command line.
+          ssh vm 'sudo bash ~/name-atlas-ops/provision.sh' <<< "$VM_DB_WEB_PASSWORD"
+
+      - name: build
+        if: steps.step.outputs.step == 'build'
+        run: |
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/build.sh vm:name-atlas-ops/build.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/build.sh ~/name-atlas-ops/app.tar.gz'
+
+      - name: status
+        if: steps.step.outputs.step == 'status'
+        run: |
+          scp -q ops/vm/status.sh vm:name-atlas-ops/status.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/status.sh'
+
+      - name: finalize
+        if: steps.step.outputs.step == 'finalize'
+        run: |
+          scp -q ops/vm/finalize.sh vm:name-atlas-ops/finalize.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/finalize.sh'
+
+      - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
+        if: >-
+          steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
+          steps.step.outputs.step == 'finalize'
+        env:
+          PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
+        run: |
+          conn="host=$VM_HOST port=6432 dbname=name_atlas user=nameatlas_web sslmode=require connect_timeout=15"
+          p() { psql "$conn" -X -v ON_ERROR_STOP=1 -tA "$@"; }
+          p -c '\conninfo'
+          p -c "SELECT current_user, current_setting('default_transaction_read_only'),
+                       current_setting('statement_timeout'), version()"
+          if [ "$(p -c "SELECT to_regclass('public.surnames') IS NOT NULL")" = t ]; then
+            p -c "SELECT 'surnames ' || count(*) FROM surnames"
+          fi
+          if p -c 'CREATE TABLE public.web_role_must_not_write (x int)' 2> write.err; then
+            echo "::error::the web role could create a table"
+            exit 1
+          fi
+          echo "a write as the web role is refused: $(head -n 1 write.err)"
