@@ -1,4 +1,4 @@
 # The step the Register VM workflow runs when a push changes this file (TASK-040).
 # One word on the first non-comment line: check, provision, build, status or finalize.
-# status: port 6432 opened at Oracle; build progress
+# status: the 6432 ingress rule was moved from Egress to Ingress at Oracle
 status
