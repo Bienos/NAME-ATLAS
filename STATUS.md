@@ -37,7 +37,7 @@ No unblocked task is specified. The two candidates are blocked or parked:
 
 ## Open pull requests and branches
 
-One: TASK-040 from `claude/laughing-curie-tsc5mk` (checked 2026-09-30). #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
+One: #29, TASK-040, from `claude/laughing-curie-tsc5mk` (checked 2026-09-30). #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
 
 ## Blocked on the project owner
 
