@@ -19,6 +19,7 @@ import type { Intent, Lang } from "./messages.js";
 import { Result } from "./result-view.js";
 import { SearchForm } from "./search-form.js";
 import { ShareButton } from "./share-button.js";
+import { ReportLink } from "./report-link.js";
 import { NamePrint } from "./name-print.js";
 import { SiteFooter } from "./site-footer.js";
 
@@ -322,6 +323,7 @@ export function CanonicalSurnamePage({
               <p className="again">
                 <a href="#surname">{t.searchAnother}</a>
               </p>
+              <ReportLink surnames={[answer.display]} pageUrl={shareUrl ?? path} lang={lang} />
             </div>
           </>
         ) : // `MOVED`. The route answers a permanent redirect before rendering, so
