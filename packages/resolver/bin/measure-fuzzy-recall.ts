@@ -19,6 +19,7 @@
  */
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { sql } from "kysely";
+import { SHORTLIST_CAP } from "../src/candidates.js";
 import { damerauLevenshtein, hasAdjacentTransposition } from "../src/distance.js";
 
 /** Similarity thresholds to sweep. Wider than any table would ship. */
@@ -38,9 +39,6 @@ const BUCKETS: readonly { readonly label: string; readonly min: number; readonly
  * measured rather than assumed.
  */
 const PREFER_TRANSPOSITION = !process.argv.includes("--no-transposition-preference");
-
-/** The DB shortlist cap (docs/canonical/13 §21.1). */
-const SHORTLIST_CAP = 25;
 
 type EditClass = "transposition" | "substitution" | "deletion" | "insertion";
 

@@ -191,9 +191,6 @@ importers:
       '@name-atlas/logging':
         specifier: workspace:*
         version: link:../logging
-      bullmq:
-        specifier: 6.3.8
-        version: 6.3.8(ioredis@5.9.0)(pg@8.23.0)
       ioredis:
         specifier: 5.9.0
         version: 5.9.0
