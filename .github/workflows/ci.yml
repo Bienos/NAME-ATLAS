@@ -1,7 +1,12 @@
 name: CI
 
 on:
+  # A push runs CI on main only. Any other branch is verified by its pull
+  # request, which already runs this workflow on the merge with main; running
+  # it on the push as well billed every change twice (from #31;
+  # docs/progress/2026-09-30-repository-cleanup.md).
   push:
+    branches: [main]
   pull_request:
 
 env:
