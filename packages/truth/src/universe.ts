@@ -20,7 +20,7 @@ import { assessUniverseCompleteness } from "./completeness.js";
 import type { CompletenessVerdict } from "./completeness.js";
 import type { EffectiveRights } from "./rights.js";
 import { TruthInvariantError } from "./derive.js";
-import type { CanonicalSurnameIdentity, SurnameRankResult } from "./result.js";
+import type { CanonicalSurnameIdentity, SurnameRankResult, SurnameTruthResult } from "./result.js";
 
 /**
  * A source record's `universe_description` cannot be absent for a snapshot that
@@ -110,7 +110,6 @@ export async function loadCandidates(
   }));
 }
 
-/** How many surnames have a national value against this source record. */
 /**
  * A run-scoped memo for {@link universeSize}.
  *
@@ -129,6 +128,7 @@ export async function loadCandidates(
  */
 export type UniverseSizeCache = Map<string, number>;
 
+/** How many surnames have a national value against this source record. */
 export async function universeSize(
   db: Kysely<DB>,
   sourceRecordId: string,
@@ -177,9 +177,13 @@ export type PreparedDerivation =
       readonly complete: readonly CompleteUniverse[];
     };
 
-/** The shape a successful resolution hands to either derivation path. */
+/**
+ * The shape a successful resolution hands to either derivation path. Its
+ * refusals are the population chain's, which every other chain's refusal type
+ * includes, so the population chain can return them as they are.
+ */
 export type ResolvedForDerivation =
-  | DerivationRefusal
+  | Extract<SurnameTruthResult, { kind: "NO_RESULT" }>
   | {
       readonly kind: "RESOLVED";
       readonly status: string;
@@ -378,6 +382,7 @@ export async function loadSourceContext(
     .executeTakeFirst();
 
   if (!row) {
+    // ARCHITECTURE.md §10 invariant 13: no production source without rights.
     throw new TruthInvariantError(
       "MISSING_RIGHTS_PROFILE",
       `source ${sourceId} has no reachable rights profile`,

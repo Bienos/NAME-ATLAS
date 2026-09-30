@@ -46,6 +46,7 @@ import type {
   CompleteRegionalUniverse,
   DerivationSourceContext,
   RegionalUniverseCandidate,
+  UniverseCandidate,
 } from "./universe.js";
 import {
   CURRENT_DISTRIBUTION_METHOD_VERSION,
@@ -166,14 +167,14 @@ export function coverageState(
  */
 async function nationalCoverageCount(
   db: Kysely<DB>,
-  surnameId: string,
+  nationalCandidates: () => Promise<readonly UniverseCandidate[]>,
   regional: PeselResourceDescriptor,
   cache?: UniverseSizeCache,
 ): Promise<number | null> {
   const national = nationalCounterpartOf(regional);
   if (!national) return null;
 
-  const candidates = (await loadCandidates(db, surnameId)).filter(
+  const candidates = (await nationalCandidates()).filter(
     (candidate) => candidate.external_record_id === national.resource_id,
   );
   for (const candidate of candidates) {
@@ -225,11 +226,16 @@ export async function deriveCurrentDistribution(
   const surfaceEligibility = evaluateAllSurfaces(options.rightsOverride ?? source.rights);
   const threshold = options.lowCoverageThreshold ?? DISTRIBUTION_LOW_COVERAGE_THRESHOLD;
 
+  // The surname's national values are the same for every regional universe;
+  // load them once, and only if some universe has a national counterpart.
+  let national: Promise<UniverseCandidate[]> | undefined;
+  const nationalCandidates = () => (national ??= loadCandidates(db, surname.surname_id));
+
   const claims: CurrentDistributionClaimResult[] = [];
   for (const universe of complete) {
     const nationalCount = await nationalCoverageCount(
       db,
-      surname.surname_id,
+      nationalCandidates,
       universe.descriptor,
       options.universeSizeCache,
     );

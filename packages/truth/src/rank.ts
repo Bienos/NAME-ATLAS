@@ -212,7 +212,6 @@ export async function deriveCurrentRank(
 
   const claims: CurrentRankClaimResult[] = [];
   for (const { candidate, verdict } of complete) {
-    if (verdict.kind !== "COMPLETE") continue;
     const rank = await competitionRank(
       db,
       candidate.source_record_id,

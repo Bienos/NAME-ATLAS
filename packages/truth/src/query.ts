@@ -502,10 +502,13 @@ export async function querySurnameResult(
   }
 
   const surnameId = resolution.resolved_surname_id;
-  const claims = await readCurrentPopulation(db, surnameId);
-  const meaningSection = await meaningSectionFor(db, surnameId, surface);
-  const rarityClaims = await readRarityContext(db, surnameId);
-  const distributionClaims = await readCurrentDistribution(db, surnameId);
+  // Four independent reads; none writes, none depends on another.
+  const [claims, meaningSection, rarityClaims, distributionClaims] = await Promise.all([
+    readCurrentPopulation(db, surnameId),
+    meaningSectionFor(db, surnameId, surface),
+    readRarityContext(db, surnameId),
+    readCurrentDistribution(db, surnameId),
+  ]);
 
   const identity = {
     id: surnameId,
@@ -523,16 +526,7 @@ export async function querySurnameResult(
     const reason = (await hasNationalRegisterCount(db, surnameId))
       ? "NOT_DERIVED_YET"
       : "NO_APPLICABLE_EVIDENCE";
-    const noRights = evaluateSurface(
-      {
-        automated_access: "UNKNOWN",
-        commercial_use: "UNKNOWN",
-        redistribution: "UNKNOWN",
-        metadata_rights: "UNKNOWN",
-        review_status: "LEGAL_REVIEW_REQUIRED",
-      },
-      surface,
-    );
+    const noRights = evaluateSurface(NO_RIGHTS_KNOWN, surface);
     return {
       kind: "OK",
       response: {
