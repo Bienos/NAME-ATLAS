@@ -137,9 +137,18 @@ jobs:
         run: |
           [ -n "$VM_DB_WEB_PASSWORD" ] ||
             { echo "::error::repository secret VM_DB_WEB_PASSWORD is not set"; exit 1; }
+          # A copied secret often carries a trailing newline or space; those are dropped.
+          pw=$(printf '%s' "$VM_DB_WEB_PASSWORD" | tr -d '[:space:]')
+          [ "${#pw}" = "${#VM_DB_WEB_PASSWORD}" ] ||
+            echo "::notice::VM_DB_WEB_PASSWORD had whitespace in it; it was removed"
+          if ! [[ "$pw" =~ ^[A-Za-z0-9]{24,128}$ ]]; then
+            echo "::error::VM_DB_WEB_PASSWORD has ${#pw} characters and must be 24 to 128 letters and" \
+              "digits only: no symbols, dashes or spaces, because it goes into a URL"
+            exit 1
+          fi
           scp -q ops/vm/provision.sh vm:name-atlas-ops/provision.sh
           # The password goes to the script's stdin, never into a command line.
-          ssh vm 'sudo bash ~/name-atlas-ops/provision.sh' <<< "$VM_DB_WEB_PASSWORD"
+          ssh vm 'sudo bash ~/name-atlas-ops/provision.sh' <<< "$pw"
 
       - name: build
         if: steps.step.outputs.step == 'build'
