@@ -18,7 +18,7 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 - Milestones M0–M2 are complete.
 - Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–045 and 051 (TASK-051 is built and not yet merged; its batch is running on the VM), plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
 - Ahead of `PLAN.md`'s milestone order: the async runtime (TASK-020), rights per asset and surface (TASK-021), the meaning chain (TASK-022), slugs and the sitemap (TASK-027), `pnpm coverage:report`, the visual system, evidence linked to the source's website (ADR-0012), and the landing atlas's seven plates (TASK-040, 043, 044; ADR-0018, ADR-0019).
-- Local suite on the TASK-051 branch merged with `main` @ `35aa48d`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0; `test:integration` (27 files, 328 tests) and `test:golden` (4 files, 364 tests) passed against a local PostgreSQL 16.
+- Local suite on the TASK-051 branch merged with `main` @ `a5adf02`, run 2026-10-01: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0; `test:integration` (27 files, 328 tests) and `test:golden` (4 files, 364 tests) passed against a local PostgreSQL 16.
 
 ## Next
 

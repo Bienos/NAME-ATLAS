@@ -16,7 +16,7 @@ Scope authority: `tasks/051-surname-change-over-time.md`. Decision: `docs/adr/00
 
 ## Verified
 
-Run 2026-09-30 in this session on the branch built on `main` @ `107ff65`, and run again, with the same results (web 326 tests after #46's and #47's additions), after `main` moved to `3a43bc8` (#45, which took TASK-046–050, so this task was renumbered from 046 to 051) and again to `35aa48d` (#46, #47) and was merged in each time:
+Run 2026-09-30 in this session on the branch built on `main` @ `107ff65`, and run again, with the same results (web 326 tests after #46's and #47's additions), after `main` moved to `3a43bc8` (#45, which took TASK-046–050, so this task was renumbered from 046 to 051) and again to `35aa48d` (#46, #47) and to `a5adf02` (#48, #49; web 338 tests) and was merged in each time:
 
 | Command | Result |
 |---|---|
@@ -50,7 +50,7 @@ The first `status` the owner pasted, 10 minutes after the batch started (unit ac
 
 Cause, found in the code and reproduced on a toy table, not yet seen on the VM: the derivation looked up the claim it supersedes with `claim_key LIKE 'prefix%'`. Production's database is `en_US.UTF-8` (`ops/vm/provision.sh`), under which a btree cannot answer a `LIKE` prefix, so each claim scanned the whole claims table (about 3 million rows). The local development database is `C.UTF-8`, where the index works, so every local test was fast. On a 800,000-row toy table under an ICU `en-US` collation, `EXPLAIN` showed a parallel sequential scan for the `LIKE` and an index scan on `claims_subject_type_status_idx` for a lookup by surname and claim type.
 
-Fix: the supersession lookup goes by surname, claim type and list (`claims_subject_type_status_idx`, then `structured_value->>'role'`), and the batch's candidate query compares the claim type as the enum so the same index serves it. A unit test now fails if either file looks a claim up by a key prefix. Locally the fixed batch writes the same 67 claims, the second run writes nothing, and the integration test (supersession included) passes. **The rate on the VM with the fix has not been measured.**
+Fix: the supersession lookup goes by surname, claim type and list (`claims_subject_type_status_idx`, then `structured_value->>'role'`), and the batch's candidate query compares the claim type as the enum so the same index serves it. A unit test now fails if either file looks a claim up by a key prefix. Locally the fixed batch writes the same 67 claims, the second run writes nothing, and the integration test (supersession included) passes. On the VM the owner's `pg_stat_activity` query, run while the old batch was still going, showed four statements `select "claim_id" from "claims" where "claim_key" like $1 and "claim_status" = $2`, each running 2–5 s: the cause above, seen on the VM. The owner then stopped the unit, uploaded the fixed branch and ran `shift.sh start` again (pasted output: migration "no pending migrations", unit started). **That the fixed code is the code running, and the rate with it, have not been seen.**
 
 ## Rollout, when the VM is reachable
 
