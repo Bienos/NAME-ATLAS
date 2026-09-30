@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -193,5 +193,42 @@ describe("content hash", () => {
     const a = onomasticContentHash(new TextEncoder().encode("a"));
     const b = onomasticContentHash(new TextEncoder().encode("b"));
     expect(a).not.toBe(b);
+  });
+});
+
+/**
+ * TASK-046 — the committed real source files. `extras.sh` imports every file in
+ * `sources/onomastics/`, so each one must stay admissible, real, and free of a
+ * surname listed twice (the importer would store both, and the claim would
+ * count one work's entry as two interpretations).
+ */
+describe("the committed real source files", () => {
+  const dir = path.join(repoRoot, "sources/onomastics");
+  const files = readdirSync(dir).filter((f) => f.endsWith(".json"));
+
+  it("exist", () => {
+    expect(files).toEqual(
+      expect.arrayContaining(["buryan-1933.json", "onomastica-64-16-walkowiak.json"]),
+    );
+  });
+
+  it.each(files)("%s parses as admissible, is not synthetic, and lists each surname once", (f) => {
+    const raw = JSON.parse(readFileSync(path.join(dir, f), "utf8")) as Record<string, unknown>;
+    expect(raw["synthetic"]).toBe(false);
+    const outcome = parseOnomasticSource(raw);
+    expect(outcome.kind).toBe("PARSED");
+    if (outcome.kind !== "PARSED") return;
+    const surnames = outcome.file.entries.map((e) => e.surname);
+    expect(surnames.length).toBeGreaterThan(0);
+    expect(new Set(surnames).size).toBe(surnames.length);
+  });
+
+  it("keys each work by a distinct source_key", () => {
+    const keys = files.map(
+      (f) =>
+        (JSON.parse(readFileSync(path.join(dir, f), "utf8")) as { work: { source_key: string } })
+          .work.source_key,
+    );
+    expect(new Set(keys).size).toBe(keys.length);
   });
 });

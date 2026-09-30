@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by landing TASK-041's `ops/vm/extras.sh` and the workflow's `extras` step on `main` (`docs/progress/2026-09-30-teryt-and-buryan-on-the-vm.md`).
+**Last rewritten:** 2026-09-30, by TASK-046, *Onomastica* back as a meaning source (`docs/progress/2026-09-30-onomastica-meanings.md`).
 
 ## Production
 
@@ -16,13 +16,14 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–045, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
+- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–046, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
 - Ahead of `PLAN.md`'s milestone order: the async runtime (TASK-020), rights per asset and surface (TASK-021), the meaning chain (TASK-022), slugs and the sitemap (TASK-027), `pnpm coverage:report`, the visual system, evidence linked to the source's website (ADR-0012), and the landing atlas's seven plates (TASK-040, 043, 044; ADR-0018, ADR-0019).
 - Local suite on `main` @ `61ffc49`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0. `test:integration` and `test:golden` were not run.
 
 ## Next
 
 - **When GitHub Actions works again (the owner expects it on 2026-10-01):** one `Register VM` run of `status` on `main`, to read the finalize and extras markers, the counts and the stored password's connection step from the VM.
+- **Load TASK-046's meanings.** Once it is merged, one `extras` run (or `sudo bash ops/vm/extras.sh` over SSH) puts *Onomastica*'s 147 meanings in production. Its gate expects 172 listed surnames with a meaning. Until then production shows Buryan's 25 only.
 - **The trend feature** ("how a surname changed"): not written. The editions are loaded; the feature needs a claim type, a contract change, an ADR and a page section, and ADR-0019 §2.2 to be amended for 2019. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`; the load's record). There is no 2022 women's edition: resource 38772 is the 2021 data.
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`). Approved in scope by the project owner on 2026-09-30, unnumbered and unscheduled. Its §4 leaves two preconditions to confirm in preflight. Release is gated on a privacy sign-off (its §13 U-6).
@@ -43,7 +44,7 @@ Checked 2026-09-30, about 21:50 UTC:
   - **Delete, decided with the owner's delegation:** `claude/charming-ptolemy-bld7af`, one commit adding a third-party design skill (MIT, vendored from `Leonxlnx/taste-skill` at `ce26fc2`) to `.claude/skills/`. It does not affect the site, and the project has its own visual system. Re-adding it is one commit.
   - **Keep, unique content.** Neither is on `main` or recovered: `claude/amazing-allen-zjl819` (a Fact Lab data demo and market research, 122 files, no app code) and `claude/friendly-tesla-kv125o` (twelve design directions with research notes).
   - **Keep, parked:** the branch of #30, `claude/funny-allen-vrp074`. `claude/awesome-darwin-af7l50` can be deleted once its pull request is merged. #30 is parked: its review found a four-way read fan-out against a two-connection pool, a regional import that reports every failure as a database error, and no test for either. It also rewrites the importer files that TASK-045 changed, so it needs a rebase, and it is not built on the latest `main`. `claude/inspiring-bohr-vten7x` can be deleted once its pull request is merged. `register-vm.yml`'s push trigger names `claude/eager-brown-s2u6qh`, now deleted, so only `workflow_dispatch` starts it.
-- **Decisions.** Two are open.
+- **Decisions.** Two are open. D-022 (*Onomastica*) was answered again on 2026-09-30: it is a meaning source (TASK-046).
   - **D-023**, non-blocking: should TERC ids stay under `provider_key = 'TERYT'` or move to `docs/canonical/12` §11.3's `TERYT_TERC`?
   - **D-021**, items 1 and 4: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default? It blocks only the Polona connector task.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.

@@ -13,7 +13,7 @@ name: Register VM
 #   status     ops/vm/status.sh: the build, the database, the services, the machine
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
 #   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
-#   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
+#   extras     ops/vm/extras.sh (TASK-041, 046): TERYT and the onomastic sources, after finalize
 #
 # provision, status, finalize, editions and extras end by connecting the way the web app does.
 

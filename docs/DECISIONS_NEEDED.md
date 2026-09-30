@@ -25,13 +25,17 @@ Neither changes any behaviour today.
 
 ---
 
-## D-022 — RESOLVED (2026-09-29): *Onomastica* is dropped as a meaning source
+## D-022 — RESOLVED (2026-09-30): *Onomastica* is a meaning source, on its printed CC BY-ND 4.0 licence
 
-**Resolution**, decided by the project owner on 2026-09-29: option (c), "Drop Onomastica".
+**Resolution**, decided by the project owner on 2026-09-30, reversing their answer of 2026-09-29: option (b). The owner's words: "bring back onomastica … use that source".
 
-- *Onomastica* is not a source for meaning claims. No ingestion task is written, and none is blocked on this entry.
-- TASK-032's record (`docs/sources/onomastica.md`) and its acquisition record stay as evidence of what was found.
-- D-002 and ADR-0008 are unchanged. Meaning still comes from attributed Path B sources, or it is a stated gap. It needs no ADR: nothing in the code or the model changes.
+- The project relies on the licence each article prints, CC BY-ND 4.0 International, for the OJS copies of vols 64 (2020) onward. This is the project owner's judgement, recorded as such, as D-007 was for PESEL. The contradicting statements (below) are unchanged, and the rights profiles stay `LEGAL_REVIEW_REQUIRED`: no lawyer has reviewed the reliance.
+- Only the OJS copies are used. The journals.pan.pl copies of vol. 64, which print a BY-NC-ND URL, are not.
+- Vols 56–63 stay out: they state no licence, and this decision does not grant one.
+- Only verbatim excerpts are published, each cited to its page, never an adaptation, because of the NoDerivatives term. The open legal question N7 in `docs/sources/onomastica.md` §13 (whether a gloss or root is "Adapted Material") therefore does not arise for what is published.
+- TASK-046 imports the first article. D-002 and ADR-0008 are unchanged.
+
+**The answer of 2026-09-29**, superseded: option (c), "Drop Onomastica".
 
 **Original record, for reference**
 

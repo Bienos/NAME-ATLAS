@@ -6,7 +6,7 @@ The verification record for *Onomastica*, the proper-names journal of the Instit
 - **No article bytes are committed.** No PDF, page image or article text is in the repository. The 511 PDFs (383 from the OJS site, 128 from journals.pan.pl), the HTML pages and the text extracted from them stayed in the session's scratch space. Their SHA-256 values are in `SHA256SUMS.txt`.
 - **Nothing is ingested.** There is no table, no `Source` or `RightsProfile` row, no source file under `sources/onomastics/`, no code and no claim. The `Source` and `RightsProfile` values in §11 and §12 are proposals in this document only.
 - **One decision is raised:** **D-022**, whether Name Atlas may rely on the licence the journal declares for vol. 64 (2020) onward, given the statements that contradict it (§8, §9).
-- **Resolved 2026-09-29: dropped.** The project owner answered D-022 with "Drop Onomastica". *Onomastica* is not a source for meaning claims, and no ingestion task follows. This record is kept as evidence; its findings are unchanged.
+- **Resolved 2026-09-29: dropped. Reversed 2026-09-30:** the project owner answered D-022 again with option (b). The printed CC BY-ND 4.0 licence of the OJS copies of vols 64 onward is relied on, and TASK-046 imports the first article (`sources/onomastics/onomastica-64-16-walkowiak.json`). This record's findings are unchanged.
 
 ## At a glance
 
