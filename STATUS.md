@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Checked 2026-09-30: #29, TASK-040, is open. ADR-0016 and TASK-041 are on `claude/oracle-postgres-hosting`, with no pull request yet. #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
+Checked 2026-09-30: none. #29 (TASK-040, the family surnames view) was closed without merging at 13:29 UTC; its work is still on `claude/laughing-curie-tsc5mk`. ADR-0016 and TASK-041 are on `claude/oracle-postgres-hosting`, with no pull request yet. #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
 
 ## Blocked on the project owner
 

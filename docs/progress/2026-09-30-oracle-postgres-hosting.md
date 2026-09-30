@@ -37,7 +37,8 @@ Documentation only. No code, migration, CI or dependency change.
 
 - ADR-0015 was free on `main` and in open pull requests.
 - On 2026-09-30, branch `claude/keen-cannon-1jc301`, with no pull request, held `docs/adr/0015-list-scope-statistics-as-a-committed-artefact.md` and `tasks/040-landing-atlas-list-facts.md`.
-- This change took ADR-0016 so as not to collide knowingly. TASK-040 is taken by #29. That branch's `tasks/040-…` will need a new number whichever of the two merges second.
+- This change took ADR-0016 so as not to collide knowingly.
+- #29, which held TASK-040 for the family surnames view, was closed without merging at 13:29 UTC the same day. TASK-040 is therefore free on `main` and in open pull requests again. Whichever of the two TASK-040 files reaches `main` second will need a new number.
 
 ## Verified
 
