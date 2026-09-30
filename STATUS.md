@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: from `claude/funny-bardeen-f4jbay`, which carries the family surnames draft and this rewrite (checked 2026-09-30). TASK-039 was merged in #26, TASK-038 in #25.
+One: #27 from `claude/funny-bardeen-f4jbay`, which carries the family surnames draft and this rewrite (checked 2026-09-30). TASK-039 was merged in #26, TASK-038 in #25.
 
 ## Blocked on the project owner
 
