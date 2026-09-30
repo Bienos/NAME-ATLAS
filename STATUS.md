@@ -35,12 +35,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Two, checked 2026-09-30:
-
-- #25 from `claude/jolly-faraday-uas99n` carries TASK-038.
-- The pull request from `claude/teryt-localities-import` carries TASK-039 and this rewrite. It is built on #25's branch, so it merges after #25.
-
-TASK-037 was merged in #24.
+One: #26 from `claude/teryt-localities-import`, which carries TASK-039 and this rewrite (checked 2026-09-30). TASK-038 was merged in #25.
 
 ## Blocked on the project owner
 
@@ -51,6 +46,7 @@ TASK-037 was merged in #24.
   - `claude/verify-task-023-025` (#21)
   - `claude/task-023-rules-amended` (#22)
   - `claude/share-card-not-derived-wording` (#24)
+  - `claude/jolly-faraday-uas99n` (#25)
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
