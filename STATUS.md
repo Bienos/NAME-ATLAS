@@ -40,7 +40,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 Four (checked 2026-09-30):
 
-- This pull request, from `claude/trusting-ride-sfsclw`: TASK-042 and this rewrite. It carries every commit of `claude/eager-brown-s2u6qh`. Keep that branch: `Register VM` runs on a push to it that changes `ops/vm/request`.
+- #35 from `claude/trusting-ride-sfsclw`: TASK-042 and this rewrite. It carries every commit of `claude/eager-brown-s2u6qh`. Keep that branch: `Register VM` runs on a push to it that changes `ops/vm/request`.
 - #34 from `claude/oracle-postgres-hosting`: ADR-0016 and TASK-041, a second design for the same database (PostgreSQL 16, a DuckDNS name with a publicly trusted certificate, commands run by the owner). It has not touched the VM, and Oracle's Always Free allowance is one A1 instance of 2 OCPUs and 12 GB. #34 and TASK-042 both supersede ADR-0011's Neon; the project owner chooses one.
 - #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up.
 
