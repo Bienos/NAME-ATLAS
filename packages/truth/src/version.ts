@@ -170,18 +170,22 @@ export const MEANING_CONFIDENCE_ASSESSMENT_VERSION = "onomastic_confidence@1";
  */
 export const MEANING_AGREEMENT_BASIS = "identical root_form and root_language, case-insensitive";
 
-// --- TASK-040: list facts (statistics about one whole published list) -----
+// --- TASK-040, TASK-043: list facts (statistics about one whole published list)
 //
-// A list fact describes the shape of ONE published national list (male or
-// female, one resource version): never a sum, union or comparison across the
-// two, and never a named surname (`docs/contracts/list-facts.md`, ADR-0015).
+// A list fact describes ONE published national list (male or female, one
+// resource version): never a sum or union across the two
+// (`docs/contracts/list-facts.md`, ADR-0015). ADR-0018 adds the one
+// comparison allowed (`overlap`, counts of surnames) and the named selections,
+// each at `NAMED_SURNAME_FLOOR` (`@name-atlas/contracts`) people or more.
 
 /**
- * The list-facts pipeline: the gate, confidence and rights checks and the three
+ * The list-facts pipeline: the gate, confidence and rights checks and the
  * methods below, run by `bin/build-list-facts.ts`. Recorded on the artefact as
- * `pipeline_version`; it is not the artefact's `schema_version` (`list_facts@1`).
+ * `pipeline_version`; it is not the artefact's `schema_version` (`list_facts@2`).
+ * `@2` (TASK-043) keeps each row's key and published string past the parser,
+ * for the named selections and the overlap, and adds the eight methods below.
  */
-export const LIST_FACTS_METHOD_VERSION = "list_facts_pipeline@1";
+export const LIST_FACTS_METHOD_VERSION = "list_facts_pipeline@2";
 
 /** People, surnames, extremes, medians, thresholds and quantiles of one list. */
 export const LIST_SUMMARY_METHOD_VERSION = "list_summary@1";
@@ -235,6 +239,49 @@ export const LIST_REACH_SETS = [
   { set: "TOP_10", k: 10 },
   { set: "TOP_100", k: 100 },
 ] as const;
+
+/** Every distinct count on the list with how many surnames have it (plate I's dots). */
+export const LIST_DOTS_METHOD_VERSION = "list_dots@1";
+
+/** The fewest most common surnames that carry a share q of the list's people. */
+export const LIST_CONCENTRATION_METHOD_VERSION = "list_concentration@1";
+
+/** Surnames and people per band of bearers, and the surnames under 10. */
+export const LIST_BANDS_METHOD_VERSION = "list_bands@1";
+
+/** Surnames and people whose key ends with each of the partition's fixed endings. */
+export const LIST_ENDINGS_METHOD_VERSION = "list_endings@1";
+
+/** Surnames and people by the first letter of the key, the top letter and the rarest Polish one. */
+export const LIST_INITIALS_METHOD_VERSION = "list_initials@1";
+
+/** Surnames and people whose key holds a hyphen, and ADR-0018 `HYPHENATED_TOP`. */
+export const LIST_HYPHENATED_METHOD_VERSION = "list_hyphenated@1";
+
+/** ADR-0018 `TOP_3`: the list's three most common surnames, named at or above the floor. */
+export const LIST_NAMED_TOP_METHOD_VERSION = "list_named_top@1";
+
+/**
+ * The two lists' sets of keys compared (ADR-0018 §2.3), `ON_BOTH_TOP` and
+ * `ONE_LIST_TOP`.
+ */
+export const LIST_OVERLAP_METHOD_VERSION = "list_overlap@1";
+
+/** The shares q of a list's people `concentration` reports; compared as exact thousandths. */
+export const LIST_CONCENTRATION_QUANTILES: readonly number[] = [0.1, 0.5, 0.9];
+
+/**
+ * The bands of bearers per surname, `from` to `to` inclusive (`to` null: no
+ * upper bound). Contiguous from the publisher's minimum count, 2.
+ */
+export const LIST_COUNT_BANDS: readonly { readonly from: number; readonly to: number | null }[] = [
+  { from: 2, to: 2 },
+  { from: 3, to: 9 },
+  { from: 10, to: 99 },
+  { from: 100, to: 999 },
+  { from: 1000, to: 9999 },
+  { from: 10000, to: null },
+];
 
 /** The birthday comparison: equally likely days in a year. A model constant, not PESEL data. */
 export const BIRTHDAY_REFERENCE_DAYS = 365;

@@ -25,9 +25,10 @@ import { loadListFacts } from "../lib/list-atlas-load.js";
  *
  * A server component: a `GET` form and server rendering answer this journey,
  * and `PRODUCT.md` §2's user is on mobile. It is not free of client code: the
- * search field is a client island (`surname-combobox.tsx`), and so is the
+ * search field is a client island (`surname-combobox.tsx`), and so are the
  * landing atlas's section (`list-atlas-shell.tsx`), whose only script is the
- * plates' entrance motion — its list switch is HTML and CSS.
+ * plates' entrance motion — its list switch is HTML and CSS — and its plate I
+ * sky (`list-atlas-sky.tsx`), a canvas drawn from the stored figures.
  *
  * A query that resolves to exactly one surname is **redirected** to that
  * surname's canonical page (ADR-0009) — `/pl/nazwisko/{slug}` — so the address
@@ -210,8 +211,9 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   const given = await answer(query, origin, lang);
   const common = given.kind === "NONE" ? await commonLists(lang) : [];
-  // The landing atlas (TASK-040): statistics about each whole published list,
-  // from the committed artefact. Fails soft: no facts, no section.
+  // The landing atlas (TASK-040, TASK-043): statistics about each whole
+  // published list, from the committed artefact. Fails soft: no facts, no
+  // section.
   const atlas = given.kind === "NONE" ? loadListFacts(listFacts) : null;
 
   if (given.kind === "RESULT" && given.path !== null) {

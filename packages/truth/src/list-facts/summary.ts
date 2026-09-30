@@ -38,7 +38,8 @@ export interface ListSummary {
   readonly person_quantiles: readonly ListQuantile[];
 }
 
-function thousandths(q: number): number {
+/** A quantile q as a whole number of thousandths, for exact integer comparisons. */
+export function thousandths(q: number): number {
   const t = Math.round(q * 1000);
   if (t < 1 || t > 1000 || Math.abs(t / 1000 - q) > 1e-12) {
     throw new ListFactsInputError(

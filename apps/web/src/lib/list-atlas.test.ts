@@ -4,25 +4,18 @@ import { fileURLToPath } from "node:url";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { listFactsArtefactSchema } from "@name-atlas/contracts";
-import type { ListFacts, ListFactsArtefact } from "@name-atlas/contracts";
+import { listFactsArtefactSchema, NAMED_SURNAME_FLOOR } from "@name-atlas/contracts";
+import type { ListFacts, ListFactsArtefact, NamedSurname } from "@name-atlas/contracts";
 import { listFacts } from "@name-atlas/truth";
-import { ListAtlas } from "./list-atlas.js";
+import { isOneInFour, ListAtlas } from "./list-atlas.js";
 import { LIST_FACTS_FIXTURE } from "./list-atlas.fixture.js";
-import { LABEL_TIERS_EM } from "./list-atlas-geometry.js";
 import { loadListFacts } from "./list-atlas-load.js";
 import { reachedAtHydration } from "./list-atlas-shell.js";
-import {
-  formatChance,
-  formatDecimal,
-  formatInteger,
-  formatPercent,
-  formatQuantile,
-  UI,
-} from "./messages.js";
+import { formatDate, formatInteger, formatQuantile, formatShare, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 const LANGS = ["pl", "en"] as const;
+type Side = "male" | "female";
 
 const render = (facts: ListFactsArtefact | null, lang: Lang) =>
   renderToStaticMarkup(createElement(ListAtlas, { facts, lang }));
@@ -43,40 +36,148 @@ function readable(markup: string): string {
   return `${text(markup)} ${labels.join(" ")}`;
 }
 
-/** The fact card of each plate, as text. */
-function factCards(markup: string): string[] {
-  return [...markup.matchAll(/<p class="lf-fact">([\s\S]*?)<\/p>/gu)].map((m) => text(m[1] ?? ""));
+/**
+ * The markup of each list's variants (`data-l="male"` / `"female"`) and the
+ * markup outside any variant, found by walking the tags with a depth count.
+ */
+function byList(markup: string): { male: string[]; female: string[]; shared: string } {
+  const out = { male: [] as string[], female: [] as string[], shared: "" };
+  let side: Side | null = null;
+  let depth = 0;
+  let start = 0;
+  let last = 0;
+  for (const m of markup.matchAll(/<(\/?)([a-zA-Z][\w-]*)([^>]*?)(\/?)>/gu)) {
+    const [whole, close, name, attrs, self] = m;
+    const at = m.index;
+    const empty = self === "/" || /^(?:input|br|img|hr|meta|link)$/iu.test(name ?? "");
+    if (side === null) {
+      const found = close === "" && !empty ? /\sdata-l="(male|female)"/u.exec(attrs ?? "") : null;
+      if (found !== null) {
+        out.shared += markup.slice(last, at);
+        side = found[1] as Side;
+        depth = 1;
+        start = at;
+      }
+      continue;
+    }
+    if (empty) continue;
+    depth += close === "/" ? -1 : 1;
+    if (depth === 0) {
+      const end = at + whole.length;
+      out[side].push(markup.slice(start, end));
+      side = null;
+      last = end;
+    }
+  }
+  out.shared += markup.slice(last);
+  return out;
 }
 
-/** The two variants of a plate's headline, by list, as text. */
-function headlineVariants(markup: string, plate: string): { male: string; female: string } {
-  const heading = new RegExp(`<h3 id="${plate}-title"[^>]*>([\\s\\S]*?)</h3>`, "u").exec(markup);
-  const inner = heading?.[1] ?? "";
-  const variant = (side: string) =>
-    text(
-      new RegExp(`<span data-v="${side}">([\\s\\S]*?)</span>(?=<span data-v=|$)`, "u").exec(
-        inner,
-      )?.[1] ?? "",
-    );
-  return { male: variant("male"), female: variant("female") };
+/** Method versions (`list_bands@1`) carry digits that are not figures. */
+function withoutMethods(value: string): string {
+  return value.replace(/\b[a-z_0-9]+@\d+/gu, " ");
 }
 
-/** Every number in a piece of text, as printed (grouped, with its decimal part). */
-function numbersIn(value: string): string[] {
-  return value.match(/\d+(?:[\u00a0,]\d{3})*(?:[.,]\d+)?/gu) ?? [];
+/** Every number printed in a piece of text: grouped, with its decimal part and per cent sign. */
+function numbersIn(value: string, lang: Lang): string[] {
+  const pattern =
+    lang === "pl" ? /\d+(?:\u00a0\d{3})*(?:,\d+)?%?/gu : /\d+(?:,\d{3})*(?:\.\d+)?%?/gu;
+  return withoutMethods(value).match(pattern) ?? [];
 }
 
-/** `needle` as a whole number in `haystack`: not part of a longer figure. */
-function containsNumber(haystack: string, needle: string): boolean {
-  const escaped = needle.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-  return new RegExp(`(?<![\\d\\u00a0.,])${escaped}(?![\\d]|[.,\\u00a0]\\d)`, "u").test(haystack);
+/** Every number in a subtree of the artefact, with its path. */
+function numbersOf(value: unknown, at = ""): { path: string; value: number }[] {
+  if (typeof value === "number") return [{ path: at, value }];
+  if (Array.isArray(value))
+    return value.flatMap((item, i) => numbersOf(item, `${at}[${String(i)}]`));
+  if (value !== null && typeof value === "object") {
+    return Object.entries(value).flatMap(([key, item]) => numbersOf(item, `${at}.${key}`));
+  }
+  return [];
 }
+
+/** How a stored value may be printed: an integer grouped, a share or a quantile. */
+function printed(value: number, lang: Lang): string[] {
+  if (Number.isInteger(value)) return [formatInteger(value, lang)];
+  if (value >= 0 && value <= 1) return [formatShare(value, lang), formatQuantile(value, lang)];
+  return [];
+}
+
+/** The sections of a list that the plates print: all but `dots`, `collision` and `crowd`. */
+function printedSections(list: ListFacts): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(list).filter(([key]) => !["dots", "collision", "crowd"].includes(key)),
+  );
+}
+
+function allowed(subtrees: readonly unknown[], lang: Lang): Set<string> {
+  const out = new Set<string>();
+  for (const tree of subtrees) {
+    for (const { value } of numbersOf(tree)) for (const form of printed(value, lang)) out.add(form);
+  }
+  return out;
+}
+
+/** The snapshot date's own numbers: the day and the year. */
+function dateNumbers(facts: ListFactsArtefact, lang: Lang): string[] {
+  return formatDate(facts.snapshot_date, lang).match(/\d+/gu) ?? [];
+}
+
+/** Every named selection of the artefact, as `[published, count]`. */
+function selections(facts: ListFactsArtefact): [string, number][] {
+  const named: [string, number][] = [];
+  const add = (s: Omit<NamedSurname, "key"> | null) => {
+    if (s !== null) named.push([s.published, s.count]);
+  };
+  for (const list of [facts.lists.male, facts.lists.female]) {
+    list.named_top.items.forEach(add);
+    add(list.hyphenated.top);
+  }
+  if (facts.overlap.on_both_top !== null) {
+    add(facts.overlap.on_both_top.male);
+    add(facts.overlap.on_both_top.female);
+  }
+  add(facts.overlap.one_list_top.male);
+  add(facts.overlap.one_list_top.female);
+  return named;
+}
+
+/** Words in capitals: a surname as published. PESEL and plate numerals are not names. */
+function capitalWords(value: string): string[] {
+  return (value.match(/\p{Lu}[\p{Lu}-]*\p{Lu}/gu) ?? []).filter(
+    (word) => word !== "PESEL" && !/^[IVX]+$/u.test(word),
+  );
+}
+
+const FORBIDDEN = [
+  "lives in",
+  "comes from",
+  "originat",
+  "is found in",
+  "mieszka",
+  "pochodzi",
+  "urodzon",
+  "polaków",
+  "w polsce",
+  "of poles",
+  "in poland",
+  "narodow",
+  "nationality",
+] as const;
 
 const { male: M, female: F } = LIST_FACTS_FIXTURE.lists;
+const REAL = listFacts();
+const ARTEFACTS = [
+  ["the synthetic fixture", LIST_FACTS_FIXTURE],
+  ["the committed artefact", REAL],
+] as const;
 
 describe("the synthetic fixture", () => {
-  it("is a valid artefact, so the view is tested against the contract's own shape", () => {
+  it("is a valid list_facts@2 artefact, so the view is tested against the contract's own shape", () => {
     expect(listFactsArtefactSchema.safeParse(LIST_FACTS_FIXTURE).success).toBe(true);
+    // Both wordings of plate IV's headline are exercised.
+    expect(isOneInFour(M.endings.entries[0]!.share_of_people)).toBe(true);
+    expect(isOneInFour(F.endings.entries[0]!.share_of_people)).toBe(false);
   });
 });
 
@@ -86,238 +187,153 @@ describe("ListAtlas", () => {
     expect(render(null, "en")).toBe("");
   });
 
-  it("renders the three plates, headed in order, with the snapshot date", () => {
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    expect(html.match(/<article /gu)).toHaveLength(3);
-    expect(html).toContain('<h2 id="lf-title"');
-    expect(html.match(/<h3 /gu)).toHaveLength(3);
-    for (const plate of [UI.pl.lfP1No, UI.pl.lfP2No, UI.pl.lfP3No]) expect(html).toContain(plate);
-    expect(text(html)).toContain("Stan\u00a0na\u00a020\u00a0stycznia 2026\u00a0r.");
-    expect(text(html)).not.toContain("r..");
-    expect(text(render(LIST_FACTS_FIXTURE, "en"))).toContain(
-      "As\u00a0of\u00a020\u00a0January 2026.",
-    );
-  });
-
-  it("renders every plate I figure from the artefact, for both lists", () => {
+  it("renders the six plates in order, then the coda, headed with the snapshot date", () => {
     for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      for (const list of [M, F]) {
-        const s = list.summary;
-        for (const n of [
-          s.people,
-          s.surnames,
-          s.max_count,
-          s.median_count_per_surname,
-          s.median_count_per_person,
-          ...s.thresholds
-            .filter((t) => t.at_least > s.min_count)
-            .flatMap((t) => [t.surnames, t.people]),
-          ...s.surname_quantiles.map((q) => q.count),
-          ...s.person_quantiles.map((q) => q.count),
-        ]) {
-          expect(containsNumber(all, formatInteger(n, lang)), `${lang} ${String(n)}`).toBe(true);
-        }
-      }
-    }
-  });
-
-  it("renders every plate II figure, probabilities near one half to two decimals", () => {
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      for (const list of [M, F]) {
-        const c = list.collision;
-        const [a, b] = c.example_rooms.showcase_pair;
-        for (const figure of [
-          formatInteger(c.n_half, lang),
-          formatInteger(c.pair_one_in, lang),
-          formatInteger(a, lang),
-          formatInteger(b, lang),
-          formatInteger(c.example_rooms.first_pair_at.length, lang),
-          formatChance(c.p_at_n_half, lang),
-          formatChance(c.p_before_n_half, lang),
-          formatChance(c.curve.find((p) => p.n === 23)!.p, lang),
-        ]) {
-          expect(all, `${lang} ${figure}`).toContain(figure);
-        }
-      }
-      expect(all).toContain(formatChance(LIST_FACTS_FIXTURE.birthday_reference.p_at_n_half, lang));
-      // Two decimals near one half: the two sides of n_half never both read "50%".
-      expect(formatChance(M.collision.p_at_n_half, lang)).toMatch(/^50[.,]\d\d%$/u);
-    }
-  });
-
-  it("renders every plate III figure: averages, the example draw and the reach lanes", () => {
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      for (const list of [M, F]) {
-        const w = list.crowd;
-        const at1000 = w.expected_distinct.find((e) => e.n === w.crowd_size)!;
-        for (const figure of [
-          formatDecimal(at1000.value, 1, lang),
-          formatDecimal(at1000.value, 0, lang),
-          formatPercent(w.share_without_namesake, lang),
-          formatInteger(w.example.distinct, lang),
-          formatInteger(w.example.without_namesake, lang),
-          ...w.expected_distinct.map((e) => formatDecimal(e.value, 0, lang)),
-          ...w.reach_half.flatMap((r) => [
-            formatInteger(r.n_half, lang),
-            formatChance(r.p_at_n_half, lang),
-          ]),
-        ]) {
-          expect(all, `${lang} ${figure}`).toContain(figure);
-        }
-      }
-      // A share under one per cent keeps two decimals: 0,43%, not 0,4%.
-      expect(all).toContain(formatPercent(0.0043, lang, 2));
-    }
-  });
-
-  it("names both lists, with their own figures, in every fact card", () => {
-    for (const lang of LANGS) {
-      const cards = factCards(render(LIST_FACTS_FIXTURE, lang));
-      expect(cards).toHaveLength(3);
-      const [one, two, three] = cards as [string, string, string];
-      const men = lang === "pl" ? /mężczyzn/u : /\bmale\b|\bmen\b/u;
-      const women = lang === "pl" ? /kobiet/u : /\bfemale\b|\bwomen\b/u;
-      for (const card of cards) {
-        expect(card).toMatch(men);
-        expect(card).toMatch(women);
-      }
-      const pairs: [string, (l: ListFacts) => string][] = [
-        [one, (l) => formatInteger(l.summary.median_count_per_person, lang)],
-        [one, (l) => formatInteger(l.summary.people, lang)],
-        [one, (l) => formatInteger(l.summary.max_count, lang)],
-        [two, (l) => formatInteger(l.collision.n_half, lang)],
-        [two, (l) => formatInteger(l.collision.pair_one_in, lang)],
-        [two, (l) => formatChance(l.collision.p_at_n_half, lang)],
-        [three, (l) => formatDecimal(l.crowd.expected_distinct[1]!.value, 1, lang)],
-        [three, (l) => formatPercent(l.crowd.share_without_namesake, lang)],
-        [three, (l) => formatInteger(l.crowd.reach_half[0]!.n_half, lang)],
-      ];
-      for (const [card, figure] of pairs) {
-        expect(card).toContain(figure(M));
-        expect(card).toContain(figure(F));
-      }
-    }
-  });
-
-  it("never renders a sum of the two lists", () => {
-    // Every list-specific figure, paired across the lists. Figures under 20 are
-    // skipped: their sums are small numbers that honestly occur as ticks.
-    const figures: ((l: ListFacts) => number)[] = [
-      (l) => l.summary.people,
-      (l) => l.summary.surnames,
-      (l) => l.summary.max_count,
-      (l) => l.summary.median_count_per_person,
-      ...[0, 1, 2, 3, 4, 5].flatMap((i) => [
-        (l: ListFacts) => l.summary.thresholds[i]!.surnames,
-        (l: ListFacts) => l.summary.thresholds[i]!.people,
-      ]),
-      ...[0, 1, 2, 3].flatMap((i) => [
-        (l: ListFacts) => l.summary.surname_quantiles[i]!.count,
-        (l: ListFacts) => l.summary.person_quantiles[i]!.count,
-      ]),
-      (l) => l.collision.n_half,
-      (l) => l.collision.pair_one_in,
-      (l) => l.collision.example_rooms.showcase_pair[1],
-      (l) => l.crowd.example.distinct,
-      (l) => l.crowd.example.without_namesake,
-      (l) => l.crowd.reach_half[0]!.n_half,
-      (l) => l.crowd.reach_half[1]!.n_half,
-    ];
-    const decimals: ((l: ListFacts) => number)[] = [0, 1, 2, 3, 4].map(
-      (i) => (l: ListFacts) => l.crowd.expected_distinct[i]!.value,
-    );
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      for (const figure of figures) {
-        const sum = figure(M) + figure(F);
-        if (figure(M) < 20 || figure(F) < 20) continue;
-        expect(containsNumber(all, formatInteger(sum, lang)), `${lang} sum ${String(sum)}`).toBe(
-          false,
-        );
-      }
-      for (const figure of decimals) {
-        const sum = figure(M) + figure(F);
-        for (const digits of [0, 1]) {
-          expect(containsNumber(all, formatDecimal(sum, digits, lang))).toBe(false);
-        }
-      }
-      for (const share of [
-        M.crowd.share_without_namesake + F.crowd.share_without_namesake,
-        M.collision.p_at_n_half + F.collision.p_at_n_half,
-      ]) {
-        expect(all).not.toContain(formatPercent(share, lang));
-      }
-    }
-  });
-
-  it("never says where anyone lives, comes from, or that a figure is about Poles", () => {
-    const FORBIDDEN = [
-      "lives in",
-      "comes from",
-      "originat",
-      "is found in",
-      "mieszka",
-      "pochodzi",
-      "urodzon",
-      "polaków",
-      "w polsce",
-      "of poles",
-      "in poland",
-      "narodow",
-      "nationality",
-    ] as const;
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang)).toLowerCase();
-      for (const wrong of FORBIDDEN) expect(all, `${lang}: ${wrong}`).not.toContain(wrong);
-    }
-  });
-
-  it("prints no surname: no capitalised name and no surname-like word in capitals", () => {
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      // PESEL is the register's name; I–III are plate numbers.
-      const shouting = (all.match(/\p{Lu}{3,}/gu) ?? []).filter(
-        (w) => w !== "PESEL" && !/^[IVX]+$/u.test(w),
+      const t = UI[lang];
+      const html = render(LIST_FACTS_FIXTURE, lang);
+      expect(html.match(/<article /gu)).toHaveLength(6);
+      const ids = [...html.matchAll(/<article id="(lf-p\d)"/gu)].map((m) => m[1]);
+      expect(ids).toEqual(["lf-p1", "lf-p2", "lf-p3", "lf-p4", "lf-p5", "lf-p6"]);
+      const names = [t.lfP1Name, t.lfP2Name, t.lfP3Name, t.lfP4Name, t.lfP5Name, t.lfP6Name];
+      const numerals = ["I", "II", "III", "IV", "V", "VI"];
+      const heads = [...html.matchAll(/<p class="lf-plate-no">([\s\S]*?)<\/p>/gu)].map((m) =>
+        text(m[1] ?? "").trim(),
       );
-      expect(shouting).toEqual([]);
-      for (const name of [
-        "Nowak",
-        "Kowalsk",
-        "Wiśniewsk",
-        "Kamińsk",
-        "Dąbrowsk",
-        "Kajak",
-        "Lewandowsk",
-        "Wójcik",
+      expect(heads).toEqual(names.map((name, i) => `${t.lfPlate} ${numerals[i]!} · ${name}`));
+      expect(html).toContain('<h2 id="lf-title" class="lf-title">');
+      expect(html.indexOf("lf-coda")).toBeGreaterThan(html.lastIndexOf("<article "));
+      expect(text(html)).toContain(lang === "pl" ? "wydanie 2026" : "2026 edition");
+      // The date's own "r." is never followed by a second full stop.
+      expect(text(html)).not.toMatch(/\.\s*\./u);
+      expect(text(html)).toContain(
+        lang === "pl"
+          ? "Stan\u00a0na\u00a020\u00a0stycznia 2026\u00a0r."
+          : "As\u00a0of\u00a020\u00a0January 2026.",
+      );
+    }
+  });
+
+  it("renders every plate for both lists, each variant naming its own list", () => {
+    const html = render(LIST_FACTS_FIXTURE, "pl");
+    const plates = [...html.matchAll(/<article id="lf-p\d"[\s\S]*?<\/article>/gu)].map((m) => m[0]);
+    expect(plates).toHaveLength(6);
+    for (const plate of plates) {
+      const parts = byList(plate);
+      expect(parts.male.length).toBeGreaterThan(0);
+      expect(parts.female.length).toBe(parts.male.length);
+    }
+    const parts = byList(html);
+    const male = text(parts.male.join(" "));
+    const female = text(parts.female.join(" "));
+    expect(male).toContain("mężczyzn");
+    expect(male).not.toMatch(/kobiet/u);
+    expect(female).toContain("kobiet");
+    expect(female).not.toMatch(/mężczy/u);
+  });
+
+  it("prints each plate's own figures for each list", () => {
+    for (const lang of LANGS) {
+      const parts = byList(render(LIST_FACTS_FIXTURE, lang));
+      for (const [side, list] of [
+        ["male", M],
+        ["female", F],
+      ] as const) {
+        const shown = numbersIn(text(parts[side].join(" ")), lang);
+        const half = list.concentration.levels.find((level) => level.q === 0.5)!;
+        const top = list.initials.letters.find((entry) => entry.letter === list.initials.top)!;
+        const rare = list.initials.letters.find((e) => e.letter === list.initials.rarest_polish)!;
+        const figures = [
+          formatInteger(list.summary.surnames, lang),
+          formatInteger(list.summary.people, lang),
+          formatInteger(half.surnames, lang),
+          formatInteger(list.concentration.beyond_half, lang),
+          formatInteger(list.bands.under_10, lang),
+          formatInteger(list.bands.ranges[0]!.surnames, lang),
+          formatInteger(list.summary.median_count_per_surname, lang),
+          formatShare(list.endings.entries[0]!.share_of_people, lang),
+          formatInteger(list.endings.entries[0]!.people, lang),
+          formatInteger("absent" in top ? 0 : top.people, lang),
+          formatInteger("absent" in rare ? 0 : rare.people, lang),
+          formatInteger(list.initials.outside.surnames, lang),
+          formatInteger(list.hyphenated.surnames, lang),
+          formatInteger(list.hyphenated.people, lang),
+          formatInteger(list.hyphenated.top!.count, lang),
+          ...list.named_top.items.map((item) => formatInteger(item.count, lang)),
+          ...list.bands.ranges.flatMap((band) => [
+            formatInteger(band.surnames, lang),
+            formatInteger(band.people, lang),
+          ]),
+          ...list.endings.entries.map((e) => formatShare(e.share_of_people, lang)),
+        ];
+        for (const figure of figures) expect(shown, `${lang} ${side} ${figure}`).toContain(figure);
+      }
+      const shared = numbersIn(text(parts.shared), lang);
+      const o = LIST_FACTS_FIXTURE.overlap;
+      for (const n of [
+        o.male_only,
+        o.both,
+        o.female_only,
+        o.on_both_top!.male.count,
+        o.on_both_top!.female.count,
+        o.one_list_top.male!.count,
+        o.one_list_top.female!.count,
       ]) {
-        expect(all).not.toContain(name);
+        expect(shared, `${lang} ${String(n)}`).toContain(formatInteger(n, lang));
       }
     }
   });
 
-  it("fills every template: no stray brace, undefined or NaN reaches the page", () => {
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang));
-      expect(all).not.toMatch(/[{}]|undefined|NaN|Infinity/u);
+  it("writes plate IV's headline from the stored share: 'one in four' only in [0.24, 0.26)", () => {
+    expect([0.2399, 0.24, 0.2512, 0.2599, 0.26].map(isOneInFour)).toEqual([
+      false,
+      true,
+      true,
+      true,
+      false,
+    ]);
+    const title = (lang: Lang) => {
+      const plate = /<article id="lf-p4"[\s\S]*?<\/h3>/u.exec(render(LIST_FACTS_FIXTURE, lang))![0];
+      const parts = byList(plate);
+      return { male: text(parts.male.join(" ")), female: text(parts.female.join(" ")) };
+    };
+    expect(title("pl").male).toContain("Co czwarty mężczyzna nosi nazwisko na\u00a0 -ski");
+    expect(title("pl").female).toContain("27,3% kobiet nosi nazwisko na\u00a0 -ska");
+    expect(title("pl").female).not.toContain("Co czwarta");
+    expect(title("en").male).toContain("One man in four has a surname ending in\u00a0 -ski");
+    expect(title("en").female).toContain("27.3% of women on the list have a surname ending in");
+  });
+
+  it("states an absent letter as absent, never as a count of zero", () => {
+    const html = render(LIST_FACTS_FIXTURE, "pl");
+    const parts = byList(html);
+    const cell = (markup: string, letter: string) =>
+      new RegExp(
+        `<li class="lf-abc-cell"[^>]*><span class="lf-abc-g">${letter}</span>[\\s\\S]*?</li>`,
+        "u",
+      ).exec(markup)?.[0] ?? "";
+    for (const side of ["male", "female"] as const) {
+      const all = parts[side].join(" ");
+      for (const letter of ["Ą", "Ę", "Ń"]) {
+        const markup = cell(all, letter);
+        expect(markup, `${side} ${letter}`).toContain("data-absent");
+        expect(text(markup)).toContain("—");
+        expect(numbersIn(text(markup), "pl")).toEqual([]);
+      }
+      expect(text(all)).toContain("Ą, Ę, Ń — brak.");
+      expect(text(all)).toContain("To brak, nie zero.");
     }
+    // X is absent on the female list only; it is not a Polish letter, so it is
+    // drawn as absent but left out of the Polish letters' note.
+    expect(cell(parts.female.join(" "), "X")).toContain("data-absent");
+    expect(cell(parts.male.join(" "), "X")).not.toContain("data-absent");
+    expect(text(parts.female.join(" "))).not.toMatch(/X — brak\./u);
+    expect(text(parts.male.join(" "))).toContain(
+      "Najrzadsza litera polskiego alfabetu, od której zaczyna się nazwisko na liście mężczyzn.",
+    );
   });
 
-  it("gives every figure a label or hides it: graphics are role=img or aria-hidden", () => {
+  it("server-renders a working radio switch with both lists, so nothing depends on JavaScript", () => {
     const html = render(LIST_FACTS_FIXTURE, "pl");
-    for (const svg of html.match(/<svg[^>]*>/gu) ?? []) expect(svg).toContain('aria-hidden="true"');
-    const images = [...html.matchAll(/role="img" aria-label="([^"]*)"/gu)];
-    expect(images.length).toBeGreaterThanOrEqual(12);
-    for (const [, label] of images) expect((label ?? "").length).toBeGreaterThan(20);
-    expect(html.match(/role="img"/gu)?.length).toBe(images.length);
-  });
-
-  it("server-renders both lists and a working radio switch, so nothing depends on JavaScript", () => {
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    // No state for hydration to change: no data-list, nothing hidden, native radios.
-    expect(html).not.toContain("data-list=");
     expect(html).not.toMatch(/\shidden(?:=|\s|>)/u);
     expect(html).not.toContain("aria-pressed");
     expect(html).toContain('<div class="lf-switchbar"><fieldset class="lf-switch">');
@@ -326,311 +342,127 @@ describe("ListAtlas", () => {
     expect(html).toMatch(/<input type="radio" name="lf-list" value="female"\/>/u);
     expect(html.match(/type="radio"/gu)).toHaveLength(2);
     expect(html.match(/data-l="male"/gu)?.length).toBe(html.match(/data-l="female"/gu)?.length);
-    // Both headline variants are in the markup, as a pair in one wrapper
-    // (`.lf-per`, one grid cell); the stylesheet shows one.
-    expect(html).toContain('<span data-v="male">');
-    expect(html).toContain('<span data-v="female">');
-    const pairs = html.match(/<span class="lf-per"><span data-v="male">/gu)?.length ?? 0;
-    expect(pairs).toBeGreaterThanOrEqual(3);
-    expect(html.match(/data-v="male"/gu)).toHaveLength(pairs);
-    expect(html.match(/data-v="female"/gu)).toHaveLength(pairs);
   });
 
-  it("ties the example room back to the list's answer: a line after seat n_half, labelled", () => {
-    for (const lang of LANGS) {
-      const html = render(LIST_FACTS_FIXTURE, lang);
-      expect(html.match(/<path class="lf-room-half" d="M/gu)).toHaveLength(2);
-      for (const list of [M, F]) {
-        const n = formatInteger(list.collision.n_half, lang);
-        const p = formatChance(list.collision.p_at_n_half, lang);
-        // The fixture's n_half values (80, 78) take the "osób" form.
-        expect(text(html)).toContain(
-          lang === "pl" ? `${n} osób: szansa ${p}` : `${n} people: a ${p} chance`,
-        );
-        expect(readable(html)).toContain(
-          lang === "pl" ? `Kreska po miejscu nr ${n}` : `A line after seat no. ${n}`,
-        );
+  it("hides every drawing from assistive technology; its figures are text beside it", () => {
+    const html = render(LIST_FACTS_FIXTURE, "pl");
+    for (const tag of html.match(/<(?:svg|canvas)[^>]*>/gu) ?? []) {
+      expect(tag).toContain('aria-hidden="true"');
+    }
+    // One canvas per list, in the list's variant, so the switch runs no script.
+    expect(html.match(/<canvas /gu)).toHaveLength(2);
+    expect(html).toMatch(/<div data-l="male"><canvas class="lf-sky" aria-hidden="true">/u);
+    expect(html).toMatch(/<div data-l="female"><canvas class="lf-sky" aria-hidden="true">/u);
+    expect(html).toContain('<canvas class="lf-sky" aria-hidden="true">');
+  });
+
+  it("fills every template: no stray brace, undefined, null or NaN reaches the page", () => {
+    for (const [, facts] of ARTEFACTS) {
+      for (const lang of LANGS) {
+        const all = readable(render(facts, lang));
+        expect(all).not.toMatch(/[{}]|undefined|\bnull\b|NaN|Infinity|\*\*/u);
       }
     }
   });
+});
 
-  it("gives the typical person's flag a number-only form and its sentence under the sheet", () => {
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    const sheet = /<div class="lf-sheet lf-rv" data-l="male">[\s\S]*?<\/dl>/u.exec(html)?.[0] ?? "";
-    const p = formatInteger(M.summary.median_count_per_person, "pl");
-    expect(sheet).toContain(`<b class="lf-flag-short">${p}</b>`);
-    expect(
-      text(/<p class="lf-row-cap lf-row-cap-flag"[\s\S]*?<\/p>/u.exec(sheet)?.[0] ?? ""),
-    ).toContain(`typowy mężczyzna: nazwisko ${p} mężczyzn`);
-  });
-
-  it("leaves out a sentence whose figure is missing, never printing a blank or a zero", () => {
-    // Not a valid artefact (the schema requires both), which is the point: the
-    // view must not fill the gap itself.
-    const gappy: ListFactsArtefact = {
-      ...LIST_FACTS_FIXTURE,
-      lists: {
-        male: {
-          ...M,
-          crowd: {
-            ...M.crowd,
-            expected_distinct: M.crowd.expected_distinct.filter((e) => e.n !== M.crowd.crowd_size),
-            reach_half: M.crowd.reach_half.filter((r) => r.set !== "TOP_1"),
-          },
-        },
-        female: F,
-      },
-    };
-    for (const lang of LANGS) {
-      const html = render(gappy, lang);
-      expect(html).not.toContain('<span class="lf-n"></span>');
-      const male = headlineVariants(html, "lf-p3").male;
-      expect(male).toBe(UI[lang].lfP3Short);
-      const card = factCards(html)[2] ?? "";
-      expect(card).not.toContain(lang === "pl" ? "różnych nazwisk" : "different surnames");
-      expect(card).not.toContain(lang === "pl" ? "najczęstszego nazwiska" : "most common surname");
-      expect(card).toContain(lang === "pl" ? "Nikogo o tym samym nazwisku" : "nobody else");
-      expect(containsNumber(card, "0")).toBe(false);
-      const counters =
-        /<div class="lf-col lf-rv" data-l="male"><p class="lf-label">[^<]*<\/p><div class="lf-counters">([\s\S]*?)<\/div>/u.exec(
-          html.slice(html.indexOf('id="lf-p3"')),
-        );
-      expect(counters?.[1]?.match(/<p>/gu)).toHaveLength(1);
-    }
-  });
-
-  it("names its list, with that list's figures only, in every variant of a plate headline", () => {
-    for (const lang of LANGS) {
-      const html = render(LIST_FACTS_FIXTURE, lang);
-      const names = {
-        male: lang === "pl" ? /listy mężczyzn|liście mężczyzn/u : /\bmale list\b/u,
-        female: lang === "pl" ? /listy kobiet|liście kobiet/u : /\bfemale list\b/u,
-      };
-      const own = (list: ListFacts) => {
-        const d = list.crowd.expected_distinct.find((e) => e.n === list.crowd.crowd_size)!;
-        return [
-          formatInteger(list.summary.median_count_per_surname, lang),
-          formatInteger(list.summary.median_count_per_person, lang),
-          formatDecimal(d.value, 0, lang),
-        ];
-      };
-      for (const plate of ["lf-p1", "lf-p3"]) {
-        const variants = headlineVariants(html, plate);
-        for (const [side, list, other] of [
-          ["male", M, "female"],
-          ["female", F, "male"],
+describe("the atlas derives nothing (TASK-043 AC-04)", () => {
+  for (const [name, facts] of ARTEFACTS) {
+    it(`prints only stored values, each list's in its own variant: ${name}`, () => {
+      const { male, female } = facts.lists;
+      for (const lang of LANGS) {
+        const parts = byList(render(facts, lang));
+        const date = dateNumbers(facts, lang);
+        // The sections no plate prints are left out, so a computed figure
+        // cannot pass by matching one of their many values.
+        const own = (list: ListFacts) =>
+          new Set([...allowed([printedSections(list), facts.overlap], lang), ...date]);
+        for (const [side, list] of [
+          ["male", male],
+          ["female", female],
         ] as const) {
-          const heading = variants[side];
-          expect(heading, `${lang} ${plate} ${side}`).toMatch(names[side]);
-          expect(heading, `${lang} ${plate} ${side}`).not.toMatch(names[other]);
-          const figures = numbersIn(heading);
-          expect(figures.length, `${lang} ${plate} ${side}`).toBeGreaterThan(0);
-          for (const figure of figures) {
-            expect(own(list), `${lang} ${plate} ${side}: ${figure}`).toContain(figure);
+          const ok = own(list);
+          for (const n of numbersIn(text(parts[side].join(" ")), lang)) {
+            expect(ok.has(n), `${lang} ${side}: ${n}`).toBe(true);
           }
         }
+        const any = new Set([...allowed([male, female, facts.overlap], lang), ...date]);
+        for (const n of numbersIn(readable(parts.shared), lang)) {
+          expect(any.has(n), `${lang} shared: ${n}`).toBe(true);
+        }
       }
-      // Plate II's headline is a question with no figure in it.
-      expect(
-        numbersIn(text(/<h3 id="lf-p2-title"[^>]*>([\s\S]*?)<\/h3>/u.exec(html)?.[1] ?? "")),
-      ).toEqual([]);
-    }
-  });
-
-  it("gives every list's sentence its own crowd size", () => {
-    const female: ListFacts = {
-      ...F,
-      crowd: { ...F.crowd, crowd_size: 10000 },
-    };
-    const facts: ListFactsArtefact = {
-      ...LIST_FACTS_FIXTURE,
-      lists: { male: M, female },
-    };
-    const html = render(facts, "pl");
-    const { male: headM, female: headF } = headlineVariants(html, "lf-p3");
-    expect(headM).toContain("Tysiąc nieznajomych z listy mężczyzn");
-    expect(headM).toContain(formatDecimal(921.1, 0, "pl"));
-    expect(headF).toContain(`${formatInteger(10000, "pl")} nieznajomych z listy kobiet`);
-    expect(headF).toContain(formatDecimal(7001.8, 0, "pl"));
-    const card = factCards(html)[2]!;
-    expect(card).toContain(`w losowym tłumie ${formatInteger(1000, "pl")} mężczyzn`.slice(2));
-    expect(card).toContain(
-      `w tłumie ${formatInteger(10000, "pl")} kobiet z listy — ${formatDecimal(7001.8, 1, "pl")}`,
-    );
-    const plate3 = /<article id="lf-p3"[\s\S]*?<\/article>/u.exec(html)?.[0] ?? "";
-    const lede = text(/<p class="lf-plate-lede">([\s\S]*?)<\/p>/u.exec(plate3)?.[1] ?? "");
-    expect(lede).toContain(`${formatInteger(10000, "pl")} osób z listy kobiet`);
-    expect(lede).toContain(`${formatInteger(1000, "pl")} osób z listy mężczyzn`);
-  });
-
-  it("does not set the two example crowds' largest groups side by side", () => {
-    for (const lang of LANGS) {
-      const all = readable(render(LIST_FACTS_FIXTURE, lang)).toLowerCase();
-      expect(all).not.toContain(lang === "pl" ? "największa grupa" : "largest group");
-      // The caveat says each example crowd is one draw and the two are not comparable.
-      expect(all).toContain(
-        lang === "pl"
-          ? "dwóch przykładowych tłumów nie należy ze sobą porównywać"
-          : "the two example crowds are not to be compared",
-      );
-    }
-  });
-
-  it("states the full scope of the list in every plate's caveat", () => {
-    for (const lang of LANGS) {
-      const caveats = [
-        ...render(LIST_FACTS_FIXTURE, lang).matchAll(/<p class="lf-caveat">([\s\S]*?)<\/p>/gu),
-      ].map((m) => text(m[1] ?? ""));
-      expect(caveats).toHaveLength(3);
-      for (const caveat of caveats) {
-        expect(caveat).toContain(
-          lang === "pl" ? "osoby żyjące, nazwisko aktualne" : "living persons, current surname",
-        );
-        expect(caveat).toContain(lang === "pl" ? "co najmniej 2 osoby" : "at least 2 people");
-      }
-    }
-  });
-
-  it("words quantiles as 'at least', and draws no person tick on the count axis's end", () => {
-    for (const lang of LANGS) {
-      const html = render(LIST_FACTS_FIXTURE, lang);
-      const all = readable(html);
-      const atLeast = lang === "pl" ? "co najmniej" : "at least";
-      expect(all).toContain(`${atLeast} ${formatQuantile(0.999, lang)}`);
-      expect(text(html)).toContain(
-        lang === "pl" ? "co najmniej …% nazwisk" : "at least …% of surnames",
-      );
-      // Both fixture lists' 99.9% person quantile is the list's largest count.
-      for (const list of [M, F]) {
-        expect(list.summary.person_quantiles.find((q) => q.q === 0.999)?.count).toBe(
-          list.summary.max_count,
-        );
-      }
-      expect(html.match(/class="lf-lab lf-lab-bottom"/gu)).toHaveLength(6);
-      expect(html.match(/class="lf-lab lf-lab-top"/gu)).toHaveLength(8);
-      expect(html.match(/<line class="lf-qtick"/gu)).toHaveLength(14);
-      // The figure's label still carries the quantile, worded so it is true.
-      expect(all).toContain(
-        lang === "pl"
-          ? `co najmniej 99,9% nosi nazwisko, które ma najwyżej ${formatInteger(M.summary.max_count, lang)}`
-          : `at least 99.9% carry a surname with at most ${formatInteger(M.summary.max_count, lang)}`,
-      );
-    }
-  });
-
-  it("hangs the person quantile under the typical person's flag away from the flag", () => {
-    // Male fixture: the 50% person quantile is the typical person's count, and
-    // the flag hangs to the left of its stem, so the label hangs to the right.
-    expect(M.summary.person_quantiles.find((q) => q.q === 0.5)?.count).toBe(
-      M.summary.median_count_per_person,
-    );
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    const sheet = /<div class="lf-sheet lf-rv" data-l="male">[\s\S]*?<\/dl>/u.exec(html)?.[0] ?? "";
-    expect(sheet).toContain('<span class="lf-flag lf-flag-bottom" data-side="end"');
-    expect(sheet).toMatch(
-      /<span class="lf-lab lf-lab-bottom" data-anchor="start"[^>]*>50%<\/span>/u,
-    );
-  });
-
-  it("gives the example rooms a short label and their values as a list", () => {
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    const strips = [
-      ...html.matchAll(/<div class="lf-strip"><div role="img" aria-label="([^"]*)">/gu),
-    ];
-    expect(strips).toHaveLength(2);
-    for (const [, label] of strips) {
-      expect((label ?? "").length).toBeLessThan(160);
-      expect(numbersIn(label ?? "")).toEqual([]);
-    }
-    for (const list of [M, F]) {
-      const values = list.collision.example_rooms.first_pair_at
-        .map((n) => `<li>${formatInteger(n, "pl")}</li>`)
-        .join("");
-      expect(html).toContain(values);
-    }
-    expect(html.match(/<ul class="lf-sr" aria-label="Przykładowe sale/gu)).toHaveLength(2);
-  });
-
-  it("draws the same plates whatever order the artefact lists its keyed entries in", () => {
-    const reorder = (list: ListFacts): ListFacts => ({
-      ...list,
-      summary: {
-        ...list.summary,
-        thresholds: [...list.summary.thresholds].reverse(),
-        surname_quantiles: [...list.summary.surname_quantiles].reverse(),
-        person_quantiles: [...list.summary.person_quantiles].reverse(),
-      },
-      collision: { ...list.collision, curve: [...list.collision.curve].reverse() },
-      crowd: {
-        ...list.crowd,
-        expected_distinct: [...list.crowd.expected_distinct].reverse(),
-        reach_half: [...list.crowd.reach_half].reverse(),
-      },
     });
-    const shuffled: ListFactsArtefact = {
+
+    it(`never prints a sum of the two lists: ${name}`, () => {
+      const { male, female } = facts.lists;
+      const o = facts.overlap;
+      const f = new Map(numbersOf(female).map((entry) => [entry.path, entry.value]));
+      const sums = numbersOf(male)
+        .filter((entry) => Number.isInteger(entry.value) && entry.value >= 20)
+        .map((entry) => [entry.value, f.get(entry.path)] as const)
+        .filter((pair): pair is readonly [number, number] => pair[1] !== undefined && pair[1] >= 20)
+        .map(([a, b]) => a + b);
+      sums.push(o.male_only + o.both + o.female_only);
+      if (o.on_both_top !== null) sums.push(o.on_both_top.male.count + o.on_both_top.female.count);
+      for (const lang of LANGS) {
+        const legit = allowed([male, female, o], lang);
+        const shown = new Set(numbersIn(readable(render(facts, lang)), lang));
+        for (const sum of sums) {
+          const form = formatInteger(sum, lang);
+          // A sum that happens to equal a stored figure is that figure.
+          if (legit.has(form)) continue;
+          expect(shown.has(form), `${lang}: ${form}`).toBe(false);
+        }
+      }
+    });
+
+    it(`names a surname only as a selection at or above the floor, never as a link: ${name}`, () => {
+      const named = new Map(selections(facts));
+      for (const lang of LANGS) {
+        const html = render(facts, lang);
+        const words = capitalWords(readable(html));
+        expect(words.length).toBeGreaterThan(0);
+        for (const word of words) {
+          expect(named.has(word), `${lang}: ${word}`).toBe(true);
+          expect(named.get(word)!).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
+        }
+        for (const [published] of named) expect(html).toContain(published);
+        for (const [, inside] of html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gu)) {
+          expect(capitalWords(text(inside ?? ""))).toEqual([]);
+        }
+      }
+    });
+
+    it(`never says where anyone lives, comes from, or that a figure is about Poles: ${name}`, () => {
+      for (const lang of LANGS) {
+        const all = readable(render(facts, lang)).toLowerCase();
+        for (const wrong of FORBIDDEN) expect(all, `${lang}: ${wrong}`).not.toContain(wrong);
+      }
+    });
+  }
+
+  it("names no surname when no selection reaches the floor", () => {
+    const empty = (list: ListFacts): ListFacts => ({
+      ...list,
+      named_top: { ...list.named_top, items: [] },
+      hyphenated: { ...list.hyphenated, top: null },
+    });
+    const bare: ListFactsArtefact = {
       ...LIST_FACTS_FIXTURE,
-      lists: { male: reorder(M), female: reorder(F) },
+      lists: { male: empty(M), female: empty(F) },
+      overlap: {
+        ...LIST_FACTS_FIXTURE.overlap,
+        on_both_top: null,
+        one_list_top: { male: null, female: null },
+      },
     };
+    expect(listFactsArtefactSchema.safeParse(bare).success).toBe(true);
     for (const lang of LANGS) {
-      expect(render(shuffled, lang)).toBe(render(LIST_FACTS_FIXTURE, lang));
-    }
-  });
-
-  it("names each list in the plate III fact card's every pair of figures", () => {
-    const r = (list: ListFacts, set: string) =>
-      list.crowd.reach_half.find((x) => x.set === set)!.n_half;
-    for (const lang of LANGS) {
-      const card = factCards(render(LIST_FACTS_FIXTURE, lang))[2]!;
-      for (const set of ["TOP_100", "TOP_10", "TOP_1"]) {
-        const m = formatInteger(r(M, set), lang);
-        const f = formatInteger(r(F, set), lang);
-        expect(card).toMatch(
-          lang === "pl"
-            ? new RegExp(`${m} mężczyzn albo ${f} kobiet`, "u")
-            : new RegExp(`${m} men or ${f} women`, "u"),
-        );
-      }
-    }
-  });
-
-  it("keeps the source line's and the scope line's date with its words", () => {
-    // Non-breaking spaces glue "stan na" / "as of" to the day and month, and
-    // the year to "r.": a narrow line breaks between the two pieces only, so
-    // at large text the date never pushes the page sideways.
-    const pl = render(LIST_FACTS_FIXTURE, "pl");
-    expect(pl).toContain("stan\u00a0na\u00a020\u00a0stycznia 2026\u00a0r.");
-    expect(pl).toContain("Stan\u00a0na\u00a020\u00a0stycznia 2026\u00a0r.");
-    const en = render(LIST_FACTS_FIXTURE, "en");
-    expect(en).toContain("as\u00a0of\u00a020\u00a0January 2026");
-    expect(en).toContain("As\u00a0of\u00a020\u00a0January 2026.");
-    expect(pl).not.toContain("lf-nowrap");
-  });
-
-  it("links the source and states its assessment and method", () => {
-    const html = render(LIST_FACTS_FIXTURE, "pl");
-    expect(html).toContain(`href="${M.source.source_page_url}"`);
-    expect(text(html)).toContain("Zweryfikowane · metoda list_summary@1");
-    expect(text(html)).toContain("metoda list_collision@1");
-    expect(text(html)).toContain("metoda list_crowd@1");
-  });
-
-  it("renders the committed artefact without a sum of the two lists", () => {
-    const real = listFacts();
-    for (const lang of LANGS) {
-      const all = readable(render(real, lang));
-      expect(all).not.toMatch(/[{}]|undefined|NaN/u);
-      const { male, female } = real.lists;
-      for (const [a, b] of [
-        [male.summary.people, female.summary.people],
-        [male.summary.surnames, female.summary.surnames],
-        [male.summary.max_count, female.summary.max_count],
-        [male.summary.median_count_per_person, female.summary.median_count_per_person],
-        [male.collision.pair_one_in, female.collision.pair_one_in],
-      ] as const) {
-        expect(containsNumber(all, formatInteger(a, lang))).toBe(true);
-        expect(containsNumber(all, formatInteger(b, lang))).toBe(true);
-        expect(containsNumber(all, formatInteger(a + b, lang))).toBe(false);
-      }
+      const all = readable(render(bare, lang));
+      expect(capitalWords(all)).toEqual([]);
+      expect(all).not.toMatch(/\bnull\b|undefined/u);
+      expect(all).toContain(lang === "pl" ? UI.pl.lfP6HyphenNoneMale : UI.en.lfP6HyphenNoneFemale);
+      expect(all).toContain(UI[lang].lfP6Why);
     }
   });
 });
@@ -642,56 +474,60 @@ describe("the atlas stylesheet", () => {
     "",
   );
   /** Innermost rules: selector and declarations, whatever at-rule they sit in. */
-  const rules = [...CSS.matchAll(/([^{}]+)\{([^{}]*)\}/gu)].map((m) => ({
-    selector: (m[1] ?? "").trim().replace(/\s+/gu, " "),
-    body: m[2] ?? "",
-  }));
-  const rule = (selector: string) => rules.filter((r) => r.selector === selector);
+  const rulesOf = (css: string) =>
+    [...css.matchAll(/([^{}]+)\{([^{}]*)\}/gu)].map((m) => ({
+      selector: (m[1] ?? "").trim().replace(/\s+/gu, " "),
+      body: m[2] ?? "",
+    }));
+  const rules = rulesOf(CSS);
 
-  it("stacks a line's two list variants in one grid cell, so flipping lists moves nothing", () => {
-    expect(rule(".lf-per").some((r) => /display: grid;/u.test(r.body))).toBe(true);
-    expect(rule(".lf-per > [data-v]").some((r) => /grid-area: 1 \/ 1;/u.test(r.body))).toBe(true);
-    // On a phone the two lists' sheets and columns share a cell too.
+  /** The stylesheet without its `prefers-reduced-motion: no-preference` blocks. */
+  function withoutMotionBlocks(css: string): string {
+    const marker = "@media (prefers-reduced-motion: no-preference)";
+    let out = css;
+    for (let at = out.indexOf(marker); at !== -1; at = out.indexOf(marker)) {
+      let depth = 0;
+      let end = out.indexOf("{", at);
+      for (; end < out.length; end++) {
+        if (out[end] === "{") depth++;
+        else if (out[end] === "}" && --depth === 0) break;
+      }
+      out = out.slice(0, at) + out.slice(end + 1);
+    }
+    return out;
+  }
+
+  it("stacks a list's two variants in one grid cell, so flipping lists moves nothing", () => {
+    expect(rules.some((r) => r.selector === ".lf-alt" && /display: grid;/u.test(r.body))).toBe(
+      true,
+    );
     expect(
-      rule(".lf :is(.lf-sheets, .lf-cols) > [data-l]").some((r) =>
-        /grid-area: 1 \/ 1;/u.test(r.body),
-      ),
+      rules.some((r) => r.selector === ".lf-alt > [data-l]" && /grid-area: 1 \/ 1;/u.test(r.body)),
     ).toBe(true);
   });
 
   it("hides the list not chosen with visibility, never by taking it out of the layout", () => {
-    const listRules = rules.filter((r) => /\[data-[vl]="(?:male|female)"\]/u.test(r.selector));
-    expect(listRules.length).toBeGreaterThanOrEqual(3);
+    const listRules = rules.filter((r) => /\[data-l="(?:male|female)"\]/u.test(r.selector));
+    expect(listRules.length).toBeGreaterThanOrEqual(2);
     for (const r of listRules) expect(r.body, r.selector).not.toMatch(/display:\s*none/u);
     const hidden = listRules.filter((r) => /visibility: hidden;/u.test(r.body));
-    expect(hidden.map((r) => r.selector).join(" ")).toMatch(/\[data-v="female"\]/u);
-    expect(hidden.map((r) => r.selector).join(" ")).toMatch(/\[data-l="male"\]/u);
+    expect(hidden.map((r) => r.selector).join(" ")).toMatch(/\.lf \[data-l="female"\]/u);
+    expect(hidden.map((r) => r.selector).join(" ")).toMatch(/:checked\) \[data-l="male"\]/u);
   });
 
-  it("draws each label tier only where its row is as many em wide as it was fitted at", () => {
-    for (const [tier, em] of LABEL_TIERS_EM.entries()) {
-      if (tier === 0) continue;
-      expect(CSS).toMatch(
-        new RegExp(
-          `@container \\(min-width: ${String(em)}em\\) \\{\\s*\\.lf-lab\\[data-fit="${String(tier)}"\\] \\{\\s*display: block;`,
-          "u",
-        ),
-      );
+  it("moves the atlas only without a reduced-motion preference", () => {
+    const still = rulesOf(withoutMotionBlocks(CSS)).filter((r) => /\.lf/u.test(r.selector));
+    for (const r of still) {
+      expect(r.body, r.selector).not.toMatch(/\b(?:animation|transition)(?:-[a-z]+)?\s*:/u);
     }
-    expect(CSS).toMatch(
-      /\.lf-plot,\s*\.lf-curve,\s*\.lf-spark,\s*\.lf-queue-axis \{\s*container-type: inline-size;/u,
-    );
+    expect(CSS).toMatch(/\.lf\[data-motion\] \.lf-rv \{\s*animation:/u);
   });
 
-  it("draws the typical person in Atlas Blue, as the headline does, as a diamond", () => {
-    const person = rule(".lf-dot-person")
-      .map((r) => r.body)
-      .join("");
-    expect(person).toContain("background: var(--accent);");
-    expect(person).toContain("rotate: 45deg;");
-    expect(
-      rules.some((r) => r.selector.includes(".lf-stem-bottom") && r.body.includes("var(--accent)")),
-    ).toBe(true);
+  it("keeps every atlas target at least 44px tall", () => {
+    const label = rules.find((r) => r.selector === ".lf-switch label");
+    expect(label?.body).toMatch(/min-height: 44px;/u);
+    const link = rules.find((r) => r.selector === ".lf-source a");
+    expect(link?.body).toMatch(/padding-block: 15px;/u);
   });
 });
 
@@ -705,7 +541,7 @@ describe("reachedAtHydration", () => {
   });
 });
 
-describe("loadListFacts", () => {
+describe("loadListFacts (TASK-043 AC-06)", () => {
   it("returns the facts it reads", () => {
     expect(loadListFacts(() => LIST_FACTS_FIXTURE)).toBe(LIST_FACTS_FIXTURE);
   });

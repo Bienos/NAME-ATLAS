@@ -2,10 +2,11 @@
  * The histogram of one published list: for each count, how many surnames
  * carry it (TASK-040).
  *
- * Every list fact except the seeded examples depends on a list only through
- * this histogram, so the methods work on it rather than on 400,000 rows. The
- * rows never carry a surname string past the parser: a list fact is about the
- * shape of a list, never about a named surname.
+ * Every `list_facts@1` fact except the seeded examples, and `dots`, `bands`
+ * and `concentration`, depend on a list only through this histogram, so those
+ * methods work on it rather than on 400,000 rows. It carries no surname
+ * string; the methods that need the spelling work on the keyed rows
+ * (`rows.ts`).
  *
  * One list only. Nothing here accepts, or can be given, two lists at once.
  */

@@ -37,7 +37,7 @@ export interface AtlasSwitchLabels {
   readonly note: string;
 }
 
-/** Longer than the slowest entrance in `globals.css` (a full room: about 1.8 s). */
+/** Longer than the slowest entrance in `globals.css` (plate IV's gauge: about 1.6 s). */
 const SPENT_AFTER_MS = 2600;
 
 /**
@@ -51,18 +51,17 @@ export function reachedAtHydration(box: { readonly top: number }, viewportHeight
 }
 
 /**
- * The atlas section's one client island (TASK-040): the section, its list
- * switch, and the plates' entrance.
+ * The atlas section's client island (TASK-040; six plates since TASK-043): the
+ * section, its list switch, and the plates' entrance. Plate I's sky is a
+ * second island (`list-atlas-sky.tsx`) that follows the same switch.
  *
  * Everything inside is server-rendered, and every figure is in the markup for
  * both lists. The switch is two native radio buttons, the male list checked in
- * the markup, and the stylesheet does the rest with `:has()`: which headline
- * variant shows, which list a phone shows (one at a time below 900px), and
- * which column a wide screen puts in front (both stay on screen). So it works
- * the same before hydration, after it and without JavaScript at all, and
- * hydration changes no layout. React never reads it; nothing here reads or
- * changes a figure. The fact cards name both lists in full sentences whichever
- * list is chosen.
+ * the markup, and the stylesheet does the rest with `:has()`: of each pair of
+ * list variants (`.lf-alt`), the chosen one shows and the other keeps its
+ * place, hidden. So it works the same before hydration, after it and without
+ * JavaScript at all, and hydration changes no layout. React never reads it;
+ * nothing here reads or changes a figure.
  *
  * Motion is opt-in and the island's only job: when the reader has not asked
  * for reduced motion, every `.lf-rv` block already reached — on screen or

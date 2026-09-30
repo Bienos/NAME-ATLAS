@@ -1,31 +1,33 @@
 # Contract — list facts (statistics about one whole published list)
 
-- **Status:** Accepted with ADR-0015 (TASK-040, merged in #32 on 2026-09-30).
-- **Schema:** `packages/contracts/src/list-facts.ts` (`listFactsArtefactSchema`, `LIST_FACTS_SCHEMA_VERSION = "list_facts@1"`).
-- **Producer:** `packages/truth/bin/build-list-facts.ts` (`pnpm truth:list-facts`), which runs the pure pipeline `computeListFacts` / `buildListFactsArtefact` in `packages/truth/src/list-facts/build.ts` (pipeline version `list_facts_pipeline@1`, `LIST_FACTS_METHOD_VERSION` in `packages/truth/src/version.ts`) and writes the generated module `packages/truth/src/generated/list-facts.ts` (`LIST_FACTS_DATA`).
+- **Status:** `list_facts@1` accepted with ADR-0015 (TASK-040, merged in #32 on 2026-09-30). `list_facts@2` (TASK-043) is proposed with ADR-0018 and accepted when TASK-043's pull request is merged.
+- **Schema:** `packages/contracts/src/list-facts.ts` (`listFactsArtefactSchema`, `LIST_FACTS_SCHEMA_VERSION = "list_facts@2"`).
+- **Producer:** `packages/truth/bin/build-list-facts.ts` (`pnpm truth:list-facts`), which runs the pure pipeline `computeListFacts` / `buildListFactsArtefact` in `packages/truth/src/list-facts/build.ts` (pipeline version `list_facts_pipeline@2`, `LIST_FACTS_METHOD_VERSION` in `packages/truth/src/version.ts`) and writes the generated module `packages/truth/src/generated/list-facts.ts` (`LIST_FACTS_DATA`).
 - **Consumer:** the landing page (`apps/web`), server-side, through `listFacts()` from `@name-atlas/truth` (`packages/truth/src/list-facts/artefact.ts`). It parses the module against the schema once, memoises it and throws if it does not parse; the page then renders without the atlas section.
-- **Canonical basis:** ADR-0015 (the data path: list-scope statistics derived offline into a committed, SHA-pinned artefact), TASK-040 (scope). The statistics themselves are not specified in the canonical corpus; `docs/canonical/14` §30 (a derived statistic is a FACT about a deterministic calculation) is the confidence rule the artefact applies, and `docs/canonical/12` §6.3–§6.4 the surface rule.
+- **Canonical basis:** ADR-0015 (the data path: list-scope statistics derived offline into a committed, SHA-pinned artefact), ADR-0018 (named selections and the one comparison of the two lists), TASK-040 and TASK-043 (scope). The statistics themselves are not specified in the canonical corpus; `docs/canonical/14` §30 (a derived statistic is a FACT about a deterministic calculation) is the confidence rule the artefact applies, and `docs/canonical/12` §6.3–§6.4 the surface rule.
 
 ## What a list fact is, and is not
 
 - **About one list.** Its subject is one resource version of one national PESEL file: the male list (`1148808`) or the female list (`1148811`), reference date 2026-01-20. Each figure describes the **published list**: living persons, current surname (`nazwisko aktualne`), surnames with at least 2 bearers (the publisher omits surnames with one bearer), in the PESEL register at the reference date. It is never a figure about "Poles" or "Poland".
-- **Never both lists.** The male and female lists are two universes (TASK-004 §14 U-1). The artefact holds them under separate keys, each computed on its own. No field is a sum, union, merge or comparison across the two; a sum *within* one list (its people) is allowed.
-- **Never a named surname.** No surname string crosses this boundary. "The list's most common surname" is an unnamed set (`TOP_1`); a named surname's count, rank or map is a surname claim and stays in the claim chain.
+- **Never both lists summed.** The male and female lists are two universes (TASK-004 §14 U-1). The artefact holds them under separate keys, each computed on its own. No field is a sum, union or merge across the two; a sum *within* one list (its people) is allowed. The one comparison is `overlap` (ADR-0018 §2.3): how many surnames are on the male list only, on both lists and on the female list only, compared by `canonical_key_v2`. It counts surnames, never people, and no field adds the people of the two lists. *(Amended by ADR-0018; `list_facts@1` allowed no comparison.)*
+- **A named surname only by a list-scope rule.** A surname string crosses this boundary only as one of ADR-0018's named selections (`TOP_3`, `HYPHENATED_TOP`, `ON_BOTH_TOP`, `ONE_LIST_TOP`), each chosen in the generator by a fixed rule over the whole list, ties broken by key in code-point order, and each stored only when its count is at least `NAMED_SURNAME_FLOOR` = 20 on its list. It carries its key, its source string as published and its count, and it is text, not a link. Any other surname's count, rank or map is a surname claim and stays in the claim chain; the reach sets (`TOP_1`, `TOP_10`, `TOP_100`) stay unnamed. *(Amended by ADR-0018; `list_facts@1` carried no surname string.)*
 - **Not regional.** Voivodeship figures are out of scope. Absence and suppression are not zero.
 
 ## Shape
 
 ```json
 {
-  "schema_version": "list_facts@1",
+  "schema_version": "list_facts@2",
   "generated_by": "packages/truth/bin/build-list-facts.ts",
-  "pipeline_version": "list_facts_pipeline@1",
+  "pipeline_version": "list_facts_pipeline@2",
   "snapshot_date": "2026-01-20",
   "birthday_reference": { "n_half": 23, "p_at_n_half": 0.507297234 },
   "lists": {
-    "male":   { "partition": "national_male",   "source": {…}, "assessment": {…}, "summary": {…}, "collision": {…}, "crowd": {…} },
-    "female": { "partition": "national_female", "source": {…}, "assessment": {…}, "summary": {…}, "collision": {…}, "crowd": {…} }
-  }
+    "male":   { "partition": "national_male",   "source": {…}, "assessment": {…}, "summary": {…}, "collision": {…}, "crowd": {…},
+                "dots": {…}, "concentration": {…}, "bands": {…}, "endings": {…}, "initials": {…}, "hyphenated": {…}, "named_top": {…} },
+    "female": { "partition": "national_female", … the same sections … }
+  },
+  "overlap": { "method_version": "list_overlap@1", "male_only": …, "both": …, "female_only": …, "on_both_top": {…}, "one_list_top": { "male": {…}, "female": {…} } }
 }
 ```
 
@@ -39,17 +41,31 @@ The schema refuses:
 - a `reach_half` that does not hold `TOP_1`, `TOP_10` and `TOP_100` exactly once each;
 - a `crowd` whose `expected_distinct` has no entry for its own `crowd_size`, so the crowd the page describes always has its figure.
 
-Unknown fields are stripped, never passed on.
+Since `list_facts@2` it also refuses:
+
+- `dots` out of ascending order by `count` or with a count twice, or whose surnames do not add up to `summary.surnames` or whose count × surnames do not add up to `summary.people`;
+- `bands` that are not contiguous and ascending with only the last one open-ended, with no band starting at 10, with a band whose people cannot come from its surnames (outside `from × surnames … to × surnames`), that do not add up to the list's surnames and people, or whose `under_10` is not the surnames of the bands below 10;
+- `concentration` levels out of ascending order by `q`, without q = 0.5, falling in surnames or people as q rises, carrying less than their share q of the list's people (`people × 1000 < q‰ × N`), or a `beyond_half` other than `summary.surnames` less the q = 0.5 set's surnames;
+- `endings` that are not the partition's fixed set in its order, where one ending is a suffix of another, whose surnames or people exceed the list's, or whose `share_of_people` is not its people over the list's (to 10⁻⁹);
+- `initials` that do not hold each of the 35 letters once in the fixed order, an entry that is neither `{letter, surnames, people}` with positive figures nor exactly `{letter, absent: true}`, a `top` that is absent or does not have the most people, a `rarest_polish` that is absent, not a letter of the Polish alphabet or does not have the fewest people among the Polish letters present, or letters and `outside` that do not add up to the list's surnames and people;
+- a `hyphenated.top` whose key holds no hyphen, or figures that do not fit within the list;
+- `named_top.items` with more than three entries, out of selection order (count descending, ties by key in code-point order), or not led by the list's `max_count`;
+- any named selection (`named_top.items[]`, `hyphenated.top`, `overlap.on_both_top` on either list, `overlap.one_list_top.*`) with a count below `NAMED_SURNAME_FLOOR` (20);
+- an `overlap` whose `male_only + both` is not the male list's surnames or whose `female_only + both` is not the female list's, a selection from a part that holds no surname, or a selection's count above its own list's `max_count`;
+- two lists with different `concentration` q values or different band edges (added to the model parameters above). The endings differ by design: each list must carry its own partition's fixed set.
+
+Unknown fields are stripped, never passed on, except in an `initials.letters[]` entry, which is strict: an absent letter can carry no figure and a present letter no `absent` flag.
 
 ### Top level
 
 | Field | Meaning |
 |---|---|
-| `schema_version` | `list_facts@1`. |
+| `schema_version` | `list_facts@2`. |
 | `generated_by` | The generator, repository-relative. |
-| `pipeline_version` | The version of the pipeline that wrote the artefact (`list_facts_pipeline@1`): the gate, confidence and rights checks and the three methods. Not the schema's version. |
+| `pipeline_version` | The version of the pipeline that wrote the artefact (`list_facts_pipeline@2`): the gate, confidence and rights checks and the methods below. Not the schema's version. |
 | `snapshot_date` | The register's reference date (`data_date`) both lists share. |
 | `birthday_reference` | A **model constant, not PESEL data**: with 365 equally likely days, the smallest n at which two of n people share a day with chance at least one half (23), and that chance, computed in exact rational arithmetic (0.507297234). |
+| `overlap` | The two lists' sets of surnames compared (below). |
 
 ### `source` — lineage, pinned to the registry
 
@@ -117,15 +133,80 @@ Same model. Ratios of binomials C(N − c, n) / C(N, n) = Π_{j<c}(1 − n/(N �
 | `reach_half[]` | For `TOP_1`, `TOP_10`, `TOP_100`, each exactly once (the list's 1, 10, 100 most common surnames, unnamed: the first k rows by count descending, file order breaking ties; a tie at the boundary cannot change any figure, because tied rows carry the same count): `share_of_people` = C_S / N, with C_S the people on the set; `n_half` = the smallest n whose unrounded chance 1 − C(N − C_S, n) / C(N, n) is ≥ 0.5; `p_at_n_half` = that chance, rounded. |
 | `example` | **An illustration, not a figure.** Seed = the list's room seed + 1000 (20261120 male, 20261121 female); `n` = 1000 people drawn as in the rooms; `distinct` surnames among them; `without_namesake` people whose surname appears once; `group_sizes` the sizes of the groups of two or more sharing a surname, largest first. `distinct = without_namesake + len(group_sizes)` and `n = without_namesake + Σ group_sizes`. |
 
+### Keys, selections and the floor (`list_facts@2`)
+
+- **Key.** Each row's `canonical_key_v2` (`canonicalKey` in `@name-atlas/resolver`: NFC, Unicode simple case folding, dash and apostrophe variants mapped to `-` and `'`, spaces trimmed and collapsed, NFC). Identity is the exact key, never a Polish fold: `ŁUCZAK` and `LUCZAK` are two surnames. The pipeline refuses a list on which two rows share a key.
+- **Published string.** The surname exactly as the source file spells it (`ŻMUDA-TRZEBIATOWSKA`), stored beside the key in every named selection.
+- **Selection order.** Count descending, ties by key in code-point order (not UTF-16 order, not the Polish alphabet).
+- **A named surname** is `{ key, published, count }` with `count ≥ NAMED_SURNAME_FLOOR` (20, `packages/contracts`). A rule's selection below the floor is stored as `null` (or left out of `named_top.items`); the generator never moves on to a further surname to find one above it.
+
+### `dots` — `list_dots@1`
+
+| Field | Definition |
+|---|---|
+| `histogram[]` | `{count, surnames}` for every distinct count on the list, ascending: `surnames` surnames have exactly `count` bearers. The surnames add up to `summary.surnames` and count × surnames to `summary.people`. Plate I draws one dot per surname from it; positions and sizes are presentation geometry. |
+
+### `concentration` — `list_concentration@1`
+
+| Field | Definition |
+|---|---|
+| `levels[]` | For q ∈ {0.1, 0.5, 0.9}, ascending: `surnames` = the smallest k such that the list's k most common surnames carry at least a share q of its people, decided in integers (`people_k × 1000 ≥ q‰ × N`), and `people` = those k surnames' people. A tie at the boundary cannot change k, since tied surnames carry the same count. |
+| `beyond_half` | `summary.surnames` less the q = 0.5 level's surnames: the surnames outside the set that carries half the people. |
+
+### `bands` — `list_bands@1`
+
+| Field | Definition |
+|---|---|
+| `ranges[]` | `{from, to, surnames, people}` for the bands 2, 3–9, 10–99, 100–999, 1000–9999 and 10 000+ bearers (`to` inclusive, `null` for no upper bound): the surnames whose count is in the band and their people. The bands add up to the list's surnames and people. |
+| `under_10` | The surnames with fewer than 10 bearers: the 2 and 3–9 bands' surnames, stored so that no page adds them. |
+
+### `endings` — `list_endings@1`
+
+| Field | Definition |
+|---|---|
+| `entries[]` | For each ending of the partition's fixed set, in order — male list `ski ak ek cki ik czyk uk ewicz owicz`, female list `ska ak ek cka ik czyk uk ewicz owicz` (`LIST_ENDINGS`) — the `surnames` whose key ends with it, their `people`, and `share_of_people` = people / N. An ending is written without its dash and matched on the key's last letters, so it counts a spelling, never an origin; the set is disjoint, so no surname counts twice. |
+
+### `initials` — `list_initials@1`
+
+| Field | Definition |
+|---|---|
+| `letters[]` | For each of `LIST_INITIAL_LETTERS` in order — the 32 letters of the Polish alphabet (A Ą B C Ć D E Ę F G H I J K L Ł M N Ń O Ó P R S Ś T U W Y Z Ź Ż), then Q, V and X — either `{letter, surnames, people}` (positive) for the surnames whose key's first letter is that letter in lower case, or `{letter, absent: true}` when no surname starts with it. The first letter is the key's first code point with any combining marks after it. An absent letter is never a count of zero. |
+| `top` | The letter with the most people (a tie goes to the earlier letter). |
+| `rarest_polish` | The letter of the Polish alphabet with the fewest people among the Polish letters present (a tie goes to the earlier letter). Q, V and X are not candidates. |
+| `outside` | `{surnames, people}` whose first letter is none of the 35 (for example `Á`, `Ç`, `Ö`, `İ`). With the letters present it adds up to the list. |
+
+### `hyphenated` — `list_hyphenated@1`
+
+| Field | Definition |
+|---|---|
+| `surnames`, `people` | The surnames whose key holds a hyphen (any dash variant maps to `-`; a space is not a hyphen), and their people. |
+| `top` | ADR-0018 `HYPHENATED_TOP`: the first of them in selection order, as a named surname, or `null` below the floor. |
+
+### `named_top` — `list_named_top@1`
+
+| Field | Definition |
+|---|---|
+| `items[]` | ADR-0018 `TOP_3`: the list's three most common surnames in selection order, those at or above the floor (so up to three). The first one's count is `summary.max_count`. |
+
+### `overlap` — `list_overlap@1` (artefact level)
+
+| Field | Definition |
+|---|---|
+| `male_only`, `both`, `female_only` | The keys on the male list only, on both lists, and on the female list only. `male_only + both` = the male list's surnames and `female_only + both` = the female list's. Counts of surnames, never of people. |
+| `on_both_top` | ADR-0018 `ON_BOTH_TOP`: the male list's first surname in selection order whose key is also on the female list, as `{key, male: {published, count}, female: {published, count}}`, each count on its own list; `null` unless both counts are at or above the floor. |
+| `one_list_top` | ADR-0018 `ONE_LIST_TOP`: `{male, female}`, each list's first surname in selection order whose key is not on the other list, as a named surname, or `null` below the floor. |
+
 ## Rules
 
-1. **Two lists, never merged.** Each list is computed from its own bytes. Nothing in the artefact, and nothing a consumer derives from it, adds, unions or compares the two lists into one number.
-2. **No surname strings.** The only strings are the fixed fields above (versions, ids, hashes, dates, the source URL, enum values). The pipeline drops the surname column straight after parsing.
+1. **Two lists, never merged.** Each list is computed from its own bytes. Nothing in the artefact, and nothing a consumer derives from it, adds or unions the two lists into one number. The only comparison is `overlap`, which the generator computes and which counts surnames, never people.
+2. **Surname strings only as named selections.** The only strings are the fixed fields above (versions, ids, hashes, dates, the source URL, enum values, endings and letters) and ADR-0018's named selections (`key` and `published`), each at or above the floor. The pipeline keeps each row's key and source string only for the methods that need the spelling and for those selections; no other method sees a surname.
 3. **Values are stored rounded to nine decimals, never to display precision.** Shares, probabilities and expectations are rounded with `Number(x.toFixed(9))` (as `shareOf`), `birthday_reference.p_at_n_half` by exact rational rounding half up. Counts are exact integers. Every decision against one half (`n_half` of the curve and of each reach set) is taken on the unrounded value; only the stored value is rounded. Display rounding (for example two decimals near one half, so 49.72% and 50.56% are not both "50%") is presentation and happens in the page.
 4. **Scope travels with every figure.** A page shows each figure with its list, its reference date and the published-list scope above.
 5. **Valid only for its SHA-pinned resources.** The artefact describes exactly the bytes named in `source.sha256`. A new resource version needs a new artefact; comparing two artefacts is a trend, and trends are out of scope.
 6. **Nothing is computed by the consumer.** The page formats stored values and lays them out; positions and scales are presentation geometry, never a new figure.
-7. **One set of model parameters.** Both lists are computed with the same parameters (crowd size, curve range, example rooms, crowd sizes, thresholds, quantiles), and the schema refuses an artefact where they differ. A consumer may therefore state a parameter once for both lists, but it still states each figure with its own list.
+7. **One set of model parameters.** Both lists are computed with the same parameters (crowd size, curve range, example rooms, crowd sizes, thresholds, quantiles, concentration q values, band edges), and the schema refuses an artefact where they differ. A consumer may therefore state a parameter once for both lists, but it still states each figure with its own list. The endings are the exception by design: each list has its partition's fixed set (`-ski`/`-cki` on the male list, `-ska`/`-cka` on the female list).
+8. **Every combined figure is stored.** Where a sentence needs a figure made from others (`under_10`, `beyond_half`, a share), the generator stores it; the page adds, subtracts and divides nothing.
+9. **A named surname is text.** A consumer shows `published` as text, never as a link to a surname page, and never frames it with origin, region or nationality (ADR-0018 §2.4–§2.5).
 
 ## Regenerating
 
@@ -135,6 +216,13 @@ pnpm truth:list-facts   # refuses, writing nothing, unless every check above pas
 ```
 
 The generator is deterministic: a second run over the same bytes writes a byte-identical file, formatted with the repository's Prettier configuration through Prettier's API. `@name-atlas/truth` declares `prettier` as a devDependency at the root's exact version, and the generated file's header records the version used. CI has no copy of the CSVs, so it cannot regenerate; it checks that the committed module parses, that its lineage equals the registry, that it is internally consistent, and that derivation over the `fixtures/pesel` excerpts is refused at the completeness gate (`packages/truth/src/list-facts/*.test.ts`).
+
+## Version history
+
+| Version | Pipeline | Change |
+|---|---|---|
+| `list_facts@1` | `list_facts_pipeline@1` | TASK-040, ADR-0015: `source`, `assessment`, `summary`, `collision`, `crowd` per list and `birthday_reference`. No surname string, no comparison of the two lists. |
+| `list_facts@2` | `list_facts_pipeline@2` | TASK-043, ADR-0018: every `list_facts@1` section and definition unchanged. Adds per list `dots` (`list_dots@1`), `concentration` (`list_concentration@1`), `bands` (`list_bands@1`), `endings` (`list_endings@1`), `initials` (`list_initials@1`), `hyphenated` (`list_hyphenated@1`) and `named_top` (`list_named_top@1`), and at artefact level `overlap` (`list_overlap@1`). Amends "Never both lists" (the surname-set comparison) and "Never a named surname" (the named selections at or above the floor of 20). A breaking change: `overlap` is a figure spanning both lists, and the named selections put surname strings in the artefact. |
 
 ## Compatibility
 

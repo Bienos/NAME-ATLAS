@@ -4,14 +4,26 @@ import {
   PESEL_NATIONAL_MALE_2026,
   PESEL_SOURCE,
 } from "@name-atlas/sources";
+import { LIST_ENDINGS, NAMED_SURNAME_FLOOR } from "@name-atlas/contracts";
 import type { ListFacts } from "@name-atlas/contracts";
+import { canonicalKey } from "@name-atlas/resolver";
 import { listFacts } from "./artefact.js";
 import { birthdayReference } from "./collision.js";
 import { LIST_FACTS_GENERATOR } from "./build.js";
 import {
+  LIST_BANDS_METHOD_VERSION,
   LIST_COLLISION_CURVE_MAX,
   LIST_COLLISION_METHOD_VERSION,
+  LIST_CONCENTRATION_METHOD_VERSION,
+  LIST_CONCENTRATION_QUANTILES,
+  LIST_COUNT_BANDS,
   LIST_CROWD_METHOD_VERSION,
+  LIST_DOTS_METHOD_VERSION,
+  LIST_ENDINGS_METHOD_VERSION,
+  LIST_HYPHENATED_METHOD_VERSION,
+  LIST_INITIALS_METHOD_VERSION,
+  LIST_NAMED_TOP_METHOD_VERSION,
+  LIST_OVERLAP_METHOD_VERSION,
   LIST_CROWD_SEED_OFFSET,
   LIST_CROWD_SIZE,
   LIST_CROWD_SIZES,
@@ -27,9 +39,9 @@ import {
 } from "../version.js";
 
 /**
- * The committed artefact (TASK-040 AC-04). CI has no copy of the official
- * files, so it cannot regenerate the artefact; it checks instead that the
- * committed one parses, is pinned to the registry's resources and is
+ * The committed artefact (TASK-040 AC-04, TASK-043 AC-01). CI has no copy of
+ * the official files, so it cannot regenerate the artefact; it checks instead
+ * that the committed one parses, is pinned to the registry's resources and is
  * internally consistent.
  */
 
@@ -178,6 +190,76 @@ describe.each(lists)("the %s list", (_key, list: ListFacts, descriptor) => {
   });
 });
 
+describe.each(lists)("the %s list, list_facts@2 sections", (_key, list: ListFacts) => {
+  it("carries each new section's method version and the shared parameters", () => {
+    expect(list.dots.method_version).toBe(LIST_DOTS_METHOD_VERSION);
+    expect(list.concentration.method_version).toBe(LIST_CONCENTRATION_METHOD_VERSION);
+    expect(list.bands.method_version).toBe(LIST_BANDS_METHOD_VERSION);
+    expect(list.endings.method_version).toBe(LIST_ENDINGS_METHOD_VERSION);
+    expect(list.initials.method_version).toBe(LIST_INITIALS_METHOD_VERSION);
+    expect(list.hyphenated.method_version).toBe(LIST_HYPHENATED_METHOD_VERSION);
+    expect(list.named_top.method_version).toBe(LIST_NAMED_TOP_METHOD_VERSION);
+    expect(list.concentration.levels.map((l) => l.q)).toEqual(LIST_CONCENTRATION_QUANTILES);
+    expect(list.bands.ranges.map(({ from, to }) => ({ from, to }))).toEqual(LIST_COUNT_BANDS);
+    expect(list.endings.entries.map((e) => e.ending)).toEqual(LIST_ENDINGS[list.partition]);
+  });
+
+  it("dots, bands and summary describe the same counts", () => {
+    const { dots, bands, summary } = list;
+    expect(dots.histogram[0]!.count).toBe(summary.min_count);
+    expect(dots.histogram.at(-1)!.count).toBe(summary.max_count);
+    const twos = dots.histogram.find((d) => d.count === 2)!;
+    expect(bands.ranges[0]).toEqual({
+      from: 2,
+      to: 2,
+      surnames: twos.surnames,
+      people: 2 * twos.surnames,
+    });
+    const atLeast10 = summary.thresholds.find((t) => t.at_least === 10)!;
+    expect(bands.under_10).toBe(summary.surnames - atLeast10.surnames);
+  });
+
+  it("names only ADR-0018 selections, each at or above the floor, keyed by canonical_key_v2", () => {
+    const selections = [
+      ...list.named_top.items,
+      ...(list.hyphenated.top ? [list.hyphenated.top] : []),
+    ];
+    expect(list.named_top.items).toHaveLength(3);
+    for (const selection of selections) {
+      expect(selection.count).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
+      expect(selection.key).toBe(canonicalKey(selection.published));
+    }
+    expect(list.named_top.items[0]!.count).toBe(list.summary.max_count);
+    expect(list.hyphenated.top?.key).toContain("-");
+  });
+
+  it("the top letter and the rarest Polish letter are present on the list", () => {
+    const byLetter = new Map(list.initials.letters.map((l) => [l.letter, l]));
+    expect("absent" in byLetter.get(list.initials.top)!).toBe(false);
+    expect("absent" in byLetter.get(list.initials.rarest_polish)!).toBe(false);
+  });
+});
+
+describe("the overlap of the two lists (ADR-0018 §2.3)", () => {
+  const { overlap } = artefact;
+  const { male, female } = artefact.lists;
+
+  it("adds up to each list's own surnames, and names only selections at or above the floor", () => {
+    expect(overlap.method_version).toBe(LIST_OVERLAP_METHOD_VERSION);
+    expect(overlap.male_only + overlap.both).toBe(male.summary.surnames);
+    expect(overlap.female_only + overlap.both).toBe(female.summary.surnames);
+    const top = overlap.on_both_top!;
+    expect(top.male.count).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
+    expect(top.female.count).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
+    expect(top.key).toBe(canonicalKey(top.male.published));
+    expect(top.key).toBe(canonicalKey(top.female.published));
+    for (const selection of [overlap.one_list_top.male!, overlap.one_list_top.female!]) {
+      expect(selection.count).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
+      expect(selection.key).toBe(canonicalKey(selection.published));
+    }
+  });
+});
+
 describe("the two lists stay two universes", () => {
   const { male, female } = artefact.lists;
 
@@ -202,8 +284,8 @@ describe("the two lists stay two universes", () => {
   });
 });
 
-describe("no surname string can be in the artefact", () => {
-  it("holds strings only at the contract's fixed, non-surname fields", () => {
+describe("surname strings are only ADR-0018's named selections", () => {
+  it("holds strings only at the contract's fixed fields", () => {
     const paths = new Set<string>();
     const walk = (value: unknown, at: string): void => {
       if (typeof value === "string") paths.add(at);
@@ -230,6 +312,21 @@ describe("no surname string can be in the artefact", () => {
       "crowd.method_version",
       "crowd.model",
       "crowd.reach_half[].set",
+      "dots.method_version",
+      "concentration.method_version",
+      "bands.method_version",
+      "endings.method_version",
+      "endings.entries[].ending",
+      "initials.method_version",
+      "initials.letters[].letter",
+      "initials.top",
+      "initials.rarest_polish",
+      "hyphenated.method_version",
+      "hyphenated.top.key",
+      "hyphenated.top.published",
+      "named_top.method_version",
+      "named_top.items[].key",
+      "named_top.items[].published",
     ];
     expect([...paths].sort()).toEqual(
       [
@@ -239,6 +336,14 @@ describe("no surname string can be in the artefact", () => {
         "snapshot_date",
         ...perList.map((p) => `lists.male.${p}`),
         ...perList.map((p) => `lists.female.${p}`),
+        "overlap.method_version",
+        "overlap.on_both_top.key",
+        "overlap.on_both_top.male.published",
+        "overlap.on_both_top.female.published",
+        "overlap.one_list_top.male.key",
+        "overlap.one_list_top.male.published",
+        "overlap.one_list_top.female.key",
+        "overlap.one_list_top.female.published",
       ].sort(),
     );
   });
