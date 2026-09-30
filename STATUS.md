@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, to record that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, by the CI trigger change: a push runs CI on `main` only, and every other branch is verified through its pull request (`docs/progress/2026-09-30-ci-push-main-only.md`). Before it, #28 recorded that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
 
 ## Production
 
@@ -36,10 +36,11 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
+Two (checked 2026-09-30): one from `claude/funny-bardeen-f4jbay`, which carries the CI trigger change and this rewrite, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. The last STATUS correction was merged in #28, the family surnames draft in #27, TASK-039 in #26, TASK-038 in #25.
 
 ## Blocked on the project owner
 
+- **GitHub Actions runs no jobs.** Since 05:53 UTC on 2026-09-30 no job has been given a runner, on any branch, `main` included. Each one fails within seconds and leaves no log. This repository used about 1,780 billable minutes from 2026-09-18 to 2026-09-30. That is below GitHub Free's 2,000 for private repositories, so the cause is not confirmed. It may be other private repositories on the account, or a spending-limit or payment block. The failed run's page and the account's billing settings show the reason. Until it is fixed, no pull request can pass CI. #28 was merged red at the project owner's instruction.
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
@@ -49,7 +50,7 @@ One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked
   - `claude/share-card-not-derived-wording` (#24)
   - `claude/jolly-faraday-uas99n` (#25)
   - `claude/teryt-localities-import` (#26)
-  - `claude/funny-bardeen-f4jbay` (#27). It also carries #28, so delete it once #28 is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
+  - `claude/funny-bardeen-f4jbay` (#27, #28). It also carries the CI trigger change above, so delete it once that is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
