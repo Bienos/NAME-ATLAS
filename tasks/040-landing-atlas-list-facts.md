@@ -1,6 +1,6 @@
 # TASK-040 — Landing atlas, part 1: statistics about each whole published list, in three plates
 
-- **Status:** IN PROGRESS (2026-09-30). The verification actually run will be recorded in `docs/progress/2026-09-30-landing-atlas-list-facts.md`.
+- **Status:** IMPLEMENTED AND VERIFIED (2026-09-30), not yet merged. The verification actually run is in `docs/progress/2026-09-30-landing-atlas-list-facts.md`; `pnpm db:migrate`, `test:integration` and `test:golden` were not run here (no PostGIS), and CI runs them.
 - **Requested by:** the project owner, in the session that produced the "Atlas nazwisk" mock-up.
   - The request: "the main landing page is going to be all about like putting your surname in … but like on the main website, I will also like have some sort of like designed … interesting facts, like a general information about like the current state of the … surnames … so something general in terms of like the overall number … Think about it first … and then apply these changes."
   - After reviewing an 11-plate mock-up: "go ahead" (2026-09-30).
