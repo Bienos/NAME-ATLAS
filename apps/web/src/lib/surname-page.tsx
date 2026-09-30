@@ -20,6 +20,7 @@ import { Result } from "./result-view.js";
 import { SearchForm } from "./search-form.js";
 import { ShareButton } from "./share-button.js";
 import { NamePrint } from "./name-print.js";
+import { SiteFooter } from "./site-footer.js";
 
 /**
  * The canonical surname page (TASK-024, ADR-0009), shared by
@@ -327,7 +328,7 @@ export function CanonicalSurnamePage({
         // this branch exists only to keep the union exhaustive.
         null}
       </main>
-      <footer lang={htmlLang(lang)}>{t.footer}</footer>
+      <SiteFooter lang={lang} />
     </>
   );
 }

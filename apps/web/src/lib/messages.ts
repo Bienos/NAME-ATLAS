@@ -883,6 +883,17 @@ export const UI = {
       "Wydań z 2019 r. nie pokazujemy: ich opis nie mówi, że to osoby żyjące i nazwisko " +
       "aktualne, więc zmiana od nich mogłaby być zmianą definicji. Pokazujemy, co się " +
       "zmieniło, nie dlaczego.",
+    contactLink: "Kontakt",
+    contactHeading: "Kontakt",
+    contactIntro: "Name Atlas prowadzi jedna osoba. Napisz na adres:",
+    contactTopicsLead: "Napisz, jeśli:",
+    contactTopics: [
+      "liczba, znaczenie lub źródło na stronie nazwiska jest błędne albo czegoś brakuje (podaj nazwisko i, jeśli możesz, źródło);",
+      "chcesz skorzystać z praw dotyczących danych osobowych albo zgłosić naruszenie praw do źródła;",
+      "znalazłeś problem z bezpieczeństwem strony.",
+    ],
+    contactNoPromise:
+      "Czytamy każdą wiadomość, ale nie obiecujemy terminu odpowiedzi. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.",
     footer:
       "Każda liczba pochodzi z rejestru PESEL i jest podana razem z zakresem zbioru, datą i źródłem. Brak danych jest podany jako brak, nigdy jako zero.",
   },
@@ -1228,6 +1239,17 @@ export const UI = {
       "The 2019 editions are left out: their description does not say that they cover living " +
       "persons by their current surname, so a change from them could be a change of " +
       "definition. We show what changed, not why.",
+    contactLink: "Contact",
+    contactHeading: "Contact",
+    contactIntro: "Name Atlas is run by one person. Write to:",
+    contactTopicsLead: "Write if:",
+    contactTopics: [
+      "a figure, meaning or source on a surname page is wrong or missing (name the surname and, if you can, the source);",
+      "you want to exercise your rights over personal data, or report a breach of a source's rights;",
+      "you have found a security problem with the site.",
+    ],
+    contactNoPromise:
+      "Every message is read, but no reply time is promised. A report of an error does not change the page at once: the source is checked first.",
     footer:
       "Every number comes from the PESEL register and is shown with its dataset scope, date and source. Missing data is stated as missing, never as zero.",
   },
