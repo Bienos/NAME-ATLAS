@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by landing TASK-041's `ops/vm/extras.sh` and the workflow's `extras` step on `main` (`docs/progress/2026-09-30-teryt-and-buryan-on-the-vm.md`).
+**Last rewritten:** 2026-09-30, by specifying the five launch hygiene tasks, TASK-046–050 (`docs/progress/2026-09-30-launch-hygiene-tasks.md`).
 
 ## Production
 
@@ -23,6 +23,7 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 ## Next
 
 - **When GitHub Actions works again (the owner expects it on 2026-10-01):** one `Register VM` run of `status` on `main`, to read the finalize and extras markers, the counts and the stored password's connection step from the VM.
+- **Launch hygiene, TASK-046–050** (specified 2026-09-30, none started): privacy notice and terms pages (046), a published contact address and `security.txt` (047), security headers and a CSP (048), an encrypted off-host database backup with one restore drill (049), and a report-a-problem link (050). Each needs an owner answer before it can merge: the controller's name and address (046), the contact address (046, 047, 050), nonces or not for the CSP (048), the backup destination and key (049), the channel (050). The VM's dumps have never been restored and none is off the VM.
 - **The trend feature** ("how a surname changed"): not written. The editions are loaded; the feature needs a claim type, a contract change, an ADR and a page section, and ADR-0019 §2.2 to be amended for 2019. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`; the load's record). There is no 2022 women's edition: resource 38772 is the 2021 data.
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`). Approved in scope by the project owner on 2026-09-30, unnumbered and unscheduled. Its §4 leaves two preconditions to confirm in preflight. Release is gated on a privacy sign-off (its §13 U-6).
