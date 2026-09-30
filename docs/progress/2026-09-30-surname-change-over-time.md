@@ -1,6 +1,6 @@
-# 2026-09-30 — TASK-046: each surname page shows how its count changed across the editions of its list
+# 2026-09-30 — TASK-051: each surname page shows how its count changed across the editions of its list
 
-Scope authority: `tasks/046-surname-change-over-time.md`. Decision: `docs/adr/0020-surname-change-over-time.md` (Proposed; accepted when the owner merges this change). Requested by the project owner: "build the change over time section". The same session recorded "approve poona" as D-021 item 1, option (b) (`docs/DECISIONS_NEEDED.md`, its own commit); that decision is not part of this record.
+Scope authority: `tasks/051-surname-change-over-time.md`. Decision: `docs/adr/0020-surname-change-over-time.md` (Proposed; accepted when the owner merges this change). Requested by the project owner: "build the change over time section". The same session recorded "approve poona" as D-021 item 1, option (b) (`docs/DECISIONS_NEEDED.md`, its own commit); that decision is not part of this record.
 
 ## What changed
 
@@ -11,7 +11,7 @@ Scope authority: `tasks/046-surname-change-over-time.md`. Decision: `docs/adr/00
 - **Read and contract**: `readDistributionShift` (text comparison on the claim type); `surname-result` 1.7 with the nullable `change` section and its refinements (`docs/contracts/surname-result.md`); `querySurnameResult` returns `READY`, `UNAVAILABLE` (`NO_CHANGE_DERIVED`, or the population's own reason where the surname has no count) or `RIGHTS_BLOCKED`, the men's list first.
 - **Page**: chapter 04 "Zmiany w czasie" / "Change over time" between the map and the meaning, PL and EN: a sentence (what changed, between which editions, and what the whole list did over the same two), a table per list (date, share of that edition's list as a bar and "1 in X", count), the `NOT_ON_LIST` and gap rows, the 2019 note; `?intent=change`. Hidden where there is no claim. `sections.ts` registers it.
 - **VM**: `ops/vm/shift.sh` (`start`: unpack, record what the gate must find unchanged, migrate, start the batch in the unit `name-atlas-shift-batch`; `finish`: the gate, grants, `VACUUM ANALYZE`, a dump), the workflow's `shift` and `shift-finish` steps, `status.sh` lines, `ops/vm/README.md`.
-- Records: ADR-0020, TASK-046, `docs/contracts/surname-result.md`, `docs/CODEMAP.md`, `STATUS.md`.
+- Records: ADR-0020, TASK-051, `docs/contracts/surname-result.md`, `docs/CODEMAP.md`, `STATUS.md`.
 - Existing tests touched only to follow the contract: fixtures at schema 1.7 with a `change` section; four integration test files' expected schema version; the expected `claim_type` list; the migration lists.
 
 ## Verified

@@ -304,7 +304,7 @@ export const LIST_COUNT_BANDS: readonly { readonly from: number; readonly to: nu
 export const BIRTHDAY_REFERENCE_DAYS = 365;
 
 /**
- * `SURNAME_DISTRIBUTION_SHIFT` (TASK-046, ADR-0020): a surname's national count
+ * `SURNAME_DISTRIBUTION_SHIFT` (TASK-051, ADR-0020): a surname's national count
  * across the editions of one published list. Bumped when the points, the
  * denominator, the rounding or the lineage change; a new version is a new claim
  * key, so the old claim is superseded and never rewritten.

@@ -1,6 +1,6 @@
 /**
  * `SURNAME_DISTRIBUTION_SHIFT`: a surname's national count across the editions
- * of one published list (TASK-046, ADR-0020).
+ * of one published list (TASK-051, ADR-0020).
  *
  * Two layers. `buildShift` is pure: given the editions a list has, which of
  * them are loaded, and the surname's value on each, it returns the points, the

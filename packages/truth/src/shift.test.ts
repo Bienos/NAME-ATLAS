@@ -12,7 +12,7 @@ import {
 import type { EditionValueRow, LoadedEdition, ShiftEditions } from "./shift.js";
 
 /**
- * TASK-046: the pure half of `SURNAME_DISTRIBUTION_SHIFT`. The database half is
+ * TASK-051: the pure half of `SURNAME_DISTRIBUTION_SHIFT`. The database half is
  * `tests/integration/src/distribution-shift.test.ts`.
  */
 

@@ -23,7 +23,7 @@ import type { ShiftEdition, ShiftEditionSet } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
- * TASK-046 — the `SURNAME_DISTRIBUTION_SHIFT` chain against a real PostgreSQL.
+ * TASK-051 — the `SURNAME_DISTRIBUTION_SHIFT` chain against a real PostgreSQL.
  *
  * GENUINE: the four 2026 resources come from the committed fixtures through
  * TASK-004's importer, and the surnames and the population claim are derived

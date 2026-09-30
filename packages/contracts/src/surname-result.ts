@@ -8,7 +8,7 @@
  *
  * Scope grew one fact at a time and still carries no field whose only purpose
  * is a later task (`AGENTS.md` §6). TASK-006 added `population`, TASK-014
- * `rarity`, TASK-012 `distribution`, TASK-016 `suggestions` and TASK-046 `change`; there is still no chapter framework, no
+ * `rarity`, TASK-012 `distribution`, TASK-016 `suggestions` and TASK-051 `change`; there is still no chapter framework, no
  * pagination and no placeholder for a fact that has no truth chain behind it.
  *
  * ── One recorded deviation ──────────────────────────────────────────────
@@ -202,7 +202,7 @@ export const raritySectionSchema = z
 
 /**
  * `SURNAME_DISTRIBUTION_SHIFT` — one surname's count on the editions of one
- * list (TASK-046, ADR-0020).
+ * list (TASK-051, ADR-0020).
  *
  * A point is one edition. A `KNOWN` point carries the count and the edition's
  * own published total of people, so one in X is over that edition's total and
@@ -338,7 +338,7 @@ export const changeEntrySchema = z
 
 /**
  * The change-over-time chapter: one entry per list the surname is on at two
- * or more stored editions (TASK-046). `UNAVAILABLE` says why — fewer than two
+ * or more stored editions (TASK-051). `UNAVAILABLE` says why — fewer than two
  * editions, not derived yet — and is never an empty chart.
  */
 export const changeSectionSchema = z
@@ -662,7 +662,7 @@ export const surnameResultResponseSchema = z
      */
     meaning: meaningSectionSchema.nullable(),
     /**
-     * Added in 1.7 (TASK-046, ADR-0020). Present exactly when RESOLVED, like the
+     * Added in 1.7 (TASK-051, ADR-0020). Present exactly when RESOLVED, like the
      * other fact sections, and stating its own absence (`NOT_ENOUGH_EDITIONS`,
      * `NOT_DERIVED_YET`) rather than being omitted.
      */

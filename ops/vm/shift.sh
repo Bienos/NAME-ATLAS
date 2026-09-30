@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Derives every surname's change over time on the database VM (TASK-046,
+# Derives every surname's change over time on the database VM (TASK-051,
 # ADR-0020): the migration that adds the claim type, then the batch that writes
 # one SURNAME_DISTRIBUTION_SHIFT claim per surname and list, then a gate.
 #
@@ -109,7 +109,7 @@ start)
   runuser -u "$BUILD_USER" -- rm -f "$BATCH_DONE"
   rm -f "$DONE"
   cat >/etc/systemd/system/$UNIT.service <<UNITFILE
-# Written by ops/vm/shift.sh (TASK-046). Do not edit by hand.
+# Written by ops/vm/shift.sh (TASK-051). Do not edit by hand.
 [Unit]
 Description=Name Atlas: derive every surname's change over time
 After=postgresql@17-main.service

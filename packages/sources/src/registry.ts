@@ -199,7 +199,7 @@ export interface PeselResourceDescriptor {
   readonly header?: string;
   /**
    * The sum of every count in the official file: the edition's published total
-   * of people (TASK-046), pinned from the file's bytes on 2026-09-30. A trend
+   * of people (TASK-051), pinned from the file's bytes on 2026-09-30. A trend
    * needs it as the denominator of one in X, and cannot sum stored rows for an
    * edition, which keeps only the surnames the current register has (TASK-045).
    * National resources only.

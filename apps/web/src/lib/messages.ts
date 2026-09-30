@@ -338,7 +338,7 @@ export function changeListLabel(list: ChangeEntry["list"], lang: Lang): string {
 }
 
 /**
- * The accepted change sentence (TASK-046, ADR-0020): what changed, between which
+ * The accepted change sentence (TASK-051, ADR-0020): what changed, between which
  * two editions, and what the whole list did over the same editions. Never why,
  * and never a word of popularity, decline or fashion — a number went from one
  * value to another, and the list it is counted in moved too.

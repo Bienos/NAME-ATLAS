@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Batch derivation of `SURNAME_DISTRIBUTION_SHIFT` over the register (TASK-046).
+ * Batch derivation of `SURNAME_DISTRIBUTION_SHIFT` over the register (TASK-051).
  *
  *   pnpm truth:derive-shift [--limit N] [--concurrency C] [--recheck]
  *

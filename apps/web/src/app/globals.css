@@ -2032,7 +2032,7 @@ main.profile .search {
   white-space: nowrap;
 }
 
-/* The change table (TASK-046) wears the voivodeship table's bars. Its value
+/* The change table (TASK-051) wears the voivodeship table's bars. Its value
    reads "1 in 1,167", which needs more room than a percentage, and its rows for
    an edition without the surname, or a publisher's duplicate, are plain words. */
 /* Each list takes the chapter's full width until two of them fit at a readable one:

@@ -1,6 +1,6 @@
 # ADR-0020 — a surname's count may be shown across the editions of its list, as one derived claim per list
 
-- **Status:** Proposed. It is accepted when the project owner merges TASK-046's pull request.
+- **Status:** Proposed. It is accepted when the project owner merges TASK-051's pull request.
 - **Date:** 2026-09-30
 - **Deciders:** the project owner, 2026-09-30: "build the change over time section" (the session had offered it as the first product step after the register reached production), and, the same evening, that the 2019 lists describe living persons ("no use it is is living persona").
 - **Relates to:** ADR-0019 (the list-scope comparison of editions), ADR-0007 (rights), ADR-0004 (the unit of a count), `docs/canonical/14` §13.5 (`SURNAME_DISTRIBUTION_SHIFT`), TASK-025 (comparisons refuse different dates), TASK-045 (the editions are loaded).

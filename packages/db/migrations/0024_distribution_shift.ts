@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * `SURNAME_DISTRIBUTION_SHIFT` (TASK-046, ADR-0020).
+ * `SURNAME_DISTRIBUTION_SHIFT` (TASK-051, ADR-0020).
  *
  * One enum value: `claim_type` gains `SURNAME_DISTRIBUTION_SHIFT`, the claim
  * `docs/canonical/14` §13.5 names for how a surname's distribution moved. Here

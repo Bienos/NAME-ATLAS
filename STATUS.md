@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-046, the change-over-time section, and D-021's item 1 (`docs/progress/2026-09-30-surname-change-over-time.md`).
+**Last rewritten:** 2026-09-30, by TASK-051, the change-over-time section, and D-021's item 1 (`docs/progress/2026-09-30-surname-change-over-time.md`).
 
 ## Production
 
@@ -16,14 +16,14 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–046 (TASK-046 is built and not yet merged or run on the VM), plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
+- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–046 (TASK-051 is built and not yet merged or run on the VM), plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
 - Ahead of `PLAN.md`'s milestone order: the async runtime (TASK-020), rights per asset and surface (TASK-021), the meaning chain (TASK-022), slugs and the sitemap (TASK-027), `pnpm coverage:report`, the visual system, evidence linked to the source's website (ADR-0012), and the landing atlas's seven plates (TASK-040, 043, 044; ADR-0018, ADR-0019).
-- Local suite on the TASK-046 branch, rebased onto `main` @ `107ff65`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0; `test:integration` (27 files, 328 tests) and `test:golden` (4 files, 364 tests) passed against a local PostgreSQL 16.
+- Local suite on the TASK-051 branch, rebased onto `main` @ `107ff65`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0; `test:integration` (27 files, 328 tests) and `test:golden` (4 files, 364 tests) passed against a local PostgreSQL 16.
 
 ## Next
 
 - **When GitHub Actions works again (the owner expects it on 2026-10-01):** one `Register VM` run of `status` on `main`, to read the finalize and extras markers, the counts and the stored password's connection step from the VM.
-- **The change-over-time section** (TASK-046, ADR-0020): built and not merged. Once it is on `main` and the VM is reachable: `Register VM` `shift` (migration, then the batch starts), `status` until `shift batch complete: yes` (about 830,000 claims, hours; not measured), `shift-finish` (the gate), then the web deploy, in that order. Until then production shows no such chapter. The landing's Plate VII still reads 2020–2026 while the surname page reads 2019–2026; ADR-0019 §2.2 needs amending for 2019 there. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`; the load's record). There is no 2022 women's edition: resource 38772 is the 2021 data.
+- **The change-over-time section** (TASK-051, ADR-0020): built and not merged. Once it is on `main` and the VM is reachable: `Register VM` `shift` (migration, then the batch starts), `status` until `shift batch complete: yes` (about 830,000 claims, hours; not measured), `shift-finish` (the gate), then the web deploy, in that order. Until then production shows no such chapter. The landing's Plate VII still reads 2020–2026 while the surname page reads 2019–2026; ADR-0019 §2.2 needs amending for 2019 there. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`; the load's record). There is no 2022 women's edition: resource 38772 is the 2021 data.
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`). Approved in scope by the project owner on 2026-09-30, unnumbered and unscheduled. Its §4 leaves two preconditions to confirm in preflight. Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task.** Not written. Blocked on D-021 item 4 only: item 1 was resolved on 2026-09-30 as option (b), which is the session's reading of the owner's "approve poona" and stands until the owner says otherwise. TASK-031's record (`docs/sources/polona.md`) holds what the task needs.

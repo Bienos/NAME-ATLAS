@@ -422,7 +422,7 @@ function ChangeTable({ entry, lang }: { entry: ChangeEntry; lang: Lang }) {
 }
 
 /**
- * The change chapter (TASK-046, ADR-0020): per list, the sentence, then the
+ * The change chapter (TASK-051, ADR-0020): per list, the sentence, then the
  * table, then the notes a reader needs next to it. Not shown where there is no
  * claim, which is most surnames until they are on two editions of a list: an
  * absence is not a chapter.

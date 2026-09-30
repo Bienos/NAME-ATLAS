@@ -737,7 +737,7 @@ export async function readSurnameMeaning(
   }));
 }
 
-/** One persisted `SURNAME_DISTRIBUTION_SHIFT` claim: a surname's count across one list's editions (TASK-046). */
+/** One persisted `SURNAME_DISTRIBUTION_SHIFT` claim: a surname's count across one list's editions (TASK-051). */
 export interface PersistedDistributionShift {
   readonly claim_id: string;
   readonly claim_key: string;

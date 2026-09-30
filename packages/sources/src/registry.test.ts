@@ -620,7 +620,7 @@ describe("the editions (TASK-045)", () => {
   });
 });
 
-describe("the editions a trend reads (TASK-046, ADR-0020)", () => {
+describe("the editions a trend reads (TASK-051, ADR-0020)", () => {
   const PEOPLE = {
     national_male: [
       ["18990", 19_859_783],

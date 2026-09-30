@@ -1,7 +1,7 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-046 / ADR-0020 (`change`, 1.7), 2026-09-30
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-051 / ADR-0020 (`change`, 1.7), 2026-09-30
 - **Schema version:** `1.7` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
@@ -274,7 +274,7 @@ and a below-threshold entry says so **before** any figure:
 
 ## Accepted rendering of a change entry
 
-Decided with TASK-046 (2026-09-30, ADR-0020 §2.5). It says what changed between the first and the last known edition and what the whole list did over the same two, with each change signed; it never says why, and uses no word of popularity, decline or fashion:
+Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between the first and the last known edition and what the whole list did over the same two, with each change signed; it never says why, and uses no word of popularity, decline or fashion:
 
 - EN: `The number of people with the surname {surname} ({sex}) in the PESEL register changed from {a} on {date} to {b} on {date}: {change}. The whole list changed by {list} between those editions.` — e.g. *… changed from 101,473 on 30 June 2019 to 98,859 on 22 January 2025: −2.6%. The whole list changed by +6.2% between those editions.*
 - PL: `Liczba osób o nazwisku {surname} ({sex}) w rejestrze PESEL zmieniła się z {a} na dzień {date} na {b} na dzień {date}: {change}. Cała lista zmieniła się między tymi edycjami o {list}.`
@@ -298,7 +298,7 @@ Decided with TASK-046 (2026-09-30, ADR-0020 §2.5). It says what changed between
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
 
-**1.6 → 1.7 (2026-09-30, TASK-046, ADR-0020).** Adds the `change` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule the other fact sections follow. A consumer written against 1.6 is unaffected; a producer must now supply it. The section is `UNAVAILABLE` with `reason_code = NO_CHANGE_DERIVED` for a surname with no claim. That code does not say why: a surname on one edition only and a surname the batch has not reached look the same to the request path, which derives nothing.
+**1.6 → 1.7 (2026-09-30, TASK-051, ADR-0020).** Adds the `change` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule the other fact sections follow. A consumer written against 1.6 is unaffected; a producer must now supply it. The section is `UNAVAILABLE` with `reason_code = NO_CHANGE_DERIVED` for a surname with no claim. That code does not say why: a surname on one edition only and a surname the batch has not reached look the same to the request path, which derives nothing.
 
 **1.5 → 1.6 (2026-09-24, ADR-0012).** One additive field, required and nullable. `citation.source_page_url` carries the source registry's `homepage_or_reference_url`: the public page of the source a record was taken from, which for PESEL is the dataset's page on dane.gov.pl. `url` is unchanged and stays the exact resource retrieved, which for a dataset is a file download. The page links a reader to `source_page_url`, because the surname page now points at the source's own website instead of showing a per-claim evidence panel (ADR-0012). A consumer written against 1.5 is unaffected; a producer must now supply it.
 

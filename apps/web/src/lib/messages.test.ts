@@ -625,7 +625,7 @@ describe("UI strings", () => {
   });
 });
 
-describe("formatPercentChange (TASK-046)", () => {
+describe("formatPercentChange (TASK-051)", () => {
   it("writes a stored change with its sign, one decimal and a true minus", () => {
     expect(formatPercentChange(6, "en")).toBe("+6.0%");
     expect(formatPercentChange(6, "pl")).toBe("+6,0%");
@@ -640,7 +640,7 @@ describe("formatPercentChange (TASK-046)", () => {
   });
 });
 
-describe("changeSentence and its notes (TASK-046, ADR-0020)", () => {
+describe("changeSentence and its notes (TASK-051, ADR-0020)", () => {
   // SYNTHETIC figures, as in the contract tests.
   const entry = (firstCount: number, lastCount: number, count: number, list: number): ChangeEntry =>
     ({

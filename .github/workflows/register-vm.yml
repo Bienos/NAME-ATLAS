@@ -14,7 +14,7 @@ name: Register VM
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
 #   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
 #   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
-#   shift          ops/vm/shift.sh start (TASK-046): migrate, then start the change-over-time batch and return
+#   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #
 # provision, status, finalize, editions, extras and shift-finish end by connecting the way the web app does.

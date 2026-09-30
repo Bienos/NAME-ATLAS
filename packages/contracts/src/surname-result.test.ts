@@ -654,7 +654,7 @@ describe("error envelope (docs/canonical/16 §78)", () => {
   });
 });
 
-describe("change over time (TASK-046, ADR-0020; schema 1.7)", () => {
+describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
   // Synthetic two-edition list, arithmetic checkable by eye: 100 of 1,000 is one in 10.
   const KNOWN_2019 = {
     status: "KNOWN" as const,

@@ -1065,7 +1065,7 @@ describe("the profile layout", () => {
 });
 
 /**
- * TASK-046, ADR-0020: the change-over-time chapter, from the contract alone.
+ * TASK-051, ADR-0020: the change-over-time chapter, from the contract alone.
  *
  * The counts and list totals below are SYNTHETIC, chosen so the arithmetic is
  * checkable by eye (a count of 100 on a list of 1,000 is one in 10). The
@@ -1151,7 +1151,7 @@ const CHANGE_READY = withChange({
   surface: SURFACE,
 });
 
-describe("TASK-046: the change-over-time chapter", () => {
+describe("TASK-051: the change-over-time chapter", () => {
   it("renders, in Polish, what changed between the first and last edition and what the list did", () => {
     const body = text(render(CHANGE_READY, "pl"));
     expect(body).toContain("Zmiany w czasie");

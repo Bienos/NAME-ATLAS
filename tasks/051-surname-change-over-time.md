@@ -1,4 +1,4 @@
-# TASK-046 — Each surname page shows how its count changed across the editions of its list
+# TASK-051 — Each surname page shows how its count changed across the editions of its list
 
 - **Status:** BUILT 2026-09-30 on `claude/inspiring-bohr-vten7x`, on the merged `main`; awaiting the owner's merge. Not yet run on the VM (AC-7). The record is in `docs/progress/2026-09-30-surname-change-over-time.md`.
 - **Requested by:** the project owner, 2026-09-30: "build the change over time section". The same evening: the 2019 lists are living persons.

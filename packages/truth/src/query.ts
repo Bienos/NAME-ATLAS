@@ -378,7 +378,7 @@ function toDistributionEntry(claim: PersistedCurrentDistribution): DistributionE
 }
 
 /**
- * Projects one persisted change claim into the contract's shape (TASK-046).
+ * Projects one persisted change claim into the contract's shape (TASK-051).
  *
  * The stored payload carries the row ids each point was read from; they are
  * lineage, not something a reader needs, and stay behind. Every figure here

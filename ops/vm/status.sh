@@ -25,7 +25,7 @@ if systemctl cat "$UNIT" >/dev/null 2>&1; then
 else
   echo "not started"
 fi
-# The change-over-time batch (TASK-046), when it has been started.
+# The change-over-time batch (TASK-051), when it has been started.
 SHIFT_UNIT=name-atlas-shift-batch
 if systemctl cat "$SHIFT_UNIT" >/dev/null 2>&1; then
   echo
