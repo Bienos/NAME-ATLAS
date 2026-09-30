@@ -95,3 +95,7 @@ export type { LinedRow, SliceSpec } from "./slice.js";
 // Polona (Biblioteka Cyfrowa Polona) — TASK-031 source spike: a pure,
 // fail-closed parser for the captured response shapes. No database, no network.
 export * from "./polona/index.js";
+
+// Source catalogue — TASK-038: every researched source as a registry row,
+// seeded idempotently. Registry data only; it fetches and ingests nothing.
+export * from "./catalogue/index.js";
