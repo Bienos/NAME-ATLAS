@@ -1,7 +1,7 @@
 /**
- * `list_facts_pipeline@1` — from the bytes of one published national list to
- * its validated facts, and from the two lists to the `list_facts@1` artefact
- * (TASK-040, ADR-0015, `docs/contracts/list-facts.md`).
+ * `list_facts_pipeline@2` — from the bytes of one published national list to
+ * its validated facts, and from the two lists to the `list_facts@2` artefact
+ * (TASK-040, TASK-043, ADR-0015, ADR-0018, `docs/contracts/list-facts.md`).
  *
  * Pure: bytes in, facts out, no file system and no database. The generator
  * (`bin/build-list-facts.ts`) reads the files and writes the result.
@@ -19,7 +19,8 @@
  *
  * Confidence and rights are decided separately and neither reads the other
  * (`ARCHITECTURE.md` §5–6, ADR-0001). The two lists are computed apart and
- * placed side by side; nothing here adds, merges or compares them.
+ * placed side by side; nothing here adds or merges them. The one comparison,
+ * `overlap` (ADR-0018 §2.3), compares their sets of keys and counts surnames.
  */
 import {
   LIST_FACTS_SCHEMA_VERSION,
@@ -47,9 +48,19 @@ import {
   RANK_CONFIDENCE_ASSESSMENT_METHOD,
   RANK_CONFIDENCE_ASSESSMENT_VERSION,
 } from "../version.js";
+import { listBands } from "./bands.js";
 import { birthdayReference, listCollision } from "./collision.js";
+import { listConcentration } from "./concentration.js";
 import { listCrowd } from "./crowd.js";
+import { listDots } from "./dots.js";
+import { listEndings } from "./endings.js";
 import { buildListHistogram } from "./histogram.js";
+import { listHyphenated } from "./hyphenated.js";
+import { listInitials } from "./initials.js";
+import { listOverlap } from "./overlap.js";
+import { buildListRows } from "./rows.js";
+import type { ListRow } from "./rows.js";
+import { listNamedTop } from "./selections.js";
 import { listSummary } from "./summary.js";
 
 /** The generator, recorded on the artefact as `generated_by`. */
@@ -102,8 +113,18 @@ export interface ListInput {
   readonly bytes: Uint8Array;
 }
 
+/** One list's validated facts, and its keyed rows in selection order for the overlap. */
+interface ComputedList {
+  readonly facts: ListFacts;
+  readonly rows: readonly ListRow[];
+}
+
 /** Computes, and validates against the contract, the facts of one national list. */
-export function computeListFacts({ descriptor, bytes }: ListInput): ListFacts {
+export function computeListFacts(input: ListInput): ListFacts {
+  return computeList(input).facts;
+}
+
+function computeList({ descriptor, bytes }: ListInput): ComputedList {
   const partition = descriptor.role;
   if (partition !== "national_male" && partition !== "national_female") {
     throw new ListFactsRefusedError(
@@ -162,12 +183,15 @@ export function computeListFacts({ descriptor, bytes }: ListInput): ListFacts {
     );
   }
 
-  // The surname strings stop here: only the counts, in file order, go on.
+  // The counts in file order, for the histogram and the seeded examples; and
+  // the keyed rows in selection order, for the methods that need the spelling
+  // and for ADR-0018's named selections. No other method sees a surname.
   const rowCounts = rows.map((row) => row.count);
   const histogram = buildListHistogram(rowCounts);
+  const keyed = buildListRows(rows);
   const roomSeed = LIST_ROOM_SEEDS[partition];
 
-  return listFactsSchema.parse({
+  const facts = listFactsSchema.parse({
     partition,
     source: {
       dataset_id: 1681,
@@ -187,12 +211,21 @@ export function computeListFacts({ descriptor, bytes }: ListInput): ListFacts {
     summary: listSummary(histogram),
     collision: listCollision(histogram, rowCounts, roomSeed),
     crowd: listCrowd(histogram, rowCounts, roomSeed + LIST_CROWD_SEED_OFFSET),
+    dots: listDots(histogram),
+    concentration: listConcentration(histogram),
+    bands: listBands(histogram),
+    endings: listEndings(keyed, partition, histogram.people),
+    initials: listInitials(keyed),
+    hyphenated: listHyphenated(keyed),
+    named_top: listNamedTop(keyed),
   });
+  return { facts, rows: keyed };
 }
 
 /**
  * The artefact: the male list and the female list side by side, each
- * computed on its own, plus the birthday comparison (a model constant).
+ * computed on its own, the birthday comparison (a model constant) and the
+ * two lists' sets of surnames compared (ADR-0018 §2.3).
  */
 export function buildListFactsArtefact(input: {
   readonly male: ListInput;
@@ -213,12 +246,15 @@ export function buildListFactsArtefact(input: {
       "the two lists must come from the same reference date",
     );
   }
+  const male = computeList(input.male);
+  const female = computeList(input.female);
   return listFactsArtefactSchema.parse({
     schema_version: LIST_FACTS_SCHEMA_VERSION,
     generated_by: LIST_FACTS_GENERATOR,
     pipeline_version: LIST_FACTS_METHOD_VERSION,
     snapshot_date: input.male.descriptor.data_date,
     birthday_reference: birthdayReference(),
-    lists: { male: computeListFacts(input.male), female: computeListFacts(input.female) },
+    lists: { male: male.facts, female: female.facts },
+    overlap: listOverlap(male.rows, female.rows),
   });
 }

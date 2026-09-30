@@ -2,23 +2,28 @@ import { z } from "zod";
 
 /**
  * List facts — statistics about one whole published PESEL list
- * (`docs/contracts/list-facts.md`, ADR-0015, TASK-040).
+ * (`docs/contracts/list-facts.md`, ADR-0015, ADR-0018, TASK-040, TASK-043).
  *
  * Every figure here describes **one** list: the national male list or the
  * national female list of one resource version. The two lists are two
  * universes. The artefact carries them side by side under separate keys and
- * nothing in it is a sum, a union or a comparison across them.
+ * nothing in it is a sum or a union across them. The one comparison ADR-0018
+ * allows is `overlap`: how many surnames (never people) are on one list only
+ * or on both, compared by `canonical_key_v2`.
  *
- * No surname string crosses this boundary. A list fact is about the shape of
- * a list (how many people, how many surnames, how counts are spread), never
- * about a named surname: those are surname claims and stay in the claim chain.
+ * Surname strings cross this boundary only as ADR-0018's named selections
+ * (`named_top`, `hyphenated.top`, `overlap.on_both_top`,
+ * `overlap.one_list_top`): each chosen by a fixed list-scope rule in the
+ * generator, and each at {@link NAMED_SURNAME_FLOOR} people or more on its
+ * list. Every other figure is about the shape of a list, never about a named
+ * surname: those are surname claims and stay in the claim chain.
  *
  * Shares, probabilities and expectations are stored rounded to 9 decimals,
  * never to display precision (shares and probabilities as fractions in
  * [0, 1]); counts are exact integers. Rounding for display is presentation.
  * Every decision against one half (`n_half`) is taken on the unrounded chance.
  */
-export const LIST_FACTS_SCHEMA_VERSION = "list_facts@1" as const;
+export const LIST_FACTS_SCHEMA_VERSION = "list_facts@2" as const;
 
 const fraction = z.number().min(0).max(1);
 const positiveInt = z.number().int().positive();
@@ -35,6 +40,91 @@ function strictlyAscending<T>(items: readonly T[], key: (item: T) => number): bo
     previous = value;
   }
   return true;
+}
+
+/** Orders two strings by Unicode code point (not by UTF-16 code unit, as `<` does). */
+function compareCodePoints(a: string, b: string): number {
+  const x = [...a];
+  const y = [...b];
+  for (let i = 0; i < Math.min(x.length, y.length); i++) {
+    const d = (x[i]!.codePointAt(0) ?? 0) - (y[i]!.codePointAt(0) ?? 0);
+    if (d !== 0) return d;
+  }
+  return x.length - y.length;
+}
+
+/**
+ * ADR-0018 §2.2: a surname is named only when it has at least this many
+ * people on its list. A selection below it is stored as no name at all.
+ */
+export const NAMED_SURNAME_FLOOR = 20;
+
+/** ADR-0018 §2.1 `TOP_3`: how many of the list's most common surnames `named_top` names. */
+export const LIST_NAMED_TOP_SIZE = 3;
+
+/**
+ * The letters `initials` reports, in this order: the 32 letters of the
+ * Polish alphabet, then Q, V and X. A surname counts under a letter when the
+ * first letter of its `canonical_key_v2` is that letter (lower case, with no
+ * combining mark after it); every other first letter counts as `outside`.
+ */
+export const LIST_INITIAL_LETTERS = [
+  "A",
+  "Ą",
+  "B",
+  "C",
+  "Ć",
+  "D",
+  "E",
+  "Ę",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "Ł",
+  "M",
+  "N",
+  "Ń",
+  "O",
+  "Ó",
+  "P",
+  "R",
+  "S",
+  "Ś",
+  "T",
+  "U",
+  "W",
+  "Y",
+  "Z",
+  "Ź",
+  "Ż",
+  "Q",
+  "V",
+  "X",
+] as const;
+
+/** The letters of the Polish alphabet: {@link LIST_INITIAL_LETTERS} without Q, V and X. */
+export const POLISH_ALPHABET = LIST_INITIAL_LETTERS.slice(0, 32) as readonly ListInitialLetter[];
+
+export type ListInitialLetter = (typeof LIST_INITIAL_LETTERS)[number];
+
+/**
+ * The endings `endings` reports for each list, in this order (TASK-043 §3).
+ * An ending is a spelling matched on the last letters of the surname's
+ * `canonical_key_v2`, never an origin. Each set is disjoint: no ending is a
+ * suffix of another, so no surname counts under two.
+ */
+export const LIST_ENDINGS = {
+  national_male: ["ski", "ak", "ek", "cki", "ik", "czyk", "uk", "ewicz", "owicz"],
+  national_female: ["ska", "ak", "ek", "cka", "ik", "czyk", "uk", "ewicz", "owicz"],
+} as const;
+
+/** True when no entry is a suffix of another (an entry twice counts as a suffix). */
+function suffixDisjoint(endings: readonly string[]): boolean {
+  return endings.every((a, i) => endings.every((b, j) => i === j || !a.endsWith(b)));
 }
 
 /** Which published list a block describes. Never both. */
@@ -213,13 +303,355 @@ export const listCrowdSchema = z
     message: "expected_distinct must carry an entry for crowd_size, the crowd the page describes",
   });
 
-export const listFactsSchema = z.object({
-  partition: listPartitionSchema,
-  source: listSourceSchema,
-  assessment: listAssessmentSchema,
-  summary: listSummarySchema,
-  collision: listCollisionSchema,
-  crowd: listCrowdSchema,
+/**
+ * A surname named by an ADR-0018 selection: its `canonical_key_v2`, its
+ * source string exactly as published, and its people on its list, never
+ * below {@link NAMED_SURNAME_FLOOR}.
+ */
+export const namedSurnameSchema = z.object({
+  key: z.string().min(1),
+  published: z.string().min(1),
+  count: z.number().int().min(NAMED_SURNAME_FLOOR),
+});
+
+/** Named surnames in the selection order: count descending, ties by key in code-point order. */
+function inSelectionOrder(items: readonly { key: string; count: number }[]): boolean {
+  for (let i = 1; i < items.length; i++) {
+    const a = items[i - 1]!;
+    const b = items[i]!;
+    if (a.count < b.count) return false;
+    if (a.count === b.count && compareCodePoints(a.key, b.key) >= 0) return false;
+  }
+  return true;
+}
+
+/** `list_dots@1`: every distinct count on the list, ascending, with how many surnames have it. */
+export const listDotsSchema = z.object({
+  method_version: z.string().min(1),
+  histogram: z
+    .array(z.object({ count: positiveInt, surnames: positiveInt }))
+    .min(1)
+    .refine((items) => strictlyAscending(items, (item) => item.count), {
+      message: "dots.histogram must be ascending by count, with no duplicates",
+    }),
+});
+
+/** For a share q of the list's people: the fewest most common surnames that carry it, and their people. */
+export const concentrationLevelSchema = z.object({
+  q: fraction,
+  surnames: positiveInt,
+  people: positiveInt,
+});
+
+/** `list_concentration@1`. */
+export const listConcentrationSchema = z
+  .object({
+    method_version: z.string().min(1),
+    /** Ascending by `q`, no duplicates; holds q = 0.5. */
+    levels: z
+      .array(concentrationLevelSchema)
+      .min(1)
+      .refine((items) => strictlyAscending(items, (level) => level.q), {
+        message: "concentration.levels must be ascending by q, with no duplicates",
+      }),
+    /** The surnames outside the q = 0.5 set: the list's surnames less that set's. */
+    beyond_half: nonNegativeInt,
+  })
+  .refine((c) => c.levels.some((level) => level.q === 0.5), {
+    message: "concentration.levels must hold q = 0.5, the set beyond_half is measured against",
+  })
+  .refine(
+    (c) =>
+      c.levels.every(
+        (level, i) =>
+          i === 0 ||
+          (level.surnames >= c.levels[i - 1]!.surnames && level.people >= c.levels[i - 1]!.people),
+      ),
+    { message: "concentration.levels must not fall in surnames or people as q rises" },
+  );
+
+/** One band of bearers per surname, `from` to `to` inclusive (`to` null: no upper bound). */
+export const countBandSchema = z.object({
+  from: positiveInt,
+  to: positiveInt.nullable(),
+  surnames: nonNegativeInt,
+  people: nonNegativeInt,
+});
+
+/** `list_bands@1`. */
+export const listBandsSchema = z
+  .object({
+    method_version: z.string().min(1),
+    /** Contiguous, ascending, the last one open-ended. */
+    ranges: z.array(countBandSchema).min(1),
+    /** The surnames with fewer than 10 bearers: the bands below 10, stored so no page adds them. */
+    under_10: nonNegativeInt,
+  })
+  .refine(
+    (b) =>
+      b.ranges.every((band, i) => {
+        const last = i === b.ranges.length - 1;
+        if (last !== (band.to === null)) return false;
+        if (band.to !== null && band.to < band.from) return false;
+        const previous = b.ranges[i - 1];
+        return previous === undefined || (previous.to !== null && band.from === previous.to + 1);
+      }),
+    {
+      message: "bands.ranges must be contiguous and ascending, with only the last one open-ended",
+    },
+  )
+  .refine(
+    (b) =>
+      b.ranges.every(
+        (band) =>
+          band.people >= band.from * band.surnames &&
+          (band.to === null || band.people <= band.to * band.surnames),
+      ),
+    { message: "a band's people must lie between its surnames times its lower and upper bound" },
+  )
+  .refine((b) => b.ranges.some((band) => band.from === 10), {
+    message: "bands.ranges must have a band starting at 10, so under_10 is a set of whole bands",
+  })
+  .refine(
+    (b) =>
+      b.under_10 ===
+      b.ranges
+        .filter((band) => band.to !== null && band.to < 10)
+        .reduce((sum, band) => sum + band.surnames, 0),
+    { message: "bands.under_10 must equal the surnames of the bands below 10" },
+  );
+
+/** Surnames and people on one list whose key ends with `ending`, and the share of the list's people. */
+export const endingSchema = z.object({
+  /** The ending as the key's last letters, lower case, without the dash: "ski" for -ski. */
+  ending: z.string().regex(/^\p{Ll}+$/u),
+  surnames: nonNegativeInt,
+  people: nonNegativeInt,
+  share_of_people: fraction,
+});
+
+/** `list_endings@1`. */
+export const listEndingsSchema = z.object({
+  method_version: z.string().min(1),
+  entries: z
+    .array(endingSchema)
+    .min(1)
+    .refine((items) => suffixDisjoint(items.map((item) => item.ending)), {
+      message: "endings must be disjoint: no ending may be a suffix of another",
+    }),
+});
+
+const initialLetterSchema = z.enum(LIST_INITIAL_LETTERS);
+
+/** A letter at least one surname on the list starts with. Absent letters are never a zero. */
+export const presentInitialSchema = z.strictObject({
+  letter: initialLetterSchema,
+  surnames: positiveInt,
+  people: positiveInt,
+});
+
+/** A letter no surname on the list starts with: stated as absent, never as zero people. */
+export const absentInitialSchema = z.strictObject({
+  letter: initialLetterSchema,
+  absent: z.literal(true),
+});
+
+export const listInitialSchema = z.union([presentInitialSchema, absentInitialSchema]);
+
+type ListInitialEntry = z.infer<typeof listInitialSchema>;
+
+function presentPeople(entry: ListInitialEntry | undefined): number | null {
+  return entry === undefined || "absent" in entry ? null : entry.people;
+}
+
+/** `list_initials@1`. */
+export const listInitialsSchema = z
+  .object({
+    method_version: z.string().min(1),
+    /** Each of {@link LIST_INITIAL_LETTERS} once, in that order. */
+    letters: z
+      .array(listInitialSchema)
+      .refine(
+        (items) =>
+          items.length === LIST_INITIAL_LETTERS.length &&
+          items.every((item, i) => item.letter === LIST_INITIAL_LETTERS[i]),
+        {
+          message:
+            "initials.letters must hold each letter of the Polish alphabet, then Q, V and X, " +
+            "once and in that order",
+        },
+      ),
+    /** The letter with the most people. */
+    top: initialLetterSchema,
+    /** The letter of the Polish alphabet with the fewest people, among the letters present. */
+    rarest_polish: initialLetterSchema,
+    /** Surnames whose first letter is none of the letters above, and their people. */
+    outside: z.object({ surnames: nonNegativeInt, people: nonNegativeInt }),
+  })
+  .refine(
+    (initials) => {
+      const people = initials.letters.map(presentPeople);
+      const top = presentPeople(initials.letters.find((item) => item.letter === initials.top));
+      return top !== null && people.every((value) => value === null || value <= top);
+    },
+    { message: "initials.top must be a letter present on the list, with the most people" },
+  )
+  .refine(
+    (initials) => {
+      const polish = initials.letters.filter((item) => POLISH_ALPHABET.includes(item.letter));
+      const rarest = presentPeople(polish.find((item) => item.letter === initials.rarest_polish));
+      return (
+        rarest !== null &&
+        polish.map(presentPeople).every((value) => value === null || value >= rarest)
+      );
+    },
+    {
+      message:
+        "initials.rarest_polish must be a Polish letter present on the list, with the fewest " +
+        "people among the Polish letters present",
+    },
+  );
+
+/** `list_hyphenated@1`: the surnames whose key contains a hyphen. */
+export const listHyphenatedSchema = z
+  .object({
+    method_version: z.string().min(1),
+    surnames: nonNegativeInt,
+    people: nonNegativeInt,
+    /** ADR-0018 `HYPHENATED_TOP`, or null when there is none at or above the floor. */
+    top: namedSurnameSchema.nullable(),
+  })
+  .refine((h) => h.top === null || (h.top.key.includes("-") && h.top.count <= h.people), {
+    message: "hyphenated.top must be a hyphenated surname among the ones counted",
+  });
+
+/** `list_named_top@1`: ADR-0018 `TOP_3`, those of the three at or above the floor. */
+export const listNamedTopSchema = z.object({
+  method_version: z.string().min(1),
+  items: z.array(namedSurnameSchema).max(LIST_NAMED_TOP_SIZE).refine(inSelectionOrder, {
+    message: "named_top.items must be by count descending, ties by key, each key once",
+  }),
+});
+
+function sumOf<T>(items: readonly T[], value: (item: T) => number): number {
+  return items.reduce((sum, item) => sum + value(item), 0);
+}
+
+export const listFactsSchema = z
+  .object({
+    partition: listPartitionSchema,
+    source: listSourceSchema,
+    assessment: listAssessmentSchema,
+    summary: listSummarySchema,
+    collision: listCollisionSchema,
+    crowd: listCrowdSchema,
+    dots: listDotsSchema,
+    concentration: listConcentrationSchema,
+    bands: listBandsSchema,
+    endings: listEndingsSchema,
+    initials: listInitialsSchema,
+    hyphenated: listHyphenatedSchema,
+    named_top: listNamedTopSchema,
+  })
+  .refine(
+    (l) =>
+      sumOf(l.dots.histogram, (d) => d.surnames) === l.summary.surnames &&
+      sumOf(l.dots.histogram, (d) => d.count * d.surnames) === l.summary.people,
+    { message: "dots must add up to the list's surnames, and count × surnames to its people" },
+  )
+  .refine(
+    (l) =>
+      l.concentration.levels.every(
+        (level) =>
+          level.surnames <= l.summary.surnames &&
+          level.people <= l.summary.people &&
+          level.people * 1000 >= Math.round(level.q * 1000) * l.summary.people,
+      ),
+    { message: "each concentration level must carry at least its share q of the list's people" },
+  )
+  .refine(
+    (l) =>
+      l.concentration.beyond_half ===
+      l.summary.surnames -
+        (l.concentration.levels.find((level) => level.q === 0.5)?.surnames ?? Number.NaN),
+    { message: "concentration.beyond_half must be the list's surnames less the q = 0.5 set" },
+  )
+  .refine(
+    (l) =>
+      sumOf(l.bands.ranges, (b) => b.surnames) === l.summary.surnames &&
+      sumOf(l.bands.ranges, (b) => b.people) === l.summary.people,
+    { message: "bands must add up to the list's surnames and people" },
+  )
+  .refine(
+    (l) => {
+      const fixed: readonly string[] = LIST_ENDINGS[l.partition];
+      const endings = l.endings.entries.map((e) => e.ending);
+      return endings.length === fixed.length && endings.every((e, i) => e === fixed[i]);
+    },
+    { message: "endings must be the fixed set of endings for the list's partition, in order" },
+  )
+  .refine(
+    (l) =>
+      sumOf(l.endings.entries, (e) => e.surnames) <= l.summary.surnames &&
+      sumOf(l.endings.entries, (e) => e.people) <= l.summary.people &&
+      l.endings.entries.every(
+        (e) => Math.abs(e.share_of_people - e.people / l.summary.people) <= 1e-9,
+      ),
+    {
+      message:
+        "endings must fit within the list, each share of people being its people over the list's",
+    },
+  )
+  .refine(
+    (l) => {
+      const present = l.initials.letters.filter(
+        (item): item is z.infer<typeof presentInitialSchema> => !("absent" in item),
+      );
+      return (
+        sumOf(present, (i) => i.surnames) + l.initials.outside.surnames === l.summary.surnames &&
+        sumOf(present, (i) => i.people) + l.initials.outside.people === l.summary.people
+      );
+    },
+    { message: "initials and outside must add up to the list's surnames and people" },
+  )
+  .refine(
+    (l) =>
+      l.hyphenated.surnames <= l.summary.surnames &&
+      l.hyphenated.people <= l.summary.people &&
+      (l.hyphenated.top === null || l.hyphenated.top.count <= l.summary.max_count),
+    { message: "hyphenated must fit within the list" },
+  )
+  .refine(
+    (l) => l.named_top.items.length === 0 || l.named_top.items[0]!.count === l.summary.max_count,
+    { message: "named_top must start with the list's most common surname" },
+  );
+
+/** The surname ADR-0018 `ON_BOTH_TOP` selects, with its source string and people on each list. */
+export const onBothTopSchema = z.object({
+  key: z.string().min(1),
+  male: namedSurnameSchema.omit({ key: true }),
+  female: namedSurnameSchema.omit({ key: true }),
+});
+
+/**
+ * `list_overlap@1` (ADR-0018 §2.3): the two lists' sets of surnames compared
+ * by `canonical_key_v2`. Counts of surnames only; no field adds people.
+ */
+export const listOverlapSchema = z.object({
+  method_version: z.string().min(1),
+  /** Surnames on the male list and not on the female list. */
+  male_only: nonNegativeInt,
+  /** Surnames on both lists. */
+  both: nonNegativeInt,
+  /** Surnames on the female list and not on the male list. */
+  female_only: nonNegativeInt,
+  /** ADR-0018 `ON_BOTH_TOP`, or null when there is none at or above the floor on both lists. */
+  on_both_top: onBothTopSchema.nullable(),
+  /** ADR-0018 `ONE_LIST_TOP` for each list, or null when there is none at or above the floor. */
+  one_list_top: z.object({
+    male: namedSurnameSchema.nullable(),
+    female: namedSurnameSchema.nullable(),
+  }),
 });
 
 /**
@@ -235,6 +667,8 @@ function modelParameters(list: z.infer<typeof listFactsSchema>): string {
     thresholds: list.summary.thresholds.map((threshold) => threshold.at_least),
     surname_quantiles: list.summary.surname_quantiles.map((quantile) => quantile.q),
     person_quantiles: list.summary.person_quantiles.map((quantile) => quantile.q),
+    concentration_q: list.concentration.levels.map((level) => level.q),
+    band_edges: list.bands.ranges.map((band) => [band.from, band.to]),
   });
 }
 
@@ -249,6 +683,8 @@ export const listFactsArtefactSchema = z
     /** A fixed model constant, not PESEL data: 23 people, 365 equally likely days. */
     birthday_reference: z.object({ n_half: positiveInt, p_at_n_half: fraction }),
     lists: z.object({ male: listFactsSchema, female: listFactsSchema }),
+    /** The one comparison of the two lists ADR-0018 allows: counts of surnames, never people. */
+    overlap: listOverlapSchema,
   })
   .refine((a) => a.lists.male.partition === "national_male", {
     message: "lists.male must describe the national male list",
@@ -271,9 +707,52 @@ export const listFactsArtefactSchema = z
   .refine((a) => modelParameters(a.lists.male) === modelParameters(a.lists.female), {
     message:
       "both lists must use the same model parameters: crowd_size, the curve's n, the number " +
-      "of example rooms, expected_distinct's n, thresholds' at_least and quantiles' q",
-  });
+      "of example rooms, expected_distinct's n, thresholds' at_least, quantiles' q, " +
+      "concentration's q and the bands' edges",
+  })
+  .refine(
+    (a) =>
+      a.overlap.male_only + a.overlap.both === a.lists.male.summary.surnames &&
+      a.overlap.female_only + a.overlap.both === a.lists.female.summary.surnames,
+    {
+      message:
+        "overlap must add up: male_only + both is the male list's surnames, female_only + both " +
+        "the female list's",
+    },
+  )
+  .refine(
+    (a) =>
+      (a.overlap.on_both_top === null || a.overlap.both > 0) &&
+      (a.overlap.one_list_top.male === null || a.overlap.male_only > 0) &&
+      (a.overlap.one_list_top.female === null || a.overlap.female_only > 0),
+    { message: "an overlap selection needs a surname in the part it is selected from" },
+  )
+  .refine(
+    (a) =>
+      (a.overlap.on_both_top === null ||
+        (a.overlap.on_both_top.male.count <= a.lists.male.summary.max_count &&
+          a.overlap.on_both_top.female.count <= a.lists.female.summary.max_count)) &&
+      (a.overlap.one_list_top.male === null ||
+        a.overlap.one_list_top.male.count <= a.lists.male.summary.max_count) &&
+      (a.overlap.one_list_top.female === null ||
+        a.overlap.one_list_top.female.count <= a.lists.female.summary.max_count),
+    { message: "an overlap selection's count must fit within its own list" },
+  );
 
 export type ListPartition = z.infer<typeof listPartitionSchema>;
 export type ListFacts = z.infer<typeof listFactsSchema>;
 export type ListFactsArtefact = z.infer<typeof listFactsArtefactSchema>;
+export type NamedSurname = z.infer<typeof namedSurnameSchema>;
+export type ListDots = z.infer<typeof listDotsSchema>;
+export type ConcentrationLevel = z.infer<typeof concentrationLevelSchema>;
+export type ListConcentration = z.infer<typeof listConcentrationSchema>;
+export type CountBand = z.infer<typeof countBandSchema>;
+export type ListBands = z.infer<typeof listBandsSchema>;
+export type ListEnding = z.infer<typeof endingSchema>;
+export type ListEndings = z.infer<typeof listEndingsSchema>;
+export type ListInitial = z.infer<typeof listInitialSchema>;
+export type ListInitials = z.infer<typeof listInitialsSchema>;
+export type ListHyphenated = z.infer<typeof listHyphenatedSchema>;
+export type ListNamedTop = z.infer<typeof listNamedTopSchema>;
+export type OnBothTop = z.infer<typeof onBothTopSchema>;
+export type ListOverlap = z.infer<typeof listOverlapSchema>;

@@ -1,6 +1,6 @@
 /**
  * The words the free result page renders (TASK-017), and the landing atlas's
- * (TASK-040).
+ * (TASK-040; six plates since TASK-043).
  *
  * Pure: strings in, strings out. No database, no React, no request. That is
  * deliberate — every honesty rule this page must keep is then a unit test
@@ -8,7 +8,7 @@
  *
  * The result page's sentences are **verbatim from
  * `docs/contracts/surname-result.md`**, where the project owner accepted them.
- * The `lf*` strings are the landing atlas's own (TASK-040), written for
+ * The `lf*` strings are the landing atlas's own (TASK-040, TASK-043), written for
  * `list-atlas.tsx` under the list-facts contract's rules (every figure names
  * its list; the two lists are never summed). Neither set is paraphrased here,
  * and the rules attached to them are not negotiable by a layout decision:
@@ -624,201 +624,185 @@ export const UI = {
     invalidBody: "Sprawdź wpisane nazwisko i spróbuj ponownie.",
     noFigures: "Brak danych do pokazania.",
     notSummed: "Zbiory męski i żeński są odrębne i nigdy nie są sumowane.",
-    // --- The landing atlas (TASK-040). Every figure arrives from `listFacts()`;
-    // these are the words around it. The two lists are named in every sentence
-    // that carries a figure, and nothing here adds them up.
-    lfEyebrow: "Atlas nazwisk",
-    lfTitle: "Dwie listy, trzy plansze",
+    // --- The landing atlas (TASK-040; six plates since TASK-043). Every figure
+    // arrives from `listFacts()`; these are the words around it. A line that
+    // carries one list's figures names that list, and nothing here adds the
+    // two lists up. A named surname is the artefact's published string, as text.
+    lfEyebrow: "Rejestr PESEL · wydanie {year}",
+    lfTitle: "Atlas nazwisk",
     lfLede:
-      "Trzy plansze o opublikowanych listach nazwisk z rejestru PESEL: o tym, jak nazwiska się " +
-      "rozkładają, kiedy się powtarzają i ile ich jest w tłumie. Listę mężczyzn i listę kobiet " +
-      "pokazujemy obok siebie i nigdy ich nie sumujemy.",
+      "Sześć plansz o nazwiskach z rejestru PESEL (stan na {date}). Mężczyźni i kobiety są w nim " +
+      "na dwóch osobnych listach: przełącz listę, a plansze I–V pokażą tę listę, a plansza VI " +
+      "porówna obie. Nigdy ich nie sumujemy.",
     lfScope:
       "Każda liczba opisuje jedną opublikowaną listę rejestru PESEL: nazwiska noszone przez co " +
       "najmniej 2 osoby, osoby żyjące, nazwisko aktualne. Stan\u00a0na\u00a0{date}",
-    lfIndexLabel: "Plansze",
-    lfP1Short: "Typowe nazwisko i typowa osoba",
-    lfP2Short: "Kiedy nazwisko się powtarza",
-    lfP3Short: "Ile nazwisk w tłumie",
     lfSwitchLabel: "Która lista",
     lfSwitchMale: "Mężczyźni",
     lfSwitchFemale: "Kobiety",
     lfSwitchNote: "osobne listy, nigdy sumowane",
-    lfListMale: "Lista mężczyzn",
-    lfListFemale: "Lista kobiet",
     lfListInMale: "lista mężczyzn",
     lfListInFemale: "lista kobiet",
     lfSource: "Źródło: {link} · stan\u00a0na\u00a0{date}",
     lfSourceName: "rejestr PESEL, dane.gov.pl",
     lfSourceTwo: "Źródło: rejestr PESEL, dane.gov.pl ({male}, {female}) · stan\u00a0na\u00a0{date}",
     lfMethod: "{status} · metoda {method}",
-    lfP1No: "Plansza I · Suwak",
-    lfP1TitleMale:
-      "Na liście mężczyzn typowe nazwisko {s:nosi|noszą|nosi} {s} {s:osoba|osoby|osób}, a typowy " +
-      "mężczyzna\u00a0— nazwisko {p} mężczyzn.",
-    lfP1TitleFemale:
-      "Na liście kobiet typowe nazwisko {s:nosi|noszą|nosi} {s} {s:osoba|osoby|osób}, a typowa " +
-      "kobieta\u00a0— nazwisko {p} kobiet.",
-    lfP1Lede:
-      "Rzadkich nazwisk jest bardzo wiele, ale każde nosi niewiele osób. Częstych jest niewiele, " +
-      "ale noszą je tłumy. Dlatego typowe nazwisko i nazwisko typowej osoby to dwie różne liczby " +
-      "— z tej samej listy.",
-    lfP1AxisNote: "liczba osób z nazwiskiem · skala logarytmiczna",
-    lfP1TopRow: "co najmniej …% nazwisk ma najwyżej tyle osób",
-    lfP1BottomRowMale: "co najmniej …% mężczyzn nosi nazwisko, które ma najwyżej tyle osób",
-    lfP1BottomRowFemale: "co najmniej …% kobiet nosi nazwisko, które ma najwyżej tyle osób",
-    lfP1FlagSurname: "typowe nazwisko: {s} {s:osoba|osoby|osób}",
-    lfP1FlagPersonMale: "typowy mężczyzna: nazwisko {p} mężczyzn",
-    lfP1FlagPersonFemale: "typowa kobieta: nazwisko {p} kobiet",
-    lfP1Omitted: "1 osoba: pomijane przez wydawcę",
-    lfP1Max: "najczęstsze nazwisko listy",
-    lfP1Arc: "ta sama lista, dwa pytania",
-    lfP1Rung: "{t}+: {n} {n:nazwisko|nazwiska|nazwisk}",
-    lfP1ThresholdsHeading: "Ile nazwisk ma co najmniej…",
-    lfP1ThresholdAtLeast: "{t}+ {t:osoba|osoby|osób}",
-    lfP1ThresholdSurnames: "{n} {n:nazwisko|nazwiska|nazwisk}",
-    lfP1ThresholdPeopleMale: "nosi je {p} mężczyzn",
-    lfP1ThresholdPeopleFemale: "{p:nosi|noszą|nosi} je {p} {p:kobieta|kobiety|kobiet}",
-    lfP1FigureMale:
-      "Skala logarytmiczna liczby osób z nazwiskiem na liście mężczyzn, od {min} do {max} osób. " +
-      "Typowe nazwisko: {s} {s:osoba|osoby|osób}. Typowy mężczyzna: nazwisko {p} mężczyzn. " +
-      "Nazwiska: {surnames}. Mężczyźni: {people}.",
-    lfP1FigureFemale:
-      "Skala logarytmiczna liczby osób z nazwiskiem na liście kobiet, od {min} do {max} osób. " +
-      "Typowe nazwisko: {s} {s:osoba|osoby|osób}. Typowa kobieta: nazwisko {p} kobiet. " +
-      "Nazwiska: {surnames}. Kobiety: {people}.",
-    lfP1FigureSurnameQuantile: "co najmniej {q} ma najwyżej {c} {c:osobę|osoby|osób}",
-    lfP1FigurePersonQuantile:
-      "co najmniej {q} nosi nazwisko, które ma najwyżej {c} {c:osobę|osoby|osób}",
-    lfP1Fact:
-      "**Typowe nazwisko** nosi {sm} {sm:mężczyzna|mężczyzn|mężczyzn} na liście mężczyzn i {sf} " +
-      "{sf:kobieta|kobiety|kobiet} na liście kobiet: co najmniej połowa nazwisk z każdej " +
-      "listy ma najwyżej tylu. **Typowy mężczyzna** nosi nazwisko {pm} mężczyzn, a **typowa " +
-      "kobieta** — nazwisko {pf} kobiet: co najmniej połowa osób z każdej listy nosi nazwisko co " +
-      "najmniej tak częste. Lista mężczyzn liczy {nm} {nm:osobę|osoby|osób} i {rm} " +
-      "{rm:nazwisko|nazwiska|nazwisk}, lista kobiet — {nf} {nf:osobę|osoby|osób} i {rf} " +
-      "{rf:nazwisko|nazwiska|nazwisk}. Najczęstsze nazwisko listy mężczyzn nosi {xm} mężczyzn, " +
-      "a najczęstsze nazwisko listy kobiet — {xf} {xf:kobieta|kobiety|kobiet}.",
-    lfP1Caveat:
-      "Liczone na opublikowanej liście: nazwiska noszone przez co najmniej 2 osoby, osoby żyjące, " +
-      "nazwisko aktualne. Wydawca pomija nazwiska noszone przez 1 osobę, więc nie wchodzą one do " +
-      "rachunku — ich brak nie oznacza zera. Mediana opisuje tylko tę listę. Listy mężczyzn " +
-      "i kobiet liczone są osobno i nigdy nie są sumowane.",
-    lfP2No: "Plansza II · Sala",
-    lfP2Title: "Ile osób musi wejść, zanim nazwisko się powtórzy?",
-    lfP2Lede:
-      "Dwie osoby wylosowane z listy mężczyzn noszą to samo nazwisko z szansą około 1 na {om}; " +
-      "z listy kobiet — około 1 na {of}. Ile osób musi wejść do sali, żeby szansa, że co " +
-      "najmniej dwie noszą to samo nazwisko, sięgnęła połowy?",
-    lfP2Answer: "{n:osoba|osoby|osób} — szansa, że co najmniej dwie noszą to samo nazwisko: {p}",
-    lfP2Model: "Model: osoby losowane bez zwracania z tej listy.",
-    lfP2XAxis: "osób w sali",
-    lfP2BirthdayTick: "urodziny",
-    lfP2CurveFigure:
-      "Wykres: szansa, że co najmniej dwie z n osób wylosowanych z listy ({list}) noszą to samo " +
-      "nazwisko, dla n od {from} do {to}. Połowę osiąga przy {n} osobach: {p}. Przy {bn} " +
-      "osobach: {p23}.",
-    lfP2StripCaption:
-      "{rooms} {rooms:przykładowa sala|przykładowe sale|przykładowych sal}: każda kropka to jedna " +
-      "sala, postawiona przy osobie, z którą weszła do niej pierwsza para o tym samym nazwisku. " +
-      "Pionowa kreska: {n} {n:osoba|osoby|osób}.",
-    lfP2StripFigure:
-      "Przykładowe sale ({list}): kropka na salę, przy osobie, z którą weszła pierwsza para o tym " +
-      "samym nazwisku.",
-    lfP2StripList: "Przykładowe sale ({list}), po kolei: osoba, z którą weszła pierwsza para",
-    lfP2RoomCaption:
-      "W tym losowaniu, w pierwszej z tych sal, pierwsza para pojawiła się przy osobie nr {b}: " +
-      "osoby nr {a} i nr {b} noszą to samo nazwisko.",
-    lfP2RoomFigure:
-      "Sala ({list}): {b} {b:zajęte miejsce|zajęte miejsca|zajętych miejsc}; osoby nr {a} i nr {b} " +
-      "połączone linią, bo noszą to samo nazwisko.",
-    lfP2Birthday:
-      "Urodziny (model 365 jednakowo prawdopodobnych dni): {bn} {bn:osoba|osoby|osób}, {bp}. " +
-      "Wspólne nazwisko przy {bn} osobach: {p23}.",
-    lfP2LegendSeat: "osoba w sali",
-    lfP2LegendEmpty: "wolne miejsce",
-    lfP2LegendPair: "pierwsza para o tym samym nazwisku",
-    lfP2RoomHalf: "{n} {n:osoba|osoby|osób}: szansa {p}",
-    lfP2RoomHalfFigure:
-      "Kreska po miejscu nr {n}: przy {n} {n:osobie|osobach|osobach} szansa, że co najmniej " +
-      "dwie noszą to samo nazwisko, wynosi {p}.",
-    lfP2Fact:
-      "{nm:Wystarczy|Wystarczą|Wystarczy} **{nm} {nm:osoba|osoby|osób}** z listy mężczyzn, żeby " +
-      "szansa, że co najmniej dwie noszą to samo nazwisko, wyniosła {pm}; o jedną osobę mniej — " +
-      "{qm}. Z listy kobiet {nf:wystarczy|wystarczą|wystarczy} **{nf} {nf:osoba|osoby|osób}**: " +
-      "{pf}, a o jedną mniej — {qf}. Dwie losowo wybrane osoby noszą to samo nazwisko z szansą " +
-      "około 1 na {om} na liście mężczyzn i około 1 na {of} na liście kobiet.",
-    lfP2FactBirthday:
-      "Dla porównania: w modelu 365 jednakowo prawdopodobnych dni urodzin " +
-      "{bn:wystarczy|wystarczą|wystarczy} {bn} {bn:osoba|osoby|osób} ({bp}), a przy {bn} osobach " +
-      "szansa na wspólne nazwisko wynosi {p23m} na liście mężczyzn i {p23f} na liście kobiet.",
-    lfP2Caveat:
-      "Model: osoby losowane bez zwracania z jednej opublikowanej listy (nazwiska noszone przez " +
-      "co najmniej 2 osoby, osoby żyjące, nazwisko aktualne). Prawdziwe grupy — rodziny, klasy, zakłady pracy — nie są losowe. " +
-      "Przykładowe sale to zapisane losowania, nie prawdziwe sale. Liczba {bn} dla urodzin to " +
-      "wynik modelu 365 jednakowo prawdopodobnych dni, nie dane PESEL.",
-    lfP3No: "Plansza III · Tłum",
-    lfP3TitleThousandMale:
-      "Tysiąc nieznajomych z listy mężczyzn: średnio {d} {d:różne nazwisko|różne nazwiska|różnych nazwisk}",
-    lfP3TitleThousandFemale:
-      "Tysiąc nieznajomych z listy kobiet: średnio {d} {d:różne nazwisko|różne nazwiska|różnych nazwisk}",
-    lfP3TitleMale:
-      "{c} nieznajomych z listy mężczyzn: średnio {d} {d:różne nazwisko|różne nazwiska|różnych nazwisk}",
-    lfP3TitleFemale:
-      "{c} nieznajomych z listy kobiet: średnio {d} {d:różne nazwisko|różne nazwiska|różnych nazwisk}",
+    lfPlate: "Plansza",
+    // Plate I: the constellation.
+    lfP1Name: "Gwiazdozbiór",
+    lfP1Title: "Każde nazwisko to jeden punkt.",
+    lfP1SurnamesMale: "{n:nazwisko|nazwiska|nazwisk} na liście mężczyzn",
+    lfP1SurnamesFemale: "{n:nazwisko|nazwiska|nazwisk} na liście kobiet",
+    lfP1PeopleMale: "{n:mężczyzna|mężczyzn|mężczyzn} na liście",
+    lfP1PeopleFemale: "{n:kobieta|kobiety|kobiet} na liście",
+    lfP1CoreMale: "W środku najczęstsze nazwiska listy mężczyzn:",
+    lfP1CoreFemale: "W środku najczęstsze nazwiska listy kobiet:",
+    lfP1RingMale:
+      "W przerywanym kółku {k} {k:najczęstsze nazwisko|najczęstsze nazwiska|najczęstszych nazwisk}. " +
+      "Nosi je połowa mężczyzn z listy.",
+    lfP1RingFemale:
+      "W przerywanym kółku {k} {k:najczęstsze nazwisko|najczęstsze nazwiska|najczęstszych nazwisk}. " +
+      "Nosi je połowa kobiet z listy.",
+    lfP1Dust:
+      "Pył na brzegu: {u} {u:nazwisko noszone|nazwiska noszone|nazwisk noszonych} przez mniej " +
+      "niż {edge} {edge:osobę|osoby|osób}.",
+    lfP1Foot:
+      "Punkty ułożone od najczęstszego nazwiska (środek) do najrzadszego (brzeg), na skali " +
+      "logarytmicznej; punkt rośnie z liczbą osób.",
+    // Plate II: half.
+    lfP2Name: "Połowa",
+    lfP2TitleMale: "Połowa mężczyzn nosi jedno z {k} nazwisk.",
+    lfP2TitleFemale: "Połowa kobiet nosi jedno z {k} nazwisk.",
+    lfP2LedeMale:
+      "Druga połowa dzieli się na {b} {b:nazwisko|nazwiska|nazwisk}. Górny pasek to wszyscy " +
+      "mężczyźni z listy, dolny — wszystkie nazwiska.",
+    lfP2LedeFemale:
+      "Druga połowa dzieli się na {b} {b:nazwisko|nazwiska|nazwisk}. Górny pasek to wszystkie " +
+      "kobiety z listy, dolny — wszystkie nazwiska.",
+    lfP2PeopleMale: "Wszyscy: {n} {n:mężczyzna|mężczyzn|mężczyzn}",
+    lfP2PeopleFemale: "Wszystkie: {n} {n:kobieta|kobiety|kobiet}",
+    lfP2Surnames: "Wszystkie nazwiska: {n}",
+    lfP2LevelMale:
+      "{k} {k:najczęstsze nazwisko|najczęstsze nazwiska|najczęstszych nazwisk} → {q} mężczyzn",
+    lfP2LevelFemale:
+      "{k} {k:najczęstsze nazwisko|najczęstsze nazwiska|najczęstszych nazwisk} → {q} kobiet",
+    lfP2Foot:
+      "Wstęgi łączą część ludzi z listy z najczęstszymi nazwiskami, które ta część nosi; każdy " +
+      "próg jest osiągnięty albo nieznacznie przekroczony.",
+    // Plate III: rarity.
+    lfP3Name: "Rzadkość",
+    lfP3TitleMale: "{n} {n:nazwisko|nazwiska|nazwisk} nosi dokładnie dwóch mężczyzn.",
+    lfP3TitleFemale: "{n} {n:nazwisko|nazwiska|nazwisk} noszą dokładnie dwie kobiety.",
     lfP3LedeMale:
-      "Wylosuj {c} {c:osobę|osoby|osób} z listy mężczyzn i sprawdź ich nazwiska. Kropka to jedna " +
-      "osoba; linia łączy osoby o tym samym nazwisku.",
+      "Typowe nazwisko (mediana) {m:nosi|noszą|nosi} {m} {m:osoba|osoby|osób}: co najmniej " +
+      "połowa nazwisk z listy mężczyzn ma najwyżej tylu nosicieli.",
     lfP3LedeFemale:
-      "Wylosuj {c} {c:osobę|osoby|osób} z listy kobiet i sprawdź ich nazwiska. Kropka to jedna " +
-      "osoba; linia łączy osoby o tym samym nazwisku.",
-    lfP3Distinct: "różnych nazwisk — średnio w losowym tłumie {c} {c:osoby|osób|osób}",
-    lfP3Alone: "osób bez nikogo o tym samym nazwisku — średnio",
-    lfP3Example:
-      "W tym losowaniu: {d} {d:różne nazwisko|różne nazwiska|różnych nazwisk}, {w} " +
-      "{w:osoba|osoby|osób} bez nikogo o tym samym nazwisku.",
-    lfP3CrowdFigure:
-      "Przykładowy tłum {n} {n:osoby|osób|osób} z listy ({list}), jedna kropka na osobę. {example}",
-    lfP3LegendDot: "1 kropka = 1 osoba",
-    lfP3LegendAlone: "jedyne takie nazwisko w tłumie",
-    lfP3LegendShared: "wspólne nazwisko w tłumie",
-    lfP3SparkTitle: "Im większy tłum, tym wolniej przybywa nazwisk",
-    lfP3SparkLine: "średnio różnych nazwisk",
-    lfP3SparkRef: "gdyby każdy nosił inne nazwisko",
-    lfP3SparkAxis: "osób w tłumie · obie osie w skali logarytmicznej",
-    lfP3SparkFigure: "Średnia liczba różnych nazwisk w losowym tłumie ({list}): {values}.",
-    lfP3SparkPoint: "{n} {n:osoba|osoby|osób}: {d}",
-    lfP3LanesTitle: "Po ilu nieznajomych…",
-    lfP3LanesLede:
-      "…szansa, że jest wśród nich ktoś o nazwisku z danej grupy, sięga połowy? Kropka to jedna " +
-      "osoba w kolejce.",
-    lfP3SetTop100: "ktoś ze 100 najczęstszych nazwisk listy",
-    lfP3SetTop10: "ktoś z 10 najczęstszych nazwisk listy",
-    lfP3SetTop1: "najczęstsze nazwisko listy",
-    lfP3SetSubMale:
-      "nosi je {s} mężczyzn z listy · szansa przy {n} {n:osobie|osobach|osobach}: {p}",
-    lfP3SetSubFemale:
-      "nosi je {s} kobiet z listy · szansa przy {n} {n:osobie|osobach|osobach}: {p}",
-    lfP3QueueAxis: "osób w kolejce",
-    // The plate III fact card in three sentences: one whose figure is missing
-    // is left out, never printed with a blank or a zero.
-    lfP3FactDistinct:
-      "W losowym tłumie {cm} mężczyzn z listy jest średnio **{dm}** różnych nazwisk, a w tłumie " +
-      "{cf} kobiet z listy — **{df}**.",
-    lfP3FactAlone:
-      "Nikogo o tym samym nazwisku nie ma w swoim tłumie średnio {sm} mężczyzn i {sf} kobiet.",
-    lfP3FactReach:
-      "Żeby szansa na spotkanie kogoś ze 100 " +
-      "najczęstszych nazwisk listy sięgnęła połowy, wystarczy {a1} mężczyzn albo {a2} " +
-      "{a2:kobieta|kobiety|kobiet}; dla 10 najczęstszych nazwisk — {b1} mężczyzn albo {b2} " +
-      "{b2:kobieta|kobiety|kobiet}; dla najczęstszego nazwiska listy — {c1} mężczyzn albo {c2} " +
-      "{c2:kobieta|kobiety|kobiet}.",
-    lfP3Caveat:
-      "Tłum to model: osoby losowane bez zwracania z jednej opublikowanej listy (nazwiska noszone " +
-      "przez co najmniej 2 osoby, osoby żyjące, nazwisko aktualne) — prawdziwe tłumy nie są " +
-      "losowe. „Średnio” to wartość oczekiwana dla losowego tłumu. Każdy przykładowy tłum to " +
-      "jedno zapisane losowanie, a dwóch przykładowych tłumów nie należy ze sobą porównywać. " +
-      "Nazwiska noszone przez 1 osobę nie są publikowane i nie są tu uwzględnione.",
+      "Typowe nazwisko (mediana) {m:nosi|noszą|nosi} {m} {m:osoba|osoby|osób}: co najmniej " +
+      "połowa nazwisk z listy kobiet ma najwyżej tylu nosicieli.",
+    lfP3KeySurnames: "ile nazwisk",
+    lfP3KeyPeople: "ile osób je nosi",
+    lfP3Axis: "liczba nosicieli nazwiska",
+    lfP3NoteKicker: "Czego nie ma na liście",
+    lfP3Note:
+      "Nazwisk noszonych przez jedną osobę wydawca nie publikuje, więc najmniejsza liczba " +
+      "nosicieli na liście to {min}. Nie pokazujemy też przykładów tak rzadkich nazwisk: tak " +
+      "małe liczby mogą wskazywać konkretne osoby.",
+    lfP3Foot:
+      "Przedziały liczby nosicieli nazwiska. Czarne słupki: nazwiska; niebieskie: osoby, które je " +
+      "noszą.",
+    // Plate IV: endings. The headline says "one in four" only when the stored
+    // share lies in [0.24, 0.26); otherwise it states the share.
+    lfP4Name: "Końcówki",
+    lfP4TitleQuarterMale: "Co czwarty mężczyzna nosi nazwisko na\u00a0{ending}.",
+    lfP4TitleQuarterFemale: "Co czwarta kobieta nosi nazwisko na\u00a0{ending}.",
+    lfP4TitleShareMale: "{share} mężczyzn nosi nazwisko na\u00a0{ending}.",
+    lfP4TitleShareFemale: "{share} kobiet nosi nazwisko na\u00a0{ending}.",
+    lfP4CaptionMale:
+      "**{share}** mężczyzn z listy · {p} {p:osoba|osoby|osób} · {s} " +
+      "{s:nazwisko|nazwiska|nazwisk} na\u00a0{ending}",
+    lfP4CaptionFemale:
+      "**{share}** kobiet z listy · {p} {p:osoba|osoby|osób} · {s} " +
+      "{s:nazwisko|nazwiska|nazwisk} na\u00a0{ending}",
+    lfP4Glyph: "Cztery znaki to cała lista; niebieskie wypełnienie to udział osób z tą końcówką.",
+    lfP4ListMale: "Udział mężczyzn z listy, według końcówki nazwiska",
+    lfP4ListFemale: "Udział kobiet z listy, według końcówki nazwiska",
+    lfP4Foot:
+      "Liczymy zapis końcówki, nie pochodzenie nazwiska. Końcówki się nie nakładają: żadne " +
+      "nazwisko nie jest liczone dwa razy.",
+    // Plate V: the alphabet.
+    lfP5Name: "Alfabet",
+    lfP5TitleMale: "Najwięcej mężczyzn ma nazwisko na {letter}.",
+    lfP5TitleFemale: "Najwięcej kobiet ma nazwisko na {letter}.",
+    lfP5LedeMale:
+      "{p} {p:mężczyzna ma|mężczyzn ma|mężczyzn ma} nazwisko na {letter}. Wielkość litery rośnie " +
+      "z liczbą osób, których nazwisko się od niej zaczyna.",
+    lfP5LedeFemale:
+      "{p} {p:kobieta ma|kobiety mają|kobiet ma} nazwisko na {letter}. Wielkość litery rośnie " +
+      "z liczbą osób, których nazwisko się od niej zaczyna.",
+    lfP5GridMale: "Pierwsze litery nazwisk z listy mężczyzn i liczba osób",
+    lfP5GridFemale: "Pierwsze litery nazwisk z listy kobiet i liczba osób",
+    lfP5AbsentCell: "brak nazwisk",
+    lfP5AbsentMale:
+      "**{letters} — brak.** Żadne nazwisko z listy mężczyzn nie zaczyna się od " +
+      "{n:tej litery|tych liter|tych liter}. To brak, nie zero.",
+    lfP5AbsentFemale:
+      "**{letters} — brak.** Żadne nazwisko z listy kobiet nie zaczyna się od " +
+      "{n:tej litery|tych liter|tych liter}. To brak, nie zero.",
+    lfP5RarestMale:
+      "**{letter} — {s} {s:nazwisko|nazwiska|nazwisk}, {p} {p:osoba|osoby|osób}.** Najrzadsza " +
+      "litera polskiego alfabetu, od której zaczyna się nazwisko na liście mężczyzn.",
+    lfP5RarestFemale:
+      "**{letter} — {s} {s:nazwisko|nazwiska|nazwisk}, {p} {p:osoba|osoby|osób}.** Najrzadsza " +
+      "litera polskiego alfabetu, od której zaczyna się nazwisko na liście kobiet.",
+    lfP5OutsideMale:
+      "**{s} {s:nazwisko|nazwiska|nazwisk} ({p} {p:osoba|osoby|osób})** z listy mężczyzn " +
+      "{s:zaczyna|zaczynają|zaczyna} się od litery, której nie ma w tej tablicy.",
+    lfP5OutsideFemale:
+      "**{s} {s:nazwisko|nazwiska|nazwisk} ({p} {p:osoba|osoby|osób})** z listy kobiet " +
+      "{s:zaczyna|zaczynają|zaczyna} się od litery, której nie ma w tej tablicy.",
+    lfP5Foot:
+      "Q, V i X nie należą do polskiego alfabetu (pola kreskowane). Liczymy pierwszą literę " +
+      "zapisu nazwiska.",
+    // Plate VI: the two lists as sets of surnames. Counts of surnames only.
+    lfP6Name: "Dwie listy",
+    lfP6Title: "{b} {b:nazwisko jest|nazwiska są|nazwisk jest} na obu listach.",
+    lfP6OnBoth:
+      "{name} jest na obu listach: {m} {m:mężczyzna|mężczyzn|mężczyzn} na liście mężczyzn i {f} " +
+      "{f:kobieta|kobiety|kobiet} na liście kobiet.",
+    lfP6FemaleOnly: "{name} jest tylko na liście kobiet ({f} {f:kobieta|kobiety|kobiet}).",
+    lfP6MaleOnly: "{name} jest tylko na liście mężczyzn ({m} {m:mężczyzna|mężczyzn|mężczyzn}).",
+    lfP6Why: "Dlatego list nie sumujemy: wspólne nazwiska liczyłyby się dwa razy.",
+    lfP6MaleOnlyLabel: "tylko na liście mężczyzn",
+    lfP6BothLabel: "na obu listach",
+    lfP6FemaleOnlyLabel: "tylko na liście kobiet",
+    lfP6HyphenKicker: "Nazwiska z łącznikiem",
+    lfP6HyphenTopMale:
+      "Najczęstsze nazwisko z łącznikiem na liście mężczyzn: {c} {c:mężczyzna|mężczyzn|mężczyzn}.",
+    lfP6HyphenTopFemale:
+      "Najczęstsze nazwisko z łącznikiem na liście kobiet: {c} {c:kobieta|kobiety|kobiet}.",
+    lfP6HyphenNoneMale:
+      "Żadnego nazwiska z łącznikiem z listy mężczyzn nie nosi dość osób, by je wymienić.",
+    lfP6HyphenNoneFemale:
+      "Żadnego nazwiska z łącznikiem z listy kobiet nie nosi dość osób, by je wymienić.",
+    lfP6HyphenCountMale:
+      "Na liście mężczyzn {s:jest|są|jest} {s} " +
+      "{s:nazwisko|nazwiska|nazwisk} z łącznikiem; nosi je {p} " +
+      "{p:mężczyzna|mężczyzn|mężczyzn}.",
+    lfP6HyphenCountFemale:
+      "Na liście kobiet {s:jest|są|jest} {s} " +
+      "{s:nazwisko|nazwiska|nazwisk} z łącznikiem; {p:nosi|noszą|nosi} " +
+      "je {p} {p:kobieta|kobiety|kobiet}.",
+    lfP6Foot:
+      "Pola kół są proporcjonalne do liczby nazwisk na każdej liście. Nazwiska porównujemy po " +
+      "dokładnym zapisie, z polskimi znakami: forma męska i żeńska to dwa różne nazwiska.",
+    // The coda: no trend from one edition.
+    lfCodaKicker: "Zmiany w czasie",
+    lfCodaTitle: "Trend potrzebuje dwóch wydań. Mamy jedno.",
+    lfCodaBody:
+      "Wczytaliśmy jedno wydanie rejestru (stan na {date}). Gdy wczytamy kolejne, plansze będą " +
+      "mogły pokazać, co się zmieniło — policzone, nie zgadywane.",
+    lfCodaEdition: "wydanie",
+    lfCodaNext: "następne",
     footer:
       "Każda liczba pochodzi z rejestru PESEL i jest podana razem z zakresem zbioru, datą i źródłem. Brak danych jest podany jako brak, nigdy jako zero.",
   },
@@ -947,189 +931,166 @@ export const UI = {
     invalidBody: "Check the surname you entered and try again.",
     noFigures: "There is nothing to show.",
     notSummed: "The male and female datasets are separate and are never summed.",
-    lfEyebrow: "Surname atlas",
-    lfTitle: "Two lists, three plates",
+    lfEyebrow: "PESEL register · {year} edition",
+    lfTitle: "Surname atlas",
     lfLede:
-      "Three plates about the published surname lists of the PESEL register: how surnames are " +
-      "spread, when they repeat, and how many turn up in a crowd. The male list and the female " +
-      "list are shown side by side and never summed.",
+      "Six plates about the surnames in the PESEL register (as of {date}). Men and women are on " +
+      "two separate lists: switch the list and plates I–V show that list, while plate VI compares " +
+      "both. We never add them up.",
     lfScope:
       "Every figure describes one published list of the PESEL register: surnames borne by at " +
       "least 2 people, living persons, current surname. As\u00a0of\u00a0{date}",
-    lfIndexLabel: "Plates",
-    lfP1Short: "The typical surname and the typical person",
-    lfP2Short: "When a surname repeats",
-    lfP3Short: "How many surnames a crowd carries",
     lfSwitchLabel: "Which list",
-    lfSwitchMale: "Male list",
-    lfSwitchFemale: "Female list",
+    lfSwitchMale: "Men",
+    lfSwitchFemale: "Women",
     lfSwitchNote: "separate lists, never summed",
-    lfListMale: "Male list",
-    lfListFemale: "Female list",
     lfListInMale: "male list",
     lfListInFemale: "female list",
     lfSource: "Source: {link} · as\u00a0of\u00a0{date}",
     lfSourceName: "PESEL register, dane.gov.pl",
     lfSourceTwo: "Source: PESEL register, dane.gov.pl ({male}, {female}) · as\u00a0of\u00a0{date}",
     lfMethod: "{status} · method {method}",
-    lfP1No: "Plate I · Slide rule",
-    lfP1TitleMale:
-      "On the male list the typical surname has {s} {s:bearer|bearers}, and the typical man bears " +
-      "one shared by {p} men.",
-    lfP1TitleFemale:
-      "On the female list the typical surname has {s} {s:bearer|bearers}, and the typical woman " +
-      "bears one shared by {p} women.",
-    lfP1Lede:
-      "Rare surnames are many, but each has few bearers; common ones are few, but each is carried " +
-      "by crowds. So the typical surname and the typical person's surname are two different " +
-      "numbers — from the same list.",
-    lfP1AxisNote: "bearers per surname · log scale",
-    lfP1TopRow: "at least …% of surnames have at most this many bearers",
-    lfP1BottomRowMale: "at least …% of men carry a surname with at most this many bearers",
-    lfP1BottomRowFemale: "at least …% of women carry a surname with at most this many bearers",
-    lfP1FlagSurname: "typical surname: {s} {s:bearer|bearers}",
-    lfP1FlagPersonMale: "typical man: a surname of {p} men",
-    lfP1FlagPersonFemale: "typical woman: a surname of {p} women",
-    lfP1Omitted: "1 bearer: left out by the publisher",
-    lfP1Max: "the list's most common surname",
-    lfP1Arc: "one list, two questions",
-    lfP1Rung: "{t}+: {n} {n:surname|surnames}",
-    lfP1ThresholdsHeading: "How many surnames have at least…",
-    lfP1ThresholdAtLeast: "{t}+ {t:bearer|bearers}",
-    lfP1ThresholdSurnames: "{n} {n:surname|surnames}",
-    lfP1ThresholdPeopleMale: "borne by {p} men",
-    lfP1ThresholdPeopleFemale: "borne by {p} women",
-    lfP1FigureMale:
-      "Log scale of bearers per surname on the male list, from {min} to {max} bearers. Typical " +
-      "surname: {s} {s:bearer|bearers}. Typical man: a surname of {p} men. Surnames: {surnames}. " +
-      "Men: {people}.",
-    lfP1FigureFemale:
-      "Log scale of bearers per surname on the female list, from {min} to {max} bearers. Typical " +
-      "surname: {s} {s:bearer|bearers}. Typical woman: a surname of {p} women. Surnames: " +
-      "{surnames}. Women: {people}.",
-    lfP1FigureSurnameQuantile: "at least {q} have at most {c} {c:bearer|bearers}",
-    lfP1FigurePersonQuantile: "at least {q} carry a surname with at most {c} {c:bearer|bearers}",
-    lfP1Fact:
-      "The **typical surname** has {sm} {sm:bearer|bearers} on the male list and {sf} on the " +
-      "female list: at least half the surnames on each list have at most that many. The **typical " +
-      "man** bears a surname shared by {pm} men, the **typical woman** one shared by {pf} women: " +
-      "at least half the people on each list carry a surname at least that common. The male list " +
-      "counts {nm} people and {rm} surnames; the female list, {nf} people and {rf} surnames. The " +
-      "male list's most common surname is borne by {xm} men; the female list's, by {xf} women.",
-    lfP1Caveat:
-      "Counted on the published list: surnames borne by at least 2 people, living persons, current " +
-      "surname. The publisher leaves out surnames borne by 1 person, so they are not counted — " +
-      "their absence is not zero. A median describes this list only. The male and female lists " +
-      "are counted separately and never summed.",
-    lfP2No: "Plate II · The room",
-    lfP2Title: "How many people must walk in before a surname repeats?",
-    lfP2Lede:
-      "Two people drawn from the male list share a surname with a chance of about 1 in {om}; from " +
-      "the female list, about 1 in {of}. How many people must walk into a room before the chance " +
-      "that at least two share a surname reaches one half?",
-    lfP2Answer: "{n:person|people} — the chance that at least two share a surname: {p}",
-    lfP2Model: "Model: people drawn at random, without replacement, from this list.",
-    lfP2XAxis: "people in the room",
-    lfP2BirthdayTick: "birthdays",
-    lfP2CurveFigure:
-      "Chart: the chance that at least two of n people drawn from the {list} share a surname, for " +
-      "n from {from} to {to}. It reaches one half at {n} people: {p}. At {bn} people: {p23}.",
-    lfP2StripCaption:
-      "{rooms} example {rooms:room|rooms}: each dot is one room, placed at the person with whom " +
-      "its first pair sharing a surname arrived. Vertical line: {n} {n:person|people}.",
-    lfP2StripFigure:
-      "Example rooms ({list}): one dot per room, at the person with whom its first pair sharing a " +
-      "surname arrived.",
-    lfP2StripList: "Example rooms ({list}), in order: the person with whom the first pair arrived",
-    lfP2RoomCaption:
-      "In this draw, in the first of these rooms, the first pair arrived with person no. {b}: " +
-      "people no. {a} and no. {b} share a surname.",
-    lfP2RoomFigure:
-      "Room ({list}): {b} {b:seat|seats} taken; people no. {a} and no. {b} are joined by a line " +
-      "because they share a surname.",
-    lfP2Birthday:
-      "Birthdays (a model of 365 equally likely days): {bn} {bn:person|people}, {bp}. A shared " +
-      "surname at {bn} people: {p23}.",
-    lfP2LegendSeat: "person in the room",
-    lfP2LegendEmpty: "empty seat",
-    lfP2LegendPair: "first pair with the same surname",
-    lfP2RoomHalf: "{n} {n:person|people}: a {p} chance",
-    lfP2RoomHalfFigure:
-      "A line after seat no. {n}: with {n} {n:person|people}, the chance that at least two share " +
-      "a surname is {p}.",
-    lfP2Fact:
-      "**{nm} {nm:person|people}** from the male list are enough for the chance that at least two " +
-      "share a surname to reach {pm}; with one person fewer it is {qm}. From the female list, " +
-      "**{nf} {nf:person|people}**: {pf}, and with one fewer, {qf}. Two people picked at random " +
-      "share a surname with a chance of about 1 in {om} on the male list and about 1 in {of} on " +
-      "the female list.",
-    lfP2FactBirthday:
-      "For comparison, in a model of 365 equally likely birthdays {bn} {bn:person is|people are} " +
-      "enough ({bp}); at {bn} people the chance of a shared surname is {p23m} on the male list and " +
-      "{p23f} on the female list.",
-    lfP2Caveat:
-      "Model: people drawn at random, without replacement, from one published list (surnames " +
-      "borne by at least 2 people, living persons, current surname). Real groups — families, classes, workplaces — are not random. " +
-      "The example rooms are recorded draws, not real rooms. The {bn} for birthdays is the result " +
-      "of a model of 365 equally likely days, not PESEL data.",
-    lfP3No: "Plate III · The crowd",
-    lfP3TitleThousandMale:
-      "A thousand strangers from the male list: {d} different {d:surname|surnames} on average",
-    lfP3TitleThousandFemale:
-      "A thousand strangers from the female list: {d} different {d:surname|surnames} on average",
-    lfP3TitleMale:
-      "{c} strangers from the male list: {d} different {d:surname|surnames} on average",
-    lfP3TitleFemale:
-      "{c} strangers from the female list: {d} different {d:surname|surnames} on average",
+    lfPlate: "Plate",
+    lfP1Name: "Constellation",
+    lfP1Title: "Every surname is one dot.",
+    lfP1SurnamesMale: "{n:surname|surnames} on the male list",
+    lfP1SurnamesFemale: "{n:surname|surnames} on the female list",
+    lfP1PeopleMale: "{n:man|men} on the list",
+    lfP1PeopleFemale: "{n:woman|women} on the list",
+    lfP1CoreMale: "At the centre, the male list's most common surnames:",
+    lfP1CoreFemale: "At the centre, the female list's most common surnames:",
+    lfP1RingMale:
+      "Inside the dashed ring, the {k} most common {k:surname|surnames}. Half the men on the " +
+      "list carry them.",
+    lfP1RingFemale:
+      "Inside the dashed ring, the {k} most common {k:surname|surnames}. Half the women on the " +
+      "list carry them.",
+    lfP1Dust: "Dust at the edge: {u} {u:surname|surnames} borne by fewer than {edge} people.",
+    lfP1Foot:
+      "Dots run from the most common surname (centre) to the rarest (edge) on a logarithmic " +
+      "scale; a dot grows with the number of people.",
+    lfP2Name: "Half",
+    lfP2TitleMale: "Half of the men on the list carry one of {k} surnames.",
+    lfP2TitleFemale: "Half of the women on the list carry one of {k} surnames.",
+    lfP2LedeMale:
+      "The other half is spread over {b} {b:surname|surnames}. The top bar is every man on the " +
+      "list, the bottom bar every surname.",
+    lfP2LedeFemale:
+      "The other half is spread over {b} {b:surname|surnames}. The top bar is every woman on the " +
+      "list, the bottom bar every surname.",
+    lfP2PeopleMale: "All: {n} {n:man|men}",
+    lfP2PeopleFemale: "All: {n} {n:woman|women}",
+    lfP2Surnames: "All surnames: {n}",
+    lfP2LevelMale: "{k} most common {k:surname|surnames} → {q} of men",
+    lfP2LevelFemale: "{k} most common {k:surname|surnames} → {q} of women",
+    lfP2Foot:
+      "The bands link a share of the people on the list with the most common surnames that share " +
+      "carries; each threshold is met or just passed.",
+    lfP3Name: "Rarity",
+    lfP3TitleMale: "{n} {n:surname is|surnames are} borne by exactly two men.",
+    lfP3TitleFemale: "{n} {n:surname is|surnames are} borne by exactly two women.",
     lfP3LedeMale:
-      "Draw {c} {c:person|people} from the male list and look at their surnames. A dot is one " +
-      "person; a line joins people who share a surname.",
+      "The typical surname (the median) is borne by {m} {m:person|people}: at least half the " +
+      "surnames on the male list have at most that many bearers.",
     lfP3LedeFemale:
-      "Draw {c} {c:person|people} from the female list and look at their surnames. A dot is one " +
-      "person; a line joins people who share a surname.",
-    lfP3Distinct: "different surnames — the average over random crowds of {c}",
-    lfP3Alone: "of people with nobody else of the same surname — on average",
-    lfP3Example:
-      "In this draw: {d} different {d:surname|surnames}, {w} {w:person|people} with nobody else of " +
-      "the same surname.",
-    lfP3CrowdFigure:
-      "An example crowd of {n} {n:person|people} from the {list}, one dot per person. {example}",
-    lfP3LegendDot: "1 dot = 1 person",
-    lfP3LegendAlone: "the only one with that surname",
-    lfP3LegendShared: "a surname shared in the crowd",
-    lfP3SparkTitle: "The bigger the crowd, the more slowly new surnames arrive",
-    lfP3SparkLine: "different surnames, on average",
-    lfP3SparkRef: "if everyone had a different surname",
-    lfP3SparkAxis: "people in the crowd · both axes on a log scale",
-    lfP3SparkFigure: "Average number of different surnames in a random crowd ({list}): {values}.",
-    lfP3SparkPoint: "{n} {n:person|people}: {d}",
-    lfP3LanesTitle: "After how many strangers…",
-    lfP3LanesLede:
-      "…does the chance that one of them carries a surname from the group reach one half? A dot is " +
-      "one person in the queue.",
-    lfP3SetTop100: "someone with one of the list's 100 most common surnames",
-    lfP3SetTop10: "someone with one of the list's 10 most common surnames",
-    lfP3SetTop1: "the list's most common surname",
-    lfP3SetSubMale: "carried by {s} of the men on the list · the chance at {n}: {p}",
-    lfP3SetSubFemale: "carried by {s} of the women on the list · the chance at {n}: {p}",
-    lfP3QueueAxis: "people in the queue",
-    lfP3FactDistinct:
-      "In a random crowd of {cm} men from the list there are on average **{dm}** different " +
-      "surnames; in a crowd of {cf} women from the list, **{df}**.",
-    lfP3FactAlone:
-      "On average {sm} of the men and {sf} of the women have nobody else of the same surname in " +
-      "their crowd.",
-    lfP3FactReach:
-      "For the chance of " +
-      "meeting someone with one of the list's 100 most common surnames to reach one half, {a1} men " +
-      "or {a2} women are enough; for the 10 most common, {b1} men or {b2} women; for the list's " +
-      "most common surname, {c1} men or {c2} women.",
-    lfP3Caveat:
-      "The crowd is a model: people drawn at random, without replacement, from one published list " +
-      "(surnames borne by at least 2 people, living persons, current surname) — real crowds are " +
-      "not random. “On average” is the expected value for a random crowd. Each example " +
-      "crowd is one recorded draw, and the two example crowds are not to be compared with each " +
-      "other. Surnames borne by 1 person are not published and are not included here.",
+      "The typical surname (the median) is borne by {m} {m:person|people}: at least half the " +
+      "surnames on the female list have at most that many bearers.",
+    lfP3KeySurnames: "surnames",
+    lfP3KeyPeople: "people bearing them",
+    lfP3Axis: "bearers per surname",
+    lfP3NoteKicker: "What the list leaves out",
+    lfP3Note:
+      "The publisher omits surnames borne by one person, so the smallest count on the list is " +
+      "{min}. Nor do we show examples of surnames this rare: counts this small can point to " +
+      "particular people.",
+    lfP3Foot:
+      "Bands of bearers per surname. Black bars: surnames; blue bars: the people bearing them.",
+    lfP4Name: "Endings",
+    lfP4TitleQuarterMale: "One man in four has a surname ending in\u00a0{ending}.",
+    lfP4TitleQuarterFemale: "One woman in four has a surname ending in\u00a0{ending}.",
+    lfP4TitleShareMale: "{share} of men on the list have a surname ending in\u00a0{ending}.",
+    lfP4TitleShareFemale: "{share} of women on the list have a surname ending in\u00a0{ending}.",
+    lfP4CaptionMale:
+      "**{share}** of men on the list · {p} {p:person|people} · {s} {s:surname|surnames} ending " +
+      "in\u00a0{ending}",
+    lfP4CaptionFemale:
+      "**{share}** of women on the list · {p} {p:person|people} · {s} {s:surname|surnames} " +
+      "ending in\u00a0{ending}",
+    lfP4Glyph:
+      "The four marks are the whole list; the blue fill is the share of people with this ending.",
+    lfP4ListMale: "Share of men on the list, by surname ending",
+    lfP4ListFemale: "Share of women on the list, by surname ending",
+    lfP4Foot:
+      "We count an ending as it is spelled, never as a surname's origin. The endings do not " +
+      "overlap: no surname is counted twice.",
+    lfP5Name: "Alphabet",
+    lfP5TitleMale: "{letter} starts the surnames of the most men.",
+    lfP5TitleFemale: "{letter} starts the surnames of the most women.",
+    lfP5LedeMale:
+      "{p} {p:man has|men have} a surname starting with {letter}. Each letter grows with the " +
+      "number of people whose surname starts with it.",
+    lfP5LedeFemale:
+      "{p} {p:woman has|women have} a surname starting with {letter}. Each letter grows with the " +
+      "number of people whose surname starts with it.",
+    lfP5GridMale: "First letters of the surnames on the male list, with the number of people",
+    lfP5GridFemale: "First letters of the surnames on the female list, with the number of people",
+    lfP5AbsentCell: "no surnames",
+    lfP5AbsentMale:
+      "**{letters}: none.** No surname on the male list starts with " +
+      "{n:this letter|these letters}. That is absence, not zero.",
+    lfP5AbsentFemale:
+      "**{letters}: none.** No surname on the female list starts with " +
+      "{n:this letter|these letters}. That is absence, not zero.",
+    lfP5RarestMale:
+      "**{letter}: {s} {s:surname|surnames}, {p} {p:person|people}.** The rarest letter of the " +
+      "Polish alphabet that starts a surname on the male list.",
+    lfP5RarestFemale:
+      "**{letter}: {s} {s:surname|surnames}, {p} {p:person|people}.** The rarest letter of the " +
+      "Polish alphabet that starts a surname on the female list.",
+    lfP5OutsideMale:
+      "**{s} {s:surname|surnames} ({p} {p:person|people})** on the male list " +
+      "{s:starts|start} with a letter that is not in this table.",
+    lfP5OutsideFemale:
+      "**{s} {s:surname|surnames} ({p} {p:person|people})** on the female list " +
+      "{s:starts|start} with a letter that is not in this table.",
+    lfP5Foot:
+      "Q, V and X are not in the Polish alphabet (hatched). We count the first letter of the " +
+      "surname as spelled.",
+    lfP6Name: "Two lists",
+    lfP6Title: "{b} {b:surname is|surnames are} on both lists.",
+    lfP6OnBoth:
+      "{name} is on both lists: {m} {m:man|men} on the male list and {f} {f:woman|women} on the " +
+      "female list.",
+    lfP6FemaleOnly: "{name} is on the female list only ({f} {f:woman|women}).",
+    lfP6MaleOnly: "{name} is on the male list only ({m} {m:man|men}).",
+    lfP6Why: "That is why the lists are never added up: the shared surnames would count twice.",
+    lfP6MaleOnlyLabel: "on the male list only",
+    lfP6BothLabel: "on both lists",
+    lfP6FemaleOnlyLabel: "on the female list only",
+    lfP6HyphenKicker: "Hyphenated surnames",
+    lfP6HyphenTopMale: "The most common hyphenated surname on the male list: {c} {c:man|men}.",
+    lfP6HyphenTopFemale:
+      "The most common hyphenated surname on the female list: {c} {c:woman|women}.",
+    lfP6HyphenNoneMale:
+      "No hyphenated surname on the male list is borne by enough people to be named.",
+    lfP6HyphenNoneFemale:
+      "No hyphenated surname on the female list is borne by enough people to be named.",
+    lfP6HyphenCountMale:
+      "The male list holds {s} hyphenated {s:surname|surnames}, borne by {p} {p:man|men}.",
+    lfP6HyphenCountFemale:
+      "The female list holds {s} hyphenated {s:surname|surnames}, borne by {p} " +
+      "{p:woman|women}.",
+    lfP6Foot:
+      "Each circle's area is proportional to the number of surnames on its list. Surnames are " +
+      "compared exactly as spelled, with Polish letters: a male and a female form are two " +
+      "different surnames.",
+    lfCodaKicker: "Change over time",
+    lfCodaTitle: "A trend needs two editions. We have one.",
+    lfCodaBody:
+      "We have loaded one edition of the register (as of {date}). When we load the next, the " +
+      "plates can show what changed — counted, not guessed.",
+    lfCodaEdition: "edition",
+    lfCodaNext: "next",
     footer:
       "Every number comes from the PESEL register and is shown with its dataset scope, date and source. Missing data is stated as missing, never as zero.",
   },

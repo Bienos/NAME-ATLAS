@@ -107,8 +107,33 @@ describe("computeListFacts on a synthetic complete list", () => {
     expect(facts.crowd.example.seed).toBe(20261120);
   });
 
-  it("carries no surname string out of the parser", () => {
-    expect(JSON.stringify(computeListFacts(list))).not.toContain("SYNTH");
+  it("carries surname strings only in ADR-0018's named selections, at or above the floor", () => {
+    const facts = computeListFacts(list);
+    const { named_top, hyphenated, ...rest } = facts;
+    expect(JSON.stringify(rest)).not.toContain("SYNTH");
+    // The three largest counts: 2 + (i·37 mod 90) reaches 91 at i = 17 and 107, 90 at i = 34.
+    expect(named_top.items).toEqual([
+      { key: "synth0017", published: "SYNTH0017", count: 91 },
+      { key: "synth0107", published: "SYNTH0107", count: 91 },
+      { key: "synth0034", published: "SYNTH0034", count: 90 },
+    ]);
+    expect(hyphenated).toEqual({
+      method_version: "list_hyphenated@1",
+      surnames: 0,
+      people: 0,
+      top: null,
+    });
+  });
+
+  it("names nothing on a list whose surnames are all below the floor", () => {
+    // Counts 2…19 (1224 people, enough for the example crowd of 1000): none reaches 20.
+    const small = syntheticList(
+      "national_male",
+      Array.from({ length: 120 }, (_, i) => 2 + (i % 18)),
+    );
+    const facts = computeListFacts(small);
+    expect(facts.named_top.items).toEqual([]);
+    expect(JSON.stringify(facts)).not.toContain("SYNTH");
   });
 
   it("is deterministic", () => {
@@ -155,10 +180,26 @@ describe("buildListFactsArtefact", () => {
     expect(artefact.birthday_reference).toEqual({ n_half: 23, p_at_n_half: 0.507297234 });
   });
 
+  it("compares the two lists' sets of keys: SYNTH0000–0149 on both, 0150–0159 female only", () => {
+    const { overlap } = buildListFactsArtefact({ male, female });
+    expect(overlap).toMatchObject({ male_only: 0, both: 150, female_only: 10 });
+    // Male counts 2 + (i mod 60) peak at 61 for i = 59 and 119; "synth0059" comes first.
+    expect(overlap.on_both_top).toEqual({
+      key: "synth0059",
+      male: { published: "SYNTH0059", count: 61 },
+      female: { published: "SYNTH0059", count: 61 },
+    });
+    expect(overlap.one_list_top).toEqual({
+      male: null,
+      // Female counts 2 + (i mod 70) for i = 150…159: 12…21, so SYNTH0159 with 21.
+      female: { key: "synth0159", published: "SYNTH0159", count: 21 },
+    });
+  });
+
   it("records the pipeline version, apart from the schema version", () => {
     const artefact = buildListFactsArtefact({ male, female });
     expect(artefact.pipeline_version).toBe(LIST_FACTS_METHOD_VERSION);
-    expect(artefact.pipeline_version).toBe("list_facts_pipeline@1");
+    expect(artefact.pipeline_version).toBe("list_facts_pipeline@2");
     expect(artefact.pipeline_version).not.toBe(artefact.schema_version);
   });
 
