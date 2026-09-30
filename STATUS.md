@@ -35,7 +35,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-No open pull request (checked 2026-09-30). TASK-037 was merged in #24. The branch `claude/jolly-faraday-uas99n` carries TASK-038 and this rewrite.
+One: #25 from `claude/jolly-faraday-uas99n`, which carries TASK-038 and this rewrite (checked 2026-09-30). TASK-037 was merged in #24.
 
 ## Blocked on the project owner
 
