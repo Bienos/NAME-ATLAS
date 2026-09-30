@@ -1,6 +1,6 @@
 # TASK-035 — Load the real PESEL register into production
 
-- **Status:** PARKED 2026-09-29 by the project owner, who will not move Supabase off the free plan (§0). What was measured before stopping is in `docs/progress/2026-09-29-register-load-parked.md`.
+- **Status:** SUPERSEDED 2026-09-30 by TASK-041 (ADR-0016): the register goes to production on an Oracle Cloud Always Free VM, built there rather than transferred. Before that: PARKED 2026-09-29 by the project owner, who will not move Supabase off the free plan (§0). What was measured before stopping is in `docs/progress/2026-09-29-register-load-parked.md`.
 - **Requested by:** the project owner, who chose "load the real register" on 2026-09-29, after the go-live of #9, #10, #7 and #11. They then chose a GitHub Actions workflow for the transfer.
 - **Milestone:** launch. `PROGRESS.md` (2026-09-21): "A launch needs the full register imported, which is what makes rank, rarity and geography answer instead of refusing."
 - **Numbering:** TASK-034 is reserved in `STATUS.md` for the section registry; this takes the next number.

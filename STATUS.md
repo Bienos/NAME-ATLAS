@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, to record that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, by ADR-0016 and TASK-041, documentation only (`docs/progress/2026-09-30-oracle-postgres-hosting.md`). The project owner chose to move production's database off Supabase to PostgreSQL on an Oracle Cloud Always Free VM in Frankfurt, with the complete register built there. TASK-041 specifies the move and waits on the owner's answers. Before it, #27 carried the family surnames draft (`docs/progress/2026-09-30-family-surnames-draft.md`).
 
 ## Production
 
@@ -32,7 +32,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
-- **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
+- **TASK-041**, production's database on Oracle Cloud with the complete register (ADR-0016): specified, not started. It waits on the owner's answers to its §13 (U-1 to U-6) and on the console steps in its §12. It supersedes TASK-035, which was parked because the complete register (about 16 GB, projected) does not fit Supabase's free 500 MB.
 
 ## Open pull requests and branches
 
@@ -77,7 +77,7 @@ One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
-- **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
+- **TASK-041, the database move.** Answer its §13 U-1 to U-6, then do its §12 console steps: the A1 instance, a 150 GB block volume, the security-list rules, a DNS record, and later the Vercel `DATABASE_URL`. ADR-0016 replaces ADR-0011's Neon choice, which was the open "Hosting ADR" item.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
   - **D-023**, raised by TASK-039 and non-blocking: should TERC ids stay under `provider_key = 'TERYT'`, as they have since TASK-011, or move to `docs/canonical/12` §11.3's `TERYT_TERC`?
