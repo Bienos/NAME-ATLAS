@@ -115,7 +115,7 @@ async function seedOne(
   trx: Transaction<DB>,
   entry: CorrespondenceEntry,
   registerReferenceDate: string,
-): Promise<{ readonly placeId: string; readonly created: boolean; readonly nameCreated: boolean }> {
+): Promise<{ readonly placeId: string; readonly created: boolean }> {
   const existing = await trx
     .selectFrom("entity_external_ids")
     .select(["entity_id"])
@@ -123,7 +123,7 @@ async function seedOne(
     .where("external_id", "=", entry.terc_code)
     .executeTakeFirst();
   if (existing) {
-    return { placeId: existing.entity_id, created: false, nameCreated: false };
+    return { placeId: existing.entity_id, created: false };
   }
 
   const placeId = uuidv7();
@@ -197,7 +197,7 @@ async function seedOne(
     })
     .execute();
 
-  return { placeId, created: true, nameCreated: true };
+  return { placeId, created: true };
 }
 
 /**
@@ -219,29 +219,27 @@ export async function seedVoivodeshipPlacesIn(
   trx: Transaction<DB>,
   correspondence: VoivodeshipCorrespondence = readVoivodeshipCorrespondence(),
 ): Promise<VoivodeshipSeedReport> {
-  return (async () => {
-    let placesCreated = 0;
-    let placesReused = 0;
-    let namesCreated = 0;
-    const byCode = new Map<string, string>();
-    const byValue = new Map<string, string>();
+  let placesCreated = 0;
+  let placesReused = 0;
+  const byCode = new Map<string, string>();
+  const byValue = new Map<string, string>();
 
-    for (const entry of correspondence.entries) {
-      const result = await seedOne(trx, entry, correspondence.registerReferenceDate);
-      byCode.set(entry.terc_code, result.placeId);
-      byValue.set(entry.observed_geography_value, result.placeId);
-      if (result.created) placesCreated += 1;
-      else placesReused += 1;
-      if (result.nameCreated) namesCreated += 1;
-    }
+  for (const entry of correspondence.entries) {
+    const result = await seedOne(trx, entry, correspondence.registerReferenceDate);
+    byCode.set(entry.terc_code, result.placeId);
+    byValue.set(entry.observed_geography_value, result.placeId);
+    if (result.created) placesCreated += 1;
+    else placesReused += 1;
+  }
 
-    return {
-      placesCreated,
-      placesReused,
-      externalIdsCreated: placesCreated,
-      namesCreated,
-      placeIdByTercCode: byCode,
-      placeIdByGeographyValue: byValue,
-    };
-  })();
+  // A place and its one name are created together, so both counts are the
+  // number of places created.
+  return {
+    placesCreated,
+    placesReused,
+    externalIdsCreated: placesCreated,
+    namesCreated: placesCreated,
+    placeIdByTercCode: byCode,
+    placeIdByGeographyValue: byValue,
+  };
 }

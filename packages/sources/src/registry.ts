@@ -237,7 +237,6 @@ export const PESEL_NATIONAL_FEMALE_2026: PeselResourceDescriptor = {
   coverage_notes: PARTITION_NOT_DISAMBIGUATED,
 };
 
-/** The approved national production pair, in a stable order. */
 const REGIONAL_SCOPE_RESTRICTION =
   "The geography is *wojew\u00f3dztwo zameldowania na pobyt sta\u0142y* \u2014 the voivodeship of PERMANENT " +
   "REGISTERED RESIDENCE, a legal registration record. It is never surname origin, ancestry, " +
@@ -304,6 +303,7 @@ export const PESEL_REGIONAL_RESOURCES_2026 = [
   PESEL_REGIONAL_FEMALE_2026,
 ] as const;
 
+/** The approved national production pair, in a stable order. */
 export const PESEL_NATIONAL_RESOURCES_2026: readonly PeselResourceDescriptor[] = [
   PESEL_NATIONAL_MALE_2026,
   PESEL_NATIONAL_FEMALE_2026,

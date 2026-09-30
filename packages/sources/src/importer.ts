@@ -131,14 +131,16 @@ interface DistinctSurname {
 /** What the read pass concluded about one distinct source string. */
 interface ResolvedIdentity {
   readonly surnameId: string | null;
-  readonly created: boolean;
 }
 
 function collectDistinct(rows: readonly LinedRow[]): {
   distinct: DistinctSurname[];
+  /** `keys[i]` is `rows[i]`'s canonical key, computed once here. */
+  keys: string[];
   duplicate: { key: string; first: string; second: string } | null;
 } {
   const byKey = new Map<string, DistinctSurname>();
+  const keys: string[] = [];
   for (const { row, line } of rows) {
     const key = canonicalKey(row.surname);
     const existing = byKey.get(key);
@@ -147,28 +149,21 @@ function collectDistinct(rows: readonly LinedRow[]): {
       // the source's shape, not data to reconcile. Fail closed.
       return {
         distinct: [],
+        keys: [],
         duplicate: { key, first: existing.surname, second: row.surname },
       };
     }
+    keys.push(key);
     // The line travels with the row rather than being recomputed from its
     // position: under a slice the two differ, and a finding reported against
     // the wrong line is a false provenance claim.
     byKey.set(key, { surname: row.surname, key, firstLine: line });
   }
-  return { distinct: [...byKey.values()], duplicate: null };
+  return { distinct: [...byKey.values()], keys, duplicate: null };
 }
 
-/**
- * Creates the canonical identity for one attested source string: one
- * `Surname` plus one `NameForm` recording that this exact spelling was
- * attested by an official source.
- *
- * `canonical_display` and `form` hold the source string exactly as read
- * (NFC only) — a trailing space, a standalone combining mark, an embedded
- * slash and a non-Latin script all survive verbatim (AC-05).
- */
 /** Rows of at most this many per INSERT (TASK-013). */
-export const INSERT_CHUNK = 1_000;
+const INSERT_CHUNK = 1_000;
 
 export async function insertChunked<T extends keyof DB>(
   trx: Transaction<DB>,
@@ -196,11 +191,13 @@ export interface IdentityRows {
  * caller (TASK-013). Nothing about the rows changed with batching — the
  * display is NFC only, the key is the resolver's, the flags are as detected.
  */
-export function identityRows(sourceString: string): IdentityRows {
+export function identityRows(
+  sourceString: string,
+  key: string = canonicalKey(sourceString),
+): IdentityRows {
   const surnameId = uuidv7();
   const nameFormId = uuidv7();
   const display = toNfc(sourceString);
-  const key = canonicalKey(sourceString);
   const detection = detectScripts(display);
   const script = detection.primary_script;
   return {
@@ -387,7 +384,7 @@ export async function importPeselResource(
   const rowsExcludedBySlice = sliced.excluded;
 
   // 4. Duplicate canonical keys within one file are schema drift.
-  const { distinct, duplicate } = collectDistinct(rows);
+  const { distinct, keys, duplicate } = collectDistinct(rows);
   if (duplicate) {
     return {
       kind: "FAILED",
@@ -440,12 +437,9 @@ export async function importPeselResource(
       mixedScriptRows.push({ line: entry.firstLine, surname: entry.surname });
     }
     if (status === "EXACT" || status === "KNOWN_VARIANT") {
-      identities.set(entry.key, {
-        surnameId: outcome.resolution.resolved_surname_id,
-        created: false,
-      });
+      identities.set(entry.key, { surnameId: outcome.resolution.resolved_surname_id });
     } else if (status === "UNKNOWN") {
-      identities.set(entry.key, { surnameId: null, created: true });
+      identities.set(entry.key, { surnameId: null });
     } else {
       // MULTIPLE_EXACT, REVIEW_REQUIRED, or any validation-stage status.
       // Never resolved by guessing, never silently dropped.
@@ -558,7 +552,7 @@ export async function importPeselResource(
           surnamesReused += 1;
           continue;
         }
-        const built = identityRows(entry.surname);
+        const built = identityRows(entry.surname, entry.key);
         surnameIdByKey.set(entry.key, built.surnameId);
         newEntities.push(...built.entities);
         newSurnames.push(built.surname);
@@ -579,8 +573,8 @@ export async function importPeselResource(
       // and one value per row, exactly as before.
       const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
       const newValues: Insertable<DB["distribution_values"]>[] = [];
-      for (const { row } of rows) {
-        const key = canonicalKey(row.surname);
+      for (const [index, { row }] of rows.entries()) {
+        const key = keys[index]!;
         const surnameId = surnameIdByKey.get(key);
         if (!surnameId) {
           throw new Error(`no identity resolved for canonical key ${JSON.stringify(key)}`);

@@ -5,37 +5,18 @@
  * the two files are different shapes with separately verified facts, and a
  * parser that accepted either by branching would be one mistake away from
  * reading a three-column file as two columns. Both share the line-ending
- * and count rules, which live in `schema.ts` and are imported, not copied.
+ * and count rules, which live in `schema.ts` and `parser.ts` and are
+ * imported, not copied.
  */
 import { PeselSchemaError } from "./errors.js";
-import { PESEL_DELIMITER, PESEL_LINE_TERMINATOR, PESEL_MIN_VALID_COUNT } from "./schema.js";
+import { COUNT_PATTERN, splitPeselLines } from "./parser.js";
+import { PESEL_DELIMITER, PESEL_MIN_VALID_COUNT } from "./schema.js";
 import {
   isPeselRegionalGeographyValue,
   PESEL_REGIONAL_COLUMN_COUNT,
   PESEL_REGIONAL_HEADER,
 } from "./regional-schema.js";
 import type { PeselRegionalSourceRow } from "./regional-schema.js";
-
-const COUNT_PATTERN = /^[0-9]+$/;
-
-/** Splits on the confirmed CRLF only; a bare LF or CR is a shape change. */
-function splitLines(text: string): string[] {
-  const withoutTerminators = text.replaceAll(PESEL_LINE_TERMINATOR, "");
-  if (withoutTerminators.includes("\n") || withoutTerminators.includes("\r")) {
-    throw new PeselSchemaError(
-      "bad_line_ending",
-      "found a bare LF or CR line ending outside CRLF pairs",
-    );
-  }
-  const lines = text.split(PESEL_LINE_TERMINATOR);
-  if (lines.length === 0 || lines[lines.length - 1] !== "") {
-    throw new PeselSchemaError(
-      "missing_trailing_terminator",
-      "resource does not end with the confirmed trailing line terminator",
-    );
-  }
-  return lines.slice(0, -1);
-}
 
 function parseDataLine(line: string, lineNumber: number): PeselRegionalSourceRow {
   const parts = line.split(PESEL_DELIMITER);
@@ -89,7 +70,7 @@ function parseDataLine(line: string, lineNumber: number): PeselRegionalSourceRow
  * the first structural violation and never returns a partial result.
  */
 export function parsePeselRegionalFile(text: string): PeselRegionalSourceRow[] {
-  const lines = splitLines(text);
+  const lines = splitPeselLines(text);
   const header = lines[0];
   if (header !== PESEL_REGIONAL_HEADER) {
     throw new PeselSchemaError(

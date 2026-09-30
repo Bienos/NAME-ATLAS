@@ -28,7 +28,7 @@ function dirArg(argv: readonly string[]): string {
 
 async function readIfPresent(file: string): Promise<Uint8Array | undefined> {
   try {
-    return new Uint8Array(await readFile(file));
+    return await readFile(file);
   } catch (cause: unknown) {
     if ((cause as NodeJS.ErrnoException).code === "ENOENT") return undefined;
     throw cause;

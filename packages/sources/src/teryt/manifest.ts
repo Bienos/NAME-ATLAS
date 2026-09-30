@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 import type { TerytFileInput } from "./importer.js";
 import type { TerytFile } from "./plan.js";
 
-export const TERYT_MANIFEST_PATH = path.resolve(
+const TERYT_MANIFEST_PATH = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../../../../fixtures/teryt/source-manifest.json",
 );

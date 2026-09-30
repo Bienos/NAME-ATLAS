@@ -1,7 +1,7 @@
-import { createHash } from "node:crypto";
 import { uuidv7 } from "@name-atlas/domain";
 import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
+import { sha256Hex } from "./importer.js";
 import type { RightsProfileSeed, RightsReviewStatus } from "./registry.js";
 
 /**
@@ -291,7 +291,7 @@ export function parseOnomasticSource(raw: unknown): ParseOutcome {
 
 /** Lowercase hex SHA-256, so a source record pins the exact bytes it parsed. */
 export function onomasticContentHash(bytes: Uint8Array): string {
-  return createHash("sha256").update(bytes).digest("hex");
+  return sha256Hex(bytes);
 }
 
 export interface ImportOnomasticOptions {
@@ -487,7 +487,7 @@ export async function importOnomasticSource(
         source_url: options.sourceUrl ?? parsed.file.work.reference_url,
         // The file itself is the payload: every entry the claims rest on is
         // here verbatim, so a claim can always be traced to the exact text.
-        raw_payload: JSON.parse(Buffer.from(options.bytes).toString("utf8")) as never,
+        raw_payload: raw as never,
         raw_text_ref: null,
         content_hash: contentHash,
         retrieved_at: retrievedAt,

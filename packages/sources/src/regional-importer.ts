@@ -81,6 +81,8 @@ interface DistinctSurname {
  */
 function collectRegional(rows: readonly PeselRegionalSourceRow[]): {
   readonly distinct: DistinctSurname[];
+  /** `keys[i]` is `rows[i]`'s canonical key, computed once here. */
+  readonly keys: string[];
   readonly duplicateCell: {
     readonly geography: string;
     readonly key: string;
@@ -89,20 +91,26 @@ function collectRegional(rows: readonly PeselRegionalSourceRow[]): {
 } {
   const byKey = new Map<string, DistinctSurname>();
   const seenCells = new Set<string>();
+  const keys: string[] = [];
   for (const [index, row] of rows.entries()) {
     const key = canonicalKey(row.surname);
     // U+0000 cannot occur in either field (validation rejects control
     // characters), so it is a safe separator for the composite cell key.
     const cell = `${row.geography}\u0000${key}`;
     if (seenCells.has(cell)) {
-      return { distinct: [], duplicateCell: { geography: row.geography, key, line: index + 2 } };
+      return {
+        distinct: [],
+        keys: [],
+        duplicateCell: { geography: row.geography, key, line: index + 2 },
+      };
     }
     seenCells.add(cell);
+    keys.push(key);
     if (!byKey.has(key)) {
       byKey.set(key, { surname: row.surname, key, firstLine: index + 2 });
     }
   }
-  return { distinct: [...byKey.values()], duplicateCell: null };
+  return { distinct: [...byKey.values()], keys, duplicateCell: null };
 }
 
 /**
@@ -160,7 +168,7 @@ export async function importPeselRegionalResource(
   }
 
   // 4. A repeated (voivodeship, surname) cell is schema drift.
-  const { distinct, duplicateCell } = collectRegional(rows);
+  const { distinct, keys, duplicateCell } = collectRegional(rows);
   if (duplicateCell) {
     return {
       kind: "FAILED",
@@ -309,7 +317,7 @@ export async function importPeselRegionalResource(
         surnamesReused += 1;
         continue;
       }
-      const built = identityRows(entry.surname);
+      const built = identityRows(entry.surname, entry.key);
       surnameIdByKey.set(entry.key, built.surnameId);
       newEntities.push(...built.entities);
       newSurnames.push(built.surname);
@@ -353,8 +361,8 @@ export async function importPeselRegionalResource(
     const referencedPlaces = new Set<string>();
     let regionalCountSum = 0;
     const newValues: Insertable<DB["distribution_values"]>[] = [];
-    for (const row of rows) {
-      const key = canonicalKey(row.surname);
+    for (const [index, row] of rows.entries()) {
+      const key = keys[index]!;
       const snapshotId = snapshotIdByKey.get(key);
       const placeId = places.placeIdByGeographyValue.get(row.geography);
       if (!snapshotId) {
