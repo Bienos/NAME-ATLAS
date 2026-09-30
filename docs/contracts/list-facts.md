@@ -1,6 +1,6 @@
 # Contract — list facts (statistics about one whole published list)
 
-- **Status:** Proposed with ADR-0015 (TASK-040); accepted when the owner merges.
+- **Status:** Accepted with ADR-0015 (TASK-040, merged in #32 on 2026-09-30).
 - **Schema:** `packages/contracts/src/list-facts.ts` (`listFactsArtefactSchema`, `LIST_FACTS_SCHEMA_VERSION = "list_facts@1"`).
 - **Producer:** `packages/truth/bin/build-list-facts.ts` (`pnpm truth:list-facts`), which runs the pure pipeline `computeListFacts` / `buildListFactsArtefact` in `packages/truth/src/list-facts/build.ts` (pipeline version `list_facts_pipeline@1`, `LIST_FACTS_METHOD_VERSION` in `packages/truth/src/version.ts`) and writes the generated module `packages/truth/src/generated/list-facts.ts` (`LIST_FACTS_DATA`).
 - **Consumer:** the landing page (`apps/web`), server-side, through `listFacts()` from `@name-atlas/truth` (`packages/truth/src/list-facts/artefact.ts`). It parses the module against the schema once, memoises it and throws if it does not parse; the page then renders without the atlas section.

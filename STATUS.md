@@ -2,21 +2,21 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-040 (`docs/progress/2026-09-30-landing-atlas-list-facts.md`): the landing page gains the first three plates of the atlas, statistics about each whole published list, derived offline into a committed, SHA-pinned artefact (ADR-0015, Proposed until its pull request merges). Before it, the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`), and TASK-039, the TERYT localities import.
+**Last rewritten:** 2026-09-30, by the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted. Before it, TASK-040 itself (`docs/progress/2026-09-30-landing-atlas-list-facts.md`), the family surnames draft, and TASK-039, the TERYT localities import.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `0eb4814` (Merge #11), deployment `dpl_H55YeqWUjCg34F4F3wcufMym6sM6`, created by hand with target production. The previous one, `dpl_33fKu5ryMHRuNfvnMNMgiF262uLG` (`4d605e5`), is the rollback candidate |
+| Deployed commit | `main` @ `12fb474` (Merge #32, TASK-040), deployment `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`, created through the Vercel API with target production on 2026-09-30. The one it replaced, `dpl_B2D15z8i9FYbL6gqoUU2nEy9e2MC` (`main` @ `ea03941`, Merge #24), is the rollback candidate |
 | Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
 | Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
 
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. TASK-040 is implemented on its branch and not yet merged. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–040, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -38,7 +38,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Three (checked 2026-09-30): #32 from `claude/keen-cannon-1jc301`, TASK-040; #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change; and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none of the three has a CI result; #31 records the outage. #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
+Two (checked 2026-09-30): #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so neither has a CI result; #31 records the outage. TASK-040 was merged in #32 without a CI result, at the project owner's instruction; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
 
 ## Blocked on the project owner
 
