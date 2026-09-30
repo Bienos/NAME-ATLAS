@@ -44,6 +44,14 @@ The new tests: `packages/truth/src/shift.test.ts` (28: the arithmetic, points, g
 - The 2019 editions' universe: the owner ruled them living persons ("no use it is is living persona"); the lists' totals are consistent with that (+0.10% men, −0.14% women between 2019 and 2020) and that is not proof. The publisher has not said.
 - Whether the chapter's table reads well for the surnames with the most editions absent; the screenshots cover NOWAK and AA only.
 
+## Found on the VM, 2026-10-01, and fixed
+
+The first `status` the owner pasted, 10 minutes after the batch started (unit active since 22:43:14 UTC, status read at 22:53:09): **984 `ACTIVE` `SURNAME_DISTRIBUTION_SHIFT` claims**, about 1.7 a second, which would take days for about 830,000 claims. Load average on the VM was 8.69. The local run had done about 100 a second.
+
+Cause, found in the code and reproduced on a toy table, not yet seen on the VM: the derivation looked up the claim it supersedes with `claim_key LIKE 'prefix%'`. Production's database is `en_US.UTF-8` (`ops/vm/provision.sh`), under which a btree cannot answer a `LIKE` prefix, so each claim scanned the whole claims table (about 3 million rows). The local development database is `C.UTF-8`, where the index works, so every local test was fast. On a 800,000-row toy table under an ICU `en-US` collation, `EXPLAIN` showed a parallel sequential scan for the `LIKE` and an index scan on `claims_subject_type_status_idx` for a lookup by surname and claim type.
+
+Fix: the supersession lookup goes by surname, claim type and list (`claims_subject_type_status_idx`, then `structured_value->>'role'`), and the batch's candidate query compares the claim type as the enum so the same index serves it. A unit test now fails if either file looks a claim up by a key prefix. Locally the fixed batch writes the same 67 claims, the second run writes nothing, and the integration test (supersession included) passes. **The rate on the VM with the fix has not been measured.**
+
 ## Rollout, when the VM is reachable
 
 `Register VM` `shift` (migration, then the batch starts and the step returns), `status` until `shift batch complete: yes`, `shift-finish` (the gate), then the web deploy. A deploy before the batch shows no chapter; a deploy before the migration also shows none (the read compares the claim type as text).

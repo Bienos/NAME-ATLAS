@@ -535,17 +535,25 @@ async function deriveOneShift(
 
   // An ACTIVE claim of the same surname and list over other editions is the
   // one this replaces: superseded, never rewritten (ARCHITECTURE.md §10).
-  const prefix = distributionShiftClaimKeyPrefix(surname.surname_id, build.role);
+  //
+  // Found by surname and claim type, which `claims_subject_type_status_idx`
+  // serves, and not by `claim_key LIKE 'prefix%'`: production's database uses
+  // the `en_US.UTF-8` collation (provision.sh), under which a btree cannot
+  // answer a LIKE prefix, so every claim of the batch scanned the whole
+  // claims table (2026-10-01: about 1.7 claims a second on the VM, against a
+  // hundred on a `C.UTF-8` development database that hid it).
   const previous = await trx
     .selectFrom("claims")
     .select(["claim_id"])
-    .where("claim_key", "like", `${prefix}%`)
+    .where("subject_entity_id", "=", surname.surname_id)
+    .where("claim_type", "=", "SURNAME_DISTRIBUTION_SHIFT")
     .where("claim_status", "=", "ACTIVE")
+    .where(sql`structured_value->>'role'`, "=", build.role)
     .execute();
   if (previous.length > 1) {
     throw new TruthInvariantError(
       "CONFLICTING_ACTIVE_CLAIMS",
-      `${previous.length} active claims share the key prefix ${prefix}`,
+      `${previous.length} active change claims of surname ${surname.surname_id} on ${build.role}`,
     );
   }
 

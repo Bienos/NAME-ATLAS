@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { PESEL_TREND_EDITIONS } from "@name-atlas/sources";
 import { LIST_FACTS_DATA } from "./generated/list-facts.js";
@@ -329,4 +330,21 @@ describe("the registry's editions (ADR-0020 §2)", () => {
       );
     }
   });
+});
+
+describe("the derivation's lookups stay indexable (production's collation is en_US.UTF-8)", () => {
+  // A btree cannot answer `claim_key LIKE 'prefix%'` under a collation other than C, so such a
+  // lookup scans the whole claims table, once per claim. A `C.UTF-8` development database hides it
+  // (2026-10-01: about 1.7 claims a second on the VM). The supersession lookup goes by surname and
+  // claim type instead, through `claims_subject_type_status_idx`.
+  it.each(["src/shift.ts", "bin/derive-shift-batch.ts"])(
+    "%s never looks a claim up by a key prefix",
+    (file) => {
+      const source = readFileSync(new URL(`../${file}`, import.meta.url), "utf8")
+        .replace(/\/\*[\s\S]*?\*\//gu, "")
+        .replace(/\/\/.*$/gmu, "");
+      expect(source).not.toMatch(/claim_key["']?\s*,\s*["']like["']/iu);
+      expect(source).not.toMatch(/claim_key\s+(?:i?like|~~)\b/iu);
+    },
+  );
 });

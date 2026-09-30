@@ -60,6 +60,9 @@ interface Row {
 /**
  * The next batch of candidate surnames, ordered by id.
  *
+ * The claim type is compared as the enum, not as text, so the lookup can use
+ * `claims_subject_type_status_idx`; this runs only after migration 0024.
+ *
  * `recordIds[i]` is a stored edition's source record and `roles[i]` the list it
  * belongs to. A candidate is on two or more records of one list; it is skipped
  * unless some such list lacks an up-to-date claim.
@@ -94,7 +97,7 @@ async function nextBatch(
                 : sql`AND NOT EXISTS (
                     SELECT 1 FROM claims c
                      WHERE c.subject_entity_id = s.surname_id
-                       AND c.claim_type::text = 'SURNAME_DISTRIBUTION_SHIFT'
+                       AND c.claim_type = 'SURNAME_DISTRIBUTION_SHIFT'
                        AND c.claim_status = 'ACTIVE'
                        AND c.structured_value->>'role' = e.role
                        AND jsonb_array_length(c.structured_value->'points') =
