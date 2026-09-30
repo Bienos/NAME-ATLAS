@@ -31,7 +31,7 @@ The repository has no home for these figures:
    - `evaluateSurface(…, "FREE")` allows the source.
 
    Each statistic has a method version in `packages/truth/src/version.ts`. The pure functions are unit-tested.
-3. **The result is a committed, generated module** (`packages/truth/src/generated/list-facts.ts`), validated by `listFactsArtefactSchema` (`packages/contracts`, `docs/contracts/list-facts.md`) when it is written and every time it is read. The large source files are not committed (`data/` stays git-ignored), as with `apps/web/src/lib/voivodeship-geometry.ts`. Regenerating from the same bytes gives the same file.
+3. **The result is a committed, generated module** (`packages/truth/src/generated/list-facts.ts`), validated by `listFactsArtefactSchema` (`packages/contracts`, `docs/contracts/list-facts.md`) when it is written, and again the first time each process reads it (`listFacts()` memoises the parsed result). The large source files are not committed (`data/` stays git-ignored), as with `apps/web/src/lib/voivodeship-geometry.ts`. Regenerating from the same bytes gives the same file.
 4. **The artefact carries its own lineage and assessment.** For each list:
    - the resource id, the SHA-256 and row count of the bytes it was computed from, the snapshot date and the source page URL;
    - the completeness verdict, the confidence status with its method and version, and the FREE-surface decision;

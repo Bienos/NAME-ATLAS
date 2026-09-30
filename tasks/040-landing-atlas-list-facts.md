@@ -53,7 +53,7 @@ Put the first three plates of the "Atlas nazwisk" on the landing page, below the
    - The example rooms and the example crowd are drawn with recorded seeds in the generator, not in the page.
    - The page labels them "w tym losowaniu" (in this draw).
 5. **Precision.**
-   - Values are stored unrounded, and rounding is presentation.
+   - Values are stored rounded to 9 decimals, never to display precision. Every threshold decision (`n_half`, `reach_half`) is made on the unrounded value. Rounding for display is presentation.
    - Probabilities near one half are shown to two decimals, so that 49,72% and 50,56% are not both "50%".
    - Counts are exact.
 
@@ -65,6 +65,8 @@ Put the first three plates of the "Atlas nazwisk" on the landing page, below the
    - the method versions in `src/version.ts`;
    - `listFacts()`, which validates the committed module.
 3. `packages/truth/bin/build-list-facts.ts`, `pnpm truth:list-facts`, and the generated `packages/truth/src/generated/list-facts.ts`.
+   - The generator checks the bytes the way `fetch-pesel` does, so `packages/sources` exports `localFileName` and `verifyResourceBytes`.
+   - It formats its output with prettier's API, so `@name-atlas/truth` declares `prettier` (the root's exact version, already in the lockfile) as a devDependency.
 4. `apps/web`:
    - the atlas section with plates I–III;
    - its list switch (a small client island);
@@ -113,7 +115,7 @@ Put the first three plates of the "Atlas nazwisk" on the landing page, below the
   - `n_half` agrees with the curve;
   - thresholds are monotone;
   - expected distinct counts increase and never exceed n or the number of surnames.
-- **AC-05:** `pnpm truth:list-facts` run twice on the official files writes byte-identical output, and its values agree with an independent recomputation from the raw CSVs. Both are recorded in the progress record.
+- **AC-05:** `pnpm truth:list-facts` run twice on the official files writes byte-identical output. Its values agree with an independent recomputation from the raw CSVs to the stored 9 decimals, or to a relative 1e-12 where the recomputation itself is floating point. Both are recorded in the progress record.
 - **AC-06:** With no query, the landing page renders plates I–III from `listFacts()`. Each fact card names both lists with their own figures. No rendered figure is a sum or union of the two lists (tested).
 - **AC-07:** No surname string appears in the artefact or in the atlas markup. A copy guard over the atlas markup finds none of: "pochodzi", "mieszka", "urodzon", "Polaków", "w Polsce", "comes from", "lives in", "of Poles", "originat" (tested).
 - **AC-08:** If `listFacts()` throws, the landing page renders without the atlas section (tested).
