@@ -16,7 +16,7 @@ Scope authority: `tasks/051-surname-change-over-time.md`. Decision: `docs/adr/00
 
 ## Verified
 
-Run 2026-09-30 in this session on the branch built on `main` @ `107ff65`, and run again, with the same results, after `main` moved to `3a43bc8` (#45, which took TASK-046–050, so this task was renumbered from 046 to 051) and was merged in:
+Run 2026-09-30 in this session on the branch built on `main` @ `107ff65`, and run again, with the same results (web 326 tests after #46's and #47's additions), after `main` moved to `3a43bc8` (#45, which took TASK-046–050, so this task was renumbered from 046 to 051) and again to `35aa48d` (#46, #47) and was merged in each time:
 
 | Command | Result |
 |---|---|
@@ -38,7 +38,7 @@ The new tests: `packages/truth/src/shift.test.ts` (28: the arithmetic, points, g
 
 ## Not verified
 
-- **Anything on the VM or in production** (AC-7). `shift.sh` ran nowhere: GitHub Actions starts no job (the owner expects it on 2026-10-01) and the session has no route to the VM. Its SQL gate was run by hand on the local database; its systemd unit, its `start`/`finish` logic and its timings were not exercised. The size of the batch (about 830,000 claims) and its duration are estimates, not measurements: the register build's derivation wrote comparable volume in 2 h 51 min on the VM.
+- **The batch's completion and the gate on the VM** (AC-7). On 2026-10-01 the owner ran `shift.sh start` on the VM from the branch (GitHub Actions starts no job; the session has no route to the VM) and pasted its output: the recorded baseline matched the known counts, `0024_distribution_shift: applied`, 8 of 8 men's and 7 of 7 women's editions found stored, the unit `name-atlas-shift-batch` active. So `start` and the migration have run for real. Nothing after that has been seen: no progress, no completion, no `finish`, nothing in production. The gate's SQL was run by hand on the local database; `finish` and its timings were not exercised. The size of the batch (about 830,000 claims) and its duration are estimates, not measurements: the register build's derivation wrote comparable volume in 2 h 51 min on the VM.
 - The page against the real 2026 resources and the real full registry: the local trend ends at 2025, and the local database holds 44 surnames.
 - The landing atlas is unchanged and still reads 2020–2026; until a later task amends ADR-0019 §2.2 for it, the landing and the surname page define the series differently.
 - The 2019 editions' universe: the owner ruled them living persons ("no use it is is living persona"); the lists' totals are consistent with that (+0.10% men, −0.14% women between 2019 and 2020) and that is not proof. The publisher has not said.
