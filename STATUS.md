@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
+One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
 
 ## Blocked on the project owner
 
@@ -49,7 +49,7 @@ One: from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 202
   - `claude/share-card-not-derived-wording` (#24)
   - `claude/jolly-faraday-uas99n` (#25)
   - `claude/teryt-localities-import` (#26)
-  - `claude/funny-bardeen-f4jbay` (#27). It also carries the open pull request above, so delete it once that is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
+  - `claude/funny-bardeen-f4jbay` (#27). It also carries #28, so delete it once #28 is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
