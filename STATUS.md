@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, to record that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
 
 ## Production
 
@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: #27 from `claude/funny-bardeen-f4jbay`, which carries the family surnames draft and this rewrite (checked 2026-09-30). TASK-039 was merged in #26, TASK-038 in #25.
+One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
 
 ## Blocked on the project owner
 
@@ -48,6 +48,8 @@ One: #27 from `claude/funny-bardeen-f4jbay`, which carries the family surnames d
   - `claude/task-023-rules-amended` (#22)
   - `claude/share-card-not-derived-wording` (#24)
   - `claude/jolly-faraday-uas99n` (#25)
+  - `claude/teryt-localities-import` (#26)
+  - `claude/funny-bardeen-f4jbay` (#27). It also carries #28, so delete it once #28 is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
