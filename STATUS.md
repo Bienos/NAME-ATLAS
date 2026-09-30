@@ -38,7 +38,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Two (checked 2026-09-30): #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so neither has a CI result; #31 records the outage. TASK-040 was merged in #32 without a CI result, at the project owner's instruction; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
+Three (checked 2026-09-30): #33 from `claude/keen-cannon-1jc301`, this go-live record; #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change; and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. TASK-040 was merged in #32 without a CI result, at the project owner's instruction; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
 
 ## Blocked on the project owner
 
