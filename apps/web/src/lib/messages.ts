@@ -897,7 +897,7 @@ export const UI = {
     contactTopics: [
       "liczba, znaczenie lub źródło na stronie nazwiska jest błędne albo czegoś brakuje (podaj nazwisko i, jeśli możesz, źródło);",
       "chcesz skorzystać z praw dotyczących danych osobowych albo zgłosić naruszenie praw do źródła;",
-      "znalazłeś problem z bezpieczeństwem strony.",
+      "widzisz problem z bezpieczeństwem strony.",
     ],
     contactReportHint:
       "Na każdej stronie nazwiska i na stronie porównania jest link „Zgłoś błąd”, który przygotowuje taką wiadomość z nazwiskiem i adresem strony.",
