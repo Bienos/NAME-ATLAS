@@ -461,6 +461,31 @@ export const UI = {
     invalidBody: "Sprawdź wpisane nazwisko i spróbuj ponownie.",
     noFigures: "Brak danych do pokazania.",
     notSummed: "Zbiory męski i żeński są odrębne i nigdy nie są sumowane.",
+    familyTitle: "Nazwiska w Twojej rodzinie",
+    familyLede:
+      "Wpisz do czterech nazwisk. Każde sprawdzamy osobno, tak jak zwykłe wyszukiwanie. " +
+      "Etykiety zostają w Twojej przeglądarce i nigdzie ich nie wysyłamy. Odświeżenie strony " +
+      "wszystko usuwa.",
+    // TASK-040 AC-11: the meaning is binding — a result is about the surname,
+    // never about the visitor's relatives.
+    familyNotice:
+      "Każdy wynik opisuje nazwisko jako całość — wszystkie osoby, które je noszą — a nie " +
+      "Twoich krewnych.",
+    // U-2: a generic prompt, never the mother's maiden name, which banks use as
+    // a security answer.
+    familyPrompt: "Nazwisko z Twojej rodziny",
+    familyLabelPrompt: "Etykieta (opcjonalnie)",
+    familyNoLabel: "Bez etykiety",
+    familyLabelSelf: "Twoje nazwisko",
+    familyLabelFather: "Strona ojca",
+    familyLabelMother: "Strona matki",
+    familyLabelOther: "Inne",
+    familyShow: "Pokaż wyniki",
+    familyLoading: "Sprawdzamy…",
+    familyRateLimited: "Zbyt wiele zapytań w krótkim czasie. Spróbuj ponownie za chwilę.",
+    familyRetry: "Spróbuj ponownie",
+    familyEntered: "Wpisano",
+    familyFullPage: "Pełna strona nazwiska",
     footer:
       "Każda liczba pochodzi z rejestru PESEL i jest podana razem z zakresem zbioru, datą i źródłem. Brak danych jest podany jako brak, nigdy jako zero.",
   },
@@ -589,6 +614,26 @@ export const UI = {
     invalidBody: "Check the surname you entered and try again.",
     noFigures: "There is nothing to show.",
     notSummed: "The male and female datasets are separate and are never summed.",
+    familyTitle: "Surnames in your family",
+    familyLede:
+      "Enter up to four surnames. Each is looked up on its own, like an ordinary search. " +
+      "Labels stay in your browser and are never sent. Refreshing the page clears everything.",
+    familyNotice:
+      "Each result describes the surname as a whole — everyone who carries it — not your " +
+      "relatives.",
+    familyPrompt: "A surname from your family",
+    familyLabelPrompt: "Label (optional)",
+    familyNoLabel: "No label",
+    familyLabelSelf: "Your surname",
+    familyLabelFather: "Father's side",
+    familyLabelMother: "Mother's side",
+    familyLabelOther: "Other",
+    familyShow: "Show results",
+    familyLoading: "Looking up…",
+    familyRateLimited: "Too many lookups in a short time. Try again in a moment.",
+    familyRetry: "Try again",
+    familyEntered: "Entered",
+    familyFullPage: "Full surname page",
     footer:
       "Every number comes from the PESEL register and is shown with its dataset scope, date and source. Missing data is stated as missing, never as zero.",
   },

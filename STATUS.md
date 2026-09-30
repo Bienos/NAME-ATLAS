@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, to record that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, by TASK-040: the family surnames view, `/pl/nazwiska-rodzinne` and `/en/family-surnames`. It shows the free result for up to four surnames on one page and sends no label, no combination and no `Referer` to the server. It is built and verified, and **not released**: its release waits on a privacy sign-off (`docs/progress/2026-09-30-family-surnames-view.md`). Before it, #27 and #28 merged the draft it was built from and this page's record of #27. TASK-039 before them: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places` (`docs/progress/2026-09-30-teryt-localities-import.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–040, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -30,16 +30,18 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Next
 
-- **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
+No unblocked task is specified. The two candidates are blocked or parked:
+
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
 
 ## Open pull requests and branches
 
-One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
+One: TASK-040 from `claude/laughing-curie-tsc5mk` (checked 2026-09-30). #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
 
 ## Blocked on the project owner
 
+- **TASK-040 privacy sign-off (§13 U-6).** The family surnames view must not be released until a short privacy sign-off confirms its §9 invariants. No page links to it, and a merge does not deploy. But the next production deployment of `main` after TASK-040 merges would serve both routes to anyone with the address, so the sign-off belongs before that deployment.
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.

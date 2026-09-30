@@ -77,6 +77,8 @@ For a sufficiently covered surname, free includes:
 
 If an expected element is unsupported, the free result compresses and says so. It does not manufacture a replacement.
 
+Approved 2026-09-30 as a free, post-M2 feature (TASK-040 §13 U-1): a `noindex` family surnames view that shows this free result for up to four surnames on one page. It adds no data and no value across surnames, and it never sends or stores which surnames were entered together.
+
 ## 6. Premium scope
 
 Premium sells **depth and synthesis**, never the answer already promised free.

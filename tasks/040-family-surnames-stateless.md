@@ -1,6 +1,7 @@
-# DRAFT — Family surnames view (stateless)
+# TASK-040 — Family surnames view (stateless)
 
-- **Status:** APPROVED IN SCOPE, NOT SCHEDULED, not numbered. Written 2026-09-30 at the project owner's request. The project owner accepted all six §13 decisions the same day. It takes the next task number free on `origin/main` and in open pull requests (`AGENTS.md` §11) when the owner schedules it.
+- **Status:** IMPLEMENTED AND VERIFIED (2026-09-30), **not released**: release waits on the §13 U-6 privacy sign-off. Verification actually run: `docs/progress/2026-09-30-family-surnames-view.md`.
+- **History:** written 2026-09-30 as the unnumbered draft `tasks/drafts/family-surnames-stateless.md` at the project owner's request; the owner accepted all six §13 decisions the same day. Scheduled the same day ("can we carry on and have final version") and numbered TASK-040, the next number free on `origin/main` with no pull request open (`AGENTS.md` §11). The text below is the draft as approved, unchanged except for this header.
 - **Milestone:** none. A free feature after M2 (U-1). Not on the paid-MVP critical path.
 - **Canonical epics:** none. New scope, approved under U-1.
 - **Depends on:** TASK-006 (the contract and `GET /api/v1/surname-results`), TASK-016 (every fact reachable through that contract), TASK-017 (the free result page and its view components), TASK-029 (the rate limit). All are implemented on `main`.
