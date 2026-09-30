@@ -40,6 +40,11 @@ Two static pages in each language, linked from every page's footer: a privacy no
 - **U-2.** The contact address (shared with TASK-047).
 - **U-3.** Approval of the drafted wording in both languages.
 
+**Answers the project owner gave on 2026-09-30:**
+
+- U-1: the name "Patryk cicbowski" and the place "ilawa hehe". This is read as Iława, with no street address given. Before publishing, confirm the spelling of the surname and whether a postal address is wanted.
+- U-2: `cihypatryk@gmail.com`, in `apps/web/src/lib/site-footer.tsx` since TASK-047.
+
 If U-1 or U-2 is missing the session writes `[OWNER: …]` placeholders and the pull request stays a draft. It never invents a name or address.
 
 ## 6. Acceptance criteria

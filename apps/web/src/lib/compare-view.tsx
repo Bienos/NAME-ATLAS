@@ -16,6 +16,7 @@ import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { NamePrint } from "./name-print.js";
 import { anchorOf } from "./sections.js";
+import { SiteFooter } from "./site-footer.js";
 
 /**
  * The comparison page (TASK-025, directive §24–§25).
@@ -295,7 +296,7 @@ export function ComparisonView({
         </p>
         <SearchForm lang={lang} query="" />
       </main>
-      <footer lang={htmlLang(lang)}>{t.footer}</footer>
+      <SiteFooter lang={lang} />
     </>
   );
 }
