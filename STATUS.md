@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, after the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`). Before it, the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted. Before it, TASK-040 itself (`docs/progress/2026-09-30-landing-atlas-list-facts.md`), the family surnames draft, and TASK-039, the TERYT localities import.
+**Last rewritten:** 2026-09-30, by TASK-042 (in progress), merged with `main` and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
 
 ## Production
 
@@ -34,11 +34,18 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 - **The landing atlas, plates IV–XI**: each needs a decision first, listed as U-1 to U-4 in TASK-040 §6. They are a display floor for small counts, a rule for surnames that are also nationality or sensitive words, a method and wording for per-voivodeship leaders, and a lookup that goes through the resolver.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
-- **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
+- **TASK-042**, the complete register in production on a free Oracle Cloud VM (ADR-0017): **in progress**. The VM (2 OCPUs, 11.9 GB, Frankfurt) runs PostgreSQL 17.11, PostGIS 3.6.4 and PgBouncer 1.26.0. Port 6432 answers from the internet: as the read-only role, over TLS 1.3 through PgBouncer, a connection sees 598,476 surnames and a write is refused (`Register VM` run 36662326820). The register build started on the VM at about 02:45 UTC. At the last `status`, 04:55 UTC (run 36671020045), it was in step 7 of 7 at 118,000 of 328,455 surnames, 0 failures, the database 12 GB. No `status` has run since, so whether it finished is not known. Left: `status` until `built: yes`, then `finalize`, then Vercel's production `DATABASE_URL` and a redeploy of the current production deployment. Vercel's `DATABASE_URL` is not changed yet. It supersedes TASK-035, parked because Supabase's free plan stops at 500 MB.
 
 ## Open pull requests and branches
 
-Three (checked 2026-09-30): #33 from `claude/keen-cannon-1jc301`, this go-live record; #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change; and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. TASK-040 was merged in #32 without a CI result, at the project owner's instruction; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
+Three (checked 2026-09-30, 16:00 UTC):
+
+- #35 from `claude/trusting-ride-sfsclw`: TASK-042 and this rewrite. It carries every commit of `claude/eager-brown-s2u6qh`. Keep that branch until this is merged: `Register VM` runs on a push to it that changes `ops/vm/request`. Once the workflow is on `main`, GitHub's default branch, it also runs by `workflow_dispatch`, and merging this deploys production from `main` with no change to the app.
+- #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up.
+
+#34, a second design for the same database under ADR-0016 and TASK-041, was closed without merging at 15:50 UTC. Two branches without a pull request now use TASK-041: `claude/keen-cannon-1jc301` (with ADR-0016: the search answers for every surname from figures built at deploy time) and `claude/awesome-darwin-af7l50` (TERYT and Buryan 1933 on the VM, built on TASK-042's branch).
+
+GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. `Register VM` run 36675514844, the `status` request created at 05:53, failed at 08:52 after 2 s with no runner assigned. TASK-040 was merged in #32 without a CI result, at the project owner's instruction, and its go-live record in #33; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25; #36, the record that Vercel's production branch is `main`, is merged.
 
 ## Blocked on the project owner
 
@@ -78,7 +85,7 @@ Three (checked 2026-09-30): #33 from `claude/keen-cannon-1jc301`, this go-live r
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
   `claude/exciting-noether-05np1s` can now be deleted too: GitHub's default branch is `main` (checked through the GitHub API on 2026-09-30) and Vercel's production branch no longer names it.
-- **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
+- **The database VM** (TASK-042 §3). Done: the Oracle Cloud account with Frankfurt as its home region, the A1 VM at 2 OCPUs and 12 GB, TCP 6432 open on its subnet, and the GitHub secrets `VM_HOST`, `VM_SSH_KEY` and `VM_DB_WEB_PASSWORD`. Left: GitHub Actions starting jobs again (why it stopped is not established), and after `finalize`, Vercel's production `DATABASE_URL` (`ops/vm/README.md` step 5).
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
   - **D-023**, raised by TASK-039 and non-blocking: should TERC ids stay under `provider_key = 'TERYT'`, as they have since TASK-011, or move to `docs/canonical/12` §11.3's `TERYT_TERC`?
