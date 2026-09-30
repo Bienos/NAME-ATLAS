@@ -4,6 +4,7 @@ node_modules/
 dist/
 coverage/
 packages/db/src/generated/
+apps/web/src/generated/
 
 # Markdown is prose (control plane + delivered specification corpus), not
 # code. It is intentionally hand-formatted (long lines, hard line breaks in

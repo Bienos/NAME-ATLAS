@@ -144,6 +144,26 @@ No further action needed. Do not revisit unless the pinned digest is deliberatel
 
 ---
 
+## D-007 — Landing-page national overview before the claim chain exists
+
+**Status: BLOCKS PUBLIC DEPLOYMENT of the landing page's national overview.** Non-blocking for WEB-000, which is built and not deployed.
+
+**What exists.** The landing page (`tasks/WEB-000-landing-page.md`) shows PESEL figures: the number of surnames on each national list, the reference and portal dates, the smallest published count, the fifteen highest published counts per list, and two spelling specimens. Every value passes verbatim from `fixtures/pesel/source-manifest.json` and the verified fixture excerpts through a generated presentation object. Nothing is summed, ranked, estimated or called a head-count.
+
+**Why it is still a question.** Two invariants in `ARCHITECTURE.md` §10 are not met by that path:
+
+- **Invariant 11** — projections render validated claims. No `Claim` exists yet (TASK-005, blocked on D-006), so these figures carry source lineage but no `EvidenceItem` → `Claim` → `ConfidenceAssessment` → `Citation` chain.
+- **Invariant 13** — a production source needs an approved `RightsProfile` before it reaches a production surface. The PESEL profile is `LEGAL_REVIEW_REQUIRED`; no legal review has been performed.
+
+**Options for the project owner.**
+
+1. Keep the overview off any public deployment until TASK-005 lands and the PESEL rights review is done, then switch the page to claim-backed values.
+2. Accept, by ADR, that dataset-level figures and verbatim published counts may appear on the free landing page before the claim chain exists, and complete the PESEL rights review before the first public deployment.
+
+*Raised by WEB-000.*
+
+---
+
 ## Reviewed and not blocking TASK-001
 
 Recorded so they are not re-raised:

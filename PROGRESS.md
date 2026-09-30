@@ -2,7 +2,7 @@
 
 Facts only. What exists, what was verified, what is blocked. No diary, no intentions.
 
-**Last updated:** 2026-09-20 — TASK-004 implemented and verified (PESEL ingestion: source/rights registry, immutable source records, surname-scoped national distribution)
+**Last updated:** 2026-09-30 — WEB-000 implemented and verified (landing page, national overview, search destination). Previous: 2026-09-20 — TASK-004 implemented and verified.
 
 ## Current state
 
@@ -17,6 +17,7 @@ Facts only. What exists, what was verified, what is blocked. No diary, no intent
 | Application source code | `packages/sources` (PESEL CSV schema/parser from TASK-002, plus the `@name-atlas/sources/pesel` registry + importer from TASK-004) and `packages/resolver` (exact resolver, TASK-003). Tables: the three identity tables, `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`. No `EvidenceItem`, `Claim`, `ConfidenceAssessment`, `Citation`, `DigitalAsset`, `Place` or `ResearchRun` table exists. |
 | Database migrations | `0001_bootstrap_extensions` (`postgis` + `pg_trgm`), `0002_identity_core` (three identity tables + `resolvable_name_forms` view) and `0003_source_rights_distribution` (five tables + ten enums). Nothing else. |
 | CI | configured (`.github/workflows/ci.yml`) |
+| **WEB-000 — landing page** | **IMPLEMENTED AND VERIFIED, NOT DEPLOYED.** Requested directly by the project owner. `apps/web` now has the real landing page and a `/search` destination. Public deployment of its national overview is blocked by **D-007**. See the WEB-000 section below. |
 | Next approved task | None. TASK-005 (`CURRENT_POPULATION` truth chain) is the natural next task; it has no task file and was not started (AGENTS.md §8). It is blocked on **D-006** (the unit of `Liczba`). |
 
 ## What TASK-001 built
@@ -402,3 +403,42 @@ Open for the project owner, none of it work this session may do:
 3. **The `TemporalExtent` omission from TASK-003** still awaits acknowledgement: `name_forms` has no `valid_from_*`/`valid_to_*` columns. Adding them later is a nullable-column migration. TASK-004 performs no temporal logic and did not need them.
 4. **Raw object storage (INF-001)** is still missing, which is why `SourceRecord.raw_text_ref` is null. Recorded as a deviation from `docs/canonical/12` §9.2, acknowledged under §14 U-3.
 5. **D-002, D-003 and D-004** are unchanged by this task. No regional resource was downloaded, parsed or ingested, and no map or regional logic exists.
+
+## WEB-000 implemented — landing page and national overview (2026-09-30)
+
+The scope authority is `tasks/WEB-000-landing-page.md`, written in this session at the project owner's direct request ("design the main website and the landing page … apply these changes"). It is ahead of M2: WEB-001 (Free Profile v1) is still unbuilt.
+
+**Built:**
+
+- `apps/web/src/app/page.tsx` — the landing page, replacing the TASK-001 placeholder: sticky header, hero with the surname search form and example links, a "specimen" card showing one real surname's published counts with list names and date, four stat tiles, a "why there's no grand total" callout, the fifteen highest published counts per list as two bar charts on one shared scale, a trends section in an explicit not-enough-data state, a spelling section, a five-chapter outline of the rundown with a second search form, a source card and a footer.
+- `apps/web/src/app/search/page.tsx` — where the form lands. Shows the input exactly as typed and states that surname pages are not open yet. Resolves nothing and states no fact about the input. `noindex`.
+- `apps/web/src/lib/national-overview.ts` — builds the `NationalOverview` presentation object from `fixtures/pesel/source-manifest.json` and the two PESEL fixture excerpts, through `decodePeselBytes`/`parsePeselFile`. Fails closed on a missing manifest field, differing reference or portal dates across the two lists, a duplicate resource for one list, an excerpt head out of descending order, a missing specimen, or any parser rejection.
+- `apps/web/scripts/generate-overview.ts` (`pnpm --filter web generate:overview`) writes that object to `apps/web/src/generated/national-overview.ts`, which the page imports. The page never runs the builder, so the web bundle contains a presentation object and no source rows.
+- `apps/web/src/lib/format.ts` — number and date display formatting.
+- Shared components under `apps/web/src/components/`: `site-chrome`, `search-form`, `count-bars`, `rundown-outline`. Styles in `globals.css` and CSS Modules, light and dark tokens.
+
+**Data rules held, each asserted by a test in `national-overview.test.ts`:** list sizes equal the manifest (408,182 and 420,082); the object never contains their sum; reference date `2026-01-20` and portal date `2026-01-28` kept separate; each list's head is 15 rows in the publisher's descending order; specimen spellings byte-for-byte (`NGUYỄN`, `MÜLLER`); smallest published count 2; trend `INSUFFICIENT_DATA` with one edition held. Counts are labelled "published counts", never people (D-006). The lists are named by the publisher's own titles; the partition basis is not asserted (TASK-004 §14 U-1). No map, rank claim, share, rarity or trend figure exists.
+
+**Why a generated module rather than reading the fixtures at build time.** `@name-atlas/sources` exports TypeScript source with `.js` import specifiers. Turbopack, which `next build` uses by default in Next 16.3.5, does not map `.js` to `.ts`, and `experimental.extensionAlias` is webpack-only (listed as unsupported in `next/dist/lib/turbopack-warning.js`). The first build failed with `module-not-found` on `./schema.js`. Generating the object follows the repository's existing generated-types pattern, with a test that fails when the committed file drifts from the verified records.
+
+**Dependencies.** `apps/web` gained `@name-atlas/sources` (`workspace:*`), used only by the generator script and the tests, so the landing page's figures go through the same fail-closed parser as the importer. No third-party dependency added or upgraded. The lockfile diff is that one workspace link. No web fonts are used: the page uses system font stacks.
+
+**Config touched:** `apps/web/src/generated/` added to `.prettierignore` and the ESLint ignores, the same treatment as `packages/db/src/generated/`.
+
+**Recorded, not resolved:** **D-007** in `docs/DECISIONS_NEEDED.md`. The overview renders source-published figures with lineage but no `Claim` (invariant 11), from a source whose `RightsProfile` is `LEGAL_REVIEW_REQUIRED` (invariant 13). It blocks public deployment of the overview, not this build. Nothing is deployed.
+
+### Verification run for WEB-000 (2026-09-30)
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | Passed. |
+| `pnpm typecheck` | Passed, 10 of 10 packages. |
+| `pnpm lint` | Passed, zero errors, zero warnings. |
+| `pnpm format:check` | Passed, after one `prettier --write` over four newly written files. |
+| `pnpm test` | Passed, **178 tests** across 9 packages. `apps/web` has 17: the existing health test plus 16 new (`national-overview.test.ts` 13, `format.test.ts` 3). |
+| Drift check | Changing one value in `src/generated/national-overview.ts` made `national-overview.test.ts` fail ("matches what the verified records produce today"); the file was restored and the suite passed again. |
+| `pnpm build` | Passed. `apps/web` routes: `/` static, `/search` dynamic, `/api/health` dynamic. |
+| Rendered check (`next start`, Playwright Chromium) | `/`, `/search?surname=Kowalczyk` and `/search` rendered at 1280 px and 390 px in light and dark. Horizontal overflow 0 px in all seven cases. The built `index.html` contains no `828,264`/`828264` (the would-be sum of the two lists). Section screenshots also checked at 1000 px. Three layout defects found in the screenshots were fixed and re-checked: the date tile wrapping, a three-plus-one tile grid at 1000 px, and the rundown thread running past the last chapter. |
+| `git status --porcelain` on `docs/canonical/`, `docs/library/`, `docs/archive/`, `docs/reference/`, `docs/review/`, `prompts/` | Empty. All untouched. |
+
+**Not verified:** the page on real iOS/Android devices or with a screen reader (only Chromium was used); the CI workflow end to end; Polish-language copy (none exists, the page is in English per the task's §4).

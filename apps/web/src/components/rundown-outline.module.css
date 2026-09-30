@@ -1,0 +1,51 @@
+.list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chapter {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 12px 0;
+}
+
+/* The thread from each chapter's number down to the next one's. */
+.chapter:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: 60px;
+  bottom: -16px;
+  left: 23px;
+  width: 1px;
+  background: var(--rule-strong);
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.title {
+  padding-top: 10px;
+  font-size: 1.25rem;
+}
+
+.body {
+  margin-top: 4px;
+  color: var(--ink-2);
+}

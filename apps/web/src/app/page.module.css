@@ -1,0 +1,608 @@
+.container {
+  width: min(1120px, 100% - 2 * var(--gutter));
+  margin-inline: auto;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  color: var(--accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---------- Hero ---------- */
+
+.hero {
+  position: relative;
+  padding-block: 48px 72px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* A faint graticule, fading out from behind the specimen card. */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 80% at 78% 40%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 80% at 78% 40%, #000 20%, transparent 75%);
+}
+
+.heroGrid {
+  display: grid;
+  gap: 56px;
+  align-items: center;
+}
+
+.heroCopy {
+  display: grid;
+  gap: 20px;
+  justify-items: start;
+}
+
+.heroCopy .eyebrow {
+  margin-bottom: -4px;
+}
+
+.heroTitle {
+  font-size: clamp(2.75rem, 7vw + 0.5rem, 4.75rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.heroLede {
+  max-width: 34rem;
+  color: var(--ink-2);
+  font-size: 1.1875rem;
+  line-height: 1.6;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-3);
+  font-size: 0.9375rem;
+}
+
+.examples a {
+  padding: 4px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+
+.examples a:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.specimen {
+  position: relative;
+  justify-self: center;
+  width: min(100%, 400px);
+  margin: 0;
+}
+
+/* A second index card, tucked behind the first. */
+.specimen::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 56px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transform: rotate(3.5deg) translate(10px, 6px);
+  opacity: 0.7;
+}
+
+.specimenCard {
+  position: relative;
+  padding: 28px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.specimenKicker {
+  color: var(--ink-3);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.specimenName {
+  margin-top: 6px;
+  font-size: clamp(2.25rem, 5vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.specimenCounts {
+  display: grid;
+  gap: 2px;
+  margin: 20px 0 0;
+}
+
+.specimenCounts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.specimenCounts dt {
+  display: grid;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+}
+
+.specimenCounts dt span {
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+.specimenCounts dd {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.specimenSource {
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-size: 0.8125rem;
+}
+
+.specimenCaption {
+  position: relative;
+  margin-top: 20px;
+  color: var(--ink-2);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    padding-block: 88px 48px;
+  }
+
+  .heroGrid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 64px;
+  }
+
+  .specimen {
+    justify-self: end;
+  }
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding-block: 56px;
+  scroll-margin-top: 64px;
+}
+
+.sectionHead {
+  display: grid;
+  max-width: 44rem;
+}
+
+.sectionTitle {
+  font-size: clamp(1.875rem, 3vw + 1rem, 2.75rem);
+  line-height: 1.1;
+}
+
+.sectionLede {
+  margin-top: 16px;
+  color: var(--ink-2);
+  font-size: 1.0625rem;
+}
+
+.caption {
+  margin-top: 16px;
+  max-width: 48rem;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 900px) {
+  .section {
+    padding-block: 80px;
+  }
+}
+
+/* ---------- Stat tiles ---------- */
+
+.tiles {
+  display: grid;
+  gap: 16px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One, two or four across — never three plus an orphan. */
+@media (min-width: 540px) {
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1040px) {
+  .tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.tile {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.tileValue {
+  font-size: clamp(2.25rem, 3vw + 1rem, 3rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+/* A date is wider than a count: size it to the tile so it stays on one line. */
+.tileValueDate {
+  font-size: clamp(1.5rem, 14cqi, 2.25rem);
+  white-space: nowrap;
+}
+
+.tileLabel {
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.tileNote {
+  margin-top: auto;
+  padding-top: 16px;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.callout {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  color: var(--ink-2);
+}
+
+.calloutTitle {
+  color: var(--ink);
+  font-size: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .callout {
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: 32px;
+    padding: 28px 32px;
+  }
+}
+
+/* ---------- Most frequent ---------- */
+
+.charts {
+  display: grid;
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.chartCard {
+  padding: 20px 12px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.chartTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 12px;
+  padding-inline: 8px;
+  font-size: 1.375rem;
+}
+
+.chartTitle span {
+  color: var(--ink-3);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+@media (min-width: 900px) {
+  .charts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Trends ---------- */
+
+.trendCard {
+  display: grid;
+  gap: 40px;
+  padding: 28px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.edition {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 28px 16px 0 0;
+  border-top: 2px solid var(--accent);
+}
+
+.edition[data-held="false"] {
+  border-top-style: dashed;
+  border-top-color: var(--rule-strong);
+}
+
+.editionDot {
+  position: absolute;
+  top: -9px;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--surface);
+}
+
+.edition[data-held="false"] .editionDot {
+  border-color: var(--rule-strong);
+  background: var(--surface);
+}
+
+.edition strong {
+  font-size: 1.125rem;
+}
+
+.edition span:last-child {
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 900px) {
+  .trendCard {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 56px;
+    padding: 40px;
+  }
+}
+
+/* ---------- Spelling ---------- */
+
+.spellingGrid {
+  display: grid;
+  gap: 40px;
+  align-items: center;
+}
+
+.spellings {
+  display: grid;
+  gap: 8px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.spelling {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.spellingName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.spellingCounts {
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.letters {
+  justify-self: center;
+  width: min(100%, 360px);
+}
+
+.letterGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.letterGrid li {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--surface);
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease;
+}
+
+.letterGrid li:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+}
+
+.lettersCaption {
+  margin-top: 14px;
+  color: var(--ink-3);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .spellingGrid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 72px;
+  }
+
+  .letters {
+    justify-self: end;
+  }
+}
+
+/* ---------- Rundown ---------- */
+
+.rundownGrid {
+  display: grid;
+  gap: 40px;
+}
+
+.cta {
+  margin-top: 28px;
+}
+
+@media (min-width: 900px) {
+  .rundownGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 72px;
+    align-items: start;
+  }
+}
+
+/* ---------- Source ---------- */
+
+.sourceCard {
+  padding: 28px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.sourceList {
+  display: grid;
+  margin: 28px 0 0;
+}
+
+.sourceList > div {
+  display: grid;
+  gap: 2px 24px;
+  padding-block: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.sourceList dt {
+  color: var(--ink-3);
+  font-size: 0.875rem;
+}
+
+.sourceList dd {
+  margin: 0;
+}
+
+.sourceLink {
+  margin-top: 20px;
+}
+
+.sourceLink a {
+  color: var(--accent);
+  font-weight: 600;
+  text-underline-offset: 3px;
+}
+
+@media (min-width: 720px) {
+  .sourceCard {
+    padding: 40px;
+  }
+
+  .sourceList > div {
+    grid-template-columns: 11rem minmax(0, 1fr);
+  }
+}

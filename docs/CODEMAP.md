@@ -10,6 +10,8 @@ Where things live. Updated by whichever task changes the repository structure (`
 
 **TASK-004 status:** implemented. PESEL national surname ingestion exists end to end — migration `0003_source_rights_distribution` adds `rights_profiles`, `sources`, `source_records`, `distribution_snapshots`, `distribution_values`; `packages/sources/src/pesel/` holds the source registry, the rights hard gate, the pure row mapping and the importer; `packages/sources/bin/import-pesel.ts` is the CLI. Stores only: raw counts, provenance and surname-scoped national snapshots. No `EvidenceItem`, no `Claim`, no confidence, no citation, and no derived value of any kind (verified in PROGRESS.md).
 
+**WEB-000 status:** implemented, not deployed. The landing page and a `/search` destination exist in `apps/web`, rendering a generated presentation object built from the verified PESEL manifest and fixtures. No resolution, no claims, no surname profile. Public deployment of the overview is blocked by D-007.
+
 ## Current — exists now
 
 | Path | Contents | Status |
@@ -27,13 +29,13 @@ Where things live. Updated by whichever task changes the repository structure (`
 | `docs/CODEMAP.md` | This file | active |
 | `docs/DECISIONS_NEEDED.md` | Unresolved blocking decisions | active |
 | `docs/sources/pesel.md` | PESEL source-verification record — complete for the national production pair; D-001 resolved; TASK-004's §14 answers and the partition observation recorded at the end | active |
-| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (done). One file per task — the second, superseded TASK-004 draft was deleted, its one unique contribution having been adopted first (`AGENTS.md` §3) | active |
+| `tasks/` | Task specifications — `001-project-foundation.md` (done), `002-pesel-source-spike.md` (done), `003-exact-surname-resolver.md` (done), `004-pesel-surname-ingestion.md` (done), `WEB-000-landing-page.md` (done — the landing page, ahead of WEB-001). One file per task — the second, superseded TASK-004 draft was deleted, its one unique contribution having been adopted first (`AGENTS.md` §3) | active |
 | `prompts/` | Session prompts as delivered | reference |
 | `00_READ_THIS_FIRST.md`, `PACKAGE_MANIFEST.md`, `FIRST_PROMPT_TO_COPY.md`, `NAME_ATLAS_IMPLEMENTATION_PLAN_REVIEWED_2026-09-18.md` | Package orientation and review | reference |
 | `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `tsconfig.base.json`, `.nvmrc`, `.editorconfig`, `.gitignore`, `.env.example` | Root workspace/tooling configuration | stable (TASK-001) |
 | `eslint.config.js`, `.prettierrc.json`, `.prettierignore` | Single lint/format configuration for the whole workspace (`AGENTS.md` §6) | stable (TASK-001) |
 | `.github/workflows/ci.yml` | CI: install → typecheck → lint → format check → unit tests → migrate → verify generated types → integration tests → build | stable (TASK-001) |
-| `apps/web` | Next.js public application. One page, one `/api/health` route handler (tested). No BFF logic yet — that arrives with the first real endpoint at M2. | stable (TASK-001 skeleton) |
+| `apps/web` | Next.js public application. `src/app/page.tsx` is the landing page (WEB-000); `src/app/search/page.tsx` is the search destination, which resolves nothing yet; `/api/health` route handler (tested). `src/lib/national-overview.ts` builds the landing page's `NationalOverview` presentation object from the PESEL manifest and fixtures; `scripts/generate-overview.ts` writes it to `src/generated/national-overview.ts`, which the page imports (drift is a test failure). Shared components in `src/components/`, design tokens in `src/app/globals.css`. No BFF logic yet — that arrives with the first real endpoint at M2. | active (TASK-001 skeleton; WEB-000 landing page) |
 | `apps/admin` | Minimal internal Next.js application. One page. No auth, no admin features. | stable (TASK-001 skeleton) |
 | `apps/worker` | Node entry point (`runWorker()`). Logs a structured startup line with a correlation ID and exits. No queue, no Redis, no BullMQ (ADR-0001) — those arrive at M3. | stable (TASK-001 skeleton, buildable, no queue) |
 | `packages/domain` | `uuidv7()`/`isUuidV7()` (via the `uuid` package) and `createCorrelationId()`. Nothing domain-specific yet — no `Surname`, no `Claim`. | stable (TASK-001 skeleton) |

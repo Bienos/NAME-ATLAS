@@ -14,6 +14,7 @@ export default tseslint.config(
       "**/coverage/**",
       "**/*.d.ts",
       "packages/db/src/generated/**",
+      "apps/web/src/generated/**",
       "pnpm-lock.yaml",
     ],
   },
