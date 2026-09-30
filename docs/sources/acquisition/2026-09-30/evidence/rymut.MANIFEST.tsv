@@ -1,0 +1,74 @@
+file	url	fetched_utc(mtime)	sha256	bytes
+data.bn.org.pl_api_title_slownik_nazwisk.json	https://data.bn.org.pl/api/institutions/bibs.json?title=S%C5%82ownik+nazwisk+wsp%C3%B3%C5%82cze%C5%9Bnie&limit=50	2026-09-29T23:50:48Z	000eb098fd5cb5c722ec2cee15f74745d2c2039ec528f1bc4b5a836c130c28d3	45171
+data.bn.org.pl_api_author_rymut.json	https://data.bn.org.pl/api/institutions/bibs.json?author=Rymut%2C+Kazimierz&limit=100	2026-09-29T23:51:06Z	bdfca98995476a964c67b8deadc87654c60ee95c391a5e5dae480f9680136f4e	364419
+data.bn.org.pl_api_id_1053905.json	https://data.bn.org.pl/api/institutions/bibs.json?id=1053905	2026-09-30T00:00:54Z	f01f7a81d28e511534b1e3dd174b33d155fbbd4e8c664c8d169be664040b3297	4636
+onomastica.ijp.pan.pl_article51_view.html	https://onomastica.ijp.pan.pl/index.php/ONOM/article/view/51	2026-09-29T23:51:34Z	7f7c9949c8b18540cd2257c2489ed7a1f293cf46ffe22c29b8c1d18e67b29d17	29080
+onomastica.ijp.pan.pl_article51_download.pdf	https://onomastica.ijp.pan.pl/index.php/ONOM/article/download/51/33	2026-09-29T23:51:43Z	5463d360b6941e3bd5aa377619a39472bf386b2bb45d6e62d54d8163f0b495fe	1685758
+onomastica.ijp.pan.pl_article51_extracted.txt	(text extracted locally from onomastica.ijp.pan.pl_article51_download.pdf)	2026-09-29T23:52:04Z	ec6dfd2b69af74f2a4474b8cf3c68dd4cac6876a9b95466b184d08e3c37007e0	32306
+api.europeana.eu_search_slownik_nazwisk.json	https://api.europeana.eu/record/v2/search.json?wskey=api2demo&query=%22S%C5%82ownik+nazwisk+wsp%C3%B3%C5%82cze%C5%9Bnie%22&rows=30&profile=standard	2026-09-29T23:54:28Z	02e8611533922117a2e5a0dd2cf2ff9d3197abf85fec0aea192ef83eb03f4f7a	38895
+api.europeana.eu_search_rymut_nazwisk.json	https://api.europeana.eu/record/v2/search.json?wskey=api2demo&query=Rymut+nazwisk&rows=50&profile=minimal	2026-09-30T00:01:03Z	406e2fa77ea1c996ab86dbc90d076d59c2a84d91bd633b656a113bf032ce43a0	16513
+polona.pl_api_search_phrase.json	POST https://polona.pl/api/search-service/search/simple?query=%22S%C5%82ownik%20nazwisk%20wsp%C3%B3%C5%82cze%C5%9Bnie%22&page=0&pageSize=50&sort=RELEVANCE	2026-09-29T23:59:20Z	3e21311a3e9af3b84580d96c73525586c5456edc3b845ab211a7c4fe6aadbc1e	13132
+polona.pl_api_search_broad.json	POST https://polona.pl/api/search-service/search/simple?query=S%C5%82ownik%20nazwisk%20wsp%C3%B3%C5%82cze%C5%9Bnie%20w%20Polsce%20u%C5%BCywanych&page=0&pageSize=24&sort=RELEVANCE	2026-09-29T23:59:01Z	84ed010fbd1a73b3ad57130305099d4a0ceae3804c92132ac4e03569c10fee1a	128288
+www.bn.org.pl_document_1534405883.pdf	https://www.bn.org.pl/download/document/1534405883.pdf	2026-09-29T23:59:39Z	f1c67a02e0c75945c2f026a599bfb0c9d69b0126643535f297d51becdd65c3d2	329363
+rcin.org.pl_publication_33731.html	https://rcin.org.pl/dlibra/publication/33731	2026-09-30T00:03:00Z	c8b9c59454b5707eae26c7fe3a07cb554d7f72358cb43f60fbc98cb5e3b0a424	249873
+rcin.org.pl_publication_15370_edition_2722.html	https://rcin.org.pl/dlibra/publication/15370/edition/2722?language=pl	2026-09-30T00:05:03Z	75e386919154b07e3480627e39050fe9a70621f0a3c0525b594759be819d675c	291846
+rcin.org.pl_publication_43327_edition_24807.html	https://rcin.org.pl/dlibra/publication/43327/edition/24807?language=pl	2026-09-30T00:04:34Z	c3691453d59f820e6d9ea7a1a560a0b298b4d580d5816e88646aff4b61c2fa9b	290691
+rcin.org.pl_text_copyright-law.html	https://rcin.org.pl/dlibra/text?id=copyright-law&language=pl	2026-09-30T00:04:15Z	aed1c41a513f0c93ce0f9a13072768eb7a925216fb27d6525ac326e9790fb9e3	234334
+rcin.org.pl_text_regulations.html	https://rcin.org.pl/dlibra/text?id=regulations&language=pl	2026-09-30T00:04:31Z	38cdac7c20d679d1a9a7d6729a94e6c4a41349c3531a06d645f4d705da2eaab5	263782
+rcin.org.pl_challenge_page_example.html	https://rcin.org.pl/dlibra/oai-pmh-repository.xml?verb=GetRecord&metadataPrefix=oai_dc&identifier=oai:rcin.org.pl:105745	2026-09-29T23:53:28Z	ec6ba9f0131ecf8195e5aa24c146cf82e013565c0f9933f2f3e28c02f271fd65	1746
+fbc.pionier.net.pl_id_rcin2628_testpage.html	https://fbc.pionier.net.pl/id/oai:rcin.org.pl:2628	2026-09-29T23:55:11Z	be7fed82e771f6744b5b2671b192ccae0fc88796f4daa7f18ecd901226f83e96	1477
+archive.org_advancedsearch_rymut.json	https://archive.org/advancedsearch.php?q=title%3A%28S%C5%82ownik+nazwisk%29+OR+%28Rymut%29&fl[]=identifier,title,creator,date,mediatype,licenseurl&rows=50&output=json	2026-09-29T23:58:10Z	05d2eb38da3762e9efce0e54d41294e6a09022db952546f5bca65ffb89cdc389	1986
+archive.org_metadata_sowniknazwiskwsp0000rymu.json	https://archive.org/metadata/sowniknazwiskwsp0000rymu/metadata	2026-09-29T23:58:18Z	2abf6bf84d00ac3f009ebf3ae1602f947b28b2e5e2bf9c2c6e087555ba490e4e	2352
+catalog.hathitrust.org_api_isbn_8385579257.json	https://catalog.hathitrust.org/api/volumes/brief/isbn/8385579257.json	2026-09-29T23:58:10Z	80b099585a2239409d9e9eab047ee14984ebc9567db56135c8ef2cdae29f4cc2	2272
+books.google.com_xV5mAAAAMAAJ.html	https://books.google.com/books?id=xV5mAAAAMAAJ	2026-09-30T00:04:06Z	b83bb0a0667c9ae765b74072f140e0f1929e39ac8c155ab49b54a80ade583323	86742
+ijppan.pl_home.html	https://ijp.pan.pl/ (-> https://ijppan.pl/)	2026-09-29T23:56:56Z	aa034894c861b6fe615ee76fe3521399238ffd2a58e178a5670d9d24c465b9b0	40794
+ijppan.pl_kontakt.html	https://ijppan.pl/kontakt/	2026-09-29T23:57:03Z	c90677b42a492b334af48ee1ef05aa5ea2cc932be0d8ea2976df096190743948	46177
+ijppan.pl_administracja.html	https://ijppan.pl/administracja/	2026-09-29T23:57:29Z	ed47e4f3c22d5f45a387b411bd3233c1805458fc97b9070e5f1b65111bb504db	44865
+ijppan.pl_publikacje-i-materialy_wydawnictwo.html	https://ijppan.pl/publikacje-i-materialy/wydawnictwo/	2026-09-29T23:57:04Z	72115e414412dd86b6c3765718237c861221553290e88adfecd343529cda19d9	46763
+ijppan.pl_publikacje-i-materialy_slowniki.html	https://ijppan.pl/publikacje-i-materialy/slowniki/	2026-09-29T23:57:05Z	dbda5e187193c862e05b6b76c2d3828a17d075b9434cde87433996f16a921637	47846
+ijppan.pl_publikacje-i-materialy_zasoby.html	https://ijppan.pl/publikacje-i-materialy/zasoby/	2026-09-29T23:57:07Z	008e4222c8dd578d1a5a0e7b35b54a220c77cedc7cca422f45627f2a052217ae	46902
+nazwiska.ijppan.pl_home.html	https://nazwiska.ijp.pan.pl/ (-> https://nazwiska.ijppan.pl/)	2026-09-29T23:56:27Z	3b64b028b5a725426e049f48f23dd49dd9f95b96bb1100d552862fb27dd54860	7939
+nazwiska.ijppan.pl_info_oslowniku.html	https://nazwiska.ijppan.pl/info/oslowniku	2026-09-29T23:56:35Z	c3feb8fa0172a0b9ec893497dbb4df2da785f0a584f8d58196c2e38cd44a9143	48819
+nazwiska.ijppan.pl_info_kontakt.html	https://nazwiska.ijppan.pl/info/kontakt	2026-09-29T23:56:36Z	21898986d2d97466fb7c4405a7f2691a3e79ffa6dfde267d148ff80220103046	5600
+sklep.ijppan.pl_product278.html	https://sklep.ijppan.pl/index.php?route=product/product&product_id=278	2026-09-29T23:55:39Z	1e5c8edfa35905621f853cbdbf6bb8a338bf0690de290aa27318ab502b5c7c67	10233
+sklep.ijppan.pl_search.html	https://sklep.ijppan.pl/index.php?route=product/search&search=nazwisk	2026-09-29T23:55:48Z	41ecf3d9719be9d6d8b67b4efc19e74d6a321a4270c00fcc49513511b727e6ad	24615
+sklep.ijppan.pl_search_Rymut_.html	https://sklep.ijppan.pl/index.php?route=product/search&search=Rymut&description=true	2026-09-29T23:55:57Z	50aa281be340d48fea7f57ce2b0a33c6a572610a4aa0d259306318425f7144ca	53417
+sklep.ijppan.pl_search_Rymut_p2.html	https://sklep.ijppan.pl/index.php?route=product/search&search=Rymut&description=true&page=2	2026-09-29T23:56:06Z	4170601cc503bb06d2470b2f7c7f1a0d244f5f5ec2283d9afca80d280e6cab64	33775
+sklep.ijppan.pl_search_S_C____ownik_nazwisk_.html	https://sklep.ijppan.pl/index.php?route=product/search&search=S%C5%82ownik+nazwisk&description=true	2026-09-29T23:55:58Z	5be3e15159cb6b42dc37abc1c25d99bc397f1624138b8ee2a71dfa7e1773f5a8	13642
+sklep.ijppan.pl_search_slowniknazwisk2.html	https://sklep.ijppan.pl/index.php?route=product/search&search=S%C5%82ownik%20nazwisk	2026-09-29T23:56:16Z	9662af1160c1e18395cfb161328c1a29c089f4a7035d272456d0d33fa421104e	13603
+ruj.uj.edu.pl_bitstream_704cc4ce.pdf	https://ruj.uj.edu.pl/server/api/core/bitstreams/704cc4ce-aa28-4588-8cd6-f33729389b17/content	2026-09-30T00:01:22Z	cd0abb8fc488417a35a6a173a7f79006e678b3e7e7418798a199768682e7a2ea	488564
+www.genpol.com.pl_home.html	https://genpol.com.pl/ (-> http://www.genpol.com.pl/)	2026-09-30T00:01:54Z	13413624383e65496d7f047f91ed617684a5f25e5c4a22e20abd4fcd86364a98	6211
+www.herby.com.pl_indexslo.html	http://www.herby.com.pl/indexslo.html	2026-09-29T23:59:53Z	c946e6480ec1bc49f89253ac06ffb243762ace62822ee26cce9abbd0b3a70f07	1174
+www.herby.com.pl_naz_wstep.html	http://www.herby.com.pl/naz_wstep.html	2026-09-30T00:00:03Z	5d847367804e78465cfd8454dc7a993c241143a5e6138209d35a299058fa2de7	2222
+www.herby.com.pl_naz_query.html	http://www.herby.com.pl/naz_query.html	2026-09-30T00:00:03Z	03d4fb6ac366583f5e702de67a1c978f05866aefd289f9e1d8ec550cb1236b6d	2281
+nazwiska-polskie.pl_home.html	https://nazwiska-polskie.pl/	2026-09-30T00:00:17Z	34fee6bf68b134142f9d7d75fdf92d1edb14909d910ab795f6c0cc5ba7657098	12932
+nazwiska-polskie.pl_o-danych.html	https://nazwiska-polskie.pl/o-danych	2026-09-30T00:00:26Z	75e0cbc2933983c62ef19361f7eafc10f1f53918af1399960d8c930283cb9d25	8178
+jri-poland.org_slownik-nazwisk-online.html	https://jri-poland.org/blog/slownik-nazwisk-online/	2026-09-30T00:06:04Z	c68e3e5be2430f96752c31a6a2aebd268b33292b63aa2e73168753665183f461	113370
+europeana/rec_0940431_nn930tg.json	https://api.europeana.eu/record/v2/0940431/_nn930tg.json?wskey=api2demo	2026-09-29T23:54:43Z	abda114fb038e18f3a74bbdd2032778b7efed51426accdf51031929f9d2e7dd4	838322
+europeana/rec_0940431_nn930wz.json	https://api.europeana.eu/record/v2/0940431/_nn930wz.json?wskey=api2demo	2026-09-29T23:54:46Z	5efafd84b68fe33c094528a485fd25749c83492a06e561ef1db843a17429aea8	804883
+europeana/rec_0940431_nn93S7d.json	https://api.europeana.eu/record/v2/0940431/_nn93S7d.json?wskey=api2demo	2026-09-29T23:54:41Z	e6fcacbeb6abdb4a5a656b912f11867810d816afbb8c25f85c1a63351d4402aa	753016
+europeana/rec_0940431_nn9m8st.json	https://api.europeana.eu/record/v2/0940431/_nn9m8st.json?wskey=api2demo	2026-09-29T23:54:46Z	f3a76055501b2296addbaff78d0ffd6338c858c1c447e5e9b9d520ec9082ff7c	744525
+europeana/rec_0940431_nn9mb06.json	https://api.europeana.eu/record/v2/0940431/_nn9mb06.json?wskey=api2demo	2026-09-29T23:54:41Z	4529e8d36559e8d51d27f2a30c1c391bd0c3426514d82a666f81fbdbd3f0b39f	783555
+europeana/rec_0940431_nn9mb09.json	https://api.europeana.eu/record/v2/0940431/_nn9mb09.json?wskey=api2demo	2026-09-29T23:54:45Z	3df19127ddad94bb2e2576e8131234902cc55c7497fc293b607b550714d8d0bf	811025
+europeana/rec_0940431_nn9mb0c.json	https://api.europeana.eu/record/v2/0940431/_nn9mb0c.json?wskey=api2demo	2026-09-29T23:54:44Z	12d55574bd12e569eacea5abf323f4241337e6f3217d59ed45756db2d0db24da	819302
+europeana/rec_0940431_nn9mb0m.json	https://api.europeana.eu/record/v2/0940431/_nn9mb0m.json?wskey=api2demo	2026-09-29T23:54:43Z	4f7b973bc8e72b83d51f38ce800b23d7dcb71c934ae96e09069d1adb7e8ca2e1	753028
+europeana/rec_0940431_nnfSh5v.json	https://api.europeana.eu/record/v2/0940431/_nnfSh5v.json?wskey=api2demo	2026-09-29T23:54:42Z	295761edac9269eafe551b2009ad081b352edb603a2eef0c56e1f24f24048b0b	12152
+europeana/rec_0940431_nnfdvq3.json	https://api.europeana.eu/record/v2/0940431/_nnfdvq3.json?wskey=api2demo	2026-09-29T23:54:39Z	2dbaaa4aee8d22e71ee01623a41a8e6183b50d4ddda2fd8fed36a3b7a1f8e886	12105
+robots/archive.org.robots.txt	https://archive.org/robots.txt	2026-09-29T23:52:38Z	83e00f46c71e9fa872694af73fa9c15a615b9052b2f10820a3d146bc506c6161	238
+robots/bibliotekacyfrowa.pl.robots.txt	https://bibliotekacyfrowa.pl/robots.txt	2026-09-29T23:52:39Z	f8ef3e81cbd46030de29b885b96768391ed14c4ce50b654ec8d299a4875b8c94	455
+robots/fbc.pionier.net.pl.robots.txt	https://fbc.pionier.net.pl/robots.txt	2026-09-29T23:52:30Z	47362d72b944c7bec8c5e1ebeae2f193671fbb630bdb5ee726adb0c0463c07f9	453
+robots/ijp.pan.pl.robots.txt	https://ijp.pan.pl/robots.txt	2026-09-29T23:52:33Z	451c656787ccb68bba8ce281261dc372c8a45dcee85558df4ef93c7f4ecef26a	110
+robots/ijppan.pl.robots.txt	https://ijppan.pl/robots.txt	2026-09-29T23:56:53Z	451c656787ccb68bba8ce281261dc372c8a45dcee85558df4ef93c7f4ecef26a	110
+robots/jbc.bj.uj.edu.pl.robots.txt	https://jbc.bj.uj.edu.pl/robots.txt	2026-09-29T23:52:29Z	292e4d40963bd5c8fe21e8b2fd7f4cf09cddf165fcd5fb348c9b05e7f02181a5	409
+robots/katalog.nukat.edu.pl.robots.txt	https://katalog.nukat.edu.pl/robots.txt	2026-09-30T00:02:27Z	fa8795cb8822997665dc23b49a2d453939fb4507e113fa29140a973bc28c4941	95
+robots/mbc.malopolska.pl.robots.txt	https://mbc.malopolska.pl/robots.txt	2026-09-29T23:52:29Z	b35718ef133d5049f2d1c6abcf0e953a3109dd32539ef4ffe56d0c066c20a42c	14
+robots/nazwiska-polskie.pl.robots.txt	https://nazwiska-polskie.pl/robots.txt	2026-09-30T00:00:16Z	bacfe37719a4af787b31e4415db75ddaff51f5bcad9c224cd20c003cf4c2afd9	529
+robots/nazwiska.ijp.pan.pl.robots.txt	https://nazwiska.ijp.pan.pl/robots.txt	2026-09-29T23:52:38Z	fd89345af6aca5dab85f2aa6a830e270a362b1fa6b5f19607ddd773a081ed651	14
+robots/nazwiska.ijppan.pl.robots.txt	https://nazwiska.ijppan.pl/robots.txt	2026-09-29T23:56:34Z	fd89345af6aca5dab85f2aa6a830e270a362b1fa6b5f19607ddd773a081ed651	14
+robots/polona.pl.robots.txt	https://polona.pl/robots.txt	2026-09-29T23:52:28Z	3838ee1f89238ed57db67f73af726768a38fab7407f75a5a0faf77e433475606	15968
+robots/rcin.org.pl.robots.txt	https://rcin.org.pl/robots.txt	2026-09-29T23:52:27Z	252bac95a3ee2515be18caf971ea778c851564951ad01cbde7fcf9a93d23a990	483
+robots/search.worldcat.org.robots.txt	https://search.worldcat.org/robots.txt	2026-09-30T00:02:35Z	4d9d884f476fe1e504244bf26742f28d6add64ea50b7929409e78e95053fb025	651
+robots/sklep.ijppan.pl.robots.txt	https://sklep.ijppan.pl/robots.txt	2026-09-29T23:55:38Z	68a916f4407f474f0c25bab017296fe287fd6b00b879bbf5ee5a8851638c50c9	345
+robots/www.familysearch.org.robots.txt	https://www.familysearch.org/robots.txt	2026-09-29T23:58:45Z	24baff01496b472e251e41ed526c39f40880bc1f392b48675b1f14e21bac597d	2723
+robots/www.herby.com.pl.robots.txt	http://www.herby.com.pl/robots.txt	2026-09-29T23:59:53Z	38c4151ea9b92426c07f64c64cde2d1268da062c50c9db8b12670e8f79a670dc	569
+robots/www.ijp.pan.pl.robots.txt	https://www.ijp.pan.pl/robots.txt	2026-09-29T23:52:36Z	451c656787ccb68bba8ce281261dc372c8a45dcee85558df4ef93c7f4ecef26a	110

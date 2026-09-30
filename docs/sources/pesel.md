@@ -185,6 +185,8 @@ Regional resources (`1148786`, `1148790`) now also have confirmed checksums, end
 
 The archive additionally contains PESEL national data for 2019–2025, regional for 2025, and non-Polish sources (US Census, France INSEE, Belgium, GeoNames, TERYT, Morfeusz). **None of it is ingested, validated, or rights-reviewed**, and multi-country coverage is an explicit MVP non-goal (`PRODUCT.md` §8 item 9). Earlier annual snapshots are not trend data: comparable methodology across years is unproven, and the archive's own report says so.
 
+**Update 2026-09-30** (recovered from `claude/peaceful-planck-u659j1`; see the note at the top of `pesel-earlier-editions.md`). The 2019–2025 national and 2025 regional editions were rights-checked and verified at file level in `docs/sources/pesel-earlier-editions.md`. They were not ingested when this was written. Later, TASK-044 (ADR-0019) registered eleven of the national editions, pinned by SHA-256, for list-scope figures only (`packages/sources/src/registry.ts`). The same session re-downloaded this record's 2026 pair from `csv_download_url`; both files match the checksums above exactly, the first check made directly against the publisher. It also found a concrete case of the conversion risk described above: in the 2020–2022 editions one surname cell is a boolean in the native xlsx and becomes the string `True` in the portal's CSV.
+
 ## D-001 status
 
 **RESOLVED** (`docs/DECISIONS_NEEDED.md` has the authoritative record). All 20 items in TASK-002 §8 now have a verified answer sourced above — including items 3 and 7, which were previously carried forward as residuals and are closed by the evidence in the section above. Nothing was guessed.
