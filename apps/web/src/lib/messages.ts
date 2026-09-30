@@ -1,6 +1,6 @@
 /**
  * The words the free result page renders (TASK-017), and the landing atlas's
- * (TASK-040; six plates since TASK-043).
+ * (TASK-040; six plates since TASK-043, seven since TASK-044).
  *
  * Pure: strings in, strings out. No database, no React, no request. That is
  * deliberate — every honesty rule this page must keep is then a unit test
@@ -8,9 +8,10 @@
  *
  * The result page's sentences are **verbatim from
  * `docs/contracts/surname-result.md`**, where the project owner accepted them.
- * The `lf*` strings are the landing atlas's own (TASK-040, TASK-043), written for
- * `list-atlas.tsx` under the list-facts contract's rules (every figure names
- * its list; the two lists are never summed). Neither set is paraphrased here,
+ * The `lf*` strings are the landing atlas's own (TASK-040, TASK-043, TASK-044),
+ * written for `list-atlas.tsx` under the list-facts contract's rules (every
+ * figure names its list; the two lists are never summed; a change is stated,
+ * never its cause). Neither set is paraphrased here,
  * and the rules attached to them are not negotiable by a layout decision:
  *
  * - a count is exact and never says "about"; a rarity figure is rounded and
@@ -144,6 +145,17 @@ export function formatQuantile(q: number, lang: Lang): string {
  */
 export function formatShare(share: number, lang: Lang): string {
   return formatPercent(share, lang, share < 0.01 ? 2 : 1);
+}
+
+/**
+ * A stored difference with its sign (TASK-044): `+1 318 492`, `−5` (a minus
+ * sign, not a hyphen), `0`. Grouped like {@link formatInteger}. It formats a
+ * difference the artefact stores; it never takes one.
+ */
+export function formatSigned(value: number, lang: Lang): string {
+  if (value > 0) return `+${formatInteger(value, lang)}`;
+  if (value < 0) return `−${formatInteger(Math.abs(value), lang)}`;
+  return formatInteger(0, lang);
 }
 
 /** Polish months in the genitive, as the accepted rendering requires. */
@@ -624,19 +636,21 @@ export const UI = {
     invalidBody: "Sprawdź wpisane nazwisko i spróbuj ponownie.",
     noFigures: "Brak danych do pokazania.",
     notSummed: "Zbiory męski i żeński są odrębne i nigdy nie są sumowane.",
-    // --- The landing atlas (TASK-040; six plates since TASK-043). Every figure
-    // arrives from `listFacts()`; these are the words around it. A line that
-    // carries one list's figures names that list, and nothing here adds the
-    // two lists up. A named surname is the artefact's published string, as text.
+    // --- The landing atlas (TASK-040; six plates since TASK-043, seven since
+    // TASK-044). Every figure arrives from `listFacts()`; these are the words
+    // around it. A line that carries one list's figures names that list, and
+    // nothing here adds the two lists up. A named surname is the artefact's
+    // published string, linked to its search answer (ADR-0019 §2.6).
     lfEyebrow: "Rejestr PESEL · wydanie {year}",
     lfTitle: "Atlas nazwisk",
     lfLede:
-      "Sześć plansz o nazwiskach z rejestru PESEL (stan na {date}). Mężczyźni i kobiety są w nim " +
-      "na dwóch osobnych listach: przełącz listę, a plansze I–V pokażą tę listę, a plansza VI " +
-      "porówna obie. Nigdy ich nie sumujemy.",
+      "Siedem plansz o nazwiskach z rejestru PESEL (stan na {date}). Mężczyźni i kobiety są w " +
+      "nim na dwóch osobnych listach: przełącz listę, a plansze I–V i VII pokażą tę listę, a " +
+      "plansza VI porówna obie. Nigdy ich nie sumujemy.",
     lfScope:
       "Każda liczba opisuje jedną opublikowaną listę rejestru PESEL: nazwiska noszone przez co " +
-      "najmniej 2 osoby, osoby żyjące, nazwisko aktualne. Stan\u00a0na\u00a0{date}",
+      "najmniej 2 osoby, osoby żyjące, nazwisko aktualne. Plansza VII zestawia też wcześniejsze " +
+      "wydania tej samej listy. Stan\u00a0na\u00a0{date}",
     lfSwitchLabel: "Która lista",
     lfSwitchMale: "Mężczyźni",
     lfSwitchFemale: "Kobiety",
@@ -646,6 +660,8 @@ export const UI = {
     lfSource: "Źródło: {link} · stan\u00a0na\u00a0{date}",
     lfSourceName: "rejestr PESEL, dane.gov.pl",
     lfSourceTwo: "Źródło: rejestr PESEL, dane.gov.pl ({male}, {female}) · stan\u00a0na\u00a0{date}",
+    lfSourceEditions: "Źródło: {link} · wydania z {date}",
+    lfSourceEditionsTwo: "Źródło: rejestr PESEL, dane.gov.pl ({male}, {female}) · wydania z {date}",
     lfMethod: "{status} · metoda {method}",
     lfPlate: "Plansza",
     // Plate I: the constellation.
@@ -795,14 +811,78 @@ export const UI = {
     lfP6Foot:
       "Pola kół są proporcjonalne do liczby nazwisk na każdej liście. Nazwiska porównujemy po " +
       "dokładnym zapisie, z polskimi znakami: forma męska i żeńska to dwa różne nazwiska.",
-    // The coda: no trend from one edition.
-    lfCodaKicker: "Zmiany w czasie",
-    lfCodaTitle: "Trend potrzebuje dwóch wydań. Mamy jedno.",
-    lfCodaBody:
-      "Wczytaliśmy jedno wydanie rejestru (stan na {date}). Gdy wczytamy kolejne, plansze będą " +
-      "mogły pokazać, co się zmieniło — policzone, nie zgadywane.",
-    lfCodaEdition: "wydanie",
-    lfCodaNext: "następne",
+    // Plate VII: the editions of one list's series (ADR-0019). What changed,
+    // never why; a gap is a gap with its reason; no surname named for growth.
+    // The headline's words are chosen by the sign of the stored difference.
+    lfP7Name: "Zmiany w czasie",
+    lfP7TitleMoreMale:
+      "Lista mężczyzn z {last}\u00a0r. ma o {d} {d:nazwisko|nazwiska|nazwisk} więcej niż lista z " +
+      "{first}\u00a0r.",
+    lfP7TitleMoreFemale:
+      "Lista kobiet z {last}\u00a0r. ma o {d} {d:nazwisko|nazwiska|nazwisk} więcej niż lista z " +
+      "{first}\u00a0r.",
+    lfP7TitleFewerMale:
+      "Lista mężczyzn z {last}\u00a0r. ma mniej nazwisk niż lista z {first}\u00a0r.: {sl} wobec {sf}.",
+    lfP7TitleFewerFemale:
+      "Lista kobiet z {last}\u00a0r. ma mniej nazwisk niż lista z {first}\u00a0r.: {sl} wobec {sf}.",
+    lfP7TitleSameMale:
+      "Lista mężczyzn z {last}\u00a0r. ma tyle samo nazwisk co lista z {first}\u00a0r.: {sl}.",
+    lfP7TitleSameFemale:
+      "Lista kobiet z {last}\u00a0r. ma tyle samo nazwisk co lista z {first}\u00a0r.: {sl}.",
+    lfP7LedeMale:
+      "Wydania listy mężczyzn od {from} do {to}, jedno obok drugiego: słupek to liczba nazwisk " +
+      "w wydaniu; niebieskie są dwa porównywane wydania, pierwsze i ostatnie. Mężczyzn na liście: " +
+      "{pf} w pierwszym wydaniu, {pl} w ostatnim ({pd}).",
+    lfP7LedeFemale:
+      "Wydania listy kobiet od {from} do {to}, jedno obok drugiego: słupek to liczba nazwisk " +
+      "w wydaniu; niebieskie są dwa porównywane wydania, pierwsze i ostatnie. Kobiet na liście: " +
+      "{pf} w pierwszym wydaniu, {pl} w ostatnim ({pd}).",
+    lfP7TableMale: "Wydania listy mężczyzn: liczba nazwisk i mężczyzn w każdym",
+    lfP7TableFemale: "Wydania listy kobiet: liczba nazwisk i kobiet w każdym",
+    lfP7ColEdition: "Wydanie",
+    lfP7ColSurnames: "Nazwiska",
+    lfP7ColPeopleMale: "Mężczyźni",
+    lfP7ColPeopleFemale: "Kobiety",
+    lfP7GapShort: "brak",
+    // {of} is a date that already ends in "r.", so no full stop follows it.
+    lfP7Gap: "brak: plik z {date} jest identyczny z plikiem z {of}",
+    lfP7NewMale:
+      "{s:nazwisko jest|nazwiska są|nazwisk jest} na liście z {last}\u00a0r., a nie na liście z " +
+      "{first}\u00a0r.; {p} {p:mężczyzna nosi|mężczyzn nosi|mężczyzn nosi} " +
+      "{s:to nazwisko|te nazwiska|te nazwiska}.",
+    lfP7NewFemale:
+      "{s:nazwisko jest|nazwiska są|nazwisk jest} na liście z {last}\u00a0r., a nie na liście z " +
+      "{first}\u00a0r.; {p} {p:kobieta nosi|kobiety noszą|kobiet nosi} " +
+      "{s:to nazwisko|te nazwiska|te nazwiska}.",
+    lfP7GoneMale:
+      "{s:nazwisko było|nazwiska były|nazwisk było} na liście z {first}\u00a0r., a nie ma " +
+      "{s:go|ich|ich} na liście z {last}\u00a0r.; na liście z {first}\u00a0r. " +
+      "{p:nosił je|nosiło je|nosiło je} {p} {p:mężczyzna|mężczyzn|mężczyzn}.",
+    lfP7GoneFemale:
+      "{s:nazwisko było|nazwiska były|nazwisk było} na liście z {first}\u00a0r., a nie ma " +
+      "{s:go|ich|ich} na liście z {last}\u00a0r.; na liście z {first}\u00a0r. " +
+      "{p:nosiła je|nosiły je|nosiło je} {p} {p:kobieta|kobiety|kobiet}.",
+    lfP7NotZero:
+      "Brak na liście to nie zero: wydawca nie publikuje nazwisk noszonych przez jedną osobę.",
+    lfP7TopMale: "Najczęstsze nazwiska listy mężczyzn: {first}\u00a0→\u00a0{last}",
+    lfP7TopFemale: "Najczęstsze nazwiska listy kobiet: {first}\u00a0→\u00a0{last}",
+    lfP7TopAbsent: "nie na liście z {first}\u00a0r.",
+    lfP7Top10Male:
+      "Dziesięć najczęstszych nazwisk listy mężczyzn to te same nazwiska, w tej samej " +
+      "kolejności, co na liście z {first}\u00a0r.",
+    lfP7Top10Female:
+      "Dziesięć najczęstszych nazwisk listy kobiet to te same nazwiska, w tej samej " +
+      "kolejności, co na liście z {first}\u00a0r.",
+    lfP7Top10ChangedMale:
+      "Dziesięć najczęstszych nazwisk listy mężczyzn to nie te same nazwiska w tej samej " +
+      "kolejności, co na liście z {first}\u00a0r.",
+    lfP7Top10ChangedFemale:
+      "Dziesięć najczęstszych nazwisk listy kobiet to nie te same nazwiska w tej samej " +
+      "kolejności, co na liście z {first}\u00a0r.",
+    lfP7Foot:
+      "Wydań z 2019 r. nie pokazujemy: ich opis nie mówi, że to osoby żyjące i nazwisko " +
+      "aktualne, więc zmiana od nich mogłaby być zmianą definicji. Pokazujemy, co się " +
+      "zmieniło, nie dlaczego.",
     footer:
       "Każda liczba pochodzi z rejestru PESEL i jest podana razem z zakresem zbioru, datą i źródłem. Brak danych jest podany jako brak, nigdy jako zero.",
   },
@@ -934,12 +1014,13 @@ export const UI = {
     lfEyebrow: "PESEL register · {year} edition",
     lfTitle: "Surname atlas",
     lfLede:
-      "Six plates about the surnames in the PESEL register (as of {date}). Men and women are on " +
-      "two separate lists: switch the list and plates I–V show that list, while plate VI compares " +
-      "both. We never add them up.",
+      "Seven plates about the surnames in the PESEL register (as of {date}). Men and women are " +
+      "on two separate lists: switch the list and plates I–V and VII show that list, while " +
+      "plate VI compares both. We never add them up.",
     lfScope:
       "Every figure describes one published list of the PESEL register: surnames borne by at " +
-      "least 2 people, living persons, current surname. As\u00a0of\u00a0{date}",
+      "least 2 people, living persons, current surname. Plate VII also sets out earlier " +
+      "editions of the same list. As\u00a0of\u00a0{date}",
     lfSwitchLabel: "Which list",
     lfSwitchMale: "Men",
     lfSwitchFemale: "Women",
@@ -949,6 +1030,9 @@ export const UI = {
     lfSource: "Source: {link} · as\u00a0of\u00a0{date}",
     lfSourceName: "PESEL register, dane.gov.pl",
     lfSourceTwo: "Source: PESEL register, dane.gov.pl ({male}, {female}) · as\u00a0of\u00a0{date}",
+    lfSourceEditions: "Source: {link} · editions of {date}",
+    lfSourceEditionsTwo:
+      "Source: PESEL register, dane.gov.pl ({male}, {female}) · editions of {date}",
     lfMethod: "{status} · method {method}",
     lfPlate: "Plate",
     lfP1Name: "Constellation",
@@ -1084,13 +1168,66 @@ export const UI = {
       "Each circle's area is proportional to the number of surnames on its list. Surnames are " +
       "compared exactly as spelled, with Polish letters: a male and a female form are two " +
       "different surnames.",
-    lfCodaKicker: "Change over time",
-    lfCodaTitle: "A trend needs two editions. We have one.",
-    lfCodaBody:
-      "We have loaded one edition of the register (as of {date}). When we load the next, the " +
-      "plates can show what changed — counted, not guessed.",
-    lfCodaEdition: "edition",
-    lfCodaNext: "next",
+    lfP7Name: "Change over time",
+    lfP7TitleMoreMale:
+      "The {last} male list has {d} more {d:surname|surnames} than the {first} one.",
+    lfP7TitleMoreFemale:
+      "The {last} female list has {d} more {d:surname|surnames} than the {first} one.",
+    lfP7TitleFewerMale:
+      "The {last} male list has fewer surnames than the {first} one: {sl} against {sf}.",
+    lfP7TitleFewerFemale:
+      "The {last} female list has fewer surnames than the {first} one: {sl} against {sf}.",
+    lfP7TitleSameMale: "The {last} male list has as many surnames as the {first} one: {sl}.",
+    lfP7TitleSameFemale: "The {last} female list has as many surnames as the {first} one: {sl}.",
+    lfP7LedeMale:
+      "The editions of the male list from {from} to {to}, side by side: each bar is the number " +
+      "of surnames in one edition; the two blue bars are the editions compared, the first and " +
+      "the last. Men on the list: {pf} in the first edition, {pl} in the last ({pd}).",
+    lfP7LedeFemale:
+      "The editions of the female list from {from} to {to}, side by side: each bar is the " +
+      "number of surnames in one edition; the two blue bars are the editions compared, the first " +
+      "and the last. Women on the list: {pf} in the first edition, {pl} in the last ({pd}).",
+    lfP7TableMale: "Editions of the male list: surnames and men in each",
+    lfP7TableFemale: "Editions of the female list: surnames and women in each",
+    lfP7ColEdition: "Edition",
+    lfP7ColSurnames: "Surnames",
+    lfP7ColPeopleMale: "Men",
+    lfP7ColPeopleFemale: "Women",
+    lfP7GapShort: "missing",
+    lfP7Gap: "missing: the file dated {date} is identical to the file dated {of}.",
+    lfP7NewMale:
+      "{s:surname is|surnames are} on the {last} list and not on the {first} list; {p} " +
+      "{p:man bears|men bear} {s:it|them}.",
+    lfP7NewFemale:
+      "{s:surname is|surnames are} on the {last} list and not on the {first} list; {p} " +
+      "{p:woman bears|women bear} {s:it|them}.",
+    lfP7GoneMale:
+      "{s:surname was|surnames were} on the {first} list and {s:is|are} not on the {last} list; " +
+      "on the {first} list, {p} {p:man bore|men bore} {s:it|them}.",
+    lfP7GoneFemale:
+      "{s:surname was|surnames were} on the {first} list and {s:is|are} not on the {last} list; " +
+      "on the {first} list, {p} {p:woman bore|women bore} {s:it|them}.",
+    lfP7NotZero:
+      "Not on a list is not zero: the publisher does not publish surnames borne by one person.",
+    lfP7TopMale: "The male list's most common surnames: {first}\u00a0→\u00a0{last}",
+    lfP7TopFemale: "The female list's most common surnames: {first}\u00a0→\u00a0{last}",
+    lfP7TopAbsent: "not on the {first} list",
+    lfP7Top10Male:
+      "The ten most common surnames on the male list are the same, in the same order, as on " +
+      "the {first} list.",
+    lfP7Top10Female:
+      "The ten most common surnames on the female list are the same, in the same order, as on " +
+      "the {first} list.",
+    lfP7Top10ChangedMale:
+      "The ten most common surnames on the male list are not the same, in the same order, as " +
+      "on the {first} list.",
+    lfP7Top10ChangedFemale:
+      "The ten most common surnames on the female list are not the same, in the same order, as " +
+      "on the {first} list.",
+    lfP7Foot:
+      "The 2019 editions are left out: their description does not say that they cover living " +
+      "persons by their current surname, so a change from them could be a change of " +
+      "definition. We show what changed, not why.",
     footer:
       "Every number comes from the PESEL register and is shown with its dataset scope, date and source. Missing data is stated as missing, never as zero.",
   },

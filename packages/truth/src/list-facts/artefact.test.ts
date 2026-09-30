@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   PESEL_NATIONAL_FEMALE_2026,
   PESEL_NATIONAL_MALE_2026,
+  PESEL_NATIONAL_SERIES,
+  PESEL_REFUSED_RESOURCES,
+  PESEL_SERIES_KEYS,
   PESEL_SOURCE,
 } from "@name-atlas/sources";
 import { LIST_ENDINGS, NAMED_SURNAME_FLOOR } from "@name-atlas/contracts";
@@ -12,6 +15,7 @@ import { birthdayReference } from "./collision.js";
 import { LIST_FACTS_GENERATOR } from "./build.js";
 import {
   LIST_BANDS_METHOD_VERSION,
+  LIST_CHANGE_METHOD_VERSION,
   LIST_COLLISION_CURVE_MAX,
   LIST_COLLISION_METHOD_VERSION,
   LIST_CONCENTRATION_METHOD_VERSION,
@@ -19,6 +23,7 @@ import {
   LIST_COUNT_BANDS,
   LIST_CROWD_METHOD_VERSION,
   LIST_DOTS_METHOD_VERSION,
+  LIST_EDITIONS_METHOD_VERSION,
   LIST_ENDINGS_METHOD_VERSION,
   LIST_HYPHENATED_METHOD_VERSION,
   LIST_INITIALS_METHOD_VERSION,
@@ -240,6 +245,76 @@ describe.each(lists)("the %s list, list_facts@2 sections", (_key, list: ListFact
   });
 });
 
+describe.each(lists)(
+  "the %s list, list_facts@3 editions and change (ADR-0019)",
+  (_key, list: ListFacts, descriptor) => {
+    const partition = descriptor.role as "national_male" | "national_female";
+    const { editions, change } = list;
+
+    it("holds every edition of its registry series, in date order, pinned byte for byte", () => {
+      expect(editions.method_version).toBe(LIST_EDITIONS_METHOD_VERSION);
+      expect(editions.series).toBe(PESEL_SERIES_KEYS[partition]);
+      expect(
+        editions.items.map((e) => [e.series, e.resource_id, e.data_date, e.sha256, e.row_count]),
+      ).toEqual(
+        PESEL_NATIONAL_SERIES[partition].map((d) => [
+          d.series,
+          d.resource_id,
+          d.data_date,
+          d.official_sha256,
+          d.official_row_count,
+        ]),
+      );
+      // ADR-0019 §1: every edition has the same publication floor.
+      for (const edition of editions.items) {
+        expect(edition.min_count).toBe(2);
+        expect(edition.surnames).toBe(edition.row_count);
+      }
+    });
+
+    it("records each resource the registry refused from its series as a gap, never a value", () => {
+      expect(editions.gaps).toEqual(
+        PESEL_REFUSED_RESOURCES.filter((r) => r.series === PESEL_SERIES_KEYS[partition]).map(
+          (r) => ({
+            data_date: r.data_date,
+            resource_id: r.resource_id,
+            reason: r.reason,
+            duplicate_of: r.duplicate_of,
+          }),
+        ),
+      );
+    });
+
+    it("ends with the list itself", () => {
+      const last = editions.items[editions.items.length - 1]!;
+      expect([last.resource_id, last.sha256, last.data_date]).toEqual([
+        descriptor.resource_id,
+        descriptor.official_sha256,
+        descriptor.data_date,
+      ]);
+      expect([last.surnames, last.people]).toEqual([list.summary.surnames, list.summary.people]);
+    });
+
+    it("compares the first edition with the last, for TOP_3 by key", () => {
+      const first = editions.items[0]!;
+      const last = editions.items[editions.items.length - 1]!;
+      expect(change.method_version).toBe(LIST_CHANGE_METHOD_VERSION);
+      expect(change).toMatchObject({
+        first_data_date: first.data_date,
+        last_data_date: last.data_date,
+        surnames_delta: last.surnames - first.surnames,
+        people_delta: last.people - first.people,
+      });
+      expect(change.top3_first_counts.map((t) => t.key)).toEqual(
+        list.named_top.items.map((item) => item.key),
+      );
+      for (const entry of change.top3_first_counts) {
+        expect(entry.count_first === null || entry.count_first >= 2).toBe(true);
+      }
+    });
+  },
+);
+
 describe("the overlap of the two lists (ADR-0018 §2.3)", () => {
   const { overlap } = artefact;
   const { male, female } = artefact.lists;
@@ -266,6 +341,12 @@ describe("the two lists stay two universes", () => {
   it("come from two different resources", () => {
     expect(male.source.external_record_id).not.toBe(female.source.external_record_id);
     expect(male.source.sha256).not.toBe(female.source.sha256);
+  });
+
+  it("are two series, with no edition in both", () => {
+    expect(male.editions.series).not.toBe(female.editions.series);
+    const maleIds = new Set(male.editions.items.map((e) => e.resource_id));
+    expect(female.editions.items.filter((e) => maleIds.has(e.resource_id))).toEqual([]);
   });
 
   it("no number in the artefact is a sum of the two lists' people or surnames", () => {
@@ -327,6 +408,17 @@ describe("surname strings are only ADR-0018's named selections", () => {
       "named_top.method_version",
       "named_top.items[].key",
       "named_top.items[].published",
+      // list_facts@3 (ADR-0019): lineage, and the keys of TOP_3 on the first edition.
+      "editions.method_version",
+      "editions.series",
+      "editions.items[].series",
+      "editions.items[].resource_id",
+      "editions.items[].data_date",
+      "editions.items[].sha256",
+      "change.method_version",
+      "change.first_data_date",
+      "change.last_data_date",
+      "change.top3_first_counts[].key",
     ];
     expect([...paths].sort()).toEqual(
       [
@@ -336,6 +428,10 @@ describe("surname strings are only ADR-0018's named selections", () => {
         "snapshot_date",
         ...perList.map((p) => `lists.male.${p}`),
         ...perList.map((p) => `lists.female.${p}`),
+        // Only the female series has a gap: resource 38772, a publisher duplicate.
+        ...["data_date", "resource_id", "reason", "duplicate_of"].map(
+          (field) => `lists.female.editions.gaps[].${field}`,
+        ),
         "overlap.method_version",
         "overlap.on_both_top.key",
         "overlap.on_both_top.male.published",

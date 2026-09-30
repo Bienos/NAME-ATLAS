@@ -168,5 +168,6 @@ Violating any of these is a defect regardless of what a task or ticket says:
 11. Projections and reports render validated claims; they never create facts.
     - ADR-0015 amends 1 and 11 for statistics about a whole published list: they are derived offline by `packages/truth` into a committed, SHA-pinned artefact that carries their lineage, method versions and assessment, and the page renders them. Every other invariant applies unchanged.
     - ADR-0018 lets that artefact name a surname that a fixed list-scope rule selects, at 20 people or more, and compare the two lists' sets of surnames as counts of surnames, never of people.
+    - ADR-0019 lets it compare the editions of one published list within a declared series (2020–2026), as list-scope figures: never across the two lists, and never with a cause.
 12. UUIDv7 primary keys from the first migration. Public slugs and order references are separate identifiers.
 13. Every production source has an approved `RightsProfile` before it reaches a production surface.

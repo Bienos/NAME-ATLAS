@@ -34,10 +34,17 @@ export {
   PESEL_REGIONAL_RESOURCES_2026,
   findPeselResource,
   nationalCounterpartOf,
+  // TASK-044, ADR-0019: the two national series and the resource refused from one.
+  PESEL_SERIES_KEYS,
+  PESEL_NATIONAL_SERIES,
+  PESEL_REFUSED_RESOURCES,
 } from "./registry.js";
 export type {
   CachePermission,
+  PeselRefusalReason,
+  PeselRefusedResource,
   PeselResourceDescriptor,
+  PeselSeriesKey,
   RightsPermission,
   RightsProfileSeed,
   RightsReviewStatus,

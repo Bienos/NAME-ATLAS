@@ -1,6 +1,6 @@
 # TASK-044 — The landing atlas's last panel shows how the two lists changed, 2020–2026
 
-- **Status:** IN PROGRESS (2026-09-30).
+- **Status:** IMPLEMENTED AND VERIFIED (2026-09-30). The verification actually run is in `docs/progress/2026-09-30-landing-atlas-changes-over-time.md`. `pnpm db:migrate`, `test:integration` and `test:golden` were not run (no PostGIS here), and GitHub Actions starts no job.
 - **Requested by:** the project owner, 2026-09-30. On the live six-plate atlas (TASK-043), they asked that the last panel use more data. Offered three options, they chose "Real trend 2019–2026".
 - **Depends on:**
   - TASK-043: `list_facts@2`, the six plates and ADR-0018;

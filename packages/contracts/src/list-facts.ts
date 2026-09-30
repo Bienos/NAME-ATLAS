@@ -2,7 +2,8 @@ import { z } from "zod";
 
 /**
  * List facts — statistics about one whole published PESEL list
- * (`docs/contracts/list-facts.md`, ADR-0015, ADR-0018, TASK-040, TASK-043).
+ * (`docs/contracts/list-facts.md`, ADR-0015, ADR-0018, ADR-0019, TASK-040,
+ * TASK-043, TASK-044).
  *
  * Every figure here describes **one** list: the national male list or the
  * national female list of one resource version. The two lists are two
@@ -22,8 +23,13 @@ import { z } from "zod";
  * never to display precision (shares and probabilities as fractions in
  * [0, 1]); counts are exact integers. Rounding for display is presentation.
  * Every decision against one half (`n_half`) is taken on the unrounded chance.
+ *
+ * `list_facts@3` (ADR-0019) adds, per list, the editions of the list's one
+ * series (`editions`) and what changed between its first and last edition
+ * (`change`): list-scope figures compared over time within one series, never
+ * across the two lists, and never a cause.
  */
-export const LIST_FACTS_SCHEMA_VERSION = "list_facts@2" as const;
+export const LIST_FACTS_SCHEMA_VERSION = "list_facts@3" as const;
 
 const fraction = z.number().min(0).max(1);
 const positiveInt = z.number().int().positive();
@@ -40,6 +46,11 @@ function strictlyAscending<T>(items: readonly T[], key: (item: T) => number): bo
     previous = value;
   }
   return true;
+}
+
+/** True when the ISO dates `key` gives strictly rise along `items` (ISO dates order as strings). */
+function datesAscending<T>(items: readonly T[], key: (item: T) => string): boolean {
+  return items.every((item, i) => i === 0 || key(items[i - 1]!) < key(item));
 }
 
 /** Orders two strings by Unicode code point (not by UTF-16 code unit, as `<` does). */
@@ -533,6 +544,159 @@ export const listNamedTopSchema = z.object({
   }),
 });
 
+/** ADR-0019 §2.2: why a resource the publisher lists in a series is not one of its editions. */
+export const LIST_EDITION_GAP_REASONS = ["PUBLISHER_DUPLICATE"] as const;
+
+const resourceId = z.string().regex(/^\d+$/u);
+
+/**
+ * One edition of the list's series: its lineage, pinned to the registry, and
+ * its surnames and people (ADR-0019 §2.3). Figures of one edition, never a
+ * sum across editions or lists.
+ */
+export const listEditionSchema = z.object({
+  /** The series the edition belongs to (the registry's `series`). */
+  series: z.string().min(1),
+  /** dane.gov.pl resource id. */
+  resource_id: resourceId,
+  /** The register's reference date the publisher states for the edition. */
+  data_date: isoDate,
+  /** SHA-256 of the exact bytes read; equals the registry's. */
+  sha256,
+  /** Data rows in the file; equals the registry's official row count. */
+  row_count: positiveInt,
+  /** Surnames on the edition: its rows. */
+  surnames: positiveInt,
+  /** People on the edition: the sum of its counts. A sum within one edition. */
+  people: positiveInt,
+  /** The smallest count on the edition: its publication floor. */
+  min_count: positiveInt,
+});
+
+/** A date of the series with no edition: a resource refused, and why. Never a value. */
+export const listEditionGapSchema = z.object({
+  data_date: isoDate,
+  /** The refused resource. */
+  resource_id: resourceId,
+  reason: z.enum(LIST_EDITION_GAP_REASONS),
+  /** `PUBLISHER_DUPLICATE`: the edition whose bytes the refused resource repeats. */
+  duplicate_of: resourceId,
+});
+
+/** `list_editions@1`: the editions of the list's one series, in date order, and its gaps. */
+export const listEditionsSchema = z
+  .object({
+    method_version: z.string().min(1),
+    /** The list's one series (ADR-0019 §2.1). */
+    series: z.string().min(1),
+    /** Strictly ascending by `data_date`; at least the first and the last edition. */
+    items: z
+      .array(listEditionSchema)
+      .min(2)
+      .refine((items) => datesAscending(items, (item) => item.data_date), {
+        message: "editions must be in ascending order of data_date, with no date twice",
+      }),
+    /** Strictly ascending by `data_date`. */
+    gaps: z
+      .array(listEditionGapSchema)
+      .refine((gaps) => datesAscending(gaps, (gap) => gap.data_date), {
+        message: "edition gaps must be in ascending order of data_date, with no date twice",
+      }),
+  })
+  .refine((e) => e.items.every((item) => item.series === e.series), {
+    message: "every edition of a list must belong to the list's one series",
+  })
+  .refine((e) => e.items.every((item) => item.row_count === item.surnames), {
+    message: "an edition's surnames must be its rows",
+  })
+  .refine((e) => e.items.every((item) => item.min_count === e.items[0]?.min_count), {
+    message:
+      "every edition must have the same publication floor (min_count): editions are compared " +
+      "only on the same floor (ADR-0019 §1)",
+  })
+  .refine((e) => new Set(e.items.map((item) => item.sha256)).size === e.items.length, {
+    message:
+      "two editions must not share a SHA-256: a publisher duplicate is a gap, not an edition",
+  })
+  .refine(
+    (e) => {
+      const ids = [...e.items.map((i) => i.resource_id), ...e.gaps.map((g) => g.resource_id)];
+      return new Set(ids).size === ids.length;
+    },
+    { message: "a resource may be an edition or a gap, once" },
+  )
+  .refine(
+    (e) =>
+      e.gaps.every(
+        (gap) =>
+          e.items.every((item) => item.data_date !== gap.data_date) &&
+          e.items.some((item) => item.resource_id === gap.duplicate_of),
+      ),
+    {
+      message:
+        "a gap must fall on a date with no edition, and duplicate an edition of the same series",
+    },
+  );
+
+/**
+ * `list_change@1` (ADR-0019 §2.3): the list's first edition against its last,
+ * compared by `canonical_key_v2`. States what changed, never why. A surname
+ * absent from one edition is not on that list (it may be below the floor),
+ * never zero people.
+ */
+export const listChangeSchema = z
+  .object({
+    method_version: z.string().min(1),
+    first_data_date: isoDate,
+    last_data_date: isoDate,
+    surnames_first: positiveInt,
+    surnames_last: positiveInt,
+    /** `surnames_last − surnames_first`, stored so that no page subtracts. */
+    surnames_delta: z.number().int(),
+    people_first: positiveInt,
+    people_last: positiveInt,
+    /** `people_last − people_first`, stored so that no page subtracts. */
+    people_delta: z.number().int(),
+    /** The surnames on the last edition and not on the first, and their people on the last. */
+    on_last_not_first: z.object({ surnames: nonNegativeInt, people: nonNegativeInt }),
+    /** The surnames on the first edition and not on the last, and their people on the first. */
+    on_first_not_last: z.object({ surnames: nonNegativeInt, people_on_first: nonNegativeInt }),
+    /**
+     * For each of the list's `named_top.items`, in their order: its count on the
+     * first edition, or null when it is not on the first edition (never zero).
+     */
+    top3_first_counts: z
+      .array(z.object({ key: z.string().min(1), count_first: positiveInt.nullable() }))
+      .max(LIST_NAMED_TOP_SIZE),
+    /** Whether the ten most common surnames, in order, are the same keys on both editions. */
+    top10_unchanged: z.boolean(),
+  })
+  .refine((c) => c.first_data_date < c.last_data_date, {
+    message: "change.first_data_date must come before change.last_data_date",
+  })
+  .refine(
+    (c) =>
+      c.surnames_delta === c.surnames_last - c.surnames_first &&
+      c.people_delta === c.people_last - c.people_first,
+    { message: "each change delta must equal the last edition's figure less the first's" },
+  )
+  .refine(
+    (c) =>
+      c.on_last_not_first.surnames <= c.surnames_last &&
+      c.on_last_not_first.people <= c.people_last &&
+      c.on_first_not_last.surnames <= c.surnames_first &&
+      c.on_first_not_last.people_on_first <= c.people_first,
+    { message: "the surnames on one edition only must fit within that edition" },
+  )
+  .refine(
+    (c) =>
+      c.surnames_last - c.on_last_not_first.surnames ===
+      c.surnames_first - c.on_first_not_last.surnames,
+    {
+      message: "the surnames on both editions must be the same number counted from either edition",
+    },
+  );
+
 function sumOf<T>(items: readonly T[], value: (item: T) => number): number {
   return items.reduce((sum, item) => sum + value(item), 0);
 }
@@ -552,6 +716,8 @@ export const listFactsSchema = z
     initials: listInitialsSchema,
     hyphenated: listHyphenatedSchema,
     named_top: listNamedTopSchema,
+    editions: listEditionsSchema,
+    change: listChangeSchema,
   })
   .refine(
     (l) =>
@@ -624,6 +790,49 @@ export const listFactsSchema = z
   .refine(
     (l) => l.named_top.items.length === 0 || l.named_top.items[0]!.count === l.summary.max_count,
     { message: "named_top must start with the list's most common surname" },
+  )
+  .refine(
+    (l) => {
+      const last = l.editions.items[l.editions.items.length - 1];
+      return (
+        last !== undefined &&
+        last.resource_id === l.source.external_record_id &&
+        last.sha256 === l.source.sha256 &&
+        last.row_count === l.source.row_count &&
+        last.data_date === l.source.snapshot_date &&
+        last.surnames === l.summary.surnames &&
+        last.people === l.summary.people &&
+        last.min_count === l.summary.min_count
+      );
+    },
+    {
+      message:
+        "the last edition must be the list itself: its source's resource, SHA-256, rows and " +
+        "date, and its summary's surnames, people and min_count",
+    },
+  )
+  .refine(
+    (l) => {
+      const first = l.editions.items[0];
+      const last = l.editions.items[l.editions.items.length - 1];
+      return (
+        first !== undefined &&
+        last !== undefined &&
+        l.change.first_data_date === first.data_date &&
+        l.change.last_data_date === last.data_date &&
+        l.change.surnames_first === first.surnames &&
+        l.change.surnames_last === last.surnames &&
+        l.change.people_first === first.people &&
+        l.change.people_last === last.people
+      );
+    },
+    { message: "change must compare the list's first edition with its last" },
+  )
+  .refine(
+    (l) =>
+      l.change.top3_first_counts.length === l.named_top.items.length &&
+      l.change.top3_first_counts.every((entry, i) => entry.key === l.named_top.items[i]?.key),
+    { message: "change.top3_first_counts must follow named_top.items, key by key" },
   );
 
 /** The surname ADR-0018 `ON_BOTH_TOP` selects, with its source string and people on each list. */
@@ -704,6 +913,9 @@ export const listFactsArtefactSchema = z
       a.lists.male.source.sha256 !== a.lists.female.source.sha256,
     { message: "the two lists must come from two resources: different ids and different SHA-256" },
   )
+  .refine((a) => a.lists.male.editions.series !== a.lists.female.editions.series, {
+    message: "the two lists must be two series: editions are never compared across lists",
+  })
   .refine((a) => modelParameters(a.lists.male) === modelParameters(a.lists.female), {
     message:
       "both lists must use the same model parameters: crowd_size, the curve's n, the number " +
@@ -756,3 +968,7 @@ export type ListHyphenated = z.infer<typeof listHyphenatedSchema>;
 export type ListNamedTop = z.infer<typeof listNamedTopSchema>;
 export type OnBothTop = z.infer<typeof onBothTopSchema>;
 export type ListOverlap = z.infer<typeof listOverlapSchema>;
+export type ListEdition = z.infer<typeof listEditionSchema>;
+export type ListEditionGap = z.infer<typeof listEditionGapSchema>;
+export type ListEditions = z.infer<typeof listEditionsSchema>;
+export type ListChange = z.infer<typeof listChangeSchema>;

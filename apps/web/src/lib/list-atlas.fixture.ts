@@ -1,8 +1,8 @@
-import type { ListFacts, ListFactsArtefact } from "@name-atlas/contracts";
+import type { ListEdition, ListFacts, ListFactsArtefact } from "@name-atlas/contracts";
 
 /**
  * A SYNTHETIC list-facts artefact for the atlas view tests (TASK-040, v2 for
- * TASK-043).
+ * TASK-043, v3 for TASK-044).
  *
  * Every number and every surname below is invented. It tests rendering, not
  * the register, and is never read by the page (`page.tsx` reads
@@ -13,6 +13,12 @@ import type { ListFacts, ListFactsArtefact } from "@name-atlas/contracts";
  * overlap), so the fixture passes `listFactsArtefactSchema`. The male list's
  * first ending falls in the "one in four" wording band and the female list's
  * does not, so both wordings are rendered.
+ *
+ * Plate VII's series are invented too: five male editions, and four female
+ * editions with a publisher-duplicate gap between them. The female list's
+ * third most common surname is not on its first edition (`null`, never zero),
+ * and only the male list's ten most common surnames are unchanged, so both
+ * branches of each are rendered.
  */
 
 /** A smooth shared-surname curve for a list whose pairs share a surname 1 in `oneIn`. */
@@ -53,6 +59,30 @@ const ASSESSMENT = {
 } as const;
 
 const SOURCE_PAGE = "https://dane.gov.pl/pl/dataset/1681";
+
+const MALE_SERIES = "pesel_living_current_surname_national_male";
+const FEMALE_SERIES = "pesel_living_current_surname_national_female";
+
+/** One edition of a series; its SHA-256 is `digit` repeated, and its surnames are its rows. */
+function edition(
+  series: string,
+  resourceId: string,
+  dataDate: string,
+  digit: string,
+  surnames: number,
+  people: number,
+): ListEdition {
+  return {
+    series,
+    resource_id: resourceId,
+    data_date: dataDate,
+    sha256: digit.repeat(64),
+    row_count: surnames,
+    surnames,
+    people,
+    min_count: 2,
+  };
+}
 
 const MALE: ListFacts = {
   partition: "national_male",
@@ -242,6 +272,37 @@ const MALE: ListFacts = {
       { key: "gamma", published: "GAMMA", count: 45678 },
     ],
   },
+  editions: {
+    method_version: "list_editions@1",
+    series: "pesel_living_current_surname_national_male",
+    items: [
+      edition(MALE_SERIES, "22817", "2020-01-22", "a", 30511, 2011234),
+      edition(MALE_SERIES, "28052", "2021-02-01", "b", 32107, 2030119),
+      edition(MALE_SERIES, "36401", "2022-01-27", "c", 33702, 2045678),
+      edition(MALE_SERIES, "54097", "2024-01-19", "d", 37113, 2090123),
+      edition(MALE_SERIES, "1148808", "2026-01-20", "1", 40818, 2119753),
+    ],
+    gaps: [],
+  },
+  change: {
+    method_version: "list_change@1",
+    first_data_date: "2020-01-22",
+    last_data_date: "2026-01-20",
+    surnames_first: 30511,
+    surnames_last: 40818,
+    surnames_delta: 10307,
+    people_first: 2011234,
+    people_last: 2119753,
+    people_delta: 108519,
+    on_last_not_first: { surnames: 11203, people: 30456 },
+    on_first_not_last: { surnames: 896, people_on_first: 2412 },
+    top3_first_counts: [
+      { key: "alfa", count_first: 93012 },
+      { key: "betowski", count_first: 61234 },
+      { key: "gamma", count_first: 44001 },
+    ],
+    top10_unchanged: true,
+  },
 };
 
 const FEMALE: ListFacts = {
@@ -430,12 +491,49 @@ const FEMALE: ListFacts = {
       { key: "gammowa", published: "GAMMOWA", count: 46789 },
     ],
   },
+  editions: {
+    method_version: "list_editions@1",
+    series: "pesel_living_current_surname_national_female",
+    items: [
+      edition(FEMALE_SERIES, "22815", "2020-01-22", "e", 31622, 2051234),
+      edition(FEMALE_SERIES, "35279", "2021-02-02", "f", 34013, 2080456),
+      edition(FEMALE_SERIES, "54098", "2024-01-19", "7", 38904, 2120789),
+      edition(FEMALE_SERIES, "1148811", "2026-01-20", "2", 42008, 2156030),
+    ],
+    gaps: [
+      {
+        data_date: "2022-01-27",
+        resource_id: "38772",
+        reason: "PUBLISHER_DUPLICATE",
+        duplicate_of: "35279",
+      },
+    ],
+  },
+  change: {
+    method_version: "list_change@1",
+    first_data_date: "2020-01-22",
+    last_data_date: "2026-01-20",
+    surnames_first: 31622,
+    surnames_last: 42008,
+    surnames_delta: 10386,
+    people_first: 2051234,
+    people_last: 2156030,
+    people_delta: 104796,
+    on_last_not_first: { surnames: 11417, people: 31890 },
+    on_first_not_last: { surnames: 1031, people_on_first: 2744 },
+    top3_first_counts: [
+      { key: "alfa", count_first: 95011 },
+      { key: "betowska", count_first: 62345 },
+      { key: "gammowa", count_first: null },
+    ],
+    top10_unchanged: false,
+  },
 };
 
 export const LIST_FACTS_FIXTURE: ListFactsArtefact = {
-  schema_version: "list_facts@2",
+  schema_version: "list_facts@3",
   generated_by: "apps/web/src/lib/list-atlas.fixture.ts (SYNTHETIC)",
-  pipeline_version: "list_facts_pipeline@2",
+  pipeline_version: "list_facts_pipeline@3",
   snapshot_date: "2026-01-20",
   birthday_reference: { n_half: 23, p_at_n_half: 0.507297234 },
   lists: { male: MALE, female: FEMALE },

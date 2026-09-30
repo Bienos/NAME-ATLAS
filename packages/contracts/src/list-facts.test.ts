@@ -7,7 +7,7 @@ import {
   listEndingsSchema,
   listFactsArtefactSchema,
 } from "./list-facts.js";
-import type { ListFacts, ListInitial } from "./list-facts.js";
+import type { ListChange, ListEditions, ListFacts, ListInitial } from "./list-facts.js";
 
 /**
  * The list-facts contract (TASK-040 AC-01, TASK-043 AC-01,
@@ -18,6 +18,15 @@ import type { ListFacts, ListInitial } from "./list-facts.js";
  *   female: NOWAK 30, KOWALSKA 24, ŻMUDA-TRZEBIATOWSKA 21, WÓJCIK 4, LEE 2 (81 people)
  *
  * On both lists: nowak and wójcik; on one list only: three surnames each.
+ *
+ * list_facts@3 (TASK-044, ADR-0019): each list above is the last edition of
+ * its series. The first editions, also made up:
+ *
+ *   male   2020-01-22: NOWAK 42, KOWALSKI 26, WÓJCIK 3, KOWAL 2                  (73 people)
+ *   female 2020-01-22: NOWAK 31, KOWALSKA 25, ŻMUDA-TRZEBIATOWSKA 22, WÓJCIK 5, LEE 3 (86 people)
+ *
+ * and the female series has a 2021 edition (5 surnames, 84 people) and a gap
+ * on 2022-01-27, a publisher duplicate of it.
  */
 
 type Row = readonly [published: string, key: string, count: number];
@@ -100,6 +109,104 @@ const FIGURES = {
 } as const;
 
 const named = (row: Row) => ({ key: row[1], published: row[0], count: row[2] });
+
+const SERIES = {
+  national_male: "pesel_living_current_surname_national_male",
+  national_female: "pesel_living_current_surname_national_female",
+} as const;
+
+const edition = (
+  partition: "national_male" | "national_female",
+  resource_id: string,
+  data_date: string,
+  sha256: string,
+  surnames: number,
+  people: number,
+) => ({
+  series: SERIES[partition],
+  resource_id,
+  data_date,
+  sha256,
+  row_count: surnames,
+  surnames,
+  people,
+  min_count: 2,
+});
+
+function editions(
+  partition: "national_male" | "national_female",
+  id: string,
+  sha: string,
+): ListEditions {
+  const last = edition(partition, id, "2026-01-20", sha, 5, FIGURES[partition].people);
+  return partition === "national_male"
+    ? {
+        method_version: "list_editions@1",
+        series: SERIES[partition],
+        items: [edition(partition, "22817", "2020-01-22", "c".repeat(64), 4, 73), last],
+        gaps: [],
+      }
+    : {
+        method_version: "list_editions@1",
+        series: SERIES[partition],
+        items: [
+          edition(partition, "22815", "2020-01-22", "d".repeat(64), 5, 86),
+          edition(partition, "35279", "2021-02-02", "e".repeat(64), 5, 84),
+          last,
+        ],
+        gaps: [
+          {
+            data_date: "2022-01-27",
+            resource_id: "38772",
+            reason: "PUBLISHER_DUPLICATE",
+            duplicate_of: "35279",
+          },
+        ],
+      };
+}
+
+/** The first edition against the last, worked out by hand from the lists above. */
+const CHANGE = {
+  national_male: {
+    method_version: "list_change@1",
+    first_data_date: "2020-01-22",
+    last_data_date: "2026-01-20",
+    surnames_first: 4,
+    surnames_last: 5,
+    surnames_delta: 1,
+    people_first: 73,
+    people_last: 90,
+    people_delta: 17,
+    // ŻMUDA-TRZEBIATOWSKI 20 and XU 2 are new; KOWAL 2 is gone.
+    on_last_not_first: { surnames: 2, people: 22 },
+    on_first_not_last: { surnames: 1, people_on_first: 2 },
+    top3_first_counts: [
+      { key: "nowak", count_first: 42 },
+      { key: "kowalski", count_first: 26 },
+      { key: "żmuda-trzebiatowski", count_first: null },
+    ],
+    top10_unchanged: false,
+  },
+  national_female: {
+    method_version: "list_change@1",
+    first_data_date: "2020-01-22",
+    last_data_date: "2026-01-20",
+    surnames_first: 5,
+    surnames_last: 5,
+    surnames_delta: 0,
+    people_first: 86,
+    people_last: 81,
+    people_delta: -5,
+    on_last_not_first: { surnames: 0, people: 0 },
+    on_first_not_last: { surnames: 0, people_on_first: 0 },
+    top3_first_counts: [
+      { key: "nowak", count_first: 31 },
+      { key: "kowalska", count_first: 25 },
+      { key: "żmuda-trzebiatowska", count_first: 22 },
+    ],
+    top10_unchanged: true,
+  },
+} as const;
 
 function list(partition: "national_male" | "national_female", id: string, sha: string): ListFacts {
   const f = FIGURES[partition];
@@ -207,6 +314,11 @@ function list(partition: "national_male" | "national_female", id: string, sha: s
       top: named(rows[2]!),
     },
     named_top: { method_version: "list_named_top@1", items: rows.slice(0, 3).map(named) },
+    editions: editions(partition, id, sha),
+    change: {
+      ...CHANGE[partition],
+      top3_first_counts: CHANGE[partition].top3_first_counts.map((entry) => ({ ...entry })),
+    },
   };
 }
 
@@ -233,7 +345,7 @@ function artefact(overrides: Record<string, unknown> = {}) {
   return {
     schema_version: LIST_FACTS_SCHEMA_VERSION,
     generated_by: "packages/truth/bin/build-list-facts.ts",
-    pipeline_version: "list_facts_pipeline@2",
+    pipeline_version: "list_facts_pipeline@3",
     snapshot_date: "2026-01-20",
     birthday_reference: { n_half: 23, p_at_n_half: 0.507297234 },
     lists: { male, female },
@@ -430,6 +542,21 @@ describe("listFactsArtefactSchema", () => {
         "overlap.one_list_top.male.published",
         "overlap.one_list_top.female.key",
         "overlap.one_list_top.female.published",
+        // list_facts@3: the editions' lineage, and the keys of TOP_3 on the first edition.
+        "lists.*.editions.method_version",
+        "lists.*.editions.series",
+        "lists.*.editions.items[].series",
+        "lists.*.editions.items[].resource_id",
+        "lists.*.editions.items[].data_date",
+        "lists.*.editions.items[].sha256",
+        "lists.*.editions.gaps[].data_date",
+        "lists.*.editions.gaps[].resource_id",
+        "lists.*.editions.gaps[].reason",
+        "lists.*.editions.gaps[].duplicate_of",
+        "lists.*.change.method_version",
+        "lists.*.change.first_data_date",
+        "lists.*.change.last_data_date",
+        "lists.*.change.top3_first_counts[].key",
       ].sort(),
     );
   });
@@ -599,8 +726,8 @@ const withBoth = (patch: (l: ListFacts) => unknown) =>
   artefact({ lists: { male: patch(male), female: patch(female) } });
 
 describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
-  it("is list_facts@2 with a floor of 20 people for a named surname", () => {
-    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@2");
+  it("keeps list_facts@2's floor of 20 people for a named surname", () => {
+    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@3");
     expect(NAMED_SURNAME_FLOOR).toBe(20);
     expect(issues(artefact())).toEqual([]);
   });
@@ -938,7 +1065,11 @@ describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
         artefact({
           lists: {
             male: { ...male, hyphenated: { ...male.hyphenated, top: null } },
-            female: { ...female, named_top: { ...female.named_top, items: [] } },
+            female: {
+              ...female,
+              named_top: { ...female.named_top, items: [] },
+              change: { ...female.change, top3_first_counts: [] },
+            },
           },
           overlap: { ...OVERLAP, on_both_top: null, one_list_top: { male: null, female: null } },
         }),
@@ -951,6 +1082,14 @@ describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
     const withItems = (items: unknown[]) => (l: ListFacts) => ({
       ...l,
       named_top: { ...l.named_top, items },
+      // list_facts@3: change follows named_top key by key; only named_top is under test here.
+      change: {
+        ...l.change,
+        top3_first_counts: (items as { key: string }[]).map((item) => ({
+          key: item.key,
+          count_first: null,
+        })),
+      },
     });
     expectRefused(withMale(withItems([second, first, third])), "by count descending");
     // A tie is broken by key in code-point order: "a…" before "b…".
@@ -1032,5 +1171,227 @@ describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
   it("requires the overlap", () => {
     const { overlap: _dropped, ...without } = artefact();
     expect(accepts(without)).toBe(false);
+  });
+});
+
+/** The artefact with the male list's editions patched. */
+const withMaleEditions = (patch: (e: ListEditions) => unknown) =>
+  withMale((l) => ({ ...l, editions: patch(l.editions) }));
+/** The artefact with the female list's editions patched (the list with a gap). */
+const withFemaleEditions = (patch: (e: ListEditions) => unknown) =>
+  artefact({ lists: { male, female: { ...female, editions: patch(female.editions) } } });
+/** The artefact with the male list's change patched. */
+const withMaleChange = (patch: (c: ListChange) => unknown) =>
+  withMale((l) => ({ ...l, change: patch(l.change) }));
+
+describe("listFactsArtefactSchema, list_facts@3 (TASK-044, ADR-0019)", () => {
+  it("is list_facts@3, and the example with a gap is accepted", () => {
+    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@3");
+    expect(issues(artefact())).toEqual([]);
+    expect(female.editions.gaps).toHaveLength(1);
+  });
+
+  it("refuses editions out of date order, or with a date twice", () => {
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, items: [e.items[1], e.items[0], e.items[2]] })),
+      "ascending order of data_date",
+    );
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: [e.items[0], { ...e.items[1]!, data_date: "2020-01-22" }, e.items[2]],
+      })),
+      "ascending order of data_date",
+    );
+  });
+
+  it("refuses a gap without a reason, or with a reason it does not know", () => {
+    const [gap] = female.editions.gaps;
+    const { reason: _dropped, ...withoutReason } = gap!;
+    expect(accepts(withFemaleEditions((e) => ({ ...e, gaps: [withoutReason] })))).toBe(false);
+    expect(
+      accepts(withFemaleEditions((e) => ({ ...e, gaps: [{ ...gap, reason: "MISSING" }] }))),
+    ).toBe(false);
+    expect(accepts(withFemaleEditions((e) => ({ ...e, gaps: [{ ...gap, reason: "" }] })))).toBe(
+      false,
+    );
+  });
+
+  it("refuses a gap on an edition's date, or duplicating no edition of the series", () => {
+    const [gap] = female.editions.gaps;
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, gaps: [{ ...gap, data_date: "2021-02-02" }] })),
+      "a gap must fall on a date with no edition",
+    );
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, gaps: [{ ...gap, duplicate_of: "99999" }] })),
+      "duplicate an edition of the same series",
+    );
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, gaps: [gap, { ...gap, data_date: "2021-12-01" }] })),
+      "edition gaps must be in ascending order",
+    );
+  });
+
+  it("refuses editions on different publication floors (ADR-0019 §1)", () => {
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: [{ ...e.items[0]!, min_count: 3 }, e.items[1], e.items[2]],
+      })),
+      "the same publication floor",
+    );
+  });
+
+  it("refuses editions of different series in one list", () => {
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: [{ ...e.items[0]!, series: SERIES.national_male }, e.items[1], e.items[2]],
+      })),
+      "the list's one series",
+    );
+    expectRefused(
+      withMaleEditions((e) => ({ ...e, series: "pesel_2019_national_male" })),
+      "the list's one series",
+    );
+  });
+
+  it("refuses the two lists in one series: editions are never compared across lists", () => {
+    const sameSeries = (e: ListEditions) => ({
+      ...e,
+      series: "one_series",
+      items: e.items.map((item) => ({ ...item, series: "one_series" })),
+    });
+    expectRefused(
+      artefact({
+        lists: {
+          male: { ...male, editions: sameSeries(male.editions) },
+          female: { ...female, editions: sameSeries(female.editions) },
+        },
+      }),
+      "two series",
+    );
+  });
+
+  it("refuses a duplicate edition: two editions with one SHA-256", () => {
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: [e.items[0], { ...e.items[1]!, sha256: e.items[0]!.sha256 }, e.items[2]],
+      })),
+      "must not share a SHA-256",
+    );
+  });
+
+  it("refuses a series of one edition, and a resource that is both an edition and a gap", () => {
+    expect(accepts(withMaleEditions((e) => ({ ...e, items: e.items.slice(-1) })))).toBe(false);
+    const [gap] = female.editions.gaps;
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, gaps: [{ ...gap, resource_id: "22815" }] })),
+      "an edition or a gap, once",
+    );
+  });
+
+  it("refuses an edition whose surnames are not its rows", () => {
+    expectRefused(
+      withMaleEditions((e) => ({ ...e, items: [{ ...e.items[0]!, row_count: 5 }, e.items[1]] })),
+      "surnames must be its rows",
+    );
+  });
+
+  it("refuses a last edition that is not the list itself", () => {
+    const lastPatched = (patch: Record<string, unknown>) =>
+      withMaleEditions((e) => ({ ...e, items: [e.items[0], { ...e.items[1]!, ...patch }] }));
+    for (const patch of [
+      { resource_id: "63892" },
+      { sha256: "f".repeat(64) },
+      { data_date: "2025-01-22" },
+      { people: 91 },
+      { surnames: 6, row_count: 6 },
+      { min_count: 3 },
+    ]) {
+      expectRefused(lastPatched(patch), "the last edition must be the list itself");
+    }
+  });
+
+  it("refuses a change delta that is not the last edition's figure less the first's", () => {
+    for (const patch of [
+      { surnames_delta: 2 },
+      { people_delta: -17 },
+      // A delta read from the sum of the two lists is still a wrong delta.
+      { people_delta: 90 + 81 - 73 },
+    ]) {
+      expectRefused(
+        withMaleChange((c) => ({ ...c, ...patch })),
+        "last edition's figure less the first's",
+      );
+    }
+  });
+
+  it("refuses a change that does not compare the list's first edition with its last", () => {
+    for (const patch of [
+      { first_data_date: "2021-02-01" },
+      { last_data_date: "2025-01-22" },
+      { surnames_first: 3, surnames_delta: 2 },
+      { people_last: 91, people_delta: 18 },
+    ]) {
+      expectRefused(
+        withMaleChange((c) => ({ ...c, ...patch })),
+        "change must compare the list's first edition with its last",
+      );
+    }
+    expectRefused(
+      withMaleChange((c) => ({
+        ...c,
+        first_data_date: "2026-01-20",
+        last_data_date: "2020-01-22",
+      })),
+      "must come before",
+    );
+  });
+
+  it("refuses one-edition-only surnames that do not fit, or do not agree on the common ones", () => {
+    expectRefused(
+      withMaleChange((c) => ({ ...c, on_last_not_first: { surnames: 6, people: 22 } })),
+      "fit within that edition",
+    );
+    expectRefused(
+      withMaleChange((c) => ({ ...c, on_first_not_last: { surnames: 1, people_on_first: 74 } })),
+      "fit within that edition",
+    );
+    expectRefused(
+      withMaleChange((c) => ({ ...c, on_last_not_first: { surnames: 3, people: 22 } })),
+      "counted from either edition",
+    );
+  });
+
+  it("states a surname absent from the first edition as null, never zero, and follows TOP_3", () => {
+    expect(male.change.top3_first_counts[2]).toEqual({
+      key: "żmuda-trzebiatowski",
+      count_first: null,
+    });
+    const zero = male.change.top3_first_counts.map((entry, i) =>
+      i === 2 ? { ...entry, count_first: 0 } : entry,
+    );
+    expect(accepts(withMaleChange((c) => ({ ...c, top3_first_counts: zero })))).toBe(false);
+    expectRefused(
+      withMaleChange((c) => ({
+        ...c,
+        top3_first_counts: [c.top3_first_counts[1], c.top3_first_counts[0], c.top3_first_counts[2]],
+      })),
+      "follow named_top.items",
+    );
+    expectRefused(
+      withMaleChange((c) => ({ ...c, top3_first_counts: c.top3_first_counts.slice(0, 2) })),
+      "follow named_top.items",
+    );
+  });
+
+  it("requires editions and change on each list", () => {
+    const { editions: _e, ...withoutEditions } = male;
+    const { change: _c, ...withoutChange } = male;
+    expect(accepts(artefact({ lists: { male: withoutEditions, female } }))).toBe(false);
+    expect(accepts(artefact({ lists: { male: withoutChange, female } }))).toBe(false);
   });
 });

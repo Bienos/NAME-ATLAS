@@ -2,21 +2,21 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by the TASK-043 go-live: #37 is merged and `main` @ `b156bd8` is deployed to production, so the landing page shows the atlas's six plates (`docs/progress/2026-09-30-landing-atlas-six-plates-go-live.md`). ADR-0018 is accepted. Before it, TASK-043 itself (`docs/progress/2026-09-30-landing-atlas-six-plates.md`). Before it, TASK-042 (in progress), merged in #35 and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
+**Last rewritten:** 2026-09-30, by TASK-044: the atlas's last panel becomes Plate VII, how each list changed across its editions from 2020 to 2026, and named surnames link to the search; ADR-0019 (Proposed) allows comparing editions of one list (`docs/progress/2026-09-30-landing-atlas-changes-over-time.md`). Before it, the TASK-043 go-live: #37 is merged and `main` @ `b156bd8` is deployed to production (`docs/progress/2026-09-30-landing-atlas-six-plates-go-live.md`). ADR-0018 is accepted. Before it, TASK-043 itself (`docs/progress/2026-09-30-landing-atlas-six-plates.md`). Before it, TASK-042 (in progress), merged in #35 and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `b156bd8` (Merge #37, TASK-043), deployment `dpl_FqLffcZJxPXho3wXQjPRoUM9EWjF`, `READY`, target production, built automatically from the push to `main` on 2026-09-30. The one it replaced, `dpl_HAvMMx6BbErUEY9xbQZwXwkhQVua` (`main` @ `1e9fa81`, Merge #35; the app code of `12fb474`, TASK-040), is the rollback candidate |
-| Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
+| Deployed commit | `main` @ `b156bd8` (Merge #37, TASK-043), deployment `dpl_3Zf5iXwoTTmDfMRj6MR3RuYiPTc5`, `READY`, created 19:03 UTC on 2026-09-30 (Vercel `list_deployments`). Earlier the same day production was deployed from `b156bd8` at 17:31 (`dpl_FqLffcZJxPXho3wXQjPRoUM9EWjF`) and 17:42 (`dpl_9BZDwyLJqe7RUbF4iukc6uL4jbdE`), then **from the older `1e9fa81`** at 17:44 (`dpl_7TRC2cdHNf2NUognTgRV7N6sFQNg`), which put TASK-040's three plates back until 19:03. The account that created each is `bienos`; why `1e9fa81` was redeployed is not recorded. After a deploy, check which deployment the alias serves, not only the page |
+| Database | Production's search answers for surnames outside the old seven-surname slice: on 2026-09-30, `curl` of `/?surname=` for PIĄTEK, ŻMUDA-TRZEBIATOWSKI, ŻMUDA-TRZEBIATOWSKA, POZNAŃSKI and WIŚNIEWSKA each redirected to a 200 surname page with counts (PIĄTEK 11 003 men, rank 122). So production reads a database with the full register; which one, and its connection, is TASK-042's to record. Before that: Supabase project `xujctkjpvnmcdpximtda` (EU) with a seven-surname slice (`docs/LOCAL_DATABASE.md`) |
 | Deploys | From `main`, automatically. The project owner set Vercel's production branch (Settings → Environments → Production → Branch Tracking) from the stale `claude/exciting-noether-05np1s` to `main` on 2026-09-30. The merges of #36, #35 and #37 each built a production deployment on their own |
 
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 043, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034, 036–040, 043 and 044, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -26,7 +26,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
   - the landing page and the surname page redesigned for readers new to statistics (#11);
-  - the landing atlas (TASK-040, redesigned by TASK-043): six plates about the two published lists. They show every surname as a dot, how few surnames half the people carry, rarity bands, endings, first letters, and the surnames on both lists, per list and never summed. It names only surnames that a fixed rule selects, at 20 people or more, as plain text (ADR-0018).
+  - the landing atlas (TASK-040, redesigned by TASK-043, extended by TASK-044): seven plates about the two published lists. They show every surname as a dot, how few surnames half the people carry, rarity bands, endings, first letters, the surnames on both lists, and how each list changed across its editions from 2020 to 2026, per list and never summed. It names only surnames that a fixed rule selects, at 20 people or more, each linked to its search answer (ADR-0018, ADR-0019).
 - On `main`, CI was green on `9ed24d7` (run #235, Merge #19).
 
 ## Next
@@ -38,9 +38,9 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Checked 2026-09-30, 17:40 UTC:
+Checked 2026-09-30, 19:30 UTC:
 
-- This go-live record, from `claude/keen-cannon-1jc301`.
+- TASK-044's pull request from `claude/keen-cannon-1jc301`. It also carries the TASK-043 go-live record.
 - #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up.
 
 #35 (TASK-042) and #37 (TASK-043) are merged.
