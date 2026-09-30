@@ -38,7 +38,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-TASK-040 on `claude/keen-cannon-1jc301`, not yet opened as a pull request (2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
+One: TASK-040's, from `claude/keen-cannon-1jc301` (2026-09-30). #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
 
 ## Blocked on the project owner
 
@@ -50,6 +50,8 @@ TASK-040 on `claude/keen-cannon-1jc301`, not yet opened as a pull request (2026-
   - `claude/task-023-rules-amended` (#22)
   - `claude/share-card-not-derived-wording` (#24)
   - `claude/jolly-faraday-uas99n` (#25)
+  - `claude/teryt-localities-import` (#26)
+  - `claude/funny-bardeen-f4jbay` (#27). It also carries #28, so delete it once #28 is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
