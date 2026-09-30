@@ -4,10 +4,18 @@ import {
   coverageWarning,
   explanationText,
   distributionSentence,
+  fillTemplate,
+  formatChance,
+  formatCompact,
   formatDate,
+  formatDecimal,
   formatInteger,
   formatPercent,
+  formatQuantile,
+  formatShare,
   parseLang,
+  parseTemplate,
+  pluralForm,
   partitionLabel,
   populationSentence,
   rankSentence,
@@ -147,6 +155,182 @@ describe("formatPercent", () => {
     expect(formatPercent(0.184858973, "pl")).toBe("18,5%");
     expect(formatPercent(0.184858973, "en")).toBe("18.5%");
     expect(formatPercent(0.032598572, "pl")).toBe("3,3%");
+  });
+});
+
+describe("formatPercent with a precision (TASK-040)", () => {
+  it("keeps one decimal by default and takes the caller's precision otherwise", () => {
+    expect(formatPercent(0.505603006, "pl")).toBe("50,6%");
+    expect(formatPercent(0.505603006, "pl", 2)).toBe("50,56%");
+    expect(formatPercent(0.505603006, "en", 2)).toBe("50.56%");
+    expect(formatPercent(0.5, "pl", 0)).toBe("50%");
+    expect(formatPercent(0.999, "pl", 1)).toBe("99,9%");
+  });
+});
+
+describe("formatDecimal", () => {
+  it("groups the whole part like a count and uses the locale's decimal mark", () => {
+    expect(formatDecimal(921.139864938, 1, "pl")).toBe("921,1");
+    expect(formatDecimal(921.139864938, 1, "en")).toBe("921.1");
+    expect(formatDecimal(146707.158767278, 0, "pl")).toBe("146\u00a0707");
+    expect(formatDecimal(146707.158767278, 0, "en")).toBe("146,707");
+    expect(formatDecimal(7041.760172186, 1, "pl")).toBe("7\u00a0041,8");
+    expect(formatDecimal(98.941585207, 0, "pl")).toBe("99");
+  });
+
+  it("never prints a negative zero", () => {
+    expect(formatDecimal(-0.01, 1, "pl")).toBe("0,0");
+    expect(formatDecimal(-1234.5, 1, "en")).toBe("-1,234.5");
+  });
+});
+
+describe("formatChance", () => {
+  it("shows a probability to two decimals, so both sides of one half stay apart", () => {
+    expect(formatChance(0.505603006, "pl")).toBe("50,56%");
+    expect(formatChance(0.497246043, "pl")).toBe("49,72%");
+    expect(formatChance(0.054230001, "en")).toBe("5.42%");
+  });
+
+  it("adds digits rather than round a value onto 0%, 50% or 100% it does not equal", () => {
+    expect(formatChance(0.50001953, "pl")).toBe("50,002%");
+    expect(formatChance(0.500001, "pl")).toBe("50,0001%");
+    expect(formatChance(0.999801374, "en")).toBe("99.98%");
+    expect(formatChance(0.99999, "en")).toBe("99.999%");
+    expect(formatChance(0.000023, "pl")).toBe("0,002%");
+    expect(formatChance(0.5, "pl")).toBe("50,00%");
+  });
+
+  it("rounds a value still on an edge at four decimals toward the side it is on", () => {
+    expect(formatChance(0.4999996, "pl")).toBe("49,9999%");
+    expect(formatChance(0.49999999, "en")).toBe("49.9999%");
+    expect(formatChance(0.5000004, "pl")).toBe("50,0001%");
+    expect(formatChance(0.9999999, "en")).toBe("99.9999%");
+    expect(formatChance(0.0000001, "en")).toBe("0.0001%");
+    expect(formatChance(1, "en")).toBe("100.00%");
+    expect(formatChance(0, "en")).toBe("0.00%");
+  });
+
+  it("never shows a chance on the wrong side of one half", () => {
+    const shown = (p: number) => Number(formatChance(p, "en").replace("%", ""));
+    for (let k = -2000; k <= 2000; k++) {
+      const p = 0.5 + k * 1.3e-8;
+      if (p < 0.5) expect(shown(p), String(p)).toBeLessThan(50);
+      else if (p > 0.5) expect(shown(p), String(p)).toBeGreaterThan(50);
+      else expect(shown(p)).toBe(50);
+    }
+  });
+});
+
+describe("formatQuantile", () => {
+  it("shows a quantile with only the digits it needs", () => {
+    expect(formatQuantile(0.5, "pl")).toBe("50%");
+    expect(formatQuantile(0.9, "pl")).toBe("90%");
+    expect(formatQuantile(0.99, "en")).toBe("99%");
+    expect(formatQuantile(0.999, "pl")).toBe("99,9%");
+    expect(formatQuantile(0.999, "en")).toBe("99.9%");
+    expect(formatQuantile(0.9999, "pl")).toBe("99,99%");
+    expect(formatQuantile(0.12345, "en")).toBe("12.345%");
+  });
+});
+
+describe("formatShare", () => {
+  it("keeps one decimal, and two below one per cent so a small share is not rounded up", () => {
+    expect(formatShare(0.862875112, "pl")).toBe("86,3%");
+    expect(formatShare(0.10680321, "en")).toBe("10.7%");
+    expect(formatShare(0.004641435, "pl")).toBe("0,46%");
+    expect(formatShare(0.004641435, "en")).toBe("0.46%");
+    expect(formatShare(0.0251, "pl")).toBe("2,5%");
+  });
+});
+
+describe("formatCompact", () => {
+  it("writes round thousands and millions as words, and anything else in full", () => {
+    expect(formatCompact(100, "pl")).toBe("100");
+    expect(formatCompact(1000, "pl")).toBe("1\u00a0tys.");
+    expect(formatCompact(100000, "pl")).toBe("100\u00a0tys.");
+    expect(formatCompact(1000000, "pl")).toBe("1\u00a0mln");
+    expect(formatCompact(1000000, "en")).toBe("1M");
+    expect(formatCompact(10000, "en")).toBe("10k");
+    expect(formatCompact(1500, "pl")).toBe("1\u00a0500");
+  });
+});
+
+describe("message templates (TASK-040)", () => {
+  it("parses slots, agreeing words and emphasis", () => {
+    expect(parseTemplate("**Typowe** {s} {s:osoba|osoby|osób}.")).toEqual([
+      { kind: "text", text: "Typowe", strong: true },
+      { kind: "text", text: " ", strong: false },
+      { kind: "slot", key: "s", strong: false },
+      { kind: "text", text: " ", strong: false },
+      { kind: "plural", key: "s", forms: ["osoba", "osoby", "osób"], strong: false },
+      { kind: "text", text: ".", strong: false },
+    ]);
+  });
+
+  it("agrees a Polish word with its count in three forms, an English one in two", () => {
+    const forms = ["osoba", "osoby", "osób"];
+    expect([1, 2, 5, 12, 22, 82, 112, 738].map((n) => pluralForm(n, forms, "pl"))).toEqual([
+      "osoba",
+      "osoby",
+      "osób",
+      "osób",
+      "osoby",
+      "osoby",
+      "osób",
+      "osób",
+    ]);
+    expect(pluralForm(1, ["person", "people"], "en")).toBe("person");
+    expect(pluralForm(82, ["person", "people"], "en")).toBe("people");
+  });
+
+  it("fills a template as text and leaves no mark for a missing key", () => {
+    expect(
+      fillTemplate(
+        "{n:Wystarczy|Wystarczą|Wystarczy} {n} {n:osoba|osoby|osób}.",
+        { n: "82" },
+        { n: 82 },
+        "pl",
+      ),
+    ).toBe("Wystarczą 82 osoby.");
+    expect(fillTemplate("a {missing} b {gone:x|y}", {}, {}, "en")).toBe("a  b ");
+  });
+
+  it("uses only marks its sentences can fill: every atlas string parses to known parts", () => {
+    for (const lang of ["pl", "en"] as const) {
+      for (const [key, value] of Object.entries(UI[lang])) {
+        if (!key.startsWith("lf")) continue;
+        const parts = parseTemplate(value);
+        const rebuilt = parts.map((p) => (p.kind === "text" ? p.text : "")).join("");
+        expect(rebuilt, `${lang}.${key}`).not.toMatch(/[{}]|\*\*/u);
+        for (const part of parts) {
+          if (part.kind !== "plural") continue;
+          expect(part.forms.length, `${lang}.${key}`).toBe(lang === "pl" ? 3 : 2);
+        }
+      }
+    }
+  });
+
+  it("keeps the atlas's copy clear of origin, residence and nationality words", () => {
+    for (const lang of ["pl", "en"] as const) {
+      for (const [key, value] of Object.entries(UI[lang])) {
+        if (!key.startsWith("lf")) continue;
+        const lower = value.toLowerCase();
+        for (const wrong of [
+          "pochodzi",
+          "mieszka",
+          "urodzon",
+          "polaków",
+          "w polsce",
+          "comes from",
+          "lives in",
+          "of poles",
+          "in poland",
+          "originat",
+        ]) {
+          expect(lower, `${lang}.${key}`).not.toContain(wrong);
+        }
+      }
+    }
   });
 });
 
