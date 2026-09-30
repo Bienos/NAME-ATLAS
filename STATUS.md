@@ -2,16 +2,16 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted. Before it, TASK-040 itself (`docs/progress/2026-09-30-landing-atlas-list-facts.md`), the family surnames draft, and TASK-039, the TERYT localities import.
+**Last rewritten:** 2026-09-30, after the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`). Before it, the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted. Before it, TASK-040 itself (`docs/progress/2026-09-30-landing-atlas-list-facts.md`), the family surnames draft, and TASK-039, the TERYT localities import.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `12fb474` (Merge #32, TASK-040), deployment `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`, created through the Vercel API with target production on 2026-09-30. The one it replaced, `dpl_B2D15z8i9FYbL6gqoUU2nEy9e2MC` (`main` @ `ea03941`, Merge #24), is the rollback candidate |
+| Deployed commit | `main` @ `03d1efb` (Merge #33, documentation only; the app code is that of `12fb474`, Merge #32, TASK-040), deployment `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu`, a redeploy from the Vercel dashboard by the project owner on 2026-09-30, right after the production branch was set to `main`. The one it replaced, `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm` (`main` @ `12fb474`), is the rollback candidate |
 | Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
-| Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
+| Deploys | From `main`. The project owner set Vercel's production branch (Settings → Environments → Production → Branch Tracking) from the stale `claude/exciting-noether-05np1s` to `main` on 2026-09-30. No merge to `main` has happened since, so the first automatic production deployment is not yet observed |
 
 ## Built
 
@@ -42,7 +42,6 @@ Three (checked 2026-09-30): #33 from `claude/keen-cannon-1jc301`, this go-live r
 
 ## Blocked on the project owner
 
-- **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
   - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
@@ -78,7 +77,7 @@ Three (checked 2026-09-30): #33 from `claude/keen-cannon-1jc301`, this go-live r
   - `claude/serene-gauss-6inrf3`: the stale default branch's own commit.
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
-  Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
+  `claude/exciting-noether-05np1s` can now be deleted too: GitHub's default branch is `main` (checked through the GitHub API on 2026-09-30) and Vercel's production branch no longer names it.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
