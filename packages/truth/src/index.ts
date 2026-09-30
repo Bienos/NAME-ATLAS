@@ -174,3 +174,13 @@ export { mostCommonSurnames } from "./common.js";
 export type { CommonSurname, CommonSurnameList } from "./common.js";
 export { COVERAGE_BANDS, COVERAGE_FAMILIES, coverageMarkdown, coverageReport } from "./coverage.js";
 export type { CoverageBand, CoverageCell, CoverageFamily, ResourceCoverage } from "./coverage.js";
+
+// List facts — TASK-040, ADR-0015: statistics about one whole published list,
+// derived offline into a committed artefact. The web app reads `listFacts()`.
+export { listFacts } from "./list-facts/artefact.js";
+export {
+  LIST_COLLISION_METHOD_VERSION,
+  LIST_CROWD_METHOD_VERSION,
+  LIST_FACTS_METHOD_VERSION,
+  LIST_SUMMARY_METHOD_VERSION,
+} from "./version.js";

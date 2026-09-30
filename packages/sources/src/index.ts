@@ -44,6 +44,9 @@ export type {
   SourceSeed,
 } from "./registry.js";
 export { importPeselResource, rightsRefusal, sha256Hex } from "./importer.js";
+// TASK-040: the list-facts generator applies the byte check fetch-pesel applies, not a copy of it.
+export { localFileName, verifyResourceBytes } from "./acquire.js";
+export type { ResourceBytesVerdict } from "./acquire.js";
 export { importPeselRegionalResource } from "./regional-importer.js";
 export type { ImportPeselRegionalOptions } from "./regional-importer.js";
 export {

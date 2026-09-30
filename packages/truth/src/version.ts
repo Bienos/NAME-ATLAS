@@ -169,3 +169,72 @@ export const MEANING_CONFIDENCE_ASSESSMENT_VERSION = "onomastic_confidence@1";
  * two `POSSIBLE`s.
  */
 export const MEANING_AGREEMENT_BASIS = "identical root_form and root_language, case-insensitive";
+
+// --- TASK-040: list facts (statistics about one whole published list) -----
+//
+// A list fact describes the shape of ONE published national list (male or
+// female, one resource version): never a sum, union or comparison across the
+// two, and never a named surname (`docs/contracts/list-facts.md`, ADR-0015).
+
+/**
+ * The list-facts pipeline: the gate, confidence and rights checks and the three
+ * methods below, run by `bin/build-list-facts.ts`. Recorded on the artefact as
+ * `pipeline_version`; it is not the artefact's `schema_version` (`list_facts@1`).
+ */
+export const LIST_FACTS_METHOD_VERSION = "list_facts_pipeline@1";
+
+/** People, surnames, extremes, medians, thresholds and quantiles of one list. */
+export const LIST_SUMMARY_METHOD_VERSION = "list_summary@1";
+
+/** The shared-surname curve, n one half, the pair figure and the seeded example rooms. */
+export const LIST_COLLISION_METHOD_VERSION = "list_collision@1";
+
+/** Expected distinct surnames, the share without a namesake, reach-half and the example crowd. */
+export const LIST_CROWD_METHOD_VERSION = "list_crowd@1";
+
+/**
+ * Stored shares and probabilities are rounded to nine decimal places with
+ * `Number(x.toFixed(9))`, the rule `shareOf` and `DISTRIBUTION_SHARE_PRECISION`
+ * already use. Expected counts are rounded the same way; the birthday reference
+ * is rounded half up from its exact rational value to the same nine places.
+ * Counts are exact integers and are never rounded. Every decision against one
+ * half (`n_half` of the curve and of each reach set) is taken on the unrounded
+ * chance; only the stored values are rounded.
+ */
+export const LIST_FACTS_PRECISION = 9;
+
+/** `at_least` values of the summary's thresholds. */
+export const LIST_SUMMARY_THRESHOLDS: readonly number[] = [2, 10, 20, 100, 1000, 10000, 50000];
+
+/** Quantiles reported over surnames and over people; compared as exact thousandths, never as floats. */
+export const LIST_SUMMARY_QUANTILES: readonly number[] = [0.5, 0.9, 0.99, 0.999];
+
+/** The shared-surname curve runs from n = 2 to this n (or to the list's people, if fewer). */
+export const LIST_COLLISION_CURVE_MAX = 300;
+
+/** Seeded example rooms per list. */
+export const LIST_EXAMPLE_ROOMS = 64;
+
+/**
+ * PRNG seeds (mulberry32). The rooms of the male list use 20260120 and of the
+ * female list 20260121; each list's example crowd uses its room seed plus
+ * {@link LIST_CROWD_SEED_OFFSET}.
+ */
+export const LIST_ROOM_SEEDS = { national_male: 20260120, national_female: 20260121 } as const;
+export const LIST_CROWD_SEED_OFFSET = 1000;
+
+/** Crowd sizes for the expected number of distinct surnames. */
+export const LIST_CROWD_SIZES: readonly number[] = [100, 1000, 10000, 100000, 1000000];
+
+/** The crowd the share without a namesake and the example crowd are for. */
+export const LIST_CROWD_SIZE = 1000;
+
+/** The sets reach-half is computed for: the list's k most common surnames, unnamed. */
+export const LIST_REACH_SETS = [
+  { set: "TOP_1", k: 1 },
+  { set: "TOP_10", k: 10 },
+  { set: "TOP_100", k: 100 },
+] as const;
+
+/** The birthday comparison: equally likely days in a year. A model constant, not PESEL data. */
+export const BIRTHDAY_REFERENCE_DAYS = 365;

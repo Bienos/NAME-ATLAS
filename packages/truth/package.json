@@ -15,7 +15,8 @@
     "demo:surname-distribution": "tsx bin/surname-distribution.ts",
     "demo:surname-meaning": "tsx bin/surname-meaning.ts",
     "derive-batch": "tsx bin/derive-batch.ts",
-    "coverage-report": "tsx bin/coverage-report.ts"
+    "coverage-report": "tsx bin/coverage-report.ts",
+    "build-list-facts": "tsx bin/build-list-facts.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",
@@ -24,5 +25,8 @@
     "@name-atlas/resolver": "workspace:*",
     "@name-atlas/sources": "workspace:*",
     "kysely": "0.29.6"
+  },
+  "devDependencies": {
+    "prettier": "3.9.8"
   }
 }

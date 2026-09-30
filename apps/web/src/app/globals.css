@@ -2149,3 +2149,1737 @@ main.profile .search {
     transform: scaleX(0);
   }
 }
+
+/* --- landing atlas, part 1 (TASK-040) -------------------------------------- */
+
+/*
+ * Three plates about each whole published list (`list-atlas.tsx`). An atlas
+ * page's furniture — crop marks, a plate number, a serif headline, the figure,
+ * then a fact card, a caveat and the source line — in the landing's own type
+ * and colour. Mobile first: one list at a time below 900px, both side by side
+ * above with the chosen one in front. The list switch is two radio buttons and
+ * `:has()` does the choosing, so it works the same with or without JavaScript
+ * and hydration changes nothing on screen.
+ *
+ * Every chart is positioned by `--x` / `--y`, unitless fractions the view
+ * computes as presentation geometry. Lines are SVG drawn at any aspect ratio
+ * (non-scaling strokes); dots and labels are HTML so text stays crisp and
+ * readable at 360px.
+ */
+
+.lf {
+  margin: var(--space-9) 0 0;
+  padding: var(--space-7) 0 0;
+  border-top: 2px solid var(--text-primary);
+}
+
+.lf-head {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.lf-head-text {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 50rem;
+}
+
+@media (min-width: 900px) {
+  .lf-head {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    align-items: end;
+    gap: var(--space-9);
+  }
+}
+
+/* The plates as an atlas's list of plates: every one a tap away. */
+.lf-index ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border-default);
+}
+
+.lf-index li {
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.lf-index a {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-3) 0;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.lf-index a:hover .lf-index-name {
+  color: var(--accent);
+}
+
+.lf-index-no {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.lf-index-name {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.lf-eyebrow {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lf-title {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 5rem);
+  font-weight: 500;
+  line-height: 0.96;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+/* Long words wrap rather than push the page sideways at large text sizes. */
+.lf-title,
+.lf .lf-plate-title,
+.lf-plate-lede,
+.lf-sub,
+.lf-fact,
+.lf-caveat {
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+.lf-lede {
+  max-width: 46ch;
+  margin: var(--space-2) 0 0;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.lf-scope {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+/* The list switch: sticky while the plates scroll past, so the reader can flip
+   lists anywhere. On a phone it is a full-width bar on Paper, edge to edge
+   over the page's gutter, so no text shows beside it; on a wide screen, a
+   pill. Both are in the markup from the first byte (`list-atlas-shell.tsx`). */
+.lf-switchbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-6) calc(-1 * var(--space-5)) 0;
+  padding: var(--space-2) var(--space-5);
+  background: var(--surface-primary);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.lf-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The page's gutter is 12px on the narrowest phones (see `body`). */
+@media (max-width: 400px) {
+  .lf-switchbar {
+    margin-inline: calc(-1 * var(--space-4));
+    padding-inline: var(--space-4);
+  }
+}
+
+@media (min-width: 900px) {
+  .lf-switchbar {
+    top: var(--space-3);
+    width: fit-content;
+    max-width: 100%;
+    margin: var(--space-6) 0 0;
+    padding: 3px;
+    border: 1px solid var(--border-default);
+    border-radius: 999px;
+  }
+}
+
+.lf-switch {
+  display: grid;
+  flex: 0 1 26rem;
+  grid-template-columns: 1fr 1fr;
+  min-width: 0;
+  margin: 0;
+  padding: 3px;
+  background: var(--hover-light);
+  border: 0;
+  border-radius: 999px;
+}
+
+@media (min-width: 900px) {
+  .lf-switch {
+    flex: none;
+  }
+}
+
+.lf-switch label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 7.5rem;
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.lf-switch input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* The chosen list is filled with Ink: 16.3:1 against the track. */
+.lf-switch label:has(input:checked) {
+  color: var(--text-inverse);
+  background: var(--text-primary);
+}
+
+.lf-switch label:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  .lf-switch label:has(input:checked) {
+    forced-color-adjust: none;
+    color: HighlightText;
+    background: Highlight;
+  }
+}
+
+.lf-switch-note {
+  padding-right: var(--space-4);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 559.98px) {
+  .lf-switch-note {
+    display: none;
+  }
+
+  .lf-switch label {
+    min-width: 0;
+  }
+}
+
+/* The checked radio chooses the list, before and without JavaScript. The two
+   variants of a line (`.lf-per`), and on a phone the two lists' sheets and
+   columns, share one grid cell, and the one not chosen is hidden with
+   `visibility`: it keeps its place, so flipping lists moves nothing on the
+   page, and it leaves the accessibility tree. Without `:has()` the male
+   list's line shows, and a phone shows both lists one after the other. */
+.lf-per {
+  display: grid;
+}
+
+.lf-per > [data-v] {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.lf [data-v="female"],
+.lf:has(.lf-switch input[value="female"]:checked) [data-v="male"] {
+  visibility: hidden;
+}
+
+.lf:has(.lf-switch input[value="female"]:checked) [data-v="female"] {
+  visibility: visible;
+}
+
+@media (max-width: 899.98px) {
+  @supports selector(:has(*)) {
+    .lf :is(.lf-sheets, .lf-cols) > [data-l] {
+      grid-area: 1 / 1;
+    }
+  }
+
+  .lf:has(.lf-switch input[value="male"]:checked) [data-l="female"],
+  .lf:has(.lf-switch input[value="female"]:checked) [data-l="male"] {
+    visibility: hidden;
+  }
+}
+
+/* On a wide screen both lists stay on screen and fully readable; the one not
+   chosen steps back: its Atlas Blue marks and numerals turn Graphite (6.9:1
+   on Paper), so the chosen column is the one in colour. */
+@media (min-width: 900px) {
+  .lf:has(.lf-switch input[value="male"]:checked) [data-l="female"],
+  .lf:has(.lf-switch input[value="female"]:checked) [data-l="male"] {
+    --accent: var(--text-secondary);
+  }
+}
+
+/* --- plate furniture --- */
+
+.lf-plate {
+  position: relative;
+  margin: var(--space-8) -8px 0;
+  padding: var(--space-6) 8px var(--space-5);
+  /* Clear of the sticky list switch when reached from the plate index. */
+  scroll-margin-top: calc(var(--space-9) + var(--space-4));
+}
+
+.lf-plate::before,
+.lf-plate::after,
+.lf-crop::before,
+.lf-crop::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 0 solid var(--border-strong);
+  pointer-events: none;
+}
+
+.lf-plate::before {
+  top: 0;
+  left: 0;
+  border-width: 1px 0 0 1px;
+}
+
+.lf-plate::after {
+  top: 0;
+  right: 0;
+  border-width: 1px 1px 0 0;
+}
+
+.lf-crop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.lf-crop::before {
+  bottom: 0;
+  left: 0;
+  border-width: 0 0 1px 1px;
+}
+
+.lf-crop::after {
+  right: 0;
+  bottom: 0;
+  border-width: 0 1px 1px 0;
+}
+
+@media (min-width: 900px) {
+  .lf-plate {
+    margin: var(--space-9) 0 0;
+    padding: var(--space-8) var(--space-8) var(--space-6);
+  }
+}
+
+.lf-plate-head {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-7);
+}
+
+.lf-plate-no {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* `section h3` is the result page's small uppercase chapter label; a plate's
+   headline is the page's editorial voice instead. */
+.lf .lf-plate-title {
+  max-width: 22ch;
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.875rem, 1rem + 3.2vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  text-transform: none;
+  text-wrap: balance;
+  color: var(--text-primary);
+}
+
+/* A figure in a headline: the sans numeral in Atlas Blue (Visual System §6.1). */
+.lf-n {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+
+.lf-plate-lede {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.lf-plate-lede b {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.lf-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.lf-label::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+@media (min-width: 900px) {
+  .lf:has(.lf-switch input[value="male"]:checked) [data-l="female"] .lf-label,
+  .lf:has(.lf-switch input[value="female"]:checked) [data-l="male"] .lf-label {
+    color: var(--text-secondary);
+  }
+}
+
+.lf-cols {
+  display: grid;
+  gap: var(--space-8);
+}
+
+@media (min-width: 900px) {
+  .lf-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8) var(--space-9);
+  }
+}
+
+.lf-col {
+  min-width: 0;
+  padding-top: var(--space-4);
+  border-top: 2px solid var(--text-primary);
+}
+
+.lf-sub {
+  margin: var(--space-9) 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.5rem, 1.15rem + 1.2vw, 2rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+.lf-sub-lede {
+  max-width: 60ch;
+  margin: 0 0 var(--space-6);
+  color: var(--text-secondary);
+}
+
+.lf-caption,
+.lf-model {
+  max-width: 60ch;
+  margin: var(--space-3) 0 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.lf-model {
+  margin: 0 0 var(--space-5);
+}
+
+/* The fact card carries every figure in words, for both lists; the caveat is
+   body text beside it, never small print. */
+.lf-notes {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-8) 0 0;
+}
+
+@media (min-width: 900px) {
+  .lf-notes {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-8);
+    align-items: start;
+  }
+}
+
+.lf-fact {
+  margin: 0;
+  padding: var(--space-5);
+  font-size: 1rem;
+  line-height: 1.6;
+  background: var(--surface-elevated);
+  border-left: 2px solid var(--text-primary);
+}
+
+.lf-fact b {
+  font-weight: 600;
+}
+
+.lf-caveat {
+  position: relative;
+  margin: 0;
+  padding-left: var(--space-6);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* Ring = a model, not a measurement (§8, §11): dotted, never filled. */
+.lf-caveat::before {
+  content: "";
+  position: absolute;
+  top: 0.4em;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border: 1.25px dashed var(--text-tertiary);
+  border-radius: 50%;
+}
+
+.lf-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--space-5);
+  margin: var(--space-6) 0 0;
+  padding-top: var(--space-2);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-soft);
+}
+
+/* A tap target, so it is sized like one: vertical padding on an inline box
+   widens what can be tapped without making its line 44px tall, so the line
+   still wraps like text. */
+.lf-source a {
+  padding-block: 15px;
+}
+
+.lf-method {
+  color: var(--text-secondary);
+}
+
+/* --- shared chart parts --- */
+
+.lf-scale,
+.lf-curve,
+.lf-spark,
+.lf-queue-axis {
+  position: relative;
+}
+
+/* Each row of labels is its own query container: which labels it draws
+   depends on its width in em, so on the screen and the text size together. */
+.lf-plot,
+.lf-curve,
+.lf-spark,
+.lf-queue-axis {
+  container-type: inline-size;
+}
+
+.lf-plot > svg,
+.lf-curve > svg,
+.lf-spark > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.lf-scale line,
+.lf-scale path,
+.lf-curve line,
+.lf-curve path,
+.lf-spark path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.lf-plot > span,
+.lf-curve > span,
+.lf-spark > span,
+.lf-queue-axis > span {
+  position: absolute;
+}
+
+.lf-lab,
+.lf-ylab,
+.lf-node-lab,
+.lf-spark-val,
+.lf-xnote {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+}
+
+.lf-lab {
+  left: calc(var(--x) * 100%);
+  transform: translateX(-50%);
+}
+
+.lf-lab[data-anchor="start"] {
+  transform: none;
+}
+
+.lf-lab[data-anchor="end"] {
+  right: calc((1 - var(--x)) * 100%);
+  left: auto;
+  transform: none;
+}
+
+/* A label's tier (`fitTiers`, `LABEL_TIERS_EM`): drawn only where its row is
+   at least as many em wide as it was fitted at. Tier 0 is always drawn. */
+.lf-lab[data-fit] {
+  display: none;
+}
+
+@container (min-width: 12.5em) {
+  .lf-lab[data-fit="1"] {
+    display: block;
+  }
+}
+
+@container (min-width: 17em) {
+  .lf-lab[data-fit="2"] {
+    display: block;
+  }
+}
+
+@container (min-width: 22em) {
+  .lf-lab[data-fit="3"] {
+    display: block;
+  }
+}
+
+@container (min-width: 30em) {
+  .lf-lab[data-fit="4"] {
+    display: block;
+  }
+}
+
+@container (min-width: 47em) {
+  .lf-lab[data-fit="5"] {
+    display: block;
+  }
+}
+
+.lf-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.lf-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lf-key {
+  display: inline-block;
+  flex: none;
+}
+
+.lf-key-omitted {
+  width: 16px;
+  height: 10px;
+  background: repeating-linear-gradient(135deg, var(--border-strong) 0 1px, transparent 1px 4px);
+  border: 1px solid var(--border-default);
+}
+
+.lf-key-max,
+.lf-key-seat,
+.lf-key-person {
+  width: 7px;
+  height: 7px;
+  background: var(--text-primary);
+  border-radius: 50%;
+}
+
+.lf-key-arc {
+  width: 18px;
+  height: 10px;
+  border-top: 1px solid var(--text-tertiary);
+  border-right: 1px solid var(--text-tertiary);
+  border-top-right-radius: 10px;
+}
+
+/* The typical person: a diamond, where the typical surname is a round dot. */
+.lf-key-typical {
+  width: 7px;
+  height: 7px;
+  margin: 0 1px;
+  rotate: 45deg;
+  background: var(--accent);
+}
+
+.lf-key-half {
+  width: 14px;
+  border-top: 1.5px solid var(--accent);
+}
+
+.lf-key-empty {
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--border-strong);
+}
+
+.lf-key-pair,
+.lf-key-shared {
+  width: 22px;
+  height: 7px;
+  background:
+    radial-gradient(circle at 3.5px 50%, var(--accent) 3.5px, transparent 4px),
+    radial-gradient(circle at calc(100% - 3.5px) 50%, var(--accent) 3.5px, transparent 4px),
+    linear-gradient(var(--accent), var(--accent)) center / 100% 2px no-repeat;
+}
+
+.lf-key-line {
+  width: 18px;
+  height: 2px;
+  background: var(--text-primary);
+}
+
+.lf-key-ref {
+  width: 18px;
+  border-top: 1px dashed var(--text-tertiary);
+}
+
+/* --- plate I: the slide rule --- */
+
+.lf-sheets {
+  display: grid;
+  gap: var(--space-9);
+}
+
+.lf-sheet {
+  min-width: 0;
+  padding-top: var(--space-4);
+  border-top: 2px solid var(--text-primary);
+  container: lf-sheet / inline-size;
+}
+
+.lf-sheet-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  margin: 0 0 var(--space-5);
+}
+
+.lf-axis-note,
+.lf-row-cap,
+.lf-xnote-static {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Six rows, top to bottom: surname quantiles on their rule; the typical
+   surname's flag; threshold rungs; the count axis; the typical person's flag;
+   person quantiles on their rule. Rows are placed in rem, so they move apart
+   when the reader enlarges text; the SVG's 190 y units span the same height.
+   The plot is inset by a dot's radius, so the most common surname's dot at the
+   far end is drawn whole. */
+.lf-scale {
+  height: 11.875rem;
+  margin: var(--space-2) 0;
+  overflow-x: clip;
+}
+
+.lf-plot {
+  position: absolute;
+  inset: 0 6px;
+}
+
+.lf-rule {
+  stroke: var(--border-default);
+  stroke-width: 1;
+}
+
+.lf-qtick,
+.lf-ctick {
+  stroke: var(--text-primary);
+  stroke-width: 1;
+}
+
+.lf-scale .lf-axis {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.lf-rung {
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+}
+
+/* The rungs are labelled only where a wide screen has room for it; a phone
+   draws none, and the list under the sheet carries every threshold. */
+@media (max-width: 899.98px) {
+  .lf-scale .lf-rung,
+  .lf-plot .lf-lab.lf-lab-rung {
+    display: none;
+  }
+}
+
+.lf-arc {
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+}
+
+.lf-stem {
+  stroke-width: 1.5;
+}
+
+/* Both typical values in Atlas Blue, as in the headline; they differ by
+   place (above the axis or below) and by shape (dot or diamond). */
+.lf-stem-top,
+.lf-stem-bottom {
+  stroke: var(--accent);
+}
+
+.lf-lab-top {
+  top: 0.1875rem;
+}
+
+.lf-lab-rung {
+  top: 3.5rem;
+  font-weight: 400;
+}
+
+/* On Paper, so a flag's stem passing behind a count reads as interrupted. */
+.lf-lab-count {
+  top: 6.1875rem;
+  padding: 2px 3px;
+  color: var(--text-primary);
+  background: var(--surface-primary);
+}
+
+.lf-lab-bottom {
+  top: 11.0625rem;
+}
+
+.lf-omitted {
+  top: 5.375rem;
+  left: 0;
+  width: calc(var(--x) * 100%);
+  height: 0.75rem;
+  background: repeating-linear-gradient(135deg, var(--border-strong) 0 1px, transparent 1px 4px);
+  border: 1px solid var(--border-default);
+}
+
+.lf-dot {
+  top: 5.75rem;
+  left: calc(var(--x) * 100%);
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface-primary);
+}
+
+.lf-dot-surname {
+  background: var(--accent);
+}
+
+.lf-dot-person {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 1px;
+  rotate: 45deg;
+  background: var(--accent);
+}
+
+.lf-dot-max {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: var(--text-primary);
+}
+
+/* A flag hangs beside its stem, on whichever side has room, and wraps there. */
+.lf-flag {
+  top: 2rem;
+  left: calc(var(--x) * 100%);
+  max-width: calc((1 - var(--x)) * 100%);
+  padding-left: var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.lf-flag b,
+.lf-row-cap-flag b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.lf-flag[data-side="end"] {
+  right: calc((1 - var(--x)) * 100%);
+  left: auto;
+  max-width: calc(var(--x) * 100%);
+  padding: 0 var(--space-3) 0 0;
+  text-align: right;
+}
+
+.lf-flag-bottom {
+  top: 7.25rem;
+}
+
+/* Where the sheet is narrow for its text size, the typical person's flag
+   keeps only its number, and its sentence moves under the sheet. */
+.lf-flag-short,
+.lf-row-cap-flag {
+  display: none;
+}
+
+@container lf-sheet (max-width: 20em) {
+  .lf-flag-full {
+    display: none;
+  }
+
+  .lf-flag-short {
+    display: inline;
+  }
+
+  .lf-row-cap-flag {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+    color: var(--text-primary);
+  }
+}
+
+.lf-clubs {
+  margin: var(--space-6) 0 0;
+}
+
+.lf-clubs-head {
+  margin: 0 0 var(--space-3);
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.lf-clubs dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.5rem), 1fr));
+  margin: 0;
+  border-top: 1px solid var(--border-soft);
+}
+
+.lf-clubs dl > div {
+  padding: var(--space-3) var(--space-4) var(--space-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.lf-clubs dt {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.lf-clubs dd {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.lf-clubs dd.lf-clubs-n {
+  margin: var(--space-2) 0 0;
+  font-size: 1.125rem;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- plate II: the room --- */
+
+.lf-answer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-2) var(--space-5);
+  margin: var(--space-4) 0 var(--space-5);
+}
+
+.lf-big {
+  font-size: clamp(4.5rem, 3rem + 5vw, 7rem);
+  line-height: 0.8;
+}
+
+.lf-big .lf-n {
+  letter-spacing: -0.06em;
+}
+
+.lf-answer-text {
+  max-width: 24ch;
+  padding-bottom: 0.2em;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.lf-answer-text b {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.lf-curve {
+  height: 180px;
+  /* Room below for the axis labels and title, which grow with the text. */
+  margin: var(--space-6) 0 calc(var(--space-6) + 1.5rem);
+}
+
+.lf-grid {
+  stroke: var(--border-soft);
+  stroke-width: 1;
+}
+
+.lf-grid-half {
+  stroke: var(--border-strong);
+  stroke-dasharray: 4 4;
+}
+
+.lf-curve .lf-axis {
+  stroke: var(--text-primary);
+  stroke-width: 1;
+}
+
+.lf-curve-line {
+  stroke: var(--text-primary);
+  stroke-width: 2;
+}
+
+.lf-drop {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.lf-bday-line {
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+
+.lf-ylab {
+  top: calc((1 - var(--y)) * 100%);
+  left: 0;
+  transform: translateY(-130%);
+}
+
+.lf-node {
+  top: calc((1 - var(--y)) * 100%);
+  left: calc(var(--x) * 100%);
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%;
+}
+
+.lf-node-half {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--surface-primary);
+}
+
+.lf-node-bday {
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  background: var(--surface-primary);
+  border: 1.5px dashed var(--text-secondary);
+}
+
+.lf-node-lab {
+  top: calc((1 - var(--y)) * 100%);
+  left: calc(var(--x) * 100%);
+  transform: translate(6px, -140%);
+}
+
+/* The list's own chance at the birthday model's n sits where the curve
+   passes: on a Paper halo, so the curve never crosses its digits; so does the
+   birthday label, which reaches the curve at large text sizes. */
+.lf-node-lab-p23,
+.lf-node-lab-bday {
+  padding: 1px 3px;
+  background: var(--surface-primary);
+  border-radius: var(--radius-xs);
+}
+
+.lf-ylab-end {
+  right: 0;
+  left: auto;
+}
+
+/* The birthday model's 50%: a ring (a model, not a measurement) on the half line. */
+.lf-node-lab-bday {
+  transform: translate(-4px, -190%);
+}
+
+.lf-node-p23 {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: var(--text-primary);
+}
+
+.lf-curve .lf-lab-x {
+  top: calc(100% + 8px);
+}
+
+.lf-lab-half {
+  color: var(--accent);
+}
+
+.lf-xnote {
+  top: calc(100% + 12px + 0.75rem);
+  right: 0;
+}
+
+.lf-strip {
+  margin: 0;
+}
+
+.lf-strip svg,
+.lf-room svg,
+.lf-crowd svg,
+.lf-queue {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lf-strip-half {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.lf-room-dot {
+  fill: var(--surface-primary);
+  stroke: var(--text-secondary);
+  stroke-width: 1;
+  stroke-dasharray: 2.5 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.lf-room-dot-this {
+  fill: var(--text-primary);
+  stroke: var(--text-primary);
+  stroke-dasharray: none;
+}
+
+/* The room, and beside it the line after seat n_half labelled; where the
+   column is narrow for its text size, the label goes under the room. */
+.lf-col {
+  container: lf-col / inline-size;
+}
+
+.lf-room-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) 7.5rem;
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-6) 0 0;
+}
+
+.lf-room {
+  min-width: 0;
+}
+
+.lf-room-half {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.lf-room-note {
+  position: relative;
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text-primary);
+}
+
+.lf-room-note > span {
+  position: absolute;
+  top: calc((1 - var(--y)) * 100%);
+  left: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  transform: translateY(-0.675em);
+}
+
+.lf-room-note .lf-key-half {
+  flex: none;
+  align-self: center;
+}
+
+.lf-room-note b {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+@container lf-col (max-width: 26em) {
+  .lf-room-wrap {
+    grid-template-columns: minmax(0, 22rem);
+  }
+
+  .lf-room-note > span {
+    position: static;
+    transform: none;
+  }
+}
+
+.lf-wall {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 1.25;
+}
+
+.lf-door {
+  fill: none;
+  stroke: var(--text-tertiary);
+  stroke-width: 0.75;
+  stroke-dasharray: 2 2;
+}
+
+.lf-seat {
+  fill: var(--text-primary);
+}
+
+.lf-seat-pair {
+  fill: var(--accent);
+}
+
+.lf-seat-empty {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lf-pair-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.lf-legend-room {
+  margin-top: var(--space-3);
+}
+
+.lf-caption-bday {
+  padding-left: var(--space-5);
+  border-left: 1px dashed var(--text-tertiary);
+}
+
+/* --- plate III: the crowd --- */
+
+.lf-legend-crowd {
+  margin: 0 0 var(--space-6);
+}
+
+.lf-chip {
+  padding: 2px var(--space-4);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  border: 1px solid var(--border-default);
+  border-radius: 999px;
+}
+
+.lf-counters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-5);
+  margin: var(--space-4) 0 var(--space-6);
+}
+
+.lf-counters p {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.lf-mid {
+  font-size: clamp(2.5rem, 1.6rem + 3vw, 3.75rem);
+  line-height: 0.95;
+}
+
+.lf-mid .lf-n,
+.lf-lane-n .lf-n {
+  color: var(--text-primary);
+}
+
+.lf-counter-text {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+.lf-crowd {
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.lf-person {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 5.4;
+  stroke-linecap: round;
+}
+
+.lf-person-shared {
+  stroke: var(--accent);
+}
+
+.lf-link {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.lf-caption-crowd {
+  text-align: center;
+  margin-inline: auto;
+}
+
+.lf-spark {
+  height: 150px;
+  /* Room below for the axis labels, which grow with the text. */
+  margin: var(--space-8) var(--space-4) calc(var(--space-6) + 0.75rem);
+}
+
+.lf-spark-ref {
+  stroke: var(--text-tertiary);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.lf-spark-line {
+  stroke: var(--text-primary);
+  stroke-width: 2;
+}
+
+.lf-node-spark {
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  background: var(--text-primary);
+}
+
+.lf-node-now {
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  background: var(--surface-primary);
+  border: 2.5px solid var(--accent);
+}
+
+.lf-spark-val {
+  top: calc((1 - var(--y)) * 100%);
+  left: calc(var(--x) * 100%);
+  transform: translate(-50%, -190%);
+  color: var(--text-primary);
+}
+
+.lf-spark-val[data-anchor="start"] {
+  transform: translate(-4px, -190%);
+}
+
+.lf-spark-val[data-anchor="end"] {
+  transform: translate(calc(-100% + 4px), -190%);
+}
+
+/* Below the line, to the right of its point, where the line rises away from
+   it; pulled back left where it would pass the plot's end (the spark is a
+   query container: 100cqw is its width). */
+.lf-spark-val[data-anchor="below"] {
+  transform: translate(min(7px, calc((1 - var(--x)) * 100cqw - 100%)), 60%);
+}
+
+.lf-spark .lf-lab-x {
+  top: calc(100% + 10px);
+}
+
+.lf-xnote-static {
+  margin-top: var(--space-2);
+  text-align: right;
+}
+
+.lf-lanes {
+  display: grid;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+}
+
+.lf-lanes > * {
+  min-width: 0;
+}
+
+.lf-lane-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin: 0;
+}
+
+/* Beside its number where there is room; above it on a narrow row at large text. */
+.lf-lane-label {
+  flex: 1 1 12rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.lf-lane-n {
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.lf-lane-sub {
+  margin: var(--space-2) 0 var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.lf-queue-rule {
+  stroke: var(--border-soft);
+  stroke-width: 1;
+}
+
+.lf-queue-dots {
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.lf-queue-last {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 7.5;
+  stroke-linecap: round;
+}
+
+.lf-queue-axis {
+  height: calc(0.75rem + 4px);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.lf-queue-axis .lf-lab {
+  top: 4px;
+}
+
+/*
+ * Motion (Visual System §23): reveal, connect, travel — nothing else, once.
+ * Opt-in twice over: only without a reduced-motion preference, and only once
+ * the island has marked the section `data-motion`. A block already on screen
+ * at hydration is marked seen and done at once, so it never blanks out to
+ * replay; any other block waits, paused on its first frame, until any part of
+ * it is first seen (`data-seen`), and is released for good after
+ * (`data-done`), so switching lists never replays it. Text waits at most
+ * 200ms. Without any of this every figure is simply in its final state.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .lf-switch label {
+    transition:
+      background-color var(--duration-fast) var(--ease-primary),
+      color var(--duration-fast) var(--ease-primary),
+      box-shadow var(--duration-fast) var(--ease-primary);
+  }
+
+  /* Figures resolve once, in reading order (the `.hero-number` pattern). */
+  .lf[data-motion] .lf-n {
+    animation: resolve var(--duration-standard) var(--ease-primary) 80ms both;
+  }
+
+  /* Axes and rules are drawn; ticks and labels appear. */
+  .lf[data-motion] :is(.lf-scale .lf-axis, .lf-rule, .lf-grid, .lf-curve .lf-axis) {
+    transform-box: fill-box;
+    transform-origin: left center;
+    animation: lf-draw-x var(--duration-narrative) var(--ease-primary) both;
+  }
+
+  .lf[data-motion] :is(.lf-lab, .lf-ylab, .lf-qtick, .lf-ctick, .lf-rung, .lf-omitted) {
+    animation: lf-appear var(--duration-fast) var(--ease-primary) 100ms both;
+  }
+
+  /* The typical surname and the typical person travel along the axis to their place. */
+  .lf[data-motion] :is(.lf-dot-surname, .lf-dot-person) {
+    animation: lf-travel var(--duration-narrative) var(--ease-primary) 200ms both;
+  }
+
+  .lf[data-motion] :is(.lf-stem, .lf-drop, .lf-bday-line) {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: lf-draw-y var(--duration-standard) var(--ease-primary) 700ms both;
+  }
+
+  .lf[data-motion] .lf-stem-bottom {
+    transform-origin: center top;
+  }
+
+  .lf[data-motion] :is(.lf-flag, .lf-node-lab, .lf-spark-val) {
+    animation: lf-appear var(--duration-fast) var(--ease-primary) 200ms both;
+  }
+
+  /* Lines drawn at any aspect ratio are revealed from the left; the arc —
+     one list, two questions — connects the two flags last. */
+  .lf[data-motion] :is(.lf-arc, .lf-curve-line, .lf-spark-line) {
+    animation: lf-wipe var(--duration-narrative) var(--ease-primary) both;
+  }
+
+  .lf[data-motion] .lf-arc {
+    animation-delay: 1000ms;
+  }
+
+  /* A pair or a group sharing a surname connects. */
+  .lf[data-motion] :is(.lf-pair-line, .lf-link) {
+    stroke-dasharray: 1;
+    animation: lf-connect var(--duration-narrative) var(--ease-primary) both;
+  }
+
+  .lf[data-motion] :is(.lf-node, .lf-dot-max) {
+    animation: lf-appear var(--duration-standard) var(--ease-primary) 650ms both;
+  }
+
+  /* The rooms fill seat by seat; the first pair connects once seated. */
+  .lf[data-motion] :is(.lf-seat, .lf-room-dot, .lf-room-half, .lf-room-note > span) {
+    animation: lf-appear var(--duration-fast) var(--ease-primary) both;
+    animation-delay: calc(var(--i, 0) * 6ms);
+  }
+
+  .lf[data-motion] .lf-room-dot {
+    animation-delay: calc(var(--i, 0) * 12ms);
+  }
+
+  .lf[data-motion] .lf-pair-line {
+    animation-delay: calc(var(--b, 0) * 6ms + 150ms);
+  }
+
+  /* The crowd appears ring by ring from the centre; the groups then connect. */
+  .lf[data-motion] .lf-person {
+    animation: lf-appear var(--duration-standard) var(--ease-primary) both;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+
+  .lf[data-motion] .lf-link {
+    animation-delay: 650ms;
+  }
+
+  /* The queue files in from the left; its last person arrives last. */
+  .lf[data-motion] .lf-queue-dots {
+    animation: lf-wipe var(--duration-narrative) var(--ease-primary) both;
+  }
+
+  .lf[data-motion] .lf-queue-last {
+    animation: lf-appear var(--duration-fast) var(--ease-primary) 600ms both;
+  }
+
+  /* Last, so they win over every shorthand above: wait on the first frame
+     until seen, and never run again once done. */
+  .lf[data-motion] .lf-rv:not([data-seen]) * {
+    animation-play-state: paused;
+  }
+
+  .lf[data-motion] .lf-rv[data-done] * {
+    animation: none;
+  }
+}
+
+@keyframes lf-draw-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes lf-draw-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes lf-appear {
+  from {
+    opacity: 0;
+  }
+}
+
+/* From the axis's start: `--x` of the plot's width (a query container). */
+@keyframes lf-travel {
+  from {
+    translate: calc(var(--x) * -100cqw) 0;
+  }
+}
+
+@keyframes lf-connect {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes lf-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+/* Windows High Contrast / forced colours: marks drawn with system colours, so
+   the dots, curves and seats do not vanish into Canvas. */
+@media (forced-colors: active) {
+  .lf :is(.lf-dot, .lf-node, .lf-key-max, .lf-key-seat, .lf-key-person, .lf-key-line) {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .lf :is(.lf-dot-surname, .lf-dot-person, .lf-node-half, .lf-key-typical) {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  .lf .lf-key-half {
+    forced-color-adjust: none;
+    border-color: Highlight;
+  }
+
+  .lf :is(.lf-node-bday, .lf-node-now) {
+    background: Canvas;
+    border-color: CanvasText;
+  }
+
+  .lf .lf-label::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  .lf :is(.lf-key-pair, .lf-key-shared) {
+    forced-color-adjust: none;
+    background:
+      radial-gradient(circle at 3.5px 50%, Highlight 3.5px, transparent 4px),
+      radial-gradient(circle at calc(100% - 3.5px) 50%, Highlight 3.5px, transparent 4px),
+      linear-gradient(Highlight, Highlight) center / 100% 2px no-repeat;
+  }
+
+  .lf :is(.lf-omitted, .lf-key-omitted) {
+    forced-color-adjust: none;
+    background: repeating-linear-gradient(135deg, CanvasText 0 1px, Canvas 1px 4px);
+  }
+
+  .lf svg :is(line, path, rect) {
+    stroke: CanvasText;
+  }
+
+  .lf
+    svg
+    :is(
+      .lf-stem-top,
+      .lf-stem-bottom,
+      .lf-drop,
+      .lf-pair-line,
+      .lf-link,
+      .lf-strip-half,
+      .lf-queue-last,
+      .lf-room-half
+    ) {
+    stroke: Highlight;
+  }
+
+  .lf svg .lf-person-shared {
+    stroke: Highlight;
+  }
+
+  .lf svg .lf-seat {
+    fill: CanvasText;
+  }
+
+  .lf svg .lf-seat-pair {
+    fill: Highlight;
+  }
+
+  .lf svg .lf-room-dot {
+    fill: Canvas;
+    stroke: CanvasText;
+  }
+
+  .lf svg .lf-room-dot-this {
+    fill: CanvasText;
+  }
+}

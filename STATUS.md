@@ -2,21 +2,21 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by the CI trigger change: a push runs CI on `main` only, and every other branch is verified through its pull request (`docs/progress/2026-09-30-ci-push-main-only.md`). Before it, #28 recorded that #27 is merged. #27 carried the family surnames draft, documentation only (`docs/progress/2026-09-30-family-surnames-draft.md`). Before it, TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
+**Last rewritten:** 2026-09-30, by the CI trigger change: a push runs CI on `main` only, and every other branch is verified through its pull request (`docs/progress/2026-09-30-ci-push-main-only.md`). Before it, the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted. Before that, TASK-040 itself (`docs/progress/2026-09-30-landing-atlas-list-facts.md`), the family surnames draft, and TASK-039, the TERYT localities import.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `0eb4814` (Merge #11), deployment `dpl_H55YeqWUjCg34F4F3wcufMym6sM6`, created by hand with target production. The previous one, `dpl_33fKu5ryMHRuNfvnMNMgiF262uLG` (`4d605e5`), is the rollback candidate |
+| Deployed commit | `main` @ `12fb474` (Merge #32, TASK-040), deployment `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`, created through the Vercel API with target production on 2026-09-30. The one it replaced, `dpl_B2D15z8i9FYbL6gqoUU2nEy9e2MC` (`main` @ `ea03941`, Merge #24), is the rollback candidate |
 | Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
 | Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
 
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–040, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -25,22 +25,35 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - `pnpm coverage:report`;
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
-  - the landing page and the surname page redesigned for readers new to statistics (#11).
+  - the landing page and the surname page redesigned for readers new to statistics (#11);
+  - the landing atlas, plates I–III (TASK-040): the typical surname and the typical person's surname, how many people before two share a surname, and how many surnames a crowd of 1 000 carries, per list and never summed.
 - On `main`, CI was green on `9ed24d7` (run #235, Merge #19).
 
 ## Next
 
+- **The landing atlas, plates IV–XI**: each needs a decision first, listed as U-1 to U-4 in TASK-040 §6. They are a display floor for small counts, a rule for surnames that are also nationality or sensitive words, a method and wording for per-voivodeship leaders, and a lookup that goes through the resolver.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-035**, the real register in production: **parked**. The derived register is about 16 GB, the free Supabase plan stops at 500 MB, and the project owner will not move to a paid plan. On the free plan only population fits, for a national top-N slice. Rank, rarity and the map each need their complete universe. The task's §0 lists what would unpark it; its record has the measurements.
 
 ## Open pull requests and branches
 
-Two (checked 2026-09-30): #31 from `claude/funny-bardeen-f4jbay`, which carries the CI trigger change and this rewrite, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. The last STATUS correction was merged in #28, the family surnames draft in #27, TASK-039 in #26, TASK-038 in #25.
+Four (checked 2026-09-30 at 15:35 UTC):
+
+- #35 from `claude/trusting-ride-sfsclw`: TASK-042 and ADR-0017, production's database on a free Oracle Cloud VM.
+- #34 from `claude/oracle-postgres-hosting`: ADR-0016 and TASK-041, production's database on Oracle Cloud.
+- #31 from `claude/funny-bardeen-f4jbay`: the CI trigger change and this rewrite.
+- #30 from `claude/funny-allen-vrp074`: a code-review clean-up.
+
+GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none of them has a CI result (see "Blocked on the project owner"). Merged so far:
+
+- The TASK-040 go-live record in #33, and TASK-040 in #32. Both were merged without a CI result, at the project owner's instruction.
+- #28, a STATUS rewrite.
+- The family surnames draft in #27, TASK-039 in #26 and TASK-038 in #25.
 
 ## Blocked on the project owner
 
-- **GitHub Actions runs no jobs.** Since 05:53 UTC on 2026-09-30 no job has been given a runner, on any branch, `main` included. Each one fails within seconds and leaves no log. This repository used about 1,780 billable minutes from 2026-09-18 to 2026-09-30. That is below GitHub Free's 2,000 for private repositories, so the cause is not confirmed. It may be other private repositories on the account, or a spending-limit or payment block. The failed run's page and the account's billing settings show the reason. Until it is fixed, no pull request can pass CI. #28 was merged red at the project owner's instruction.
+- **GitHub Actions runs no jobs.** Since 05:53 UTC on 2026-09-30 no job has been given a runner, on any branch, `main` included. Each one fails within seconds and leaves no log. This repository used about 1,780 billable minutes from 2026-09-18 to 2026-09-30. That is below GitHub Free's 2,000 for private repositories, so the cause is not confirmed. It may be other private repositories on the account, or a spending-limit or payment block. The failed run's page and the account's billing settings show the reason. Until it is fixed, no pull request can pass CI. #28, #32 and #33 were merged red at the project owner's instruction.
 - **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
