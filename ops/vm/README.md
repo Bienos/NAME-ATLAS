@@ -15,11 +15,12 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `build.sh` | Unpacks the pushed commit, runs `pnpm install` on the VM, starts the `name-atlas-register-build` unit (`scripts/local-setup.sh`) and returns. |
 | `status.sh` | The build's state and log (`built: yes` only once it completed), the database's counts, the services, waiting security upgrades, memory and disk. Read-only. |
 | `finalize.sh` | The gate (it names the surnames the import flagged as mixed-script, which get no figures by design, and checks every other one), durability back on, grants, `VACUUM ANALYZE`, `pg_prewarm`, and a `pg_dump` to `/var/lib/name-atlas/backup/`. |
+| `extras.sh` | TASK-041, after `finalize`: downloads TERC and SIMC from GUS and checks them against `fixtures/teryt/source-manifest.json`, runs `seed:sources`, `import:teryt` and `import-onomastics` (Buryan 1933), derives each Buryan surname's meaning, runs its own gate, grants, `VACUUM ANALYZE`, and a second `pg_dump` beside `finalize`'s. Idempotent. |
 | `editions.sh` | Every earlier PESEL edition (2019, 2020–2025, the 2025 regional pair) as dated snapshots, through `scripts/import-editions.sh`, with a gate that proves the surnames and every claim count unchanged, then grants, `VACUUM ANALYZE` and a third dump (TASK-045). Takes the pushed commit's archive, like `build.sh`, and leaves the register build alone. |
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 
-`.github/workflows/register-vm.yml` runs one step over SSH. It starts on a push to `claude/eager-brown-s2u6qh` that changes `request`, or, once the workflow is on the default branch (`main`), by `workflow_dispatch`.
+`.github/workflows/register-vm.yml` runs one step over SSH. It starts by `workflow_dispatch` (the workflow is on the default branch, `main`), or on a push that changes `request` to a branch named in its `on.push` trigger: `claude/eager-brown-s2u6qh` and `claude/awesome-darwin-af7l50`.
 
 ## Setting it up: the project owner's part
 
@@ -57,8 +58,9 @@ Each step is one push that changes `request`, or one `workflow_dispatch`:
 3. `build`: starts the build and returns in minutes. The build takes hours on the VM (projected 5–7).
 4. `status`: repeat until it prints `built: yes`. The unit is enabled, so a reboot resumes it, and a failed step restarts after two minutes and resumes. Eight failures in 12 hours stop it; the log says why. `ActiveState=inactive` alone does not mean the build finished: if it prints `built: no` with the unit inactive, push `build` again.
 5. `finalize`: refuses unless the build succeeded and the gate passes.
-6. `editions`, any time after `finalize` (and after `extras`, if it ran): the fifteen earlier editions. Its output ends with "done: every edition is loaded; the pages read the current resources only". About 15 downloads and imports; expect it to take a while.
-7. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
+6. `extras` (TASK-041): refuses unless `finalize` has run. It adds 106,227 TERYT source records, so a later `finalize` fails its "source records = 4" check; that is expected, and the rest of its gate still applies.
+7. `editions`, any time after `finalize` (and after `extras`, if it ran): the fifteen earlier editions. Its output ends with "done: every edition is loaded; the pages read the current resources only". About 15 downloads and imports; expect it to take a while.
+8. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
 
 ## Going back
 
@@ -70,4 +72,4 @@ Vercel keeps the previous production deployment with the old `DATABASE_URL` in i
 - **The account.** Oracle may suspend an account left idle for 30 days. Sign in to the console now and then.
 - **Firewall.** Never enable UFW on this image. Oracle's known issue: it can remove the rules the instance needs to reach its boot volume. `provision.sh` inserts its rule into iptables, limits one address to 200 connections, and saves both with `netfilter-persistent`.
 - **Updates.** Security updates for the OS, PostgreSQL and PgBouncer install themselves nightly (`unattended-upgrades`, including the PostgreSQL repository). PgBouncer restarts itself after a crash. `status` lists any upgrade still waiting.
-- **Backups.** `finalize.sh` leaves one `pg_dump` on the VM, and `editions.sh` a second, with the editions. Restoring it has not been tested, and there is no copy off the VM.
+- **Backups.** `finalize.sh` leaves one `pg_dump` on the VM, `extras.sh` a second one with TERYT and Buryan in it, and `editions.sh` a third, with the editions. Restoring any of them has not been tested, and there is no copy off the VM.
