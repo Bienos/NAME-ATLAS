@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Two (checked 2026-09-30): one from `claude/funny-bardeen-f4jbay`, which carries the CI trigger change and this rewrite, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. The last STATUS correction was merged in #28, the family surnames draft in #27, TASK-039 in #26, TASK-038 in #25.
+Two (checked 2026-09-30): #31 from `claude/funny-bardeen-f4jbay`, which carries the CI trigger change and this rewrite, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. The last STATUS correction was merged in #28, the family surnames draft in #27, TASK-039 in #26, TASK-038 in #25.
 
 ## Blocked on the project owner
 
@@ -50,7 +50,7 @@ Two (checked 2026-09-30): one from `claude/funny-bardeen-f4jbay`, which carries 
   - `claude/share-card-not-derived-wording` (#24)
   - `claude/jolly-faraday-uas99n` (#25)
   - `claude/teryt-localities-import` (#26)
-  - `claude/funny-bardeen-f4jbay` (#27, #28). It also carries the CI trigger change above, so delete it once that is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
+  - `claude/funny-bardeen-f4jbay` (#27, #28). It also carries #31, so delete it once #31 is merged. The session that merged #27 could not delete it: the git proxy dropped the connection on both attempts.
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
