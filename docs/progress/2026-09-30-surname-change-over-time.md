@@ -16,7 +16,7 @@ Scope authority: `tasks/051-surname-change-over-time.md`. Decision: `docs/adr/00
 
 ## Verified
 
-Run 2026-09-30 in this session, on the branch rebased onto `main` @ `107ff65`:
+Run 2026-09-30 in this session on the branch built on `main` @ `107ff65`, and run again, with the same results, after `main` moved to `3a43bc8` (#45, which took TASK-046–050, so this task was renumbered from 046 to 051) and was merged in:
 
 | Command | Result |
 |---|---|
