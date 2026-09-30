@@ -36,7 +36,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: #28 from `claude/funny-bardeen-f4jbay`, which carries this rewrite (checked 2026-09-30). The family surnames draft was merged in #27, TASK-039 in #26, TASK-038 in #25.
+Checked 2026-09-30: #29, TASK-040, is open. ADR-0016 and TASK-041 are on `claude/oracle-postgres-hosting`, with no pull request yet. #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
 
 ## Blocked on the project owner
 
