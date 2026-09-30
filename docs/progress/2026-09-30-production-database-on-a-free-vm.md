@@ -94,6 +94,7 @@ The project owner asked for this branch's pull request with the numbers fixed ("
   - references in the ADR, the task, this record, ADR-0011, TASK-035, `ops/vm/README.md`, the comments of `ops/vm/*.sh`, `ops/vm/request` and the workflow, `docs/CODEMAP.md` and `STATUS.md` changed to match.
 - **Five lines kept as TASK-040 on purpose.** They are the first line of files the scripts write onto the VM: `provision.sh` lines 108, 136, 247 and 286, and `build.sh` line 69 ("Written by ops/vm/… (TASK-040)"). `provision.sh` compares each written file with `cmp` and restarts PostgreSQL or PgBouncer when one differs, so a new header would restart the production database on the next `provision`.
 - **Made untrue by `main`, and corrected.** TASK-042 §2, §4 and AC-7 and `ops/vm/README.md` step 6 named `0eb4814` (`dpl_H55YeqWUjCg34F4F3wcufMym6sM6`) as the deployment to redeploy at the cutover. Production served `12fb474` (`dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`) after the TASK-040 go-live, and since about 15:44 UTC serves `main` @ `03d1efb` (`dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu`), deployed from `main` after the owner set Vercel's production branch to `main` (#36; Vercel's production deployment list, read 2026-09-30). Redeploying `0eb4814` would remove the landing atlas. They now name the current production deployment, not a fixed one. TASK-042's status line no longer says the VM steps wait on the owner.
+- **`main` merged again** @ `82a9d6c` (Merge #36), after the PR was opened. #36 records that Vercel's production branch and GitHub's default branch are both `main`. So once this is on `main`, `Register VM` also runs by `workflow_dispatch`, and merging it deploys production from `main` with no change to the app. `STATUS.md` conflicted; its lines from #36 were kept, and its "Hosting ADR" item stays replaced by "The database VM". #34 was closed without merging at 15:50 UTC.
 - **Not changed:** the workflow's trigger. It still runs on a push to `claude/eager-brown-s2u6qh` that changes `ops/vm/request`, so pushing this branch or merging it starts no run.
 
 | Command, on the merged tree | Result |
@@ -104,6 +105,7 @@ The project owner asked for this branch's pull request with the numbers fixed ("
 | `shellcheck ops/vm/*.sh` (0.11.0) | exit 0, no findings |
 | `actionlint .github/workflows/register-vm.yml` (1.7.7) | exit 0 |
 | `git diff origin/claude/eager-brown-s2u6qh -- ops/vm/*.sh ops/vm/request .github/workflows/register-vm.yml` | seven changed lines, all comments: the task and ADR numbers |
+| after merging `main` @ `82a9d6c`: `pnpm check:ids`, `pnpm format:check` | exit 0, exit 0 |
 
 ## Not verified
 

@@ -18,7 +18,7 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 
-`.github/workflows/register-vm.yml` runs one step over SSH. It starts on a push to TASK-042's branch that changes `request`, or, once the workflow is on the default branch, by `workflow_dispatch`.
+`.github/workflows/register-vm.yml` runs one step over SSH. It starts on a push to `claude/eager-brown-s2u6qh` that changes `request`, or, once the workflow is on the default branch (`main`), by `workflow_dispatch`.
 
 ## Setting it up: the project owner's part
 

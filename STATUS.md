@@ -2,16 +2,16 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-042 (in progress), merged with `main` and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
+**Last rewritten:** 2026-09-30, by TASK-042 (in progress), merged with `main` and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `12fb474` (Merge #32, TASK-040), deployment `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`, created through the Vercel API with target production on 2026-09-30. The one it replaced, `dpl_B2D15z8i9FYbL6gqoUU2nEy9e2MC` (`main` @ `ea03941`, Merge #24), is the rollback candidate |
+| Deployed commit | `main` @ `03d1efb` (Merge #33, documentation only; the app code is that of `12fb474`, Merge #32, TASK-040), deployment `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu`, a redeploy from the Vercel dashboard by the project owner on 2026-09-30, right after the production branch was set to `main`. The one it replaced, `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm` (`main` @ `12fb474`), is the rollback candidate |
 | Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
-| Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
+| Deploys | From `main`. The project owner set Vercel's production branch (Settings → Environments → Production → Branch Tracking) from the stale `claude/exciting-noether-05np1s` to `main` on 2026-09-30. No merge to `main` has happened since, so the first automatic production deployment is not yet observed |
 
 ## Built
 
@@ -38,19 +38,17 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Four (checked 2026-09-30, 15:55 UTC):
+Three (checked 2026-09-30, 16:00 UTC):
 
-- #35 from `claude/trusting-ride-sfsclw`: TASK-042 and this rewrite. It carries every commit of `claude/eager-brown-s2u6qh`. Keep that branch: `Register VM` runs on a push to it that changes `ops/vm/request`.
-- #36 from `claude/intelligent-wozniak-33ilmb`: the record that Vercel's production branch is `main`.
+- #35 from `claude/trusting-ride-sfsclw`: TASK-042 and this rewrite. It carries every commit of `claude/eager-brown-s2u6qh`. Keep that branch until this is merged: `Register VM` runs on a push to it that changes `ops/vm/request`. Once the workflow is on `main`, GitHub's default branch, it also runs by `workflow_dispatch`, and merging this deploys production from `main` with no change to the app.
 - #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up.
 
 #34, a second design for the same database under ADR-0016 and TASK-041, was closed without merging at 15:50 UTC. Two branches without a pull request now use TASK-041: `claude/keen-cannon-1jc301` (with ADR-0016: the search answers for every surname from figures built at deploy time) and `claude/awesome-darwin-af7l50` (TERYT and Buryan 1933 on the VM, built on TASK-042's branch).
 
-GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. `Register VM` run 36675514844, the `status` request created at 05:53, failed at 08:52 after 2 s with no runner assigned. TASK-040 was merged in #32 without a CI result, at the project owner's instruction, and its go-live record in #33; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
+GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. `Register VM` run 36675514844, the `status` request created at 05:53, failed at 08:52 after 2 s with no runner assigned. TASK-040 was merged in #32 without a CI result, at the project owner's instruction, and its go-live record in #33; #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25; #36, the record that Vercel's production branch is `main`, is merged.
 
 ## Blocked on the project owner
 
-- **Default branch.** Set GitHub's default branch to `main`, and Vercel's production branch to `main`. Until then new sessions start far behind: 119 commits on 2026-09-29 (`AGENTS.md` §11).
 - **Branches to delete.** These are merged into `main`:
   - `claude/task-031-polona-spike` (#16). The session that merged it could not delete it: its git proxy answered HTTP 403.
   - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
@@ -86,7 +84,7 @@ GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a C
   - `claude/serene-gauss-6inrf3`: the stale default branch's own commit.
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
-  Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
+  `claude/exciting-noether-05np1s` can now be deleted too: GitHub's default branch is `main` (checked through the GitHub API on 2026-09-30) and Vercel's production branch no longer names it.
 - **The database VM** (TASK-042 §3). Done: the Oracle Cloud account with Frankfurt as its home region, the A1 VM at 2 OCPUs and 12 GB, TCP 6432 open on its subnet, and the GitHub secrets `VM_HOST`, `VM_SSH_KEY` and `VM_DB_WEB_PASSWORD`. Left: GitHub Actions starting jobs again (why it stopped is not established), and after `finalize`, Vercel's production `DATABASE_URL` (`ops/vm/README.md` step 5).
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
