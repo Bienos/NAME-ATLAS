@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-29, by TASK-037: the share card now says a listed surname's figures are not prepared yet, instead of that the dataset publishes no count (`docs/progress/2026-09-29-share-card-not-derived-wording.md`).
+**Last rewritten:** 2026-09-30, by TASK-038: 96 researched sources can be registered in `sources` with a default rights profile each (`pnpm seed:sources`). Nothing is ingested from them (`docs/progress/2026-09-30-source-catalogue-registry.md`).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–038, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -35,7 +35,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-None besides the one from `claude/share-card-not-derived-wording`, which carries TASK-037 and this rewrite (checked 2026-09-29).
+One: #25 from `claude/jolly-faraday-uas99n`, which carries TASK-038 and this rewrite (checked 2026-09-30). TASK-037 was merged in #24.
 
 ## Blocked on the project owner
 
@@ -45,7 +45,7 @@ None besides the one from `claude/share-card-not-derived-wording`, which carries
   - `claude/procent-continuation-7c2e00` (#14, #17, #18, #19 and #20)
   - `claude/verify-task-023-025` (#21)
   - `claude/task-023-rules-amended` (#22)
-  - `claude/share-card-not-derived-wording`, once its pull request is merged
+  - `claude/share-card-not-derived-wording` (#24)
   - `claude/awesome-archimedes-t6hb55`
   - `claude/ecstatic-volta-khgeln`
   - `claude/elegant-archimedes-w5ony1`
