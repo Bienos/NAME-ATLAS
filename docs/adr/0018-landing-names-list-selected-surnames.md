@@ -1,6 +1,6 @@
 # ADR-0018 — the landing atlas may name surnames that a list-scope rule selects, and may compare the two lists' sets of surnames
 
-- **Status:** Proposed. It is accepted when the project owner merges TASK-043's pull request.
+- **Status:** Accepted (2026-09-30). The project owner's instruction was "go wtih 2 push live", confirmed with "Yes, keep building it"; TASK-043's pull request, #37, was merged on it and deployed to production.
 - **Date:** 2026-09-30
 - **Deciders:** the project owner chose the six-plate atlas mock-up for the landing page ("go wtih 2 push live", 2026-09-30). Its plates name surnames and count the surnames on both lists. This ADR is what TASK-043 proposes to allow that.
 - **Relates to:** ADR-0015 (list-scope statistics as a committed artefact), TASK-040 §4.2 and §6 U-1/U-2

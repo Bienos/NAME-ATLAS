@@ -2,16 +2,16 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-043: the landing atlas becomes six plates about the two published lists, and ADR-0018 (Proposed) lets it name surnames that a fixed rule selects (`docs/progress/2026-09-30-landing-atlas-six-plates.md`). Before it, TASK-042 (in progress), merged in #35 and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
+**Last rewritten:** 2026-09-30, by the TASK-043 go-live: #37 is merged and `main` @ `b156bd8` is deployed to production, so the landing page shows the atlas's six plates (`docs/progress/2026-09-30-landing-atlas-six-plates-go-live.md`). ADR-0018 is accepted. Before it, TASK-043 itself (`docs/progress/2026-09-30-landing-atlas-six-plates.md`). Before it, TASK-042 (in progress), merged in #35 and renumbered: on `claude/eager-brown-s2u6qh` it was TASK-040 with ADR-0015, numbers #32 had since taken. ADR-0017 moves production's database to a free Oracle Cloud VM. The register build there reached step 7 of 7; `finalize` and the cutover have not run (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`). Before it, the project owner set Vercel's production branch to `main` and redeployed production from `main` @ `03d1efb` (`docs/progress/2026-09-30-vercel-production-branch-main.md`), and the TASK-040 go-live: #32 is merged and `main` @ `12fb474` is deployed to production, so the landing page shows the atlas's plates I–III (`docs/progress/2026-09-30-landing-atlas-go-live.md`). ADR-0015 is accepted.
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed commit | `main` @ `1e9fa81` (Merge #35, TASK-042: documentation, `ops/vm` scripts and a workflow; the app code is that of `12fb474`, Merge #32, TASK-040), deployment `dpl_HAvMMx6BbErUEY9xbQZwXwkhQVua`, `READY`, target production, built automatically from the push to `main` (Vercel `list_deployments`, checked 17:30 UTC on 2026-09-30). Before it, `dpl_CzqB46mCDbm615CrnZFo3KnYE99G` (`main` @ `82a9d6c`, Merge #36) |
+| Deployed commit | `main` @ `b156bd8` (Merge #37, TASK-043), deployment `dpl_FqLffcZJxPXho3wXQjPRoUM9EWjF`, `READY`, target production, built automatically from the push to `main` on 2026-09-30. The one it replaced, `dpl_HAvMMx6BbErUEY9xbQZwXwkhQVua` (`main` @ `1e9fa81`, Merge #35; the app code of `12fb474`, TASK-040), is the rollback candidate |
 | Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
-| Deploys | From `main`, automatically. The project owner set Vercel's production branch (Settings → Environments → Production → Branch Tracking) from the stale `claude/exciting-noether-05np1s` to `main` on 2026-09-30. The merges of #36 and #35 each built a production deployment on their own |
+| Deploys | From `main`, automatically. The project owner set Vercel's production branch (Settings → Environments → Production → Branch Tracking) from the stale `claude/exciting-noether-05np1s` to `main` on 2026-09-30. The merges of #36, #35 and #37 each built a production deployment on their own |
 
 ## Built
 
@@ -38,12 +38,12 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-Checked 2026-09-30, 17:30 UTC:
+Checked 2026-09-30, 17:40 UTC:
 
-- TASK-043's pull request from `claude/keen-cannon-1jc301`.
+- This go-live record, from `claude/keen-cannon-1jc301`.
 - #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change, and #30 from `claude/funny-allen-vrp074`, a code-review clean-up.
 
-#35 (TASK-042) is merged.
+#35 (TASK-042) and #37 (TASK-043) are merged.
 
 #34, a second design for the same database under ADR-0016 and TASK-041, was closed without merging at 15:50 UTC. On `claude/keen-cannon-1jc301`, TASK-041 and ADR-0016 (the search answering for every surname from figures built at deploy time) were stopped by the project owner ("stop search i working on adding orcale data base") and reverted there, unmerged. `claude/awesome-darwin-af7l50` (TERYT and Buryan 1933 on the VM, built on TASK-042's branch) still uses TASK-041, with no pull request.
 
