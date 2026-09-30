@@ -77,7 +77,7 @@ For a sufficiently covered surname, free includes:
 
 If an expected element is unsupported, the free result compresses and says so. It does not manufacture a replacement.
 
-The landing page may also show statistics about each whole published list: how many surnames and people are on it, how bearer counts are spread, and model figures such as how many people it takes before two share a surname. The male and female lists are always shown side by side and never summed. No named surname appears, and every figure carries its source and snapshot date (TASK-040, ADR-0015).
+The landing page may also show a few statistics about each whole published list, with the full detail on an atlas page it links to: how many surnames and people are on it, how bearer counts are spread, and model figures such as how many people it takes before two share a surname. The male and female lists are always shown side by side and never summed. No named surname appears, and every figure carries its source and snapshot date (TASK-040, TASK-041, ADR-0015).
 
 ## 6. Premium scope
 
