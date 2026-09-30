@@ -2032,6 +2032,41 @@ main.profile .search {
   white-space: nowrap;
 }
 
+/* The change table (TASK-046) wears the voivodeship table's bars. Its value
+   reads "1 in 1,167", which needs more room than a percentage, and its rows for
+   an edition without the surname, or a publisher's duplicate, are plain words. */
+/* Each list takes the chapter's full width until two of them fit at a readable one:
+   an edition's date would otherwise wrap over three lines. */
+.lists-change {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+}
+
+.change-table tbody th {
+  white-space: nowrap;
+}
+
+.change-table .rb-track {
+  width: calc(100% - 6.5rem);
+  min-width: 2.5rem;
+}
+
+.change-table .rb-value {
+  width: 6.5rem;
+}
+
+.change-table .change-absent td,
+.change-table .change-gap td {
+  padding-right: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  white-space: normal;
+}
+
+.change-table sup {
+  margin-left: 2px;
+  color: var(--text-secondary);
+}
+
 /* Sources at the foot, and the page's two actions. */
 .result section.sources-section {
   display: grid;

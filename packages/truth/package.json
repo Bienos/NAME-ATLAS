@@ -15,6 +15,7 @@
     "demo:surname-distribution": "tsx bin/surname-distribution.ts",
     "demo:surname-meaning": "tsx bin/surname-meaning.ts",
     "derive-batch": "tsx bin/derive-batch.ts",
+    "derive-shift": "tsx bin/derive-shift-batch.ts",
     "coverage-report": "tsx bin/coverage-report.ts",
     "build-list-facts": "tsx bin/build-list-facts.ts"
   },

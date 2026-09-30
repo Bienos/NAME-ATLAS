@@ -24,7 +24,12 @@
  * Nothing here computes a fact. Every number it formats arrives already derived,
  * already validated against the contract, and already carrying its own scope.
  */
-import type { DistributionEntry, PopulationObservation, RarityEntry } from "@name-atlas/contracts";
+import type {
+  ChangeEntry,
+  DistributionEntry,
+  PopulationObservation,
+  RarityEntry,
+} from "@name-atlas/contracts";
 
 export type Lang = "pl" | "en";
 
@@ -310,6 +315,75 @@ export function rankSentence(entry: RarityEntry, surname: string, lang: Lang): s
 }
 
 /**
+ * A change in per cent as the claim stores it (already one decimal, already
+ * rounded): with its sign, a true minus and one decimal, `+6,0%` / `−6.7%` /
+ * `0,0%`. Display only; it formats a figure the claim carries and takes none.
+ */
+export function formatPercentChange(percent: number, lang: Lang): string {
+  const fixed = Math.abs(percent).toFixed(1);
+  const number = lang === "pl" ? fixed.replace(".", ",") : fixed;
+  if (Number(fixed) === 0) return `${number}%`;
+  return `${percent > 0 ? "+" : "−"}${number}%`;
+}
+
+/** Which list a change entry is of, in the words the count's own label uses. */
+export function changeListLabel(list: ChangeEntry["list"], lang: Lang): string {
+  return list === "MALE"
+    ? lang === "pl"
+      ? "mężczyźni"
+      : "male"
+    : lang === "pl"
+      ? "kobiety"
+      : "female";
+}
+
+/**
+ * The accepted change sentence (TASK-046, ADR-0020): what changed, between which
+ * two editions, and what the whole list did over the same editions. Never why,
+ * and never a word of popularity, decline or fashion — a number went from one
+ * value to another, and the list it is counted in moved too.
+ */
+export function changeSentence(entry: ChangeEntry, surname: string, lang: Lang): string {
+  const { first, last, count_change_percent, list_change_percent } = entry.summary;
+  const sex = parenthetical(changeListLabel(entry.list, lang));
+  const from = formatDate(first.data_date, lang);
+  const to = formatDate(last.data_date, lang);
+  const list = formatPercentChange(list_change_percent, lang);
+  if (first.count === last.count) {
+    const count = formatInteger(first.count, lang);
+    return `${terminate(
+      lang === "pl"
+        ? `Liczba osób o nazwisku ${surname}${sex} w rejestrze PESEL była taka sama (${count}) na dzień ${from} i na dzień ${to}`
+        : `The number of people with the surname ${surname}${sex} in the PESEL register was the same (${count}) on ${from} and on ${to}`,
+    )} ${terminate(
+      lang === "pl"
+        ? `Cała lista zmieniła się między tymi edycjami o ${list}`
+        : `The whole list changed by ${list} between those editions`,
+    )}`;
+  }
+  const a = formatInteger(first.count, lang);
+  const b = formatInteger(last.count, lang);
+  const change = formatPercentChange(count_change_percent, lang);
+  return `${terminate(
+    lang === "pl"
+      ? `Liczba osób o nazwisku ${surname}${sex} w rejestrze PESEL zmieniła się z ${a} na dzień ${from} na ${b} na dzień ${to}: ${change}`
+      : `The number of people with the surname ${surname}${sex} in the PESEL register changed from ${a} on ${from} to ${b} on ${to}: ${change}`,
+  )} ${terminate(
+    lang === "pl"
+      ? `Cała lista zmieniła się między tymi edycjami o ${list}`
+      : `The whole list changed by ${list} between those editions`,
+  )}`;
+}
+
+/** Why an edition the publisher lists is not one of the table's rows. */
+export function changeGapNote(date: string, lang: Lang): string {
+  const when = formatDate(date, lang);
+  return lang === "pl"
+    ? `Plik wydawcy z dnia ${when} powtarza dane poprzedniej edycji, więc nie jest pokazany jako osobna edycja.`
+    : `The publisher's file dated ${when} repeats the data of the previous edition, so it is not shown as an edition of its own.`;
+}
+
+/**
  * The warning a below-threshold distribution carries, returned separately so the
  * page cannot render it after a figure. Null when coverage is adequate.
  */
@@ -573,6 +647,10 @@ export const UI = {
     chapterWhereLede:
       "Mapa i lista pokazują, w których województwach osoby o tym nazwisku mają zameldowanie " +
       "na pobyt stały. Im ciemniejszy kolor i dłuższy pasek, tym większy udział.",
+    chapterChangeTitle: "Jak zmieniała się ta liczba w kolejnych edycjach listy?",
+    chapterChangeLede:
+      "Rejestr PESEL publikuje swoje listy co roku. Pokazujemy liczbę osób o tym nazwisku na " +
+      "każdej edycji, obok tego, jak zmieniła się cała lista. Mówimy, co się zmieniło — nie dlaczego.",
     chapterMeaningTitle: "Co oznacza to nazwisko?",
     chapterMeaningLede:
       "Znaczenie podajemy tylko wtedy, gdy stoi za nim opracowanie naukowe. Nie zgadujemy.",
@@ -581,6 +659,7 @@ export const UI = {
     navRarity: "Rzadkość",
     navWhere: "Województwa",
     navMeaning: "Znaczenie",
+    navChange: "Zmiany w czasie",
     navSources: "Źródła",
     rankCaption: "miejsce na liście nazwisk",
     scaleLabel: "Skala rzadkości",
@@ -622,6 +701,18 @@ export const UI = {
     regionColumn: "Województwo",
     countColumn: "Liczba",
     shareColumn: "Udział",
+    changeTableLabel: "Liczba osób na kolejnych edycjach listy",
+    changeEditionColumn: "Stan na dzień",
+    changeShareColumn: "Udział w liście",
+    changeCountColumn: "Liczba osób",
+    changeNotOnList: "brak na liście — nie oznacza zera",
+    changeNoteMark: "zob. uwaga pod tabelą",
+    changeListNote:
+      "Rozmiar samej listy zmienia się między edycjami, dlatego obok liczby osób pokazujemy udział " +
+      "w liście danej edycji („1 na X”).",
+    change2019Note:
+      "Pliki z 2019 roku opisują swoją zawartość krótszym opisem niż późniejsze. Czytamy je jako " +
+      "tę samą listę: osoby z nazwiskiem aktualnym.",
     coveredNote:
       "Udziały liczone są względem osób z zameldowaniem, nie względem wszystkich nosicieli.",
     snapshotLabel: "Stan na",
@@ -950,6 +1041,10 @@ export const UI = {
       "The map and the list show the voivodeships where people with this surname have a " +
       "registered permanent address. The darker the colour and the longer the bar, the bigger " +
       "the share.",
+    chapterChangeTitle: "How did this count change between editions of the list?",
+    chapterChangeLede:
+      "The PESEL register publishes its lists every year. We show the number of people with this " +
+      "surname on each edition, beside how the whole list changed. We say what changed, not why.",
     chapterMeaningTitle: "What does this surname mean?",
     chapterMeaningLede: "We give a meaning only when a scholarly work supports it. We don't guess.",
     navLabel: "On this page",
@@ -957,6 +1052,7 @@ export const UI = {
     navRarity: "Rarity",
     navWhere: "Voivodeships",
     navMeaning: "Meaning",
+    navChange: "Change over time",
     navSources: "Sources",
     rankCaption: "rank on the surname list",
     scaleLabel: "Rarity scale",
@@ -997,6 +1093,18 @@ export const UI = {
     regionColumn: "Voivodeship",
     countColumn: "Count",
     shareColumn: "Share",
+    changeTableLabel: "The number of people on successive editions of the list",
+    changeEditionColumn: "As of",
+    changeShareColumn: "Share of the list",
+    changeCountColumn: "People",
+    changeNotOnList: "not on the list — not zero",
+    changeNoteMark: "see the note under the table",
+    changeListNote:
+      "The size of the list itself changes between editions, so beside the count we show the " +
+      "share of that edition's list (“1 in X”).",
+    change2019Note:
+      "The 2019 files describe their contents in fewer words than the later ones. We read them as " +
+      "the same list: people with their current surname.",
     coveredNote:
       "Shares are of the people with a registered voivodeship, not of every bearer of the surname.",
     snapshotLabel: "As of",

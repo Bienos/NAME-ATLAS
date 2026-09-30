@@ -22,6 +22,7 @@ import {
   PESEL_REGIONAL_MALE_2025,
   PESEL_REGIONAL_FEMALE_2025,
   findPeselEdition,
+  PESEL_TREND_EDITIONS,
   isPeselEdition,
   nationalCounterpartOf,
 } from "./registry.js";
@@ -616,5 +617,79 @@ describe("the editions (TASK-045)", () => {
     expect(new Set(all.map((r) => localFileName(r))).size).toBe(all.length);
     expect(localFileName(PESEL_NATIONAL_MALE_2019)).toBe("national-male-2019-06-30.csv");
     expect(localFileName(PESEL_REGIONAL_FEMALE_2025)).toBe("regional-female-2025-02-24.csv");
+  });
+});
+
+describe("the editions a trend reads (TASK-046, ADR-0020)", () => {
+  const PEOPLE = {
+    national_male: [
+      ["18990", 19_859_783],
+      ["22817", 19_879_045],
+      ["28052", 19_987_207],
+      ["36401", 20_203_548],
+      ["44647", 20_808_071],
+      ["54097", 20_976_785],
+      ["63892", 21_096_170],
+      ["1148808", 21_197_537],
+    ],
+    national_female: [
+      ["18989", 20_249_319],
+      ["22815", 20_220_345],
+      ["35279", 20_263_212],
+      ["44646", 21_369_477],
+      ["54098", 21_479_386],
+      ["63888", 21_535_515],
+      ["1148811", 21_560_302],
+    ],
+  } as const;
+
+  it.each(["national_male", "national_female"] as const)(
+    "holds the %s editions in date order, 2019 first and 2026 last, with each published total",
+    (partition) => {
+      const editions = PESEL_TREND_EDITIONS[partition];
+      expect(editions.map((r) => [r.resource_id, r.official_people_sum])).toEqual(
+        PEOPLE[partition].map(([id, sum]) => [id, sum]),
+      );
+      const dates = editions.map((r) => r.data_date);
+      expect([...dates].sort()).toEqual(dates);
+      expect(new Set(dates).size).toBe(dates.length);
+      expect(dates[0]).toBe("2019-06-30");
+      expect(dates.at(-1)).toBe("2026-01-20");
+      for (const edition of editions) expect(edition.role).toBe(partition);
+    },
+  );
+
+  it("has no women's 2022 edition: its resource is refused as a publisher duplicate", () => {
+    expect(PESEL_TREND_EDITIONS.national_female.map((r) => r.data_date)).not.toContain(
+      "2022-01-27",
+    );
+    expect(PESEL_TREND_EDITIONS.national_male.map((r) => r.data_date)).toContain("2022-01-27");
+    expect(PESEL_REFUSED_RESOURCES.map((r) => [r.resource_id, r.role, r.data_date])).toEqual([
+      ["38772", "national_female", "2022-01-27"],
+    ]);
+  });
+
+  it("flags the 2019 pair, and only it, as a universe the owner ruled the same", () => {
+    const flagged = [...PESEL_TREND_EDITIONS.national_male, ...PESEL_TREND_EDITIONS.national_female]
+      .filter((r) => r.universe_note_code !== undefined)
+      .map((r) => [r.resource_id, r.data_date, r.universe_note_code]);
+    expect(flagged).toEqual([
+      ["18990", "2019-06-30", "UNIVERSE_DESCRIPTION_DIFFERS"],
+      ["18989", "2019-06-30", "UNIVERSE_DESCRIPTION_DIFFERS"],
+    ]);
+    expect(PESEL_NATIONAL_MALE_2019.series).toBeNull();
+    expect(PESEL_NATIONAL_FEMALE_2019.series).toBeNull();
+  });
+
+  it("pins a total only for national resources, and never below the largest count it could hold", () => {
+    for (const edition of [...PESEL_EDITIONS, ...PESEL_NATIONAL_RESOURCES_2026]) {
+      if (edition.role.startsWith("regional")) {
+        expect(edition.official_people_sum).toBeUndefined();
+      } else {
+        expect(Number.isInteger(edition.official_people_sum)).toBe(true);
+        // every surname on the list has at least 2 people, so the total is at least 2 per row
+        expect(edition.official_people_sum).toBeGreaterThanOrEqual(2 * edition.official_row_count);
+      }
+    }
   });
 });

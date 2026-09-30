@@ -8,7 +8,7 @@
  *
  * Scope grew one fact at a time and still carries no field whose only purpose
  * is a later task (`AGENTS.md` §6). TASK-006 added `population`, TASK-014
- * `rarity`, TASK-012 `distribution` and TASK-016 `suggestions`; there is still no chapter framework, no
+ * `rarity`, TASK-012 `distribution`, TASK-016 `suggestions` and TASK-046 `change`; there is still no chapter framework, no
  * pagination and no placeholder for a fact that has no truth chain behind it.
  *
  * ── One recorded deviation ──────────────────────────────────────────────
@@ -24,7 +24,7 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.6";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.7";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -193,6 +193,159 @@ export const raritySectionSchema = z
     state: populationStateSchema,
     /** Empty unless `state` is `READY`. */
     entries: z.array(rarityEntrySchema),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine((s) => (s.state === "READY" ? s.entries.length > 0 : s.entries.length === 0), {
+    message: "entries are present exactly when state is READY",
+  });
+
+/**
+ * `SURNAME_DISTRIBUTION_SHIFT` — one surname's count on the editions of one
+ * list (TASK-046, ADR-0020).
+ *
+ * A point is one edition. A `KNOWN` point carries the count and the edition's
+ * own published total of people, so one in X is over that edition's total and
+ * a surname's count is never shown without the list that grew around it. A
+ * `NOT_ON_LIST` point has no count field at all and is `strict`, so a payload
+ * that puts `count: 0` on it fails validation: a surname a list does not name
+ * is below the publisher's floor of 2 or absent, never zero.
+ */
+export const changeListSchema = z.enum(["MALE", "FEMALE"]);
+
+const changeDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/u);
+
+/** `UNIVERSE_DESCRIPTION_DIFFERS`: the 2019 files describe their universe in fewer words (ADR-0020 §2.2). */
+export const changeNoteCodeSchema = z.enum(["UNIVERSE_DESCRIPTION_DIFFERS"]);
+
+export const changePointSchema = z.discriminatedUnion("status", [
+  z.object({
+    status: z.literal("KNOWN"),
+    data_date: changeDateSchema,
+    note_code: changeNoteCodeSchema.nullable(),
+    /** The edition's own resource, where the reader can fetch it. */
+    source_url: z.string().min(1).nullable(),
+    count: z.number().int().positive(),
+    /** The sum of every published count on that edition: what one in X is over. */
+    list_total: z.number().int().positive(),
+    one_in_x: z.number().int().positive(),
+    share: z.number().positive().max(1),
+  }),
+  z
+    .object({
+      status: z.literal("NOT_ON_LIST"),
+      data_date: changeDateSchema,
+      note_code: changeNoteCodeSchema.nullable(),
+      source_url: z.string().min(1).nullable(),
+    })
+    .strict(),
+]);
+
+/** A resource the publisher lists in the series that is not an edition (the women's 2022 file repeats 2021). */
+export const changeGapSchema = z.object({
+  data_date: changeDateSchema,
+  reason_code: z.literal("PUBLISHER_DUPLICATE"),
+});
+
+export const changeEndSchema = z.object({
+  data_date: changeDateSchema,
+  count: z.number().int().positive(),
+  list_total: z.number().int().positive(),
+});
+
+export const changeSummarySchema = z.object({
+  known_points: z.number().int().min(2),
+  first: changeEndSchema,
+  last: changeEndSchema,
+  /** Signed, per cent, one decimal, half away from zero. The count's change. */
+  count_change_percent: z.number(),
+  /** The same for the list's total of people: what the count changed beside. */
+  list_change_percent: z.number(),
+});
+
+export const changeEntrySchema = z
+  .object({
+    list: changeListSchema,
+    /** Ascending by date. At least two are `KNOWN`: one edition is a count, not a change. */
+    points: z.array(changePointSchema).min(2),
+    /** Only gaps between the first and the last known point. */
+    gaps: z.array(changeGapSchema),
+    summary: changeSummarySchema,
+    methodology_code: z.string().min(1),
+    scope_label_code: z.string().min(1),
+    country_code: z.string().min(2),
+    confidence: confidenceSchema,
+    citation: citationSchema,
+  })
+  .refine(
+    (e) => e.points.every((p, i) => i === 0 || p.data_date > (e.points[i - 1]?.data_date ?? "")),
+    {
+      message: "points must be in strictly ascending order of date",
+    },
+  )
+  .refine(
+    (e) => {
+      const known = e.points.filter((p) => p.status === "KNOWN");
+      const first = known[0];
+      const last = known.at(-1);
+      return (
+        first?.status === "KNOWN" &&
+        last?.status === "KNOWN" &&
+        e.summary.known_points === known.length &&
+        e.summary.first.data_date === first.data_date &&
+        e.summary.first.count === first.count &&
+        e.summary.first.list_total === first.list_total &&
+        e.summary.last.data_date === last.data_date &&
+        e.summary.last.count === last.count &&
+        e.summary.last.list_total === last.list_total
+      );
+    },
+    { message: "summary must describe the first and the last known point, and count them" },
+  )
+  .refine((e) => e.points.every((p) => p.status !== "KNOWN" || p.count <= p.list_total), {
+    message: "a count can never exceed its own list's total",
+  })
+  .refine(
+    (e) =>
+      e.points.every(
+        (p) =>
+          p.status !== "KNOWN" ||
+          (p.one_in_x === Math.floor(p.list_total / p.count + 0.5) &&
+            p.share === Number((p.count / p.list_total).toFixed(9))),
+      ),
+    { message: "one in X and the share must follow the point's own count and list total" },
+  )
+  .refine(
+    (e) => {
+      const { first, last, count_change_percent: c, list_change_percent: l } = e.summary;
+      // A change of exactly 0.0 per cent means the values differ by less than
+      // 0.05% of the start (half away from zero to one decimal): 2000·|Δ| < start.
+      const agrees = (percent: number, from: number, to: number): boolean =>
+        percent === 0 ? 2000 * Math.abs(to - from) < from : percent > 0 ? to > from : to < from;
+      return agrees(c, first.count, last.count) && agrees(l, first.list_total, last.list_total);
+    },
+    { message: "each change's sign must agree with its own first and last values" },
+  )
+  .refine(
+    (e) => {
+      const known = e.points.filter((p) => p.status === "KNOWN");
+      const from = known[0]?.data_date ?? "";
+      const to = known.at(-1)?.data_date ?? "";
+      return e.gaps.every((g) => g.data_date > from && g.data_date < to);
+    },
+    { message: "a gap is reported only between the first and the last known point" },
+  );
+
+/**
+ * The change-over-time chapter: one entry per list the surname is on at two
+ * or more stored editions (TASK-046). `UNAVAILABLE` says why — fewer than two
+ * editions, not derived yet — and is never an empty chart.
+ */
+export const changeSectionSchema = z
+  .object({
+    state: populationStateSchema,
+    /** Empty unless `state` is `READY`. */
+    entries: z.array(changeEntrySchema),
     reason_code: z.string().min(1).nullable(),
     surface: surfaceEligibilitySchema,
   })
@@ -508,6 +661,12 @@ export const surnameResultResponseSchema = z
      * the answer for every surname until a source is imported (ADR-0008 §3).
      */
     meaning: meaningSectionSchema.nullable(),
+    /**
+     * Added in 1.7 (TASK-046, ADR-0020). Present exactly when RESOLVED, like the
+     * other fact sections, and stating its own absence (`NOT_ENOUGH_EDITIONS`,
+     * `NOT_DERIVED_YET`) rather than being omitted.
+     */
+    change: changeSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -526,6 +685,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.meaning !== null : r.meaning === null), {
     message: "meaning section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.change !== null : r.change === null), {
+    message: "change section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -563,6 +725,11 @@ export type PopulationSection = z.infer<typeof populationSectionSchema>;
 export type RarityMetric = z.infer<typeof rarityMetricSchema>;
 export type RarityEntry = z.infer<typeof rarityEntrySchema>;
 export type RaritySection = z.infer<typeof raritySectionSchema>;
+export type ChangeList = z.infer<typeof changeListSchema>;
+export type ChangePoint = z.infer<typeof changePointSchema>;
+export type ChangeGap = z.infer<typeof changeGapSchema>;
+export type ChangeEntry = z.infer<typeof changeEntrySchema>;
+export type ChangeSection = z.infer<typeof changeSectionSchema>;
 export type PlaceStat = z.infer<typeof placeStatSchema>;
 export type DistributionCoverageState = z.infer<typeof distributionCoverageStateSchema>;
 export type DistributionEntry = z.infer<typeof distributionEntrySchema>;

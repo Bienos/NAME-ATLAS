@@ -17,6 +17,7 @@ export type { DeriveOptions } from "./derive.js";
 export {
   readCurrentDistribution,
   readCurrentPopulation,
+  readDistributionShift,
   readRarityContext,
   readSurnameMeaning,
 } from "./read.js";
@@ -25,6 +26,7 @@ export type {
   PersistedCurrentDistribution,
   PersistedCurrentPopulation,
   PersistedDistributionEntry,
+  PersistedDistributionShift,
   PersistedRarityContext,
 } from "./read.js";
 export { querySurnameResult } from "./query.js";
@@ -45,6 +47,37 @@ export {
   publishedUniverseSum,
 } from "./rarity.js";
 export type { DeriveRarityOptions, UniverseSumCache } from "./rarity.js";
+export {
+  buildShift,
+  deriveDistributionShift,
+  deriveDistributionShiftFor,
+  distributionShiftClaimKey,
+  distributionShiftClaimKeyPrefix,
+  loadEditionValues,
+  loadOfficialEditions,
+  percentChange,
+  registryShiftEditions,
+  SHIFT_ROLES,
+  shiftStructuredValue,
+} from "./shift.js";
+export type {
+  AbsentPoint,
+  DeriveShiftOptions,
+  DistributionShiftClaimResult,
+  EditionValueRow,
+  KnownPoint,
+  LoadedEdition,
+  ShiftBuild,
+  ShiftEdition,
+  ShiftEditions,
+  ShiftEditionSet,
+  ShiftEnd,
+  ShiftGap,
+  ShiftPoint,
+  ShiftRole,
+  ShiftSummary,
+  SurnameShiftResult,
+} from "./shift.js";
 export {
   coverageRatio,
   coverageState,
@@ -135,6 +168,8 @@ export {
   RANK_CONFIDENCE_ASSESSMENT_VERSION,
   RANK_TIES_POLICY,
   RANK_UNIVERSE_KIND,
+  DISTRIBUTION_SHIFT_METHOD_VERSION,
+  DISTRIBUTION_SHIFT_ROUNDING,
   RARITY_CONTEXT_METHOD_VERSION,
   RARITY_CONTEXT_PAYLOAD_VERSION,
   RARITY_DENOMINATOR_KIND,

@@ -4,7 +4,7 @@ import type { UI } from "./messages.js";
 /**
  * The surname page's sections, declared once (TASK-034).
  *
- * Each of the four chapters goes by four names:
+ * Each chapter goes by four names:
  *
  *   - the contract field that carries it;
  *   - the view's key, which the page orders by;
@@ -66,6 +66,15 @@ export const SECTIONS = [
     nav: "navWhere",
     title: "chapterWhereTitle",
     lede: "chapterWhereLede",
+  },
+  {
+    key: "change",
+    field: "change",
+    anchor: "change",
+    intent: "change",
+    nav: "navChange",
+    title: "chapterChangeTitle",
+    lede: "chapterChangeLede",
   },
   {
     key: "meaning",

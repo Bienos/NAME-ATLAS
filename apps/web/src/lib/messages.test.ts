@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
-import type { DistributionEntry, PopulationObservation, RarityEntry } from "@name-atlas/contracts";
+import type {
+  ChangeEntry,
+  DistributionEntry,
+  PopulationObservation,
+  RarityEntry,
+} from "@name-atlas/contracts";
 import {
+  changeGapNote,
+  changeListLabel,
+  changeSentence,
   coverageWarning,
   explanationText,
   distributionSentence,
@@ -11,6 +19,7 @@ import {
   formatDecimal,
   formatInteger,
   formatPercent,
+  formatPercentChange,
   formatQuantile,
   formatShare,
   formatSigned,
@@ -613,5 +622,90 @@ describe("UI strings", () => {
   it("says the two datasets are never summed, in both languages", () => {
     expect(UI.pl.notSummed).toMatch(/nigdy nie są sumowane/u);
     expect(UI.en.notSummed).toMatch(/never summed/u);
+  });
+});
+
+describe("formatPercentChange (TASK-046)", () => {
+  it("writes a stored change with its sign, one decimal and a true minus", () => {
+    expect(formatPercentChange(6, "en")).toBe("+6.0%");
+    expect(formatPercentChange(6, "pl")).toBe("+6,0%");
+    expect(formatPercentChange(-6.7, "en")).toBe("\u22126.7%");
+    expect(formatPercentChange(-6.7, "pl")).toBe("\u22126,7%");
+    expect(formatPercentChange(0.1, "en")).toBe("+0.1%");
+  });
+
+  it("writes zero without a sign, and never a negative zero", () => {
+    expect(formatPercentChange(0, "en")).toBe("0.0%");
+    expect(formatPercentChange(-0, "pl")).toBe("0,0%");
+  });
+});
+
+describe("changeSentence and its notes (TASK-046, ADR-0020)", () => {
+  // SYNTHETIC figures, as in the contract tests.
+  const entry = (firstCount: number, lastCount: number, count: number, list: number): ChangeEntry =>
+    ({
+      list: "FEMALE",
+      points: [],
+      gaps: [],
+      summary: {
+        known_points: 2,
+        first: { data_date: "2019-06-30", count: firstCount, list_total: 1_000_000 },
+        last: { data_date: "2026-01-20", count: lastCount, list_total: 1_200_000 },
+        count_change_percent: count,
+        list_change_percent: list,
+      },
+    }) as unknown as ChangeEntry;
+
+  it("names the list, both dates, both counts and both changes, in each language", () => {
+    expect(changeSentence(entry(100, 120, 20, 20), "NOWAK", "en")).toBe(
+      "The number of people with the surname NOWAK (female) in the PESEL register changed from 100 on 30 June 2019 to 120 on 20 January 2026: +20.0%. The whole list changed by +20.0% between those editions.",
+    );
+    expect(changeSentence(entry(100, 120, 20, 20), "NOWAK", "pl")).toBe(
+      "Liczba osób o nazwisku NOWAK (kobiety) w rejestrze PESEL zmieniła się z 100 na dzień 30 czerwca 2019 r. na 120 na dzień 20 stycznia 2026 r.: +20,0%. Cała lista zmieniła się między tymi edycjami o +20,0%.",
+    );
+  });
+
+  it("says the count was the same when it was, rather than a change of nothing", () => {
+    const sentence = changeSentence(entry(100, 100, 0, 20), "NOWAK", "en");
+    expect(sentence).toContain("was the same (100) on 30 June 2019 and on 20 January 2026.");
+    expect(sentence).not.toContain("changed from");
+  });
+
+  it("ends each of its two sentences with one full stop, including after a Polish date", () => {
+    const pl = changeSentence(entry(100, 100, 0, 20), "NOWAK", "pl");
+    expect(pl).toContain("na dzień 20 stycznia 2026 r. Cała lista");
+    expect(pl).not.toContain("..");
+    expect(pl.endsWith("+20,0%.")).toBe(true);
+  });
+
+  it("labels the lists as the count does", () => {
+    expect(changeListLabel("MALE", "pl")).toBe("mężczyźni");
+    expect(changeListLabel("FEMALE", "pl")).toBe("kobiety");
+    expect(changeListLabel("MALE", "en")).toBe("male");
+    expect(changeListLabel("FEMALE", "en")).toBe("female");
+  });
+
+  it("dates a publisher's duplicate in words", () => {
+    expect(changeGapNote("2022-01-27", "en")).toContain("dated 27 January 2022 repeats");
+    expect(changeGapNote("2022-01-27", "pl")).toContain("z dnia 27 stycznia 2022 r. powtarza");
+  });
+
+  it("uses no word of cause, popularity, decline or fashion anywhere in its catalogue", () => {
+    const causal =
+      /popular|declin|rising|fashion|because|due to|migrat|birth|death|trend|popularn|spad|wzrost|wzrosł|moda|modn|przyczyn|migrac|urodzen|zgon/iu;
+    for (const lang of ["pl", "en"] as const) {
+      const words = Object.entries(UI[lang])
+        .filter(([key]) => /^(change|chapterChange|navChange)/u.test(key))
+        .map(([, value]) => String(value));
+      expect(words.length).toBeGreaterThan(8);
+      for (const word of words) expect(word).not.toMatch(causal);
+      for (const sentence of [
+        changeGapNote("2022-01-27", lang),
+        changeSentence(entry(100, 120, 20, 20), "NOWAK", lang),
+        changeSentence(entry(100, 100, 0, 20), "NOWAK", lang),
+      ]) {
+        expect(sentence).not.toMatch(causal);
+      }
+    }
   });
 });
