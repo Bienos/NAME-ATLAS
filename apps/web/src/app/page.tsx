@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createLogger } from "@name-atlas/logging";
-import { mostCommonSurnames, querySurnameResult } from "@name-atlas/truth";
+import { listFacts, mostCommonSurnames, querySurnameResult } from "@name-atlas/truth";
 import { currentSlugsFor } from "@name-atlas/seo";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
@@ -17,12 +17,17 @@ import { currentPathFor, pathForSlug } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
 import { NamePrint } from "../lib/name-print.js";
 import { AtlasField } from "../lib/atlas-field.js";
+import { ListAtlas } from "../lib/list-atlas.js";
+import { loadListFacts } from "../lib/list-atlas-load.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
  *
- * A server component with no client bundle: a `GET` form and server rendering
- * answer this journey, and `PRODUCT.md` §2's user is on mobile.
+ * A server component: a `GET` form and server rendering answer this journey,
+ * and `PRODUCT.md` §2's user is on mobile. It is not free of client code: the
+ * search field is a client island (`surname-combobox.tsx`), and so is the
+ * landing atlas's section (`list-atlas-shell.tsx`), whose only script is the
+ * plates' entrance motion — its list switch is HTML and CSS.
  *
  * A query that resolves to exactly one surname is **redirected** to that
  * surname's canonical page (ADR-0009) — `/pl/nazwisko/{slug}` — so the address
@@ -205,6 +210,9 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   const given = await answer(query, origin, lang);
   const common = given.kind === "NONE" ? await commonLists(lang) : [];
+  // The landing atlas (TASK-040): statistics about each whole published list,
+  // from the committed artefact. Fails soft: no facts, no section.
+  const atlas = given.kind === "NONE" ? loadListFacts(listFacts) : null;
 
   if (given.kind === "RESULT" && given.path !== null) {
     // The result has an address of its own. `?intent=` travels with it; the
@@ -254,6 +262,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         )}
         <Body answer={given} lang={lang} />
         <CommonSurnames lists={common} lang={lang} />
+        <ListAtlas facts={atlas} lang={lang} />
       </main>
       <footer lang={htmlLang(lang)}>{t.footer}</footer>
     </>

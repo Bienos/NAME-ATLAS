@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by ADR-0016 and TASK-041, documentation only (`docs/progress/2026-09-30-oracle-postgres-hosting.md`). The project owner chose to move production's database off Supabase to PostgreSQL on an Oracle Cloud Always Free VM in Frankfurt, with the complete register built there. TASK-041 specifies the move and waits on the owner's answers. Before it, #27 carried the family surnames draft (`docs/progress/2026-09-30-family-surnames-draft.md`).
+**Last rewritten:** 2026-09-30, by ADR-0016 and TASK-041 (`docs/progress/2026-09-30-oracle-postgres-hosting.md`): the project owner moved production's database off Supabase to PostgreSQL on an Oracle Cloud Always Free VM in Frankfurt, with the complete register built there. TASK-041's repository side, the provisioning scripts and `docs/PRODUCTION_DATABASE.md`, is done; the rest runs on the VM. Before it, TASK-040 (`docs/progress/2026-09-30-landing-atlas-list-facts.md`): the landing page gains the first three plates of the atlas, statistics about each whole published list, derived offline into a committed, SHA-pinned artefact (ADR-0015).
 
 ## Production
 
@@ -16,7 +16,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. TASK-040 is implemented on its branch and not yet merged. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -25,18 +25,20 @@ The current state in one page: what is live, what is next, what is blocked. **Re
   - `pnpm coverage:report`;
   - the visual system and the live deployment;
   - evidence at the foot of the page, linked to the source's website (ADR-0012, #7);
-  - the landing page and the surname page redesigned for readers new to statistics (#11).
+  - the landing page and the surname page redesigned for readers new to statistics (#11);
+  - the landing atlas, plates I–III (TASK-040): the typical surname and the typical person's surname, how many people before two share a surname, and how many surnames a crowd of 1 000 carries, per list and never summed.
 - On `main`, CI was green on `9ed24d7` (run #235, Merge #19).
 
 ## Next
 
+- **The landing atlas, plates IV–XI**: each needs a decision first, listed as U-1 to U-4 in TASK-040 §6. They are a display floor for small counts, a rule for surnames that are also nationality or sensitive words, a method and wording for per-voivodeship leaders, and a lookup that goes through the resolver.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-041**, production's database on Oracle Cloud with the complete register (ADR-0016): **in progress**. The owner answered its §13 on 2026-09-30. The repository side is done and was rehearsed in an Ubuntu 24.04 container: `scripts/production/` and the runbook `docs/PRODUCTION_DATABASE.md`. The rest runs on the VM, which the owner creates (runbook §1–§3). It supersedes TASK-035.
 
 ## Open pull requests and branches
 
-Checked 2026-09-30: none. #29 (TASK-040, the family surnames view) was closed without merging at 13:29 UTC; its work is still on `claude/laughing-curie-tsc5mk`. ADR-0016 and TASK-041 are on `claude/oracle-postgres-hosting`, with no pull request yet. #28 is merged, and so are the family surnames draft (#27), TASK-039 (#26) and TASK-038 (#25).
+Four (checked 2026-09-30, 14:45 UTC): #34 from `claude/oracle-postgres-hosting`, ADR-0016 and TASK-041; #33 from `claude/keen-cannon-1jc301`, TASK-040's go-live records; #31 from `claude/funny-bardeen-f4jbay`, the CI trigger change; and #30 from `claude/funny-allen-vrp074`, a code-review clean-up. GitHub Actions has started no job since 05:53 UTC on 2026-09-30, so none has a CI result; #31 records the outage. #32 (TASK-040, the landing atlas) is merged. #29 (the family surnames view) was closed without merging; its work is on `claude/laughing-curie-tsc5mk`, and it would need a new task number, because TASK-040 on `main` is the landing atlas. #28 (a STATUS rewrite) is merged; the family surnames draft was merged in #27, TASK-039 in #26 and TASK-038 in #25.
 
 ## Blocked on the project owner
 

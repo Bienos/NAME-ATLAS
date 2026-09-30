@@ -78,3 +78,22 @@ export {
   surnamePrefixResponseSchema,
 } from "./surname-prefix.js";
 export type { PrefixItem, SurnamePrefixResponse } from "./surname-prefix.js";
+
+// --- TASK-040: list facts (statistics about one whole published list) ---
+export {
+  LIST_FACTS_SCHEMA_VERSION,
+  collisionPointSchema,
+  expectedDistinctSchema,
+  listAssessmentSchema,
+  listCollisionSchema,
+  listCrowdSchema,
+  listFactsArtefactSchema,
+  listFactsSchema,
+  listPartitionSchema,
+  listQuantileSchema,
+  listSourceSchema,
+  listSummarySchema,
+  listThresholdSchema,
+  reachHalfSchema,
+} from "./list-facts.js";
+export type { ListFacts, ListFactsArtefact, ListPartition } from "./list-facts.js";
