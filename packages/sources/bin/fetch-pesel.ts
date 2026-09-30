@@ -25,6 +25,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { localFileName, verifyResourceBytes } from "../src/acquire.js";
 import {
+  PESEL_EDITIONS,
   PESEL_NATIONAL_RESOURCES_2026,
   PESEL_NATIONAL_SERIES,
   PESEL_REGIONAL_RESOURCES_2026,
@@ -96,9 +97,14 @@ async function ensure(resource: PeselResourceDescriptor, dir: string): Promise<b
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
   const dir = dirArg(argv);
-  const resources = argv.includes("--series")
-    ? [...PESEL_NATIONAL_SERIES.national_male, ...PESEL_NATIONAL_SERIES.national_female]
-    : [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026];
+  // --editions: every registered edition that is not current (TASK-045),
+  // for the VM's editions step; --series: the two national series, for the
+  // list-facts generator; neither: the four current resources, for the build.
+  const resources = argv.includes("--editions")
+    ? [...PESEL_EDITIONS]
+    : argv.includes("--series")
+      ? [...PESEL_NATIONAL_SERIES.national_male, ...PESEL_NATIONAL_SERIES.national_female]
+      : [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026];
   await mkdir(dir, { recursive: true });
   let ok = true;
   for (const resource of resources) {

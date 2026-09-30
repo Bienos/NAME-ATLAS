@@ -208,3 +208,25 @@ As the note above warned, the release is about an earlier edition. Its figures w
 > 1. Czy w zbiorze „Nazwiska występujące w rejestrze PESEL” (dane.gov.pl, zbiór nr 1681; zasoby „Nazwiska męskie – stan na 2026-01-20” i „Nazwiska żeńskie – stan na 2026-01-20”) wartość w kolumnie „Liczba” oznacza liczbę żyjących osób, których nazwisko aktualne w rejestrze PESEL ma daną postać (jedna osoba = jedno wystąpienie), czy też liczbę rekordów/wpisów w rejestrze, która może różnić się od liczby osób?
 > 2. Czy podział na zasoby „męskie” i „żeńskie” odpowiada płci osoby noszącej nazwisko, czy formie gramatycznej (rodzajowi) nazwiska?
 > 3. Czy licencja CC0 1.0 wskazana na poziomie zbioru danych obejmuje każdy z jego zasobów (plików)?
+
+## Editions — every published resource of dataset 1681, registered and importable (TASK-045, 2026-09-30)
+
+The current resources are the four 2026-01-20 files above. Every other resource the publisher lists is registered as an **edition** in `packages/sources/src/registry.ts` (`PESEL_EDITIONS`): imported as its own dated snapshot under its own source record, with the publisher's resource metadata as the record's payload; never derived from, so no page changes (`isPeselEdition` keeps them out of every derivation); and creating no surname entity — an edition's rows for surnames the current register lacks are read, counted and reported (`rows not written`), never written. Checked from the bytes on 2026-09-30, through `api.dane.gov.pl`:
+
+| Reference date | Resource | Role | Rows | SHA-256 (CSV endpoint; 18989 its native CSV) |
+|---|---|---|---:|---|
+| 2019-06-30 | 18990 | national men | 277,108 | `e975ecc4…` |
+| 2019-06-30 | 18989 | national women | 297,456 | `c35e4477…` |
+| 2020-01-22 | 22817 / 22815 | national men / women | 283,221 / 299,612 | as TASK-044 §3 |
+| 2021-02-01 / 02-02 | 28052 / 35279 | national men / women | 298,692 / 311,240 | as TASK-044 §3 |
+| 2022-01-27 | 36401 | national men | 322,232 | as TASK-044 §3 |
+| 2023-01-30 | 44647 / 44646 | national men / women | 363,360 / 389,365 | as TASK-044 §3 |
+| 2024-01-19 | 54097 / 54098 | national men / women | 379,712 / 400,764 | as TASK-044 §3 |
+| 2025-01-22 | 63892 / 63888 | national men / women | 395,127 / 411,012 | as TASK-044 §3 |
+| 2025-02-24 | 65049 / 65090 | regional men / women | 646,100 / 694,199 | `4e258a32…` / `9322fc8c…` |
+
+Two rulings by the project owner on 2026-09-30, both recorded in the registry:
+
+- **2019 is an edition.** The publisher's descriptions say only "lista nazwisk męskich/żeńskich w rejestrze PESEL stan na 30.06.2019", and the header is `nazwisko,liczba`. The owner ruled that the lists describe living persons with their current surname, as the later editions do. That ruling, not a publisher statement, is why the pair is registered; the descriptor says so. ADR-0019 §2.2 keeps 2019 out of the landing's series until that ADR is amended.
+- **There is no 2022 women's edition.** The owner asked for the correct file to be found. Resource 38772 (2022-01-27, women) was fetched in every form the portal offers: its CSV endpoint and its CSV media file are byte-identical to the 2021 resource 35279 (SHA-256 `9af26480…`, 311,240 rows), and its native XLSX (`4c8eed88…`, 5,785,728 bytes) differs from 35279's XLSX (`25e5c5cc…`, 5,186,584 bytes) only as a file: parsed, it holds the same 311,240 rows, the same sum 20,263,212 and the same counts (NOWAK 102,503, KOWALSKA 69,240, WIŚNIEWSKA 55,329). It is the 2021 data saved again under a 2022 date. It stays refused (`PESEL_REFUSED_RESOURCES`), and only the publisher can supply the missing edition; the enquiry above is where to ask.
+

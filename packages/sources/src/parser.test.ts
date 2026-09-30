@@ -123,3 +123,22 @@ describe("parsePeselFile — fail-closed schema drift (TASK-002 §8 item 20: dri
     }
   });
 });
+
+describe("the expected header is the registry's word (TASK-045)", () => {
+  const body = "NOWAK,101473\r\nKOWALSKI,68692\r\n";
+
+  it("accepts the 2019 header when a resource names it", () => {
+    const rows = parsePeselFile(`nazwisko,liczba\r\n${body}`, "nazwisko,liczba");
+    expect(rows.map((r) => [r.surname, r.count])).toEqual([
+      ["NOWAK", 101473],
+      ["KOWALSKI", 68692],
+    ]);
+  });
+
+  it("still refuses the 2019 header by default", () => {
+    expect(() => parsePeselFile(`nazwisko,liczba\r\n${body}`)).toThrow(PeselSchemaError);
+    expect(() => parsePeselFile(`${PESEL_HEADER}\r\n${body}`, "nazwisko,liczba")).toThrow(
+      PeselSchemaError,
+    );
+  });
+});
