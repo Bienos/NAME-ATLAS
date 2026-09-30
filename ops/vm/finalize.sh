@@ -45,8 +45,16 @@ check() { # name expected actual
   if [ "$2" = "$3" ]; then echo "[finalize]   ok   $1 = $3"; else echo "[finalize]   FAIL $1 = $3, expected $2"; fail=1; fi
 }
 check surnames 598476 "$(q "SELECT count(*) FROM surnames")"
-check "national values (408,182 + 420,082)" 828264 "$(q "SELECT count(*) FROM distribution_values WHERE place_id IS NULL")"
-check "regional values (646,052 + 694,553)" 1340605 "$(q "SELECT count(*) FROM distribution_values WHERE place_id IS NOT NULL")"
+# The current resources' values only: earlier editions (TASK-045, editions.sh)
+# add dated snapshots under their own source records and change nothing here.
+values_of() { # national|regional, the four current resource ids
+  q "SELECT count(*) FROM distribution_values v
+       JOIN distribution_snapshots ds ON ds.distribution_snapshot_id = v.distribution_snapshot_id
+       JOIN source_records sr ON sr.source_record_id = ds.source_record_id
+      WHERE v.place_id IS $1 NULL AND sr.external_record_id IN ($2)"
+}
+check "national values (408,182 + 420,082)" 828264 "$(values_of "" "'1148808', '1148811'")"
+check "regional values (646,052 + 694,553)" 1340605 "$(values_of "NOT" "'1148786', '1148790'")"
 check "source records" 4 "$(q "SELECT count(*) FROM source_records")"
 # The four official SHA-256s pinned in packages/sources/src/registry.ts, sorted.
 check "source hashes" \

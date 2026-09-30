@@ -35,7 +35,7 @@ import { decodePeselBytes } from "./decode.js";
 import { PeselSchemaError } from "./errors.js";
 import { parsePeselRegionalFile } from "./regional-parser.js";
 import type { PeselRegionalSourceRow } from "./regional-schema.js";
-import { PESEL_RIGHTS_PROFILE } from "./registry.js";
+import { isPeselEdition, PESEL_RIGHTS_PROFILE } from "./registry.js";
 import type { PeselResourceDescriptor, RightsProfileSeed } from "./registry.js";
 import {
   ensureRegistry,
@@ -159,8 +159,12 @@ export async function importPeselRegionalResource(
     throw cause;
   }
 
+  const rowsRead = rows.length;
+
   // 4. A repeated (voivodeship, surname) cell is schema drift.
-  const { distinct, duplicateCell } = collectRegional(rows);
+  const collected = collectRegional(rows);
+  let { distinct } = collected;
+  const { duplicateCell } = collected;
   if (duplicateCell) {
     return {
       kind: "FAILED",
@@ -221,11 +225,27 @@ export async function importPeselRegionalResource(
       quarantined,
       report: {
         ...blank,
-        rowsRead: rows.length,
+        rowsRead,
         rowsQuarantined: quarantined.length,
         quarantinedByReason: tallyReasons(quarantined),
       },
     };
+  }
+
+  // 5b. An earlier edition creates no surname entity (TASK-045 §3): rows for
+  //     surnames the current register lacks are read, counted and reported,
+  //     never written. Same rule as the national importer.
+  let rowsNotInCurrentRegister = 0;
+  if (isPeselEdition(resource.resource_id)) {
+    const absent = new Set<string>();
+    for (const [key, identity] of identities) {
+      if (identity.surnameId === null) absent.add(key);
+    }
+    for (const key of absent) identities.delete(key);
+    distinct = distinct.filter((entry) => !absent.has(entry.key));
+    const kept = rows.filter((row) => !absent.has(canonicalKey(row.surname)));
+    rowsNotInCurrentRegister = rows.length - kept.length;
+    rows = kept;
   }
 
   // 6. Write pass: one transaction for the whole resource.
@@ -243,7 +263,7 @@ export async function importPeselRegionalResource(
       return {
         kind: "ALREADY_IMPORTED" as const,
         sourceRecordId: alreadyImported.source_record_id,
-        report: { ...blank, rowsRead: rows.length },
+        report: { ...blank, rowsRead, rowsNotInCurrentRegister },
       };
     }
 
@@ -403,8 +423,9 @@ export async function importPeselRegionalResource(
 
     const report: RegionalReconciliationReport = {
       resourceId: resource.resource_id,
-      rowsRead: rows.length,
+      rowsRead,
       rowsImported: rows.length,
+      rowsNotInCurrentRegister,
       rowsQuarantined: 0,
       quarantinedByReason: {},
       surnamesCreated,

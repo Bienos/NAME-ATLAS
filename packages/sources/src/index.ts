@@ -33,6 +33,13 @@ export {
   PESEL_REGIONAL_FEMALE_2026,
   PESEL_REGIONAL_RESOURCES_2026,
   findPeselResource,
+  findPeselEdition,
+  isPeselEdition,
+  PESEL_EDITIONS,
+  PESEL_NATIONAL_MALE_2019,
+  PESEL_NATIONAL_FEMALE_2019,
+  PESEL_REGIONAL_MALE_2025,
+  PESEL_REGIONAL_FEMALE_2025,
   nationalCounterpartOf,
   // TASK-044, ADR-0019: the two national series and the resource refused from one.
   PESEL_SERIES_KEYS,

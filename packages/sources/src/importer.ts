@@ -50,7 +50,12 @@ import { decodePeselBytes } from "./decode.js";
 import { PeselSchemaError } from "./errors.js";
 import { parsePeselFile } from "./parser.js";
 import type { PeselSourceRow } from "./schema.js";
-import { PESEL_RIGHTS_PROFILE, PESEL_SOURCE, PESEL_SOURCE_KEY } from "./registry.js";
+import {
+  PESEL_RIGHTS_PROFILE,
+  PESEL_SOURCE,
+  PESEL_SOURCE_KEY,
+  isPeselEdition,
+} from "./registry.js";
 import type { PeselResourceDescriptor, RightsProfileSeed } from "./registry.js";
 import { assertReconciles, emptyReport, tallyReasons } from "./import-result.js";
 import type {
@@ -363,7 +368,7 @@ export async function importPeselResource(
   // 3. Decode and parse, reusing TASK-002's validator unchanged.
   let allRows: PeselSourceRow[];
   try {
-    allRows = parsePeselFile(decodePeselBytes(bytes));
+    allRows = parsePeselFile(decodePeselBytes(bytes), resource.header);
   } catch (cause: unknown) {
     if (cause instanceof PeselSchemaError) {
       return {
@@ -383,11 +388,13 @@ export async function importPeselResource(
   //     official file. `rowsRead` stays the whole file either way.
   const lined: LinedRow[] = allRows.map((row, index) => ({ row, line: index + 2 }));
   const sliced = options.slice ? applySlice(lined, options.slice) : { kept: lined, excluded: 0 };
-  const rows = sliced.kept;
+  let rows = sliced.kept;
   const rowsExcludedBySlice = sliced.excluded;
 
   // 4. Duplicate canonical keys within one file are schema drift.
-  const { distinct, duplicate } = collectDistinct(rows);
+  const collected = collectDistinct(rows);
+  let { distinct } = collected;
+  const { duplicate } = collected;
   if (duplicate) {
     return {
       kind: "FAILED",
@@ -473,6 +480,24 @@ export async function importPeselResource(
     };
   }
 
+  // 5b. An earlier edition creates no surname entity (TASK-045 §3). A surname
+  //     it lists that the current register does not have gets no row here:
+  //     the register of record is the current one, and a page for a surname
+  //     with no current figure would show nothing. The rows are read,
+  //     counted and reported, never written.
+  let rowsNotInCurrentRegister = 0;
+  if (isPeselEdition(resource.resource_id)) {
+    const absent = new Set<string>();
+    for (const [key, identity] of identities) {
+      if (identity.created) absent.add(key);
+    }
+    for (const key of absent) identities.delete(key);
+    distinct = distinct.filter((entry) => !absent.has(entry.key));
+    const kept = rows.filter(({ row }) => !absent.has(canonicalKey(row.surname)));
+    rowsNotInCurrentRegister = rows.length - kept.length;
+    rows = kept;
+  }
+
   // 6. Write pass: one transaction for the whole resource.
   try {
     return await db.transaction().execute(async (trx) => {
@@ -490,7 +515,12 @@ export async function importPeselResource(
         return {
           kind: "ALREADY_IMPORTED" as const,
           sourceRecordId: alreadyImported.source_record_id,
-          report: { ...blank, rowsRead: allRows.length, rowsExcludedBySlice },
+          report: {
+            ...blank,
+            rowsRead: allRows.length,
+            rowsExcludedBySlice,
+            rowsNotInCurrentRegister,
+          },
         };
       }
 
@@ -630,6 +660,7 @@ export async function importPeselResource(
         resourceId: resource.resource_id,
         rowsRead: allRows.length,
         rowsImported: rows.length,
+        rowsNotInCurrentRegister,
         rowsQuarantined: 0,
         quarantinedByReason: {},
         rowsExcludedBySlice,

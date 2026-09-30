@@ -16,6 +16,14 @@ import {
   PESEL_NATIONAL_SERIES,
   PESEL_REFUSED_RESOURCES,
   PESEL_SERIES_KEYS,
+  PESEL_EDITIONS,
+  PESEL_NATIONAL_MALE_2019,
+  PESEL_NATIONAL_FEMALE_2019,
+  PESEL_REGIONAL_MALE_2025,
+  PESEL_REGIONAL_FEMALE_2025,
+  findPeselEdition,
+  isPeselEdition,
+  nationalCounterpartOf,
 } from "./registry.js";
 import { localFileName } from "./acquire.js";
 
@@ -495,5 +503,118 @@ describe("the refused resource (ADR-0019 §2.2)", () => {
       refused?.data_date,
     );
     expect(findPeselResource(refused?.resource_id ?? "")).toBeUndefined();
+  });
+});
+
+describe("the editions (TASK-045)", () => {
+  it("lists every registered resource that is not current, in a stable order", () => {
+    expect(PESEL_EDITIONS.map((r) => r.resource_id)).toEqual([
+      "18990",
+      "18989",
+      "22817",
+      "28052",
+      "36401",
+      "44647",
+      "54097",
+      "63892",
+      "22815",
+      "35279",
+      "44646",
+      "54098",
+      "63888",
+      "65049",
+      "65090",
+    ]);
+    for (const edition of PESEL_EDITIONS) {
+      expect(findPeselResource(edition.resource_id)).toBeUndefined();
+    }
+  });
+
+  it.each([
+    [
+      PESEL_NATIONAL_MALE_2019,
+      "2019-06-30",
+      "e975ecc4226aec76a5144ce17ca32612e4aaba058dd9589f6b4cbd2db3e4a4bb",
+      3_610_164,
+      277_108,
+    ],
+    [
+      PESEL_NATIONAL_FEMALE_2019,
+      "2019-06-30",
+      "c35e44779eb3e655f66c453a71b1c8db192b309375e828f16893864822fdbba8",
+      3_993_861,
+      297_456,
+    ],
+    [
+      PESEL_REGIONAL_MALE_2025,
+      "2025-02-24",
+      "4e258a328cf7a8f66766a73e486505e760d2ebb0840814df72c09695c374ef39",
+      16_619_443,
+      646_100,
+    ],
+    [
+      PESEL_REGIONAL_FEMALE_2025,
+      "2025-02-24",
+      "9322fc8c72e6ddaa2d4c51bf247f2847ce9ee96ea397587b87d9056039064e43",
+      17_891_156,
+      694_199,
+    ],
+  ])("pins %o's bytes as fetched on 2026-09-30", (resource, dataDate, sha256, bytes, rows) => {
+    expect(resource.data_date).toBe(dataDate);
+    expect(resource.official_sha256).toBe(sha256);
+    expect(resource.official_byte_size).toBe(bytes);
+    expect(resource.official_row_count).toBe(rows);
+    expect(resource.retrieved_at).toMatch(/^2026-09-30T19:5[5-8]:\d\dZ$/);
+  });
+
+  it("names the 2019 header, and no other", () => {
+    expect(PESEL_NATIONAL_MALE_2019.header).toBe("nazwisko,liczba");
+    expect(PESEL_NATIONAL_FEMALE_2019.header).toBe("nazwisko,liczba");
+    for (const resource of [
+      ...PESEL_EDITIONS,
+      ...PESEL_NATIONAL_RESOURCES_2026,
+      ...PESEL_REGIONAL_RESOURCES_2026,
+    ]) {
+      if (resource.data_date !== "2019-06-30") expect(resource.header).toBeUndefined();
+    }
+  });
+
+  it("keeps 2019 out of the landing's series (ADR-0019 §2.2) and records the owner's ruling", () => {
+    expect(PESEL_NATIONAL_MALE_2019.series).toBeNull();
+    expect(PESEL_NATIONAL_FEMALE_2019.series).toBeNull();
+    expect(PESEL_NATIONAL_MALE_2019.coverage_notes).toContain("2026-09-30");
+    expect(PESEL_NATIONAL_MALE_2019.universe_description).toBe(
+      "lista nazwisk męskich w rejestrze PESEL stan na 30.06.2019",
+    );
+  });
+
+  it("distinguishes an edition from a current resource for the importers and the derivations", () => {
+    expect(findPeselEdition("18990")).toBe(PESEL_NATIONAL_MALE_2019);
+    expect(findPeselEdition("1148808")).toBe(PESEL_NATIONAL_MALE_2026);
+    expect(findPeselEdition("38772")).toBeUndefined();
+    expect(isPeselEdition("18990")).toBe(true);
+    expect(isPeselEdition("65049")).toBe(true);
+    expect(isPeselEdition("1148808")).toBe(false);
+    expect(isPeselEdition("38772")).toBe(false);
+    expect(isPeselEdition(null)).toBe(false);
+  });
+
+  it("gives the 2025 regional pair no national counterpart: their dates differ", () => {
+    expect(nationalCounterpartOf(PESEL_REGIONAL_MALE_2025)).toBeUndefined();
+    expect(nationalCounterpartOf(PESEL_REGIONAL_FEMALE_2025)).toBeUndefined();
+    expect(nationalCounterpartOf(PESEL_REGIONAL_MALE_2026)).toBe(PESEL_NATIONAL_MALE_2026);
+    expect(nationalCounterpartOf(PESEL_REGIONAL_FEMALE_2026)).toBe(PESEL_NATIONAL_FEMALE_2026);
+  });
+
+  it("gives every edition its own comparability group and local file name", () => {
+    const all = [
+      ...PESEL_EDITIONS,
+      ...PESEL_NATIONAL_RESOURCES_2026,
+      ...PESEL_REGIONAL_RESOURCES_2026,
+    ];
+    expect(new Set(all.map((r) => r.comparability_group)).size).toBe(all.length);
+    expect(new Set(all.map((r) => localFileName(r))).size).toBe(all.length);
+    expect(localFileName(PESEL_NATIONAL_MALE_2019)).toBe("national-male-2019-06-30.csv");
+    expect(localFileName(PESEL_REGIONAL_FEMALE_2025)).toBe("regional-female-2025-02-24.csv");
   });
 });

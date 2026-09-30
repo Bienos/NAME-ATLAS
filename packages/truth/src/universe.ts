@@ -14,7 +14,7 @@
 import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { resolveSurname } from "@name-atlas/resolver";
-import { findPeselResource, TERYT_PROVIDER_KEY } from "@name-atlas/sources";
+import { findPeselResource, isPeselEdition, TERYT_PROVIDER_KEY } from "@name-atlas/sources";
 import type { PeselResourceDescriptor } from "@name-atlas/sources";
 import { assessUniverseCompleteness } from "./completeness.js";
 import type { CompletenessVerdict } from "./completeness.js";
@@ -91,23 +91,26 @@ export async function loadCandidates(
     .orderBy("s.source_record_id")
     .execute();
 
-  return rows.map((row) => ({
-    distribution_snapshot_id: row.distribution_snapshot_id,
-    distribution_value_id: row.distribution_value_id,
-    source_record_id: row.source_record_id,
-    source_id: row.source_id,
-    external_record_id: row.external_record_id,
-    content_hash: row.content_hash,
-    count: Number(row.count),
-    as_of_date: row.as_of_date,
-    universe_description: requiredProfileText(
-      row.universe_description,
-      "universe_description",
-      row.source_record_id,
-    ),
-    coverage_notes: row.coverage_notes,
-    comparability_group: row.comparability_group,
-  }));
+  // TASK-045: earlier editions never form a universe; see derive.ts.
+  return rows
+    .filter((row) => !isPeselEdition(row.external_record_id))
+    .map((row) => ({
+      distribution_snapshot_id: row.distribution_snapshot_id,
+      distribution_value_id: row.distribution_value_id,
+      source_record_id: row.source_record_id,
+      source_id: row.source_id,
+      external_record_id: row.external_record_id,
+      content_hash: row.content_hash,
+      count: Number(row.count),
+      as_of_date: row.as_of_date,
+      universe_description: requiredProfileText(
+        row.universe_description,
+        "universe_description",
+        row.source_record_id,
+      ),
+      coverage_notes: row.coverage_notes,
+      comparability_group: row.comparability_group,
+    }));
 }
 
 /** How many surnames have a national value against this source record. */
@@ -492,7 +495,8 @@ export async function loadRegionalCandidates(
 
   const byRecord = new Map<string, RegionalUniverseCandidate>();
   const cells = new Map<string, RegionalCell[]>();
-  for (const row of rows) {
+  // TASK-045: the 2025 regional pair is an edition; only the current pair is placed.
+  for (const row of rows.filter((r) => !isPeselEdition(r.external_record_id))) {
     if (row.place_id === null) continue;
     if (!byRecord.has(row.source_record_id)) {
       byRecord.set(row.source_record_id, {

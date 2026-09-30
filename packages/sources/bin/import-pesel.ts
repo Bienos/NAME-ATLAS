@@ -20,7 +20,7 @@
  */
 import { readFile } from "node:fs/promises";
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
-import { findPeselResource } from "../src/registry.js";
+import { findPeselEdition } from "../src/registry.js";
 import { importPeselResource } from "../src/importer.js";
 import { parseSliceSpec } from "../src/slice.js";
 import type { ReconciliationReport } from "../src/import-result.js";
@@ -75,6 +75,11 @@ function printReport(report: ReconciliationReport): void {
         "rank and rarity are withheld",
     );
   }
+  if (report.rowsNotInCurrentRegister > 0) {
+    console.log(
+      `[import] rows not written    ${report.rowsNotInCurrentRegister} (an edition's surnames absent from the current register)`,
+    );
+  }
   console.log(`[import] rows imported       ${report.rowsImported}`);
   console.log(`[import] rows quarantined    ${report.rowsQuarantined}`);
   for (const [reason, count] of Object.entries(report.quarantinedByReason)) {
@@ -92,10 +97,10 @@ function printReport(report: ReconciliationReport): void {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const resource = findPeselResource(args.resource);
+  const resource = findPeselEdition(args.resource);
   if (!resource) {
     throw new Error(
-      `${args.resource} is not an approved PESEL resource. ` +
+      `${args.resource} is not a registered PESEL resource or edition. ` +
         "Approved resources are listed in packages/sources/src/registry.ts.",
     );
   }

@@ -17,7 +17,7 @@
  */
 import { readFile } from "node:fs/promises";
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
-import { findPeselResource } from "../src/registry.js";
+import { findPeselEdition } from "../src/registry.js";
 import { importPeselRegionalResource } from "../src/regional-importer.js";
 import type { RegionalReconciliationReport } from "../src/import-result.js";
 
@@ -54,6 +54,11 @@ function parseArgs(argv: readonly string[]): Args {
 function printReport(report: RegionalReconciliationReport): void {
   console.log(`[regional] resource            ${report.resourceId}`);
   console.log(`[regional] rows read           ${report.rowsRead}`);
+  if (report.rowsNotInCurrentRegister > 0) {
+    console.log(
+      `[regional] rows not written    ${report.rowsNotInCurrentRegister} (an edition's surnames absent from the current register)`,
+    );
+  }
   console.log(`[regional] rows imported       ${report.rowsImported}`);
   console.log(`[regional] rows quarantined    ${report.rowsQuarantined}`);
   for (const [reason, count] of Object.entries(report.quarantinedByReason)) {
@@ -76,10 +81,10 @@ function printReport(report: RegionalReconciliationReport): void {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const resource = findPeselResource(args.resource);
+  const resource = findPeselEdition(args.resource);
   if (!resource) {
     throw new Error(
-      `${args.resource} is not an approved PESEL resource. ` +
+      `${args.resource} is not a registered PESEL resource or edition. ` +
         "Approved resources are listed in packages/sources/src/registry.ts.",
     );
   }

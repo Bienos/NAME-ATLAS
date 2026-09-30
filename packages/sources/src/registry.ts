@@ -191,6 +191,12 @@ export interface PeselResourceDescriptor {
   readonly coverage_notes: string;
   /** The series this national edition belongs to (ADR-0019 §2.1); `null` for a regional resource. */
   readonly series: PeselSeriesKey | null;
+  /**
+   * The exact header row of the file when it is not `PESEL_HEADER`
+   * (`Nazwisko aktualne,Liczba`). Only the 2019-06-30 editions differ: their
+   * header is `nazwisko,liczba` (TASK-045 §2). Absent means `PESEL_HEADER`.
+   */
+  readonly header?: string;
 }
 
 /**
@@ -365,15 +371,17 @@ export function findPeselResource(resourceId: string): PeselResourceDescriptor |
 export function nationalCounterpartOf(
   descriptor: PeselResourceDescriptor,
 ): PeselResourceDescriptor | undefined {
-  switch (descriptor.role) {
-    case "regional_male":
-      return PESEL_NATIONAL_MALE_2026;
-    case "regional_female":
-      return PESEL_NATIONAL_FEMALE_2026;
-    case "national_male":
-    case "national_female":
-      return undefined;
+  // Registry truth, not arithmetic (above): only the 2026 regional pair has a
+  // national counterpart on the same reference date. The 2025 regional pair
+  // (TASK-045) is dated 2025-02-24 against national lists dated 2025-01-22, so
+  // it has none, and it never reaches a derivation anyway (`isPeselEdition`).
+  if (descriptor.resource_id === PESEL_REGIONAL_MALE_2026.resource_id) {
+    return PESEL_NATIONAL_MALE_2026;
   }
+  if (descriptor.resource_id === PESEL_REGIONAL_FEMALE_2026.resource_id) {
+    return PESEL_NATIONAL_FEMALE_2026;
+  }
+  return undefined;
 }
 
 // --- TASK-044, ADR-0019: the two national series ---------------------------
@@ -721,3 +729,139 @@ export const PESEL_REFUSED_RESOURCES: readonly PeselRefusedResource[] = [
       "is no 2022 measurement.",
   },
 ];
+
+// --- TASK-045: every published edition, importable on the VM -----------------
+
+const EDITION_2019_NOTE =
+  'The publisher\'s description of this edition says only "lista nazwisk \u2026 w rejestrze PESEL" ' +
+  'and does not say "os\u00f3b \u017cyj\u0105cych" (living persons); its header is "nazwisko,liczba", not ' +
+  '"Nazwisko aktualne,Liczba". The project owner ruled on 2026-09-30 that it describes living ' +
+  "persons with their current surname, as the later editions do (TASK-045 \u00a72). That ruling, not " +
+  "a publisher statement, is why it is registered as an edition. ADR-0019 \u00a72.2 keeps it out of " +
+  "the landing's series until that ADR is amended.";
+
+/** The 2019-06-30 national editions: the earliest, with the older header (TASK-045 \u00a72). */
+export const PESEL_NATIONAL_MALE_2019: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "18990",
+  resource_title: "Nazwiska m\u0119skie - stan na 2019-06-30",
+  data_date: "2019-06-30",
+  portal_modified_at: "2024-01-10T12:45:57Z",
+  retrieved_at: "2026-09-30T19:55:58Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/18990,nazwiska-meskie-stan-na-2019-06-30/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/18990,nazwiska-meskie-stan-na-2019-06-30",
+  official_sha256: "e975ecc4226aec76a5144ce17ca32612e4aaba058dd9589f6b4cbd2db3e4a4bb",
+  official_byte_size: 3_610_164,
+  official_row_count: 277_108,
+  universe_description: "lista nazwisk m\u0119skich w rejestrze PESEL stan na 30.06.2019",
+  methodology_key: "pesel_current_surname_national_2019_male_resource",
+  comparability_group: "pesel_2019_national_male",
+  coverage_notes: `${PARTITION_NOT_DISAMBIGUATED} ${EDITION_2019_NOTE}`,
+  series: null,
+  header: "nazwisko,liczba",
+};
+
+/**
+ * The female 2019 resource is published as a native CSV (the others as XLSX
+ * with a CSV endpoint), so its official URL is the media file itself.
+ */
+export const PESEL_NATIONAL_FEMALE_2019: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "18989",
+  resource_title: "Nazwiska \u017ce\u0144skie - stan na 2019-06-30",
+  data_date: "2019-06-30",
+  portal_modified_at: "2020-03-17T06:58:30Z",
+  retrieved_at: "2026-09-30T19:57:08Z",
+  official_source_url:
+    "https://api.dane.gov.pl/media/resources/20190813/nazwiska_%C5%BCe%C5%84skie.csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/18989,nazwiska-zenskie-stan-na-2019-06-30",
+  official_sha256: "c35e44779eb3e655f66c453a71b1c8db192b309375e828f16893864822fdbba8",
+  official_byte_size: 3_993_861,
+  official_row_count: 297_456,
+  universe_description: "lista nazwisk \u017ce\u0144skich w rejestrze PESEL stan na 30.06.2019",
+  methodology_key: "pesel_current_surname_national_2019_female_resource",
+  comparability_group: "pesel_2019_national_female",
+  coverage_notes: `${PARTITION_NOT_DISAMBIGUATED} ${EDITION_2019_NOTE}`,
+  series: null,
+  header: "nazwisko,liczba",
+};
+
+/** The 2025-02-24 regional pair: the only earlier regional edition the publisher lists. */
+export const PESEL_REGIONAL_MALE_2025: PeselResourceDescriptor = {
+  role: "regional_male",
+  resource_id: "65049",
+  resource_title:
+    "Nazwiska m\u0119skie wg wojew\u00f3dztwa zameldowania na pobyt sta\u0142y - stan na 2025-02-24",
+  data_date: "2025-02-24",
+  portal_modified_at: "2025-03-10T11:45:42Z",
+  retrieved_at: "2026-09-30T19:57:47Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/65049,nazwiska-meskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+  official_sha256: "4e258a328cf7a8f66766a73e486505e760d2ebb0840814df72c09695c374ef39",
+  official_byte_size: 16_619_443,
+  official_row_count: 646_100,
+  universe_description:
+    "Wykaz nazwisk m\u0119skich os\u00f3b \u017cyj\u0105cych (wg pola nazwisko aktualne) wyst\u0119puj\u0105cych w rejestrze PESEL (bez zgon\u00f3w) w podziale na wojew\u00f3dztwa, stan na 24.02.2025",
+  methodology_key: "pesel_current_surname_regional_2025_male_resource",
+  comparability_group: "pesel_2025_regional_male",
+  coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+  series: null,
+};
+
+export const PESEL_REGIONAL_FEMALE_2025: PeselResourceDescriptor = {
+  role: "regional_female",
+  resource_id: "65090",
+  resource_title:
+    "Nazwiska \u017ce\u0144skie wg wojew\u00f3dztwa zameldowania na pobyt sta\u0142y - stan na 2025-02-24",
+  data_date: "2025-02-24",
+  portal_modified_at: "2025-03-10T11:45:12Z",
+  retrieved_at: "2026-09-30T19:58:24Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/65090,nazwiska-zenskie-wg-zameldowania-na-pobyt-stay-stan-na-2025-02-24",
+  official_sha256: "9322fc8c72e6ddaa2d4c51bf247f2847ce9ee96ea397587b87d9056039064e43",
+  official_byte_size: 17_891_156,
+  official_row_count: 694_199,
+  universe_description:
+    "Wykaz nazwisk \u017ce\u0144skich os\u00f3b \u017cyj\u0105cych (wg pola nazwisko aktualne) wyst\u0119puj\u0105cych w rejestrze PESEL w podziale na wojew\u00f3dztwa, stan na 24.02.2025",
+  methodology_key: "pesel_current_surname_regional_2025_female_resource",
+  comparability_group: "pesel_2025_regional_female",
+  coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+  series: null,
+};
+
+/**
+ * Every registered resource that is not one of the four current ones
+ * (`findPeselResource`): the 2019 pair, the 2020\u20132025 national editions of
+ * both series, and the 2025 regional pair. An edition is imported as its own
+ * dated snapshot and produces no claim: `isPeselEdition` keeps it out of every
+ * derivation, so the pages show the current resources only (TASK-045 \u00a73).
+ */
+export const PESEL_EDITIONS: readonly PeselResourceDescriptor[] = [
+  PESEL_NATIONAL_MALE_2019,
+  PESEL_NATIONAL_FEMALE_2019,
+  ...PESEL_NATIONAL_SERIES.national_male.filter((r) => r !== PESEL_NATIONAL_MALE_2026),
+  ...PESEL_NATIONAL_SERIES.national_female.filter((r) => r !== PESEL_NATIONAL_FEMALE_2026),
+  PESEL_REGIONAL_MALE_2025,
+  PESEL_REGIONAL_FEMALE_2025,
+];
+
+/** A current resource or an edition, by the publisher's resource id: what the importers accept. */
+export function findPeselEdition(resourceId: string): PeselResourceDescriptor | undefined {
+  return findPeselResource(resourceId) ?? PESEL_EDITIONS.find((r) => r.resource_id === resourceId);
+}
+
+/** True for a registered edition that is not current: imported, dated, and never derived from. */
+export function isPeselEdition(resourceId: string | null): boolean {
+  return (
+    resourceId !== null &&
+    findPeselResource(resourceId) === undefined &&
+    PESEL_EDITIONS.some((r) => r.resource_id === resourceId)
+  );
+}

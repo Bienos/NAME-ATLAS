@@ -86,17 +86,22 @@ function parseDataLine(line: string, lineNumber: number): PeselSourceRow {
  * This function never returns a partially valid result: either every row
  * conforms to the confirmed schema, or it throws {@link PeselSchemaError}.
  */
-export function parsePeselFile(text: string): PeselSourceRow[] {
+export function parsePeselFile(
+  text: string,
+  expectedHeader: string = PESEL_HEADER,
+): PeselSourceRow[] {
   const lines = splitPeselLines(text);
   if (lines.length === 0) {
     throw new PeselSchemaError("empty_file", "resource has no header row");
   }
 
   const [header, ...dataLines] = lines as [string, ...string[]];
-  if (header !== PESEL_HEADER) {
+  // `expectedHeader` is the registry's word for this resource: `PESEL_HEADER`
+  // for every edition but 2019, whose header is `nazwisko,liczba` (TASK-045).
+  if (header !== expectedHeader) {
     throw new PeselSchemaError(
       "unexpected_header",
-      `expected header ${JSON.stringify(PESEL_HEADER)}, found ${JSON.stringify(header)}`,
+      `expected header ${JSON.stringify(expectedHeader)}, found ${JSON.stringify(header)}`,
       1,
     );
   }
