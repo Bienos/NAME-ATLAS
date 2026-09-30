@@ -66,19 +66,23 @@ Neither changes any behaviour today.
 
 ---
 
-## D-021 — Polona: may a connector query it automatically, and what is its source default? (items 2 and 3 RESOLVED by ADR-0014)
+## D-021 — Polona: may a connector query it automatically, and what is its source default? (items 1, 2 and 3 RESOLVED; item 4 open)
 
-**Status:** BLOCKS the Polona connector task (M3), which is not written. NON-BLOCKING for everything else. Items 1 and 4 are open.
+**Status:** BLOCKS the Polona connector task (M3), which is not written, on item 4 only. NON-BLOCKING for everything else. Item 1 was resolved on 2026-09-30 (below); item 4 is open.
 **Owner:** project owner. For confirmation from the rights holder, Polona's FAQ names Biblioteka Narodowa's Pracownia Praw Autorskich, `ppa@bn.org.pl`.
 **Raised by:** TASK-031, 2026-09-29. Evidence: `docs/sources/polona.md` §4, §11 and §12, and `packages/truth/src/polona-rights.test.ts`.
 
-1. **May a connector query Polona automatically, and may it keep what it retrieves?** Open.
-   - Polona's terms ("Regulamin e-usługi Biblioteka Cyfrowa Polona", read 2026-09-29) never mention automated querying, request rates or caching.
-   - Its user manual calls the search API an "otwarte API" (open API) and links developer instructions. Those instructions state no licence, rate or caching rule.
-   - The object-metadata, IIIF and OCR-download endpoints a connector also needs are documented nowhere; they are the web app's own requests.
-   - The spike therefore records `automated_access = UNKNOWN` and `local_cache = UNKNOWN`. ADR-0007 §1, as amended by ADR-0014, already refuses text and scans whose permission is `UNKNOWN` on every public surface.
-   - It does not stop the connector itself. `connectorExecutable()` implements `docs/canonical/12` §6.4's gate literally and refuses only `PROHIBITED`.
-   - On 2026-09-29 the project owner chose to decide this later.
+1. **May a connector query Polona automatically, and may it keep what it retrieves?** **RESOLVED 2026-09-30 by the project owner, option (b).**
+   - **The decision.** The project owner answered "approve poona" (2026-09-30), having been told that the choice was between waiting for Biblioteka Narodowa (a), the documented search API only at a polite rate (b), and treating the "otwarte API" wording as permission (c). The session read that as **(b)**, the narrowest thing the approval can mean: a connector may query Polona's documented search API, at a rate the connector task states, until Biblioteka Narodowa confirms. It did not read it as (c), so object metadata, IIIF and OCR downloads, which the published API does not document, stay out of the connector until their own decision. The owner can overturn this reading by choosing (a) or (c).
+   - **What it does not change.** `automated_access` and `local_cache` stay `UNKNOWN` in the record until the rights holder answers, so ADR-0007 §1's refusal of text and scans whose permission is `UNKNOWN` on every public surface still holds. A connector must not keep what it retrieves beyond what the connector task names and this record allows; caching stays undecided here.
+   - **What it leaves to the connector task.** The request rate, the cache rule and the written enquiry to `ppa@bn.org.pl`, which the owner may still send.
+   - **Evidence as it was when the decision was put.**
+     - Polona's terms ("Regulamin e-usługi Biblioteka Cyfrowa Polona", read 2026-09-29) never mention automated querying, request rates or caching.
+     - Its user manual calls the search API an "otwarte API" (open API) and links developer instructions. Those instructions state no licence, rate or caching rule.
+     - The object-metadata, IIIF and OCR-download endpoints a connector also needs are documented nowhere; they are the web app's own requests.
+     - The spike therefore records `automated_access = UNKNOWN` and `local_cache = UNKNOWN`. ADR-0007 §1, as amended by ADR-0014, already refuses text and scans whose permission is `UNKNOWN` on every public surface.
+     - It does not stop the connector itself. `connectorExecutable()` implements `docs/canonical/12` §6.4's gate literally and refuses only `PROHIBITED`.
+     - On 2026-09-29 the project owner chose to decide this later.
 
    Options:
    - (a) obtain Biblioteka Narodowa's confirmation before any automated run;
