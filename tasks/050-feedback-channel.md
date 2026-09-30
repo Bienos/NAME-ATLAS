@@ -1,6 +1,6 @@
 # TASK-050 — A way for readers to report a wrong or missing fact
 
-- **Status:** SPECIFIED 2026-09-30, not started. One of five launch hygiene tasks (046–050).
+- **Status:** IMPLEMENTED 2026-09-30 on `claude/tender-dirac-lxsnjb`, option A (`docs/progress/2026-09-30-feedback-channel.md`). One of five launch hygiene tasks (046–050).
 - **Requested by:** the project owner, 2026-09-30 (see TASK-046).
 - **Milestone:** none in `PLAN.md`.
 - **Depends on:** TASK-047 (the contact address), for the simplest form of this task.
