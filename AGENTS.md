@@ -71,8 +71,9 @@ No generic repo-wide exploration. No "let me understand the whole codebase first
 1. Inspect the complete diff, file by file.
 2. Remove accidental changes, debug code, stray files.
 3. Update `docs/CODEMAP.md` if the repository structure changed.
-4. Record facts only in a new `docs/progress/YYYY-MM-DD-<slug>.md`: what changed, the exact verification commands with their real results, and what was not verified. Then rewrite whatever lines of `STATUS.md` your change made untrue.
-5. **STOP after the current task.** Do not start the next task, do not create the next task file, do not "get a head start".
+4. Record facts only in a new `docs/progress/YYYY-MM-DD-<slug>.md`: what changed, the exact verification commands with their real results, and what was not verified. Then rewrite whatever lines of `STATUS.md` your change made untrue. Replace its "Last rewritten" line with your change alone; do not chain earlier changes onto it.
+5. **No record-only changes.** A merge, a deploy or a go-live check gets no commit, pull request or progress file of its own. Write what you checked as a comment on the merged pull request. The next change that touches `STATUS.md` brings its Production lines up to date.
+6. **STOP after the current task.** Do not start the next task, do not create the next task file, do not "get a head start".
 
 ## 9. Facts only
 
@@ -93,6 +94,7 @@ These hold in every task and may not be traded away for convenience:
 
 `main` is the only line of development. Parallel sessions that built on other bases have repeated work `main` already had, and have given the same number to different things.
 
+- **One session at a time.** Only one session commits toward `main` at once. Start the next when the last one's pull request is merged or closed. Parallel sessions are where the renumbering, the reverted work and the stale branches came from.
 - **Start from the latest `origin/main`.** Run `git fetch origin main` and `git merge-base --is-ancestor origin/main HEAD`. If that fails and the session has committed nothing, move the branch onto `origin/main`. If the session has commits of its own, rebase them onto `origin/main` or stop and ask. Build on another branch only when the task says so. In Claude Code on the web, `.claude/hooks/session-start.sh` prints a warning when this check fails.
 - **One task, one branch, one pull request into `main`.** When it is merged or closed, delete the branch.
 - **Numbers come from `main`.** A new `TASK-NNN`, ADR, `D-NNN` or migration takes the next number that is free on `origin/main` *and* in open pull requests. Numbers that live inside a task (`U-n`, `AC-nn`) are cited with their task: `TASK-004 §14 U-1`. CI runs `pnpm check:ids`, which fails when two files or decisions share a number.
