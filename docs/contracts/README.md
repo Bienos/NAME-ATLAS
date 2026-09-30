@@ -23,3 +23,5 @@ Canonical **contract semantics** are specified in `docs/canonical/16` (API and f
 - A task session reads only the contracts its task file references (`AGENTS.md` §4).
 
 Accepted: `surname-result.md` (TASK-006) and `surname-prefix.md` (suggest-as-you-type, 2026-09-23).
+
+Proposed: `list-facts.md` (TASK-040, statistics about one whole published list), with ADR-0015; accepted when the owner merges.

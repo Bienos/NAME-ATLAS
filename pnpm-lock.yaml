@@ -288,6 +288,10 @@ importers:
       kysely:
         specifier: 0.29.6
         version: 0.29.6
+    devDependencies:
+      prettier:
+        specifier: 3.9.8
+        version: 3.9.8
 
   tests/golden:
     dependencies:
