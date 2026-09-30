@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-040 (in progress): ADR-0015 moves production's database to a free Oracle Cloud VM. The scripts and the workflow that build it are written and rehearsed, and the workflow's `check` step has reached the VM (`docs/progress/2026-09-30-production-database-on-a-free-vm.md`).
+**Last rewritten:** 2026-09-30, by TASK-041 (in progress): after TASK-040's `finalize`, `ops/vm/extras.sh` loads TERYT and Buryan 1933 into the VM's database. It is written and rehearsed; the VM run waits on `finalize` (`docs/progress/2026-09-30-teryt-and-buryan-on-the-vm.md`).
 
 ## Production
 
@@ -32,10 +32,11 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
 - **TASK-040**, the complete register in production on a free Oracle Cloud VM (ADR-0015): **in progress**. The scripts (`ops/vm/`) and the `Register VM` workflow are written and rehearsed on Ubuntu 24.04 x86_64: provisioning, the full imports and the web app through PgBouncer. On the VM, the workflow's `check` and `provision` steps have run (`Register VM` runs 36660157009 and 36660458190): 2 OCPUs and 11.9 GB, PostgreSQL 17.11, PostGIS 3.6.4 and PgBouncer 1.26.0 installed and active. The register build started on the VM at about 02:45 UTC (`Register VM` run 36661246048) and has not finished. Port 6432 answers from the internet (`Register VM` run 36662326820): a connection as the read-only role over TLS 1.3 through PgBouncer sees 598,476 surnames, and a write is refused. Vercel's `DATABASE_URL` is not changed yet. It supersedes TASK-035, parked because Supabase's free plan stops at 500 MB.
+- **TASK-041**, TERYT (TERC + SIMC) and Buryan 1933 on the VM after TASK-040's `finalize`: **in progress**. `ops/vm/extras.sh` and the workflow's `extras` step are written and rehearsed on Ubuntu 24.04 against the PESEL excerpts: 104,724 TERYT places, 106,227 source records, one meaning per Buryan surname present, PESEL unchanged, and a second run writes nothing. It has not run on the VM: the build was deriving at 04:01 UTC (`Register VM` run 36667029657). Every other source the project holds is not loaded, for the reasons in the task's §2.
 
 ## Open pull requests and branches
 
-`claude/eager-brown-s2u6qh` carries TASK-040 and this rewrite. Its pull request is not opened yet. TASK-039 was merged in #26 (checked 2026-09-30).
+`claude/eager-brown-s2u6qh` carries TASK-040. `claude/awesome-darwin-af7l50` carries TASK-041, based on TASK-040's branch, and merges after it. Neither pull request is opened yet. TASK-039 was merged in #26 (checked 2026-09-30).
 
 ## Blocked on the project owner
 

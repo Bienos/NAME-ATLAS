@@ -40,12 +40,9 @@ log() { echo "[extras] $*"; }
 die() { echo "[extras] ERROR: $*" >&2; exit 1; }
 q() { runuser -u postgres -- psql -X -tA -v ON_ERROR_STOP=1 -d "$DB" -c "$1"; }
 
-# The build user's environment, as build.sh's unit gives it. A proxy this
-# machine is configured with passes through; the VM itself has none.
+# The build user's environment, as build.sh's unit gives it.
 build_env=(env HOME="$OPS_HOME" COREPACK_ENABLE_DOWNLOAD_PROMPT=0 PATH=/usr/local/bin:/usr/bin:/bin
   DATABASE_URL="postgresql://$BUILD_USER@/$DB?host=/var/run/postgresql")
-[ -z "${HTTPS_PROXY:-}" ] || build_env+=(HTTPS_PROXY="$HTTPS_PROXY")
-[ -z "${https_proxy:-}" ] || build_env+=(https_proxy="$https_proxy")
 # Runs its arguments as the build user, in $APP.
 as_build() {
   # shellcheck disable=SC2016 # $1 and $@ belong to the inner shell

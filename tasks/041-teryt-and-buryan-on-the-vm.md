@@ -66,7 +66,7 @@ After TASK-040's `finalize`, the VM's database also holds everything else this r
   - 101,865 SIMC ids;
   - 106,227 TERYT source records;
   - 16 `REGION` places;
-  - every Buryan surname in the register has exactly one `ACTIVE` `SURNAME_MEANING` claim, and all 25 are in the register;
+  - every Buryan surname in the register has exactly one `ACTIVE` `SURNAME_MEANING` claim. The run reports how many of the 25 resolved, and all 25 are expected: the rehearsal's excerpts hold only 7;
   - the PESEL counts and hashes are unchanged (598,476 surnames, 828,264 national and 1,340,605 regional values);
   - no two `ACTIVE` claims share a `claim_key`;
   - the web role can read every table;
