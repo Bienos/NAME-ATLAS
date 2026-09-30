@@ -166,5 +166,6 @@ Violating any of these is a defect regardless of what a task or ticket says:
 9. Fuzzy, phonetic or OCR candidates never outrank an exact canonical or accepted-form match, and never auto-create or auto-merge a `Surname`.
 10. Derived values (rank, 1-in-X, share) are reproducible claims carrying method and version — never bare columns on `Surname`.
 11. Projections and reports render validated claims; they never create facts.
+    - ADR-0015 amends 1 and 11 for statistics about a whole published list: they are derived offline by `packages/truth` into a committed, SHA-pinned artefact that carries their lineage, method versions and assessment, and the page renders them. Every other invariant applies unchanged.
 12. UUIDv7 primary keys from the first migration. Public slugs and order references are separate identifiers.
 13. Every production source has an approved `RightsProfile` before it reaches a production surface.
