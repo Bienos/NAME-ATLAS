@@ -1,0 +1,53 @@
+# TASK-049 — An off-host copy of the production database, with one restore tested
+
+- **Status:** SPECIFIED 2026-09-30, not started. One of five launch hygiene tasks (046–050).
+- **Requested by:** the project owner, 2026-09-30 (see TASK-046).
+- **Milestone:** none in `PLAN.md`.
+- **Depends on:** TASK-042 (the VM) and its `finalize`; the owner's access to the VM or a working `Register VM` workflow.
+- **Model guidance:** implementation session for the script; the run on the VM is the owner's or an SSH session's.
+
+## 1. Goal
+
+If the Oracle VM, its boot volume or the account is lost, the database can be rebuilt from a copy that does not live on that VM, and that has been restored at least once to prove it works.
+
+## 2. Facts (checked on `main` @ `107ff65`, 2026-09-30)
+
+1. `ops/vm/README.md` "Keeping it": `finalize.sh`, `extras.sh` and `editions.sh` each leave a `pg_dump --format=custom` in `/var/lib/name-atlas/backup/` on the VM. "Restoring any of them has not been tested, and there is no copy off the VM."
+2. The latest dump, after the editions, is 1.7 GB; the database is 17 GB (`docs/progress/2026-09-30-pesel-editions-loaded-on-the-vm.md`).
+3. The data changes only when an import runs; there is no user-written data. A copy after each load, not a nightly one, meets the need today.
+4. Oracle may reclaim an idle Always Free instance and suspend an idle account (`ops/vm/README.md`). A copy in the same Oracle account does not cover account suspension.
+5. `docs/canonical/19` §95: backups encrypted, access-restricted, region-controlled, restore-tested.
+6. Supabase still holds the old seven-surname slice as a rollback. It is not a backup of the register.
+
+## 3. In scope
+
+- `ops/vm/backup.sh`: takes the newest dump (or makes one), encrypts it (`age` or `gpg` to a public key the owner holds; the private key never on the VM), uploads it to the chosen destination (§5 U-1), verifies the uploaded object's size and SHA-256, and keeps the last N copies. Idempotent, `shellcheck`-clean, written like the other `ops/vm/*.sh`.
+- A `backup` step in `register-vm.yml` beside `extras` and `editions`, and a line in `ops/vm/README.md` for running it over SSH while Actions is down.
+- One restore drill: download, decrypt, `pg_restore` into a scratch PostgreSQL 17 with PostGIS (local or a Neon/Supabase branch), then compare the surname count (598,476), the four `ACTIVE` claim counts and one surname's page payload with production.
+- `ops/vm/README.md` "Backups" rewritten with what now exists.
+
+## 4. Out of scope
+
+- Point-in-time recovery, WAL archiving or a replica.
+- Scheduled backups (nothing writes between imports; add a timer when something does).
+- Backing up Vercel's configuration or the repository.
+
+## 5. Unknowns
+
+- **U-1.** The destination: a provider outside the Oracle account (e.g. Cloudflare R2, Backblaze B2, the owner's Google Drive) or Oracle Object Storage in another account/region. The session lists free-tier limits read from each provider's page on the day, with the date, and the owner picks. It needs one credential from the owner, given as a VM secret, never committed.
+- **U-2.** The encryption public key, generated and held by the owner.
+
+## 6. Acceptance criteria
+
+- **AC-1.** `shellcheck ops/vm/*.sh` and `actionlint .github/workflows/register-vm.yml` pass.
+- **AC-2.** A run on the VM uploads an encrypted dump; its size and SHA-256 at the destination match the local file. The output is recorded.
+- **AC-3.** The restore drill in §3 is run and its counts match production's; the record states which database it was restored into and how long it took.
+- **AC-4.** No credential, key or password is in the repository or in the run's printed output.
+
+## 7. Verification
+
+```
+shellcheck ops/vm/*.sh && actionlint .github/workflows/register-vm.yml
+```
+
+Then the VM run and the restore drill, each with its real output in the progress record.
