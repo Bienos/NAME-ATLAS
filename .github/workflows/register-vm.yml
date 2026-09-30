@@ -12,8 +12,9 @@ name: Register VM
 #   build      ops/vm/build.sh: starts the register build on the VM and returns
 #   status     ops/vm/status.sh: the build, the database, the services, the machine
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
+#   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
 #
-# provision, status and finalize end by connecting the way the web app does.
+# provision, status, finalize and editions end by connecting the way the web app does.
 
 on:
   push:
@@ -25,7 +26,7 @@ on:
         description: Which step to run
         required: true
         type: choice
-        options: [check, provision, build, status, finalize]
+        options: [check, provision, build, status, finalize, editions]
 
 concurrency:
   group: register-vm
@@ -61,7 +62,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -169,10 +170,19 @@ jobs:
           scp -q ops/vm/finalize.sh vm:name-atlas-ops/finalize.sh
           ssh vm 'sudo bash ~/name-atlas-ops/finalize.sh'
 
+      - name: editions
+        if: steps.step.outputs.step == 'editions'
+        run: |
+          # The pushed commit's tree, because the importers and the registry it
+          # needs are newer than the one the build unpacked.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/editions.sh vm:name-atlas-ops/editions.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/editions.sh ~/name-atlas-ops/app.tar.gz'
+
       - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
         if: >-
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
-          steps.step.outputs.step == 'finalize'
+          steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |

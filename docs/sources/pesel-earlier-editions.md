@@ -101,6 +101,8 @@ ephemeral container. Re-fetch from the URLs in `acquisition/2026-09-30/SOURCES.t
 
 Recorded on 2026-09-29 by another session, on an old base. It is **not in the checks above and was not re-verified when it was recovered.** The counts are that session's. The last paragraph says the importer has no rule against these values; On 2026-09-30 a search for `BRAK DANYCH` and `PRAWDA` found neither string in `main` (outside `docs/progress/`, `PROGRESS.md` and `fixtures/`), nor in `tasks/`, `packages/`, `ops/` or `docs/progress/` of `claude/inspiring-bohr-vten7x`, the branch that holds TASK-045. A rule that does not name them was not looked for.
 
+**Update, same day.** TASK-045's importer rule is that an edition creates no surname entity and writes no row for a surname absent from the current register. That dropped these placeholder rows and the `True` rows (neither string is a surname of the current register) on 2026-09-30, and the gate's surname count stayed 598,476. `PRAWDA` therefore has no 2020, 2021 or 2022 data point in the database. See `docs/progress/2026-09-30-pesel-editions-loaded-on-the-vm.md`.
+
 ### Placeholder values published as surnames
 
 | Value | Meaning | Where it appears (count) |

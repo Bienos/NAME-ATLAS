@@ -3,6 +3,10 @@
 # PgBouncer and the machine. Read-only. Runs as root; prints no secret (the
 # build's connection string has no password).
 set -uo pipefail
+# A locale the VM has. An interactive ssh from a Mac forwards LC_CTYPE=UTF-8,
+# which Ubuntu lacks; psql's perl wrapper then warns on stderr, q() below
+# captures stderr, and the schema check read the warning instead of "t".
+export LC_ALL=C.UTF-8
 
 UNIT=name-atlas-register-build
 DB=name_atlas

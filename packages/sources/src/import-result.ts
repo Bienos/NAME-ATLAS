@@ -55,6 +55,12 @@ export interface ReconciliationReport {
    */
   readonly rowsExcludedBySlice: number;
   /**
+   * Rows of an earlier edition whose surname is not in the current register
+   * (TASK-045 §3): read and counted, never written, so an edition creates no
+   * surname entity. 0 for a current resource.
+   */
+  readonly rowsNotInCurrentRegister: number;
+  /**
    * Rows imported with a `MIXED_SCRIPT_REVIEW` finding. Counted inside
    * `rowsImported`, never inside `rowsQuarantined`: they are stored.
    */
@@ -114,6 +120,7 @@ export function emptyReport(resourceId: string): ReconciliationReport {
     snapshotsWritten: 0,
     valuesWritten: 0,
     rowsExcludedBySlice: 0,
+    rowsNotInCurrentRegister: 0,
     mixedScriptRows: [],
   };
 }
@@ -133,12 +140,17 @@ export function tallyReasons(rows: readonly QuarantinedRow[]): Record<string, nu
  * than returning a value a caller might ignore.
  */
 export function assertReconciles(report: ReconciliationReport): void {
-  const accounted = report.rowsImported + report.rowsQuarantined + report.rowsExcludedBySlice;
+  const accounted =
+    report.rowsImported +
+    report.rowsQuarantined +
+    report.rowsExcludedBySlice +
+    report.rowsNotInCurrentRegister;
   if (report.rowsRead !== accounted) {
     throw new Error(
       `reconciliation failed for ${report.resourceId}: rowsRead=${report.rowsRead} ` +
         `!= rowsImported=${report.rowsImported} + rowsQuarantined=${report.rowsQuarantined}` +
-        ` + rowsExcludedBySlice=${report.rowsExcludedBySlice}`,
+        ` + rowsExcludedBySlice=${report.rowsExcludedBySlice}` +
+        ` + rowsNotInCurrentRegister=${report.rowsNotInCurrentRegister}`,
     );
   }
   const tallied = Object.values(report.quarantinedByReason).reduce((a, b) => a + b, 0);
@@ -181,6 +193,8 @@ export interface RegionalReconciliationReport {
   readonly regionalCountSum: number;
   /** Surnames present regionally with no national row. TASK-008 observed 0. */
   readonly surnamesWithoutNationalRow: number;
+  /** As in {@link ReconciliationReport}: an edition's rows for surnames not in the current register. */
+  readonly rowsNotInCurrentRegister: number;
 }
 
 export type RegionalImportOutcome =
@@ -220,15 +234,18 @@ export function emptyRegionalReport(resourceId: string): RegionalReconciliationR
     mixedScriptRows: [],
     regionalCountSum: 0,
     surnamesWithoutNationalRow: 0,
+    rowsNotInCurrentRegister: 0,
   };
 }
 
 /** The same arithmetic guard as {@link assertReconciles}, for a regional run. */
 export function assertRegionalReconciles(report: RegionalReconciliationReport): void {
-  if (report.rowsRead !== report.rowsImported + report.rowsQuarantined) {
+  const accounted = report.rowsImported + report.rowsQuarantined + report.rowsNotInCurrentRegister;
+  if (report.rowsRead !== accounted) {
     throw new Error(
       `regional reconciliation failed for ${report.resourceId}: rowsRead ${report.rowsRead} !== ` +
-        `rowsImported ${report.rowsImported} + rowsQuarantined ${report.rowsQuarantined}`,
+        `rowsImported ${report.rowsImported} + rowsQuarantined ${report.rowsQuarantined}` +
+        ` + rowsNotInCurrentRegister ${report.rowsNotInCurrentRegister}`,
     );
   }
   if (report.rowsImported > 0 && report.valuesWritten !== report.rowsImported) {

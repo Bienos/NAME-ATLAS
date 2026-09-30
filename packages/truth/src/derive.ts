@@ -25,7 +25,7 @@ import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
 import { NORMALIZATION_VERSION, resolveSurname } from "@name-atlas/resolver";
-import { findPeselResource } from "@name-atlas/sources";
+import { findPeselResource, isPeselEdition } from "@name-atlas/sources";
 import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
@@ -114,25 +114,29 @@ async function loadApplicableSnapshots(
     .orderBy("s.distribution_snapshot_id")
     .execute();
 
-  return rows.map((row) => ({
-    distribution_snapshot_id: row.distribution_snapshot_id,
-    distribution_value_id: row.distribution_value_id,
-    source_record_id: row.source_record_id,
-    source_id: row.source_id,
-    count: String(row.count),
-    as_of_date: row.as_of_date,
-    universe_description: requiredProfileText(
-      row.universe_description,
-      "universe_description",
-      row.source_record_id,
-    ),
-    coverage_notes: row.coverage_notes,
-    comparability_group: row.comparability_group,
-    dataset_version: row.dataset_version,
-    geography_level: row.geography_level,
-    external_record_id: row.external_record_id,
-    content_hash: row.content_hash,
-  }));
+  // TASK-045: an earlier edition is imported as its own dated snapshot and is
+  // never derived from; the current resources alone yield claims.
+  return rows
+    .filter((row) => !isPeselEdition(row.external_record_id))
+    .map((row) => ({
+      distribution_snapshot_id: row.distribution_snapshot_id,
+      distribution_value_id: row.distribution_value_id,
+      source_record_id: row.source_record_id,
+      source_id: row.source_id,
+      count: String(row.count),
+      as_of_date: row.as_of_date,
+      universe_description: requiredProfileText(
+        row.universe_description,
+        "universe_description",
+        row.source_record_id,
+      ),
+      coverage_notes: row.coverage_notes,
+      comparability_group: row.comparability_group,
+      dataset_version: row.dataset_version,
+      geography_level: row.geography_level,
+      external_record_id: row.external_record_id,
+      content_hash: row.content_hash,
+    }));
 }
 
 /**

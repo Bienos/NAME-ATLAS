@@ -131,7 +131,10 @@ the working directory set to `packages/sources`, where `data/` and `fixtures/` d
 not exist.
 
 The `--resource` values are the official dane.gov.pl resource IDs, matched by
-`findPeselResource` in `packages/sources/src/registry.ts`. There is no `--sha256`
+`findPeselEdition` in `packages/sources/src/registry.ts`: the four current resources
+above, or one of the fifteen earlier editions (TASK-045), which `scripts/import-editions.sh`
+fetches and imports in one go. An edition is stored as its own dated snapshot, creates no
+surname entity and yields no claim; the pages read the current resources only. There is no `--sha256`
 flag here because the registry already carries `official_sha256` and the importer
 enforces it regardless — a wrong file fails with `CHECKSUM_MISMATCH` before a byte
 is decoded. Pass `--sha256 <hex>` only to assert a different expected digest.
