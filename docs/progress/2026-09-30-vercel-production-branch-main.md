@@ -23,4 +23,4 @@ The project owner asked in a session: "switch the production branch to main". Un
 
 - **The setting's stored value.** The connector's `get_project` does not return `link.productionBranch`, so the value `main` is known from the owner's dashboard and from the redeploy's target, not read back through the API.
 - **The first automatic production deployment.** No merge to `main` has happened since the switch. The next one should deploy to production on its own; until it does, "automatic" is the setting, not an observed deployment.
-- CI did not run for this change: it is documentation only, and it was not pushed through a pull request in this session.
+- **CI has no result for this change.** On #36, the `verify` job of the CI workflow failed twice on `23a18bf` (runs 36739537077 and 36739796903), each within 3 seconds of starting, with `runner_id: 0`, no runner name, no steps and no log to download (HTTP 404). No step ran, so there is no test, lint or build result. The change is documentation only. This is the GitHub Actions outage `STATUS.md` records, now failing jobs at once instead of not starting them.
