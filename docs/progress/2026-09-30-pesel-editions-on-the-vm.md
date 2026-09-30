@@ -61,7 +61,21 @@ The 2019 descriptions read "lista nazwisk męskich/żeńskich w rejestrze PESEL 
 
 ### The full files (the script end to end, same database)
 
-Running when this record was first committed (the fifteen files fetched and verified at 20:14 UTC, imports under way); the table follows in the next commit.
+`bash scripts/import-editions.sh` with `EDITIONS_DIR` in the scratchpad, against the same 44-surname database: exit 0 in 5 min 47 s. All fifteen files downloaded and verified against the registry (the two excerpt-hashed records for 18990 and 65049 from the step above were superseded by the official files, never rewritten), fifteen metadata objects fetched and checked to be their own, fifteen imports `IMPORTED`, every one with `surnames created 0` and the whole file read:
+
+| Resource | Rows read | Rows written (surnames in the 44) | Not written |
+|---|---:|---:|---:|
+| 18990 men 2019 | 277,108 | 32 | 277,076 |
+| 18989 women 2019 | 297,456 | 35 | 297,421 |
+| 22817 / 22815, 2020 | 283,221 / 299,612 | 26 / 36 | the rest |
+| 28052 / 35279, 2021 | 298,692 / 311,240 | 23 / 36 | the rest |
+| 36401 men 2022 | 322,232 | 27 | 322,205 |
+| 44647 / 44646, 2023 | 363,360 / 389,365 | 28 / 36 | the rest |
+| 54097 / 54098, 2024 | 379,712 / 400,764 | 29 / 36 | the rest |
+| 63892 / 63888, 2025 | 395,127 / 411,012 | 31 / 36 | the rest |
+| 65049 / 65090, regional 2025 | 646,100 / 694,199 | 269 / 407 | the rest |
+
+Then `derive-batch --all --rank` and `derive-batch` again ("finished 44 … failed 0", "finished 37 … failed 0"): `CURRENT_POPULATION` **45**, surnames **44**, 19 `ACTIVE` PESEL source records (4 current, 15 editions) and 2 superseded, claims whose key names an edition's snapshot **0**, at most **2** `ACTIVE` claims of one type per surname, database 18 MB. The `rows read` figures equal the registry's `official_row_count` for every resource, which is what `editions.sh`'s gate checks on the VM.
 
 ## Not verified
 
