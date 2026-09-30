@@ -1,6 +1,6 @@
 # ADR-0015 — statistics about a whole published list are derived offline into a committed, SHA-pinned artefact
 
-- **Status:** Proposed. It is accepted when the project owner merges TASK-040's pull request.
+- **Status:** Accepted (2026-09-30). The project owner merged TASK-040's pull request, #32, and asked for it to be deployed to production ("yes merge it and deploy to production").
 - **Date:** 2026-09-30
 - **Deciders:** the project owner approved building the landing atlas on `main` on 2026-09-30 ("go ahead"). This ADR is the data path TASK-040 proposes for it.
 - **Relates to:** ADR-0001 §2 (no dataset-global snapshot), ADR-0011 (hosting), ADR-0012 (evidence at the foot, linked to the source), TASK-035 §0 option 3 (a projection "needs an ADR first")
