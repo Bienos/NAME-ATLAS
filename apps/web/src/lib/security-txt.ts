@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL } from "./site-footer.js";
+import { CONTACT_EMAIL } from "./contact.js";
 
 /**
  * `/.well-known/security.txt` (RFC 9116; TASK-047).
