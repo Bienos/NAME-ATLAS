@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { SECURITY_HEADERS } from "./src/lib/security-headers";
 
 const nextConfig: NextConfig = {
   /**
@@ -64,6 +65,14 @@ const nextConfig: NextConfig = {
    */
   outputFileTracingIncludes: {
     "/**/opengraph-image": ["./assets/fonts/*.ttf"],
+  },
+  /**
+   * The security headers (TASK-048) on every path: pages, the API and the share
+   * cards. What each one is and why, and what is deliberately left out, is in
+   * `src/lib/security-headers.ts`.
+   */
+  async headers() {
+    return [{ source: "/:path*", headers: [...SECURITY_HEADERS] }];
   },
 };
 
