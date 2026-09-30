@@ -108,7 +108,10 @@ export function sha256Hex(bytes: Uint8Array): string {
  * values and must not stop an internal import. They close the *paid
  * surface* gate, which is a different gate on a different surface.
  */
-export function rightsRefusal(profile: RightsProfileSeed): string | null {
+export function rightsRefusal(
+  profile: Pick<RightsProfileSeed, "automated_access" | "review_status"> &
+    Partial<RightsProfileSeed>,
+): string | null {
   if (profile.automated_access === "PROHIBITED") {
     return "rights profile forbids automated access (automated_access = PROHIBITED)";
   }

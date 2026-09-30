@@ -72,6 +72,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0020_surname_fold_prefix_index",
       "0021_current_rank_top_index",
       "0022_universe_evidence_lookup_index",
+      "0023_administrative_memberships",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -86,7 +87,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     //
     // TASK-011 added `places`, `place_names` and `entity_external_ids`: the
     // voivodeship Place foundation D-004's adoption required, pulled forward
-    // from M3 for exactly that reason and no wider.
+    // from M3 for exactly that reason and no wider. TASK-039 added
+    // `administrative_memberships`, the TERC/SIMC hierarchy.
     //
     // Anything beyond this set is an accidental table. TASK-009 added
     // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
@@ -95,6 +97,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // still owned by a later task — digital_assets, places,
     // name_form_relations, research_module_runs, runtime_outbox.
     const expected = [
+      { table_name: "administrative_memberships", table_type: "BASE TABLE" },
       { table_name: "citations", table_type: "BASE TABLE" },
       { table_name: "claim_evidence", table_type: "BASE TABLE" },
       { table_name: "claims", table_type: "BASE TABLE" },

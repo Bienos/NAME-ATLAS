@@ -1,0 +1,138 @@
+{
+  "$comment": "TASK-039 acquisition record for the official TERYT registers. The full files are NOT in this repository (docs/sources/INVENTORY.md §3); the two excerpts beside this file are real lines copied byte for byte from the CSV members recorded here. Every value below was observed on 2026-09-30, none inferred.",
+  "source_key": "pl_teryt",
+  "publisher": "Główny Urząd Statystyczny (GUS)",
+  "register_reference_date": "2026-01-01",
+  "register_reference_date_field": "STAN_NA (every row of both files carries this value)",
+  "acquisition": {
+    "page_url": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+    "method": "HTTP GET of the official 'Pliki pełne' page, then the page's own ASP.NET postback for the 'wersja urzędowa' download buttons. The form's date field ctl00$body$TBData was left at the value the page served ('30 września 2026'). No other field was changed, and no restriction was bypassed.",
+    "event_targets": {
+      "TERC": "ctl00$body$BTERCUrzedowyPobierz",
+      "SIMC": "ctl00$body$BSIMCUrzedowyPobierz"
+    },
+    "client": "curl, from a Claude Code on the web sandbox, through the environment's HTTPS proxy"
+  },
+  "terms": [
+    {
+      "url": "https://api.stat.gov.pl/Home/TerytApi?lang=en",
+      "retrieved_at": "2026-09-30T01:28:17Z",
+      "page_sha256": "9955b700816c651df5cf7d09a570c75f25a8e4a030f276695eca4bea3da7fe3f",
+      "page_byte_size": 21232,
+      "quote": "The TERYT web service ws1 that makes the data available from the TERYT register to public administration entities and commercial entities. Service and data are available free of charge."
+    },
+    {
+      "url": "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/formy_i_zasady_udostepniania/formy_i_zasady_udostepniania.aspx?contrast=default",
+      "retrieved_at": "2026-09-30T01:28:28Z",
+      "page_sha256": "4821e3b40f39f9e71a6b6e9c3a790c503ba0bbfd347977616c9c61effd88e82d",
+      "page_byte_size": 43991,
+      "quote": "Rejestr terytorialny TERYT jest jawny. [...] Za pośrednictwem strony internetowej GUS-u udostępniane są dane z systemów: - TERC [...], - SIMC [...], - ULIC [...]. Dane te udostępniane są bezpłatnie wszystkim użytkownikom poprzez: Opcję Baza TERYT aplikacji eTERYT dedykowaną użytkownikom indywidualnym, oferującą następujące funkcjonalności: [...] pobieranie zbiorów pełnych (dane aktualne i historyczne) [...]"
+    }
+  ],
+  "terms_agree_with": "docs/canonical/12 §2.1 (TERYT — VERIFIED: available to public and commercial entities, free of charge). Nothing read on 2026-09-30 contradicts it. Neither page states attribution wording.",
+  "resources": [
+    {
+      "registry": "TERC",
+      "resource_id": "TERC_Urzedowy",
+      "version": "urzędowa (official)",
+      "retrieved_at": "2026-09-30T01:26:22Z",
+      "zip": {
+        "filename_from_content_disposition": "TERC_Urzedowy_2026-09-30.zip",
+        "byte_size": 132136,
+        "sha256": "0bd7d74bf54c51e6c2567bbf2602bdf68d98316dae89e941fca6dd216de2037d",
+        "members": ["TERC_Urzedowy_2026-09-30.xml", "TERC_Urzedowy_2026-09-30.csv"]
+      },
+      "http_response_headers": {
+        "status_line": "HTTP/1.1 200 OK",
+        "Cache-Control": "private,no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Content-Type": "application/zip",
+        "content-disposition": "attachment; filename=TERC_Urzedowy_2026-09-30.zip",
+        "Strict-Transport-Security": "max-age=15552000; includeSubDomains",
+        "X-Frame-Options": "deny",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+        "Date": "Wed, 30 Sep 2026 01:26:24 GMT",
+        "content-length": "132136"
+      },
+      "csv": {
+        "member": "TERC_Urzedowy_2026-09-30.csv",
+        "byte_size": 205660,
+        "sha256": "557edb286b399cc7f84a3ee0fbeb809b3928e64da70c7eda8b71fa7f06e585d4",
+        "encoding": "UTF-8 with BOM",
+        "line_terminator": "CRLF",
+        "ends_with": "CRLF CRLF (one empty last line)",
+        "delimiter": ";",
+        "quoting": "none: a double quote is a literal character (two SIMC names contain one)",
+        "header": ["WOJ", "POW", "GMI", "RODZ", "NAZWA", "NAZWA_DOD", "STAN_NA"],
+        "data_rows": 4360
+      },
+      "excerpt": {
+        "path": "fixtures/teryt/terc-urzedowy-excerpt-2026-09-30.csv",
+        "byte_size": 750,
+        "sha256": "e10b8ef1a34f2cb4f24adbad0bf357234467b7745428b60c171d61f431b8c615",
+        "data_rows": 14,
+        "framing": "same BOM, header, CRLF and trailing empty line as the full file; data lines in their original order",
+        "selection": "Every row whose (WOJ, POW, GMI) is one of: 02/–/–, 02/24/–, 02/24/04, 02/24/05, 14/–/–, 14/14/–, 14/14/04, 14/65/–, 14/65/01, 14/65/02. Chosen to cover a voivodeship, a powiat, a city with powiat rights, a rural gmina (RODZ 2), an urban-rural gmina (3) with its town (4) and rural (5) parts, the capital's urban gmina (1) and one Warsaw district (8), and to be closed under parents for the SIMC excerpt."
+      },
+      "compared_with_2026_09_18": "The TERC CSV member's SHA-256 equals file_used_sha256 in fixtures/teryt/voivodeship-terc-correspondence.json (TERC_Urzedowy_2026-09-18.csv). The zip byte size equals the 2026-09-18 zip's (132136); the zip hash differs, because a zip also wraps member names and timestamps."
+    },
+    {
+      "registry": "SIMC",
+      "resource_id": "SIMC_Urzedowy",
+      "version": "urzędowa (official)",
+      "retrieved_at": "2026-09-30T01:26:29Z",
+      "zip": {
+        "filename_from_content_disposition": "SIMC_Urzedowy_2026-09-30.zip",
+        "byte_size": 3349858,
+        "sha256": "14b2d9ae1999024ef9f8329a0063f32b12e1229c8dc07ceeedf2a337e08c9da1",
+        "members": ["SIMC_Urzedowy_2026-09-30.xml", "SIMC_Urzedowy_2026-09-30.csv"]
+      },
+      "http_response_headers": {
+        "status_line": "HTTP/1.1 200 OK",
+        "Cache-Control": "private,no-cache, no-store, max-age=0, must-revalidate",
+        "Pragma": "no-cache",
+        "Transfer-Encoding": "chunked",
+        "Content-Type": "application/zip",
+        "content-disposition": "attachment; filename=SIMC_Urzedowy_2026-09-30.zip",
+        "Strict-Transport-Security": "max-age=15552000; includeSubDomains",
+        "X-Frame-Options": "deny",
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+        "Date": "Wed, 30 Sep 2026 01:26:29 GMT"
+      },
+      "csv": {
+        "member": "SIMC_Urzedowy_2026-09-30.csv",
+        "byte_size": 5566752,
+        "sha256": "316c6446da15f53fef77ae3f28bda60f9c0300120c217eaa4431e1661a018c5a",
+        "encoding": "UTF-8 with BOM",
+        "line_terminator": "CRLF",
+        "ends_with": "CRLF CRLF (one empty last line)",
+        "delimiter": ";",
+        "quoting": "none: a double quote is a literal character (two SIMC names contain one)",
+        "header": [
+          "WOJ",
+          "POW",
+          "GMI",
+          "RODZ_GMI",
+          "RM",
+          "MZ",
+          "NAZWA",
+          "SYM",
+          "SYMPOD",
+          "STAN_NA"
+        ],
+        "data_rows": 101865
+      },
+      "excerpt": {
+        "path": "fixtures/teryt/simc-urzedowy-excerpt-2026-09-30.csv",
+        "byte_size": 845,
+        "sha256": "bf9ec25ad027d8c4875e75a0da17e8751e822357692aa4a390e3c4f219ca1141",
+        "data_rows": 14,
+        "framing": "same BOM, header, CRLF and trailing empty line as the full file; data lines in their original order",
+        "selection": "The rows whose SYM is one of 0855434, 0855397, 0855405, 0984692, 1061995, 0856623, 0856652, 0120230, 0120247, 0120075, 0120098, 0918123, 0988780, 0919938. Chosen to cover RM 01, 02, 04, 00, 99, 95 and 96; parts of a locality (SYMPOD ≠ SYM) in a village, a town and a Warsaw district; localities hanging from TERC RODZ 2, 4, 5, 1 and 8; and the two names with literal double quotes, Mazewo Dworskie\"A\" and Mazewo Dworskie\"B\"."
+      },
+      "compared_with_2026_09_18": "The 2026-09-18 SIMC zip (3349858 bytes, the same size) is recorded in docs/sources/acquisition/2026-09-18/SHA256SUMS.txt, but its CSV member's hash was never recorded, so whether the CSV bytes are identical is not verified."
+    }
+  ]
+}

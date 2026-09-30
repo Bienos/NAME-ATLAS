@@ -124,14 +124,16 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
       SELECT canonical_key, canonical_key_version FROM surnames ORDER BY canonical_key
     `.execute(db);
 
-    // `0022` down to `0007` sit above `0006` and revert cleanly (three indexes, the slug table,
-    // two index swaps, a dropped constraint, four enum additions that cannot be
-    // removed, the place tables, a data update and two dropped columns). They
-    // come down in reverse order of application, which is why `0022` is first
+    // `0023` down to `0007` sit above `0006` and revert cleanly (the membership
+    // table, three indexes, the slug table, two index swaps, a dropped
+    // constraint, four enum additions that cannot be removed, the place
+    // tables, a data update and two dropped columns). They
+    // come down in reverse order of application, which is why `0023` is first
     // here. The refusal under test is `0006`'s, so step past all of them, then
     // ask for the next step down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0023_administrative_memberships",
       "0022_universe_evidence_lookup_index",
       "0021_current_rank_top_index",
       "0020_surname_fold_prefix_index",

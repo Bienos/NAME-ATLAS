@@ -31,6 +31,7 @@ describe("MIGRATIONS_DIR", () => {
       "0020_surname_fold_prefix_index.ts", // suggest-as-you-type — diacritic-folded prefix search
       "0021_current_rank_top_index.ts", // home page — the most common surnames, from rank claims
       "0022_universe_evidence_lookup_index.ts", // TASK-036 — the universe evidence item, without a scan
+      "0023_administrative_memberships.ts", // TASK-039 — the TERC/SIMC place hierarchy
     ]);
   });
 });
