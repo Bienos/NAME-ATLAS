@@ -45,7 +45,7 @@ case "$MODE" in
     tls=$(openssl s_client -starttls postgres -connect "$host:$PGB_PORT" -servername "$host" \
       -verify_hostname "$host" -verify_return_error "${ca_opt[@]}" </dev/null 2>&1)
     if grep -q 'Verify return code: 0 (ok)' <<<"$tls"; then
-      pass "AC-03 the certificate verifies for $host ($(grep -m1 -o 'Protocol *: *TLSv[0-9.]*' <<<"$tls" | tr -s ' '))"
+      pass "AC-03 the certificate verifies for $host ($(grep -m1 -oE 'TLSv[0-9.]+' <<<"$(grep -m1 '^New, ' <<<"$tls")"))"
     else
       fail "AC-03 the certificate does not verify for $host: $(grep -m1 -E 'Verify return code|error' <<<"$tls")"
     fi
@@ -139,7 +139,8 @@ case "$MODE" in
     else
       fail "AC-08 no persisted firewall rule for $PGB_PORT in /etc/iptables/rules.v4"
     fi
-    if apt-config dump | grep -q 'APT::Periodic::Unattended-Upgrade "1"'; then
+    # A string, not a pipe: with pipefail, grep -q's early exit would SIGPIPE apt-config.
+    if grep -q 'APT::Periodic::Unattended-Upgrade "1"' <<<"$(apt-config dump)"; then
       pass "AC-08 unattended security upgrades are on"
     else
       fail "AC-08 unattended security upgrades are off"
