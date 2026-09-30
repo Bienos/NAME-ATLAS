@@ -391,6 +391,17 @@ No migration change was needed — `source_record_type` already carries `API_OBJ
 | `pnpm test:integration` | Passed — 54 tests, including the `API_OBJECT` assertion, against local PostgreSQL 16.13 / PostGIS 3.4.2 via the `TEST_DATABASE_URL` fallback. |
 | `pnpm build` | Passed. |
 
+## Design exploration — owner request, not a task (2026-09-30)
+
+At the project owner's request, a design research and concept exploration was carried out outside the task sequence. It changes no code, contract, canonical document or task.
+
+- **What exists:** `docs/design-exploration/` — seven sourced research notes (`research_notes/`), one synthesised report (`reports/`), `CONCEPTS.md` (twelve design directions, shared rules, comparison, recommendation) and `preview-reveal-screens.jpg`. The mockups themselves (75 artboards) live in a private design canvas linked from `CONCEPTS.md`, not in the repository.
+- **Data used:** only the real WOŹNIAK rows from `fixtures/pesel/` (42,550 men's list, 43,066 women's list, positions 9 and 11, as of 2026-01-20), never summed. All meanings, historical traces and confidence levels in the mockups are placeholders and are labelled as illustrative on screen.
+- **Verified:** every artboard rendered in a local headless-Chromium preview with no console errors, and each was visually reviewed. **Not verified:** real devices, Safari, Firefox, screen readers, or any user testing.
+- **Findings that affect future product copy (not acted on):**
+  - "Nobody or exactly one person carries it" is wrong when a surname is missing from both lists; the wording must be per list.
+  - A researcher's computation from the full 2026 files puts the two lists at about 42.76 million entries combined, more than Poland's resident population. That suggests the register includes people abroad, so "living in Poland" may be the wrong description. This bears on D-006 and is unverified here.
+
 ## Next action
 
 TASK-001, TASK-002, TASK-003 and TASK-004 are implemented and verified. Per `AGENTS.md` §8: **STOP.** This session did not start TASK-005 and did not write `tasks/005-*.md`.
