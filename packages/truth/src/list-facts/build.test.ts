@@ -6,11 +6,13 @@ import {
   PESEL_NATIONAL_FEMALE_2026,
   PESEL_NATIONAL_MALE_2026,
   PESEL_REGIONAL_MALE_2026,
+  PESEL_SERIES_KEYS,
   localFileName,
   sha256Hex,
 } from "@name-atlas/sources";
-import type { PeselResourceDescriptor } from "@name-atlas/sources";
+import type { PeselRefusedResource, PeselResourceDescriptor } from "@name-atlas/sources";
 import { ListFactsRefusedError, buildListFactsArtefact, computeListFacts } from "./build.js";
+import type { ListInput, SeriesInput } from "./build.js";
 import { LIST_FACTS_METHOD_VERSION } from "../version.js";
 
 /**
@@ -24,6 +26,43 @@ import { LIST_FACTS_METHOD_VERSION } from "../version.js";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const fixture = (descriptor: PeselResourceDescriptor) =>
   new Uint8Array(readFileSync(path.join(repoRoot, "fixtures/pesel", localFileName(descriptor))));
+
+/** A synthetic earlier edition of a national list, its registry entry pinning its own bytes. */
+function syntheticEdition(
+  role: "national_male" | "national_female",
+  resource_id: string,
+  data_date: string,
+  rows: readonly (readonly [string, number])[],
+): ListInput {
+  const text = "Nazwisko aktualne,Liczba\r\n" + rows.map(([n, c]) => `${n},${c}\r\n`).join("");
+  const bytes = new TextEncoder().encode(text);
+  const base = role === "national_male" ? PESEL_NATIONAL_MALE_2026 : PESEL_NATIONAL_FEMALE_2026;
+  return {
+    descriptor: {
+      ...base,
+      resource_id,
+      data_date,
+      official_sha256: sha256Hex(bytes),
+      official_byte_size: bytes.byteLength,
+      official_row_count: rows.length,
+    },
+    bytes,
+  };
+}
+
+/** A first edition, 2020-01-22, for a series whose last edition is `list`: two made-up rows. */
+function seriesOf(list: ListInput, refused: readonly PeselRefusedResource[] = []): SeriesInput {
+  const first = syntheticEdition(
+    list.descriptor.role === "national_female" ? "national_female" : "national_male",
+    list.descriptor.role === "national_female" ? "22815" : "22817",
+    "2020-01-22",
+    [
+      ["SYNTH0000", 7],
+      ["OLD0001", 2],
+    ],
+  );
+  return { editions: [first, list], refused };
+}
 
 function refusal(run: () => unknown): ListFactsRefusedError {
   try {
@@ -39,7 +78,7 @@ describe("computeListFacts over the committed fixture excerpts", () => {
   for (const descriptor of [PESEL_NATIONAL_MALE_2026, PESEL_NATIONAL_FEMALE_2026]) {
     it(`refuses ${descriptor.role} at the completeness gate`, () => {
       const bytes = fixture(descriptor);
-      const error = refusal(() => computeListFacts({ descriptor, bytes }));
+      const error = refusal(() => computeListFacts(seriesOf({ descriptor, bytes })));
       expect(error.reason).toBe("UNIVERSE_INCOMPLETE");
       expect(error.message).toContain("is not the complete published list");
       expect(error.message).toContain("not the official resource");
@@ -52,11 +91,14 @@ describe("computeListFacts over the committed fixture excerpts", () => {
   it("refuses to build an artefact from them", () => {
     const error = refusal(() =>
       buildListFactsArtefact({
-        male: { descriptor: PESEL_NATIONAL_MALE_2026, bytes: fixture(PESEL_NATIONAL_MALE_2026) },
-        female: {
+        male: seriesOf({
+          descriptor: PESEL_NATIONAL_MALE_2026,
+          bytes: fixture(PESEL_NATIONAL_MALE_2026),
+        }),
+        female: seriesOf({
           descriptor: PESEL_NATIONAL_FEMALE_2026,
           bytes: fixture(PESEL_NATIONAL_FEMALE_2026),
-        },
+        }),
       }),
     );
     expect(error.reason).toBe("UNIVERSE_INCOMPLETE");
@@ -84,7 +126,7 @@ describe("computeListFacts on a synthetic complete list", () => {
   const list = syntheticList("national_male", counts);
 
   it("computes facts that satisfy the contract, with lineage and assessment", () => {
-    const facts = computeListFacts(list);
+    const facts = computeListFacts(seriesOf(list));
     expect(facts.partition).toBe("national_male");
     expect(facts.source).toEqual({
       dataset_id: 1681,
@@ -108,9 +150,13 @@ describe("computeListFacts on a synthetic complete list", () => {
   });
 
   it("carries surname strings only in ADR-0018's named selections, at or above the floor", () => {
-    const facts = computeListFacts(list);
-    const { named_top, hyphenated, ...rest } = facts;
-    expect(JSON.stringify(rest)).not.toContain("SYNTH");
+    const facts = computeListFacts(seriesOf(list));
+    const { named_top, hyphenated, change, ...rest } = facts;
+    expect(JSON.stringify(rest)).not.toMatch(/synth/iu);
+    // change names no surname of its own: only the keys of named_top, in its order.
+    expect(change.top3_first_counts.map((entry) => entry.key)).toEqual(
+      named_top.items.map((item) => item.key),
+    );
     // The three largest counts: 2 + (i·37 mod 90) reaches 91 at i = 17 and 107, 90 at i = 34.
     expect(named_top.items).toEqual([
       { key: "synth0017", published: "SYNTH0017", count: 91 },
@@ -131,24 +177,29 @@ describe("computeListFacts on a synthetic complete list", () => {
       "national_male",
       Array.from({ length: 120 }, (_, i) => 2 + (i % 18)),
     );
-    const facts = computeListFacts(small);
+    const facts = computeListFacts(seriesOf(small));
     expect(facts.named_top.items).toEqual([]);
-    expect(JSON.stringify(facts)).not.toContain("SYNTH");
+    expect(facts.change.top3_first_counts).toEqual([]);
+    expect(JSON.stringify(facts)).not.toMatch(/synth/iu);
   });
 
   it("is deterministic", () => {
-    expect(computeListFacts(list)).toEqual(computeListFacts(list));
+    expect(computeListFacts(seriesOf(list))).toEqual(computeListFacts(seriesOf(list)));
   });
 
   it("refuses bytes whose size the registry does not pin, even with a matching checksum", () => {
     const wrongSize = { ...list.descriptor, official_byte_size: list.bytes.byteLength + 1 };
-    const error = refusal(() => computeListFacts({ descriptor: wrongSize, bytes: list.bytes }));
+    const error = refusal(() =>
+      computeListFacts(seriesOf({ descriptor: wrongSize, bytes: list.bytes })),
+    );
     expect(error.reason).toBe("BYTES_NOT_OFFICIAL");
   });
 
   it("refuses a row count the registry does not pin", () => {
     const short = { ...list.descriptor, official_row_count: 151 };
-    const error = refusal(() => computeListFacts({ descriptor: short, bytes: list.bytes }));
+    const error = refusal(() =>
+      computeListFacts(seriesOf({ descriptor: short, bytes: list.bytes })),
+    );
     expect(error.reason).toBe("UNIVERSE_INCOMPLETE");
     expect(error.message).toContain("has 150 rows where the registry pins 151");
     expect(error.message).not.toMatch(/rank/iu);
@@ -156,19 +207,25 @@ describe("computeListFacts on a synthetic complete list", () => {
 
   it("refuses a regional resource: a list fact is about a whole national list", () => {
     const regional = { ...list.descriptor, role: PESEL_REGIONAL_MALE_2026.role };
-    const error = refusal(() => computeListFacts({ descriptor: regional, bytes: list.bytes }));
+    const error = refusal(() =>
+      computeListFacts({ editions: [{ descriptor: regional, bytes: list.bytes }], refused: [] }),
+    );
     expect(error.reason).toBe("NOT_A_NATIONAL_LIST");
   });
 });
 
 describe("buildListFactsArtefact", () => {
-  const male = syntheticList(
-    "national_male",
-    Array.from({ length: 150 }, (_, i) => 2 + (i % 60)),
+  const male = seriesOf(
+    syntheticList(
+      "national_male",
+      Array.from({ length: 150 }, (_, i) => 2 + (i % 60)),
+    ),
   );
-  const female = syntheticList(
-    "national_female",
-    Array.from({ length: 160 }, (_, i) => 2 + (i % 70)),
+  const female = seriesOf(
+    syntheticList(
+      "national_female",
+      Array.from({ length: 160 }, (_, i) => 2 + (i % 70)),
+    ),
   );
 
   it("places the two lists side by side, each computed on its own", () => {
@@ -199,7 +256,7 @@ describe("buildListFactsArtefact", () => {
   it("records the pipeline version, apart from the schema version", () => {
     const artefact = buildListFactsArtefact({ male, female });
     expect(artefact.pipeline_version).toBe(LIST_FACTS_METHOD_VERSION);
-    expect(artefact.pipeline_version).toBe("list_facts_pipeline@2");
+    expect(artefact.pipeline_version).toBe("list_facts_pipeline@3");
     expect(artefact.pipeline_version).not.toBe(artefact.schema_version);
   });
 
@@ -209,8 +266,173 @@ describe("buildListFactsArtefact", () => {
   });
 
   it("refuses lists from two reference dates", () => {
-    const later = { ...female, descriptor: { ...female.descriptor, data_date: "2027-01-20" } };
+    const [first, list] = female.editions;
+    const later = {
+      ...female,
+      editions: [
+        first!,
+        { ...list!, descriptor: { ...list!.descriptor, data_date: "2027-01-20" } },
+      ],
+    };
     const error = refusal(() => buildListFactsArtefact({ male, female: later }));
     expect(error.reason).toBe("LISTS_MISMATCHED");
+  });
+
+  it("gives each list its own series: the two are never one series", () => {
+    const artefact = buildListFactsArtefact({ male, female });
+    expect(artefact.lists.male.editions.series).toBe(PESEL_SERIES_KEYS.national_male);
+    expect(artefact.lists.female.editions.series).toBe(PESEL_SERIES_KEYS.national_female);
+  });
+});
+
+/**
+ * A synthetic female series (TASK-044, ADR-0019): 2020, 2021 and 2026, and a
+ * resource dated 2022 that repeats the 2021 edition's bytes. The last edition
+ * pads to 1100 people with FILL rows (11 each, below the floor), enough for
+ * the example crowd of 1000.
+ */
+describe("computeListFacts over a series (ADR-0019)", () => {
+  const fill = Array.from(
+    { length: 100 },
+    (_, i) => [`FILL${String(i).padStart(4, "0")}`, 11] as const,
+  );
+  const e2020 = syntheticEdition("national_female", "22815", "2020-01-22", [
+    ["NOWAK", 50],
+    ["KOWALSKA", 30],
+    ["ŁUCZAK", 5],
+    ["STARA", 2],
+    ...fill,
+  ]);
+  const e2021 = syntheticEdition("national_female", "35279", "2021-02-02", [
+    ["NOWAK", 52],
+    ["KOWALSKA", 30],
+    ["ŁUCZAK", 5],
+    ["STARA", 2],
+    ...fill,
+  ]);
+  const e2026 = syntheticEdition("national_female", "1148811", "2026-01-20", [
+    ["NOWAK", 60],
+    ["KOWALSKA", 30],
+    ["LUCZAK", 25],
+    ["ŁUCZAK", 4],
+    ["NOWA", 2],
+    ...fill,
+  ]);
+  const duplicate: PeselRefusedResource = {
+    ...e2021.descriptor,
+    role: "national_female",
+    series: PESEL_SERIES_KEYS.national_female,
+    resource_id: "38772",
+    data_date: "2022-01-27",
+    reason: "PUBLISHER_DUPLICATE",
+    duplicate_of: "35279",
+    notes: "synthetic",
+  };
+  const series: SeriesInput = { editions: [e2020, e2021, e2026], refused: [duplicate] };
+
+  it("states every edition, and the duplicate as a gap with its reason", () => {
+    const { editions } = computeListFacts(series);
+    expect(editions.series).toBe(PESEL_SERIES_KEYS.national_female);
+    expect(editions.items.map((e) => [e.resource_id, e.data_date, e.surnames, e.people])).toEqual([
+      ["22815", "2020-01-22", 104, 1187],
+      ["35279", "2021-02-02", 104, 1189],
+      ["1148811", "2026-01-20", 105, 1221],
+    ]);
+    expect(editions.items.map((e) => e.sha256)).toEqual([
+      e2020.descriptor.official_sha256,
+      e2021.descriptor.official_sha256,
+      e2026.descriptor.official_sha256,
+    ]);
+    expect(editions.gaps).toEqual([
+      {
+        data_date: "2022-01-27",
+        resource_id: "38772",
+        reason: "PUBLISHER_DUPLICATE",
+        duplicate_of: "35279",
+      },
+    ]);
+  });
+
+  it("compares the first edition with the last by exact key, a surname absent being null", () => {
+    const { change, named_top } = computeListFacts(series);
+    expect(named_top.items.map((item) => item.published)).toEqual(["NOWAK", "KOWALSKA", "LUCZAK"]);
+    expect(change).toMatchObject({
+      first_data_date: "2020-01-22",
+      last_data_date: "2026-01-20",
+      surnames_delta: 1,
+      people_delta: 34,
+      // LUCZAK and NOWA are new; ŁUCZAK is another surname, on both; STARA is gone.
+      on_last_not_first: { surnames: 2, people: 27 },
+      on_first_not_last: { surnames: 1, people_on_first: 2 },
+      top3_first_counts: [
+        { key: "nowak", count_first: 50 },
+        { key: "kowalska", count_first: 30 },
+        { key: "luczak", count_first: null },
+      ],
+      top10_unchanged: false,
+    });
+  });
+
+  it("refuses the duplicate as an edition", () => {
+    const asEdition: ListInput = {
+      bytes: e2021.bytes,
+      descriptor: { ...e2021.descriptor, resource_id: "38772", data_date: "2022-01-27" },
+    };
+    const error = refusal(() =>
+      computeListFacts({ editions: [e2020, e2021, asEdition, e2026], refused: [] }),
+    );
+    expect(error.reason).toBe("DUPLICATE_EDITION");
+    expect(error.message).toContain("38772");
+    expect(error.message).toContain("35279");
+  });
+
+  it("refuses an edition on another publication floor (ADR-0019 §1)", () => {
+    const higher = syntheticEdition("national_female", "35279", "2021-02-02", [
+      ["NOWAK", 52],
+      ["KOWALSKA", 30],
+      ["ŁUCZAK", 5],
+      ...fill,
+    ]);
+    const error = refusal(() =>
+      computeListFacts({ editions: [e2020, higher, e2026], refused: [] }),
+    );
+    expect(error.reason).toBe("FLOOR_MISMATCHED");
+    expect(error.message).toContain("35279");
+  });
+
+  it("gates every edition, not only the last", () => {
+    const tampered: ListInput = {
+      ...e2021,
+      descriptor: { ...e2021.descriptor, official_row_count: 105 },
+    };
+    const error = refusal(() =>
+      computeListFacts({ editions: [e2020, tampered, e2026], refused: [] }),
+    );
+    expect(error.reason).toBe("UNIVERSE_INCOMPLETE");
+    expect(error.message).toContain("35279");
+  });
+
+  it("refuses an edition of the other list or of no series, and a series of one edition", () => {
+    const male = syntheticEdition("national_male", "28052", "2021-02-01", [["NOWAK", 9]]);
+    expect(
+      refusal(() => computeListFacts({ editions: [e2020, male, e2026], refused: [] })).reason,
+    ).toBe("SERIES_MISMATCHED");
+    const noSeries: ListInput = { ...e2021, descriptor: { ...e2021.descriptor, series: null } };
+    expect(
+      refusal(() => computeListFacts({ editions: [e2020, noSeries, e2026], refused: [] })).reason,
+    ).toBe("SERIES_MISMATCHED");
+    expect(refusal(() => computeListFacts({ editions: [e2026], refused: [] })).reason).toBe(
+      "SERIES_MISMATCHED",
+    );
+  });
+
+  it("refuses editions out of date order, and a refused resource that is no byte-identical twin", () => {
+    expect(() => computeListFacts({ editions: [e2021, e2020, e2026], refused: [] })).toThrow(
+      /ascending date order/u,
+    );
+    const notATwin = { ...duplicate, official_sha256: "0".repeat(64) };
+    expect(() => computeListFacts({ ...series, refused: [notATwin] })).toThrow(
+      /not an edition with the same SHA-256/u,
+    );
   });
 });

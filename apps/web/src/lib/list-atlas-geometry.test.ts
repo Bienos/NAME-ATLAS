@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   clamp01,
+  columnPath,
   countsByRank,
   lensArea,
   linearScale,
@@ -10,6 +11,8 @@ import {
   skyDotRadius,
   skyPoint,
   sqrtScale,
+  TREND,
+  trendColumn,
   vennLayout,
 } from "./list-atlas-geometry.js";
 
@@ -95,5 +98,28 @@ describe("the two circles (plate VI)", () => {
     expect(vennLayout(0, 0, 0)).toEqual({ r1: 0, r2: 0, d: 0 });
     const apart = vennLayout(10, 10, 0);
     expect(apart.d).toBeCloseTo(2, 9);
+  });
+});
+
+describe("the editions chart (plate VII)", () => {
+  it("gives each of n slots an equal, centred column inside the box", () => {
+    const columns = [0, 1, 2, 3, 4, 5, 6].map((i) => trendColumn(i, 7));
+    expect(columns[0]!.x).toBeGreaterThan(0);
+    const last = columns[6]!;
+    expect(last.x + last.width).toBeLessThan(TREND.width);
+    for (const column of columns) expect(column.width).toBe(columns[0]!.width);
+    expect(round4(columns[1]!.x - columns[0]!.x)).toBe(round4(TREND.width / 7));
+  });
+
+  it("stands a column on the baseline, as tall as its fraction of the plot", () => {
+    const column = trendColumn(0, 1);
+    const path = columnPath(column, 1);
+    expect(path.startsWith(`M${String(column.x)} ${String(TREND.height)}`)).toBe(true);
+    const ys = [...path.matchAll(/[VQ]\s*[\d.]+\s+([\d.]+)|V([\d.]+)/gu)].map((m) =>
+      Number(m[1] ?? m[2]),
+    );
+    expect(Math.min(...ys)).toBe(TREND.top);
+    expect(columnPath(column, 0)).toBe("");
+    expect(columnPath(column, -1)).toBe("");
   });
 });

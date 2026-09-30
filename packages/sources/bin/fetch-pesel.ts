@@ -3,6 +3,12 @@
  * Puts the four registered PESEL resources on disk, byte-exact.
  *
  *   pnpm fetch:pesel [--dir data]
+ *   pnpm fetch:pesel --series [--dir data]
+ *
+ * `--series` fetches instead every edition of the two national series
+ * (ADR-0019, TASK-044): the male and the female list from 2020-01-22 to
+ * 2026-01-20, which the list-facts generator reads. A refused resource
+ * (`PESEL_REFUSED_RESOURCES`) is not an edition and is never fetched.
  *
  * For each resource in the registry: if `<dir>/<name>.csv` already exists and
  * matches the pinned size and SHA-256, it is left alone; otherwise it is
@@ -18,7 +24,11 @@
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { localFileName, verifyResourceBytes } from "../src/acquire.js";
-import { PESEL_NATIONAL_RESOURCES_2026, PESEL_REGIONAL_RESOURCES_2026 } from "../src/registry.js";
+import {
+  PESEL_NATIONAL_RESOURCES_2026,
+  PESEL_NATIONAL_SERIES,
+  PESEL_REGIONAL_RESOURCES_2026,
+} from "../src/registry.js";
 import type { PeselResourceDescriptor } from "../src/registry.js";
 
 function dirArg(argv: readonly string[]): string {
@@ -84,10 +94,14 @@ async function ensure(resource: PeselResourceDescriptor, dir: string): Promise<b
 }
 
 async function main(): Promise<void> {
-  const dir = dirArg(process.argv.slice(2));
+  const argv = process.argv.slice(2);
+  const dir = dirArg(argv);
+  const resources = argv.includes("--series")
+    ? [...PESEL_NATIONAL_SERIES.national_male, ...PESEL_NATIONAL_SERIES.national_female]
+    : [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026];
   await mkdir(dir, { recursive: true });
   let ok = true;
-  for (const resource of [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026]) {
+  for (const resource of resources) {
     ok = (await ensure(resource, dir)) && ok;
   }
   if (!ok) process.exit(1);

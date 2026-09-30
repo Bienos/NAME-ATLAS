@@ -163,6 +163,10 @@ export const PESEL_SOURCE: SourceSeed = {
  * that docs/canonical/11 §6.1's comparability rule — "only snapshots in the
  * same group may be compared quantitatively" — mechanically forbids summing
  * or comparing the two resources. That is the enforcement for AC-17.
+ *
+ * `series` (ADR-0019 §2.1) names the editions of one national list whose
+ * published universe description is the same. Only list-scope figures may be
+ * compared across the editions of one series; a regional resource is in none.
  */
 export interface PeselResourceDescriptor {
   readonly role: "national_male" | "national_female" | "regional_male" | "regional_female";
@@ -185,7 +189,24 @@ export interface PeselResourceDescriptor {
   readonly methodology_key: string;
   readonly comparability_group: string;
   readonly coverage_notes: string;
+  /** The series this national edition belongs to (ADR-0019 §2.1); `null` for a regional resource. */
+  readonly series: PeselSeriesKey | null;
 }
+
+/**
+ * ADR-0019 §2.1: one series per national list. A series holds the editions
+ * whose publisher's universe description is the same — "Wykaz nazwisk …
+ * osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL"
+ * — from 2020-01-22 on. The 2019-06-30 editions describe their universe
+ * differently and are in no series (ADR-0019 §2.2). The male and the female
+ * series are two series: they are never added together.
+ */
+export const PESEL_SERIES_KEYS = {
+  national_male: "pesel_living_current_surname_national_male",
+  national_female: "pesel_living_current_surname_national_female",
+} as const;
+
+export type PeselSeriesKey = (typeof PESEL_SERIES_KEYS)[keyof typeof PESEL_SERIES_KEYS];
 
 const PARTITION_NOT_DISAMBIGUATED =
   "The publisher does not state whether this partition is by the bearer's sex or by the " +
@@ -214,6 +235,7 @@ export const PESEL_NATIONAL_MALE_2026: PeselResourceDescriptor = {
   methodology_key: "pesel_current_surname_national_2026_male_resource",
   comparability_group: "pesel_2026_national_male",
   coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
 };
 
 export const PESEL_NATIONAL_FEMALE_2026: PeselResourceDescriptor = {
@@ -235,6 +257,7 @@ export const PESEL_NATIONAL_FEMALE_2026: PeselResourceDescriptor = {
   methodology_key: "pesel_current_surname_national_2026_female_resource",
   comparability_group: "pesel_2026_national_female",
   coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_female,
 };
 
 /** The approved national production pair, in a stable order. */
@@ -274,6 +297,7 @@ export const PESEL_REGIONAL_MALE_2026: PeselResourceDescriptor = {
   methodology_key: "pesel_current_surname_regional_2026_male_resource",
   comparability_group: "pesel_2026_regional_male",
   coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+  series: null,
 };
 
 /** Regional resource `1148790` — female, same basis. */
@@ -297,6 +321,7 @@ export const PESEL_REGIONAL_FEMALE_2026: PeselResourceDescriptor = {
   methodology_key: "pesel_current_surname_regional_2026_female_resource",
   comparability_group: "pesel_2026_regional_female",
   coverage_notes: REGIONAL_SCOPE_RESTRICTION,
+  series: null,
 };
 
 export const PESEL_REGIONAL_RESOURCES_2026 = [
@@ -350,3 +375,349 @@ export function nationalCounterpartOf(
       return undefined;
   }
 }
+
+// --- TASK-044, ADR-0019: the two national series ---------------------------
+
+const PORTAL_DATE_2023_FEMALE =
+  `${PARTITION_NOT_DISAMBIGUATED} The portal's data_date says 2023-01-31; the title and the ` +
+  'description say "stan na 30.01.2023", and the stated reference date is the one used.';
+
+/*
+ * The earlier editions of the two national lists (ADR-0019 §2.1). Each is
+ * SHA-pinned and gated like the 2026 files; the list-facts generator reads
+ * them for list-scope figures only. They are not import-approved:
+ * `findPeselResource` does not return them, so no surname claim is built
+ * from an earlier edition (TASK-044 §5).
+ *
+ * `universe_description` is the publisher's text verbatim, including the 2020
+ * male edition's "nazwisk męskie". `retrieved_at` is when the CSV endpoint's
+ * bytes these checksums describe finished downloading; a second download of
+ * the 2020 male file gave the same bytes.
+ */
+
+export const PESEL_NATIONAL_MALE_2020: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "22817",
+  resource_title: "Nazwiska męskie - stan na 2020-01-22",
+  data_date: "2020-01-22",
+  portal_modified_at: "2022-05-23T11:47:22Z",
+  retrieved_at: "2026-09-30T17:54:37Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/22817,nazwiska-meskie-stan-na-2020-01-22/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/22817,nazwiska-meskie-stan-na-2020-01-22",
+  official_sha256: "a6af514f921c30771591bced6785c6559d63f5e88868e25eaad130eb36fd805d",
+  official_byte_size: 3_662_490,
+  official_row_count: 283_221,
+  universe_description:
+    "Wykaz nazwisk męskie osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020",
+  methodology_key: "pesel_current_surname_national_2020_male_resource",
+  comparability_group: "pesel_2020_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_MALE_2021: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "28052",
+  resource_title: "Nazwiska męskie - stan na 2021-02-01",
+  data_date: "2021-02-01",
+  portal_modified_at: "2021-02-03T11:06:56Z",
+  retrieved_at: "2026-09-30T17:54:54Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/28052,nazwiska-meskie-stan-na-2021-02-01/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/28052,nazwiska-meskie-stan-na-2021-02-01",
+  official_sha256: "ea466f2b8611be038913c6354bb13a5d029f5ff0ced07eea7ef282f5f52c215c",
+  official_byte_size: 3_859_773,
+  official_row_count: 298_692,
+  universe_description:
+    "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 01.02.2021",
+  methodology_key: "pesel_current_surname_national_2021_male_resource",
+  comparability_group: "pesel_2021_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_MALE_2022: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "36401",
+  resource_title: "Nazwiska męskie - stan na 2022-01-27",
+  data_date: "2022-01-27",
+  portal_modified_at: "2022-02-07T08:19:30Z",
+  retrieved_at: "2026-09-30T17:55:12Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/36401,nazwiska-meskie-stan-na-2022-01-27/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/36401,nazwiska-meskie-stan-na-2022-01-27",
+  official_sha256: "4389d8964dd37c7ab71306d537e98b365e171831d2be9e63b84bdcaaf33ca68d",
+  official_byte_size: 4_160_756,
+  official_row_count: 322_232,
+  universe_description:
+    "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 27.01.2022",
+  methodology_key: "pesel_current_surname_national_2022_male_resource",
+  comparability_group: "pesel_2022_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_MALE_2023: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "44647",
+  resource_title: "Nazwiska męskie - stan na 2023-01-30",
+  data_date: "2023-01-30",
+  portal_modified_at: "2024-01-25T14:56:41Z",
+  retrieved_at: "2026-09-30T17:55:28Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/44647,nazwiska-meskie-stan-na-2023-01-30/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/44647,nazwiska-meskie-stan-na-2023-01-30",
+  official_sha256: "7e95c307a2ebf62b1ea14b936925c46cc0b6db960dec8fc98c6b5fe8980f9af0",
+  official_byte_size: 4_692_377,
+  official_row_count: 363_360,
+  universe_description:
+    "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023",
+  methodology_key: "pesel_current_surname_national_2023_male_resource",
+  comparability_group: "pesel_2023_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_MALE_2024: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "54097",
+  resource_title: "Nazwiska męskie - stan na 2024-01-19",
+  data_date: "2024-01-19",
+  portal_modified_at: "2024-01-26T06:35:27Z",
+  retrieved_at: "2026-09-30T17:55:52Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/54097,nazwiska-meskie-stan-na-2024-01-19/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/54097,nazwiska-meskie-stan-na-2024-01-19",
+  official_sha256: "3c722cada73f0b52184931a4cc521a5c7d6905683f5103a417f867fd9547be0e",
+  official_byte_size: 4_904_484,
+  official_row_count: 379_712,
+  universe_description:
+    "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024",
+  methodology_key: "pesel_current_surname_national_2024_male_resource",
+  comparability_group: "pesel_2024_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_MALE_2025: PeselResourceDescriptor = {
+  role: "national_male",
+  resource_id: "63892",
+  resource_title: "Nazwiska męskie - stan na 2025-01-22",
+  data_date: "2025-01-22",
+  portal_modified_at: "2025-01-23T14:29:44Z",
+  retrieved_at: "2026-09-30T17:56:10Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/63892,nazwiska-meskie-stan-na-2025-01-22/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/63892,nazwiska-meskie-stan-na-2025-01-22",
+  official_sha256: "079695630265bf0bcb2f944743799850465123fbd280ead736f3274d867818cb",
+  official_byte_size: 5_114_559,
+  official_row_count: 395_127,
+  universe_description:
+    "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025",
+  methodology_key: "pesel_current_surname_national_2025_male_resource",
+  comparability_group: "pesel_2025_national_male",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_male,
+};
+
+export const PESEL_NATIONAL_FEMALE_2020: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "22815",
+  resource_title: "Nazwiska żeńskie - stan na 2020-01-22",
+  data_date: "2020-01-22",
+  portal_modified_at: "2022-05-23T10:50:33Z",
+  retrieved_at: "2026-09-30T17:54:46Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/22815,nazwiska-zenskie-stan-na-2020-01-22/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/22815,nazwiska-zenskie-stan-na-2020-01-22",
+  official_sha256: "b0ede69ca79698cd8f6b09462916234be67dd4322d888e6a9263b89a52bfd99b",
+  official_byte_size: 3_988_200,
+  official_row_count: 299_612,
+  universe_description:
+    "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020",
+  methodology_key: "pesel_current_surname_national_2020_female_resource",
+  comparability_group: "pesel_2020_national_female",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_female,
+};
+
+export const PESEL_NATIONAL_FEMALE_2021: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "35279",
+  resource_title: "Nazwiska żeńskie - stan na 2021-02-02",
+  data_date: "2021-02-02",
+  portal_modified_at: "2021-12-21T13:31:47Z",
+  retrieved_at: "2026-09-30T17:55:04Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/35279,nazwiska-zenskie-stan-na-2021-02-02/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/35279,nazwiska-zenskie-stan-na-2021-02-02",
+  official_sha256: "9af26480ed3035e7e6b9349033c4ccd76bee3eeb5e8ac7ce299a8d00ba0b62e0",
+  official_byte_size: 4_141_803,
+  official_row_count: 311_240,
+  universe_description:
+    "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 02.02.2021",
+  methodology_key: "pesel_current_surname_national_2021_female_resource",
+  comparability_group: "pesel_2021_national_female",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_female,
+};
+
+export const PESEL_NATIONAL_FEMALE_2023: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "44646",
+  resource_title: "Nazwiska żeńskie - stan na 2023-01-30",
+  data_date: "2023-01-30",
+  portal_modified_at: "2023-01-31T14:12:44Z",
+  retrieved_at: "2026-09-30T17:55:42Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/44646,nazwiska-zenskie-stan-na-2023-01-30/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/44646,nazwiska-zenskie-stan-na-2023-01-30",
+  official_sha256: "326bfc3dcf2b55886073a46780acaefec3fb2bc4444f6ddbc052938c1aa05cb2",
+  official_byte_size: 5_169_657,
+  official_row_count: 389_365,
+  universe_description:
+    "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023",
+  methodology_key: "pesel_current_surname_national_2023_female_resource",
+  comparability_group: "pesel_2023_national_female",
+  coverage_notes: PORTAL_DATE_2023_FEMALE,
+  series: PESEL_SERIES_KEYS.national_female,
+};
+
+export const PESEL_NATIONAL_FEMALE_2024: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "54098",
+  resource_title: "Nazwiska żeńskie - stan na 2024-01-19",
+  data_date: "2024-01-19",
+  portal_modified_at: "2024-01-26T07:06:19Z",
+  retrieved_at: "2026-09-30T17:56:57Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/54098,nazwiska-zenskie-stan-na-2024-01-19/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/54098,nazwiska-zenskie-stan-na-2024-01-19",
+  official_sha256: "7988d01d8f85f84cd84bb0069b9129c9b3944aba5349709cffca21555d6fcf28",
+  official_byte_size: 5_324_053,
+  official_row_count: 400_764,
+  universe_description:
+    "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024",
+  methodology_key: "pesel_current_surname_national_2024_female_resource",
+  comparability_group: "pesel_2024_national_female",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_female,
+};
+
+export const PESEL_NATIONAL_FEMALE_2025: PeselResourceDescriptor = {
+  role: "national_female",
+  resource_id: "63888",
+  resource_title: "Nazwiska żeńskie - stan na 2025-01-22",
+  data_date: "2025-01-22",
+  portal_modified_at: "2025-01-23T11:54:55Z",
+  retrieved_at: "2026-09-30T17:56:22Z",
+  official_source_url:
+    "https://api.dane.gov.pl/resources/63888,nazwiska-zenskie-stan-na-2025-01-22/csv",
+  official_resource_metadata_url:
+    "https://api.dane.gov.pl/1.4/resources/63888,nazwiska-zenskie-stan-na-2025-01-22",
+  official_sha256: "9ac287db5266fc03d3e24a497244d071b3ef2fb4907c43c2b07844912db0d27a",
+  official_byte_size: 5_465_724,
+  official_row_count: 411_012,
+  universe_description:
+    "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025",
+  methodology_key: "pesel_current_surname_national_2025_female_resource",
+  comparability_group: "pesel_2025_national_female",
+  coverage_notes: PARTITION_NOT_DISAMBIGUATED,
+  series: PESEL_SERIES_KEYS.national_female,
+};
+
+/**
+ * ADR-0019 §2.1: each national series, its editions in date order, the 2026
+ * edition last. The female series has no 2022 edition: the resource dated
+ * 2022-01-27 is refused ({@link PESEL_REFUSED_RESOURCES}).
+ */
+export const PESEL_NATIONAL_SERIES: {
+  readonly national_male: readonly PeselResourceDescriptor[];
+  readonly national_female: readonly PeselResourceDescriptor[];
+} = {
+  national_male: [
+    PESEL_NATIONAL_MALE_2020,
+    PESEL_NATIONAL_MALE_2021,
+    PESEL_NATIONAL_MALE_2022,
+    PESEL_NATIONAL_MALE_2023,
+    PESEL_NATIONAL_MALE_2024,
+    PESEL_NATIONAL_MALE_2025,
+    PESEL_NATIONAL_MALE_2026,
+  ],
+  national_female: [
+    PESEL_NATIONAL_FEMALE_2020,
+    PESEL_NATIONAL_FEMALE_2021,
+    PESEL_NATIONAL_FEMALE_2023,
+    PESEL_NATIONAL_FEMALE_2024,
+    PESEL_NATIONAL_FEMALE_2025,
+    PESEL_NATIONAL_FEMALE_2026,
+  ],
+};
+
+/** Why a published resource of a series is not one of its editions (ADR-0019 §2.2). */
+export type PeselRefusalReason = "PUBLISHER_DUPLICATE";
+
+/**
+ * A resource the publisher lists in a series that is not an edition of it.
+ * Recorded with the bytes it was refused on, so the refusal can be checked.
+ */
+export interface PeselRefusedResource {
+  readonly role: "national_male" | "national_female";
+  readonly series: PeselSeriesKey;
+  readonly resource_id: string;
+  readonly resource_title: string;
+  /** The reference date the publisher states for it. */
+  readonly data_date: string;
+  readonly portal_modified_at: string;
+  readonly retrieved_at: string;
+  readonly official_source_url: string;
+  readonly official_resource_metadata_url: string;
+  readonly official_sha256: string;
+  readonly official_byte_size: number;
+  readonly official_row_count: number;
+  readonly reason: PeselRefusalReason;
+  /** `PUBLISHER_DUPLICATE`: the resource id of the edition whose bytes it repeats. */
+  readonly duplicate_of: string;
+  readonly notes: string;
+}
+
+/**
+ * ADR-0019 §1 and §2.2: the female resource dated 2022-01-27 is byte-identical
+ * to the one dated 2021-02-02 (same SHA-256, 311 240 rows). It cannot be a
+ * 2022 measurement, so the female series shows a gap there, never a value.
+ */
+export const PESEL_REFUSED_RESOURCES: readonly PeselRefusedResource[] = [
+  {
+    role: "national_female",
+    series: PESEL_SERIES_KEYS.national_female,
+    resource_id: "38772",
+    resource_title: "Nazwiska żeńskie - stan na 2022-01-27",
+    data_date: "2022-01-27",
+    portal_modified_at: "2022-05-25T09:38:12Z",
+    retrieved_at: "2026-09-30T17:56:45Z",
+    official_source_url:
+      "https://api.dane.gov.pl/resources/38772,nazwiska-zenskie-stan-na-2022-01-27/csv",
+    official_resource_metadata_url:
+      "https://api.dane.gov.pl/1.4/resources/38772,nazwiska-zenskie-stan-na-2022-01-27",
+    official_sha256: "9af26480ed3035e7e6b9349033c4ccd76bee3eeb5e8ac7ce299a8d00ba0b62e0",
+    official_byte_size: 4_141_803,
+    official_row_count: 311_240,
+    reason: "PUBLISHER_DUPLICATE",
+    duplicate_of: "35279",
+    notes:
+      "Byte-identical to resource 35279 (stan na 2021-02-02): the same SHA-256, size and rows. " +
+      'Its description says "stan na 27.01.2022", but its bytes are the 2021 edition\'s, so it ' +
+      "is no 2022 measurement.",
+  },
+];

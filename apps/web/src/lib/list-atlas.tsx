@@ -1,7 +1,14 @@
 import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { POLISH_ALPHABET } from "@name-atlas/contracts";
-import type { CountBand, ListFacts, ListFactsArtefact, NamedSurname } from "@name-atlas/contracts";
+import type {
+  CountBand,
+  ListEdition,
+  ListEditionGap,
+  ListFacts,
+  ListFactsArtefact,
+  NamedSurname,
+} from "@name-atlas/contracts";
 import {
   assessmentWord,
   fillTemplate,
@@ -9,6 +16,7 @@ import {
   formatInteger,
   formatQuantile,
   formatShare,
+  formatSigned,
   parseTemplate,
   pluralForm,
   terminate,
@@ -19,18 +27,21 @@ import { ListAtlasShell } from "./list-atlas-shell.js";
 import { ListAtlasSky } from "./list-atlas-sky.js";
 import type { SkyList } from "./list-atlas-sky.js";
 import {
+  columnPath,
   linearScale,
   RIBBON,
   ribbonPath,
   round4,
   sqrtScale,
+  TREND,
+  trendColumn,
   vennLayout,
 } from "./list-atlas-geometry.js";
 
 /**
- * The landing atlas (TASK-040; six plates since TASK-043): six plates about
- * the two published PESEL surname lists, rendered from `listFacts()`, and a
- * coda.
+ * The landing atlas (TASK-040; six plates since TASK-043, seven since
+ * TASK-044): seven plates about the two published PESEL surname lists,
+ * rendered from `listFacts()`.
  *
  * **This view derives nothing.** Every figure a reader sees is a value the
  * artefact carries, formatted by `messages.ts`: nothing is added, subtracted,
@@ -44,11 +55,14 @@ import {
  * for both, every line that carries one list's figures names that list, and
  * the list switch shows one of the two (`list-atlas-shell.tsx`). No number on
  * the page is a sum of the two. Plate VI compares them only as the artefact's
- * `overlap` does: counts of surnames, never of people.
+ * `overlap` does: counts of surnames, never of people. Plate VII sets each
+ * list beside the earlier editions of its own series (ADR-0019), from the
+ * artefact's `editions` and `change`: what changed, never why, and a missing
+ * edition drawn as a gap with its reason, never as a value.
  *
  * A surname appears only as one of the artefact's ADR-0018 selections, as its
- * published string, and as text: never a link, because production's search
- * cannot answer most surnames yet (TASK-043 §2.5).
+ * published string, linked to its search answer (ADR-0019 §2.6). No surname is
+ * named for its growth: plate VII names only the list's `TOP_3`.
  */
 
 type Side = "male" | "female";
@@ -84,9 +98,20 @@ function Num({ children }: { children: ReactNode }) {
   return <span className="lf-n">{children}</span>;
 }
 
-/** A surname as the source publishes it: text, never a link (ADR-0018 §2.5). */
-function Name({ surname }: { surname: string }) {
-  return <span className="lf-name">{surname}</span>;
+/** The search's address for a surname as published: `/?surname=…` (ADR-0019 §2.6). */
+export function searchHref(published: string, lang: Lang): string {
+  const params = new URLSearchParams({ surname: published });
+  if (lang === "en") params.set("lang", "en");
+  return `/?${params.toString()}`;
+}
+
+/** A surname as the source publishes it, linked to its search answer (ADR-0019 §2.6). */
+function Name({ surname, lang }: { surname: string; lang: Lang }) {
+  return (
+    <a className="lf-name" href={searchHref(surname, lang)}>
+      {surname}
+    </a>
+  );
 }
 
 /** Custom properties for the stylesheet: positions and scales as unitless fractions. */
@@ -165,11 +190,14 @@ function SourceLine({
   facts,
   methods,
   shared = [],
+  editions = false,
   lang,
 }: {
   facts: ListFactsArtefact;
   methods: (list: ListFacts) => readonly string[];
   shared?: readonly string[];
+  /** Date the line by each list's editions (plate VII) rather than by the snapshot. */
+  editions?: boolean;
   lang: Lang;
 }) {
   const t = UI[lang];
@@ -180,18 +208,26 @@ function SourceLine({
   ]
     .map((status) => assessmentWord(status, lang))
     .join(", ");
-  const date = keptDate(facts.snapshot_date, lang);
+  const date: ReactNode = editions ? (
+    <PerList
+      facts={facts}
+      inline
+      render={(list) => list.editions.items.map((e) => keptDate(e.data_date, lang)).join(", ")}
+    />
+  ) : (
+    keptDate(facts.snapshot_date, lang)
+  );
   // Both lists are resources of one dataset: one link when they share a page.
   const line =
     male.source.source_page_url === female.source.source_page_url
       ? rich(
-          t.lfSource,
+          editions ? t.lfSourceEditions : t.lfSource,
           { link: <a href={male.source.source_page_url}>{t.lfSourceName}</a>, date },
           {},
           lang,
         )
       : rich(
-          t.lfSourceTwo,
+          editions ? t.lfSourceEditionsTwo : t.lfSourceTwo,
           {
             male: <a href={male.source.source_page_url}>{t.lfListInMale}</a>,
             female: <a href={female.source.source_page_url}>{t.lfListInFemale}</a>,
@@ -299,16 +335,19 @@ function SkyFigures({ list, side, lang }: { list: ListFacts; side: Side; lang: L
         {items.length === 0 ? null : (
           <li>
             <i className="lf-key-core" aria-hidden="true" />
-            <span>
-              {of(side, t.lfP1CoreMale, t.lfP1CoreFemale)}{" "}
-              {items.map((item, index) => (
-                <Fragment key={item.key}>
-                  {index === 0 ? null : " · "}
-                  <Name surname={item.published} />{" "}
-                  <span className="lf-count">{formatInteger(item.count, lang)}</span>
-                </Fragment>
-              ))}
-            </span>
+            <div>
+              {of(side, t.lfP1CoreMale, t.lfP1CoreFemale)}
+              {/* Standalone links, one row each, so every name is its own
+                  44px target and no row covers another. */}
+              <ol className="lf-legend-names">
+                {items.map((item) => (
+                  <li key={item.key}>
+                    <Name surname={item.published} lang={lang} />{" "}
+                    <span className="lf-count">{formatInteger(item.count, lang)}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </li>
         )}
         {half === null ? null : (
@@ -998,7 +1037,7 @@ function Hyphenated({ list, side, lang }: { list: ListFacts; side: Side; lang: L
       ) : (
         <>
           <p className="lf-hyphen-name">
-            <Name surname={h.top.published} />
+            <Name surname={h.top.published} lang={lang} />
           </p>
           <p>
             {fillTemplate(
@@ -1030,7 +1069,10 @@ function PlateTwoLists({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }
       ? null
       : rich(
           template,
-          { name: <Name surname={surname.published} />, [key]: formatInteger(surname.count, lang) },
+          {
+            name: <Name surname={surname.published} lang={lang} />,
+            [key]: formatInteger(surname.count, lang),
+          },
           { [key]: surname.count },
           lang,
         );
@@ -1040,7 +1082,7 @@ function PlateTwoLists({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }
       : rich(
           t.lfP6OnBoth,
           {
-            name: <Name surname={o.on_both_top.male.published} />,
+            name: <Name surname={o.on_both_top.male.published} lang={lang} />,
             m: formatInteger(o.on_both_top.male.count, lang),
             f: formatInteger(o.on_both_top.female.count, lang),
           },
@@ -1112,39 +1154,325 @@ function PlateTwoLists({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }
   );
 }
 
-// --- the coda ---------------------------------------------------------------------
+// --- plate VII: change over time -------------------------------------------------
 
-function Coda({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
+/** The year of an ISO date, as written: a slice of the stored string, never a new figure. */
+function yearOf(iso: string): string {
+  return iso.slice(0, 4);
+}
+
+type Slot =
+  | { readonly kind: "edition"; readonly edition: ListEdition; readonly end: boolean }
+  | { readonly kind: "gap"; readonly gap: ListEditionGap; readonly of: ListEdition | undefined };
+
+/**
+ * The list's editions and gaps in date order, for layout: a merge of two
+ * lists the contract already holds in ascending order. The first and the last
+ * edition, which `change` compares, are marked `end`.
+ */
+function slotsOf(list: ListFacts): Slot[] {
+  const { items, gaps } = list.editions;
+  const slots: Slot[] = [];
+  let g = 0;
+  items.forEach((edition, i) => {
+    for (; g < gaps.length && gaps[g]!.data_date < edition.data_date; g++) {
+      const gap = gaps[g]!;
+      slots.push({ kind: "gap", gap, of: items.find((e) => e.resource_id === gap.duplicate_of) });
+    }
+    slots.push({ kind: "edition", edition, end: i === 0 || i === items.length - 1 });
+  });
+  for (; g < gaps.length; g++) {
+    const gap = gaps[g]!;
+    slots.push({ kind: "gap", gap, of: items.find((e) => e.resource_id === gap.duplicate_of) });
+  }
+  return slots;
+}
+
+/** The largest edition across both lists: one scale, so a switch shows real differences. */
+function editionScale(facts: ListFactsArtefact): number {
+  return Math.max(
+    ...SIDES.flatMap((side) => facts.lists[side].editions.items.map((e) => e.surnames)),
+  );
+}
+
+function gapNote(slot: Extract<Slot, { kind: "gap" }>, lang: Lang): string {
   const t = UI[lang];
-  const [day = "", month = ""] = formatDate(facts.snapshot_date, lang).split(" ");
+  if (slot.of === undefined) return t.lfP7GapShort;
+  return fillTemplate(
+    t.lfP7Gap,
+    { date: keptDate(slot.gap.data_date, lang), of: keptDate(slot.of.data_date, lang) },
+    {},
+    lang,
+  );
+}
+
+/** A gap's outline height in the chart box: low, so it is never read as a count. */
+const TREND_GAP_HEIGHT = 28;
+
+/**
+ * One column per edition, and per gap a low dashed outline on the baseline, so a
+ * gap never reads as a value. Drawn only; the table carries the figures.
+ */
+function TrendChart({ slots, max, lang }: { slots: readonly Slot[]; max: number; lang: Lang }) {
   return (
-    <div className="lf-coda lf-rv">
-      <div>
-        <p className="lf-kicker">{t.lfCodaKicker}</p>
-        <h3 className="lf-coda-title">{t.lfCodaTitle}</h3>
-        <p className="lf-coda-body">
-          {fillTemplate(t.lfCodaBody, { date: keptDate(facts.snapshot_date, lang) }, {}, lang)}
-        </p>
-        <p className="lf-state">{assessmentWord("INSUFFICIENT_DATA", lang)}</p>
-      </div>
-      <div className="lf-stamps" aria-hidden="true">
-        <span className="lf-stamp">
-          <span>
-            {t.lfCodaEdition}
-            <b>{facts.snapshot_date.slice(0, 4)}</b>
-            {`${day}\u00a0${month}`}
-          </span>
-        </span>
-        <span className="lf-stamp-link" />
-        <span className="lf-stamp lf-stamp-next">
-          <span>
-            {t.lfCodaNext}
-            <b>—</b>
-            {t.lfCodaEdition}
-          </span>
-        </span>
-      </div>
+    <div className="lf-trend-fig" aria-hidden="true">
+      <svg
+        className="lf-trend"
+        viewBox={`0 0 ${String(TREND.width)} ${String(TREND.height)}`}
+        aria-hidden="true"
+      >
+        {slots.map((slot, i) => {
+          const column = trendColumn(i, slots.length);
+          if (slot.kind === "gap") {
+            return (
+              <rect
+                key={slot.gap.data_date}
+                className="lf-trend-gap"
+                x={column.x}
+                y={TREND.height - TREND_GAP_HEIGHT}
+                width={column.width}
+                height={TREND_GAP_HEIGHT}
+                fill="none"
+              />
+            );
+          }
+          return (
+            <path
+              key={slot.edition.data_date}
+              className="lf-trend-bar"
+              data-end={slot.end ? "" : undefined}
+              style={vars({ i })}
+              d={columnPath(column, linearScale(slot.edition.surnames, max))}
+            />
+          );
+        })}
+        <line
+          className="lf-trend-base"
+          x1="0"
+          x2={TREND.width}
+          y1={TREND.height}
+          y2={TREND.height}
+        />
+      </svg>
+      <ol className="lf-trend-years">
+        {slots.map((slot) =>
+          slot.kind === "gap" ? (
+            <li key={slot.gap.data_date} data-gap="">
+              {yearOf(slot.gap.data_date)}
+              <span>{UI[lang].lfP7GapShort}</span>
+            </li>
+          ) : (
+            <li key={slot.edition.data_date} data-end={slot.end ? "" : undefined}>
+              {yearOf(slot.edition.data_date)}
+            </li>
+          ),
+        )}
+      </ol>
     </div>
+  );
+}
+
+function TrendTable({ slots, side, lang }: { slots: readonly Slot[]; side: Side; lang: Lang }) {
+  const t = UI[lang];
+  return (
+    <table className="lf-trend-table">
+      <caption className="lf-sr">{of(side, t.lfP7TableMale, t.lfP7TableFemale)}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{t.lfP7ColEdition}</th>
+          <th scope="col">{t.lfP7ColSurnames}</th>
+          <th scope="col">{of(side, t.lfP7ColPeopleMale, t.lfP7ColPeopleFemale)}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {slots.map((slot) =>
+          slot.kind === "gap" ? (
+            <tr key={slot.gap.data_date} data-gap="">
+              <th scope="row">{keptDate(slot.gap.data_date, lang)}</th>
+              <td colSpan={2}>{gapNote(slot, lang)}</td>
+            </tr>
+          ) : (
+            <tr key={slot.edition.data_date} data-end={slot.end ? "" : undefined}>
+              <th scope="row">{keptDate(slot.edition.data_date, lang)}</th>
+              <td>{formatInteger(slot.edition.surnames, lang)}</td>
+              <td>{formatInteger(slot.edition.people, lang)}</td>
+            </tr>
+          ),
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+function Changes({ list, side, lang }: { list: ListFacts; side: Side; lang: Lang }) {
+  const t = UI[lang];
+  const c = list.change;
+  const first = yearOf(c.first_data_date);
+  const last = yearOf(c.last_data_date);
+  const added = c.on_last_not_first;
+  const gone = c.on_first_not_last;
+  // `top3_first_counts` follows `named_top.items` key by key (the contract
+  // refuses anything else); a pair that did not match would name nothing.
+  const top = list.named_top.items.flatMap((item, i) => {
+    const entry = c.top3_first_counts[i];
+    return entry?.key === item.key ? [{ item, first: entry.count_first }] : [];
+  });
+  return (
+    <div className="lf-trend-facts">
+      <div className="lf-big">
+        <p className="lf-big-fig">
+          <span className="lf-big-v">
+            <Num>{formatInteger(added.surnames, lang)}</Num>
+          </span>
+          <span className="lf-big-l">
+            {fillTemplate(
+              of(side, t.lfP7NewMale, t.lfP7NewFemale),
+              { first, last, p: formatInteger(added.people, lang) },
+              { s: added.surnames, p: added.people },
+              lang,
+            )}
+          </span>
+        </p>
+        <p className="lf-big-fig">
+          <span className="lf-big-v">
+            <Num>{formatInteger(gone.surnames, lang)}</Num>
+          </span>
+          <span className="lf-big-l">
+            {fillTemplate(
+              of(side, t.lfP7GoneMale, t.lfP7GoneFemale),
+              { first, last, p: formatInteger(gone.people_on_first, lang) },
+              { s: gone.surnames, p: gone.people_on_first },
+              lang,
+            )}
+          </span>
+        </p>
+        <p className="lf-trend-zero">{t.lfP7NotZero}</p>
+      </div>
+      {top.length === 0 ? null : (
+        <div className="lf-trend-top">
+          <p className="lf-kicker">
+            {fillTemplate(of(side, t.lfP7TopMale, t.lfP7TopFemale), { first, last }, {}, lang)}
+          </p>
+          <ol className="lf-trend-names">
+            {top.map(({ item, first: count }) => (
+              <li key={item.key}>
+                <Name surname={item.published} lang={lang} />
+                <span className="lf-count">
+                  {count === null
+                    ? fillTemplate(t.lfP7TopAbsent, { first }, {}, lang)
+                    : formatInteger(count, lang)}
+                  {"\u00a0→\u00a0"}
+                  {formatInteger(item.count, lang)}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+      <p className="lf-trend-ten">
+        {fillTemplate(
+          c.top10_unchanged
+            ? of(side, t.lfP7Top10Male, t.lfP7Top10Female)
+            : of(side, t.lfP7Top10ChangedMale, t.lfP7Top10ChangedFemale),
+          { first },
+          {},
+          lang,
+        )}
+      </p>
+    </div>
+  );
+}
+
+function PlateChange({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
+  const t = UI[lang];
+  const max = editionScale(facts);
+  const title = (list: ListFacts, side: Side) => {
+    const c = list.change;
+    const years = { first: yearOf(c.first_data_date), last: yearOf(c.last_data_date) };
+    const sf = formatInteger(c.surnames_first, lang);
+    const sl = formatInteger(c.surnames_last, lang);
+    // The words follow the sign of the stored difference; nothing is subtracted here.
+    if (c.surnames_delta > 0) {
+      return rich(
+        of(side, t.lfP7TitleMoreMale, t.lfP7TitleMoreFemale),
+        { ...years, d: <Num>{formatInteger(c.surnames_delta, lang)}</Num> },
+        { d: c.surnames_delta },
+        lang,
+      );
+    }
+    if (c.surnames_delta < 0) {
+      return rich(
+        of(side, t.lfP7TitleFewerMale, t.lfP7TitleFewerFemale),
+        { ...years, sl: <Num>{sl}</Num>, sf: <Num>{sf}</Num> },
+        {},
+        lang,
+      );
+    }
+    return rich(
+      of(side, t.lfP7TitleSameMale, t.lfP7TitleSameFemale),
+      { ...years, sl: <Num>{sl}</Num> },
+      {},
+      lang,
+    );
+  };
+  const lede = (list: ListFacts, side: Side) => {
+    const c = list.change;
+    return (
+      <p>
+        {fillTemplate(
+          of(side, t.lfP7LedeMale, t.lfP7LedeFemale),
+          {
+            from: keptDate(c.first_data_date, lang),
+            to: keptDate(c.last_data_date, lang),
+            pf: formatInteger(c.people_first, lang),
+            pl: formatInteger(c.people_last, lang),
+            pd: formatSigned(c.people_delta, lang),
+          },
+          {},
+          lang,
+        )}
+      </p>
+    );
+  };
+  return (
+    <Plate
+      id="lf-p7"
+      number="VII"
+      name={t.lfP7Name}
+      title={<PerList facts={facts} inline render={title} />}
+      lede={<PerList facts={facts} render={lede} />}
+      foot={t.lfP7Foot}
+      lang={lang}
+      source={
+        <SourceLine
+          facts={facts}
+          lang={lang}
+          editions
+          methods={(l) => [
+            l.editions.method_version,
+            l.change.method_version,
+            l.named_top.method_version,
+          ]}
+        />
+      }
+    >
+      <PerList
+        facts={facts}
+        className="lf-rv"
+        render={(list, side) => {
+          const slots = slotsOf(list);
+          return (
+            <div className="lf-trend-wrap">
+              <div className="lf-trend-box">
+                <TrendChart slots={slots} max={max} lang={lang} />
+                <TrendTable slots={slots} side={side} lang={lang} />
+              </div>
+              <Changes list={list} side={side} lang={lang} />
+            </div>
+          );
+        }}
+      />
+    </Plate>
   );
 }
 
@@ -1191,7 +1519,7 @@ export function ListAtlas({ facts, lang }: { facts: ListFactsArtefact | null; la
       <PlateEndings facts={facts} lang={lang} />
       <PlateAlphabet facts={facts} lang={lang} />
       <PlateTwoLists facts={facts} lang={lang} />
-      <Coda facts={facts} lang={lang} />
+      <PlateChange facts={facts} lang={lang} />
     </ListAtlasShell>
   );
 }

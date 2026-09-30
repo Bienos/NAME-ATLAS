@@ -2150,10 +2150,10 @@ main.profile .search {
   }
 }
 
-/* --- landing atlas (TASK-040; six plates since TASK-043) --------------------- */
+/* --- landing atlas (TASK-040; six plates since TASK-043, seven since TASK-044) - */
 
 /*
- * Six plates about the two published lists (`list-atlas.tsx`), then a coda.
+ * Seven plates about the two published lists (`list-atlas.tsx`).
  * An atlas page's furniture — crop marks, a plate number, a serif headline,
  * the figure, then a foot with its note and source — in the landing's own
  * type and colour. Mobile first.
@@ -2221,8 +2221,8 @@ main.profile .search {
 .lf-legend,
 .lf-abc-notes,
 .lf-hyphen,
-.lf .lf-coda-title,
-.lf-coda-body {
+.lf-trend-facts,
+.lf-trend-table {
   overflow-wrap: anywhere;
   hyphens: auto;
 }
@@ -2500,10 +2500,24 @@ span.lf-alt {
   color: var(--accent);
 }
 
-/* A named surname: the source's own string, as text. */
+/* A named surname: the source's own string, linked to its search answer
+   (ADR-0019 §2.6). Ink with an Atlas Blue underline, so it reads as a name
+   first. Inside a sentence it is an inline link with no padding (WCAG 2.5.8's
+   inline exception): padding it to 44px made each link cover the line above,
+   so a tap could open another surname. A standalone name sits in a row that
+   is at least 44px tall (`.lf-legend-names li`, `.lf-trend-names li`). */
 .lf-name {
   font-weight: 600;
   color: var(--text-primary);
+  text-decoration-line: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.lf-name:hover {
+  color: var(--accent);
+  text-decoration-thickness: 2px;
 }
 
 .lf-end {
@@ -3244,108 +3258,191 @@ span.lf-alt {
   font-weight: 500;
 }
 
-/* --- the coda --- */
+/* --- plate VII: change over time --- */
 
-.lf-coda {
+.lf-trend-wrap {
   display: grid;
-  gap: var(--space-6);
-  margin-top: var(--space-9);
-  padding-top: var(--space-7);
-  border-top: 1px solid var(--border-soft);
+  gap: var(--space-7);
 }
 
 @media (min-width: 900px) {
-  .lf-coda {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
+  .lf-trend-wrap {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    align-items: start;
     gap: var(--space-9);
   }
 }
 
-.lf .lf-coda-title {
-  margin: 0;
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(1.75rem, 1rem + 2.5vw, 2.75rem);
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  text-transform: none;
+.lf-trend-box {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* The drawing scales uniformly with its column; the years below share its
+   slots, one grid column per edition or gap. */
+.lf-trend {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.lf-trend-bar {
+  fill: var(--text-primary);
+}
+
+/* The first and the last edition, the two that `change` compares. */
+.lf-trend-bar[data-end] {
+  fill: var(--accent);
+}
+
+.lf-trend-gap {
+  stroke: var(--text-tertiary);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+}
+
+.lf-trend-base {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+.lf-trend-years {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.lf-trend-years li[data-end] {
+  font-weight: 600;
   color: var(--text-primary);
 }
 
-.lf-coda-body {
-  max-width: 50ch;
-  margin: var(--space-4) 0 0;
-  color: var(--text-secondary);
+.lf-trend-years span {
+  display: block;
+  color: var(--text-tertiary);
 }
 
-/* Insufficient data is a state, stated in words; the dotted ring marks it. */
-.lf-state {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: var(--space-5) 0 0;
-  padding: 6px var(--space-4);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-strong);
-  border-radius: 999px;
+.lf-trend-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
 }
 
-.lf-state::before {
-  content: "";
-  width: 11px;
-  height: 11px;
-  border: 1.25px dashed var(--text-secondary);
-  border-radius: 50%;
+.lf-trend-table th,
+.lf-trend-table td {
+  padding: 6px 0 6px var(--space-3);
+  text-align: right;
+  vertical-align: baseline;
+  border-bottom: 1px solid var(--border-soft);
 }
 
-/* The stamps are tilted; their box clips the tilt so it never widens the page. */
-.lf-stamps {
-  display: flex;
-  align-items: center;
-  max-width: 26rem;
-  overflow: hidden;
-  padding: var(--space-4);
+.lf-trend-table th:first-child {
+  padding-left: 0;
+  text-align: left;
 }
 
-.lf-stamp {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 124px;
-  height: 124px;
-  text-align: center;
+.lf-trend-table thead th {
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.6875rem;
+  font-weight: 500;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  border: 2px solid var(--text-primary);
-  border-radius: 50%;
-  rotate: -8deg;
-}
-
-.lf-stamp b {
-  display: block;
-  font-family: var(--font-display, Georgia, serif);
-  font-size: 1.75rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  text-transform: none;
-}
-
-.lf-stamp-next {
   color: var(--text-secondary);
-  border-style: dashed;
-  border-color: var(--text-tertiary);
-  rotate: 6deg;
+  border-bottom-color: var(--text-primary);
 }
 
-.lf-stamp-link {
-  flex: 1;
-  min-width: 16px;
-  border-top: 2px dashed var(--border-default);
+.lf-trend-table tbody th {
+  font-weight: 400;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.lf-trend-table td {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.lf-trend-table tr[data-end] td {
+  font-weight: 600;
+}
+
+/* A gap is words, never a figure: its reason spans both columns. */
+.lf-trend-table tr[data-gap] td {
+  font-style: italic;
+  text-align: left;
+  white-space: normal;
+  color: var(--text-secondary);
+}
+
+.lf-trend-facts {
+  display: grid;
+  gap: var(--space-7);
+  min-width: 0;
+}
+
+.lf-trend-facts .lf-big-v {
+  font-size: clamp(2.25rem, 1.2rem + 3vw, 3.5rem);
+}
+
+.lf-trend-zero {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.lf-legend-names {
+  display: grid;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lf-legend-names li {
+  display: flex;
+  align-items: center;
+  gap: 0 var(--space-3);
+  min-height: 44px;
+}
+
+.lf-trend-names {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border-soft);
+}
+
+/* Each name is a standalone target: its row is at least 44px tall. */
+.lf-trend-names li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-4);
+  min-height: 44px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.lf-trend-names .lf-name {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.lf-trend-names .lf-count {
+  white-space: normal;
+}
+
+.lf-trend-ten {
+  margin: 0;
+  color: var(--text-secondary);
 }
 
 /*
@@ -3412,6 +3509,14 @@ span.lf-alt {
   /* V: the letters settle to their size. */
   .lf[data-motion] .lf-abc-g {
     animation: lf-pop var(--duration-narrative) var(--ease-primary) 150ms both;
+  }
+
+  /* VII: each edition's column rises from the baseline, in date order. */
+  .lf[data-motion] .lf-trend-bar {
+    transform-box: fill-box;
+    transform-origin: center bottom;
+    animation: lf-draw-y var(--duration-narrative) var(--ease-primary) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
   }
 
   /* VI: the two circles meet; their overlap appears once they have. */
@@ -3515,11 +3620,19 @@ span.lf-alt {
     background: Highlight;
   }
 
-  .lf svg :is(.lf-rib, .lf-glyph-in text, .lf-venn-lens) {
+  .lf svg :is(.lf-rib, .lf-glyph-in text, .lf-venn-lens, .lf-trend-bar[data-end]) {
     fill: Highlight;
   }
 
-  .lf svg :is(.lf-venn-m, .lf-venn-f, .lf-glyph-out text) {
+  .lf svg .lf-trend-bar:not([data-end]) {
+    fill: CanvasText;
+  }
+
+  .lf svg :is(.lf-venn-m, .lf-venn-f, .lf-glyph-out text, .lf-trend-base) {
     stroke: CanvasText;
+  }
+
+  .lf svg .lf-trend-gap {
+    stroke: GrayText;
   }
 }

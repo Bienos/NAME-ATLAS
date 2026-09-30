@@ -1,6 +1,6 @@
 # TASK-043 — The landing atlas becomes six plates about the two published lists
 
-- **Status:** IMPLEMENTED AND VERIFIED (2026-09-30). The verification actually run is in `docs/progress/2026-09-30-landing-atlas-six-plates.md`. `pnpm db:migrate`, `test:integration` and `test:golden` were not run (no PostGIS here), and GitHub Actions starts no job (`STATUS.md`).
+- **Status:** IMPLEMENTED AND VERIFIED (2026-09-30), merged in #37 and deployed to production the same day (`docs/progress/2026-09-30-landing-atlas-six-plates-go-live.md`). The verification actually run is in `docs/progress/2026-09-30-landing-atlas-six-plates.md`. `pnpm db:migrate`, `test:integration` and `test:golden` were not run (no PostGIS here), and GitHub Actions starts no job (`STATUS.md`).
 - **Requested by:** the project owner, 2026-09-30.
   - "I think that landing page is over compalicated tbh", then "think again about what we could showcase on main page".
   - Shown every design built so far, they chose the second, the six-plate atlas mock-up: "go wtih 2 push live".

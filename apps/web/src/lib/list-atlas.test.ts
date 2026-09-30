@@ -7,11 +7,18 @@ import { describe, expect, it } from "vitest";
 import { listFactsArtefactSchema, NAMED_SURNAME_FLOOR } from "@name-atlas/contracts";
 import type { ListFacts, ListFactsArtefact, NamedSurname } from "@name-atlas/contracts";
 import { listFacts } from "@name-atlas/truth";
-import { isOneInFour, ListAtlas } from "./list-atlas.js";
+import { isOneInFour, ListAtlas, searchHref } from "./list-atlas.js";
 import { LIST_FACTS_FIXTURE } from "./list-atlas.fixture.js";
 import { loadListFacts } from "./list-atlas-load.js";
 import { reachedAtHydration } from "./list-atlas-shell.js";
-import { formatDate, formatInteger, formatQuantile, formatShare, UI } from "./messages.js";
+import {
+  formatDate,
+  formatInteger,
+  formatQuantile,
+  formatShare,
+  formatSigned,
+  UI,
+} from "./messages.js";
 import type { Lang } from "./messages.js";
 
 const LANGS = ["pl", "en"] as const;
@@ -118,9 +125,51 @@ function allowed(subtrees: readonly unknown[], lang: Lang): Set<string> {
   return out;
 }
 
-/** The snapshot date's own numbers: the day and the year. */
+/** The numbers of a date as printed: the day and the year. */
+function numbersOfDate(iso: string, lang: Lang): string[] {
+  return formatDate(iso, lang).match(/\d+/gu) ?? [];
+}
+
+/** Every date a list carries (its editions, gaps and change), as printed numbers. */
+function listDateNumbers(list: ListFacts, lang: Lang): string[] {
+  return [
+    list.source.snapshot_date,
+    list.change.first_data_date,
+    list.change.last_data_date,
+    ...list.editions.items.map((e) => e.data_date),
+    ...list.editions.gaps.map((g) => g.data_date),
+  ].flatMap((iso) => numbersOfDate(iso, lang));
+}
+
+/** The snapshot date's own numbers, and every date of either list's editions. */
 function dateNumbers(facts: ListFactsArtefact, lang: Lang): string[] {
-  return formatDate(facts.snapshot_date, lang).match(/\d+/gu) ?? [];
+  return [
+    ...numbersOfDate(facts.snapshot_date, lang),
+    ...listDateNumbers(facts.lists.male, lang),
+    ...listDateNumbers(facts.lists.female, lang),
+  ];
+}
+
+/**
+ * Numbers that are copy, not figures: the year of the editions plate VII
+ * leaves out (ADR-0019 §2.2), which the page must name and the artefact does
+ * not carry.
+ */
+function copyNumbers(lang: Lang): string[] {
+  return numbersIn(UI[lang].lfP7Foot, lang);
+}
+
+/** The markup of one plate. */
+function plate(markup: string, id: string): string {
+  return new RegExp(`<article id="${id}"[\\s\\S]*?</article>`, "u").exec(markup)?.[0] ?? "";
+}
+
+/** Every `lf-name` link: its surname as shown and its address, entities decoded. */
+function nameLinks(markup: string): { text: string; href: string }[] {
+  return [...markup.matchAll(/<a class="lf-name" href="([^"]*)">([\s\S]*?)<\/a>/gu)].map((m) => ({
+    href: (m[1] ?? "").replace(/&amp;/gu, "&"),
+    text: text(m[2] ?? "").trim(),
+  }));
 }
 
 /** Every named selection of the artefact, as `[published, count]`. */
@@ -165,6 +214,41 @@ const FORBIDDEN = [
   "nationality",
 ] as const;
 
+/**
+ * No cause of a change (ADR-0019 §2.4, TASK-044 AC-04): births, deaths,
+ * marriages, migration, war, nationality, or "przyczyn" itself.
+ */
+const CAUSES = [
+  /przyczyn/u,
+  /urodze/u,
+  /narodzin/u,
+  /zgon/u,
+  /śmier/u,
+  /zmarł/u,
+  /małżeń/u,
+  /ślub/u,
+  /migr/u,
+  /wojn/u,
+  /narodow/u,
+  /cudzoziem/u,
+  /obywatel/u,
+  /ukrai/u,
+  /przybył/u,
+  /ubył/u,
+  /\bbirth/u,
+  /\bdeath/u,
+  /\bdied\b/u,
+  /marriag/u,
+  /\bmarried\b/u,
+  /migra/u,
+  /\bwars?\b/u,
+  /\bcaus/u,
+  /nationalit/u,
+  /foreign/u,
+  /citizen/u,
+  /immigr/u,
+] as const;
+
 const { male: M, female: F } = LIST_FACTS_FIXTURE.lists;
 const REAL = listFacts();
 const ARTEFACTS = [
@@ -173,11 +257,17 @@ const ARTEFACTS = [
 ] as const;
 
 describe("the synthetic fixture", () => {
-  it("is a valid list_facts@2 artefact, so the view is tested against the contract's own shape", () => {
+  it("is a valid list_facts@3 artefact, so the view is tested against the contract's own shape", () => {
     expect(listFactsArtefactSchema.safeParse(LIST_FACTS_FIXTURE).success).toBe(true);
     // Both wordings of plate IV's headline are exercised.
     expect(isOneInFour(M.endings.entries[0]!.share_of_people)).toBe(true);
     expect(isOneInFour(F.endings.entries[0]!.share_of_people)).toBe(false);
+    // Plate VII: a gap on one list only, a TOP_3 surname not on a first
+    // edition, and both answers on the ten most common surnames.
+    expect(M.editions.gaps).toEqual([]);
+    expect(F.editions.gaps).toHaveLength(1);
+    expect(F.change.top3_first_counts.some((e) => e.count_first === null)).toBe(true);
+    expect([M.change.top10_unchanged, F.change.top10_unchanged]).toEqual([true, false]);
   });
 });
 
@@ -187,21 +277,32 @@ describe("ListAtlas", () => {
     expect(render(null, "en")).toBe("");
   });
 
-  it("renders the six plates in order, then the coda, headed with the snapshot date", () => {
+  it("renders the seven plates in order, headed with the snapshot date; the coda is gone", () => {
     for (const lang of LANGS) {
       const t = UI[lang];
       const html = render(LIST_FACTS_FIXTURE, lang);
-      expect(html.match(/<article /gu)).toHaveLength(6);
+      expect(html.match(/<article /gu)).toHaveLength(7);
       const ids = [...html.matchAll(/<article id="(lf-p\d)"/gu)].map((m) => m[1]);
-      expect(ids).toEqual(["lf-p1", "lf-p2", "lf-p3", "lf-p4", "lf-p5", "lf-p6"]);
-      const names = [t.lfP1Name, t.lfP2Name, t.lfP3Name, t.lfP4Name, t.lfP5Name, t.lfP6Name];
-      const numerals = ["I", "II", "III", "IV", "V", "VI"];
+      expect(ids).toEqual(["lf-p1", "lf-p2", "lf-p3", "lf-p4", "lf-p5", "lf-p6", "lf-p7"]);
+      const names = [
+        t.lfP1Name,
+        t.lfP2Name,
+        t.lfP3Name,
+        t.lfP4Name,
+        t.lfP5Name,
+        t.lfP6Name,
+        t.lfP7Name,
+      ];
+      const numerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
       const heads = [...html.matchAll(/<p class="lf-plate-no">([\s\S]*?)<\/p>/gu)].map((m) =>
         text(m[1] ?? "").trim(),
       );
       expect(heads).toEqual(names.map((name, i) => `${t.lfPlate} ${numerals[i]!} · ${name}`));
       expect(html).toContain('<h2 id="lf-title" class="lf-title">');
-      expect(html.indexOf("lf-coda")).toBeGreaterThan(html.lastIndexOf("<article "));
+      // TASK-044: plate VII replaces the one-edition coda.
+      expect(html).not.toContain("lf-coda");
+      expect(text(html)).not.toMatch(/Trend potrzebuje|A trend needs/u);
+      expect(html.lastIndexOf("</article>")).toBeGreaterThan(html.indexOf('<article id="lf-p7"'));
       expect(text(html)).toContain(lang === "pl" ? "wydanie 2026" : "2026 edition");
       // The date's own "r." is never followed by a second full stop.
       expect(text(html)).not.toMatch(/\.\s*\./u);
@@ -216,7 +317,7 @@ describe("ListAtlas", () => {
   it("renders every plate for both lists, each variant naming its own list", () => {
     const html = render(LIST_FACTS_FIXTURE, "pl");
     const plates = [...html.matchAll(/<article id="lf-p\d"[\s\S]*?<\/article>/gu)].map((m) => m[0]);
-    expect(plates).toHaveLength(6);
+    expect(plates).toHaveLength(7);
     for (const plate of plates) {
       const parts = byList(plate);
       expect(parts.male.length).toBeGreaterThan(0);
@@ -386,7 +487,11 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
             expect(ok.has(n), `${lang} ${side}: ${n}`).toBe(true);
           }
         }
-        const any = new Set([...allowed([male, female, facts.overlap], lang), ...date]);
+        const any = new Set([
+          ...allowed([male, female, facts.overlap], lang),
+          ...date,
+          ...copyNumbers(lang),
+        ]);
         for (const n of numbersIn(readable(parts.shared), lang)) {
           expect(any.has(n), `${lang} shared: ${n}`).toBe(true);
         }
@@ -416,7 +521,7 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
       }
     });
 
-    it(`names a surname only as a selection at or above the floor, never as a link: ${name}`, () => {
+    it(`names a surname only as a selection at or above the floor, as a link to its search: ${name}`, () => {
       const named = new Map(selections(facts));
       for (const lang of LANGS) {
         const html = render(facts, lang);
@@ -427,9 +532,18 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
           expect(named.get(word)!).toBeGreaterThanOrEqual(NAMED_SURNAME_FLOOR);
         }
         for (const [published] of named) expect(html).toContain(published);
-        for (const [, inside] of html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/gu)) {
-          expect(capitalWords(text(inside ?? ""))).toEqual([]);
+        // TASK-044 AC-05: every named surname links to `/?surname=<published>`.
+        const links = nameLinks(html);
+        expect(links.length).toBeGreaterThan(0);
+        for (const link of links) {
+          expect(named.has(link.text), `${lang}: ${link.text}`).toBe(true);
+          const query = `/?surname=${encodeURIComponent(link.text)}`;
+          expect(link.href).toBe(lang === "en" ? `${query}&lang=en` : query);
+          expect(link.href).toBe(searchHref(link.text, lang));
         }
+        // No surname is printed outside such a link, and no other link names one.
+        const rest = html.replace(/<a class="lf-name" href="[^"]*">[\s\S]*?<\/a>/gu, " ");
+        expect(capitalWords(readable(rest))).toEqual([]);
       }
     });
 
@@ -439,6 +553,13 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
         for (const wrong of FORBIDDEN) expect(all, `${lang}: ${wrong}`).not.toContain(wrong);
       }
     });
+
+    it(`never gives a cause for a change: ${name}`, () => {
+      for (const lang of LANGS) {
+        const all = readable(render(facts, lang)).toLowerCase();
+        for (const wrong of CAUSES) expect(all, `${lang}: ${String(wrong)}`).not.toMatch(wrong);
+      }
+    });
   }
 
   it("names no surname when no selection reaches the floor", () => {
@@ -446,6 +567,7 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
       ...list,
       named_top: { ...list.named_top, items: [] },
       hyphenated: { ...list.hyphenated, top: null },
+      change: { ...list.change, top3_first_counts: [] },
     });
     const bare: ListFactsArtefact = {
       ...LIST_FACTS_FIXTURE,
@@ -463,7 +585,227 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
       expect(all).not.toMatch(/\bnull\b|undefined/u);
       expect(all).toContain(lang === "pl" ? UI.pl.lfP6HyphenNoneMale : UI.en.lfP6HyphenNoneFemale);
       expect(all).toContain(UI[lang].lfP6Why);
+      expect(render(bare, lang)).not.toContain("lf-trend-names");
     }
+  });
+});
+
+describe("plate VII: change over time (TASK-044 AC-04, AC-05)", () => {
+  const SIDES = ["male", "female"] as const;
+  /** Plate VII's markup for one list. */
+  const variant = (facts: ListFactsArtefact, lang: Lang, side: Side) =>
+    byList(plate(render(facts, lang), "lf-p7"))[side].join(" ");
+  /** Its headline for one list, as text (a tag's space before punctuation dropped). */
+  const headline = (facts: ListFactsArtefact, lang: Lang, side: Side) =>
+    text(
+      byList(/<h3 id="lf-p7-title"[\s\S]*?<\/h3>/u.exec(render(facts, lang))?.[0] ?? "")[side].join(
+        " ",
+      ),
+    )
+      .replace(/ +([.,:])/gu, "$1")
+      .trim();
+  /** Non-breaking spaces as spaces, so a kept-together date reads as `formatDate` writes it. */
+  const flat = (value: string) => value.replace(/\u00a0/gu, " ").replace(/ +/gu, " ");
+
+  it("renders for both lists, each variant naming its own list", () => {
+    for (const [, facts] of ARTEFACTS) {
+      for (const lang of LANGS) {
+        const parts = byList(plate(render(facts, lang), "lf-p7"));
+        expect(parts.male.length).toBeGreaterThan(0);
+        expect(parts.female.length).toBe(parts.male.length);
+      }
+    }
+    const parts = byList(plate(render(LIST_FACTS_FIXTURE, "pl"), "lf-p7"));
+    const male = text(parts.male.join(" "));
+    const female = text(parts.female.join(" "));
+    expect(male).toContain("mężczyzn");
+    expect(male).not.toMatch(/kobiet/u);
+    expect(female).toContain("kobiet");
+    expect(female).not.toMatch(/mężczy/u);
+  });
+
+  it("prints each list's editions and change as the artefact stores them", () => {
+    for (const [name, facts] of ARTEFACTS) {
+      for (const lang of LANGS) {
+        for (const side of SIDES) {
+          const list = facts.lists[side];
+          const c = list.change;
+          const shown = text(variant(facts, lang, side));
+          const numbers = numbersIn(shown, lang);
+          const figures = [
+            ...list.editions.items.flatMap((e) => [e.surnames, e.people]),
+            c.people_first,
+            c.people_last,
+            c.on_last_not_first.surnames,
+            c.on_last_not_first.people,
+            c.on_first_not_last.surnames,
+            c.on_first_not_last.people_on_first,
+            ...list.named_top.items.map((item) => item.count),
+            ...c.top3_first_counts.flatMap((e) => (e.count_first === null ? [] : [e.count_first])),
+          ];
+          for (const figure of figures) {
+            expect(numbers, `${name} ${lang} ${side} ${String(figure)}`).toContain(
+              formatInteger(figure, lang),
+            );
+          }
+          expect(shown).toContain(formatSigned(c.people_delta, lang));
+          if (c.surnames_delta > 0) {
+            expect(headline(facts, lang, side)).toContain(formatInteger(c.surnames_delta, lang));
+          }
+          // One row per edition and per gap, one column per edition and per gap.
+          const markup = variant(facts, lang, side);
+          const slots = list.editions.items.length + list.editions.gaps.length;
+          expect(markup.match(/<tr data-gap=""|<tr data-end=""|<tr>/gu)?.length).toBe(slots + 1);
+          expect(markup.match(/class="lf-trend-(?:bar|gap)"/gu)?.length).toBe(slots);
+        }
+      }
+    }
+  });
+
+  it("states the committed artefact's change in words from the stored difference", () => {
+    const { male, female } = REAL.lists;
+    expect(flat(headline(REAL, "pl", "male"))).toContain(
+      `Lista mężczyzn z 2026 r. ma o ${flat(formatInteger(male.change.surnames_delta, "pl"))} ` +
+        "nazwisk więcej niż lista z 2020 r.",
+    );
+    expect(headline(REAL, "en", "female")).toContain(
+      `The 2026 female list has ${formatInteger(female.change.surnames_delta, "en")} more ` +
+        "surnames than the 2020 one.",
+    );
+  });
+
+  it("shows a missing edition as a gap with its reason, never as a value", () => {
+    for (const [name, facts] of ARTEFACTS) {
+      for (const side of SIDES) {
+        const list = facts.lists[side];
+        const markup = variant(facts, "pl", side);
+        const rows = [...markup.matchAll(/<tr data-gap="">([\s\S]*?)<\/tr>/gu)].map((m) =>
+          flat(text(m[1] ?? "")),
+        );
+        expect(rows, `${name} ${side}`).toHaveLength(list.editions.gaps.length);
+        list.editions.gaps.forEach((gap, i) => {
+          const of = list.editions.items.find((e) => e.resource_id === gap.duplicate_of)!;
+          expect(rows[i]).toContain(
+            `brak: plik z ${formatDate(gap.data_date, "pl")} jest identyczny z plikiem z ` +
+              formatDate(of.data_date, "pl"),
+          );
+          // The row's only numbers are its two dates.
+          const dates = [
+            ...numbersOfDate(gap.data_date, "pl"),
+            ...numbersOfDate(of.data_date, "pl"),
+          ];
+          for (const n of numbersIn(rows[i]!, "pl")) expect(dates).toContain(n);
+        });
+        expect(markup.match(/class="lf-trend-gap"/gu)?.length ?? 0).toBe(list.editions.gaps.length);
+      }
+    }
+    // The committed artefact's one gap: the female 2022 file repeats the 2021 one.
+    const real = flat(text(variant(REAL, "en", "female")));
+    expect(real).toContain(
+      "missing: the file dated 27 January 2022 is identical to the file dated 2 February 2021.",
+    );
+    expect(REAL.lists.male.editions.gaps).toEqual([]);
+  });
+
+  it("names a TOP_3 surname's first count, or says it was not on that list: never zero", () => {
+    const female = flat(text(variant(LIST_FACTS_FIXTURE, "pl", "female")));
+    expect(female).toContain("GAMMOWA nie na liście z 2020 r. → 46 789");
+    expect(female).toContain("ALFA 95 011 → 93 456");
+    const en = flat(text(variant(LIST_FACTS_FIXTURE, "en", "female")));
+    expect(en).toContain("GAMMOWA not on the 2020 list → 46,789");
+    expect(flat(text(variant(REAL, "pl", "male")))).toContain("NOWAK 101 036 → 98 387");
+  });
+
+  it("says whether the ten most common surnames are unchanged, as the artefact says", () => {
+    for (const lang of LANGS) {
+      const t = UI[lang];
+      expect(text(variant(LIST_FACTS_FIXTURE, lang, "male"))).toContain(
+        t.lfP7Top10Male.replace("{first}", "2020"),
+      );
+      // When the artefact says no, the page says no rather than nothing.
+      expect(text(variant(LIST_FACTS_FIXTURE, lang, "female"))).toContain(
+        t.lfP7Top10ChangedFemale.replace("{first}", "2020"),
+      );
+    }
+  });
+
+  it("chooses the headline's words by the sign of the stored difference", () => {
+    /** The fixture's male list with a first edition of `surnames`, every refinement kept. */
+    const withFirst = (surnames: number): ListFactsArtefact => {
+      const [first, ...rest] = M.editions.items;
+      const c = M.change;
+      const both = c.surnames_last - c.on_last_not_first.surnames;
+      return {
+        ...LIST_FACTS_FIXTURE,
+        lists: {
+          ...LIST_FACTS_FIXTURE.lists,
+          male: {
+            ...M,
+            editions: {
+              ...M.editions,
+              items: [{ ...first!, surnames, row_count: surnames }, ...rest],
+            },
+            change: {
+              ...c,
+              surnames_first: surnames,
+              surnames_delta: c.surnames_last - surnames,
+              on_first_not_last: { ...c.on_first_not_last, surnames: surnames - both },
+            },
+          },
+        },
+      };
+    };
+    const fewer = withFirst(45000);
+    const same = withFirst(M.change.surnames_last);
+    expect(listFactsArtefactSchema.safeParse(fewer).success).toBe(true);
+    expect(listFactsArtefactSchema.safeParse(same).success).toBe(true);
+    expect(flat(headline(fewer, "pl", "male"))).toBe(
+      "Lista mężczyzn z 2026 r. ma mniej nazwisk niż lista z 2020 r.: 40 818 wobec 45 000.",
+    );
+    expect(headline(fewer, "en", "male")).toBe(
+      "The 2026 male list has fewer surnames than the 2020 one: 40,818 against 45,000.",
+    );
+    expect(flat(headline(same, "pl", "male"))).toBe(
+      "Lista mężczyzn z 2026 r. ma tyle samo nazwisk co lista z 2020 r.: 40 818.",
+    );
+    expect(headline(same, "en", "male")).toBe(
+      "The 2026 male list has as many surnames as the 2020 one: 40,818.",
+    );
+    // No figure the artefact does not store: not the difference's absolute value.
+    for (const lang of LANGS) {
+      expect(numbersIn(headline(fewer, lang, "male"), lang)).not.toContain(
+        formatInteger(45000 - M.change.surnames_last, lang),
+      );
+    }
+  });
+
+  it("names only the list's TOP_3, in order, each linked: no surname for its growth", () => {
+    for (const [name, facts] of ARTEFACTS) {
+      for (const lang of LANGS) {
+        for (const side of SIDES) {
+          const list = facts.lists[side];
+          const markup = variant(facts, lang, side);
+          expect(
+            nameLinks(markup).map((link) => link.text),
+            `${name} ${lang} ${side}`,
+          ).toEqual(list.named_top.items.map((item) => item.published));
+          const rest = markup.replace(/<a class="lf-name" href="[^"]*">[\s\S]*?<\/a>/gu, " ");
+          expect(capitalWords(readable(rest))).toEqual([]);
+        }
+      }
+    }
+  });
+
+  it("hides the chart from assistive technology; a captioned table carries its figures", () => {
+    for (const side of SIDES) {
+      const markup = variant(LIST_FACTS_FIXTURE, "pl", side);
+      expect(markup).toMatch(/<div class="lf-trend-fig" aria-hidden="true"><svg class="lf-trend"/u);
+      expect(markup).toContain('<table class="lf-trend-table"><caption class="lf-sr">');
+      expect(markup.match(/<th scope="col">/gu)).toHaveLength(3);
+    }
+    // Each list's hatch pattern has its own id: no id is used twice on the page.
+    const ids = [...render(LIST_FACTS_FIXTURE, "pl").matchAll(/\sid="([^"]+)"/gu)].map((m) => m[1]);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 
@@ -528,6 +870,14 @@ describe("the atlas stylesheet", () => {
     expect(label?.body).toMatch(/min-height: 44px;/u);
     const link = rules.find((r) => r.selector === ".lf-source a");
     expect(link?.body).toMatch(/padding-block: 15px;/u);
+    // A named surname in a sentence is an inline link with no padding, so no
+    // link's hit area covers another's; a standalone name has a 44px row.
+    const name = rules.find((r) => r.selector === ".lf-name");
+    expect(name?.body).not.toMatch(/padding/u);
+    for (const selector of [".lf-legend-names li", ".lf-trend-names li"]) {
+      const row = rules.find((r) => r.selector === selector);
+      expect(row?.body, selector).toMatch(/min-height: 44px;/u);
+    }
   });
 });
 

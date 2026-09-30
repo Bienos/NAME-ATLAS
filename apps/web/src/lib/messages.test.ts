@@ -13,6 +13,7 @@ import {
   formatPercent,
   formatQuantile,
   formatShare,
+  formatSigned,
   parseLang,
   parseTemplate,
   pluralForm,
@@ -243,6 +244,16 @@ describe("formatShare", () => {
   });
 });
 
+describe("formatSigned (TASK-044)", () => {
+  it("writes a stored difference with its sign, grouped, and a minus sign for a fall", () => {
+    expect(formatSigned(1318492, "pl")).toBe("+1\u00a0318\u00a0492");
+    expect(formatSigned(1318492, "en")).toBe("+1,318,492");
+    expect(formatSigned(-4182, "pl")).toBe("\u22124\u00a0182");
+    expect(formatSigned(-4182, "en")).toBe("\u22124,182");
+    expect(formatSigned(0, "pl")).toBe("0");
+  });
+});
+
 describe("formatCompact", () => {
   it("writes round thousands and millions as words, and anything else in full", () => {
     expect(formatCompact(100, "pl")).toBe("100");
@@ -328,6 +339,46 @@ describe("message templates (TASK-040)", () => {
           "originat",
         ]) {
           expect(lower, `${lang}.${key}`).not.toContain(wrong);
+        }
+      }
+    }
+  });
+
+  it("gives no cause for a change: no births, deaths, marriages, migration or war (TASK-044)", () => {
+    for (const lang of ["pl", "en"] as const) {
+      for (const [key, value] of Object.entries(UI[lang])) {
+        if (!key.startsWith("lf")) continue;
+        const lower = value.toLowerCase();
+        for (const wrong of [
+          /przyczyn/u,
+          /urodze/u,
+          /narodzin/u,
+          /zgon/u,
+          /śmier/u,
+          /zmarł/u,
+          /małżeń/u,
+          /ślub/u,
+          /migr/u,
+          /wojn/u,
+          /narodow/u,
+          /cudzoziem/u,
+          /obywatel/u,
+          /ukrai/u,
+          /przybył/u,
+          /ubył/u,
+          /foreign/u,
+          /citizen/u,
+          /immigr/u,
+          /\bbirth/u,
+          /\bdeath/u,
+          /\bdied\b/u,
+          /marriag/u,
+          /\bmarried\b/u,
+          /\bwars?\b/u,
+          /nationalit/u,
+          /\bcaus/u,
+        ]) {
+          expect(lower, `${lang}.${key}`).not.toMatch(wrong);
         }
       }
     }
