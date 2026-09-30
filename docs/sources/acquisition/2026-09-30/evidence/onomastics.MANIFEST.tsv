@@ -1,0 +1,108 @@
+file	url	fetched_utc	sha256	http_status	note
+doaj_journal_onomastica.json	https://doaj.org/api/search/journals/issn:0078-4648	2026-09-29T23:58:38Z	e0edcdfd0424c7537e8c9e363e16f45a99114606b03705551970f15940cafdf2	200	
+doaj_journal_rkj_ltn.json	https://doaj.org/api/search/journals/issn:0076-0390	2026-09-29T23:58:39Z	e4c6af5a7322e0c12f9fdc7d71907a185dcd95ef28107ab02931641f56d67560	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_rkj_ltn.json	https://doaj.org/api/search/journals/issn:2450-9310	2026-09-29T23:58:41Z	2e1c494d744fcc5d31a46b100a94f0a99390c6afb849796b216e957f4742de68	200	
+doaj_journal_prace_jez_uwm.json	https://doaj.org/api/search/journals/issn:1509-5304	2026-09-29T23:58:42Z	aa4433d5bb6d4281a5492bf9f8885bfa5a4ea61e9b0292b952d6aea8ee5b3d8e	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_prace_jez_uwm.json	https://doaj.org/api/search/journals/issn:2450-0801	2026-09-29T23:58:43Z	9740d3fb57e9727206ae545402b8ab680b3bef374b986e5724bb104c8bf08faa	200	
+doaj_journal_lingvaria.json	https://doaj.org/api/search/journals/issn:1896-2122	2026-09-29T23:58:45Z	4a0fbc3f15341ad10745b4a894635e7d1c98914bdac2249e609062d864ae74f5	200	
+doaj_journal_jezyk_polski.json	https://doaj.org/api/search/journals/issn:0021-6941	2026-09-29T23:58:46Z	629672b8955b10ac7b9fdb9bbed066fb2c0b1e018e7b7da3bf0d63b88ea8e4a9	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_jezyk_polski.json	https://doaj.org/api/search/journals/issn:2720-1406	2026-09-29T23:58:47Z	2adc6cdd6c334c382a26e98dbb8943ac1856f50955a834318cf4bfa678a196bc	200	
+doaj_journal_poradnik.json	https://doaj.org/api/search/journals/issn:0551-5343	2026-09-29T23:58:49Z	528e7281c766a12cf4d8bb807c8cd08033ed014f0b8a90cb0c3c0ce704ca405e	200	
+doaj_journal_studia_jez_szczecin.json	https://doaj.org/api/search/journals/issn:1730-4180	2026-09-29T23:58:50Z	180b420541fdfd0f398aafd81db027cde023d9c218d3e6a745874c8f207dab62	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_studia_jez_szczecin.json	https://doaj.org/api/search/journals/issn:2353-3161	2026-09-29T23:58:51Z	2310a3b3228077a671e65c529a4cb0fa372b7725a6c0f3be664992c65fcb5780	200	
+doaj_journal_ling_copernicana.json	https://doaj.org/api/search/journals/issn:2080-1068	2026-09-29T23:58:53Z	139e7aaf59ea09e2042cec43ed120c54b1924512c6020419e544987c97e18d7c	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_ling_copernicana.json	https://doaj.org/api/search/journals/issn:2391-7768	2026-09-29T23:58:54Z	e36d2a7eb8c3ea951486cce67893ab26e772787c0ef5b74c857ecd2b42228b0e	200	
+doaj_journal_slavia_occ.json	https://doaj.org/api/search/journals/issn:0081-0002	2026-09-29T23:58:55Z	989cc625b8ee4677932eb54eb9cefdaea6f182986c0839cff06a617c9c7e5523	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_slavia_occ.json	https://doaj.org/api/search/journals/issn:2544-9222	2026-09-29T23:58:57Z	23335aefe8cfcffd5ec54036875529fd98f801943d834c61f6ca00d2ceba38ef	200	
+doaj_journal_onom_slavogerm.json	https://doaj.org/api/search/journals/issn:0474-1471	2026-09-29T23:58:58Z	c456dbf6436d962ea63d9a32dbf1ddcdb62b95d270f3d1e45be09527f543e5d4	200	
+doaj_journal_folia_ling.json	https://doaj.org/api/search/journals/issn:0208-6077	2026-09-29T23:58:59Z	f0e0c31c1859fb10ccc30cc1cb568fcb2d1ee04e6875338ffb61d43d427ab0ca	200	
+doaj_journal_sluic.json	https://doaj.org/api/search/journals/issn:1897-1059	2026-09-29T23:59:01Z	8782536350c7171d3420668d0d65b5019c21a280aac312e6a09a515f342a820f	200	
+doaj_journal_umcs_ff.json	https://doaj.org/api/search/journals/issn:0239-426X	2026-09-29T23:59:02Z	0dbff17d4cdd3fd9cb06d9f4ba49900ad7a4dec38b2663523a8fe6e5777f6f74	200	
+doaj_journal_polonica.json	https://doaj.org/api/search/journals/issn:0137-9712	2026-09-29T23:59:03Z	9b42bd120b4a8db1f116b848b14dbef5546df5e643511b5e2dd4319215227240	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_polonica.json	https://doaj.org/api/search/journals/issn:2545-045X	2026-09-29T23:59:05Z	c59efe49614d366cc3b13e7c91d6b904a22b32012b170eecee87cba02c3a7213	200	
+doaj_journal_psp_jez.json	https://doaj.org/api/search/journals/issn:1233-8672	2026-09-29T23:59:06Z	27828eb9a9fdfd54fbc2dc59eaf753df3de9eff5f0cd769b97ebf709cc5f7fac	200	
+doaj_journal_baj.json	https://doaj.org/api/search/journals/issn:1641-6961	2026-09-29T23:59:07Z	cddbfb4970d611d66dae74a62dcd4d09a1597bc0f086e6598ca34489b7c66a18	200	
+doaj_journal_prace_filol.json	https://doaj.org/api/search/journals/issn:0138-0567	2026-09-29T23:59:09Z	2c4e32c6112645e055f9c5927b31c42c82812c42427154be16657b36e1e3dae4	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_prace_filol.json	https://doaj.org/api/search/journals/issn:2720-5037	2026-09-29T23:59:10Z	d421a698f9ab774b9bdfe9bed9920379840d6102a35d6c50094b70f9ed92a62f	200	
+doaj_journal_slowo.json	https://doaj.org/api/search/journals/issn:2082-6931	2026-09-29T23:59:11Z	cb7c5fdd2bbbcea4dce440a1fe91a8b9d06b7215235c75cf80dd9f288cb6e8eb	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_slowo.json	https://doaj.org/api/search/journals/issn:2956-963X	2026-09-29T23:59:13Z	17f5c91a1131a8c95c6ddfc93370e229b9b61cbb21050c80e82c10c602f817e3	200	
+doaj_journal_studia_wschodnioslow.json	https://doaj.org/api/search/journals/issn:1642-557X	2026-09-29T23:59:14Z	529f7b4638d96c20bc0d4d323c64289f6424ef4581b65996196caaa7b5085698	200	
+doaj_journal_linguodidactica.json	https://doaj.org/api/search/journals/issn:1731-6332	2026-09-29T23:59:15Z	ec865d3834997c69aee07988546cf297ed4d1ca14f67f80f3e2001e17247998e	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_linguodidactica.json	https://doaj.org/api/search/journals/issn:2957-0204	2026-09-29T23:59:16Z	e94736f6f12dfe1356f538293b066d68cff21c507b17be589dd6c63cab2a8499	200	
+doaj_journal_acta_baltico.json	https://doaj.org/api/search/journals/issn:0065-1044	2026-09-29T23:59:18Z	1e26ca6f7376a7f99be6b25befbddf42799cbed2a9129f6fb28e2cd85fed3805	200	
+doaj_journal_jezykoznawstwo_ahe.json	https://doaj.org/api/search/journals/issn:1897-0389	2026-09-29T23:59:19Z	889ddfd1bb5e72ff790d93f5d76189eb4a66b40e3eecfcae806bd0e105397748	200	
+doaj_journal_roczniki_hum.json	https://doaj.org/api/search/journals/issn:0035-7707	2026-09-29T23:59:21Z	f9b6f4b023659d7821b0782b4543d54bb0573a41a2fd9df83e7b42255358d433	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_roczniki_hum.json	https://doaj.org/api/search/journals/issn:2544-5200	2026-09-29T23:59:22Z	78a415d9501ca2fd3efa8d91be2994ee08f4a6a9f39bbf686b8c8902ec2e1911	200	
+doaj_journal_aupc_studling.json	https://doaj.org/api/search/journals/issn:2083-1765	2026-09-29T23:59:23Z	501363f3633cae2a0c5b8b3aa418c6e5de0da944855e0e83b4eef1d6cf7a7dc1	200	
+doaj_journal_studia_bialorut.json	https://doaj.org/api/search/journals/issn:1898-0457	2026-09-29T23:59:25Z	d15961fecbcf164b2ffaf3419c328a7cd2979074cbc7d02da2582356b68ae7e0	200	
+doaj_journal_psj_poznan.json	https://doaj.org/api/search/journals/issn:2082-9825	2026-09-29T23:59:26Z	fc8b57bc6cf068cf934504e77f7654966a106f568779ea18e218f37bb6c7cf7a	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_psj_poznan.json	https://doaj.org/api/search/journals/issn:2450-0259	2026-09-29T23:59:27Z	9698e417a97ba2bd3a6470ae65294824244233823852e19bc651cb2a9943b0db	200	
+doaj_journal_sfps.json	https://doaj.org/api/search/journals/issn:0081-7090	2026-09-29T23:59:29Z	109b837a3d657753988c743842c5cb7385285bbce1a7122fd3412c68c28d47e9	200	
+doaj_journal_forum_ling.json	https://doaj.org/api/search/journals/issn:2449-9587	2026-09-29T23:59:30Z	ff72415df793a587f19b3df5b7999763013e6196742cf1ea9c42ab76f4dc0eb8	200	
+doaj_journal_gwary_dzis.json	https://doaj.org/api/search/journals/issn:1898-9276	2026-09-29T23:59:31Z	de1715e96edc4c5b4d96fd57026804759f3e5a67a40bf6c4e107cfb12292bccf	200	
+onomastica_essential-facts.html	https://onomastica.ijp.pan.pl/index.php/ONOM/essential-facts	2026-09-30T00:02:47Z	5c415048e3bdae49bc7b3c1bc54b1bd315325acdc9ae8ba04ba2448f5350bcdb	200	
+onomastica_about_submissions.html	https://onomastica.ijp.pan.pl/index.php/ONOM/about/submissions	2026-09-30T00:02:51Z	10c3ce422e9fabf9d91c1fc77ca22c83b0972636b6cadee042c79f54203bc3ff	200	
+rkj_ltn_about.html	https://journals.ltn.lodz.pl/Rozprawy-Komisji-Jezykowej/about	2026-09-30T00:02:54Z	1611b5d9a021b849ec30e27dc3ad1938465f4e6411e95ee7b8eb00a1a6e2e44e	200	
+rkj_ltn_about_submissions.html	https://journals.ltn.lodz.pl/Rozprawy-Komisji-Jezykowej/about/submissions	2026-09-30T00:02:56Z	b48f8f9b9143a07dff7933f0493c62d91ed1d4f452218d745dc4d69547ebda91	200	
+lingvaria_licensing.html	https://journals.akademicka.pl/lv/licensing	2026-09-30T00:02:58Z	9d55e11b05cc96ee1cda76a79b9546dbb1fe971f0d147a42e635e93e494f3e14	200	
+jezyk_polski_about.html	https://jezyk-polski.pl/index.php/jp/about	2026-09-30T00:03:00Z	6122460bdb55502820a12524e9bfa336cd3086b7c182ff129416982be11bbeae	200	
+jezyk_polski_about_submissions.html	https://jezyk-polski.pl/index.php/jp/about/submissions	2026-09-30T00:03:02Z	06d6c68b746eed1c293f57215c8eefa8c37c689291c548e3c991d6abb672dc6c	200	
+studia_jez_szczecin_home.html	https://wnus.edu.pl/sj/pl/	2026-09-30T00:03:05Z	fad1e832d1575caef24f73f9e93d9933f37675ee6cde29b06af40938688c5c87	200	
+ling_copernicana_about.html	https://apcz.umk.pl/LinCop/about	2026-09-30T00:03:07Z	f9a71158245dc48e274a6bfb09447c27644ef9eb9f939b5e48fab25ed256f51d	200	
+slavia_occ_about.html	https://pressto.amu.edu.pl/index.php/so/about	2026-09-30T00:03:09Z	d5f98cdaf6fd07f11a051eb1740d8e794a3c4f87a5b34ff26a2915192d70d521	200	
+folia_ling_oa_policy.html	https://czasopisma.uni.lodz.pl/linguistica/Open_access_policy	2026-09-30T00:03:12Z	38ffed9ebd43c91065a4d0bb2236dc02dc3512c0d2c00ae8888958aecaa50c4b	200	
+folia_ling_prawa_autorskie.html	https://czasopisma.uni.lodz.pl/linguistica/_prawa-autorskie_	2026-09-30T00:03:14Z	6ade926e1e22fc8769834ffabc1da19b9fe83e204854afc482c08e00124724c1	200	
+umcs_ff_editorial_policies.html	https://journals.umcs.pl/ff/about/editorialPolicies	2026-09-30T00:03:16Z	abe2235da53dd932280fa4cd01b532e83136b148aa1c2e550e3e2822bfefed8d	200	
+umcs_ff_about_submissions.html	https://journals.umcs.pl/ff/about/submissions	2026-09-30T00:03:19Z	5524b1555d4f0f92464f3cb59cdb5c6415d4468816d42c15bf56d1bb5fe05b96	200	
+psp_jez_about.html	https://pressto.amu.edu.pl/index.php/pspsj/about	2026-09-30T00:03:30Z	f294d634c9fd1cee8ee887eb4374c5e81b315b96f74c783472697e8b8169c6c1	200	
+roczniki_hum_about.html	https://czasopisma.tnkul.pl/index.php/rh/about	2026-09-30T00:03:32Z	a75461cdd5d01a06162b6da21d1f9ce4b58b99a387cd286cd0be0a5423ec0e43	200	
+psj_poznan_about.html	https://pressto.amu.edu.pl/index.php/psj/about	2026-09-30T00:03:34Z	3c55ff099f4a8ca8e8958343d2064318601a7844ba6319dde7779e77d4ac3f0a	200	
+studia_bialorut_editorial_policies.html	https://journals.umcs.pl/sb/about/editorialPolicies	2026-09-30T00:03:36Z	ce320d86c072efdfbb22a3a8a8b6cbb9a9ea171603fffdca4831dfebc317b701	200	
+acta_baltico_about_submissions.html	https://journals.ispan.edu.pl/index.php/abs/about/submissions/	2026-09-30T00:03:39Z	ac05c248d8651b429db140ee791f5adfbd365dbd42e7cfff42009bad17208a0b	200	
+sfps_about_submissions.html	https://journals.ispan.edu.pl/index.php/sfps/about/submissions/	2026-09-30T00:03:46Z	4a44dc49a6da9d21ee58e60acbeac568b2d51278cdbd22e33af8c594b1c4c5a8	200	
+forum_ling_about_submissions.html	https://journals.us.edu.pl/index.php/FL/about/submissions	2026-09-30T00:03:52Z	2a9369b5f5b39a65c64536e314db79b7a7e0930937f07d1a80237809961a8c49	200	
+gwary_dzis_about.html	https://pressto.amu.edu.pl/index.php/gd/about	2026-09-30T00:03:54Z	85dbfa59729d31f03817491e0b91585e426ef2fc68653d63ebb69cb770807bf6	200	
+jezykoznawstwo_ahe_about.html	https://ojs.academicon.pl/jezykoznawstwo/about	2026-09-30T00:03:56Z	3779f3a7fc9bcf4f6a88c38cc80cee6d65ac8f62622d9ba2b9f0d725fae9eb18	200	
+rkj_ltn_info.html	https://journals.ltn.lodz.pl/Rozprawy-Komisji-Jezykowej/pl/info	2026-09-30T00:04:29Z	a7a3ac9d7b1e8e66f30bbc729d6126b81c2e2df9b89064066cb869f4ed8eed2e	200	
+rkj_ltn_authors.html	https://journals.ltn.lodz.pl/Rozprawy-Komisji-Jezykowej/pl/authors	2026-09-30T00:04:31Z	9b787e6d14ab11dc86139b0f7782335bfac1c2a8d93ba7cb8a5c03d01a41b93f	200	
+rkj_ltn_article_2253.html	https://journals.ltn.lodz.pl/Rozprawy-Komisji-Jezykowej/article/view/2253	2026-09-30T00:04:33Z	a3fff030dd245ab7cecd413542d790afd6b29877d9e4ed70da2dd86e87f1caaa	200	
+jezyk_polski_polityka.html	https://jezyk-polski.pl/index.php/jp/polityka	2026-09-30T00:04:36Z	cab15ca9789ae04b580e2608b84f88a62015034e1032dae6cfd5910a4ace0fb4	200	
+jezyk_polski_rules.html	https://jezyk-polski.pl/index.php/jp/rules	2026-09-30T00:04:39Z	7ef4693e81a668f40695ce98410497be3cbe3443753e71e506431ca2ee30fdd9	200	
+jezyk_polski_article_994.html	https://jezyk-polski.pl/index.php/jp/article/view/994	2026-09-30T00:04:41Z	af522a5fd7171ecab28a5b8930a6c87aa8996aaa67c50b03d0416793b617f64e	200	
+slavia_occ_about_submissions.html	https://pressto.amu.edu.pl/index.php/so/about/submissions	2026-09-30T00:04:44Z	e51db9b170135e7f6f2ad3bffb6803d84f2a35b28dd526d266ac4d90eb0c6caa	200	
+onomastica_article_208_vol60.html	https://onomastica.ijp.pan.pl/index.php/ONOM/article/view/208	2026-09-30T00:04:46Z	c7fe206093e87ca4f7e4c1d70cac212783a32aa8451ae02ca4e52f93ed989a17	200	
+polonica_about.html	https://polonica.ijp.pan.pl/index.php/polonica/about	2026-09-30T00:05:48Z	82206e0c6967690af40210edd2832e7e4b7589e85d9a526aec2771ce02e1f5ee	200	
+slavia_occ_article_9992.html	https://pressto.amu.edu.pl/index.php/so/article/view/9992	2026-09-30T00:05:52Z	2786cefbf06a4f753ca7dd76ae46a5464685ae86c13d67d31b994165cd089888	200	
+uwb_repo_sw_2024_24_13.html	https://repozytorium.uwb.edu.pl/jspui/handle/11320/18159	2026-09-30T00:05:54Z	08452bb39e756190988f56bf0898388ebe0ab4061e3b4cf1d2f985b43aa98a8d	200	
+ur_repo_slowo_2022_13_3.html	https://repozytorium.ur.edu.pl/handle/item/8497	2026-09-30T00:05:58Z	af1be0c089086e9f91160a389a710d975fb868d45aa1e590eaf9575e4cb7c406	200	
+doaj_articles_abs_nazwisk_sample.json	https://doaj.org/api/search/articles/issn:2392-2389%20AND%20nazwisk?pageSize=10	2026-09-30T00:06:36Z	cef8efc3f7fc0b0d41c84d623eabe477ac2b93691766b78db37c0ebe89e506d7	200	
+aupc_copy.html	https://studialinguistica.uken.krakow.pl/copy	2026-09-30T00:07:30Z	4306d2d187e346b3af57d166c10296f521761bb68e516a375dedb9c803b9ddb9	200	
+poradnik_article_9446.html	https://poradnik-jezykowy.uw.edu.pl/article/9446?lang=en	2026-09-30T00:07:32Z	528cbe8264295686f5e279b20aaa03703f647ca564a21ae552e66c825e599753	200	
+amur_api_title_nazwisk.json	https://repozytorium.amu.edu.pl/server/api/discover/search/objects?query=dc.title:(nazwisk*)&dsoType=ITEM&size=100	2026-09-30T00:09:28Z	d0294f147d351dc937a4738300dd4c39ad96f2f00eae67b79a384610095c9646	200	
+ruw_api_title_nazwisk.json	https://repozytorium.uw.edu.pl/server/api/discover/search/objects?query=dc.title:(nazwisk*)&dsoType=ITEM&size=100	2026-09-30T00:09:30Z	f0c01800ffb7e237e7aa93947f53a92a5b8b8974b934bae78df3b22e06927f89	200	
+ruj_api_title_nazwisk.json	https://ruj.uj.edu.pl/server/api/discover/search/objects?query=dc.title:(nazwisk*)&dsoType=ITEM&size=100	2026-09-30T00:09:33Z	775e8df9745a171dbdb9e1b73928d84b09e21814a695d104393b1846321986b5	200	
+rcin_67280_webfetch_note.txt	https://rcin.org.pl/dlibra/publication/87547/edition/67280	2026-09-30T00:10:32Z	f245063a85b7c98ec2f83841e53700f0cb8e09e4d42e6beb76068384cadd846c	webfetch-note	
+digilab_uwr_osg_t30_2011.html	https://digilab.uwr.edu.pl/en/dlibra/publication/118798/onomastica-slavogermanica-t-30-2011	2026-09-30T00:11:15Z	42420ac0a02e0738be1e11829768ebb39697754cbcb32f706399ebdea93eac09	200	
+doaj_journal_rkj_wtn.json	https://doaj.org/api/search/journals/issn:2451-294X	2026-09-30T00:11:38Z	276d9257871741c153acfd3f837f3edeef941d2af82a27549c003873c53d3a34	200	
+bazhum_about.html	https://bazhum.muzhp.pl/about	2026-09-30T00:12:02Z	e8951ff01460c3f577ab1fa307aba31822681b6ec263d59e6d37387c18afe582	200	
+cejsh_element_sample.html	https://cejsh.icm.edu.pl/cejsh/element/bwmeta1.element.cejsh-5190f76b-b388-4823-b224-3d3fddfda810	2026-09-30T00:12:03Z	d26444447940644b220df674a927a6c499b023611bcf10facd67553d36e93213	200	
+elsevier_tdm_userlicense_1.0.html	https://www.elsevier.com/tdm/userlicense/1.0/	2026-09-30T00:15:22Z	85d504c9694f57e259318002d60a2a57a116f5a742c2ee6dde485424dcd95dc1	200	
+doaj_journal_names.json	https://doaj.org/api/search/journals/issn:0027-7738	2026-09-30T00:18:42Z	416bde4e88f5b16bc643154d9c241520269a0d7b05ddea1c1c55e0d0082f4e6f	200	
+doaj_journal_forum_filol_ateneum.json	https://doaj.org/api/search/journals/issn:2353-2912	2026-09-30T00:18:44Z	449ca007ae144f67d5a9d1c6c6e8cdb7e1ae99d0ade90c91d92d15075c769565	200	
+doaj_journal_wiad_botaniczne.json	https://doaj.org/api/search/journals/issn:2543-6503	2026-09-30T00:18:45Z	87b6ef282688d707aad6847df259ad3ed5ab7f8e244cade55fff5e1fdd7f6cc1	200	
+doaj_journal_slavia_orientalis.json	https://doaj.org/api/search/journals/issn:0037-6744	2026-09-30T00:18:46Z	9846650e2d650010526dc6eb4e436b5a9f3b03b5aac67f8e31175306250dec96	200	
+doaj_journal_studia_warminskie.json	https://doaj.org/api/search/journals/issn:0137-6624	2026-09-30T00:18:48Z	7ced76a5b1c10a4a5c2c0af9bff5c4b23b02af8cea1fd2efdc93c3377b232e09	200	
+doaj_journal_teka_kppzk.json	https://doaj.org/api/search/journals/issn:1733-2249	2026-09-30T00:18:49Z	a46fc52ec1abb66add5cb65c701e2e2372fa7c076e847ab8e4cadb926bb30240	200	
+doaj_journal_bialorutenistyka_bial.json	https://doaj.org/api/search/journals/issn:2081-2515	2026-09-30T00:18:50Z	e1ab8630b7d8035a0603496c6a28534210a2c831eddf0db95f43b83420a5ef2f	200	SUPERSEDED: file later overwritten by the e-ISSN query on the next row; this p-ISSN query also returned total=0
+doaj_journal_bialorutenistyka_bial.json	https://doaj.org/api/search/journals/issn:2957-2088	2026-09-30T00:18:51Z	81eeb481750a56901588c1f9fe4e091e63f2f7a9ca1133feb27d5152c909edae	200	
+doaj_journal_wiad_chemiczne.json	https://doaj.org/api/search/journals/issn:0043-5104	2026-09-30T00:18:53Z	8cff9f0a46ee055a1aece479ecd09fbd5c0b84ac83050efd9e70095a3b266bdc	200	
+doaj_journal_radomskie_sh.json	https://doaj.org/api/search/journals/issn:2300-0597	2026-09-30T00:18:54Z	eb67450b7da426eed8b7ec29197de8400d5d8b72af36a5564f64a1cb8243eace	200	
+doaj_journal_zeszyty_cyrylo_met.json	https://doaj.org/api/search/journals/issn:2449-8297	2026-09-30T00:18:55Z	1d6c32b72395fce3120f5eb5fb0b68d9d58086009256ea9bc104574b777b4e1a	200	
+doaj_journal_czlowiek_spol.json	https://doaj.org/api/search/journals/issn:0239-3271	2026-09-30T00:18:57Z	53feac51e487670fc6a2003cc27d68faae8cc23870fc144869694bbd9cbce5bd	200	
+doaj_journal_lehahayer.json	https://doaj.org/api/search/journals/issn:2082-6184	2026-09-30T00:18:58Z	04c65c89b9ea30547b6bdd2c7d60f44a078a1d89265465d733f71a797be679e5	200	
+doaj_journal_wiad_botaniczne_p.json	https://doaj.org/api/search/journals/issn:0043-5090	2026-09-30T00:19:07Z	97aefb5af24d18944f5b062aa9c86b44cf41b1af497a68705214f04a93dc0e34	200	
+names_about.html	https://ans-names.pitt.edu/ans/about	2026-09-30T00:19:28Z	03cf4e75c8528aed80842dc776007ec449414c326ae19a5c023baf8a5ad0ecd4	200	
+landing_10_11649_abs_2017_003.html	https://journals.ispan.edu.pl/index.php/abs/article/view/abs.2017.003	2026-09-30T00:21:41Z	fd3f845480ebb8e31f5f80953140ca5dac239c1e652d88fffa2dfadcc69184dc	200	
+landing_10_17951_sb_2022_16_197-219.html	https://journals.umcs.pl/sb/article/view/13064	2026-09-30T00:21:49Z	90d502f901f59a2b312e3553ccbbb7856481eafab7b45d55b59fdb547281796e	200	
+landing_10_14746_pspsj_2013_20_2_19.html	http://pressto.amu.edu.pl/index.php/pspsj/article/view/1981	2026-09-30T00:21:52Z	3b99c829811431339c8992a57c44d5be7129e5c685f3e4056251d70a5843838b	200	
+landing_10_17651_onomast_64_16.html	https://onomastica.ijp.pan.pl/index.php/ONOM/article/view/284	2026-09-30T00:21:55Z	899d158350d11590bc4d6a580690a0ab300d99285a82f6a57ba84eefb2c3ed68	200	

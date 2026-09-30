@@ -1,0 +1,11 @@
+url	attempted_utc	result
+https://czasopisma.uwm.edu.pl/index.php/pj/about	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://journals.polon.uw.edu.pl/index.php/pj/about	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://journals.polon.uw.edu.pl/index.php/pj/WYTYCZNE	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://ejournals.eu/en/journal/studia-linguistica-uic/page/licensing-copyright-and-archiving	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://www.journals.polon.uw.edu.pl/index.php/pf/about	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://studialinguistica.up.krakow.pl/copy	2026-09-30T00:07:56Z	curl: TLS 'unable to get local issuer certificate' or connection reset via egress proxy; WebFetch: HTTP 503
+https://rcin.org.pl/dlibra/oai-pmh-repository.xml?verb=GetRecord&...	2026-09-30T00:10:32Z	HTTP 200 but body is 'High Load - Verifying Browser' JS proof-of-work challenge; not bypassed
+https://wuwr.pl/osg/about ; https://wuwr.pl/osg/about/submissions	2026-09-30T00:11:00Z	robots.txt = 'User-agent: * Disallow: /'. Two pages were fetched by mistake in the same command that read robots.txt; a licence-keyword extractor ran on them and printed no matches; files then deleted; not used as evidence.
+https://ateneum.edu.pl/sites/philology-forum	2026-09-30T00:20:31Z	robots.txt returned HTTP 403; policy page not fetched (conservative); relied on DOAJ + Crossref
+https://pbsociety.org.pl/repository/handle/20.500.12333/365	2026-09-30T00:20:41Z	curl timeout after 60s, 0 bytes; relied on Crossref licence field
