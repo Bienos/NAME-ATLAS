@@ -3671,3 +3671,8 @@ span.lf-alt {
     stroke: GrayText;
   }
 }
+
+/* TASK-047: the contact line under the footer's data note. */
+.footer-contact {
+  margin: var(--space-3) 0 0;
+}

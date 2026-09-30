@@ -1,6 +1,6 @@
 # TASK-047 — A published contact address
 
-- **Status:** SPECIFIED 2026-09-30, not started. One of five launch hygiene tasks (046–050).
+- **Status:** IMPLEMENTED 2026-09-30 on `claude/tender-dirac-lxsnjb` (`docs/progress/2026-09-30-contact-address.md`). The project owner answered U-1 the same day: `cihypatryk@gmail.com`. One of five launch hygiene tasks (046–050).
 - **Requested by:** the project owner, 2026-09-30 (see TASK-046).
 - **Milestone:** none in `PLAN.md`.
 - **Depends on:** the owner choosing the address (§5 U-1). Nothing in code.

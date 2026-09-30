@@ -19,6 +19,7 @@ import { NamePrint } from "../lib/name-print.js";
 import { AtlasField } from "../lib/atlas-field.js";
 import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
+import { SiteFooter } from "../lib/site-footer.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -266,7 +267,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         <CommonSurnames lists={common} lang={lang} />
         <ListAtlas facts={atlas} lang={lang} />
       </main>
-      <footer lang={htmlLang(lang)}>{t.footer}</footer>
+      <SiteFooter lang={lang} />
     </>
   );
 }
