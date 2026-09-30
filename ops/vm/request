@@ -1,0 +1,4 @@
+# The step the Register VM workflow runs when a push changes this file (TASK-042).
+# One word on the first non-comment line: check, provision, build, status or finalize.
+# status at 05:53 UTC (build check)
+status
