@@ -14,7 +14,7 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `provision.sh` | Installs and configures everything. Idempotent. Reads the web role's password on stdin. |
 | `build.sh` | Unpacks the pushed commit, runs `pnpm install` on the VM, starts the `name-atlas-register-build` unit (`scripts/local-setup.sh`) and returns. |
 | `status.sh` | The build's state and log (`built: yes` only once it completed), the database's counts, the services, waiting security upgrades, memory and disk. Read-only. |
-| `finalize.sh` | The gate, durability back on, grants, `VACUUM ANALYZE`, `pg_prewarm`, and a `pg_dump` to `/var/lib/name-atlas/backup/`. |
+| `finalize.sh` | The gate (it names the surnames the import flagged as mixed-script, which get no figures by design, and checks every other one), durability back on, grants, `VACUUM ANALYZE`, `pg_prewarm`, and a `pg_dump` to `/var/lib/name-atlas/backup/`. |
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 

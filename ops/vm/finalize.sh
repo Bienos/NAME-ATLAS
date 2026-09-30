@@ -56,13 +56,23 @@ check "ACTIVE claims sharing a claim_key" 0 \
   "$(q "SELECT count(*) FROM (SELECT 1 FROM claims WHERE claim_status = 'ACTIVE' GROUP BY claim_key HAVING count(*) > 1) d")"
 check "surnames with more than two ACTIVE claims of one type" 0 \
   "$(q "SELECT count(*) FROM (SELECT 1 FROM claims WHERE claim_status = 'ACTIVE' GROUP BY subject_entity_id, claim_type HAVING count(*) > 2) d")"
-check "surnames missing population, rank or rarity" 0 "$(q "
-  SELECT count(*) FROM surnames s WHERE s.entity_status = 'ACTIVE' AND NOT (
+# Surnames the import flagged as mixed-script (a Latin name with a Cyrillic
+# confusable in it) are in the register but get no figures: the resolver
+# answers REVIEW_REQUIRED for them and derive writes nothing (TASK-010,
+# docs/canonical/13 §10.4). The gate names them and checks the rest.
+q "SELECT '[finalize]   set aside, flagged mixed-script at import: ' || canonical_display ||
+          CASE WHEN EXISTS (SELECT 1 FROM distribution_snapshots ds WHERE ds.surname_id = s.surname_id AND ds.geography_level = 'REGION')
+               THEN ' (has regional rows)' ELSE '' END
+     FROM surnames s WHERE s.entity_status = 'ACTIVE' AND s.mixed_script ORDER BY canonical_display"
+check "surnames flagged mixed-script at import (2 + 1 rows in the four files)" 2 \
+  "$(q "SELECT count(*) FROM surnames WHERE entity_status = 'ACTIVE' AND mixed_script")"
+check "other surnames missing population, rank or rarity" 0 "$(q "
+  SELECT count(*) FROM surnames s WHERE s.entity_status = 'ACTIVE' AND NOT s.mixed_script AND NOT (
     EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id AND c.claim_type = 'CURRENT_POPULATION' AND c.claim_status = 'ACTIVE')
     AND EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id AND c.claim_type = 'CURRENT_RANK' AND c.claim_status = 'ACTIVE')
     AND EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id AND c.claim_type = 'RARITY_CONTEXT' AND c.claim_status = 'ACTIVE'))")"
-check "surnames with regional data missing their distribution" 0 "$(q "
-  SELECT count(*) FROM surnames s WHERE s.entity_status = 'ACTIVE'
+check "other surnames with regional data missing their distribution" 0 "$(q "
+  SELECT count(*) FROM surnames s WHERE s.entity_status = 'ACTIVE' AND NOT s.mixed_script
     AND EXISTS (SELECT 1 FROM distribution_snapshots ds WHERE ds.surname_id = s.surname_id AND ds.geography_level = 'REGION')
     AND NOT EXISTS (SELECT 1 FROM claims c WHERE c.subject_entity_id = s.surname_id AND c.claim_type = 'CURRENT_DISTRIBUTION' AND c.claim_status = 'ACTIVE')")"
 q "SELECT '[finalize]   active claims ' || claim_type || ' ' || count(*) FROM claims WHERE claim_status = 'ACTIVE' GROUP BY claim_type ORDER BY claim_type"
