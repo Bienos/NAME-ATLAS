@@ -15,7 +15,7 @@ All 46 files verified against the run's own `SHA256SUMS.txt` on 2026-09-21: **46
 |---|---|---|
 | **PESEL national**, `dane.gov.pl` dataset 1681 | 2019–2026, male + female, 16 files | **2026 imported and verified.** 408,182 + 420,082 rows, checksums match the registry exactly. |
 | **PESEL regional** (voivodeship of permanent registered residence) | 2025 + 2026, male + female, 4 files | **2026 imported and verified.** 646,052 + 694,553 rows, checksums match. |
-| **TERYT** TERC (regions) + SIMC (localities) | 2 zips | Partly. `fixtures/teryt/voivodeship-terc-correspondence.json` carries the 16 voivodeship codes; the full hierarchy is not loaded. |
+| **TERYT** TERC (regions) + SIMC (localities) | 2 zips | **Importable** (TASK-039, 2026-09-30). `pnpm import:teryt` loads the full hierarchy: 380 powiats, 2,479 gminas and 101,865 localities under the 16 voivodeships. It was verified on a local database; the hosted database is not loaded. The files were re-acquired on 2026-09-30, and `fixtures/teryt/source-manifest.json` records them. |
 | **GeoNames** PL, cities15000, countryInfo, admin1 | 5 files | No. |
 | **Morfeusz** Polish morphological dictionary | 2 files (7.5 MB binary, 42 MB text) | No — and see the warning in §4. |
 | **US Census** surnames 1990, 2000, 2020 | 3 files | No. |

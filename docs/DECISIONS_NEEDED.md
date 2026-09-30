@@ -8,6 +8,23 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-023 — TERYT external-id namespaces: `TERYT` (code) or `TERYT_TERC` (`docs/canonical/12` §11.3)?
+
+**Status:** NON-BLOCKING NOW. Nothing is built or blocked on it.
+**Owner:** project owner, or an ADR.
+**Raised by:** TASK-039, 2026-09-30.
+
+`docs/canonical/12` §11.3 says TERYT ids are stored with `namespace = TERYT_SIMC / TERYT_TERC / TERYT_ULIC`. Since TASK-011, `main` has stored the 16 voivodeship TERC codes under `entity_external_ids.provider_key = 'TERYT'`. TASK-039 kept `TERYT` for every TERC code (voivodeship, powiat, gmina) and used `TERYT_SIMC` for locality ids. SIMC needed its own namespace: a seven-digit SIMC id and a seven-digit TERC gmina code can be the same digits.
+
+Renaming `TERYT` to `TERYT_TERC` would re-identify rows that other rows already reference, so TASK-039 did not do it. The options:
+
+- (a) Keep `TERYT` for TERC and record the deviation in an ADR.
+- (b) A data migration renames `TERYT` to `TERYT_TERC`, and `TERYT_PROVIDER_KEY` changes with it.
+
+Neither changes any behaviour today.
+
+---
+
 ## D-022 — RESOLVED (2026-09-29): *Onomastica* is dropped as a meaning source
 
 **Resolution**, decided by the project owner on 2026-09-29: option (c), "Drop Onomastica".

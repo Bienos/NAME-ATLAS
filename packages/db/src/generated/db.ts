@@ -5,6 +5,8 @@
 
 import type { ColumnType } from "kysely";
 
+export type AdminMembershipType = "ADMINISTRATIVE" | "ECCLESIASTICAL" | "OTHER" | "POLITICAL";
+
 export type AttestationStatus = "ATTESTED" | "DERIVED" | "DISPUTED" | "GENERATED_CANDIDATE";
 
 export type CachePermission = "ALLOWED" | "LIMITED" | "PROHIBITED" | "UNKNOWN";
@@ -94,6 +96,18 @@ export type SpatialPrecision = "APPROXIMATE" | "COUNTRY" | "EXACT_POINT" | "LOCA
 export type SurnameStatus = "ACTIVE" | "AMBIGUOUS" | "DEPRECATED" | "MERGED";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export interface AdministrativeMemberships {
+  child_place_id: string;
+  created_at: Generated<Timestamp>;
+  membership_id: string;
+  membership_type: AdminMembershipType;
+  parent_place_id: string;
+  source_record_id: string | null;
+  valid_from: Timestamp | null;
+  valid_to: Timestamp | null;
+  verification_status: EvidenceVerificationStatus;
+}
 
 export interface Citations {
   accessed_at: Timestamp | null;
@@ -428,6 +442,7 @@ export interface SurnameSlugs {
 }
 
 export interface DB {
+  administrative_memberships: AdministrativeMemberships;
   citations: Citations;
   claim_evidence: ClaimEvidence;
   claims: Claims;

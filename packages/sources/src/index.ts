@@ -99,3 +99,7 @@ export * from "./polona/index.js";
 // Source catalogue — TASK-038: every researched source as a registry row,
 // seeded idempotently. Registry data only; it fetches and ingests nothing.
 export * from "./catalogue/index.js";
+
+// TERYT localities — TASK-039: TERC + SIMC into places, names, external ids
+// and administrative memberships. Geography infrastructure, never surname evidence.
+export * from "./teryt/index.js";

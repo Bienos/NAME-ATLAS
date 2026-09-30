@@ -2,7 +2,7 @@
 
 The current state in one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-038: 96 researched sources can be registered in `sources` with a default rights profile each (`pnpm seed:sources`). Nothing is ingested from them (`docs/progress/2026-09-30-source-catalogue-registry.md`).
+**Last rewritten:** 2026-09-30, by TASK-039: `pnpm import:teryt` loads GUS's TERC and SIMC registers into `places`. That is 16 voivodeships, 380 powiats, 2,479 gminas and 101,865 localities, with an `administrative_memberships` hierarchy (migration `0023`). It was verified on a local database; the hosted database is not loaded (`docs/progress/2026-09-30-teryt-localities-import.md`). TASK-038 before it: 96 researched sources can be registered in `sources` (`pnpm seed:sources`).
 
 ## Production
 
@@ -10,13 +10,13 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
 | Deployed commit | `main` @ `0eb4814` (Merge #11), deployment `dpl_H55YeqWUjCg34F4F3wcufMym6sM6`, created by hand with target production. The previous one, `dpl_33fKu5ryMHRuNfvnMNMgiF262uLG` (`4d605e5`), is the rollback candidate |
-| Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 22 migrations applied (not `0022`, TASK-036's index, which only the derivation uses), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
+| Database | Supabase project `xujctkjpvnmcdpximtda` (EU), 21 of the 23 migrations applied (not `0022`, TASK-036's index, which only the derivation uses, nor `0023`, TASK-039's membership table), a seven-surname slice loaded (`PROGRESS.md`, "A seven-surname slice is loaded on the hosted database"). How to connect and load: `docs/LOCAL_DATABASE.md` |
 | Deploys | Manual. Vercel's production branch is still the stale `claude/exciting-noether-05np1s`, so a merge to `main` does not deploy |
 
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034 and 036–038, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
+- Implemented: TASK-001–006, 008–028, 030–034 and 036–039, plus TASK-029, which had no task file. Each task file's header holds that task's own status.
 - Work ahead of `PLAN.md`'s milestone order:
   - the async runtime (TASK-020);
   - rights per asset and surface (TASK-021);
@@ -35,7 +35,12 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 ## Open pull requests and branches
 
-One: #25 from `claude/jolly-faraday-uas99n`, which carries TASK-038 and this rewrite (checked 2026-09-30). TASK-037 was merged in #24.
+Two, checked 2026-09-30:
+
+- #25 from `claude/jolly-faraday-uas99n` carries TASK-038.
+- The pull request from `claude/teryt-localities-import` carries TASK-039 and this rewrite. It is built on #25's branch, so it merges after #25.
+
+TASK-037 was merged in #24.
 
 ## Blocked on the project owner
 
@@ -75,7 +80,8 @@ One: #25 from `claude/jolly-faraday-uas99n`, which carries TASK-038 and this rew
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
 - **Hosting ADR.** ADR-0011 chooses Neon, but production runs on Supabase. That needs a superseding ADR.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
-- **Decisions.** One is open.
+- **Decisions.** Two are open.
+  - **D-023**, raised by TASK-039 and non-blocking: should TERC ids stay under `provider_key = 'TERYT'`, as they have since TASK-011, or move to `docs/canonical/12` §11.3's `TERYT_TERC`?
   - **D-021**, raised by TASK-031. Its items 1 and 4 are open: may a connector query Polona automatically and keep what it retrieves, and what is Polona's source-level rights default? Items 2 and 3 were decided by ADR-0014 on 2026-09-29. It blocks only the Polona connector task.
 
   Every other entry is resolved, D-022 most recently: on 2026-09-29 the project owner dropped *Onomastica* as a meaning source.
