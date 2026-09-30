@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-050: a "Zgłoś błąd / Report a problem" `mailto:` link on surname and comparison pages (`docs/progress/2026-09-30-feedback-channel.md`).
+**Last rewritten:** 2026-09-30, by a wording fix on the contact page: a gender-neutral line in place of "znalazłeś" (`docs/progress/2026-09-30-contact-page-wording.md`).
 
 ## Production
 
