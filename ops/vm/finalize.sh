@@ -29,6 +29,10 @@ die() { echo "[finalize] ERROR: $*" >&2; exit 1; }
 q() { runuser -u postgres -- psql -X -tA -v ON_ERROR_STOP=1 -d "$DB" -c "$1"; }
 
 [ "$(id -u)" = 0 ] || die "run as root"
+# The SSH user's home, where `sudo` leaves the working directory, is not
+# readable by the users these scripts run commands as (`runuser -u ...`), and
+# `find` and others fail when they cannot return to it.
+cd /
 if [ -d /run/systemd/system ]; then
   state=$(systemctl show -p ActiveState --value "$UNIT")
   [ "$state" = inactive ] || [ "$state" = failed ] || die "the build is running (ActiveState=$state)"

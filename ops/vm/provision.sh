@@ -30,6 +30,10 @@ log() { echo "[provision] $*"; }
 die() { echo "[provision] ERROR: $*" >&2; exit 1; }
 
 [ "$(id -u)" = 0 ] || die "run as root"
+# The SSH user's home, where `sudo` leaves the working directory, is not
+# readable by the users these scripts run commands as (`runuser -u ...`), and
+# `find` and others fail when they cannot return to it.
+cd /
 # shellcheck source=/dev/null
 . /etc/os-release
 [ "${VERSION_ID:-}" = "24.04" ] || die "expected Ubuntu 24.04, found ${PRETTY_NAME:-unknown}"

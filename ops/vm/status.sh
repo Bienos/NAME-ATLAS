@@ -6,6 +6,10 @@ set -uo pipefail
 
 UNIT=name-atlas-register-build
 DB=name_atlas
+# The SSH user's home, where `sudo` leaves the working directory, is not
+# readable by the users these scripts run commands as (`runuser -u ...`), and
+# `find` and others fail when they cannot return to it.
+cd /
 
 q() { runuser -u postgres -- psql -X -tA -d "$DB" -c "$1" 2>&1; }
 

@@ -1,4 +1,4 @@
 # The step the Register VM workflow runs when a push changes this file (TASK-040).
 # One word on the first non-comment line: check, provision, build, status or finalize.
-# build: provision succeeded on the VM (run 36660458190 attempt 2)
+# build again: the scripts now start with cd / (run 36660859923 failed on the working directory)
 build

@@ -30,6 +30,10 @@ log() { echo "[build] $*"; }
 die() { echo "[build] ERROR: $*" >&2; exit 1; }
 
 [ "$(id -u)" = 0 ] || die "run as root"
+# The SSH user's home, where `sudo` leaves the working directory, is not
+# readable by the users these scripts run commands as (`runuser -u ...`), and
+# `find` and others fail when they cannot return to it.
+cd /
 [ -d /run/systemd/system ] || die "systemd is required"
 id -u "$BUILD_USER" >/dev/null 2>&1 || die "run provision.sh first"
 command -v pnpm >/dev/null || die "run provision.sh first (pnpm is missing)"
@@ -41,8 +45,9 @@ if [ "$state" = active ] || [ "$state" = activating ]; then
 fi
 
 log "1/3 unpack the repository into $APP (data/ and node_modules/ are kept)"
-if [ -z "$ARCHIVE" ] || [ ! -f "$ARCHIVE" ] || [ -L "$ARCHIVE" ] || [ ! -s "$ARCHIVE" ]; then
-  die "usage: build.sh ARCHIVE (a non-empty regular file)"
+case "$ARCHIVE" in /*) ;; *) die "usage: build.sh ABSOLUTE_PATH_TO_ARCHIVE" ;; esac
+if [ ! -f "$ARCHIVE" ] || [ -L "$ARCHIVE" ] || [ ! -s "$ARCHIVE" ]; then
+  die "$ARCHIVE must be a non-empty regular file"
 fi
 as_build() { runuser -u "$BUILD_USER" -- "$@"; }
 as_build mkdir -p "$APP"
