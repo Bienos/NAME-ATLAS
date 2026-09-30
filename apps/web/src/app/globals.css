@@ -3641,3 +3641,9 @@ span.lf-alt {
 .footer-contact {
   margin: var(--space-3) 0 0;
 }
+
+/* TASK-046: the privacy notice and the terms. */
+.legal-updated {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}

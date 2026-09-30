@@ -884,6 +884,8 @@ export const UI = {
       "aktualne, więc zmiana od nich mogłaby być zmianą definicji. Pokazujemy, co się " +
       "zmieniło, nie dlaczego.",
     contactLink: "Kontakt",
+    privacyLink: "Prywatność",
+    termsLink: "Regulamin",
     contactHeading: "Kontakt",
     contactIntro: "Name Atlas prowadzi jedna osoba. Napisz na adres:",
     contactTopicsLead: "Napisz, jeśli:",
@@ -1240,6 +1242,8 @@ export const UI = {
       "persons by their current surname, so a change from them could be a change of " +
       "definition. We show what changed, not why.",
     contactLink: "Contact",
+    privacyLink: "Privacy",
+    termsLink: "Terms",
     contactHeading: "Contact",
     contactIntro: "Name Atlas is run by one person. Write to:",
     contactTopicsLead: "Write if:",

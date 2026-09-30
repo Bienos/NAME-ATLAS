@@ -1,6 +1,6 @@
 # TASK-046 — Privacy notice and terms of use pages, in Polish and English
 
-- **Status:** SPECIFIED 2026-09-30, not started. One of five launch hygiene tasks (046–050) the project owner asked for on 2026-09-30.
+- **Status:** IMPLEMENTED 2026-09-30 on `claude/tender-dirac-lxsnjb` (`docs/progress/2026-09-30-privacy-and-terms-pages.md`). The owner confirmed U-1 the same day: "Patryk Cicbowski", Iława, no street address. U-3 (approval of the wording) is asked for on the pull request. One of five launch hygiene tasks (046–050) the project owner asked for on 2026-09-30.
 - **Requested by:** the project owner, 2026-09-30: "add the small launch hygiene tasks: privacy and terms pages, a contact, headers, an off-host backup and a feedback channel."
 - **Milestone:** none in `PLAN.md`. Launch hygiene for the free site as it is today.
 - **Depends on:** nothing. TASK-047 (contact) supplies the address both pages name; if 047 has not landed, this task uses the same owner-supplied address (§4 U-2).
