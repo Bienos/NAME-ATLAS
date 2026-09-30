@@ -19,7 +19,7 @@ Production answers for every surname in the 2026-01-20 PESEL register, with rank
 - **The pinned image** `postgis/postgis:16-3.4@sha256:44126d…` is amd64 only, so the A1 VM uses PGDG packages.
 - **The session** that implements this cannot open SSH or PostgreSQL connections: its egress is HTTPS only. A GitHub-hosted runner can.
 - **GitHub.** The default branch is still `claude/exciting-noether-05np1s`, so `workflow_dispatch` cannot start a workflow that exists only on `main` or a task branch. A push runs the workflow file of the pushed commit.
-- **Vercel.** Production is `12fb474` (`dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm`), deployed by hand through the Vercel API on 2026-09-30 (TASK-040's go-live). When this task was written it was `0eb4814` (`dpl_H55YeqWUjCg34F4F3wcufMym6sM6`). `DATABASE_URL` is a sensitive, production-only variable that the owner created. An environment change applies only to a new deployment.
+- **Vercel.** Production is `main` @ `03d1efb` (`dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu`), deployed from `main` on 2026-09-30 after the project owner set Vercel's production branch to `main` (#36). When this task was written it was `0eb4814` (`dpl_H55YeqWUjCg34F4F3wcufMym6sM6`). `DATABASE_URL` is a sensitive, production-only variable that the owner created. An environment change applies only to a new deployment.
 
 ## 3. Preconditions — the project owner's
 
@@ -59,7 +59,7 @@ Production answers for every surname in the 2026-01-20 PESEL register, with rank
 - **AC-4.** The web app built from this tree, connected through PgBouncer with the production URL form as `nameatlas_web`, renders counts, rarity and rank for a surname outside the seven-surname slice.
 - **AC-5.** On the VM, the `provision` run succeeds, and its connection step shows TLS, `default_transaction_read_only = on` and a refused write.
 - **AC-6.** On the VM, the build finishes, and `finalize`'s gate passes every check: 598,476 surnames, 828,264 national and 1,340,605 regional values, the four official hashes, no duplicate or surplus `ACTIVE` claims, and no surname missing its population, rank, rarity or, where it has regional data, distribution. The dump exists.
-- **AC-7.** Production (`name-atlas-two.vercel.app`) serves its current production commit (`12fb474` on 2026-09-30) against the VM. A surname page outside the slice shows its count, rarity, rank and regions. The rollback deployment is recorded.
+- **AC-7.** Production (`name-atlas-two.vercel.app`) serves its current production deployment against the VM, with no change to the app. A surname page outside the slice shows its count, rarity, rank and regions. The rollback deployment is recorded.
 
 ## 7. Verification
 

@@ -56,7 +56,7 @@ Each step is one push that changes `request`, or one `workflow_dispatch`:
 3. `build`: starts the build and returns in minutes. The build takes hours on the VM (projected 5–7).
 4. `status`: repeat until it prints `built: yes`. The unit is enabled, so a reboot resumes it, and a failed step restarts after two minutes and resumes. Eight failures in 12 hours stop it; the log says why. `ActiveState=inactive` alone does not mean the build finished: if it prints `built: no` with the unit inactive, push `build` again.
 5. `finalize`: refuses unless the build succeeded and the gate passes.
-6. The owner's step 5 above, then a production redeploy of the running deployment, so the app itself does not change. `STATUS.md` names it: `dpl_EqKfZrJcfQ139NcKcL1h1Ln3Xmxm` (`12fb474`) on 2026-09-30. Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
+6. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
 
 ## Going back
 
