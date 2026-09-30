@@ -12,12 +12,13 @@ name: Register VM
 #   build      ops/vm/build.sh: starts the register build on the VM and returns
 #   status     ops/vm/status.sh: the build, the database, the services, the machine
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
+#   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
 #
-# provision, status and finalize end by connecting the way the web app does.
+# provision, status, finalize and extras end by connecting the way the web app does.
 
 on:
   push:
-    branches: [claude/eager-brown-s2u6qh]
+    branches: [claude/eager-brown-s2u6qh, claude/awesome-darwin-af7l50]
     paths: [ops/vm/request]
   workflow_dispatch:
     inputs:
@@ -25,7 +26,7 @@ on:
         description: Which step to run
         required: true
         type: choice
-        options: [check, provision, build, status, finalize]
+        options: [check, provision, build, status, finalize, extras]
 
 concurrency:
   group: register-vm
@@ -61,7 +62,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | extras) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -169,10 +170,16 @@ jobs:
           scp -q ops/vm/finalize.sh vm:name-atlas-ops/finalize.sh
           ssh vm 'sudo bash ~/name-atlas-ops/finalize.sh'
 
+      - name: extras
+        if: steps.step.outputs.step == 'extras'
+        run: |
+          scp -q ops/vm/extras.sh vm:name-atlas-ops/extras.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/extras.sh'
+
       - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
         if: >-
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
-          steps.step.outputs.step == 'finalize'
+          steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'extras'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
@@ -192,6 +199,9 @@ jobs:
                        current_setting('statement_timeout'), version()"
           if [ "$(p -c "SELECT to_regclass('public.surnames') IS NOT NULL")" = t ]; then
             p -c "SELECT 'surnames ' || count(*) FROM surnames"
+            p -c "SELECT 'places ' || count(*) FROM places"
+            p -c "SELECT 'SURNAME_MEANING claims ' || count(*) FROM claims
+                  WHERE claim_type = 'SURNAME_MEANING' AND claim_status = 'ACTIVE'"
           fi
           if p -c 'CREATE TABLE public.web_role_must_not_write (x int)' 2> write.err; then
             echo "::error::the web role could create a table"

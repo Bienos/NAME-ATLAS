@@ -1,4 +1,4 @@
-# The step the Register VM workflow runs when a push changes this file (TASK-040).
-# One word on the first non-comment line: check, provision, build, status or finalize.
-# status: progress check asked by the owner (second)
+# The step the Register VM workflow runs when a push changes this file (TASK-040, TASK-041).
+# One word on the first non-comment line: check, provision, build, status, finalize or extras.
+# status: TASK-041 reads the build's progress before extras can run
 status
