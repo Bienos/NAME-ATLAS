@@ -1,4 +1,4 @@
 # The step the Register VM workflow runs when a push changes this file (TASK-040).
 # One word on the first non-comment line: check, provision, build, status or finalize.
-# status: progress check asked by the owner (second)
+# status at 03:52 UTC (hourly check)
 status
