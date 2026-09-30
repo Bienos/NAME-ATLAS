@@ -32,7 +32,7 @@ The current state in one page: what is live, what is next, what is blocked. **Re
 
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`): approved in scope by the project owner on 2026-09-30, all six of its decisions accepted. It is unnumbered and unscheduled, and takes the next free task number when scheduled. Its preconditions appear to hold on `main`; its §4 leaves two to confirm in preflight (a stable identity in the endpoint's response, and client-side rendering of the view components). Release is gated on a privacy sign-off (its §13 U-6).
 - **The Polona connector task**: not written, and blocked on D-021 items 1 and 4: automated access and caching, and the source default. ADR-0014 settled items 2 and 3. TASK-031's record (`docs/sources/polona.md`) holds what the task needs. The spike reached `polona.pl` on 2026-09-29, and its terms do not address automated access.
-- **TASK-041**, production's database on Oracle Cloud with the complete register (ADR-0016): specified, not started. It waits on the owner's answers to its §13 (U-1 to U-6) and on the console steps in its §12. It supersedes TASK-035, which was parked because the complete register (about 16 GB, projected) does not fit Supabase's free 500 MB.
+- **TASK-041**, production's database on Oracle Cloud with the complete register (ADR-0016): **in progress**. The owner answered its §13 on 2026-09-30. The repository side is done and was rehearsed in an Ubuntu 24.04 container: `scripts/production/` and the runbook `docs/PRODUCTION_DATABASE.md`. The rest runs on the VM, which the owner creates (runbook §1–§3). It supersedes TASK-035.
 
 ## Open pull requests and branches
 
@@ -77,7 +77,7 @@ Checked 2026-09-30: none. #29 (TASK-040, the family surnames view) was closed wi
   - `claude/serene-gauss-6inrf3-db-codegen-schema` and `claude/relaxed-cannon-p3grzz`: the generated-types fix, which is on `main`.
 
   Delete `claude/exciting-noether-05np1s` once it is no longer the default branch.
-- **TASK-041, the database move.** Answer its §13 U-1 to U-6, then do its §12 console steps: the A1 instance, a 150 GB block volume, the security-list rules, a DNS record, and later the Vercel `DATABASE_URL`. ADR-0016 replaces ADR-0011's Neon choice, which was the open "Hosting ADR" item.
+- **TASK-041, the database move.** Follow `docs/PRODUCTION_DATABASE.md` §1–§3: in the Oracle console, Pay As You Go with a budget alert, the A1 instance, a 150 GB volume and an ingress rule for TCP 6432; a DuckDNS name; then the provisioning script over SSH. Paste its output back; it holds no secret. ADR-0016 replaces ADR-0011's Neon choice, which was the open "Hosting ADR" item.
 - **`PLAN.md`** no longer describes the order work is done in. It needs an update or a status column.
 - **Decisions.** Two are open.
   - **D-023**, raised by TASK-039 and non-blocking: should TERC ids stay under `provider_key = 'TERYT'`, as they have since TASK-011, or move to `docs/canonical/12` §11.3's `TERYT_TERC`?

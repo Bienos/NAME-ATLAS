@@ -8,7 +8,7 @@
   - They confirmed an existing Oracle Cloud account whose home region is Frankfurt (EU).
 - **Supersedes:** ADR-0011 §2's database half, which chose Neon. Production never ran on Neon: it runs on Supabase, the gap `STATUS.md` recorded ("ADR-0011 chooses Neon, but production runs on Supabase"). ADR-0011's app half — Vercel in `fra1` — stands.
 - **Amends:** D-005 (`docs/DECISIONS_NEEDED.md`) for production only; see §3.
-- **Implemented by:** TASK-041 (`tasks/041-production-database-on-oracle-cloud.md`). Its §13 holds the questions this ADR leaves to the owner.
+- **Implemented by:** TASK-041 (`tasks/041-production-database-on-oracle-cloud.md`). Its §13 holds the owner's answers to the questions this ADR left open.
 - **Code:** none. `DATABASE_URL` is the only coupling to the host (ADR-0002, ADR-0011), so the move is configuration and operations.
 
 ## 1. Context
@@ -43,11 +43,15 @@ The same page states an idle-reclamation policy. An Always Free instance may be 
 6. **Two roles.**
    - An owner role runs migrations and the build.
    - The web app connects as a role that can only read: `SELECT` on the schema's tables, granted by default privileges so future migrations need no extra step. The web app issues no write query today; `apps/web/src` has no `insertInto` or `updateTable` outside tests.
-7. **The port is reachable from the internet.**
+7. **One port is reachable from the internet: PgBouncer's, 6432.**
+   - PostgreSQL itself listens on `localhost` only.
    - The app's serverless functions do not connect from a fixed address that a firewall rule could name on the project's current plan. This was not re-verified against Vercel's current offering in this session.
-   - The Oracle security list and the VM's own firewall open 5432, plus 80 when a Let's Encrypt HTTP challenge needs it, and nothing else beyond SSH.
+   - The Oracle security list and the VM's own firewall open 6432, and nothing else beyond SSH. The certificate is obtained through a DNS challenge (TASK-041 §13 U-1), so port 80 stays closed.
    - Verified TLS, SCRAM authentication and a read-only app role are what protect it.
-8. **Connection handling.** ADR-0011 split connections into pooled ones for the serverless app and direct ones for migrations and batch jobs, which need a session-level advisory lock. Whether a pooler (PgBouncer) sits in front of the app from the start is TASK-041 §13 U-3.
+8. **Connection handling: PgBouncer in transaction mode in front of the app** (TASK-041 §13 U-3, decided).
+   - This keeps ADR-0011's split: pooled connections for the serverless app, direct ones for migrations and batch jobs, which need a session-level advisory lock.
+   - The direct connections are made on the VM itself, to `localhost:5432`.
+   - Only the read-only web role is in PgBouncer's auth file, so the owner role cannot log in from outside at all.
 
 ## 3. The pinned image does not run here
 

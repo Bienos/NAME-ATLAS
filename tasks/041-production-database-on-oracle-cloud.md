@@ -1,6 +1,6 @@
 # TASK-041 — Production database on Oracle Cloud, with the complete register
 
-- **Status:** SPECIFIED 2026-09-30, not started. §13's questions await the project owner's answers.
+- **Status:** IN PROGRESS. §13 was answered by the project owner on 2026-09-30. The repository side is done: `scripts/production/` and `docs/PRODUCTION_DATABASE.md`, rehearsed in an Ubuntu 24.04 container (`docs/progress/2026-09-30-oracle-provisioning-scripts.md`). What remains needs the VM: the owner's §12 steps, then AC-01 to AC-10 on the real server.
 - **Requested by:** the project owner, 2026-09-30: "prudction should user oracle db not supabase and we should throw there much data". Asked which form, they chose PostgreSQL on an Oracle Cloud Always Free VM, in their existing account with home region Frankfurt (ADR-0016).
 - **Decision record:** ADR-0016.
 - **Supersedes:** TASK-035 (parked). Its goal, the complete register in production, is this task's goal. Its transfer design, a GitHub Actions runner restoring into Supabase, is replaced by a build on the VM (ADR-0016 §2 item 3).
@@ -52,19 +52,19 @@ The shape is ADR-0016 §2. This section records only what the implementation add
 
 - **`scripts/production/provision-db.sh`**, run as root on the VM.
   - It is idempotent: a second run changes nothing and fails on nothing.
-  - It installs PostgreSQL, PostGIS and certbot (plus PgBouncer if U-3 says so), and enables unattended security upgrades.
+  - It installs PostgreSQL, PostGIS, PgBouncer and certbot, and enables unattended security upgrades.
   - It mounts the data volume, places the data directory on it and creates the cluster.
   - It writes `postgresql.conf` settings for 12 GB of memory and a bulk build, and `pg_hba.conf` per ADR-0016 §2 item 5.
-  - It obtains the certificate for the U-1 name and installs a renewal hook that copies it to PostgreSQL and reloads.
-  - It opens the VM's own firewall for 5432 (and 80 if U-1's challenge needs it) and persists the rule. Oracle's Ubuntu images ship `iptables` rules that drop everything but SSH, independent of the security list.
-  - It creates the owner and read-only roles, with passwords read from the environment, never from arguments or files in the repository.
-- **The build** is `pnpm local:setup` on the VM with `DATABASE_URL` pointing at the local socket or `localhost`. The run is recorded step by step, with durations, the final `pg_database_size` and row counts.
+  - It keeps the DuckDNS name pointing at the VM. It obtains the certificate for that name through a DuckDNS TXT record, and installs a renewal hook that copies it to PgBouncer and reloads it.
+  - It opens the VM's own firewall for 6432, PgBouncer's port and the only public database port, and persists the rule. Oracle's Ubuntu images ship `iptables` rules that drop everything but SSH, independent of the security list. PostgreSQL listens on `localhost` only.
+  - It creates the owner and read-only roles. Their passwords are generated on the VM into `/root/name-atlas-credentials` (0600), and never passed as arguments or written to the repository.
+- **The build** is `scripts/production/build-register.sh`. It installs the pinned Node release, checked against nodejs.org's SHA-256, then runs `pnpm local:setup` as an unprivileged `atlas` user, in a systemd unit that survives an SSH disconnect. The run is recorded step by step, with durations, the final `pg_database_size` and row counts (`check-db.sh stats`).
 - **Cutover** sets Vercel's production `DATABASE_URL` to the VM's DNS name with `sslmode=verify-full`, then makes a production deployment of `main`.
 - **Rollback** is the reverse: the previous Supabase `DATABASE_URL` and a redeploy.
 
 ## 6. In scope
 
-1. `scripts/production/provision-db.sh`, and a check script `scripts/production/check-db.sh` that asserts the AC-02 to AC-04 facts from outside the VM.
+1. `scripts/production/provision-db.sh`, `scripts/production/build-register.sh`, and `scripts/production/check-db.sh`. The check script's `remote` mode asserts what the internet sees and needs no secret; its `local` and `stats` modes run on the VM.
 2. Rehearsal of the provisioning script in an Ubuntu 24.04 container before the VM, recorded.
 3. The build on the VM, recorded with its measurements.
 4. Cutover and rollback, recorded.
@@ -77,7 +77,7 @@ Each is shown by a command that was run, with its real output in the record.
 
 - **AC-01** The provisioning script completes on the fresh VM, and a second run completes with no change.
 - **AC-02** `SELECT version(), postgis_full_version()` reports PostgreSQL 16 and PostGIS 3.4. `pg_trgm` is installed. The data directory is on the data volume. After a reboot, PostgreSQL is up with no manual step.
-- **AC-03** From outside the VM:
+- **AC-03** From outside the VM, on port 6432:
   - a connection with `sslmode=disable` is refused;
   - a connection with `sslmode=verify-full` to the U-1 name succeeds;
   - a wrong password is refused.
@@ -130,45 +130,32 @@ A session cannot reach the Oracle console or the Vercel project settings.
    - image Ubuntu 24.04 (aarch64), 50 GB boot volume;
    - an SSH key.
 2. **Create a 150 GB block volume** and attach it to the instance.
-3. **Add security-list ingress rules** for TCP 5432 (and TCP 80 if U-1 needs it), from `0.0.0.0/0`.
-4. **Create the DNS record** U-1 decides, pointing at the instance's public IP.
+3. **Add a security-list ingress rule** for TCP 6432 from `0.0.0.0/0`. Not 5432, and not 80.
+4. **Create a DuckDNS name** (U-1), and note the account token. The provisioning script points the name at the VM itself.
 5. **Run the scripts**, or give access, as U-5 decides.
 6. **Set the production `DATABASE_URL` in Vercel**, and approve the production deployment.
 
-## 13. Decisions for the owner
+## 13. Decisions — answered 2026-09-30
 
-**U-1 — The DNS name for the TLS certificate.** `pg` verifies the certificate and host name (ADR-0016 §2 item 4), so the database needs a name a public CA will certify.
-- (a) A subdomain of a domain you own, such as `db.<your-domain>`.
-- (b) A free dynamic-DNS name, such as DuckDNS.
-- (c) No public CA: ship a private CA to the app. That is a code change, which ADR-0016 rejects.
+The session proposed an answer to each question. The project owner asked for the session's answers ("what your answers to TASK-041's six questions"). After an explanation of what each is for, they accepted them: "ok go ahead i want this".
 
-**Proposed:** (a) if you own a domain; otherwise (b).
+**U-1 — The DNS name for the TLS certificate.** `pg` verifies the certificate and host name (ADR-0016 §2 item 4). **Decided: a free DuckDNS name.** The certificate comes from Let's Encrypt through a DNS challenge on DuckDNS's TXT record, so port 80 stays closed. Owning a domain was not assumed: production's only address is `name-atlas-two.vercel.app`.
 
-**U-2 — Idle reclamation.** Oracle may reclaim an Always Free instance idle under 20% on CPU, network and memory for 7 days.
-- (a) Upgrade the account to Pay As You Go, which is commonly reported to exempt it, with a budget alert at the smallest amount. The exemption must be confirmed on Oracle's page before relying on it.
-- (b) Stay free-only, accept the risk, and rely on the rebuild.
+**U-2 — Idle reclamation.** **Decided: upgrade the account to Pay As You Go, with a budget alert at the smallest amount.**
+- Oracle's Always Free page states that Always Free resources are not charged after an upgrade.
+- It does **not** state that an upgrade exempts an instance from idle reclamation. That exemption is reported by users only, and is not relied on.
+- An instance counts as idle only when CPU, network and memory are all under 20% for 7 days. PostgreSQL's `shared_buffers`, a quarter of memory, is expected to keep memory above that. How Oracle measures memory was not verified.
+- A reclaimed VM is rebuilt from source (U-4).
 
-**Proposed:** (a).
+**U-3 — A pooler.** **Decided: PgBouncer on the VM, in transaction mode, on port 6432.**
+- It is the only public database port. Only the read-only web role is in its auth file.
+- PostgreSQL listens on `localhost`, where migrations and the build connect directly.
 
-**U-3 — A pooler.**
-- (a) PgBouncer on the VM in transaction mode for the app, with migrations and the build connecting directly. This mirrors ADR-0011's pooled/direct split.
-- (b) Direct connections only, with TASK-029's per-instance cap.
+**U-4 — Backups.** **Decided: rebuild from source, plus weekly block-volume backups (5 are free).** No `pg_dump` to Object Storage.
 
-**Proposed:** (a).
+**U-5 — How a session works on the VM.** **Decided: the owner runs the commands over SSH and pastes the output.** Nothing that could reveal a secret is pasted: `/root/name-atlas-credentials` and the connection strings stay on the VM and in Vercel. The session holds no key to the server.
 
-**U-4 — Backups.** The database holds nothing that cannot be rebuilt from public sources (ADR-0016 §4).
-- (a) Rebuild from source, plus weekly block-volume backups (5 are free).
-- (b) (a) plus a nightly `pg_dump` to Object Storage, where 20 GB is free. The dump's size is unmeasured and might not fit.
-
-**Proposed:** (a).
-
-**U-5 — How a session works on the VM.**
-- (a) You run the commands the session gives you over SSH and paste the output.
-- (b) You give the session a dedicated SSH key for this VM, removed after the task.
-
-**Proposed:** (a) for safety. (b) is faster.
-
-**U-6 — Supabase's retirement.** Proposed: keep it untouched as the rollback target for 14 days after a successful cutover, then delete the project and its GitHub integration.
+**U-6 — Supabase's retirement.** **Decided: kept untouched as the rollback target for 14 days after a successful cutover.** Then the project and its GitHub integration are deleted, which also removes the "Supabase Preview" check from pull requests.
 
 ## 14. Preflight
 
@@ -185,8 +172,12 @@ pnpm format:check
 shellcheck scripts/production/*.sh
 # in ubuntu:24.04, twice
 bash scripts/production/provision-db.sh --rehearsal
+DERIVE_LIMIT=300 bash scripts/production/build-register.sh --foreground
 # from outside the VM
-bash scripts/production/check-db.sh
+bash scripts/production/check-db.sh remote <DB_HOST>
+# on the VM
+sudo bash scripts/production/check-db.sh local
+sudo bash scripts/production/check-db.sh stats
 ```
 
 ## 16. Diff review
