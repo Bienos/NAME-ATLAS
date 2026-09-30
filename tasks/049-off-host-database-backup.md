@@ -34,7 +34,8 @@ If the Oracle VM, its boot volume or the account is lost, the database can be re
 
 ## 5. Unknowns
 
-- **U-1.** The destination: a provider outside the Oracle account (e.g. Cloudflare R2, Backblaze B2, the owner's Google Drive) or Oracle Object Storage in another account/region. The session lists free-tier limits read from each provider's page on the day, with the date, and the owner picks. It needs one credential from the owner, given as a VM secret, never committed.
+- **U-1. Decided on 2026-09-30: Cloudflare R2.** The project owner said to "pick something convenient". R2 is outside the Oracle account, speaks the S3 API (`rclone`), and charges nothing for downloads, so a restore costs nothing. The session reads its free-tier limits on the day and records them with the date; if they do not fit about 1.7 GB per copy, it stops and reports. The original question follows.
+- **U-1 (as asked).** The destination: a provider outside the Oracle account (e.g. Cloudflare R2, Backblaze B2, the owner's Google Drive) or Oracle Object Storage in another account/region. The session lists free-tier limits read from each provider's page on the day, with the date, and the owner picks. It needs one credential from the owner, given as a VM secret, never committed.
 - **U-2.** The encryption public key, generated and held by the owner.
 
 ## 6. Acceptance criteria

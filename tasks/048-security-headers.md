@@ -38,7 +38,8 @@ Every HTML page and API response carries a baseline set of security headers, wit
 
 ## 5. Unknowns
 
-- **U-1.** Nonce-based `script-src` (every page becomes dynamic, more database load at the rate-limited edge) or hash/`'self'` with `'unsafe-inline'` for scripts as a documented, temporary exception. The session measures what changes in `pnpm build`'s route table and proposes one; the owner decides. Recorded in `docs/DECISIONS_NEEDED.md` if not decided in the session.
+- **U-1. Decided by the project owner on 2026-09-30: report-only first.** Ship the strict policy (no `'unsafe-inline'` scripts) as `Content-Security-Policy-Report-Only`, keep pages static, and enforce in a later change once the violations are known. The original question follows.
+- **U-1 (as asked).** Nonce-based `script-src` (every page becomes dynamic, more database load at the rate-limited edge) or hash/`'self'` with `'unsafe-inline'` for scripts as a documented, temporary exception. The session measures what changes in `pnpm build`'s route table and proposes one; the owner decides. Recorded in `docs/DECISIONS_NEEDED.md` if not decided in the session.
 
 ## 6. Acceptance criteria
 

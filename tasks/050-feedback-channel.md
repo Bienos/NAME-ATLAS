@@ -34,7 +34,7 @@ Plus, for A or B: a line on the contact page (TASK-047) and a test that the link
 
 ## 5. Unknowns
 
-- **U-1.** A, B or C.
+- **U-1. Decided by the project owner on 2026-09-30: option A**, the prefilled email.
 
 ## 6. Acceptance criteria
 
