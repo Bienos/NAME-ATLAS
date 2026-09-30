@@ -53,6 +53,10 @@ Why: the importer resolves each row with `mixedScript: "RESOLVE_FLAGGED"` and ke
 
 Rollback: `dpl_HAvMMx6BbErUEY9xbQZwXwkhQVua` keeps the Supabase `DATABASE_URL`; an Instant Rollback to it returns production to the seven-surname slice.
 
+### Correction at 19:03 UTC: the redeploy had rebuilt the pre-#37 app
+
+#37 (TASK-043, the six-plate landing atlas) merged into `main` @ `b156bd8` at 17:31:50 UTC, and Vercel built it automatically (`dpl_FqLffcZJxPXho3wXQjPRoUM9EWjF` at 17:31:55, then `dpl_9BZDwyLJqe7RUbF4iukc6uL4jbdE` at 17:42:10, seven seconds after the `DATABASE_URL` edit; who started the second is not known here). The 17:44 redeploy above rebuilt `dpl_HAvMMx6…`, the deployment read as current at 16:50, so from 17:45 production served `1e9fa81`'s app, the landing page with plates I–III, against the VM. Noticed when this branch was rebased onto `main`. Fixed with a redeploy of `dpl_9BZDw…` (`b156bd8`) with `target: production`: `dpl_3Zf5iXwoTTmDfMRj6MR3RuYiPTc5`, created 19:03:22 UTC, READY 19:04:16, holding `name-atlas-two.vercel.app`. Checked: the landing page prints "Plansza I" to "Plansza VI" and "229 788 nazwisk jest na obu listach"; `/api/v1/surname-results?surname=ADAMCZYK` answers `population READY`, `meaning AVAILABLE`. So for 79 minutes the landing page was the older one; no surname page was affected.
+
 ## Not verified
 
 - **The passing `finalize` run.** The owner copied the corrected `finalize.sh` to `~/name-atlas-ops/finalize.sh` on the VM through an `ssh … 'cat > …'` heredoc and ran it, and reported "done". The session did not see its output: not the checksum of the copied file, not the gate's lines, not `synchronous_commit` after step 2, not the prewarmed block count, not the dump's size. That production reads every table as `nameatlas_web` shows that step 3's `GRANT` ran. Whether `/var/lib/name-atlas/register-finalized` and the dump exist is for the next `status` run.
