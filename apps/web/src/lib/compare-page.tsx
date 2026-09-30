@@ -27,10 +27,12 @@ export const COMPARISON_METADATA: Metadata = {
 async function loadSide(db: Kysely<DB>, slug: string, lang: Lang): Promise<ComparisonSide> {
   const resolved = await resolveSlug(db, slug);
   if (resolved.kind !== "RESOLVED") return { slug, display: null, response: null, path: null };
-  // The stored address, never recomputed from the display form (`currentPathFor`).
-  const path = await currentPathFor(db, resolved.surname_id, lang);
   const display = resolved.display_name;
-  const outcome = await querySurnameResult(db, display);
+  // The stored address, never recomputed from the display form (`currentPathFor`).
+  const [path, outcome] = await Promise.all([
+    currentPathFor(db, resolved.surname_id, lang),
+    querySurnameResult(db, display),
+  ]);
   if (outcome.kind !== "OK") return { slug, display, response: null, path };
   const parsed = surnameResultResponseSchema.safeParse(outcome.response);
   if (!parsed.success) return { slug, display, response: null, path };
@@ -46,8 +48,7 @@ export async function loadComparison(
   const startedAt = Date.now();
   try {
     const db = sharedDb();
-    const a = await loadSide(db, aSlug, lang);
-    const b = await loadSide(db, bSlug, lang);
+    const [a, b] = await Promise.all([loadSide(db, aSlug, lang), loadSide(db, bSlug, lang)]);
     log.info("comparison_rendered", {
       a_resolved: a.response !== null,
       b_resolved: b.response !== null,
@@ -69,4 +70,3 @@ export function firstParam(value: string | string[] | undefined): string {
 }
 
 export { ComparisonView };
-export type { Lang };

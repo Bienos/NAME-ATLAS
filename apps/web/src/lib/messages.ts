@@ -350,7 +350,6 @@ export const UI = {
     sectionPopulation: "Liczba osób",
     sectionRarity: "Jak rzadkie",
     sectionDistribution: "Zameldowanie na pobyt stały",
-    sectionMeaning: "Znaczenie",
     /**
      * The gap sentence (ADR-0008 §3). It says three things, all of them true:
      * we have no sourced meaning, the reason is that no admissible work covers
@@ -368,18 +367,15 @@ export const UI = {
     meaningRootLabel: "Rdzeń",
     meaningLanguageLabel: "Język rdzenia",
     meaningFormationLabel: "Typ",
-    meaningWorkLabel: "Opracowanie",
     meaningConflictNote:
       "Opracowania nie są zgodne co do pochodzenia tego nazwiska. Pokazujemy oba odczytania; " +
       "nie wybieramy między nimi.",
     meaningInterpretationNote:
       "To interpretacja naukowa, nie zmierzona wartość. Pochodzenie nazwisk bywa sporne.",
-    sectionSources: "Źródło",
     sectionSourcesAll: "Źródła na tej stronie",
     notesSummary: "Jak czytać te liczby",
     sourceSiteLink: "strona źródła",
     searchAnother: "Sprawdź inne nazwisko",
-    heroPeople: "osób",
     heroNoCount: "Ten zbiór nie podaje liczby osób o tym nazwisku.",
     heroNotDerived:
       "Rejestr PESEL zawiera to nazwisko, ale jego liczby nie zostały jeszcze opracowane.",
@@ -436,8 +432,6 @@ export const UI = {
     compareDisclaimer:
       "Porównujemy liczby z tego samego zbioru. Wspólne lub podobne nazwisko nie oznacza " +
       "wspólnej rodziny, wspólnych korzeni ani wspólnej narodowości.",
-    slugCollisionBody:
-      "Ten adres pasuje do więcej niż jednego nazwiska, więc nie wybieramy żadnego. Wpisz nazwisko w wyszukiwarce powyżej:",
     regionsHeading: "Województwa",
     mapTitle: "Mapa udziałów według województw",
     mapLegend: "Udział osób z zameldowaniem, od najmniejszego:",
@@ -450,8 +444,6 @@ export const UI = {
     coveredNote:
       "Udziały liczone są względem osób z zameldowaniem, nie względem wszystkich nosicieli.",
     snapshotLabel: "Stan na",
-    publisherLabel: "Wydawca",
-    scopeLabel: "Zakres zbioru",
     unresolvedHeading: "Nie znaleziono takiego nazwiska",
     suggestionsQuestion: "Czy chodziło Ci o:",
     ambiguousHeading: "Zapytanie wymaga uściślenia",
@@ -486,7 +478,6 @@ export const UI = {
     sectionPopulation: "How many people",
     sectionRarity: "How rare",
     sectionDistribution: "Permanent registered residence",
-    sectionMeaning: "Meaning",
     meaningNoSource:
       "We have no sourced meaning for this surname. We could not find it in any scholarly work " +
       "we are able to cite here, and we do not guess at meanings.",
@@ -496,19 +487,16 @@ export const UI = {
     meaningRootLabel: "Root",
     meaningLanguageLabel: "Root language",
     meaningFormationLabel: "Type",
-    meaningWorkLabel: "Work",
     meaningConflictNote:
       "The works disagree about where this surname comes from. Both readings are shown; we do " +
       "not choose between them.",
     meaningInterpretationNote:
       "This is a scholarly interpretation, not a measured value. Surname origins are often " +
       "contested.",
-    sectionSources: "Source",
     sectionSourcesAll: "Sources on this page",
     notesSummary: "How to read these figures",
     sourceSiteLink: "source website",
     searchAnother: "Search another surname",
-    heroPeople: "people",
     heroNoCount: "This dataset publishes no count for this surname.",
     heroNotDerived:
       "The PESEL register lists this surname, but its figures have not been prepared yet.",
@@ -564,8 +552,6 @@ export const UI = {
     compareDisclaimer:
       "We compare figures from the same dataset. A shared or similar surname does not mean a " +
       "shared family, shared roots or shared nationality.",
-    slugCollisionBody:
-      "This address matches more than one surname, so none is chosen. Type the surname in the search above:",
     regionsHeading: "Voivodeships",
     mapTitle: "Map of shares by voivodeship",
     mapLegend: "Share of people with a registered voivodeship, lowest first:",
@@ -578,8 +564,6 @@ export const UI = {
     coveredNote:
       "Shares are of the people with a registered voivodeship, not of every bearer of the surname.",
     snapshotLabel: "As of",
-    publisherLabel: "Publisher",
-    scopeLabel: "Dataset scope",
     unresolvedHeading: "No such surname was found",
     suggestionsQuestion: "Did you mean:",
     ambiguousHeading: "This query needs narrowing",

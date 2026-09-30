@@ -34,7 +34,6 @@ import type {
 import { Claim } from "./claim.js";
 import type { ClaimEvidence } from "./claim.js";
 import {
-  assessmentWord,
   coverageWarning,
   distributionSentence,
   explanationText,
@@ -556,9 +555,8 @@ function siteName(url: string, fallback: string): string {
  * entry), which is where a reader finds it. The notes the claims carry follow,
  * each once, one disclosure away, as they were inside the per-claim panels.
  */
-function Sources({ response, lang }: { response: SurnameResultResponse; lang: Lang }) {
+function Sources({ evidence, lang }: { evidence: readonly ClaimEvidence[]; lang: Lang }) {
   const t = UI[lang];
-  const evidence = pageEvidence(response, lang);
   if (evidence.length === 0) return null;
   // One line per source as a reader sees it: the same page, title, publisher,
   // date, licence and attribution are one source, however many claims cite it.
@@ -709,14 +707,15 @@ export function Result({
         meaning === null ? null : (n) => <Meaning section={meaning} number={n} lang={lang} />,
     };
     const order = sectionOrder(intent).filter((key) => chapters[key] !== null);
+    const evidence = pageEvidence(response, lang);
     return (
       <div className="result">
         <Snapshot response={{ ...response, status: "RESOLVED" }} lang={lang} />
-        <ChapterNav order={order} sources={pageEvidence(response, lang).length > 0} lang={lang} />
+        <ChapterNav order={order} sources={evidence.length > 0} lang={lang} />
         {order.map((key, index) => (
           <Fragment key={key}>{chapters[key]?.(index + 1)}</Fragment>
         ))}
-        <Sources response={response} lang={lang} />
+        <Sources evidence={evidence} lang={lang} />
       </div>
     );
   }
@@ -730,5 +729,3 @@ export function Result({
     </section>
   );
 }
-
-export { assessmentWord };

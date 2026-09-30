@@ -1,10 +1,11 @@
+import { cache } from "react";
 import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { assessIndexability, indexingEnabled } from "./seo.js";
+import { assessIndexability, indexingEnabled, siteOrigin } from "./seo.js";
 import { seoGatesFor } from "./seo-surface.js";
 import { currentPathFor, pathForSlug, resolveSlug } from "./slug.js";
 import {
@@ -33,13 +34,7 @@ import { NamePrint } from "./name-print.js";
  * a share control whose URL is this page's own.
  */
 
-export const SITE_ORIGIN_ENV = "SITE_ORIGIN";
-
-/** The public origin for canonical and Open Graph URLs. Never guessed from a request. */
-export function siteOrigin(env: Record<string, string | undefined> = process.env): string | null {
-  const value = env[SITE_ORIGIN_ENV]?.trim();
-  return value ? value.replace(/\/+$/u, "") : null;
-}
+export { siteOrigin };
 
 export type PageAnswer =
   | { readonly kind: "INVALID_SLUG" }
@@ -59,76 +54,106 @@ export type PageAnswer =
       readonly gates: { readonly seoSurfaceAllowed: boolean; readonly privacyPublic: boolean };
     };
 
+function pageLog(lang: Lang) {
+  return createLogger({
+    service: "web",
+    base: { route: lang === "en" ? "/en/surname/[slug]" : "/pl/nazwisko/[slug]" },
+  });
+}
+
 /**
  * Resolves the slug and reads the projection. Every failure is a typed answer;
  * nothing from a caught error reaches the page (canonical/16 §78).
+ *
+ * Memoised per request with React's `cache`: `generateMetadata` and the page
+ * ask for the same slug in the same request, and it is read from the database
+ * once. `ms` is the time to the validated projection, as `page_rendered` has
+ * always reported it.
  */
+const resolveAnswer = cache(
+  async (slug: string, lang: Lang): Promise<{ answer: PageAnswer; ms: number }> => {
+    const log = pageLog(lang);
+    const startedAt = Date.now();
+    try {
+      const db = sharedDb();
+      const resolved = await resolveSlug(db, slug, lang);
+      if (resolved.kind === "INVALID") return { answer: { kind: "INVALID_SLUG" }, ms: 0 };
+      if (resolved.kind === "MOVED") {
+        // A display form was corrected and this address retired. The link is
+        // already in somebody's index, so it is redirected rather than refused
+        // (ADR-0010 §2). The surname itself is never logged — only that it moved.
+        log.info("slug_superseded", { ms: Date.now() - startedAt });
+        return { answer: { kind: "MOVED", current_slug: resolved.current_slug }, ms: 0 };
+      }
+      if (resolved.kind === "UNKNOWN") {
+        log.info("slug_unknown", { ms: Date.now() - startedAt });
+        return { answer: { kind: "UNKNOWN", slug }, ms: 0 };
+      }
+      const outcome = await querySurnameResult(db, resolved.display_name);
+      if (outcome.kind !== "OK") {
+        log.error("page_unavailable", { reason: outcome.reason, ms: Date.now() - startedAt });
+        return { answer: { kind: "UNAVAILABLE" }, ms: 0 };
+      }
+      const parsed = surnameResultResponseSchema.safeParse(outcome.response);
+      if (!parsed.success) {
+        log.error("page_contract_violation", {
+          issues: parsed.error.issues,
+          ms: Date.now() - startedAt,
+        });
+        return { answer: { kind: "UNAVAILABLE" }, ms: 0 };
+      }
+      const ms = Date.now() - startedAt;
+      const [gates, otherLangPath] = await Promise.all([
+        seoGatesFor(db, resolved.surname_id),
+        currentPathFor(db, resolved.surname_id, lang === "pl" ? "en" : "pl"),
+      ]);
+      return {
+        answer: {
+          kind: "RESULT",
+          response: parsed.data,
+          display: resolved.display_name,
+          slug: resolved.slug,
+          otherLangPath,
+          gates: { seoSurfaceAllowed: gates.seoSurfaceAllowed, privacyPublic: gates.privacyPublic },
+        },
+        ms,
+      };
+    } catch (cause: unknown) {
+      log.error("page_failed", { cause, ms: Date.now() - startedAt });
+      return { answer: { kind: "UNAVAILABLE" }, ms: 0 };
+    }
+  },
+);
+
+/**
+ * The page's answer for metadata: the same memoised read as the page, without
+ * recording a page view.
+ */
+export async function answerSlugForMetadata(slug: string, lang: Lang): Promise<PageAnswer> {
+  return (await resolveAnswer(slug, lang)).answer;
+}
+
+/** The page's answer, recording one `page_rendered` view when there is a result. */
 export async function answerSlug(
   slug: string,
   referrerPath: string | null,
   lang: Lang = "pl",
 ): Promise<PageAnswer> {
-  const log = createLogger({
-    service: "web",
-    base: { route: lang === "en" ? "/en/surname/[slug]" : "/pl/nazwisko/[slug]" },
-  });
-  const startedAt = Date.now();
-  try {
-    const db = sharedDb();
-    const resolved = await resolveSlug(db, slug, lang);
-    if (resolved.kind === "INVALID") return { kind: "INVALID_SLUG" };
-    if (resolved.kind === "MOVED") {
-      // A display form was corrected and this address retired. The link is
-      // already in somebody's index, so it is redirected rather than refused
-      // (ADR-0010 §2). The surname itself is never logged — only that it moved.
-      log.info("slug_superseded", { ms: Date.now() - startedAt });
-      return { kind: "MOVED", current_slug: resolved.current_slug };
-    }
-    if (resolved.kind === "UNKNOWN") {
-      log.info("slug_unknown", { ms: Date.now() - startedAt });
-      return { kind: "UNKNOWN", slug };
-    }
-    const outcome = await querySurnameResult(db, resolved.display_name);
-    if (outcome.kind !== "OK") {
-      log.error("page_unavailable", { reason: outcome.reason, ms: Date.now() - startedAt });
-      return { kind: "UNAVAILABLE" };
-    }
-    const parsed = surnameResultResponseSchema.safeParse(outcome.response);
-    if (!parsed.success) {
-      log.error("page_contract_violation", {
-        issues: parsed.error.issues,
-        ms: Date.now() - startedAt,
-      });
-      return { kind: "UNAVAILABLE" };
-    }
-    log.info("page_rendered", {
+  const { answer, ms } = await resolveAnswer(slug, lang);
+  if (answer.kind === "RESULT") {
+    const { response } = answer;
+    pageLog(lang).info("page_rendered", {
       route: "canonical",
-      result_status: parsed.data.status,
-      population_state: parsed.data.population?.state ?? null,
-      rarity_state: parsed.data.rarity?.state ?? null,
-      distribution_state: parsed.data.distribution?.state ?? null,
-      meaning_state: parsed.data.meaning?.state ?? null,
+      result_status: response.status,
+      population_state: response.population?.state ?? null,
+      rarity_state: response.rarity?.state ?? null,
+      distribution_state: response.distribution?.state ?? null,
+      meaning_state: response.meaning?.state ?? null,
       search_origin: searchOrigin(referrerPath),
-      ms: Date.now() - startedAt,
+      ms,
     });
-    const gates = await seoGatesFor(db, resolved.surname_id);
-    const otherLangPath = await currentPathFor(
-      db,
-      resolved.surname_id,
-      lang === "pl" ? "en" : "pl",
-    );
-    return {
-      kind: "RESULT",
-      response: parsed.data,
-      display: resolved.display_name,
-      slug: resolved.slug,
-      otherLangPath,
-      gates: { seoSurfaceAllowed: gates.seoSurfaceAllowed, privacyPublic: gates.privacyPublic },
-    };
-  } catch (cause: unknown) {
-    log.error("page_failed", { cause, ms: Date.now() - startedAt });
-    return { kind: "UNAVAILABLE" };
   }
+  return answer;
 }
 
 /**
