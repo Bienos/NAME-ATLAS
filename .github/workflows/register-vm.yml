@@ -14,8 +14,9 @@ name: Register VM
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
 #   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
 #   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
+#   archive    ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
 #
-# provision, status, finalize, editions and extras end by connecting the way the web app does.
+# provision, status, finalize, editions, extras and archive end by connecting the way the web app does.
 
 on:
   push:
@@ -27,7 +28,7 @@ on:
         description: Which step to run
         required: true
         type: choice
-        options: [check, provision, build, status, finalize, editions, extras]
+        options: [check, provision, build, status, finalize, editions, extras, archive]
 
 concurrency:
   group: register-vm
@@ -63,7 +64,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | archive) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -186,11 +187,19 @@ jobs:
           scp -q ops/vm/extras.sh vm:name-atlas-ops/extras.sh
           ssh vm 'sudo bash ~/name-atlas-ops/extras.sh'
 
+      - name: archive
+        if: steps.step.outputs.step == 'archive'
+        run: |
+          # The pushed commit's tree: the loader, and migration 0025 it needs.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/archive.sh vm:name-atlas-ops/archive.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz'
+
       - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
         if: >-
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
           steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions' ||
-          steps.step.outputs.step == 'extras'
+          steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'archive'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |

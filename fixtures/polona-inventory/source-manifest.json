@@ -1,0 +1,65 @@
+{
+  "$comment": "Raw Polona responses for one surname's inventory, captured by TASK-054 with the loader's own fetcher (packages/sources/src/polona/fetch.ts). Every byte is what Polona served; nothing was trimmed or reformatted, so the responses are excluded from Prettier.",
+  "source": {
+    "name": "Polona (Biblioteka Cyfrowa Polona)",
+    "operator": "Biblioteka Narodowa",
+    "api": "https://polona.pl/api/search-service"
+  },
+  "capture": {
+    "task": "TASK-054",
+    "date": "2026-10-01",
+    "surname": "ZAREMBA",
+    "client": "NameAtlas/1.0 fetcher, one request at a time, at least 1 s apart",
+    "authentication": "none"
+  },
+  "files": [
+    {
+      "request": "catalogue",
+      "path": "responses/ZAREMBA.catalogue.json",
+      "bytes": 21421,
+      "sha256": "f374a7b0d73c421511d149c2c33f0efbd25575441835116c3a158a77fe750d83"
+    },
+    {
+      "request": "pages",
+      "path": "responses/ZAREMBA.pages.json",
+      "bytes": 53104,
+      "sha256": "ea9c321e9820237155b3085b4f8f94622a69ec6b93929776865380d3caa27c94"
+    },
+    {
+      "request": "period:-1799",
+      "path": "responses/ZAREMBA.period_-1799.json",
+      "bytes": 12122,
+      "sha256": "c82435d2cf39fb4c3fa803583cb9da22a421aedf8642147cddd6b799026be5cf"
+    },
+    {
+      "request": "period:1800-1849",
+      "path": "responses/ZAREMBA.period_1800-1849.json",
+      "bytes": 11532,
+      "sha256": "c86e80d0e724d4da6e5e9d6510a1792d20a32b3eefa91f356e0e792791b26d86"
+    },
+    {
+      "request": "period:1850-1899",
+      "path": "responses/ZAREMBA.period_1850-1899.json",
+      "bytes": 14166,
+      "sha256": "b215c02b3d0fc3dae70b689cc65c1bc70b92377bafd10849a0b879a7d40657e1"
+    },
+    {
+      "request": "period:1900-1918",
+      "path": "responses/ZAREMBA.period_1900-1918.json",
+      "bytes": 14827,
+      "sha256": "3945f711399cfbf61782c9a92652e16a6002a55d3f4f96b26f9e198cc316f272"
+    },
+    {
+      "request": "period:1919-1939",
+      "path": "responses/ZAREMBA.period_1919-1939.json",
+      "bytes": 15822,
+      "sha256": "65c38b6b44cc0cfb0d836696ef700e5a8ef0856c783f5731c64887834871e914"
+    },
+    {
+      "request": "period:1940-",
+      "path": "responses/ZAREMBA.period_1940-.json",
+      "bytes": 17521,
+      "sha256": "5b9278fb5eb326807d1c39035d3edf4c0066a9a8bf1efcf460beb547fbe0d223"
+    }
+  ]
+}

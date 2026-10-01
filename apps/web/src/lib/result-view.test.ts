@@ -72,7 +72,7 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.6",
+  schema_version: "1.8",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -142,6 +142,21 @@ const RESOLVED: unknown = {
     reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     surface: SURFACE,
   },
+  archive: {
+    state: "NOT_SEARCHED",
+    query: null,
+    searched_on: null,
+    catalogue_records: null,
+    catalogue_by_category: [],
+    pages: null,
+    pages_by_period: [],
+    pages_by_place: [],
+    examples: [],
+    confidence: null,
+    citation: null,
+    reason_code: "ARCHIVE_NOT_SEARCHED",
+    surface: SURFACE,
+  },
 };
 
 /** MELNYK's real shape: coverage below the threshold. */
@@ -182,7 +197,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.6",
+  schema_version: "1.8",
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -212,10 +227,25 @@ const RIGHTS_BLOCKED: unknown = {
     reason_code: "COMMERCIAL_USE_UNKNOWN",
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
+  archive: {
+    state: "RIGHTS_BLOCKED",
+    query: null,
+    searched_on: null,
+    catalogue_records: null,
+    catalogue_by_category: [],
+    pages: null,
+    pages_by_period: [],
+    pages_by_place: [],
+    examples: [],
+    confidence: null,
+    citation: null,
+    reason_code: "COMMERCIAL_USE_UNKNOWN",
+    surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
+  },
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.6",
+  schema_version: "1.8",
   status: "UNRESOLVED",
   surname: null,
   population: null,
@@ -248,6 +278,7 @@ const WITH_SUGGESTIONS: unknown = {
     ],
   },
   meaning: null,
+  archive: null,
 };
 
 const NO_SUGGESTIONS: unknown = {
@@ -262,7 +293,7 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.6",
+  schema_version: "1.8",
   status: "AMBIGUOUS",
   surname: null,
   population: null,
@@ -276,6 +307,7 @@ const MIXED_SCRIPT: unknown = {
     suggestions: [],
   },
   meaning: null,
+  archive: null,
 };
 
 /** Parses first: a fixture the contract would reject cannot prove anything. */
@@ -1079,6 +1111,7 @@ describe("the journey's steps", () => {
       ["#rarity", t.chapterRarityTitle],
       ["#where", t.chapterWhereTitle],
       ["#meaning", t.chapterMeaningTitle],
+      ["#archive", t.chapterArchiveTitle],
       ["#sources", t.chapterSourcesQuestion],
       ["#summary", "Twój wynik"],
     ]);
@@ -1094,8 +1127,150 @@ describe("the journey's steps", () => {
       "#today-count",
       "#rarity",
       "#meaning",
+      "#archive",
       "#sources",
     ]);
-    expect(steps(markup)[4]?.[1]).toBe(UI.en.chapterSourcesQuestion);
+    expect(steps(markup)[5]?.[1]).toBe(UI.en.chapterSourcesQuestion);
+  });
+});
+
+/**
+ * TASK-054: the archive chapter. NOWAK's real Polona inventory, as the loader
+ * stored it on 2026-10-01 (ADR-0024).
+ */
+const POLONA_CITATION = {
+  id: "cit-polona",
+  title: "Polona",
+  publisher: "Biblioteka Narodowa",
+  publication_date: null,
+  source_type: "DIGITAL_LIBRARY",
+  locator: '"NOWAK"',
+  url: "https://polona.pl/api/search-service/search/simple?query=%22NOWAK%22",
+  attribution: "Polona, Biblioteka Narodowa",
+  terms: null,
+  retrieved_at: "2026-10-01T08:18:47Z",
+  source_page_url: "https://polona.pl/",
+};
+
+const ARCHIVE_READY: unknown = {
+  ...(RESOLVED as Record<string, unknown>),
+  archive: {
+    state: "READY",
+    query: '"NOWAK"',
+    searched_on: "2026-10-01",
+    catalogue_records: 8237,
+    catalogue_by_category: [
+      { label: "Czasopisma", count: 894 },
+      { label: "Książki", count: 500 },
+    ],
+    pages: 160_571,
+    pages_by_period: [
+      { from_year: null, to_year: 1799, count: 20 },
+      { from_year: 1800, to_year: 1849, count: 2243 },
+      { from_year: 1850, to_year: 1899, count: 13_090 },
+      { from_year: 1900, to_year: 1918, count: 21_403 },
+      { from_year: 1919, to_year: 1939, count: 70_818 },
+      { from_year: 1940, to_year: null, count: 52_677 },
+    ],
+    pages_by_place: [
+      { label: "Warszawa", count: 61_608 },
+      { label: "Poznań", count: 25_519 },
+      { label: "Kraków", count: 16_163 },
+    ],
+    examples: [
+      {
+        title:
+          "Rocznik Kolejowy : opracowany na podstawie źródeł urzędowych Ministerstwa Komunikacji  R. 2 (1931/1932)",
+        date: "1931-01-01",
+        page_number: 795,
+        excerpt:
+          "Antoni 60 Nowak Józef 139 Nowak Walenty 97 Nosek Aleksander 436 Nowak Antoni 106 Nowak Józef",
+        url: "https://polona.pl/item-view/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67?page=794",
+      },
+    ],
+    confidence: { status: "VERIFIED", methodology_code: "archive_search_scope@archive_scope@1" },
+    citation: POLONA_CITATION,
+    reason_code: null,
+    surface: SURFACE,
+  },
+};
+
+describe("TASK-054: the archive chapter", () => {
+  it("counts pages and catalogue records of a word, with the search date, in both languages", () => {
+    const pl = text(render(ARCHIVE_READY, "pl"));
+    expect(pl).toContain(
+      "Słowo NOWAK występuje na 160\u00a0571 stronach dzieł niechronionych prawem autorskim i w 8\u00a0237 rekordach katalogu Polony",
+    );
+    const en = text(render(ARCHIVE_READY, "en"));
+    expect(en).toContain(
+      "The word NOWAK appears on 160,571 pages of works not under copyright and in 8,237 catalogue records in Polona",
+    );
+  });
+
+  it("says a match is a word, not a person, beside the figure", () => {
+    const markup = render(ARCHIVE_READY, "pl");
+    expect(text(markup)).toContain(UI.pl.archiveWordCaveat);
+    expect(markup.indexOf("archive-caveat")).toBeLessThan(markup.indexOf("archive-periods"));
+    expect(text(render(ARCHIVE_READY, "en"))).toContain(UI.en.archiveWordCaveat);
+  });
+
+  it("splits the pages by period and names the places of publication", () => {
+    const pl = text(render(ARCHIVE_READY, "pl"));
+    expect(pl).toContain("przed 1800");
+    expect(pl).toContain("1919–1939");
+    expect(pl).toContain("od 1940");
+    expect(pl).toContain("70\u00a0818");
+    expect(pl).toContain("Warszawa");
+    expect(text(render(ARCHIVE_READY, "en"))).toContain("before 1800");
+  });
+
+  it("quotes a public-domain page with its work, year, page and a link to that scan", () => {
+    const markup = render(ARCHIVE_READY, "pl");
+    const t = text(markup);
+    expect(t).toContain("Nowak Walenty");
+    expect(t).toContain("Rocznik Kolejowy");
+    expect(t).toContain("1931 · s. 795 · Polona, Biblioteka Narodowa");
+    expect(markup).toContain(
+      'href="https://polona.pl/item-view/a7ed43f7-ac1d-4e75-ba51-52bef4f09c67?page=794"',
+    );
+    expect(t).toContain(UI.pl.archiveOpen);
+  });
+
+  it("cites Polona and adds the word caveat to the sources", () => {
+    const t = text(render(ARCHIVE_READY, "pl"));
+    expect(t).toContain("Biblioteka Narodowa");
+    expect(t).toContain(UI.pl.limitationArchiveWord);
+  });
+
+  it("says a surname not yet searched is not searched, and shows no figure", () => {
+    const markup = render(RESOLVED, "pl");
+    expect(text(markup)).toContain(UI.pl.archiveNotSearched);
+    expect(markup).not.toContain("archive-periods");
+    expect(text(render(RESOLVED, "en"))).toContain(UI.en.archiveNotSearched);
+  });
+
+  it("renders the licence refusal and nothing else when rights block it", () => {
+    const markup = render(RIGHTS_BLOCKED, "pl");
+    expect(text(markup)).toContain(UI.pl.archiveBlocked);
+    expect(markup).not.toContain("archive-example");
+  });
+
+  it("says a search with no match is an answer, not a gap", () => {
+    const archive = (ARCHIVE_READY as { archive: Record<string, unknown> }).archive;
+    const none = {
+      ...(ARCHIVE_READY as Record<string, unknown>),
+      archive: {
+        ...archive,
+        catalogue_records: 0,
+        catalogue_by_category: [],
+        pages: 0,
+        pages_by_period: [],
+        pages_by_place: [],
+        examples: [],
+      },
+    };
+    const t = text(render(none, "pl"));
+    expect(t).toContain("Wyszukiwarka Polony nie zwróciła żadnego wyniku dla słowa NOWAK");
+    expect(t).not.toContain(UI.pl.archiveNotSearched);
   });
 });

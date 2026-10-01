@@ -28,6 +28,19 @@ export type {
   PersistedRarityContext,
 } from "./read.js";
 export { querySurnameResult } from "./query.js";
+export {
+  archiveAvailabilityClaimKey,
+  archiveSectionFor,
+  deriveArchiveAvailability,
+  projectArchiveSection,
+  readArchiveAvailability,
+  selectArchiveCandidates,
+} from "./archive.js";
+export type {
+  ArchiveCandidate,
+  ArchiveDerivation,
+  PersistedArchiveAvailability,
+} from "./archive.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
 export {
   buildRankTable,
@@ -150,6 +163,10 @@ export {
   RUN_INPUT_SCHEMA_VERSION,
   SURFACE_ELIGIBILITY_VERSION,
   WORKFLOW_VERSION,
+  ARCHIVE_AVAILABILITY_METHOD_VERSION,
+  ARCHIVE_CONFIDENCE_ASSESSMENT_METHOD,
+  ARCHIVE_CONFIDENCE_ASSESSMENT_VERSION,
+  ARCHIVE_REFRESH_DAYS,
 } from "./version.js";
 
 // The SURNAME_MEANING chain — TASK-022, ADR-0008.

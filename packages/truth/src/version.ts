@@ -302,3 +302,22 @@ export const LIST_COUNT_BANDS: readonly { readonly from: number; readonly to: nu
 
 /** The birthday comparison: equally likely days in a year. A model constant, not PESEL data. */
 export const BIRTHDAY_REFERENCE_DAYS = 365;
+
+// --- TASK-054: ARCHIVE_AVAILABILITY (ADR-0024) ------------------------------
+
+/** The `ARCHIVE_AVAILABILITY` derivation method. */
+export const ARCHIVE_AVAILABILITY_METHOD_VERSION = "archive_availability@1";
+
+/** Shape version of the `ARCHIVE_AVAILABILITY` claim payload. */
+export const ARCHIVE_AVAILABILITY_PAYLOAD_VERSION = "archive_availability_payload@1";
+
+/**
+ * The confidence rule for a count of search matches: `VERIFIED` within the
+ * searched scope (`docs/canonical/11` §11), because the claim states what the
+ * source's search returned, not that every match is the surname.
+ */
+export const ARCHIVE_CONFIDENCE_ASSESSMENT_METHOD = "archive_search_scope";
+export const ARCHIVE_CONFIDENCE_ASSESSMENT_VERSION = "archive_scope@1";
+
+/** A surname searched more recently than this is not searched again (ADR-0024 §2.6). */
+export const ARCHIVE_REFRESH_DAYS = 90;

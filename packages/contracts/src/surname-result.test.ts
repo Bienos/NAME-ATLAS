@@ -9,6 +9,7 @@ import {
   populationSectionSchema,
   populationValueSchema,
   surnameResultResponseSchema,
+  archiveSectionSchema,
 } from "./surname-result.js";
 
 /**
@@ -264,6 +265,7 @@ describe("top-level response", () => {
         distribution: null,
         suggestions: NO_SUGGESTIONS,
         meaning: null,
+        archive: null,
       }).success,
     ).toBe(true);
   });
@@ -647,5 +649,102 @@ describe("error envelope (docs/canonical/16 §78)", () => {
     if (!parsed.success) return;
     expect(parsed.data.error).not.toHaveProperty("stack");
     expect(parsed.data.error).not.toHaveProperty("details");
+  });
+});
+
+/** TASK-054: the archive section (ADR-0024). */
+describe("archive section", () => {
+  const surface = {
+    surface: "FREE",
+    decision: "ALLOWED",
+    reason_code: "RIGHTS_PERMIT_FREE_SURFACE",
+  };
+  const READY = {
+    state: "READY",
+    query: '"ZAREMBA"',
+    searched_on: "2026-10-01",
+    catalogue_records: 1148,
+    catalogue_by_category: [{ label: "Czasopisma", count: 193 }],
+    pages: 54479,
+    pages_by_period: [{ from_year: 1800, to_year: 1849, count: 2814 }],
+    pages_by_place: [{ label: "Warszawa", count: 25755 }],
+    examples: [
+      {
+        title: "Sprawozdanie Dyrekcyi Towarzystwa Przyjaciół Sztuk Pięknych w Krakowie",
+        date: "1882-01-01",
+        page_number: 122,
+        excerpt: "Zaremba, w Starej Sieniawie",
+        url: "https://polona.pl/item-view/31e6feab-8aa7-4d76-b824-a842ebc95507?page=121",
+      },
+    ],
+    confidence: { status: "VERIFIED", methodology_code: "archive_search_scope@1" },
+    citation: {
+      id: "c1",
+      title: "Polona",
+      publisher: "Biblioteka Narodowa",
+      publication_date: null,
+      source_type: "DIGITAL_LIBRARY",
+      locator: '"ZAREMBA"',
+      url: "https://polona.pl/api/search-service/search/simple?query=%22ZAREMBA%22",
+      attribution: "Polona, Biblioteka Narodowa",
+      terms: null,
+      retrieved_at: "2026-10-01T08:09:00.000Z",
+      source_page_url: "https://polona.pl/",
+    },
+    reason_code: null,
+    surface,
+  };
+  const NOT_SEARCHED = {
+    state: "NOT_SEARCHED",
+    query: null,
+    searched_on: null,
+    catalogue_records: null,
+    catalogue_by_category: [],
+    pages: null,
+    pages_by_period: [],
+    pages_by_place: [],
+    examples: [],
+    confidence: null,
+    citation: null,
+    reason_code: "ARCHIVE_NOT_SEARCHED",
+    surface,
+  };
+
+  it("accepts a searched surname, and one not searched yet", () => {
+    expect(archiveSectionSchema.safeParse(READY).success).toBe(true);
+    expect(archiveSectionSchema.safeParse(NOT_SEARCHED).success).toBe(true);
+  });
+
+  it("accepts zero matches as an answer, not as an absence", () => {
+    expect(
+      archiveSectionSchema.safeParse({
+        ...READY,
+        catalogue_records: 0,
+        pages: 0,
+        catalogue_by_category: [],
+        pages_by_period: [],
+        pages_by_place: [],
+        examples: [],
+      }).success,
+    ).toBe(true);
+  });
+
+  it("refuses figures without their search, and a search without its source", () => {
+    expect(archiveSectionSchema.safeParse({ ...READY, citation: null }).success).toBe(false);
+    expect(archiveSectionSchema.safeParse({ ...READY, searched_on: null }).success).toBe(false);
+    expect(
+      archiveSectionSchema.safeParse({ ...NOT_SEARCHED, pages_by_place: READY.pages_by_place })
+        .success,
+    ).toBe(false);
+    expect(archiveSectionSchema.safeParse({ ...NOT_SEARCHED, catalogue_records: 0 }).success).toBe(
+      false,
+    );
+  });
+
+  it("refuses an excerpt longer than 300 characters, and more than three examples", () => {
+    const long = { ...READY.examples[0], excerpt: "x".repeat(301) };
+    expect(archiveSectionSchema.safeParse({ ...READY, examples: [long] }).success).toBe(false);
+    const four = Array.from({ length: 4 }, () => READY.examples[0]);
+    expect(archiveSectionSchema.safeParse({ ...READY, examples: four }).success).toBe(false);
   });
 });

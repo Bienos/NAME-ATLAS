@@ -35,6 +35,21 @@ else
 fi
 
 echo
+echo "== archive load (name-atlas-archive-load, TASK-054)"
+if systemctl cat name-atlas-archive-load >/dev/null 2>&1; then
+  systemctl show -p ActiveState,SubState,Result,NRestarts,ActiveEnterTimestamp name-atlas-archive-load
+  echo "-- last 10 lines of its log"
+  journalctl -u name-atlas-archive-load -o short-iso --no-pager -n 10
+  if [ -f /var/lib/name-atlas/archive/loaded ]; then
+    echo "loaded: $(head -c 40 /var/lib/name-atlas/archive/loaded)"
+  else
+    echo "loaded: no"
+  fi
+else
+  echo "not started"
+fi
+
+echo
 echo "== database"
 if [ "$(q "SELECT to_regclass('public.surnames') IS NOT NULL")" = t ]; then
   q "SELECT 'size ' || pg_size_pretty(pg_database_size(current_database()))"

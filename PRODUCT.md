@@ -90,7 +90,9 @@ Rules:
 - Premium is offered **only** when coverage and the DiscoveryIndex show real inventory exists for that surname.
 - The report is an immutable, versioned artifact with claim references and citations.
 - A premium report never implies anything about the buyer's specific family.
-- One-time guest purchase. No subscription, no credits, no tiers at MVP.
+- One-time guest purchase, in PLN. No subscription and no credits. Two products (ADR-0023):
+  - **Raport nazwiska**, 24.99 zł: the report above.
+  - **Badanie eksperckie**, 149.99 zł: the report, plus research by a person into the surname's historical forms, places and archive references. It stays about the surname and never traces the buyer's family.
 
 ## 7. Trust and evidence rules
 

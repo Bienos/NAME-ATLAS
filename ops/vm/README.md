@@ -17,6 +17,7 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `finalize.sh` | The gate (it names the surnames the import flagged as mixed-script, which get no figures by design, and checks every other one), durability back on, grants, `VACUUM ANALYZE`, `pg_prewarm`, and a `pg_dump` to `/var/lib/name-atlas/backup/`. |
 | `extras.sh` | TASK-041, after `finalize`: downloads TERC and SIMC from GUS and checks them against `fixtures/teryt/source-manifest.json`, runs `seed:sources`, `import:teryt` and `import-onomastics` (Buryan 1933), derives each Buryan surname's meaning, runs its own gate, grants, `VACUUM ANALYZE`, and a second `pg_dump` beside `finalize`'s. Idempotent. |
 | `editions.sh` | Every earlier PESEL edition (2019, 2020–2025, the 2025 regional pair) as dated snapshots, through `scripts/import-editions.sh`, with a gate that proves the surnames and every claim count unchanged, then grants, `VACUUM ANALYZE` and a third dump (TASK-045). Takes the pushed commit's archive, like `build.sh`, and leaves the register build alone. |
+| `archive.sh` | TASK-054, after `finalize`: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate` (migration 0025, the `ARCHIVE_AVAILABILITY` claim type), checks the web role can read every table, starts the `name-atlas-archive-load` unit (`pnpm truth:archive-load --top-rank 2000`) and returns. The load asks Polona eight paced questions per surname, about 7 s each, so it takes hours; it resumes after a restart and writes `/var/lib/name-atlas/archive/loaded` only when a pass completes. |
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 
@@ -60,7 +61,8 @@ Each step is one push that changes `request`, or one `workflow_dispatch`:
 5. `finalize`: refuses unless the build succeeded and the gate passes.
 6. `extras` (TASK-041): refuses unless `finalize` has run. It adds 106,227 TERYT source records, so a later `finalize` fails its "source records = 4" check; that is expected, and the rest of its gate still applies.
 7. `editions`, any time after `finalize` (and after `extras`, if it ran): the fifteen earlier editions. Its output ends with "done: every edition is loaded; the pages read the current resources only". About 15 downloads and imports; expect it to take a while.
-8. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
+8. `archive` (TASK-054), any time after `finalize`: migrates, then starts Polona's archive load and returns. `status` shows its progress under "archive load", one log line per surname, and `loaded:` once a pass completes. Ten Polona failures in a row stop the loader; the unit restarts it after ten minutes, at most six times in 12 hours. Running `archive` again later starts a new pass that searches only the surnames last searched more than 90 days earlier.
+9. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
 
 ## Going back
 

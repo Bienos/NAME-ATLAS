@@ -417,3 +417,61 @@ export function parsePolonaFulltextSearch(
 ): PolonaSearchPage<PolonaFulltextHit> {
   return searchPage(text, options, { extra: [], hitsMayBeNull: false }, fulltextHit);
 }
+
+/**
+ * A search response's envelope, with its hits left unparsed (TASK-054).
+ *
+ * The archive loader needs a page's total and facets even when one of its hits
+ * carries a licence or statement the vocabulary has not met: refusing the
+ * whole page for one hit would lose the counts that are the point of the
+ * search. The envelope is checked exactly as the full parsers check it, and
+ * each hit is then parsed on its own with {@link parsePolonaFulltextHit} or
+ * {@link parsePolonaMetadataHit}, so a hit that fails closed is skipped and
+ * never quoted (ADR-0024 §2.7).
+ */
+export interface PolonaSearchEnvelope {
+  readonly totalElements: number;
+  readonly facets: Readonly<Record<string, readonly PolonaFacetValue[]>>;
+  readonly rawHits: readonly unknown[];
+}
+
+export function parsePolonaSearchEnvelope(
+  text: string,
+  kind: "simple" | "fulltext",
+): PolonaSearchEnvelope {
+  const extra = kind === "simple" ? ["timeAggregations"] : [];
+  const page = object(parseJson(text), "$", [...ENVELOPE, ...extra]);
+  if (kind === "simple") alwaysNull(page["timeAggregations"], "$.timeAggregations");
+  const numberOfElements = count(page["numberOfElements"], "$.numberOfElements");
+  const size = count(page["size"], "$.size");
+  if (numberOfElements > size) {
+    throw new PolonaShapeError(
+      "hit_count_mismatch",
+      "$.numberOfElements",
+      `${numberOfElements} exceeds the page size ${size}`,
+    );
+  }
+  const rawHits = page["hits"] === null && kind === "simple" ? [] : array(page["hits"], "$.hits");
+  if (rawHits.length !== numberOfElements) {
+    throw new PolonaShapeError(
+      "hit_count_mismatch",
+      "$.hits",
+      `${rawHits.length} hits, but numberOfElements is ${numberOfElements}`,
+    );
+  }
+  return {
+    totalElements: count(page["totalElements"], "$.totalElements"),
+    facets: facets(page["aggregations"], "$.aggregations"),
+    rawHits,
+  };
+}
+
+/** One full-text hit, parsed and its rights classified, failing closed. */
+export function parsePolonaFulltextHit(value: unknown, path = "$"): PolonaFulltextHit {
+  return fulltextHit(value, path);
+}
+
+/** One metadata hit, parsed and its rights classified, failing closed. */
+export function parsePolonaMetadataHit(value: unknown, path = "$"): PolonaMetadataHit {
+  return metadataHit(value, path);
+}

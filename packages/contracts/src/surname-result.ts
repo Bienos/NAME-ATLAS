@@ -24,7 +24,12 @@
 import { z } from "zod";
 
 /** Response schema version, distinct from the API version (`docs/canonical/16` §5). */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.6";
+/**
+ * 1.8 adds `archive` (TASK-054). 1.7 is TASK-051's (#43), which is not on
+ * `main` yet; the number is taken from `main` and open pull requests together
+ * (`AGENTS.md` §11).
+ */
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.8";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -393,6 +398,106 @@ export const meaningSectionSchema = z
     message: "a reason code is present exactly when state is not AVAILABLE",
   });
 
+/** A labelled count, largest first: a category, a place, a language. */
+export const archiveCountSchema = z.object({
+  label: z.string().min(1),
+  count: z.number().int().nonnegative(),
+});
+
+/** Pages published in one period. Years inclusive; null is open-ended. */
+export const archivePeriodSchema = z.object({
+  from_year: z.number().int().nullable(),
+  to_year: z.number().int().nullable(),
+  count: z.number().int().nonnegative(),
+});
+
+/**
+ * One page quoted from a public-domain work (ADR-0024 §2.4). The excerpt is the
+ * source's OCR text, at most 300 characters (`TRANSCRIPTION_EXCERPT_MAX_CHARS`).
+ */
+export const archiveExampleSchema = z.object({
+  title: z.string().min(1),
+  /** The work's date as the catalogue states it, unparsed. */
+  date: z.string().min(1).nullable(),
+  page_number: z.number().int().positive(),
+  excerpt: z.string().min(1).max(300),
+  url: z.string().url(),
+});
+
+export const archiveStateSchema = z.enum([
+  "READY",
+  /** The surname has not been searched yet. Never a count of zero. */
+  "NOT_SEARCHED",
+  "RIGHTS_BLOCKED",
+  "UNAVAILABLE",
+]);
+
+/**
+ * What a digital library's search returns for the surname (TASK-054,
+ * ADR-0024): an `ARCHIVE_AVAILABILITY` claim (`docs/canonical/11` §11).
+ *
+ * Every count is a count of **search matches for a word**, in any inflected
+ * form, within the searched scope: catalogue records of every licence, and
+ * pages of works that are not copyright-protected. Never people, ancestors or
+ * verified occurrences of the surname. A READY section with zero matches is an
+ * answer ("no matches"); NOT_SEARCHED is the absence of one.
+ */
+export const archiveSectionSchema = z
+  .object({
+    state: archiveStateSchema,
+    /** The query as sent, quotes included. */
+    query: z.string().min(1).nullable(),
+    /** When the search ran (ISO 8601 date). */
+    searched_on: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/u)
+      .nullable(),
+    catalogue_records: z.number().int().nonnegative().nullable(),
+    catalogue_by_category: z.array(archiveCountSchema),
+    pages: z.number().int().nonnegative().nullable(),
+    pages_by_period: z.array(archivePeriodSchema),
+    pages_by_place: z.array(archiveCountSchema),
+    examples: z.array(archiveExampleSchema).max(3),
+    confidence: confidenceSchema.nullable(),
+    citation: citationSchema.nullable(),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine(
+    (a) =>
+      (a.state === "READY") ===
+      (a.query !== null &&
+        a.searched_on !== null &&
+        a.catalogue_records !== null &&
+        a.pages !== null &&
+        a.confidence !== null &&
+        a.citation !== null),
+    { message: "query, date, counts, confidence and citation are present exactly when READY" },
+  )
+  .refine((a) => (a.state === "READY") === (a.reason_code === null), {
+    message: "reason_code is null exactly when READY",
+  })
+  .refine(
+    (a) =>
+      a.state === "READY" ||
+      (a.catalogue_by_category.length === 0 &&
+        a.pages_by_period.length === 0 &&
+        a.pages_by_place.length === 0 &&
+        a.examples.length === 0),
+    { message: "a section that is not READY carries no figures" },
+  )
+  .refine(
+    (a) =>
+      a.state === "READY" ||
+      (a.query === null &&
+        a.searched_on === null &&
+        a.catalogue_records === null &&
+        a.pages === null &&
+        a.confidence === null &&
+        a.citation === null),
+    { message: "a section that is not READY carries no search, count or source" },
+  );
+
 /**
  * `docs/canonical/16` §21, minus `canonical_slug`/`canonical_path`.
  *
@@ -508,6 +613,12 @@ export const surnameResultResponseSchema = z
      * the answer for every surname until a source is imported (ADR-0008 §3).
      */
     meaning: meaningSectionSchema.nullable(),
+    /**
+     * Added in 1.8 (TASK-054). Present exactly when RESOLVED, like the other
+     * fact sections, and `NOT_SEARCHED` rather than absent when the surname's
+     * archive search has not run.
+     */
+    archive: archiveSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -526,6 +637,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.meaning !== null : r.meaning === null), {
     message: "meaning section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.archive !== null : r.archive === null), {
+    message: "archive section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -568,6 +682,11 @@ export type DistributionCoverageState = z.infer<typeof distributionCoverageState
 export type DistributionEntry = z.infer<typeof distributionEntrySchema>;
 export type DistributionSection = z.infer<typeof distributionSectionSchema>;
 export type MeaningSection = z.infer<typeof meaningSectionSchema>;
+export type ArchiveCount = z.infer<typeof archiveCountSchema>;
+export type ArchivePeriod = z.infer<typeof archivePeriodSchema>;
+export type ArchiveExample = z.infer<typeof archiveExampleSchema>;
+export type ArchiveState = z.infer<typeof archiveStateSchema>;
+export type ArchiveSection = z.infer<typeof archiveSectionSchema>;
 export type MeaningInterpretation = z.infer<typeof meaningInterpretationSchema>;
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type SuggestionsSection = z.infer<typeof suggestionsSectionSchema>;

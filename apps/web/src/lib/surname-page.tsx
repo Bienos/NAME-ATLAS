@@ -105,6 +105,7 @@ export async function answerSlug(
       rarity_state: parsed.data.rarity?.state ?? null,
       distribution_state: parsed.data.distribution?.state ?? null,
       meaning_state: parsed.data.meaning?.state ?? null,
+      archive_state: parsed.data.archive?.state ?? null,
       search_origin: searchOrigin(referrerPath),
       ms: Date.now() - startedAt,
     });
