@@ -25,6 +25,18 @@ if systemctl cat "$UNIT" >/dev/null 2>&1; then
 else
   echo "not started"
 fi
+# The change-over-time batch (TASK-051), when it has been started.
+SHIFT_UNIT=name-atlas-shift-batch
+if systemctl cat "$SHIFT_UNIT" >/dev/null 2>&1; then
+  echo
+  echo "== change over time ($SHIFT_UNIT)"
+  systemctl show -p ActiveState,SubState,Result,ExecMainStatus,NRestarts,ActiveEnterTimestamp,InactiveEnterTimestamp "$SHIFT_UNIT"
+  echo "-- last 10 lines of its log"
+  journalctl -u "$SHIFT_UNIT" -o short-iso --no-pager -n 10
+  if [ -e /srv/name-atlas/.shift-batch-complete ]; then echo "shift batch complete: yes"; else echo "shift batch complete: no"; fi
+  if [ -f /var/lib/name-atlas/shift-derived ]; then echo "shift gate passed: yes"; else echo "shift gate passed: no"; fi
+  echo
+fi
 # The build is complete only when its marker exists: after a reboot the unit
 # also reads inactive/success without having finished.
 if [ -e /srv/name-atlas/.register-built ]; then echo "built: yes"; else echo "built: no"; fi

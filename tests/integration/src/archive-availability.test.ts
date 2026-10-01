@@ -186,7 +186,7 @@ describe("ARCHIVE_AVAILABILITY against a real PostgreSQL", () => {
     const outcome = await querySurnameResult(db(), "NOWAK", { surface: "FREE" });
     if (outcome.kind !== "OK") throw new Error("expected OK");
     const parsed = surnameResultResponseSchema.parse(outcome.response);
-    expect(parsed.schema_version).toBe("1.8");
+    expect(parsed.schema_version).toBe("1.9");
     expect(parsed.archive?.state).toBe("NOT_SEARCHED");
     expect(parsed.archive?.reason_code).toBe("ARCHIVE_NOT_SEARCHED");
     expect(parsed.archive?.pages).toBeNull();

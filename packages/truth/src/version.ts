@@ -303,6 +303,17 @@ export const LIST_COUNT_BANDS: readonly { readonly from: number; readonly to: nu
 /** The birthday comparison: equally likely days in a year. A model constant, not PESEL data. */
 export const BIRTHDAY_REFERENCE_DAYS = 365;
 
+/**
+ * `SURNAME_DISTRIBUTION_SHIFT` (TASK-051, ADR-0020): a surname's national count
+ * across the editions of one published list. Bumped when the points, the
+ * denominator, the rounding or the lineage change; a new version is a new claim
+ * key, so the old claim is superseded and never rewritten.
+ */
+export const DISTRIBUTION_SHIFT_METHOD_VERSION = "distribution_shift@1";
+
+/** How the two changes are rounded: per cent, one decimal, half away from zero. */
+export const DISTRIBUTION_SHIFT_ROUNDING = "percent_one_decimal_half_away_from_zero";
+
 // --- TASK-054: ARCHIVE_AVAILABILITY (ADR-0024) ------------------------------
 
 /** The `ARCHIVE_AVAILABILITY` derivation method. */

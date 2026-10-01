@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   SURNAME_RESULT_SCHEMA_VERSION,
   apiErrorResponseSchema,
+  changeEntrySchema,
+  changePointSchema,
+  changeSectionSchema,
   suggestionsSectionSchema,
   distributionEntrySchema,
   distributionSectionSchema,
@@ -266,6 +269,7 @@ describe("top-level response", () => {
         suggestions: NO_SUGGESTIONS,
         meaning: null,
         archive: null,
+        change: null,
       }).success,
     ).toBe(true);
   });
@@ -746,5 +750,220 @@ describe("archive section", () => {
     expect(archiveSectionSchema.safeParse({ ...READY, examples: [long] }).success).toBe(false);
     const four = Array.from({ length: 4 }, () => READY.examples[0]);
     expect(archiveSectionSchema.safeParse({ ...READY, examples: four }).success).toBe(false);
+  });
+});
+
+describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
+  // Synthetic two-edition list, arithmetic checkable by eye: 100 of 1,000 is one in 10.
+  const KNOWN_2019 = {
+    status: "KNOWN" as const,
+    data_date: "2019-06-30",
+    note_code: "UNIVERSE_DESCRIPTION_DIFFERS" as const,
+    source_url: "https://example.invalid/resources/1",
+    count: 100,
+    list_total: 1000,
+    one_in_x: 10,
+    share: 0.1,
+  };
+  const KNOWN_2026 = {
+    status: "KNOWN" as const,
+    data_date: "2026-01-20",
+    note_code: null,
+    source_url: "https://example.invalid/resources/2",
+    count: 120,
+    list_total: 1500,
+    one_in_x: 13,
+    share: 0.08,
+  };
+  const ENTRY = {
+    list: "MALE" as const,
+    points: [KNOWN_2019, KNOWN_2026],
+    gaps: [],
+    summary: {
+      known_points: 2,
+      first: { data_date: "2019-06-30", count: 100, list_total: 1000 },
+      last: { data_date: "2026-01-20", count: 120, list_total: 1500 },
+      count_change_percent: 20,
+      list_change_percent: 50,
+    },
+    methodology_code: "distribution_shift@1",
+    scope_label_code: "PESEL_CURRENT_SURNAME",
+    country_code: "PL",
+    confidence: { status: "VERIFIED" as const, methodology_code: "rule@1" },
+    citation: VALID_CITATION,
+  };
+  const SURFACE = { surface: "FREE" as const, decision: "ALLOWED" as const, reason_code: "OK" };
+
+  it("accepts a two-edition list", () => {
+    expect(changeEntrySchema.safeParse(ENTRY).success).toBe(true);
+  });
+
+  it("accepts a NOT_ON_LIST point between two known ones, and refuses it carrying a count", () => {
+    const absent = {
+      status: "NOT_ON_LIST" as const,
+      data_date: "2021-02-01",
+      note_code: null,
+      source_url: null,
+    };
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        points: [KNOWN_2019, absent, KNOWN_2026],
+      }).success,
+    ).toBe(true);
+    // The whole point: a surname a list does not name is never a zero.
+    expect(changePointSchema.safeParse({ ...absent, count: 0 }).success).toBe(false);
+    expect(changePointSchema.safeParse({ ...absent, count: 5 }).success).toBe(false);
+  });
+
+  it("refuses a known point with a count of zero or a one in X of zero", () => {
+    expect(changePointSchema.safeParse({ ...KNOWN_2019, count: 0 }).success).toBe(false);
+    expect(changePointSchema.safeParse({ ...KNOWN_2019, one_in_x: 0 }).success).toBe(false);
+  });
+
+  it("refuses fewer than two points, and fewer than two known ones", () => {
+    expect(changeEntrySchema.safeParse({ ...ENTRY, points: [KNOWN_2019] }).success).toBe(false);
+    const absent = {
+      status: "NOT_ON_LIST" as const,
+      data_date: "2026-01-20",
+      note_code: null,
+      source_url: null,
+    };
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        points: [KNOWN_2019, absent],
+        summary: { ...ENTRY.summary, known_points: 1 },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("refuses points out of date order", () => {
+    expect(
+      changeEntrySchema.safeParse({ ...ENTRY, points: [KNOWN_2026, KNOWN_2019] }).success,
+    ).toBe(false);
+  });
+
+  it("refuses a one in X, or a share, that does not follow the point's own count and total", () => {
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        points: [{ ...KNOWN_2019, one_in_x: 11 }, KNOWN_2026],
+      }).success,
+    ).toBe(false);
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        points: [{ ...KNOWN_2019, share: 0.2 }, KNOWN_2026],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("refuses a count above its own list's total", () => {
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        points: [{ ...KNOWN_2019, count: 2000, one_in_x: 1, share: 1 }, KNOWN_2026],
+      }).success,
+    ).toBe(false);
+  });
+
+  it("refuses a summary that does not describe the first and the last known point", () => {
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        summary: { ...ENTRY.summary, first: { ...ENTRY.summary.first, count: 99 } },
+      }).success,
+    ).toBe(false);
+    expect(
+      changeEntrySchema.safeParse({ ...ENTRY, summary: { ...ENTRY.summary, known_points: 3 } })
+        .success,
+    ).toBe(false);
+  });
+
+  it("refuses a change whose sign contradicts its own first and last values", () => {
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        summary: { ...ENTRY.summary, count_change_percent: -20 },
+      }).success,
+    ).toBe(false);
+    expect(
+      changeEntrySchema.safeParse({
+        ...ENTRY,
+        summary: { ...ENTRY.summary, list_change_percent: 0 },
+      }).success,
+    ).toBe(false);
+  });
+
+  it("accepts a gap between the first and the last known point and refuses one outside them", () => {
+    const gap = { data_date: "2022-01-27", reason_code: "PUBLISHER_DUPLICATE" as const };
+    expect(changeEntrySchema.safeParse({ ...ENTRY, gaps: [gap] }).success).toBe(true);
+    expect(
+      changeEntrySchema.safeParse({ ...ENTRY, gaps: [{ ...gap, data_date: "2027-01-01" }] })
+        .success,
+    ).toBe(false);
+  });
+
+  it("puts entries on the section exactly when it is READY", () => {
+    expect(
+      changeSectionSchema.safeParse({
+        state: "READY",
+        entries: [ENTRY],
+        reason_code: null,
+        surface: SURFACE,
+      }).success,
+    ).toBe(true);
+    expect(
+      changeSectionSchema.safeParse({
+        state: "READY",
+        entries: [],
+        reason_code: null,
+        surface: SURFACE,
+      }).success,
+    ).toBe(false);
+    expect(
+      changeSectionSchema.safeParse({
+        state: "UNAVAILABLE",
+        entries: [ENTRY],
+        reason_code: "NO_CHANGE_DERIVED",
+        surface: SURFACE,
+      }).success,
+    ).toBe(false);
+    expect(
+      changeSectionSchema.safeParse({
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_CHANGE_DERIVED",
+        surface: SURFACE,
+      }).success,
+    ).toBe(true);
+  });
+
+  it("is present exactly when the status is RESOLVED", () => {
+    const base = {
+      schema_version: SURNAME_RESULT_SCHEMA_VERSION,
+      status: "UNRESOLVED" as const,
+      surname: null,
+      population: null,
+      rarity: null,
+      distribution: null,
+      suggestions: NO_SUGGESTIONS,
+      meaning: null,
+      archive: null,
+    };
+    expect(surnameResultResponseSchema.safeParse({ ...base, change: null }).success).toBe(true);
+    expect(
+      surnameResultResponseSchema.safeParse({
+        ...base,
+        change: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
+      }).success,
+    ).toBe(false);
+    // Missing altogether is not the same as null: a 1.6 producer fails against 1.9.
+    expect(surnameResultResponseSchema.safeParse(base).success).toBe(false);
+  });
+
+  it("is schema version 1.9", () => {
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.9");
   });
 });
