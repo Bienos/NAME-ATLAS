@@ -5,10 +5,10 @@ import { offerDocument } from "./offer-text.js";
 import { comparePagePath, howPath, offerPath } from "./site-links.js";
 
 /**
- * The landing's sections around and below the hero (TASK-053; extended and
- * reordered in TASK-065): the example surnames and the cue in the hero, then
- * what you get, how it works, the offer and compare. Each is static or renders
- * what it is given; none derives a figure.
+ * The landing's sections below the hero (TASK-053; extended and reordered in
+ * TASK-065): the second screen says what you get and shows it, then the
+ * offer, how it works and compare. Each is static or renders what it is
+ * given; none derives a figure. The hero itself keeps ADR-0021's words.
  */
 
 /**
@@ -28,7 +28,7 @@ export function trySearchPath(surname: string, lang: Lang): string {
   return `/?${params.toString()}`;
 }
 
-/** "Spróbuj: NOWAK · ZAREMBA · …", under the search pill. */
+/** "Spróbuj: NOWAK · ZAREMBA · …", on the second screen. */
 export function LandingTries({ lang }: { lang: Lang }) {
   const t = UI[lang];
   return (
@@ -40,19 +40,6 @@ export function LandingTries({ lang }: { lang: Lang }) {
         </a>
       ))}
     </p>
-  );
-}
-
-/** The link at the foot of the hero to the first section below it. */
-export function LandingCue({ lang, target }: { lang: Lang; target: string }) {
-  const t = UI[lang];
-  return (
-    <a className="landing-cue" href={target}>
-      {t.landingCue}
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M6 10l6 6 6-6" />
-      </svg>
-    </a>
   );
 }
 
@@ -70,40 +57,59 @@ export interface LandingExample {
 }
 
 /**
- * "Co dostaniesz": the example's cards laid flat on the ground, each the
- * deck's own face with its source and date at its foot, and the way to the
- * whole deck. Nothing without an example.
+ * The second screen, "Co dostaniesz": what a search gives, as six questions
+ * with what answers each, the surnames to try, and the example's cards laid
+ * flat on the ground, each the deck's own face with its source and date, with
+ * the way to the whole deck. Without an example the cards are left out and
+ * the rest stands.
  */
-export function LandingPreview({ example, lang }: { example: LandingExample | null; lang: Lang }) {
-  if (example === null || example.cards.length === 0) return null;
+export function LandingPitch({ example, lang }: { example: LandingExample | null; lang: Lang }) {
   const t = UI[lang];
+  const cards = example !== null && example.cards.length > 0 ? example : null;
   return (
-    <section id="preview" className="landing-preview" aria-labelledby="landing-preview-heading">
-      <h2 id="landing-preview-heading">{t.previewHeading}</h2>
-      <p className="landing-preview-lede">
-        {t.previewLede} <b lang="pl">{example.surname}</b>:
-      </p>
-      <ul className="preview-cards">
-        {example.cards.map((card) => (
-          <li key={card.key}>
-            <article className="dk-card preview-card" aria-label={card.title}>
-              <span className="dk-spine" aria-hidden="true">
-                {example.surname} · NAME ATLAS
-              </span>
-              <span className="dk-index" aria-hidden="true">
-                {String(card.number).padStart(2, "0")}
-              </span>
-              {card.face}
-            </article>
+    <section id="pitch" className="landing-pitch" aria-labelledby="landing-pitch-heading">
+      <div className="pitch-head">
+        <p className="pitch-eyebrow">{t.pitchEyebrow}</p>
+        <h2 id="landing-pitch-heading">{t.pitchHeading}</h2>
+      </div>
+      <p className="pitch-lede">{t.pitchLede}</p>
+      <ol className="pitch-answers">
+        {t.pitchAnswers.map(([question, answer]) => (
+          <li key={question}>
+            <h3>{question}</h3>
+            <p>{answer}</p>
           </li>
         ))}
-      </ul>
-      <p className="landing-more">
-        <a href={example.deckPath}>
-          {t.previewAll} <span lang="pl">{example.surname}</span>
-        </a>
-        <span className="landing-preview-share">{t.previewShare}</span>
-      </p>
+      </ol>
+      <p className="pitch-note">{t.pitchNote}</p>
+      <LandingTries lang={lang} />
+      {cards === null ? null : (
+        <div className="pitch-cards">
+          <h3 className="pitch-cards-title">
+            {t.previewLede} <span lang="pl">{cards.surname}</span>:
+          </h3>
+          <ul className="preview-cards">
+            {cards.cards.map((card) => (
+              <li key={card.key}>
+                <article className="dk-card preview-card" aria-label={card.title}>
+                  <span className="dk-spine" aria-hidden="true">
+                    {cards.surname} · NAME ATLAS
+                  </span>
+                  <span className="dk-index" aria-hidden="true">
+                    {String(card.number).padStart(2, "0")}
+                  </span>
+                  {card.face}
+                </article>
+              </li>
+            ))}
+          </ul>
+          <p className="landing-more">
+            <a href={cards.deckPath}>
+              {t.previewAll} <span lang="pl">{cards.surname}</span>
+            </a>
+          </p>
+        </div>
+      )}
     </section>
   );
 }

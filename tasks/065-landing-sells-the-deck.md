@@ -1,7 +1,7 @@
 # TASK-065 — The landing sells the deck: a question, four examples, the cards, the offer
 
 - **Status:** IMPLEMENTED 2026-10-01 on `claude/optimistic-gauss-sp4p9d` (`docs/progress/2026-10-01-landing-sells-the-deck.md`).
-- **Requested by:** the project owner, 2026-10-01: "focus only on landing page could you make it more commercial na clear and engaging and interesting", then, on the proposals, "do changes".
+- **Requested by:** the project owner, 2026-10-01: "focus only on landing page could you make it more commercial na clear and engaging and interesting", then, on the proposals, "do changes", and, with ADR-0021's hero mockup: "this is my ideal starting point but then the next window should better explain it on commercial level".
 - **Decision:** ADR-0021 (the dusk look, one shell, the zoom), ADR-0022 (the journey's screens), ADR-0025 (the deck), ADR-0026 (the tiers) and ADR-0019 §2.6 (a surname named on the landing is linked to its search answer). D-025 (the owner's newer tiers) blocks a change to the offer page: this task changes none of its words. The landing reads the offer's own document, so the tier change, when it comes, updates both pages in one place.
 - **Depends on:** TASK-055 (the deck), TASK-057 (the offer page) and TASK-060 (the summary card), all on `main`.
 - **Model guidance:** implementation session.
@@ -9,7 +9,7 @@
 
 ## 1. Goal
 
-A visitor who lands on `/` sees in one screen what the answer holds and can try it with one tap. A visitor who scrolls sees the cards before searching, the three promises, the offer, the comparison, and only then the reference material: the most common surnames and the atlas.
+The first screen stays the owner's mockup: the register line, "Każde nazwisko / gdzieś się zaczęło.", the lede, the pill, Poland on the horizon, the two promises at the foot. The second screen explains the product in commercial terms: what a search gives, as six questions and what answers each, four surnames to try with one tap, the real cards for one of them, then the offer. Then how it works, the comparison, and only then the reference material: the most common surnames and the atlas.
 
 ## 2. Facts (checked on `main` @ `fd6a871`, 2026-10-01, and on production at about 21:00 UTC)
 
@@ -23,10 +23,10 @@ A visitor who lands on `/` sees in one screen what the answer holds and can try 
 
 ## 3. In scope
 
-- **The hero:** a question as the headline, a lede that names what the answer holds, four example surnames as links that open their decks through the search, then, at the foot of the stage under the map, the two promises and, from a tablet up, a link down to the next section (on a phone the ground follows at once, and the foot has no room for both).
-- **"Co dostaniesz":** a new section after the hero with three of the real cards (rarity, where, change) for one example surname, rendered by `deckCards` from its validated response so each carries its source and date, a link to that surname's whole deck and one line about sharing. The example is loaded at render time, kept for ten minutes per process, and fails soft: no answer, no section.
+- **The hero:** unchanged in words and layout (ADR-0021's mockup, as production had it). The mockup's "598 476 nazwisk" stays off the line: the two lists are never summed (ADR-0021 §2.7).
+- **The second screen, "Co dostaniesz":** an eyebrow ("Co dostaniesz · za darmo · bez konta"), a heading that says what a search gives, a lede naming the sources, six questions each with what answers it (count, rarity, where, change, meaning, old prints; the last two "where a source has it"), the note that a missing answer is said plainly, four example surnames as links that open their decks through the search, and three of the real cards (rarity, where, change) for one example surname, rendered by `deckCards` from its validated response so each carries its source and date, with a link to that surname's whole deck. The example is loaded at render time, kept for ten minutes per process, and fails soft: no answer, no cards, the rest of the screen stands.
 - **The offer on the landing:** a new section with the three tiers from `offerDocument` (status, name, price, lede), a link to the offer page and one to its waiting list.
-- **The order below the hero:** what you get, how it works, the offer, compare, the most common surnames, the atlas. The header's "Atlas" link keeps landing on the atlas.
+- **The order below the hero:** what you get, the offer, how it works, compare, the most common surnames, the atlas. The header's "Atlas" link keeps landing on the atlas.
 - Copy in both languages in `messages.ts`; styles in `globals.css`; tests in `landing-sections.test.ts`.
 
 ## 4. Out of scope
@@ -35,8 +35,8 @@ A visitor who lands on `/` sees in one screen what the answer holds and can try 
 
 ## 5. Acceptance criteria
 
-- AC-1: the bare `/` and `/?lang=en` render the hero with the question headline, four example links that open a search, the two promises at the foot of the stage and, from a tablet up, a link down the page.
-- AC-2: with a database, the landing shows three cards for the example surname, each the deck's own face with its source and date; without one it shows no such section and no error.
+- AC-1: the bare `/` and `/?lang=en` render the hero exactly as before this task, and after it a "Co dostaniesz" screen with the six questions, the note, and four example links that open a search.
+- AC-2: with a database, that screen shows three cards for the example surname, each the deck's own face with its source and date; without one it shows no cards and no error.
 - AC-3: the landing names the three tiers with the offer page's own name, price and status and links to `/pl/oferta` (`/en/offer`) and to `#tier-family` there.
 - AC-4: the sections follow §3's order and `#atlas` is the atlas.
 - AC-5: no landing copy says a surname tells where a family lives or comes from; the two lists are never summed; every figure shown is one the deck prints, with its date and source.

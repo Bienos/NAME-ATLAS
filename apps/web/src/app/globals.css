@@ -4132,33 +4132,23 @@ body.dusk {
   color: var(--dusk-ink);
 }
 
-/* The foot of the stage (TASK-065): the two promises and the link down the
-   page, under the horizon so neither is read over the map. */
-.landing-foot {
-  display: grid;
-  gap: var(--space-4);
-  margin: auto 0 0;
-  padding-block: var(--space-7) var(--space-5);
-}
-
 .landing-trust {
-  max-width: 22rem;
-  margin: 0;
+  margin: auto 0 0;
+  padding-block: var(--space-6) var(--space-5);
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.875rem;
-  line-height: 1.6;
   letter-spacing: 0.02em;
   color: var(--dusk-ink-soft);
 }
 
-/* The hero's example surnames (TASK-065): one tap opens a deck. */
+/* The surnames to try (TASK-065), on the second screen: one tap opens a deck. */
 .landing-try {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
   max-width: 52rem;
-  margin: var(--space-5) 0 0;
+  margin: 0;
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.9375rem;
   color: var(--dusk-ink-muted);
@@ -4179,52 +4169,6 @@ body.dusk {
 .landing-try a:focus-visible {
   color: var(--dusk-amber-hover);
   border-color: var(--dusk-amber);
-}
-
-/* The link down the page at the foot of the stage. */
-.landing-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  justify-self: start;
-  margin: 0;
-  font-family: var(--font-data, ui-monospace, monospace);
-  font-size: 0.875rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--dusk-ink-soft);
-  text-decoration: none;
-}
-
-.landing-cue:hover,
-.landing-cue:focus-visible {
-  color: var(--dusk-amber-hover);
-}
-
-.landing-cue svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .landing-cue svg {
-    animation: landing-cue-bob 2.4s ease-in-out infinite;
-  }
-}
-
-@keyframes landing-cue-bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(4px);
-  }
 }
 
 /* Below the hero: the most common surnames and the atlas's plates, read on the
@@ -5024,9 +4968,9 @@ body.dusk {
   border-color: var(--dusk-ink);
 }
 
-/* The landing's sections on the ground: what you get, how it works, the
-   offer and compare (TASK-053, TASK-065). */
-.landing-preview,
+/* The landing's sections on the ground: what you get, the offer, how it
+   works and compare (TASK-053, TASK-065). */
+.landing-pitch,
 .landing-how,
 .landing-offer,
 .landing-compare {
@@ -5036,7 +4980,7 @@ body.dusk {
   scroll-margin-top: var(--space-5);
 }
 
-.landing-preview > h2,
+.pitch-head > h2,
 .landing-how > h2,
 .landing-offer > h2,
 .landing-compare > h2 {
@@ -5085,18 +5029,104 @@ body.dusk {
   margin: 0;
 }
 
-.landing-preview-lede,
+.pitch-lede,
 .landing-offer-lede {
-  max-width: 46ch;
+  max-width: 52ch;
   margin: 0;
   font-size: 1.125rem;
   line-height: 1.5;
   color: var(--dusk-ink-soft);
 }
 
-/* What you get (TASK-065): the example's faces laid flat on the ground. On a
-   phone they are a row to swipe, as the deck is; from a tablet up, three
-   abreast. `.preview-card` undoes what `.dk-card` sets for the pile. */
+/* The second screen (TASK-065): what you get, as six questions with what
+   answers each, then the surnames to try and the example's cards. */
+.pitch-head {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.pitch-eyebrow {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+}
+
+.pitch-answers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-6);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: pitch;
+}
+
+.pitch-answers li {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--dusk-line);
+  counter-increment: pitch;
+}
+
+.pitch-answers li::before {
+  content: counter(pitch, decimal-leading-zero);
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  color: var(--dusk-amber);
+}
+
+.pitch-answers h3 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dusk-ink);
+}
+
+.pitch-answers p {
+  margin: var(--space-2) 0 0;
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
+}
+
+.pitch-note {
+  max-width: 52ch;
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--dusk-ink-muted);
+}
+
+.pitch-cards {
+  display: grid;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.pitch-cards-title {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.pitch-cards-title span {
+  color: var(--dusk-ink);
+}
+
+/* The example's faces laid flat on the ground. On a phone they are a row to
+   swipe, as the deck is; from a tablet up, three abreast. `.preview-card`
+   undoes what `.dk-card` sets for the pile. */
 .preview-cards {
   display: grid;
   grid-auto-flow: column;
@@ -5142,10 +5172,6 @@ body.dusk {
     padding-inline: 0;
     overflow: visible;
   }
-}
-
-.landing-preview-share {
-  color: var(--dusk-ink-muted);
 }
 
 /* The offer's strip (TASK-065): the tiers as the offer page words them. */
@@ -5298,19 +5324,8 @@ body.dusk {
     margin-top: var(--space-2);
   }
 
-  /* A little taller than the screen, so the foot sits under the map, as it
-     did before the example surnames; the cue is for wider screens, where the
-     fold hides the ground (TASK-065). */
   .landing-stage {
-    min-height: calc(100svh - 3rem);
-  }
-
-  .landing-cue {
-    display: none;
-  }
-
-  .landing-trust {
-    font-size: 0.8125rem;
+    min-height: calc(100svh - 5rem);
   }
 
   .landing-try a {

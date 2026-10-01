@@ -24,11 +24,9 @@ import { deckCards } from "../lib/deck.js";
 import {
   LANDING_EXAMPLE,
   LandingCompare,
-  LandingCue,
   LandingHow,
   LandingOffer,
-  LandingPreview,
-  LandingTries,
+  LandingPitch,
 } from "../lib/landing-sections.js";
 import type { LandingExample } from "../lib/landing-sections.js";
 
@@ -295,9 +293,9 @@ export default async function HomePage({ searchParams }: PageProps) {
   const otherPath = `/?${switchParams.toString()}`;
 
   // The bare page is the landing (ADR-0021; TASK-052): the dusk hero — the
-  // register line, the question, the field as the second-largest object,
-  // four surnames to try, Poland on the horizon behind them — then, on the
-  // ground (TASK-065's order): the example's cards, how it works, the offer,
+  // register line, the headline, the field as the second-largest object,
+  // Poland on the horizon behind them — then, on the ground (TASK-065's
+  // order): what you get with the example's cards, the offer, how it works,
   // the comparison, the most common surnames and the atlas's plates.
   if (given.kind === "NONE") {
     // The register line names the artefact's own date; without the artefact
@@ -317,7 +315,6 @@ export default async function HomePage({ searchParams }: PageProps) {
           </h1>
           <p className="landing-lede">{t.landingLede}</p>
           <SearchForm lang={lang} query={query} />
-          <LandingTries lang={lang} />
           {/* Empty until a search leaves the page: `dusk-zoom.tsx` fills it
               from `data-text`, so nothing is announced before it is true. */}
           <p
@@ -338,15 +335,12 @@ export default async function HomePage({ searchParams }: PageProps) {
               ))}
             </ul>
           </div>
-          <div className="landing-foot">
-            <p className="landing-trust">{t.landingTrust}</p>
-            <LandingCue lang={lang} target={example === null ? "#how" : "#preview"} />
-          </div>
+          <p className="landing-trust">{t.landingTrust}</p>
         </section>
         <div className="landing-atlas">
-          <LandingPreview example={example} lang={lang} />
-          <LandingHow lang={lang} />
+          <LandingPitch example={example} lang={lang} />
           <LandingOffer lang={lang} />
+          <LandingHow lang={lang} />
           <LandingCompare lang={lang} />
           <CommonSurnames lists={common} lang={lang} />
           <div id="atlas" className="landing-plates">
