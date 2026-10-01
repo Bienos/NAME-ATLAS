@@ -385,6 +385,8 @@ export function CanonicalSurnamePage({
                 next: t.deckNext,
                 hintKeys: t.deckHintKeys,
                 hintTouch: t.deckHintTouch,
+                share: t.deckShare,
+                sharing: t.deckSharing,
               }}
             />
           )}

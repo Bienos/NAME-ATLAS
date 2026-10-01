@@ -8,7 +8,16 @@ import type { DeckCard } from "./deck.js";
 import { DECK_PARAM, deckRequested, searchTarget } from "./deck-target.js";
 import { Result } from "./result-view.js";
 import { metadataFor } from "./surname-page.js";
-import { SurnameDeck } from "./deck-client.js";
+import { SurnameDeck, fileStem } from "./deck-client.js";
+import {
+  SHARE_CARDS,
+  isShareCard,
+  shareCardFor,
+  shareCardPath,
+  shareFacts,
+} from "./share-facts.js";
+import type { ShareFacts } from "./share-facts.js";
+import { shareCardResponse } from "./share-route.js";
 
 /**
  * TASK-055 AC-3 and AC-4, against rendered markup: the deck has a card for each
@@ -564,6 +573,122 @@ describe("TASK-055: every card leads with the list the surname mostly lives on",
   });
 });
 
+/** Every string a share card would print, in order. */
+function shareText(facts: ShareFacts): string {
+  const out: string[] = [];
+  const walk = (value: unknown): void => {
+    if (typeof value === "string") out.push(value);
+    else if (Array.isArray(value)) value.forEach(walk);
+    else if (value !== null && typeof value === "object") Object.values(value).forEach(walk);
+  };
+  walk([
+    facts.surname,
+    facts.warning,
+    facts.figure,
+    facts.figureNote,
+    facts.visual,
+    facts.explanation,
+  ]);
+  return out.join(" ").replace(/[ \t\r\n]+/gu, " ");
+}
+
+describe("TASK-056 AC-1: a share card for each answer, with the page's own figures", () => {
+  const FIGURE = /[\u2212+]?\d(?:[\d\u00a0,]*\d)?(?:[.,]\d+)?%?/gu;
+
+  it("draws every card when every section is ready, in both languages", () => {
+    for (const lang of ["pl", "en"] as const) {
+      expect(SHARE_CARDS.filter((card) => shareFacts(FULL, card, lang) === null)).toEqual([]);
+    }
+  });
+
+  for (const lang of ["pl", "en"] as const) {
+    it(`prints only figures the page prints (${lang})`, () => {
+      const page = text(renderToStaticMarkup(createElement(Result, { response: FULL, lang })));
+      for (const card of SHARE_CARDS) {
+        const facts = shareFacts(FULL, card, lang);
+        if (facts === null) throw new Error(card);
+        // Years of a period or an edition are labels, not figures, and are on the page as dates.
+        const figures = [...new Set(shareText(facts).match(FIGURE) ?? [])];
+        const missing = figures.filter((figure) => !page.includes(figure));
+        expect(missing, `${lang}.${card}`).toEqual([]);
+      }
+    });
+  }
+});
+
+describe("TASK-056 AC-2/AC-3: no card without an answer; every card explains and cites", () => {
+  it("draws only the summary when only the count is ready", () => {
+    expect(SHARE_CARDS.filter((card) => shareFacts(COUNT_ONLY, card, "pl") !== null)).toEqual([
+      "summary",
+    ]);
+  });
+
+  it("gives every card an explanation, and a source with a year", () => {
+    for (const card of SHARE_CARDS) {
+      const facts = shareFacts(FULL, card, "pl");
+      expect(facts?.explanation.trim(), card).not.toBe("");
+      expect(facts?.source, card).toMatch(/\b(1[0-9]|20)\d\d\b/u);
+    }
+  });
+
+  it("states the coverage warning on the map card when coverage is low", () => {
+    const where = shareFacts(FULL, "where", "pl");
+    expect(where?.warning).toContain("22,5%");
+    expect(where?.visual?.kind).toBe("map");
+  });
+
+  it("calls the other form a form, never a relative", () => {
+    const other = shareFacts(FULL, "other", "en");
+    expect(other?.explanation).toContain("It says nothing about kinship");
+    expect(other?.surname).toBe("KOWALSKI · KOWALSKA");
+  });
+
+  it("leads with the surname's main list, as the deck does", () => {
+    expect(shareFacts(kowalskaShape(), "rarity", "pl")?.figure).toBe("1 na 320");
+    expect(shareFacts(kowalskaShape(), "change", "pl")?.figure).toBe("−3,7%");
+  });
+});
+
+describe("TASK-056: the deck links each card to its image", () => {
+  it("maps cards without an image of their own to one that has", () => {
+    expect(shareCardFor("hello")).toBe("summary");
+    expect(shareCardFor("catalogue")).toBe("print");
+    expect(shareCardFor("end")).toBe("summary");
+    expect(shareCardFor("rarity")).toBe("rarity");
+    expect(isShareCard("hello")).toBe(false);
+  });
+
+  it("addresses the image beside the page, in the page's language", () => {
+    expect(shareCardPath("/pl/nazwisko/kowalski", "rarity", "pl")).toBe(
+      "/pl/nazwisko/kowalski/karta/rarity",
+    );
+    expect(shareCardPath("/en/surname/kowalski", "where", "en")).toBe(
+      "/en/surname/kowalski/card/where",
+    );
+  });
+
+  it("gives every deck card a share address, and the count-only deck the summary", () => {
+    expect(deckCards(FULL, "pl", LINKS).every((card) => card.share !== null)).toBe(true);
+    expect(deckCards(COUNT_ONLY, "pl", LINKS).map((card) => card.share)).toEqual([
+      "/pl/nazwisko/kowalski/karta/summary",
+      "/pl/nazwisko/kowalski/karta/summary",
+    ]);
+  });
+
+  it("names the downloaded file in ASCII, which every browser keeps", () => {
+    expect(fileStem("DĄBROWSKI")).toBe("dabrowski");
+    expect(fileStem("ŁUCZAK")).toBe("luczak");
+    expect(fileStem("NOWAK-ŻÓŁĆ")).toBe("nowak-zolc");
+    expect(fileStem("NGUYỄN")).toBe("nguyen");
+    expect(fileStem("Ж")).toBe("name-atlas");
+  });
+
+  it("answers 404 for a card that does not exist, before it reads anything", async () => {
+    const response = await shareCardResponse("kowalski", "horoscope", "pl", null);
+    expect(response.status).toBe(404);
+  });
+});
+
 describe("TASK-055: the deck is drawn by script only", () => {
   it("renders nothing on the server, so the page alone is what a reader without script gets", () => {
     const html = renderToStaticMarkup(
@@ -582,6 +707,8 @@ describe("TASK-055: the deck is drawn by script only", () => {
           next: "n",
           hintKeys: "h",
           hintTouch: "t",
+          share: "s",
+          sharing: "…",
         },
       }),
     );
