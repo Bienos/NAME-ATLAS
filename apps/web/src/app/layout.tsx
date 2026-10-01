@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 /**
@@ -70,7 +71,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pl" className={`${display.variable} ${ui.variable} ${data.variable}`}>
-      <body className="dusk">{children}</body>
+      <body className="dusk">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
