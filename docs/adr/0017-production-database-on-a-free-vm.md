@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-30
 - **Deciders:** project owner, 2026-09-29, choosing a free VM over Supabase's free plan for now and a paid host once the site earns money ("ja to chce miec narazie zeby to dokonycz jak zacznie to zarabiac to ja to moge zmienic"), and asking for it to be done for them ("a ty mozesz to zrobic sam")
+- **Amended in part by:** ADR-0027 (2026-10-01). §2.3's "the web app writes nothing" now has one exception: schema `accounts`, through its own role and connection string.
 - **Supersedes in part:** ADR-0011 §2's choice of Neon for the database. ADR-0011's other half stands: the app stays on Vercel in `fra1`, and `DATABASE_URL` stays the only coupling.
 - **Resolves:** `STATUS.md`, "Blocked on the project owner", the hosting ADR (ADR-0011 named Neon while production ran on Supabase), and TASK-035 §0, which parked the load because the free plan stops at 500 MB.
 - **Relates to:** ADR-0002 (Kysely over `pg`), TASK-035, TASK-036.

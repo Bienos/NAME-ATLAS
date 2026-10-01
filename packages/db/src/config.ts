@@ -31,3 +31,20 @@ export function loadDbConfig(env: NodeJS.ProcessEnv = process.env): DbConfig {
   }
   return { databaseUrl };
 }
+
+/**
+ * The accounts database configuration (TASK-061, ADR-0027).
+ *
+ * Accounts are written through their own connection, as their own role
+ * (`nameatlas_app`), never through `DATABASE_URL`'s read-only one. Unset means
+ * accounts are off: this returns null, and the caller must treat that as "no
+ * accounts", never fall back to `DATABASE_URL`, whose role cannot write them and
+ * must not be given the chance to read them.
+ */
+export function loadAccountsDbConfig(env: NodeJS.ProcessEnv = process.env): DbConfig | null {
+  const databaseUrl = env["ACCOUNTS_DATABASE_URL"];
+  if (!databaseUrl || databaseUrl.trim() === "") {
+    return null;
+  }
+  return { databaseUrl: databaseUrl.trim() };
+}
