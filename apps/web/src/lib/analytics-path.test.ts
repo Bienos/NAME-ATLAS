@@ -28,6 +28,19 @@ describe("TASK-058 AC-1: the analytics never sees a surname", () => {
     );
   });
 
+  it("drops the token a mail's link carries, on both account pages in both languages (TASK-062, AC-10)", () => {
+    const token = "k".repeat(43);
+    for (const path of [
+      "/pl/konto/potwierdz",
+      "/en/account/confirm",
+      "/pl/konto/nowe-haslo",
+      "/en/account/new-password",
+    ]) {
+      expect(analyticsUrl(`${HOST}${path}?token=${token}`), path).toBe(`${HOST}${path}`);
+      expect(analyticsUrl(`${path}?token=${token}&status=too-short`), path).toBe(path);
+    }
+  });
+
   it("leaves every other page as it is", () => {
     for (const path of [
       "/",

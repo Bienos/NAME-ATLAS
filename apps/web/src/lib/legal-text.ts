@@ -1,4 +1,5 @@
 import { CONTACT_EMAIL } from "./contact.js";
+import { accountsVariant } from "./legal-accounts.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -22,6 +23,13 @@ export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
   privacy: "2026-10-01",
   terms: "2026-09-30",
 };
+
+/**
+ * The date of the accounts variant of both documents (TASK-062), shown, and
+ * recorded as the version of the terms a reader accepted, only when accounts
+ * are on. The base text keeps `LEGAL_UPDATED`.
+ */
+export const ACCOUNTS_LEGAL_UPDATED = "2026-10-01";
 
 export interface LegalSection {
   readonly heading: string;
@@ -303,8 +311,19 @@ const TERMS: Record<Lang, LegalDocument> = {
   },
 };
 
-export function legalDocument(kind: LegalKind, lang: Lang): LegalDocument {
-  return kind === "privacy" ? PRIVACY[lang] : TERMS[lang];
+/**
+ * The document as it stands. `accounts` says whether the site has accounts
+ * (`accountsEnabled`): then the notice and the terms say so (`legal-accounts.ts`);
+ * otherwise this is the text as it was before accounts, unchanged.
+ */
+export function legalDocument(kind: LegalKind, lang: Lang, accounts = false): LegalDocument {
+  const base = kind === "privacy" ? PRIVACY[lang] : TERMS[lang];
+  return accounts ? accountsVariant(kind, lang, base) : base;
+}
+
+/** The date the document last changed, for the page and for the version recorded. */
+export function legalUpdated(kind: LegalKind, accounts = false): string {
+  return accounts ? ACCOUNTS_LEGAL_UPDATED : LEGAL_UPDATED[kind];
 }
 
 export function legalPath(kind: LegalKind, lang: Lang): string {

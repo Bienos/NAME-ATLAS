@@ -84,6 +84,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@name-atlas/accounts':
+        specifier: workspace:*
+        version: link:../../packages/accounts
       '@name-atlas/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts

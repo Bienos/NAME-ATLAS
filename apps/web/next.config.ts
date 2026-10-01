@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
    * Build configuration only: no domain logic, no rewrites.
    */
   transpilePackages: [
+    "@name-atlas/accounts",
     "@name-atlas/contracts",
     "@name-atlas/db",
     "@name-atlas/domain",
