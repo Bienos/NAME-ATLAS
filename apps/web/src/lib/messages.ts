@@ -512,9 +512,15 @@ export const UI = {
       "Zobacz, co oficjalny rejestr PESEL zapisuje o nazwisku — ze źródłem i datą przy każdej " +
       "liczbie i z uczciwą luką wszędzie tam, gdzie kończą się dane.",
     landingHint: "Wpisz dokładnie tak, jak się pisze — z polskimi znakami.",
+    // The dusk hero (TASK-052): the register line above the headline, the
+    // status line while a search leaves the page, and the three promises.
+    landingEyebrow: "Rejestr PESEL",
+    landingSearching: "Sprawdzamy rejestr PESEL…",
+    landingTrust:
+      "Źródło przy każdym fakcie · Brak danych to też odpowiedź · Nic o Twojej rodzinie, tylko o nazwisku",
     searchLabel: "Nazwisko",
     searchPlaceholder: "np. Nowak",
-    searchAction: "Szukaj",
+    searchAction: "Odkryj",
     suggestionsAvailable: "Podpowiedzi:",
     commonHeading: "Najczęstsze nazwiska",
     commonNote:
@@ -915,9 +921,13 @@ export const UI = {
       "See what Poland's official register records about a surname — with the source and date " +
       "behind every figure, and an honest blank wherever the evidence runs out.",
     landingHint: "Exactly as it's written — Polish letters welcome.",
+    landingEyebrow: "PESEL register",
+    landingSearching: "Checking the PESEL register…",
+    landingTrust:
+      "A source on every fact · No data is also an answer · About the surname, never your family",
     searchLabel: "Surname",
     searchPlaceholder: "e.g. Nowak",
-    searchAction: "Search",
+    searchAction: "Discover",
     suggestionsAvailable: "Suggestions:",
     commonHeading: "Most common surnames",
     commonNote:

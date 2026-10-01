@@ -22,6 +22,8 @@ import { ShareButton } from "./share-button.js";
 import { ReportLink } from "./report-link.js";
 import { NamePrint } from "./name-print.js";
 import { SiteFooter } from "./site-footer.js";
+import { DuskWorld } from "./dusk-world.js";
+import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
 
 /**
  * The canonical surname page (TASK-024, ADR-0009), shared by
@@ -289,9 +291,14 @@ export function CanonicalSurnamePage({
   const otherPath =
     (answer.kind === "RESULT" ? answer.otherLangPath : null) ??
     (otherLang === "en" ? "/?lang=en" : "/");
+  // The dusk world behind the journey (ADR-0021, TASK-052): the camera already
+  // down, the register as points, and the surname's own regional shares — the
+  // validated ones the chapter prints — as its light. Nothing else is derived.
+  const world = answer.kind === "RESULT" ? worldInput(answer.response) : EMPTY_WORLD;
 
   return (
-    <>
+    <div className="dusk dusk-page">
+      <DuskWorld mode="journey" weights={world.weights} lit={world.lit} />
       <main lang={htmlLang(lang)} className="profile">
         <div className="masthead">
           <h1>
@@ -331,7 +338,7 @@ export function CanonicalSurnamePage({
         null}
       </main>
       <SiteFooter lang={lang} />
-    </>
+    </div>
   );
 }
 

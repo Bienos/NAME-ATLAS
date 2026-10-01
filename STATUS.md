@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by a wording fix on the contact page: a gender-neutral line in place of "znalazłeś" (`docs/progress/2026-09-30-contact-page-wording.md`).
+**Last rewritten:** 2026-10-01, by TASK-052: the dusk landing and the surname journey (ADR-0021; `docs/progress/2026-10-01-dusk-landing-and-journey.md`).
 
 ## Production
 
@@ -16,7 +16,8 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 ## Built
 
 - Milestones M0–M2 are complete.
-- Implemented: TASK-001–006, 008–028, 030–034, 036–040 and 042–045, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
+- Implemented: TASK-001–006, 008–028, 030–034, 036–040, 042–045 and 052, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
+- The site's look: the landing hero and the surname page render the dusk direction (ADR-0021, TASK-052); the comparison, legal and contact pages, the search page's unresolved answers and the share card stay on Visual System v1's Paper until a later task.
 - Ahead of `PLAN.md`'s milestone order: the async runtime (TASK-020), rights per asset and surface (TASK-021), the meaning chain (TASK-022), slugs and the sitemap (TASK-027), `pnpm coverage:report`, the visual system, evidence linked to the source's website (ADR-0012), and the landing atlas's seven plates (TASK-040, 043, 044; ADR-0018, ADR-0019).
 - Local suite on `main` @ `61ffc49`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0. `test:integration` and `test:golden` were not run.
 
