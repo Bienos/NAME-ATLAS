@@ -53,7 +53,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Czego nie robimy",
         paragraphs: [
-          "Name Atlas nie ma kont, reklam ani zewnętrznych narzędzi analitycznych. Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Serwis nie zapisuje w przeglądarce plików cookie ani podobnych danych. Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+          "Name Atlas nie ma kont ani reklam. Statystyki odwiedzin zbiera Vercel Web Analytics bez plików cookie i bez nazwiska w adresie (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Serwis nie zapisuje w przeglądarce plików cookie ani podobnych danych. Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
         ],
       },
       {
@@ -72,6 +72,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
           "Jeśli napiszesz do nas e-mail, przetwarzamy Twój adres i treść wiadomości, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie.",
+          "Statystyki odwiedzin (które strony są oglądane, ile razy i skąd) prowadzimy na tej samej podstawie. Zbiera je Vercel Web Analytics: bez plików cookie; odwiedzający są rozróżniani skrótem obliczonym z żądania, kasowanym po 24 godzinach. Dla każdej odsłony zapisuje czas, adres strony, stronę odsyłającą, kraj, region i miasto, system, przeglądarkę i typ urządzenia. Zanim adres trafi do statystyk, nasz kod zastępuje w nim nazwisko oznaczeniem [slug] i usuwa parametry zapytania, więc statystyki nie zawierają wyszukiwanego nazwiska.",
           "Jeśli zapiszesz się na listę oczekujących albo zapytasz o badanie genealogiczne, przetwarzamy Twój adres i to, co napiszesz, żeby odpowiedzieć i dać znać, gdy usługa ruszy. Podstawą jest działanie na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO). Nie wysyłaj nam wyników testu DNA ani informacji o zdrowiu: to dane szczególnie chronione, a do pierwszej odpowiedzi nie są potrzebne.",
           "Zanim przekażemy Twoje dane genealogom, którzy prowadzą badanie, zapytamy Cię o zgodę i powiemy, kim są.",
         ],
@@ -82,12 +83,13 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "Do limitu zapytań adres IP jest trzymany tylko w pamięci serwera, na czas jednominutowego okna limitu, i nasz kod nigdzie go nie zapisuje. Własne dzienniki serwisu nie zawierają adresu IP ani wyszukiwanego nazwiska.",
           "Dostawca hostingu (Vercel) przechowuje dziennik żądań, w tym adres strony, od jednej godziny do jednego dnia, zależnie od planu usługi.",
           "Wiadomości e-mail przechowujemy tak długo, jak to potrzebne do załatwienia sprawy. Zapis na listę oczekujących trzymamy do startu usługi albo do Twojej prośby o wypisanie.",
+          "Statystyki odwiedzin Vercel przechowuje przez miesiąc (okno raportowania naszego planu) i może dłużej.",
         ],
       },
       {
         heading: "Komu powierzamy dane",
         items: [
-          "Vercel Inc. (USA) — hosting serwisu; strony są generowane we Frankfurcie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
+          "Vercel Inc. (USA) — hosting serwisu i statystyki odwiedzin (Vercel Web Analytics); strony są generowane we Frankfurcie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
           "Oracle — serwer bazy danych we Frankfurcie. Otrzymuje zapytanie o nazwisko, ale nie adres IP odwiedzającego.",
           "Google — skrzynka pocztowa, na którą przychodzą wiadomości.",
         ],
@@ -121,7 +123,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "What we do not do",
         paragraphs: [
-          "Name Atlas has no accounts, advertising or third-party analytics. The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. The site stores no cookies or similar data in your browser. We do not profile anyone and make no automated decisions.",
+          "Name Atlas has no accounts or advertising. Visit statistics are collected by Vercel Web Analytics without cookies and without the surname in the address (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. The site stores no cookies or similar data in your browser. We do not profile anyone and make no automated decisions.",
         ],
       },
       {
@@ -138,6 +140,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
           "If you email us, we process your address and your message to reply and deal with the matter, on the same basis.",
+          "Visit statistics (which pages are viewed, how often and from where) rest on the same basis. Vercel Web Analytics collects them: no cookies; visitors are told apart by a hash computed from the request, discarded after 24 hours. For each page view it records the time, the page address, the referring page, the country, region and city, the operating system, the browser and the device type. Before the address reaches the statistics, our code replaces the surname in it with [slug] and removes the query parameters, so the statistics never contain the surname searched for.",
           "If you join the waiting list or ask about genealogy research, we process your address and what you write to reply and to tell you when the service starts. The basis is taking steps at your request before entering into a contract (Article 6(1)(b) GDPR). Do not send us DNA results or health information: they are specially protected data, and a first reply does not need them.",
           "Before we pass your details to the genealogists who carry out the research, we will ask for your consent and tell you who they are.",
         ],
@@ -148,12 +151,13 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "For the request limit, the IP address is held in the server's memory only, for the limit's one-minute window, and our code never writes it anywhere. The site's own logs contain neither the IP address nor the surname searched for.",
           "The hosting provider (Vercel) keeps a request log, including the page address, for between one hour and one day, depending on the service plan.",
           "Emails are kept as long as needed to deal with the matter. A place on the waiting list is kept until the service starts or until you ask to be taken off.",
+          "Vercel keeps the visit statistics for one month (our plan's reporting window), and may keep them longer.",
         ],
       },
       {
         heading: "Who processes data for us",
         items: [
-          "Vercel Inc. (USA): hosting; pages are generated in Frankfurt. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",
+          "Vercel Inc. (USA): hosting and visit statistics (Vercel Web Analytics); pages are generated in Frankfurt. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",
           "Oracle: the database server, in Frankfurt. It receives the query for a surname, not the visitor's IP address.",
           "Google: the mailbox that receives email.",
         ],
