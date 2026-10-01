@@ -356,6 +356,75 @@ describe("sign-in (AC-6)", () => {
     expect(response.headers.get("set-cookie")).toContain(`__Host-na_session=${SESSION}`);
   });
 
+  it("goes on to the surname page the form names (TASK-064, AC-6)", async () => {
+    const f = fakes();
+    f.accounts.signIn.mockResolvedValue({
+      kind: "SIGNED_IN",
+      userId: "u-1",
+      sessionToken: SESSION,
+      expiresAt: new Date(),
+    });
+    const next = "/pl/nazwisko/kowalski?view=cards";
+    const response = await handleAccountPost("sign-in", post("sign-in", { ...form, next }), f.deps);
+    expect(location(response)).toBe(next);
+    expect(response.headers.get("set-cookie")).toContain(`__Host-na_session=${SESSION}`);
+  });
+
+  it("goes to the account, not where an unsafe address says, however it is written", async () => {
+    const f = fakes();
+    f.accounts.signIn.mockResolvedValue({
+      kind: "SIGNED_IN",
+      userId: "u-1",
+      sessionToken: SESSION,
+      expiresAt: new Date(),
+    });
+    for (const next of [
+      "https://evil.test/",
+      "//evil.test",
+      "/\\evil.test",
+      "/pl/konto/zaloguj",
+      "/pl/nazwisko/..",
+      "/pl/nazwisko/kowalski\r\nSet-Cookie: x=y",
+      "",
+    ]) {
+      const response = await handleAccountPost(
+        "sign-in",
+        post("sign-in", { ...form, next }),
+        f.deps,
+      );
+      expect(location(response), next).toBe("/en/account");
+    }
+  });
+
+  it("keeps the page to return to when the sign-in fails, and carries no address or password", async () => {
+    const f = fakes();
+    const next = "/en/surname/nowak?view=cards";
+    f.accounts.signIn.mockResolvedValue({ kind: "REJECTED" });
+    const rejected = await handleAccountPost("sign-in", post("sign-in", { ...form, next }), f.deps);
+    expect(location(rejected)).toBe(
+      "/en/account/sign-in?status=rejected&next=%2Fen%2Fsurname%2Fnowak%3Fview%3Dcards",
+    );
+    f.accounts.signIn.mockResolvedValue({ kind: "THROTTLED" });
+    const throttled = await handleAccountPost(
+      "sign-in",
+      post("sign-in", { ...form, next }),
+      f.deps,
+    );
+    expect(location(throttled)).toContain("status=throttled&next=");
+    for (const response of [rejected, throttled]) {
+      const where = decodeURIComponent(location(response));
+      expect(where).not.toContain(EMAIL);
+      expect(where).not.toContain(PASSWORD);
+    }
+    // An unsafe one is dropped from the redirect too.
+    const dropped = await handleAccountPost(
+      "sign-in",
+      post("sign-in", { ...form, next: "https://evil.test/" }),
+      f.deps,
+    );
+    expect(location(dropped)).toBe("/en/account/sign-in?status=throttled");
+  });
+
   it("answers one word for a wrong password, an unknown address and a pending one, and `throttled` for a throttled one", async () => {
     const f = fakes();
     f.accounts.signIn.mockResolvedValue({ kind: "REJECTED" });

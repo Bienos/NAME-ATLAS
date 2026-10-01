@@ -90,6 +90,14 @@ export interface DeckFace {
   readonly share: string | null;
 }
 
+/** What the deck says to a reader the image route turned away for want of a session (TASK-064). */
+export interface DeckSignIn {
+  readonly text: string;
+  readonly link: string;
+  /** The sign-in page, carrying the surname page to return to. */
+  readonly href: string;
+}
+
 export interface DeckLabels {
   readonly open: string;
   readonly close: string;
@@ -148,6 +156,7 @@ export function SurnameDeck({
   initiallyOpen,
   labels,
   lang,
+  signIn = null,
 }: {
   cards: readonly DeckFace[];
   surname: string;
@@ -156,6 +165,8 @@ export function SurnameDeck({
   /** The search that brought the reader here asked for the deck (`?view=cards`). */
   initiallyOpen: boolean;
   labels: DeckLabels;
+  /** Given only when accounts are on, which is when the image route can answer 401. */
+  signIn?: DeckSignIn | null;
 }) {
   const [open, setOpen] = useState(initiallyOpen);
   const [at, setAt] = useState(0);
@@ -166,6 +177,8 @@ export function SurnameDeck({
   const drag = useRef<{ x: number; dx: number; moved: boolean; el: ElementLike } | null>(null);
   const suppressClick = useRef(false);
   const [sharing, setSharing] = useState(false);
+  /** The card whose image the route refused with 401: the prompt shows beside that card only. */
+  const [signInFor, setSignInFor] = useState<number | null>(null);
 
   /**
    * Shares the card in view as an image: the system share sheet where the
@@ -175,6 +188,10 @@ export function SurnameDeck({
     setSharing(true);
     try {
       const response = await fetch(url);
+      if (response.status === 401) {
+        setSignInFor(at);
+        return;
+      }
       if (!response.ok) return;
       const blob = await response.blob();
       const name = `${fileStem(surname)}-${url.split("/").pop() ?? key}.png`;
@@ -377,6 +394,14 @@ export function SurnameDeck({
         <button type="button" className="deck-full" onClick={close}>
           {labels.close} <span aria-hidden="true">↓</span>
         </button>
+      </div>
+      {/* Always in the page, so a screen reader announces the text when it appears. */}
+      <div className="deck-gate" role="status">
+        {signIn !== null && signInFor === at ? (
+          <>
+            {signIn.text} <a href={signIn.href}>{signIn.link}</a>
+          </>
+        ) : null}
       </div>
       <div className="deck-stage">
         <nav className="deck-toc" aria-label={labels.cards}>

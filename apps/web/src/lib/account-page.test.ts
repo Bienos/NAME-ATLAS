@@ -32,7 +32,7 @@ function decide(
 function data(
   overrides: Partial<AccountPageData> & Pick<AccountPageData, "step">,
 ): AccountPageData {
-  return { lang: "pl", status: null, token: null, session: null, ...overrides };
+  return { lang: "pl", status: null, token: null, session: null, next: null, ...overrides };
 }
 
 function render(d: AccountPageData): string {
@@ -294,5 +294,54 @@ describe("the words (AC-12)", () => {
   it("knows no status word for an unknown name", () => {
     expect(statusWords("pl", "sign-in", "constructor")).toBeNull();
     expect(statusWords("pl", "sign-in", null)).toBeNull();
+  });
+});
+
+describe("the sign-in's way back to a surname (TASK-064, AC-7)", () => {
+  const NEXT = "/pl/nazwisko/kowalski?view=cards";
+
+  it("carries a safe address as a hidden field of the sign-in form and nowhere else", () => {
+    const decision = decide("pl", ["zaloguj"], { next: NEXT });
+    expect(decision).toMatchObject({ kind: "view", data: { step: "sign-in", next: NEXT } });
+    if (decision.kind !== "view") throw new Error("a view");
+    const html = render(decision.data);
+    expect(html).toContain(`<input type="hidden" name="next" value="${NEXT}"/>`);
+    // Not a link and not a second field: the sign-up and reset links stay as they were.
+    expect(html.split(NEXT)).toHaveLength(2);
+  });
+
+  it("says nothing about it when the address is not a surname page of this site", () => {
+    for (const next of ["https://evil.test/", "//evil.test", "/pl/konto", "/pl/nazwisko/..", ""]) {
+      const decision = decide("pl", ["zaloguj"], { next });
+      expect(decision, next).toMatchObject({ kind: "view", data: { next: null } });
+      if (decision.kind !== "view") throw new Error("a view");
+      expect(render(decision.data)).not.toContain('name="next"');
+    }
+  });
+
+  it("has no field when there is no address, and ignores one on any other step", () => {
+    expect(render(data({ step: "sign-in" }))).not.toContain('name="next"');
+    for (const [lang, segments] of [
+      ["pl", ["zaloz"]],
+      ["pl", ["reset"]],
+      ["en", ["sign-up"]],
+    ] as const) {
+      expect(decide(lang, segments, { next: NEXT })).toMatchObject({
+        kind: "view",
+        data: { next: null },
+      });
+    }
+  });
+
+  it("sends a reader who is already signed in on to the page, or to the account without one", () => {
+    expect(decide("pl", ["zaloguj"], { next: NEXT }, SESSION)).toEqual({
+      kind: "redirect",
+      to: NEXT,
+    });
+    expect(decide("pl", ["zaloguj"], { next: "https://evil.test/" }, SESSION)).toEqual({
+      kind: "redirect",
+      to: "/pl/konto",
+    });
+    expect(decide("pl", ["zaloguj"], {}, SESSION)).toEqual({ kind: "redirect", to: "/pl/konto" });
   });
 });

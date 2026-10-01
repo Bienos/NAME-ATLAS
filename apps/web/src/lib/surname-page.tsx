@@ -1,3 +1,4 @@
+import { accountsEnabled } from "./accounts-config.js";
 import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -24,7 +25,7 @@ import { SiteShell } from "./site-shell.js";
 import { SUMMARY_ANCHOR } from "./sections.js";
 import { comparePagePath } from "./site-links.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
-import { deckCards } from "./deck.js";
+import { deckCards, deckSignIn } from "./deck.js";
 import { SurnameDeck } from "./deck-client.js";
 
 /**
@@ -388,6 +389,7 @@ export function CanonicalSurnamePage({
                 share: t.deckShare,
                 sharing: t.deckSharing,
               }}
+              signIn={deckSignIn(lang, path, accountsEnabled())}
             />
           )}
         </>
