@@ -16,7 +16,6 @@ import type {
   DistributionEntry,
   NeighbourList,
   OtherForm,
-  RarityEntry,
   SurnameResultResponse,
 } from "@name-atlas/contracts";
 import {
@@ -39,6 +38,8 @@ import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { ShareButton } from "./share-button.js";
 import { comparePagePath } from "./site-links.js";
+import { inDeckOrder, oneInOf, rankOf } from "./deck-order.js";
+import { shareCardFor, shareCardPath, shareFacts } from "./share-facts.js";
 
 export interface DeckCard {
   /** Stable across renders: what the card answers. */
@@ -48,7 +49,12 @@ export interface DeckCard {
   /** A card printed on paper rather than the dusk. */
   readonly paper?: boolean;
   readonly face: ReactNode;
+  /** The address of this card's share image (TASK-056); null when there is none to share. */
+  readonly share: string | null;
 }
+
+/** A card as its builder makes it, before its share address is known. */
+type CardFace = Omit<DeckCard, "share">;
 
 export interface DeckLinks {
   /** This page's canonical path. */
@@ -94,14 +100,6 @@ function Source({ citation, date, lang }: { citation: CitationDto; date: string;
   );
 }
 
-function oneInOf(entry: RarityEntry): number | null {
-  return entry.primary.metric === "ONE_IN_X" ? entry.primary.value : null;
-}
-
-function rankOf(entry: RarityEntry): number | null {
-  return entry.supporting.find((metric) => metric.metric === "RANK")?.value ?? null;
-}
-
 function oneInText(x: number, lang: Lang): string {
   const n = formatInteger(x, lang);
   return lang === "pl" ? `1 na ${n}` : `1 in ${n}`;
@@ -109,7 +107,7 @@ function oneInText(x: number, lang: Lang): string {
 
 /* ------------------------------------------------------------------------ */
 
-function hello(response: SurnameResultResponse, surname: string, lang: Lang): DeckCard {
+function hello(response: SurnameResultResponse, surname: string, lang: Lang): CardFace {
   const t = UI[lang];
   const population = response.population;
   const ready = population?.state === "READY" ? population.observations : [];
@@ -185,7 +183,7 @@ function Dots({ x, label }: { x: number; label: string }) {
   );
 }
 
-function rarity(response: SurnameResultResponse, lang: Lang): DeckCard | null {
+function rarity(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section = response.rarity;
   if (section?.state !== "READY") return null;
@@ -249,7 +247,7 @@ function Ladder({ list, lang }: { list: NeighbourList; lang: Lang }) {
   );
 }
 
-function neighbours(response: SurnameResultResponse, lang: Lang): DeckCard | null {
+function neighbours(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section = response.neighbours;
   if (section?.state !== "READY" || section.lists.length === 0) return null;
@@ -306,7 +304,7 @@ function neighbours(response: SurnameResultResponse, lang: Lang): DeckCard | nul
   };
 }
 
-function where(response: SurnameResultResponse, lang: Lang): DeckCard | null {
+function where(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section = response.distribution;
   if (section?.state !== "READY") return null;
@@ -412,7 +410,7 @@ function ChangeLine({ entry, lang }: { entry: ChangeEntry; lang: Lang }) {
   );
 }
 
-function change(response: SurnameResultResponse, lang: Lang): DeckCard | null {
+function change(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section = response.change;
   if (section?.state !== "READY") return null;
@@ -460,7 +458,7 @@ function change(response: SurnameResultResponse, lang: Lang): DeckCard | null {
   };
 }
 
-function otherForm(response: SurnameResultResponse, surname: string, lang: Lang): DeckCard | null {
+function otherForm(response: SurnameResultResponse, surname: string, lang: Lang): CardFace | null {
   const t = UI[lang];
   const other: OtherForm | null = response.other_form;
   if (other === null) return null;
@@ -500,7 +498,7 @@ function otherForm(response: SurnameResultResponse, surname: string, lang: Lang)
   };
 }
 
-function meaning(response: SurnameResultResponse, lang: Lang): DeckCard | null {
+function meaning(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section = response.meaning;
   if (section?.state !== "AVAILABLE") return null;
@@ -537,7 +535,7 @@ function archiveYear(date: string | null): string | null {
   return /\b(1[0-9]{3}|20[0-9]{2})\b/u.exec(date ?? "")?.[1] ?? null;
 }
 
-function print(archive: ArchiveSection, lang: Lang): DeckCard | null {
+function print(archive: ArchiveSection, lang: Lang): CardFace | null {
   const t = UI[lang];
   if (archive.state !== "READY" || archive.pages === null || archive.pages === 0) return null;
   if (archive.searched_on === null) return null;
@@ -594,7 +592,7 @@ function print(archive: ArchiveSection, lang: Lang): DeckCard | null {
   };
 }
 
-function catalogue(archive: ArchiveSection, lang: Lang): DeckCard | null {
+function catalogue(archive: ArchiveSection, lang: Lang): CardFace | null {
   const t = UI[lang];
   if (archive.state !== "READY" || archive.catalogue_records === null) return null;
   if (archive.searched_on === null) return null;
@@ -635,7 +633,7 @@ function end(
   surname: string,
   links: DeckLinks,
   lang: Lang,
-): DeckCard {
+): CardFace {
   const t = UI[lang];
   const cells: { k: string; v: string }[] = [];
   if (response.population?.state === "READY") {
@@ -706,97 +704,6 @@ function end(
   };
 }
 
-type Side = "male" | "female";
-
-function sideOf(group: string | null): Side | null {
-  if (group === null) return null;
-  if (group.endsWith("_female")) return "female";
-  if (group.endsWith("_male")) return "male";
-  return null;
-}
-
-/**
- * The list that holds most of the surname's people: KOWALSKA's is the women's
- * (67,308 against 3 men), KOWALSKI's the men's. Null when nothing says.
- */
-export function mainSide(response: SurnameResultResponse): Side | null {
-  const counts =
-    response.population?.state === "READY"
-      ? response.population.observations.map((o) => ({
-          side: sideOf(o.comparability_group),
-          n: o.value.value ?? 0,
-        }))
-      : [];
-  const best = [...counts].sort((a, b) => b.n - a.n)[0];
-  return best === undefined || best.n === 0 ? null : best.side;
-}
-
-/** Stable: the main list's items first, everything else in its order. */
-function mainFirst<T>(
-  items: readonly T[],
-  side: Side | null,
-  sideOfItem: (item: T) => Side | null,
-): T[] {
-  if (side === null) return [...items];
-  return [
-    ...items.filter((i) => sideOfItem(i) === side),
-    ...items.filter((i) => sideOfItem(i) !== side),
-  ];
-}
-
-/**
- * The same response with each section's lists in the deck's order: the main
- * list first, so a card leads with the list the surname mostly lives on. The
- * page keeps the contract's order; nothing is dropped or changed.
- */
-function inDeckOrder(response: SurnameResultResponse): SurnameResultResponse {
-  const side = mainSide(response);
-  if (side === null) return response;
-  const { population, rarity, neighbours, distribution, change } = response;
-  return {
-    ...response,
-    population:
-      population === null
-        ? null
-        : {
-            ...population,
-            observations: mainFirst(population.observations, side, (o) =>
-              sideOf(o.comparability_group),
-            ),
-          },
-    rarity:
-      rarity === null
-        ? null
-        : {
-            ...rarity,
-            entries: mainFirst(rarity.entries, side, (e) => sideOf(e.comparability_group)),
-          },
-    neighbours:
-      neighbours === null
-        ? null
-        : {
-            ...neighbours,
-            lists: mainFirst(neighbours.lists, side, (l) => sideOf(l.comparability_group)),
-          },
-    distribution:
-      distribution === null
-        ? null
-        : {
-            ...distribution,
-            entries: mainFirst(distribution.entries, side, (e) => sideOf(e.comparability_group)),
-          },
-    change:
-      change === null
-        ? null
-        : {
-            ...change,
-            entries: mainFirst(change.entries, side, (e) =>
-              e.list === "MALE" ? "male" : "female",
-            ),
-          },
-  };
-}
-
 /**
  * The cards for a resolved surname, in ADR-0025 §2.3's order: the surname,
  * rarity, neighbours, where, change, the other form, meaning, old print,
@@ -820,5 +727,15 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
     archive === null ? null : catalogue(archive, lang),
     end(response, surname, links, lang),
   ];
-  return cards.filter((card): card is DeckCard => card !== null);
+  // Each card shares its own image, or the summary where it has none (TASK-056).
+  const shareOf = (key: string): string | null => {
+    const own = shareCardFor(key);
+    if (shareFacts(given, own, lang) !== null) return shareCardPath(links.path, own, lang);
+    return shareFacts(given, "summary", lang) === null
+      ? null
+      : shareCardPath(links.path, "summary", lang);
+  };
+  return cards
+    .filter((card): card is CardFace => card !== null)
+    .map((card) => ({ ...card, share: shareOf(card.key) }));
 }

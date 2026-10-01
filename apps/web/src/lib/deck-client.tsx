@@ -37,9 +37,19 @@ interface KeyLike {
   readonly metaKey: boolean;
   preventDefault(): void;
 }
+interface AnchorLike {
+  href: string;
+  download: string;
+  click(): void;
+  remove(): void;
+}
 declare const document:
   | {
-      readonly body: ElementLike & { readonly children: ArrayLike<ElementLike> };
+      readonly body: ElementLike & {
+        readonly children: ArrayLike<ElementLike>;
+        appendChild(node: AnchorLike): void;
+      };
+      createElement(tag: "a"): AnchorLike;
       readonly documentElement: {
         setAttribute(name: string, value: string): void;
         removeAttribute(name: string): void;
@@ -55,6 +65,13 @@ declare const window:
 declare const history:
   { replaceState(data: unknown, unused: string, url: string): void } | undefined;
 declare const location: { readonly href: string } | undefined;
+/** Web Share with files (TASK-056); absent or partial in many browsers, so every member is optional. */
+declare const navigator:
+  | {
+      readonly canShare?: (data: { files: readonly unknown[] }) => boolean;
+      readonly share?: (data: { files?: readonly unknown[]; title?: string }) => Promise<void>;
+    }
+  | undefined;
 
 interface PointerLike {
   readonly pointerId: number;
@@ -69,6 +86,8 @@ export interface DeckFace {
   readonly title: string;
   readonly paper?: boolean;
   readonly face: ReactNode;
+  /** The card's share image (TASK-056), or null. */
+  readonly share: string | null;
 }
 
 export interface DeckLabels {
@@ -81,6 +100,8 @@ export interface DeckLabels {
   readonly next: string;
   readonly hintKeys: string;
   readonly hintTouch: string;
+  readonly share: string;
+  readonly sharing: string;
 }
 
 /** `<html data-deck>` while the deck is open: the page behind stops scrolling (`globals.css`). */
@@ -100,6 +121,23 @@ function addressWith(open: boolean): string | null {
 }
 
 const two = (n: number) => String(n).padStart(2, "0");
+
+/**
+ * A file name browsers keep: Chromium drops a download name with letters such as
+ * "ą" and saves "download" instead (checked 2026-10-01), so the surname is
+ * folded to ASCII, ł included, which Unicode does not decompose.
+ */
+export function fileStem(surname: string): string {
+  return (
+    surname
+      .toLocaleLowerCase("pl")
+      .replace(/ł/gu, "l")
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .replace(/[^a-z0-9]+/gu, "-")
+      .replace(/^-+|-+$/gu, "") || "name-atlas"
+  );
+}
 
 /** Nothing outside changes whether this is the client, so there is nothing to subscribe to. */
 const subscribeNever = () => () => undefined;
@@ -127,6 +165,41 @@ export function SurnameDeck({
   const cardEls = useRef<(HTMLElement | null)[]>([]);
   const drag = useRef<{ x: number; dx: number; moved: boolean; el: ElementLike } | null>(null);
   const suppressClick = useRef(false);
+  const [sharing, setSharing] = useState(false);
+
+  /**
+   * Shares the card in view as an image: the system share sheet where the
+   * browser can share files (most phones), a download everywhere else.
+   */
+  async function shareCard(url: string, key: string): Promise<void> {
+    setSharing(true);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) return;
+      const blob = await response.blob();
+      const name = `${fileStem(surname)}-${url.split("/").pop() ?? key}.png`;
+      const file = new File([blob], name, { type: "image/png" });
+      if (navigator?.share !== undefined && navigator.canShare?.({ files: [file] }) === true) {
+        try {
+          await navigator.share({ files: [file], title: surname });
+        } catch {
+          // Cancelled by the reader: nothing to do.
+        }
+        return;
+      }
+      if (document === undefined) return;
+      const link = document.createElement("a");
+      const objectUrl = URL.createObjectURL(blob);
+      link.href = objectUrl;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
+    } finally {
+      setSharing(false);
+    }
+  }
   /** Whether the deck has been open: focus returns to the button only after a close. */
   const wasOpen = useRef(false);
   const last = cards.length - 1;
@@ -291,6 +364,16 @@ export function SurnameDeck({
             <li key={card.key} className={i <= at ? "done" : undefined} />
           ))}
         </ol>
+        {current?.share == null ? null : (
+          <button
+            type="button"
+            className="deck-share"
+            onClick={() => void shareCard(current.share as string, current.key)}
+            disabled={sharing}
+          >
+            <span aria-hidden="true">↗</span> {sharing ? labels.sharing : labels.share}
+          </button>
+        )}
         <button type="button" className="deck-full" onClick={close}>
           {labels.close} <span aria-hidden="true">↓</span>
         </button>

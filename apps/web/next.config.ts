@@ -65,6 +65,9 @@ const nextConfig: NextConfig = {
    */
   outputFileTracingIncludes: {
     "/**/opengraph-image": ["./assets/fonts/*.ttf"],
+    // The share cards (TASK-056) read the same files.
+    "/pl/nazwisko/**/karta/**": ["./assets/fonts/*.ttf"],
+    "/en/surname/**/card/**": ["./assets/fonts/*.ttf"],
   },
   /**
    * The security headers (TASK-048) on every path: pages, the API and the share

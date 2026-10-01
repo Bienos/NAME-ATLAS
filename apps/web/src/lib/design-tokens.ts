@@ -83,6 +83,18 @@ export const TOKENS = {
   "dusk-map-3": "#e9a24f",
   "dusk-map-4": "#fcd27a",
   "dusk-map-no-data": "#2a1424",
+  // The share cards (TASK-056): tiles and track on the dusk, and the old-print card's paper.
+  "dusk-tile": "#fffaf314",
+  "dusk-tile-line": "#fffaf326",
+  "dusk-track": "#fffaf340",
+  "dusk-amber-wash": "#fcbf5b26",
+  paper: "#f6ead4",
+  "paper-deep": "#e6cfa8",
+  "paper-ink": "#2a1610",
+  "paper-ink-soft": "#4a3226",
+  "paper-ink-muted": "#6d5544",
+  "paper-accent": "#9a4f17",
+  "paper-line": "#2a16102e",
 
   // Shape and space
   "radius-xs": "2px",

@@ -57,7 +57,8 @@ export const FONT_FILES = [
 let fonts: Promise<BrandFont[]> | null = null;
 let warned = false;
 
-function loadFonts(): Promise<BrandFont[]> {
+/** The brand fonts, read once per process; empty when the files are missing. Shared by the share cards (TASK-056). */
+export function loadFonts(): Promise<BrandFont[]> {
   fonts ??= Promise.all(
     FONT_FILES.map(async (f) => ({
       name: f.name,
