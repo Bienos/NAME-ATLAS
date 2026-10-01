@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/next";
+import { SiteAnalytics } from "../lib/site-analytics.js";
 import "./globals.css";
 
 /**
@@ -66,14 +66,15 @@ export const metadata: Metadata = {
 /**
  * Every page renders in the dusk scope (ADR-0021): the body carries `.dusk`,
  * which re-points the system's token names at the dusk values, and each page
- * draws its own world behind it (`site-shell.tsx`).
+ * draws its own world behind it (`site-shell.tsx`). Vercel Web Analytics (#58)
+ * follows the page, with the surname kept out of its events (TASK-058).
  */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pl" className={`${display.variable} ${ui.variable} ${data.variable}`}>
       <body className="dusk">
         {children}
-        <Analytics />
+        <SiteAnalytics />
       </body>
     </html>
   );
