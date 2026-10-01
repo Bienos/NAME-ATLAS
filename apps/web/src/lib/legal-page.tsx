@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SiteShell } from "./site-shell.js";
-import { LEGAL_UPDATED, legalDocument, legalPath } from "./legal-text.js";
+import { accountsEnabled } from "./accounts-config.js";
+import { legalDocument, legalPath, legalUpdated } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
 
 /**
  * `/pl/prywatnosc`, `/en/privacy`, `/pl/regulamin`, `/en/terms` (TASK-046).
- * Static: the text is in `legal-text.ts`; no database, no request data.
+ * Static: the text is in `legal-text.ts`; no database, no request data. When
+ * accounts are on (`accounts-config.ts`, read at build) it says so
+ * (`legal-accounts.ts`), and its date is the accounts variant's.
  */
 
 export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
@@ -21,7 +24,9 @@ export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
 }
 
 export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly lang: Lang }) {
-  const doc = legalDocument(kind, lang);
+  const accounts = accountsEnabled();
+  const doc = legalDocument(kind, lang, accounts);
+  const updated = legalUpdated(kind, accounts);
   const other: Lang = lang === "pl" ? "en" : "pl";
   return (
     <SiteShell
@@ -32,8 +37,7 @@ export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly l
     >
       <h2>{doc.title}</h2>
       <p className="legal-updated">
-        {doc.updatedLabel}:{" "}
-        <time dateTime={LEGAL_UPDATED[kind]}>{formatDate(LEGAL_UPDATED[kind], lang)}</time>
+        {doc.updatedLabel}: <time dateTime={updated}>{formatDate(updated, lang)}</time>
       </p>
       {doc.sections.map((section) => (
         <section key={section.heading}>

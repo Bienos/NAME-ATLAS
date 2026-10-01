@@ -725,6 +725,7 @@ export const UI = {
     navCompare: "Porównaj",
     navHow: "Jak to działa",
     navOffer: "Oferta",
+    navAccount: "Konto",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "Więcej: Twoja rodzina i DNA",
     // The footer's blog and social links (TASK-057).
@@ -1262,6 +1263,7 @@ export const UI = {
     navCompare: "Compare",
     navHow: "How it works",
     navOffer: "Offer",
+    navAccount: "Account",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "More: your family and DNA",
     // The footer's blog and social links (TASK-057).

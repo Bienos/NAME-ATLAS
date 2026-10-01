@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@name-atlas/accounts": "workspace:*",
     "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
     "@name-atlas/logging": "workspace:*",

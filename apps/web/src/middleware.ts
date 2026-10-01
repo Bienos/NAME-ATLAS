@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { clientKey, evictExpired, rateLimit } from "./lib/rate-limit.js";
-import type { RateLimitPolicy, RateLimitStore } from "./lib/rate-limit.js";
+import type { RateLimitStore } from "./lib/rate-limit.js";
+import { LONGEST_WINDOW_MS, policyFor } from "./lib/request-policy.js";
 
 /**
  * Request rate limiting (TASK-029).
@@ -23,21 +24,6 @@ import type { RateLimitPolicy, RateLimitStore } from "./lib/rate-limit.js";
  * a database connection.
  */
 
-/** Pages: generous, because a reader clicking around must never hit this. */
-const PAGE_POLICY: RateLimitPolicy = { limit: 60, windowMs: 60_000 };
-
-/** The JSON API: tighter, because it is a machine surface with no reader behind it. */
-const API_POLICY: RateLimitPolicy = { limit: 30, windowMs: 60_000 };
-
-/**
- * Suggest-as-you-type has a reader behind it and fires as they type — a few
- * requests per surname even with the client's pause between keystrokes. Its own
- * bucket (the key carries the limit), so typing can never starve the other API
- * routes, and a ceiling that still bounds one client to two queries a second.
- */
-const PREFIX_POLICY: RateLimitPolicy = { limit: 120, windowMs: 60_000 };
-const PREFIX_PATH = "/api/v1/surname-prefix";
-
 // Module scope, so it is shared across the invocations one instance serves.
 const store: RateLimitStore = new Map();
 
@@ -46,26 +32,14 @@ const EVICT_EVERY_MS = 60_000;
 
 export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
-  const policy =
-    pathname === PREFIX_PATH
-      ? PREFIX_POLICY
-      : pathname.startsWith("/api/")
-        ? API_POLICY
-        : PAGE_POLICY;
+  const policy = policyFor(pathname);
   const now = Date.now();
 
   // Opportunistic: keeps the map from growing by one entry per stranger, with
   // no timer to own and nothing to shut down.
   if (now - lastEviction > EVICT_EVERY_MS) {
     lastEviction = now;
-    evictExpired(
-      store,
-      {
-        limit: 0,
-        windowMs: Math.max(PAGE_POLICY.windowMs, API_POLICY.windowMs, PREFIX_POLICY.windowMs),
-      },
-      now,
-    );
+    evictExpired(store, { limit: 0, windowMs: LONGEST_WINDOW_MS }, now);
   }
 
   const decision = rateLimit(store, `${policy.limit}:${clientKey(request.headers)}`, policy, now);

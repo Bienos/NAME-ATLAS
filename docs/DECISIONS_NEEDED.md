@@ -8,6 +8,32 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-026 — the product's name and domain
+
+**Status:** NON-BLOCKING NOW. It blocks the sending domain for account mail (a Resend domain must be verified) and any rename of the site.
+**Owner:** project owner.
+**Raised by:** TASK-062's session, 2026-10-01, at the owner's request ("buy domena or find me better name for this tool", then "a name that works best for [a] global audience as well"). The owner chose to **buy nothing yet**.
+
+Facts, checked 2026-10-01 through Vercel's registrar and by fetching the pages:
+
+- **"Name Atlas" has no domain.** `nameatlas.com`, `.app`, `.io`, `.pl` and `.eu` are all registered. `nameatlas.app` serves another live site titled "Name Atlas" ("Find names you didn't know how to search for"), so the English name also collides with a running product.
+- **Vercel cannot register `.pl`** (`tld_not_supported`). The owner's `.pl` domains on the team (`gdziekibel.pl`, `gdziewc.pl`, `meal-prep.pl`) are registered elsewhere (`home.pl` nameservers). A `.pl` name has to be bought there by the owner.
+- **Polish-only names are out** (the owner wants a name that works globally). `atlasnazwisk.pl`, `skadnazwisko.pl`, `ilunas.pl`, `rodowy.pl` and `nazwik.pl` are taken.
+- **Free as `.com` and `.app` on Vercel, 2026-10-01** ($11.25 a year for `.com`; $14.99 the first year for `.app`, renewing at $15; none premium): `namewhere`, `surnamia`, `atlasofsurnames`, `onomatlas`, `namekith`, `surnamelore`. **Free as `.app` only** (the `.com` is taken): `namelore`, `nameprint`, `namemap`, `namepath`, `namefolk`, `namevine`, `rootname`, `surnamely`, `kinname`. **Taken as both:** `namesake`, `onoma`, `kinmap`, `kinatlas`, `namekin`, `nomina`, `nameroots`; `nomen.app` is taken too (its `.com` was not checked).
+- A web search found no existing product under `Surnamia`, `Namewhere`, `Onomatlas`, `Surnamelore` or `Namekith`. **That is not a trademark search**, and handles on Instagram, TikTok and YouTube were not checked.
+
+The assistant's recommendation, not a decision: **Namewhere** (`namewhere.com`): plain English, spelled as it sounds, and not tied to surnames, so first names and the tree fit under it. The alternative is **Surnamia** (`surnamia.com`): a coined, ownable name, but locked to surnames while first names are next on the owner's list.
+
+To decide:
+
+1. a name, or to keep "Name Atlas" and accept it has no domain;
+2. which domains to buy (the `.com` alone is $11.25 a year), and whether to add a `.pl` bought at `home.pl`;
+3. the sending domain for account mail, which Resend must verify (SPF and DKIM).
+
+A rename is its own task: it touches the copy, the share cards, the legal text, the mail text and the metadata.
+
+---
+
 ## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
 
 **Status:** NON-BLOCKING NOW. It blocks the checkout task, not the offer page.

@@ -1,10 +1,12 @@
+import { accountPath } from "./account-paths.js";
+import { accountsEnabled } from "./accounts-config.js";
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { atlasPath, comparePagePath, homePath, howPath, offerPath } from "./site-links.js";
 import { SearchForm } from "./search-form.js";
 
 /** Which of the header's places the page is, for `aria-current`. */
-export type NavPlace = "atlas" | "compare" | "how" | "offer" | null;
+export type NavPlace = "atlas" | "compare" | "how" | "offer" | "account" | null;
 
 function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
   const t = UI[lang];
@@ -13,6 +15,10 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
     ["compare", comparePagePath(lang), t.navCompare],
     ["how", howPath(lang), t.navHow],
     ["offer", offerPath(lang), t.navOffer],
+    // Only when accounts exist (TASK-062): read at render, so a static page bakes it at build.
+    ...(accountsEnabled()
+      ? ([["account", accountPath(lang, "account"), t.navAccount]] as const)
+      : []),
   ];
   return (
     <>

@@ -4392,6 +4392,58 @@ body.dusk {
   margin: 0;
 }
 
+/* The account's pages (TASK-062): the offer's form, with the messages and the
+   checkbox it did not need. */
+.account section {
+  max-width: 34rem;
+}
+
+.account-status {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  color: var(--dusk-ink);
+  background: var(--dusk-surface-sunk);
+  border-left: 3px solid var(--dusk-line-control);
+  border-radius: 4px;
+}
+
+.account-status-problem {
+  border-left-color: var(--dusk-amber);
+}
+
+.reading.account section h3 {
+  margin-top: var(--space-7);
+}
+
+.account-form small {
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-soft);
+}
+
+.offer-form .account-check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.offer-form .account-check input {
+  flex: none;
+  width: 1.25rem;
+  min-height: 1.25rem;
+  margin-top: 0.125rem;
+}
+
+.account-links {
+  margin: var(--space-4) 0 0;
+  font-size: 0.9375rem;
+}
+
+.account .offer-send.account-danger {
+  color: var(--dusk-ink);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+}
+
 .offer-small {
   max-width: 46rem;
   margin-top: var(--space-7);
