@@ -19,6 +19,7 @@ import { DuskZoom } from "../lib/dusk-zoom.js";
 import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
 import { SiteShell } from "../lib/site-shell.js";
+import { LandingCompare, LandingHow } from "../lib/landing-sections.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -256,12 +257,31 @@ export default async function HomePage({ searchParams }: PageProps) {
           <SearchForm lang={lang} query={query} />
           {/* Empty until a search leaves the page: `dusk-zoom.tsx` fills it
               from `data-text`, so nothing is announced before it is true. */}
-          <p className="landing-status" aria-live="polite" data-text={t.landingSearching} />
+          <p
+            className="landing-status visually-hidden"
+            aria-live="polite"
+            data-text={t.landingSearching}
+          />
+          {/* The journey's analysis screen (TASK-053): the typed surname and
+              the parts of the answer the one request reads, shown while the
+              camera comes down. Nothing is ticked off and there is no
+              progress bar: the request does all of it at once. The status
+              line above is what assistive technology hears. */}
+          <div className="landing-analysis" aria-hidden="true" hidden>
+            <p className="analysis-name" />
+            <ul className="analysis-steps">
+              {t.analysisSteps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ul>
+          </div>
           <p className="landing-trust">{t.landingTrust}</p>
         </section>
         <div id="atlas" className="landing-atlas">
           <CommonSurnames lists={common} lang={lang} />
           <ListAtlas facts={atlas} lang={lang} />
+          <LandingHow lang={lang} />
+          <LandingCompare lang={lang} />
         </div>
       </SiteShell>
     );

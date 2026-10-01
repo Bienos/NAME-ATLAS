@@ -3596,14 +3596,17 @@ body.dusk {
   fill-opacity: 0.2;
 }
 
-/* On an answer the map is atmosphere at the side; the chapter's own
-   choropleth and table carry the figures. Past the first screen it steps back
-   (`dusk-world.tsx`), so the chapters never read over two maps. */
+/* On an answer the map is atmosphere pinned at the side (TASK-053): it stays
+   beside the screens whose figures sit in a narrow column, and steps back on
+   the screen that brings its own map and table and on the full-width ones, so
+   no chapter is read over two maps. `dusk-world.tsx` names the screen in view. */
 .dusk-world-journey .dusk-map {
   opacity: 0.75;
 }
 
-.dusk-world-journey.is-past .dusk-map {
+.dusk-world-journey[data-step="where"] .dusk-map,
+.dusk-world-journey[data-step="sources"] .dusk-map,
+.dusk-world-journey[data-step="summary"] .dusk-map {
   opacity: 0.14;
 }
 
@@ -3637,7 +3640,7 @@ body.dusk {
   }
 
   /* The hero's words step aside as the camera comes down; the status line stays. */
-  :root[data-dusk-zoom] .landing-stage > :not(.landing-status),
+  :root[data-dusk-zoom] .landing-stage > :not(.landing-status, .landing-analysis),
   :root[data-dusk-zoom] .landing-atlas {
     opacity: 0;
     transform: translateY(-8px);
@@ -3973,6 +3976,10 @@ body.dusk {
   margin-inline: calc(var(--gutter) * -1);
   padding: var(--space-9) var(--gutter) var(--space-8);
   background: var(--dusk-surface);
+  /* The ground runs to the window's edges however wide it is, without a
+     horizontal scrollbar: a shadow spread past the box, clipped to its rows. */
+  box-shadow: 0 0 0 100vmax var(--dusk-surface);
+  clip-path: inset(0 -100vmax);
   scroll-margin-top: var(--space-5);
 }
 
@@ -4101,7 +4108,8 @@ body.dusk {
 .site-journey .result section.chapter {
   min-height: 100svh;
   grid-template-columns: minmax(0, 40rem);
-  align-content: start;
+  /* The question, the answer, then the link to the next step at the foot. */
+  grid-template-rows: auto auto 1fr;
 }
 
 .site-journey .result section.chapter-wide {
@@ -4248,6 +4256,341 @@ body.dusk {
   border-top: 1px solid var(--dusk-line);
 }
 
+/* --- the journey (TASK-053) --- */
+
+/* The analysis screen: the typed surname over the parts of the answer the one
+   request reads. Shown by `dusk-zoom.tsx`; nothing is ticked off. */
+.landing-stage {
+  position: relative;
+}
+
+.landing-analysis {
+  position: absolute;
+  inset-inline: 0 auto;
+  top: clamp(var(--space-8), 12vh, 8rem);
+  display: grid;
+  gap: var(--space-6);
+  width: min(34rem, 100%);
+}
+
+.landing-analysis[hidden] {
+  display: none;
+}
+
+.analysis-name {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+  overflow-wrap: anywhere;
+}
+
+.analysis-steps {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.1875rem;
+  color: var(--dusk-ink-soft);
+}
+
+.analysis-steps li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--dusk-line);
+}
+
+.analysis-steps li::after {
+  content: "•••";
+  flex: none;
+  letter-spacing: 0.2em;
+  color: var(--dusk-amber);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-analysis {
+    animation: dusk-rise 0.45s ease both 0.15s;
+  }
+
+  .analysis-steps li::after {
+    animation: analysis-pulse 1.2s ease-in-out infinite;
+  }
+
+  .analysis-steps li:nth-child(2)::after {
+    animation-delay: 0.2s;
+  }
+
+  .analysis-steps li:nth-child(3)::after {
+    animation-delay: 0.4s;
+  }
+
+  .analysis-steps li:nth-child(4)::after {
+    animation-delay: 0.6s;
+  }
+}
+
+@keyframes analysis-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Each step ends on the question the next one answers. */
+.chapter-next {
+  grid-column: 1 / -1;
+  align-self: end;
+  margin: var(--space-7) 0 0;
+}
+
+.chapter-next a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.25rem, 1.05rem + 0.8vw, 1.625rem);
+  font-weight: 500;
+  color: var(--dusk-amber);
+  text-decoration: none;
+}
+
+.chapter-next a:hover {
+  color: var(--dusk-amber-hover);
+}
+
+.chapter-next a::after {
+  content: "";
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  margin-top: -0.3em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* The first screen keeps its question at its foot. */
+.site-journey .snapshot {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-journey .snapshot > .tally {
+  align-self: flex-start;
+}
+
+.site-journey .snapshot > .chapter-next {
+  align-self: flex-start;
+  margin-top: auto;
+  padding-top: var(--space-7);
+}
+
+/* The evidence is a step too: its question is set as large as the chapters'. */
+.site-journey .result section.sources-section {
+  scroll-margin-top: var(--space-9);
+}
+
+.site-journey .result section.sources-section > h3 {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dusk-ink);
+}
+
+/* The last screen: the share card, to share or save, then where next. */
+.site-journey .summary {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--space-5);
+  min-height: 100svh;
+  padding-block: var(--space-9);
+  scroll-margin-top: var(--space-5);
+}
+
+.site-journey .summary > h3 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dusk-ink);
+}
+
+.summary-lede {
+  max-width: 40ch;
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--dusk-ink-soft);
+}
+
+.summary-card {
+  display: block;
+  width: min(100%, 40rem);
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--radius-md);
+  box-shadow: 0 24px 60px -32px var(--dusk-amber);
+}
+
+/* Share and save side by side; the link to copy by hand and the share's
+   status line under them. */
+.summary-share {
+  display: grid;
+  grid-template-areas:
+    "share save"
+    "url url"
+    "status status";
+  justify-content: start;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.site-journey .summary .share {
+  display: contents;
+}
+
+.site-journey .summary .share button {
+  grid-area: share;
+}
+
+.site-journey .summary .share-url {
+  grid-area: url;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.site-journey .summary .share-status {
+  grid-area: status;
+  margin: 0;
+}
+
+.site-journey .summary .again {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* The gap spaces them; the inline margin would indent a wrapped second pill. */
+.site-journey .summary .again a + a {
+  margin-left: 0;
+}
+
+.site-journey .summary .share button {
+  color: var(--dusk-on-amber);
+  background: var(--dusk-shell);
+  border-color: var(--dusk-shell);
+}
+
+.site-journey .summary .share button:hover {
+  background: var(--dusk-ink);
+  border-color: var(--dusk-ink);
+}
+
+.save-image {
+  grid-area: save;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-6);
+  font-weight: 600;
+  color: var(--dusk-ink);
+  text-decoration: none;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.dusk a.save-image {
+  color: var(--dusk-ink);
+}
+
+.save-image:hover {
+  border-color: var(--dusk-ink);
+}
+
+/* The landing's last two sections, on the atlas's ground. */
+.landing-how,
+.landing-compare {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: var(--space-9);
+}
+
+.landing-how > h2,
+.landing-compare > h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--dusk-ink);
+}
+
+.landing-how ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: landing-how;
+}
+
+.landing-how li {
+  padding-top: var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  line-height: 1.25;
+  color: var(--dusk-ink);
+  border-top: 1px solid var(--dusk-line);
+  counter-increment: landing-how;
+}
+
+.landing-how li::before {
+  content: counter(landing-how, decimal-leading-zero);
+  display: block;
+  margin-bottom: var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  color: var(--dusk-amber);
+}
+
+.landing-more {
+  margin: 0;
+}
+
+.landing-compare > p {
+  max-width: 46ch;
+  margin: 0;
+  color: var(--dusk-ink-soft);
+}
+
+.landing-compare .compare-form {
+  margin-top: 0;
+}
+
+/* Under the landing's atlas the footer keeps the same ground, so the lit
+   horizon fixed behind the page never shows through its text. */
+.site-hero > footer {
+  position: relative;
+  background: var(--dusk-surface);
+  box-shadow: 0 0 0 100vmax var(--dusk-surface);
+  clip-path: inset(0 -100vmax);
+}
+
 /* --- phones --- */
 
 @media (max-width: 760px) {
@@ -4323,10 +4666,24 @@ body.dusk {
   }
 
   .site-journey .snapshot {
+    min-height: calc(100svh - 9rem);
+  }
+
+  /* One step per screen (TASK-053); a chapter that only states an absence
+     stays short. */
+  .site-journey .result section.chapter {
+    min-height: 100svh;
+  }
+
+  .site-journey .result section.chapter-empty {
     min-height: 0;
   }
 
-  .site-journey .result section.chapter {
-    min-height: 0;
+  .landing-analysis {
+    top: var(--space-6);
+  }
+
+  .analysis-steps {
+    font-size: 1.0625rem;
   }
 }

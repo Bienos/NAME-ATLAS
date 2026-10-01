@@ -91,6 +91,15 @@ export type Intent = "default" | NonNullable<Section["intent"]>;
 /** The evidence at the foot of the page (ADR-0012). Always last; no intent moves it. */
 export const SOURCES_ANCHOR = "sources";
 
+/** The page's first screen, the snapshot, before the chapters. */
+export const SNAPSHOT_ANCHOR = "today";
+
+/**
+ * The surname page's last screen, after the sources (TASK-053): the share card,
+ * to share or save, then where to go next.
+ */
+export const SUMMARY_ANCHOR = "summary";
+
 export function sectionOf(key: SectionKey): Section {
   const section = SECTIONS.find((entry) => entry.key === key);
   if (section === undefined) {

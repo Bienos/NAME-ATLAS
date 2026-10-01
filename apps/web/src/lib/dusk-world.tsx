@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { TOKENS } from "./design-tokens.js";
 import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
+import { SECTIONS, SNAPSHOT_ANCHOR, SOURCES_ANCHOR, SUMMARY_ANCHOR } from "./sections.js";
 
 /**
  * The browser members this island uses, declared rather than widening the
@@ -29,7 +30,15 @@ interface CanvasLike {
   height: number;
   getContext(kind: "2d", options?: { willReadFrequently?: boolean }): Context2DLike | null;
 }
-declare const document: { createElement(tag: "canvas"): CanvasLike } | undefined;
+interface StepElementLike {
+  getBoundingClientRect(): { readonly top: number };
+}
+declare const document:
+  | {
+      createElement(tag: "canvas"): CanvasLike;
+      getElementById(id: string): StepElementLike | null;
+    }
+  | undefined;
 declare const window: {
   readonly scrollY: number;
   readonly innerHeight: number;
@@ -39,6 +48,20 @@ declare const window: {
 
 /** How the world is drawn: see `site-shell.tsx`. */
 export type WorldMode = "hero" | "journey" | "quiet";
+
+/**
+ * The journey's screens by element id: the snapshot, the four chapters'
+ * anchors (`sections.ts`), the sources and the summary. An answer that lacks
+ * one simply never reaches it. Which one is being read is decided by where
+ * each sits on the page, so an intent that reorders the chapters is followed.
+ */
+const FIRST_STEP = SNAPSHOT_ANCHOR;
+export const JOURNEY_STEPS: readonly string[] = [
+  FIRST_STEP,
+  ...SECTIONS.map((section) => section.anchor),
+  SOURCES_ANCHOR,
+  SUMMARY_ANCHOR,
+];
 
 /** TERC codes in the alphabetical order of the names, as the map island lists them. */
 const TERC = Object.keys(VOIVODESHIPS).sort();
@@ -231,9 +254,10 @@ export function DuskWorld({
   const dotsRef = useRef<HTMLCanvasElement>(null);
   const rimRef = useRef<HTMLCanvasElement>(null);
   const key = JSON.stringify(weights);
-  // Past the answer's first screen the chapters bring their own map and
-  // table, so the world behind them steps back.
-  const [past, setPast] = useState(false);
+  // Which screen of the journey is in view (TASK-053). The stylesheet keeps
+  // the map beside the steps whose figures sit in a narrow column and steps it
+  // back where a screen brings its own map or runs the full width.
+  const [step, setStep] = useState<string>(FIRST_STEP);
 
   useEffect(() => {
     if (mode === "quiet") return;
@@ -246,7 +270,19 @@ export function DuskWorld({
   useEffect(() => {
     if (mode !== "journey") return;
     const update = () => {
-      setPast(window.scrollY > window.innerHeight * 0.6);
+      // The screen being read: of those whose top has passed 45% of the
+      // window, the one that starts lowest on the page.
+      const line = window.innerHeight * 0.45;
+      let current: string = FIRST_STEP;
+      let best = Number.NEGATIVE_INFINITY;
+      for (const id of JOURNEY_STEPS) {
+        const top = document?.getElementById(id)?.getBoundingClientRect().top;
+        if (top !== undefined && top <= line && top > best) {
+          best = top;
+          current = id;
+        }
+      }
+      setStep(current);
     };
     update();
     window.addEventListener("scroll", update, { passive: true });
@@ -256,7 +292,11 @@ export function DuskWorld({
   }, [mode]);
 
   return (
-    <div className={`dusk-world dusk-world-${mode}${past ? " is-past" : ""}`} aria-hidden="true">
+    <div
+      className={`dusk-world dusk-world-${mode}`}
+      data-step={mode === "journey" ? step : undefined}
+      aria-hidden="true"
+    >
       <div className="dusk-deep" />
       <div className="dusk-sun" />
       <div className="dusk-ground" />
