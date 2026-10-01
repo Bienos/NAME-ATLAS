@@ -1,6 +1,6 @@
 # TASK-051 — Each surname page shows how its count changed across the editions of its list
 
-- **Status:** BUILT 2026-09-30 on `claude/inspiring-bohr-vten7x`, on the merged `main`; awaiting the owner's merge. Not yet run on the VM (AC-7). The record is in `docs/progress/2026-09-30-surname-change-over-time.md`.
+- **Status:** BUILT 2026-09-30 on `claude/inspiring-bohr-vten7x`, on the merged `main`; awaiting the owner's merge. On the VM (AC-7's first sentence): the migration, the batch and the gate ran and passed on 2026-10-01; production showing the chapter is not yet seen. The record is in `docs/progress/2026-09-30-surname-change-over-time.md`.
 - **Requested by:** the project owner, 2026-09-30: "build the change over time section". The same evening: the 2019 lists are living persons.
 - **Milestone:** M2's free profile, extended; it is the first section that reads more than one dated edition. `PLAN.md` has no row for it.
 - **Depends on:** TASK-045 (the fifteen editions in the database and the registry), ADR-0019 (the series and the refusal of the 2022 women's duplicate), ADR-0020 (this task's decision).
