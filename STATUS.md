@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-09-30, by TASK-051, the change-over-time section, and D-021's item 1 (`docs/progress/2026-09-30-surname-change-over-time.md`).
+**Last rewritten:** 2026-10-01, by TASK-051, the change-over-time section, and D-021's item 1 (`docs/progress/2026-09-30-surname-change-over-time.md`), after merging `main` @ `fed0c7c`, whose last change is a wording fix on the contact page (`docs/progress/2026-09-30-contact-page-wording.md`).
 
 ## Production
 
