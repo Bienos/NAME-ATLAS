@@ -59,7 +59,14 @@ function entry(
 
 function response(name: string, entries: unknown[]): SurnameResultResponse {
   return surnameResultResponseSchema.parse({
-    schema_version: "1.9",
+    schema_version: "1.10",
+    neighbours: {
+      state: "UNAVAILABLE",
+      lists: [],
+      reason_code: "NO_COMPLETE_UNIVERSE",
+      surface: SURFACE,
+    },
+    other_form: null,
     change: {
       state: "UNAVAILABLE",
       entries: [],

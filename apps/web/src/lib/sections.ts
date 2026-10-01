@@ -28,6 +28,8 @@ interface SectionEntry {
   readonly key: string;
   /** The field of the result contract that carries this section. */
   readonly field: keyof SurnameResultResponse;
+  /** Further fields this chapter shows, beside its own (TASK-055: rarity's neighbours). */
+  readonly also?: readonly (keyof SurnameResultResponse)[];
   /** The element id, and so the URL fragment. */
   readonly anchor: string;
   /** The `?intent=` value that moves this section first, if one does. */
@@ -52,6 +54,8 @@ export const SECTIONS = [
   {
     key: "rarity",
     field: "rarity",
+    // Read from the same rank claims, on rarity's rights (ADR-0025 §2.4–2.5).
+    also: ["neighbours", "other_form"],
     anchor: "rarity",
     intent: "rarity",
     nav: "navRarity",

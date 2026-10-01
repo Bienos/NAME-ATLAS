@@ -8,7 +8,14 @@ import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { assessIndexability, indexingEnabled } from "./seo.js";
 import { seoGatesFor } from "./seo-surface.js";
 import { currentPathFor, pathForSlug, resolveSlug } from "./slug.js";
-import { formatDate, formatInteger, parseIntent, partitionLabel, UI } from "./messages.js";
+import {
+  formatDate,
+  formatInteger,
+  htmlLang,
+  parseIntent,
+  partitionLabel,
+  UI,
+} from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
 import { Result } from "./result-view.js";
 import { ShareButton } from "./share-button.js";
@@ -17,6 +24,8 @@ import { SiteShell } from "./site-shell.js";
 import { SUMMARY_ANCHOR } from "./sections.js";
 import { comparePagePath } from "./site-links.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
+import { deckCards } from "./deck.js";
+import { SurnameDeck } from "./deck-client.js";
 
 /**
  * The canonical surname page (TASK-024, ADR-0009), shared by
@@ -264,11 +273,14 @@ export function CanonicalSurnamePage({
   slug,
   intent,
   origin,
+  cards = false,
 }: {
   answer: PageAnswer;
   lang: Lang;
   slug: string;
   intent: Intent;
+  /** The search asked for the deck (`?view=cards`, ADR-0025 §2.2). */
+  cards?: boolean;
   /**
    * The absolute origin to build the share URL from — `SITE_ORIGIN`, else the
    * request's own `Host`. `null` withholds the share control, because a
@@ -289,6 +301,8 @@ export function CanonicalSurnamePage({
   // down, the register as points, and the surname's own regional shares — the
   // validated ones the chapter prints — as its light. Nothing else is derived.
   const world = answer.kind === "RESULT" ? worldInput(answer.response) : EMPTY_WORLD;
+  // The deck over the page (TASK-055): the same response, one answer per card.
+  const deck = answer.kind === "RESULT" ? deckCards(answer.response, lang, { path, shareUrl }) : [];
 
   return (
     <SiteShell
@@ -355,6 +369,25 @@ export function CanonicalSurnamePage({
             </p>
             <ReportLink surnames={[answer.display]} pageUrl={shareUrl ?? path} lang={lang} />
           </section>
+          {deck.length === 0 ? null : (
+            <SurnameDeck
+              cards={deck}
+              surname={answer.display}
+              initiallyOpen={cards}
+              lang={htmlLang(lang)}
+              labels={{
+                open: t.deckOpen,
+                close: t.deckClose,
+                label: t.deckLabel,
+                cards: t.deckCards,
+                of: t.deckOf,
+                prev: t.deckPrev,
+                next: t.deckNext,
+                hintKeys: t.deckHintKeys,
+                hintTouch: t.deckHintTouch,
+              }}
+            />
+          )}
         </>
       ) : // `MOVED`. The route answers a permanent redirect before rendering, so
       // this branch exists only to keep the union exhaustive.

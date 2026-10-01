@@ -27,6 +27,9 @@ import type {
   CitationDto,
   DistributionEntry,
   MeaningSection,
+  NeighbourList,
+  NeighboursSection,
+  OtherForm,
   PopulationObservation,
   PopulationSection,
   RarityEntry,
@@ -37,6 +40,7 @@ import type {
 import { Claim } from "./claim.js";
 import type { ClaimEvidence } from "./claim.js";
 import {
+  archiveCategoryLabel,
   archivePeriodLabel,
   archiveSentence,
   assessmentWord,
@@ -50,6 +54,7 @@ import {
   formationWord,
   formatInteger,
   formatPercent,
+  otherFormSentence,
   partitionLabel,
   populationSentence,
   rankSentence,
@@ -185,20 +190,78 @@ function Population({
   );
 }
 
+/**
+ * The surnames two places either side on one list (TASK-055, ADR-0025): read
+ * from the rank claims, in rank order, the surname itself marked. A tie at its
+ * own place is not listed, and the note says that tied counts share a place.
+ */
+function Neighbours({ list, lang }: { list: NeighbourList; lang: Lang }) {
+  const t = UI[lang];
+  return (
+    <figure className="neighbours">
+      <figcaption>{t.neighboursHeading}</figcaption>
+      <ol>
+        {list.entries.map((entry) => {
+          const name = entry.surname.display_name;
+          return (
+            <li
+              key={entry.surname.id}
+              className={entry.is_self ? "is-self" : undefined}
+              aria-current={entry.is_self ? "true" : undefined}
+            >
+              <span className="nb-rank">#{formatInteger(entry.rank, lang)}</span>
+              {entry.is_self ? (
+                <span className="nb-name">
+                  {name} <span className="nb-self">{t.neighboursSelf}</span>
+                </span>
+              ) : (
+                <a className="nb-name" href={href(name, lang)}>
+                  {name}
+                </a>
+              )}
+              <span className="nb-count">{formatInteger(entry.count, lang)}</span>
+            </li>
+          );
+        })}
+      </ol>
+    </figure>
+  );
+}
+
+/** KOWALSKI's KOWALSKA: a form on the other list, never a relation (ADR-0025 §2.5). */
+function OtherFormNote({ other, lang }: { other: OtherForm; lang: Lang }) {
+  const t = UI[lang];
+  return (
+    <div className="other-form">
+      <p className="list-label">{t.otherFormHeading}</p>
+      <p className="other-form-line">
+        <a href={href(other.surname.display_name, lang)}>{other.surname.display_name}</a>
+        {otherFormSentence(other, lang).slice(other.surname.display_name.length)}
+      </p>
+      <p className="note">{t.otherFormNote}</p>
+    </div>
+  );
+}
+
 function Rarity({
   section,
+  neighbours,
+  otherForm,
   surname,
   number,
   next,
   lang,
 }: {
   section: RaritySection;
+  neighbours: NeighboursSection | null;
+  otherForm: OtherForm | null;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
+  const listsOfNeighbours = neighbours?.state === "READY" ? neighbours.lists : [];
   return (
     <Chapter
       chapter="rarity"
@@ -210,44 +273,52 @@ function Rarity({
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
-        <div className="lists">
-          {section.entries.map((entry, index) => {
-            const rank = entry.supporting.find((metric) => metric.metric === "RANK");
-            const rankText = rankSentence(entry, surname, lang);
-            const oneIn = entry.primary.metric === "ONE_IN_X" ? entry.primary.value : null;
-            const x = oneIn === null ? null : formatInteger(oneIn, lang);
-            const figure =
-              x === null ? null : lang === "pl" ? `około 1 na ${x}` : `about 1 in ${x}`;
-            return (
-              <div
-                className="list"
-                key={`${entry.comparability_group ?? "group"}-${String(index)}`}
-              >
-                <ListLabel group={entry.comparability_group} lang={lang} />
-                {oneIn === null || figure === null ? null : (
-                  <>
-                    <p className="figure">{figure}</p>
-                    <RarityScale oneIn={oneIn} figure={figure} lang={lang} />
-                  </>
-                )}
-                {rank === undefined ? null : (
-                  <p className="rank">
-                    <span className="rank-number">#{formatInteger(rank.value, lang)}</span>{" "}
-                    <span className="rank-caption">{t.rankCaption}</span>
-                  </p>
-                )}
-                <Claim
-                  statement={raritySentence(entry, surname, lang)}
-                  evidence={rarityEvidence(entry, lang)}
-                  country_code={entry.country_code}
-                  lang={lang}
+        <>
+          <div className="lists">
+            {section.entries.map((entry, index) => {
+              const near = listsOfNeighbours.find(
+                (list) => list.comparability_group === entry.comparability_group,
+              );
+              const rank = entry.supporting.find((metric) => metric.metric === "RANK");
+              const rankText = rankSentence(entry, surname, lang);
+              const oneIn = entry.primary.metric === "ONE_IN_X" ? entry.primary.value : null;
+              const x = oneIn === null ? null : formatInteger(oneIn, lang);
+              const figure =
+                x === null ? null : lang === "pl" ? `około 1 na ${x}` : `about 1 in ${x}`;
+              return (
+                <div
+                  className="list"
+                  key={`${entry.comparability_group ?? "group"}-${String(index)}`}
                 >
-                  {rankText !== null ? <p className="claim-more">{rankText}</p> : null}
-                </Claim>
-              </div>
-            );
-          })}
-        </div>
+                  <ListLabel group={entry.comparability_group} lang={lang} />
+                  {oneIn === null || figure === null ? null : (
+                    <>
+                      <p className="figure">{figure}</p>
+                      <RarityScale oneIn={oneIn} figure={figure} lang={lang} />
+                    </>
+                  )}
+                  {rank === undefined ? null : (
+                    <p className="rank">
+                      <span className="rank-number">#{formatInteger(rank.value, lang)}</span>{" "}
+                      <span className="rank-caption">{t.rankCaption}</span>
+                    </p>
+                  )}
+                  <Claim
+                    statement={raritySentence(entry, surname, lang)}
+                    evidence={rarityEvidence(entry, lang)}
+                    country_code={entry.country_code}
+                    lang={lang}
+                  >
+                    {rankText !== null ? <p className="claim-more">{rankText}</p> : null}
+                  </Claim>
+                  {near === undefined ? null : <Neighbours list={near} lang={lang} />}
+                </div>
+              );
+            })}
+          </div>
+          {listsOfNeighbours.length > 0 ? <p className="note">{t.neighboursNote}</p> : null}
+          {otherForm === null ? null : <OtherFormNote other={otherForm} lang={lang} />}
+        </>
       )}
     </Chapter>
   );
@@ -669,6 +740,19 @@ function Archive({
           </ol>
         </figure>
       ) : null}
+      {section.catalogue_by_category.length > 0 ? (
+        <div className="archive-places archive-categories">
+          <p className="archive-heading">{t.archiveByCategory}</p>
+          <ul>
+            {section.catalogue_by_category.slice(0, 6).map((category) => (
+              <li key={category.label}>
+                <span>{archiveCategoryLabel(category.label, lang)}</span>
+                <span className="archive-count">{formatInteger(category.count, lang)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
       {section.pages_by_place.length > 0 ? (
         <div className="archive-places">
           <p className="archive-heading">{t.archiveByPlace}</p>
@@ -1001,6 +1085,7 @@ export function Result({
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
     const { population, rarity, distribution, change, meaning, archive } = response;
+    const { neighbours, other_form: otherForm } = response;
     const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
       {
         count:
@@ -1019,7 +1104,15 @@ export function Result({
           rarity === null
             ? null
             : (n, next) => (
-                <Rarity section={rarity} surname={surname} number={n} next={next} lang={lang} />
+                <Rarity
+                  section={rarity}
+                  neighbours={neighbours}
+                  otherForm={otherForm}
+                  surname={surname}
+                  number={n}
+                  next={next}
+                  lang={lang}
+                />
               ),
         map:
           distribution === null

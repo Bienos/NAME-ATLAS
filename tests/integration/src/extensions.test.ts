@@ -75,6 +75,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0023_administrative_memberships",
       "0024_distribution_shift",
       "0025_archive_availability",
+      "0026_rank_neighbours_index",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);

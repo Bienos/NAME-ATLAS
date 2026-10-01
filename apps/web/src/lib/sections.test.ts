@@ -49,7 +49,11 @@ describe("the section registry (TASK-034)", () => {
     const contractSections = Object.keys(surnameResultResponseSchema.shape).filter(
       (field) => !notChapters.has(field),
     );
-    expect(SECTIONS.map((section) => section.field).sort()).toEqual(contractSections.sort());
+    const shown = SECTIONS.flatMap((section) => [
+      section.field,
+      ...("also" in section ? section.also : []),
+    ]);
+    expect(shown.sort()).toEqual(contractSections.sort());
   });
 
   it("has words for every chapter's link, question and reading note, in both languages", () => {

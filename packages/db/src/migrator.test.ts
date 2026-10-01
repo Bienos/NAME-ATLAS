@@ -34,6 +34,7 @@ describe("MIGRATIONS_DIR", () => {
       "0023_administrative_memberships.ts", // TASK-039 — the TERC/SIMC place hierarchy
       "0024_distribution_shift.ts", // TASK-051 / ADR-0020 — SURNAME_DISTRIBUTION_SHIFT
       "0025_archive_availability.ts", // TASK-054 — the ARCHIVE_AVAILABILITY claim type
+      "0026_rank_neighbours_index.ts", // TASK-055 — a surname's neighbours on its list
     ]);
   });
 });
