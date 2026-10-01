@@ -1,0 +1,17 @@
+{
+  "name": "@name-atlas/accounts",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "kysely": "0.29.6"
+  }
+}

@@ -15,6 +15,7 @@ If the Oracle VM, its boot volume or the account is lost, the database can be re
 1. `ops/vm/README.md` "Keeping it": `finalize.sh`, `extras.sh` and `editions.sh` each leave a `pg_dump --format=custom` in `/var/lib/name-atlas/backup/` on the VM. "Restoring any of them has not been tested, and there is no copy off the VM."
 2. The latest dump, after the editions, is 1.7 GB; the database is 17 GB (`docs/progress/2026-09-30-pesel-editions-loaded-on-the-vm.md`).
 3. The data changes only when an import runs; there is no user-written data. A copy after each load, not a nightly one, meets the need today.
+   **Amended 2026-10-01 by ADR-0027:** accounts (an address, a password hash, sessions) are user-written data in schema `accounts` once they are switched on, and a family tree will be. Losing the VM would then lose readers' work, and "nothing writes between imports" stops being true for that schema. Until accounts are on, the sentence above stands. Before the family tree, this task comes first.
 4. Oracle may reclaim an idle Always Free instance and suspend an idle account (`ops/vm/README.md`). A copy in the same Oracle account does not cover account suspension.
 5. `docs/canonical/19` §95: backups encrypted, access-restricted, region-controlled, restore-tested.
 6. Supabase still holds the old seven-surname slice as a rollback. It is not a backup of the register.
