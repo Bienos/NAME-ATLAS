@@ -8,6 +8,7 @@ import {
   LandingOffer,
   LandingPitch,
   LandingTries,
+  Scatter,
   trySearchPath,
 } from "./landing-sections.js";
 import type { LandingExample } from "./landing-sections.js";
@@ -84,7 +85,9 @@ describe("the landing's second screen and offer", () => {
       for (const surname of LANDING_TRIES) {
         // Markup escapes the query's ampersand.
         expect(html).toContain(`href="${trySearchPath(surname, lang).replace("&", "&amp;")}"`);
-        expect(html).toContain(`>${surname}</a>`);
+        // The link is named by the whole surname; its letters are flaps, hidden from readers.
+        expect(html).toContain(`aria-label="${surname}"`);
+        expect(html).toContain(`style="--i:${String(surname.length - 1)}" aria-hidden="true">`);
       }
       expect(html).toContain(UI[lang].landingTry);
     }
@@ -98,7 +101,8 @@ describe("the landing's second screen and offer", () => {
       const html = renderToStaticMarkup(createElement(LandingPitch, { example: null, lang }));
       expect(html).toContain('id="pitch"');
       expect(html).toContain(t.pitchEyebrow);
-      expect(html).toContain(`<h2 id="landing-pitch-heading">${t.pitchHeading}</h2>`);
+      // The heading's text, once and whole, then its letters for the motion.
+      expect(html).toContain(`<span class="visually-hidden">${t.pitchHeading}</span>`);
       expect(t.pitchAnswers).toHaveLength(6);
       for (const [question, answer] of t.pitchAnswers) {
         expect(html).toContain(`<h3>${question}</h3>`);
@@ -124,6 +128,26 @@ describe("the landing's second screen and offer", () => {
     expect(html).toContain("1 na 1 743");
     expect(html).toContain("mazowieckie");
     expect(html).toContain('href="/pl/nazwisko/zaremba?view=cards"');
+  });
+
+  it("keep a scattered text whole for readers, and give each letter a start of its own", () => {
+    const html = renderToStaticMarkup(createElement(Scatter, { text: "Każde nazwisko" }));
+    expect(html).toContain('<span class="visually-hidden">Każde nazwisko</span>');
+    expect(html).toContain('<span class="scatter" aria-hidden="true">');
+    expect(html.match(/class="scatter-word"/gu)).toHaveLength(2);
+    expect(html.match(/class="scatter-letter"/gu)).toHaveLength(13);
+    expect(html).toMatch(/style="--i:0;--dx:[-\d]+px;--dy:[-\d]+px;--r:[-\d]+deg"/u);
+    // The same start on every render: the server's and the browser's agree.
+    expect(renderToStaticMarkup(createElement(Scatter, { text: "Każde nazwisko" }))).toBe(html);
+  });
+
+  it("deal the cards face down, each with a back that says only whose deck it is", () => {
+    const html = renderToStaticMarkup(
+      createElement(LandingPitch, { example: EXAMPLE, lang: "pl" }),
+    );
+    expect(html.match(/class="flip" style="--i:\d"/gu)).toHaveLength(2);
+    expect(html.match(/class="flip-back" aria-hidden="true"/gu)).toHaveLength(2);
+    expect(html).toContain('<span class="flip-back-name">ZAREMBA</span>');
   });
 
   it("leave the cards out, and nothing else, when the example has none", () => {

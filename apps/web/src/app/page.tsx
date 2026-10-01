@@ -27,6 +27,7 @@ import {
   LandingHow,
   LandingOffer,
   LandingPitch,
+  Scatter,
 } from "../lib/landing-sections.js";
 import type { LandingExample } from "../lib/landing-sections.js";
 
@@ -310,8 +311,13 @@ export default async function HomePage({ searchParams }: PageProps) {
         <DuskZoom />
         <section className="landing-stage" aria-labelledby="landing-headline">
           <p className="landing-eyebrow">{eyebrow}</p>
+          {/* The words are ADR-0021's; their letters drift apart into points
+              as the headline leaves the screen (the stylesheet). */}
           <h1 id="landing-headline" className="landing-headline">
-            {t.landingHeadline} <span>{t.landingHeadlineEm}</span>
+            <Scatter text={t.landingHeadline} />{" "}
+            <span>
+              <Scatter text={t.landingHeadlineEm} />
+            </span>
           </h1>
           <p className="landing-lede">{t.landingLede}</p>
           <SearchForm lang={lang} query={query} />
