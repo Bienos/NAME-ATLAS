@@ -6,18 +6,16 @@ import {
   formatDate,
   formatInteger,
   formatPercent,
-  htmlLang,
   partitionLabel,
   UI,
 } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { SearchForm } from "./search-form.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
-import { NamePrint } from "./name-print.js";
 import { ReportLink } from "./report-link.js";
 import { anchorOf } from "./sections.js";
-import { SiteFooter } from "./site-footer.js";
+import { SiteShell } from "./site-shell.js";
+import { comparisonPath } from "./compare-request.js";
 
 /**
  * The comparison page (TASK-025, directive §24–§25).
@@ -77,8 +75,7 @@ function groupWords(group: string | null, lang: Lang): string {
  * from the query string.
  */
 export function comparePath(a: string, b: string, lang: Lang): string {
-  const base = lang === "pl" ? "/pl/porownaj" : "/en/compare";
-  return `${base}?a=${encodeURIComponent(a)}&b=${encodeURIComponent(b)}`;
+  return comparisonPath(a, b, lang);
 }
 
 /**
@@ -116,197 +113,254 @@ export function ComparisonView({
   const distributionPairs = bothResolved ? compareDistribution(a.response!, b.response!) : [];
 
   return (
-    <>
-      {/* `compare` widens the canvas on desktop so the two sides sit side by side. */}
-      <main lang={htmlLang(lang)} className="compare">
-        <div className="masthead">
-          <h1>
-            <a href={lang === "en" ? "/?lang=en" : "/"}>
-              <NamePrint className="logo-mark" size="small" />
-              {t.title}
-            </a>
-          </h1>
-          <a href={comparePath(a.slug, b.slug, lang === "pl" ? "en" : "pl")}>{t.langSwitch}</a>
-        </div>
-        <h2 className="surname compare-heading">
-          {displayFor(a)}
-          <span className="versus">{t.compareVersus}</span>
-          {displayFor(b)}
-        </h2>
+    // `compare` widens the canvas on desktop so the two sides sit side by side.
+    <SiteShell
+      lang={lang}
+      otherPath={comparePath(a.slug, b.slug, lang === "pl" ? "en" : "pl")}
+      world={{ mode: "quiet" }}
+      current="compare"
+      search={{ query: "" }}
+      mainClassName="compare"
+    >
+      <h2 className="surname compare-heading">
+        {displayFor(a)}
+        <span className="versus">{t.compareVersus}</span>
+        {displayFor(b)}
+      </h2>
 
-        {/* Before any figure. The layout is the thing that could mislead, so the
+      {/* Before any figure. The layout is the thing that could mislead, so the
             sentence that refuses the inference comes first. */}
-        <p className="warning">{t.compareDisclaimer}</p>
+      <p className="warning">{t.compareDisclaimer}</p>
 
-        {!bothResolved ? (
-          <section>
-            <h3>{t.unresolvedHeading}</h3>
-            <p className="absent">
-              {[a, b]
-                .filter((side) => side.response === null)
-                .map((side) => displayFor(side))
-                .join(", ")}
-              {" — "}
-              {t.slugUnknownBody}
-            </p>
+      {!bothResolved ? (
+        <section>
+          <h3>{t.unresolvedHeading}</h3>
+          <p className="absent">
+            {[a, b]
+              .filter((side) => side.response === null)
+              .map((side) => displayFor(side))
+              .join(", ")}
+            {" — "}
+            {t.slugUnknownBody}
+          </p>
+        </section>
+      ) : (
+        <>
+          <section id={anchorOf("count")}>
+            <h3>{t.sectionPopulation}</h3>
+            {populationPairs.length === 0 ? (
+              <p className="absent">{t.compareNothingToCompare}</p>
+            ) : (
+              populationPairs.map((pair, index) => (
+                <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
+                  <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                  {pair.comparable ? (
+                    <>
+                      <div
+                        className="table-scroll"
+                        tabIndex={0}
+                        role="region"
+                        aria-label={t.searchLabel}
+                      >
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">{t.searchLabel}</th>
+                              <th scope="col">{t.countColumn}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th scope="row">{a.display}</th>
+                              <td>
+                                {pair.a.value.value === null
+                                  ? "—"
+                                  : formatInteger(pair.a.value.value, lang)}
+                              </td>
+                            </tr>
+                            <tr>
+                              <th scope="row">{b.display}</th>
+                              <td>
+                                {pair.b.value.value === null
+                                  ? "—"
+                                  : formatInteger(pair.b.value.value, lang)}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="note">
+                        {t.snapshotLabel}: {formatDate(pair.a.snapshot_date, lang)}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                  )}
+                </div>
+              ))
+            )}
           </section>
-        ) : (
-          <>
-            <section id={anchorOf("count")}>
-              <h3>{t.sectionPopulation}</h3>
-              {populationPairs.length === 0 ? (
-                <p className="absent">{t.compareNothingToCompare}</p>
-              ) : (
-                populationPairs.map((pair, index) => (
-                  <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
-                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
-                    {pair.comparable ? (
-                      <>
-                        <div
-                          className="table-scroll"
-                          tabIndex={0}
-                          role="region"
-                          aria-label={t.searchLabel}
-                        >
-                          <table>
-                            <thead>
-                              <tr>
-                                <th scope="col">{t.searchLabel}</th>
-                                <th scope="col">{t.countColumn}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <th scope="row">{a.display}</th>
-                                <td>
-                                  {pair.a.value.value === null
-                                    ? "—"
-                                    : formatInteger(pair.a.value.value, lang)}
-                                </td>
-                              </tr>
-                              <tr>
-                                <th scope="row">{b.display}</th>
-                                <td>
-                                  {pair.b.value.value === null
-                                    ? "—"
-                                    : formatInteger(pair.b.value.value, lang)}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <p className="note">
-                          {t.snapshotLabel}: {formatDate(pair.a.snapshot_date, lang)}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
-                    )}
-                  </div>
-                ))
-              )}
-            </section>
 
-            <section id={anchorOf("rarity")}>
-              <h3>{t.sectionRarity}</h3>
-              {rarityPairs.length === 0 ? (
-                <p className="absent">{t.compareNothingToCompare}</p>
-              ) : (
-                rarityPairs.map((pair, index) => (
-                  <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
-                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
-                    {pair.comparable ? (
-                      <>
-                        <div
-                          className="table-scroll"
-                          tabIndex={0}
-                          role="region"
-                          aria-label={t.searchLabel}
-                        >
-                          <table>
-                            <thead>
-                              <tr>
-                                <th scope="col">{t.searchLabel}</th>
-                                <th scope="col">{t.compareOneIn}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <th scope="row">{a.display}</th>
-                                <td>{formatInteger(pair.a.primary.value, lang)}</td>
-                              </tr>
-                              <tr>
-                                <th scope="row">{b.display}</th>
-                                <td>{formatInteger(pair.b.primary.value, lang)}</td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
-                        <p className="note">{t.limitationRounded}</p>
-                        <p className="note">
-                          {(() => {
-                            const rarer = rarerOf(pair);
-                            if (rarer === null) return t.compareEqualRarity;
-                            if (rarer === "TOO_CLOSE") return t.compareTooClose;
-                            const name = rarer === "a" ? a.display : b.display;
-                            return lang === "pl"
-                              ? `${name ?? ""} jest rzadsze w tym zbiorze.`
-                              : `${name ?? ""} is rarer in this dataset.`;
-                          })()}
-                        </p>
-                      </>
-                    ) : (
-                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
-                    )}
-                  </div>
-                ))
-              )}
-            </section>
+          <section id={anchorOf("rarity")}>
+            <h3>{t.sectionRarity}</h3>
+            {rarityPairs.length === 0 ? (
+              <p className="absent">{t.compareNothingToCompare}</p>
+            ) : (
+              rarityPairs.map((pair, index) => (
+                <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
+                  <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                  {pair.comparable ? (
+                    <>
+                      <div
+                        className="table-scroll"
+                        tabIndex={0}
+                        role="region"
+                        aria-label={t.searchLabel}
+                      >
+                        <table>
+                          <thead>
+                            <tr>
+                              <th scope="col">{t.searchLabel}</th>
+                              <th scope="col">{t.compareOneIn}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <th scope="row">{a.display}</th>
+                              <td>{formatInteger(pair.a.primary.value, lang)}</td>
+                            </tr>
+                            <tr>
+                              <th scope="row">{b.display}</th>
+                              <td>{formatInteger(pair.b.primary.value, lang)}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="note">{t.limitationRounded}</p>
+                      <p className="note">
+                        {(() => {
+                          const rarer = rarerOf(pair);
+                          if (rarer === null) return t.compareEqualRarity;
+                          if (rarer === "TOO_CLOSE") return t.compareTooClose;
+                          const name = rarer === "a" ? a.display : b.display;
+                          return lang === "pl"
+                            ? `${name ?? ""} jest rzadsze w tym zbiorze.`
+                            : `${name ?? ""} is rarer in this dataset.`;
+                        })()}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </section>
 
-            <section id={anchorOf("map")}>
-              <h3>{t.sectionDistribution}</h3>
-              {distributionPairs.length === 0 ? (
-                <p className="absent">{t.compareNothingToCompare}</p>
-              ) : (
-                distributionPairs.map((pair, index) => (
-                  <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
-                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
-                    {pair.comparable ? (
-                      <DistributionPair
-                        pair={[
-                          { name: a.display ?? "", entry: pair.a },
-                          { name: b.display ?? "", entry: pair.b },
-                        ]}
-                        lang={lang}
-                      />
-                    ) : (
-                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
-                    )}
-                  </div>
-                ))
-              )}
-            </section>
-          </>
+          <section id={anchorOf("map")}>
+            <h3>{t.sectionDistribution}</h3>
+            {distributionPairs.length === 0 ? (
+              <p className="absent">{t.compareNothingToCompare}</p>
+            ) : (
+              distributionPairs.map((pair, index) => (
+                <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
+                  <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                  {pair.comparable ? (
+                    <DistributionPair
+                      pair={[
+                        { name: a.display ?? "", entry: pair.a },
+                        { name: b.display ?? "", entry: pair.b },
+                      ]}
+                      lang={lang}
+                    />
+                  ) : (
+                    <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                  )}
+                </div>
+              ))
+            )}
+          </section>
+        </>
+      )}
+
+      <p className="again">
+        {[a, b].map((side) =>
+          side.path === null || side.display === null ? null : (
+            <a key={side.slug} href={side.path}>
+              {side.display}
+            </a>
+          ),
         )}
+      </p>
+      <ReportLink
+        surnames={[a.display, b.display].filter((d): d is string => d !== null)}
+        pageUrl={`${origin ?? ""}${comparePath(a.slug, b.slug, lang)}`}
+        lang={lang}
+      />
+    </SiteShell>
+  );
+}
 
-        <p className="again">
-          {[a, b].map((side) =>
-            side.path === null || side.display === null ? null : (
-              <a key={side.slug} href={side.path}>
-                {side.display}
-              </a>
-            ),
-          )}
-        </p>
-        <ReportLink
-          surnames={[a.display, b.display].filter((d): d is string => d !== null)}
-          pageUrl={`${origin ?? ""}${comparePath(a.slug, b.slug, lang)}`}
-          lang={lang}
+/**
+ * The comparison's picker (TASK-052): the header's "Porównaj" opens it. Two
+ * plain fields, typed as the surnames are written, and a `GET` to this same
+ * route, which turns them into addresses (`compare-request.ts`). The
+ * disclaimer stands above the fields, as it stands above every comparison.
+ */
+export function ComparePicker({
+  lang,
+  first,
+  second,
+  error,
+}: {
+  lang: Lang;
+  first: string;
+  second: string;
+  error: boolean;
+}) {
+  const t = UI[lang];
+  const action = lang === "pl" ? "/pl/porownaj" : "/en/compare";
+  return (
+    <SiteShell
+      lang={lang}
+      otherPath={lang === "pl" ? "/en/compare" : "/pl/porownaj"}
+      world={{ mode: "quiet" }}
+      current="compare"
+      mainClassName="compare compare-pick"
+    >
+      <h1 className="page-title">{t.compareHeading}</h1>
+      <p className="page-lede">{t.compareIntro}</p>
+      <p className="warning">{t.compareDisclaimer}</p>
+      <form className="compare-form" action={action} method="get">
+        <label htmlFor="qa">{t.compareFirstLabel}</label>
+        <input
+          id="qa"
+          name="qa"
+          type="text"
+          defaultValue={first.slice(0, 80)}
+          placeholder={t.searchPlaceholder}
+          autoComplete="off"
+          spellCheck={false}
+          autoCapitalize="words"
         />
-        <SearchForm lang={lang} query="" />
-      </main>
-      <SiteFooter lang={lang} />
-    </>
+        <label htmlFor="qb">{t.compareSecondLabel}</label>
+        <input
+          id="qb"
+          name="qb"
+          type="text"
+          defaultValue={second.slice(0, 80)}
+          autoComplete="off"
+          spellCheck={false}
+          autoCapitalize="words"
+        />
+        {error ? (
+          <p className="compare-error" role="alert">
+            {t.compareNeedsTwo}
+          </p>
+        ) : null}
+        <button type="submit">{t.compareAction}</button>
+      </form>
+    </SiteShell>
   );
 }
 

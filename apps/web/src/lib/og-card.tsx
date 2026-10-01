@@ -3,19 +3,19 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { createLogger } from "@name-atlas/logging";
 import type { OgFacts } from "./og-facts.js";
-import { NAME_PRINT_DOT, NAME_PRINT_RINGS_SMALL, NAME_PRINT_VIEWBOX } from "./name-print.js";
 import { TOKENS, TYPE_FAMILIES } from "./design-tokens.js";
 
 /**
- * The share card itself (TASK-024, restyled to the Name Atlas Visual System v1).
+ * The share card itself (TASK-024; restyled to the dusk direction by TASK-052,
+ * ADR-0021).
  *
  * One renderer for both canonical routes, so the Polish and English cards can
  * never drift apart. It draws only what `ogFacts` hands it — the surname, a
  * count per partition, `1 in X` where commensurable, the dataset date — and
- * adds nothing but the brand: Paper ground, Ink type, Newsreader for the
- * surname and the wordmark, the Name Print mark, Inter for the figures, IBM Plex Mono for the
- * dataset line, and the Atlas Thread (point → tick → point → ring) that runs
- * through every Name Atlas share template (Visual System §8, §29).
+ * adds nothing but the brand: the dusk ground, cream type, Fraunces for the
+ * surname, Instrument Sans for the wordmark and the figures, IBM Plex Mono for
+ * the dataset line, and the thread (point → tick → point → ring) in the one
+ * light, amber.
  *
  * Deterministic for a given projection: the fonts are files in this app
  * (`assets/fonts/`, see its README), read once per process. If they are
@@ -23,13 +23,13 @@ import { TOKENS, TYPE_FAMILIES } from "./design-tokens.js";
  * warning is logged — a share card must never 500 because of typography.
  */
 
-/** Visual System v1 tokens, as values: `next/og` cannot read CSS (TASK-034). */
+/** The dusk tokens, as values: `next/og` cannot read CSS (TASK-034). */
 const C = {
-  paper: TOKENS["surface-primary"],
-  ink: TOKENS["text-primary"],
-  secondary: TOKENS["text-secondary"],
-  atlas: TOKENS.accent,
-  rule: TOKENS["border-strong"],
+  ground: TOKENS["dusk-surface"],
+  ink: TOKENS["dusk-ink"],
+  secondary: TOKENS["dusk-ink-muted"],
+  light: TOKENS["dusk-amber"],
+  rule: TOKENS["dusk-line-control"],
 } as const;
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -48,9 +48,9 @@ interface BrandFont {
 
 /** The files `assets/fonts/README.md` asks for. */
 export const FONT_FILES = [
-  { name: TYPE_FAMILIES.display, file: "Newsreader-Medium.ttf", weight: 500 },
-  { name: TYPE_FAMILIES.ui, file: "Inter-Regular.ttf", weight: 400 },
-  { name: TYPE_FAMILIES.ui, file: "Inter-SemiBold.ttf", weight: 600 },
+  { name: TYPE_FAMILIES.display, file: "Fraunces-Medium.ttf", weight: 500 },
+  { name: TYPE_FAMILIES.ui, file: "InstrumentSans-Regular.ttf", weight: 400 },
+  { name: TYPE_FAMILIES.ui, file: "InstrumentSans-SemiBold.ttf", weight: 600 },
   { name: TYPE_FAMILIES.data, file: "IBMPlexMono-Medium.ttf", weight: 500 },
 ] as const;
 
@@ -102,7 +102,7 @@ export function surnameSize(surname: string): number {
   const tier = n <= 10 ? 144 : n <= 16 ? 125 : n <= 22 ? 108 : 96;
   const upper =
     surname === surname.toLocaleUpperCase("pl") && surname !== surname.toLocaleLowerCase("pl");
-  const perGlyph = upper ? 0.7 : 0.56; // em per glyph, Newsreader Medium, measured loosely
+  const perGlyph = upper ? 0.7 : 0.56; // em per glyph, Fraunces Medium, measured loosely
   const fit = Math.floor(MEASURE / (n * perGlyph));
   return Math.max(56, Math.min(tier, fit));
 }
@@ -121,7 +121,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
         flexDirection: "column",
         justifyContent: "space-between",
         padding: `${PAD_Y}px ${PAD_X}px`,
-        background: C.paper,
+        background: C.ground,
         color: C.ink,
         fontFamily: TYPE_FAMILIES.ui,
       }}
@@ -139,32 +139,17 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
         >
           {facts.eyebrow}
         </div>
-        {/* The Name Print mark and the wordmark (apps/web/assets/brand). */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <svg width={46} height={46} viewBox={NAME_PRINT_VIEWBOX}>
-            {NAME_PRINT_RINGS_SMALL.map((d) => (
-              <path
-                key={d.slice(0, 16)}
-                d={d}
-                fill="none"
-                stroke={C.ink}
-                strokeWidth={7}
-                strokeLinecap="round"
-              />
-            ))}
-            <circle cx={NAME_PRINT_DOT.cx} cy={NAME_PRINT_DOT.cy} r={8.5} fill={C.atlas} />
-          </svg>
-          <div
-            style={{
-              fontFamily: TYPE_FAMILIES.display,
-              fontWeight: 500,
-              fontSize: 34,
-              letterSpacing: -0.7,
-              color: C.ink,
-            }}
-          >
-            Name Atlas
-          </div>
+        {/* The wordmark, in plain type, as the pages set it. */}
+        <div
+          style={{
+            fontFamily: TYPE_FAMILIES.ui,
+            fontWeight: 600,
+            fontSize: 32,
+            letterSpacing: -0.4,
+            color: C.ink,
+          }}
+        >
+          Name Atlas
         </div>
       </div>
 
@@ -237,7 +222,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
               width: 16,
               height: 16,
               borderRadius: 999,
-              background: C.atlas,
+              background: C.light,
             }}
           />
           <div
@@ -249,7 +234,7 @@ export async function renderOgCard(facts: OgFacts): Promise<ImageResponse> {
               height: 18,
               borderRadius: 999,
               border: `3px solid ${C.ink}`,
-              background: C.paper,
+              background: C.ground,
             }}
           />
         </div>

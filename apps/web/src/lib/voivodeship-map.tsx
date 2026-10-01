@@ -33,9 +33,9 @@ export interface MapLabels {
 }
 
 /**
- * A choropleth of the 16 voivodeships: one blue hue, darker is a larger share
+ * A choropleth of the 16 voivodeships: one ramp, dim to lit, brighter is a larger share
  * (the ramp is validated in `globals.css`). A voivodeship the dataset does not
- * list is drawn grey and hatched, never in the palest blue: an absent cell may
+ * list is drawn in the sunk ground and hatched, never in the dimmest band: an absent cell may
  * be zero, suppressed or out of scope, and the resource does not say which
  * (`docs/sources/pesel-regional.md` item 10), so it must not look like "a
  * little".

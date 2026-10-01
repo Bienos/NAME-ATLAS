@@ -52,6 +52,38 @@ export const TOKENS = {
   "map-4": "#1438a0",
   "map-no-data": "#e8e5dc",
 
+  // Dusk (ADR-0021): the landing hero and the surname journey. Text tokens read
+  // on dusk-surface at 18:1 (ink), 13.9:1 (ink-soft), 10.5:1 (ink-muted); the
+  // amber at 11.5:1; the warning at 9.5:1. The map ramp runs dim to lit, lowest
+  // share darkest, lightness rising at every step. Checked by hand against the
+  // dusk ground; the dataviz validator models light surfaces only.
+  "dusk-surface": "#1f071f",
+  "dusk-surface-raised": "#32112a",
+  "dusk-surface-sunk": "#170a17",
+  "dusk-sky-wine": "#7d2833",
+  "dusk-sky-ember": "#b15439",
+  "dusk-amber": "#fcbf5b",
+  "dusk-amber-hover": "#ffd98a",
+  "dusk-glow": "#fcbf5b59",
+  "dusk-sun": "#fdf8ad",
+  "dusk-ink": "#fffaf3",
+  "dusk-ink-soft": "#f0d6db",
+  "dusk-ink-muted": "#d9b8c4",
+  "dusk-on-amber": "#230312",
+  "dusk-shell": "#f7e4da",
+  "dusk-warning": "#f2a86a",
+  "dusk-glass": "#fffaf31a",
+  "dusk-line": "#fffaf32e",
+  "dusk-line-control": "#9e6e80",
+  "dusk-map-glow": "#fff7d1",
+  "dusk-map-dim": "#7e3b25",
+  "dusk-map-0": "#6e3524",
+  "dusk-map-1": "#9a5230",
+  "dusk-map-2": "#c77a3e",
+  "dusk-map-3": "#e9a24f",
+  "dusk-map-4": "#fcd27a",
+  "dusk-map-no-data": "#2a1424",
+
   // Shape and space
   "radius-xs": "2px",
   "radius-sm": "4px",
@@ -90,12 +122,12 @@ export const MAP_BANDS = [
 ] as const satisfies readonly TokenName[];
 
 /**
- * The three type voices (Visual System v1 §6) by family name. The page sets
- * them with `next/font/google` in `layout.tsx`. The share card loads the files
- * in `assets/fonts/` under these names.
+ * The three type voices (ADR-0021) by family name. The page sets them with
+ * `next/font/google` in `layout.tsx`. The share card loads the files in
+ * `assets/fonts/` under these names.
  */
 export const TYPE_FAMILIES = {
-  display: "Newsreader",
-  ui: "Inter",
+  display: "Fraunces",
+  ui: "Instrument Sans",
   data: "IBM Plex Mono",
 } as const;

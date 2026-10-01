@@ -7,7 +7,7 @@ import { listFacts, mostCommonSurnames, querySurnameResult } from "@name-atlas/t
 import { currentSlugsFor } from "@name-atlas/seo";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { htmlLang, parseIntent, parseLang, UI } from "../lib/messages.js";
+import { parseIntent, parseLang, UI } from "../lib/messages.js";
 import type { Lang } from "../lib/messages.js";
 import { Result } from "../lib/result-view.js";
 import { SearchForm } from "../lib/search-form.js";
@@ -15,11 +15,10 @@ import { CommonSurnames } from "../lib/common-surnames.js";
 import type { CommonList } from "../lib/common-surnames.js";
 import { currentPathFor, pathForSlug } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
-import { NamePrint } from "../lib/name-print.js";
-import { AtlasField } from "../lib/atlas-field.js";
+import { DuskZoom } from "../lib/dusk-zoom.js";
 import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
-import { SiteFooter } from "../lib/site-footer.js";
+import { SiteShell } from "../lib/site-shell.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
@@ -28,8 +27,10 @@ import { SiteFooter } from "../lib/site-footer.js";
  * and `PRODUCT.md` §2's user is on mobile. It is not free of client code: the
  * search field is a client island (`surname-combobox.tsx`), and so are the
  * landing atlas's section (`list-atlas-shell.tsx`), whose only script is the
- * plates' entrance motion — its list switch is HTML and CSS — and its plate I
- * sky (`list-atlas-sky.tsx`), a canvas drawn from the stored figures.
+ * plates' entrance motion — its list switch is HTML and CSS — its plate I
+ * sky (`list-atlas-sky.tsx`), a canvas drawn from the stored figures, and the
+ * dusk world behind the hero with its zoom (`dusk-world.tsx`, `dusk-zoom.tsx`;
+ * TASK-052, ADR-0021).
  *
  * A query that resolves to exactly one surname is **redirected** to that
  * surname's canonical page (ADR-0009) — `/pl/nazwisko/{slug}` — so the address
@@ -229,45 +230,62 @@ export default async function HomePage({ searchParams }: PageProps) {
   const switchParams = new URLSearchParams();
   if (query !== "") switchParams.set("surname", query);
   if (otherLang === "en") switchParams.set("lang", "en");
+  const otherPath = `/?${switchParams.toString()}`;
 
-  // The bare page is the landing (Visual System §39 screen 01): a headline, the
-  // field as the second-largest object, and the Atlas field graphic. Any query
-  // answered here keeps the compact search above its answer.
-  const landing = given.kind === "NONE";
-
-  return (
-    <>
-      {/* The nearest `lang` wins: the document is Polish by default and an
-          English answer says so here (see `layout.tsx`). */}
-      <main lang={htmlLang(lang)} className={landing ? "landing" : undefined}>
-        <div className="masthead">
-          <h1>
-            <NamePrint className="logo-mark" size="small" />
-            {t.title}
+  // The bare page is the landing (ADR-0021; TASK-052): the dusk hero — the
+  // register line, the headline, the field as the second-largest object,
+  // Poland on the horizon behind them — then the most common surnames and
+  // the atlas's plates.
+  if (given.kind === "NONE") {
+    // The register line names the artefact's own date; without the artefact
+    // it names the register alone. Never a count, and never the two lists
+    // added up.
+    const eyebrow =
+      atlas === null
+        ? t.landingEyebrow
+        : `${t.landingEyebrow} · ${t.landingAsOf} ${numericDate(atlas.snapshot_date)}`;
+    return (
+      <SiteShell lang={lang} otherPath={otherPath} world={{ mode: "hero" }} mainClassName="landing">
+        <DuskZoom />
+        <section className="landing-stage" aria-labelledby="landing-headline">
+          <p className="landing-eyebrow">{eyebrow}</p>
+          <h1 id="landing-headline" className="landing-headline">
+            {t.landingHeadline} <span>{t.landingHeadlineEm}</span>
           </h1>
-          <a href={`/?${switchParams.toString()}`}>{t.langSwitch}</a>
+          <p className="landing-lede">{t.landingLede}</p>
+          <SearchForm lang={lang} query={query} />
+          {/* Empty until a search leaves the page: `dusk-zoom.tsx` fills it
+              from `data-text`, so nothing is announced before it is true. */}
+          <p className="landing-status" aria-live="polite" data-text={t.landingSearching} />
+          <p className="landing-trust">{t.landingTrust}</p>
+        </section>
+        <div id="atlas" className="landing-atlas">
+          <CommonSurnames lists={common} lang={lang} />
+          <ListAtlas facts={atlas} lang={lang} />
         </div>
-        {landing ? (
-          <div className="landing-stage">
-            <h2 className="landing-headline">
-              {t.landingHeadline} <em>{t.landingHeadlineEm}</em>
-            </h2>
-            <p className="landing-lede">{t.landingLede}</p>
-            <SearchForm lang={lang} query={query} />
-            <p className="landing-hint">{t.landingHint}</p>
-            <AtlasField />
-          </div>
-        ) : (
-          <>
-            <p className="tagline">{t.tagline}</p>
-            <SearchForm lang={lang} query={query} />
-          </>
-        )}
-        <Body answer={given} lang={lang} />
-        <CommonSurnames lists={common} lang={lang} />
-        <ListAtlas facts={atlas} lang={lang} />
-      </main>
-      <SiteFooter lang={lang} />
-    </>
+      </SiteShell>
+    );
+  }
+
+  // A query answered here — unresolved, ambiguous, invalid or unavailable —
+  // keeps the search in the header, above its answer.
+  return (
+    <SiteShell
+      lang={lang}
+      otherPath={otherPath}
+      world={{ mode: "journey" }}
+      search={{ query }}
+      mainClassName="answer"
+    >
+      <Body answer={given} lang={lang} />
+    </SiteShell>
   );
+}
+
+/** `2026-01-20` → `20.01.2026`, the brand's numeric date. Presentation only. */
+function numericDate(iso: string): string {
+  const [year, month, day] = iso.split("-");
+  return day === undefined || month === undefined || year === undefined
+    ? iso
+    : `${day}.${month}.${year}`;
 }

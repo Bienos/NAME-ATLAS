@@ -507,14 +507,28 @@ export const UI = {
     title: "Name Atlas",
     tagline: "Uczciwe, udokumentowane odpowiedzi o polskich nazwiskach.",
     landingHeadline: "Każde nazwisko",
-    landingHeadlineEm: "ma swój początek.",
+    landingHeadlineEm: "gdzieś się zaczęło.",
     landingLede:
-      "Zobacz, co oficjalny rejestr PESEL zapisuje o nazwisku — ze źródłem i datą przy każdej " +
-      "liczbie i z uczciwą luką wszędzie tam, gdzie kończą się dane.",
+      "Wpisz nazwisko. Sprawdź, ile osób je nosi, jak jest rzadkie, skąd może pochodzić i skąd " +
+      "to wiemy.",
     landingHint: "Wpisz dokładnie tak, jak się pisze — z polskimi znakami.",
+    // The dusk hero (TASK-052): the register line above the headline, the
+    // status line while a search leaves the page, and the two promises.
+    landingEyebrow: "Rejestr PESEL",
+    landingAsOf: "stan na",
+    landingSearching: "Sprawdzamy rejestr PESEL…",
+    landingTrust: "Źródło przy każdym fakcie · Brak danych to też odpowiedź",
+    // The site's header (TASK-052).
+    siteNavLabel: "Nawigacja",
+    navAtlas: "Atlas",
+    navCompare: "Porównaj",
+    navHow: "Jak to działa",
+    navMenu: "Menu",
+    langNamePl: "Polski",
+    langNameEn: "English",
     searchLabel: "Nazwisko",
-    searchPlaceholder: "np. Nowak",
-    searchAction: "Szukaj",
+    searchPlaceholder: "np. Zaremba",
+    searchAction: "Odkryj",
     suggestionsAvailable: "Podpowiedzi:",
     commonHeading: "Najczęstsze nazwiska",
     commonNote:
@@ -572,7 +586,7 @@ export const UI = {
     chapterWhereTitle: "Gdzie jest najczęściej zameldowane?",
     chapterWhereLede:
       "Mapa i lista pokazują, w których województwach osoby o tym nazwisku mają zameldowanie " +
-      "na pobyt stały. Im ciemniejszy kolor i dłuższy pasek, tym większy udział.",
+      "na pobyt stały. Im jaśniejszy kolor i dłuższy pasek, tym większy udział.",
     chapterMeaningTitle: "Co oznacza to nazwisko?",
     chapterMeaningLede:
       "Znaczenie podajemy tylko wtedy, gdy stoi za nim opracowanie naukowe. Nie zgadujemy.",
@@ -611,6 +625,20 @@ export const UI = {
     compareDisclaimer:
       "Porównujemy liczby z tego samego zbioru. Wspólne lub podobne nazwisko nie oznacza " +
       "wspólnej rodziny, wspólnych korzeni ani wspólnej narodowości.",
+    // The comparison's picker (TASK-052): two surnames typed as they are written.
+    compareHeading: "Porównaj dwa nazwiska",
+    compareIntro:
+      "Wpisz dwa nazwiska. Zestawimy ich liczby, rzadkość i województwa z tego samego zbioru " +
+      "i z tą samą datą.",
+    compareFirstLabel: "Pierwsze nazwisko",
+    compareSecondLabel: "Drugie nazwisko",
+    compareAction: "Porównaj",
+    compareNeedsTwo: "Wpisz oba nazwiska, tak jak się je pisze.",
+    compareFromHere: "Porównaj z innym nazwiskiem",
+    // The page for an address that does not exist (TASK-052).
+    notFoundHeading: "Nie ma takiej strony",
+    notFoundBody:
+      "Adres mógł się zmienić albo zawierać literówkę. Wpisz nazwisko, którego szukasz.",
     slugCollisionBody:
       "Ten adres pasuje do więcej niż jednego nazwiska, więc nie wybieramy żadnego. Wpisz nazwisko w wyszukiwarce powyżej:",
     regionsHeading: "Województwa",
@@ -912,12 +940,23 @@ export const UI = {
     landingHeadline: "Every surname",
     landingHeadlineEm: "begins somewhere.",
     landingLede:
-      "See what Poland's official register records about a surname — with the source and date " +
-      "behind every figure, and an honest blank wherever the evidence runs out.",
+      "Type a Polish surname. See how many people carry it, how rare it is, where it may come " +
+      "from, and how we know.",
     landingHint: "Exactly as it's written — Polish letters welcome.",
+    landingEyebrow: "PESEL register",
+    landingAsOf: "as of",
+    landingSearching: "Checking the PESEL register…",
+    landingTrust: "A source on every fact · No data is also an answer",
+    siteNavLabel: "Site",
+    navAtlas: "Atlas",
+    navCompare: "Compare",
+    navHow: "How it works",
+    navMenu: "Menu",
+    langNamePl: "Polski",
+    langNameEn: "English",
     searchLabel: "Surname",
-    searchPlaceholder: "e.g. Nowak",
-    searchAction: "Search",
+    searchPlaceholder: "e.g. Zaremba",
+    searchAction: "Discover",
     suggestionsAvailable: "Suggestions:",
     commonHeading: "Most common surnames",
     commonNote:
@@ -968,7 +1007,7 @@ export const UI = {
     chapterWhereTitle: "Where is it most often registered?",
     chapterWhereLede:
       "The map and the list show the voivodeships where people with this surname have a " +
-      "registered permanent address. The darker the colour and the longer the bar, the bigger " +
+      "registered permanent address. The brighter the colour and the longer the bar, the bigger " +
       "the share.",
     chapterMeaningTitle: "What does this surname mean?",
     chapterMeaningLede: "We give a meaning only when a scholarly work supports it. We don't guess.",
@@ -1006,6 +1045,18 @@ export const UI = {
     compareDisclaimer:
       "We compare figures from the same dataset. A shared or similar surname does not mean a " +
       "shared family, shared roots or shared nationality.",
+    compareHeading: "Compare two surnames",
+    compareIntro:
+      "Type two surnames. We set their counts, rarity and voivodeships side by side, from the " +
+      "same dataset and the same date.",
+    compareFirstLabel: "First surname",
+    compareSecondLabel: "Second surname",
+    compareAction: "Compare",
+    compareNeedsTwo: "Type both surnames, as they are written.",
+    compareFromHere: "Compare with another surname",
+    notFoundHeading: "There is no such page",
+    notFoundBody:
+      "The address may have changed or have a typo in it. Type the surname you are looking for.",
     slugCollisionBody:
       "This address matches more than one surname, so none is chosen. Type the surname in the search above:",
     regionsHeading: "Voivodeships",

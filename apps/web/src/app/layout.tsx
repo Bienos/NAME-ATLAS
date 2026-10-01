@@ -1,28 +1,30 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Inter, Newsreader } from "next/font/google";
+import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
 
 /**
- * The three type voices of the Visual System v1 (§6). next/font/google fetches
- * them at build time and serves them from this app: no request to Google from a
- * reader's browser, fallback metrics adjusted to avoid layout shift, and each face
- * exposed as the CSS variable `globals.css` uses. `latin-ext` carries every
- * Polish letter. (The share card reads its own copies from `apps/web/assets/fonts`;
- * see that folder's README.)
+ * The three type voices of the brand (ADR-0021, TASK-052): Fraunces for the
+ * surname, the headlines and the one big number; Instrument Sans for what a
+ * reader reads and taps; IBM Plex Mono for evidence — source lines, dates,
+ * chips. next/font/google fetches them at build time and serves them from this
+ * app: no request to Google from a reader's browser, fallback metrics adjusted
+ * to avoid layout shift, and each face exposed as the CSS variable
+ * `globals.css` uses. `latin-ext` carries every Polish letter. (The share card
+ * reads its own copies from `apps/web/assets/fonts`; see that folder's README.)
  */
-const display = Newsreader({
+const display = Fraunces({
   subsets: ["latin", "latin-ext"],
-  weight: ["500"],
-  // Italic for the landing headline's second line, which would otherwise be a
-  // synthesised slant.
+  // The optical-size axis: a 96px surname is drawn from the display cut, a
+  // 22px card title from the text cut, by `font-optical-sizing: auto`.
+  axes: ["opsz"],
   style: ["normal", "italic"],
   variable: "--font-display",
   display: "swap",
   fallback: ["Georgia", "serif"],
 });
 
-const ui = Inter({
+const ui = Instrument_Sans({
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600"],
   variable: "--font-ui",
@@ -32,10 +34,9 @@ const ui = Inter({
 
 const data = IBM_Plex_Mono({
   subsets: ["latin", "latin-ext"],
-  weight: ["500"],
+  weight: ["400", "500"],
   variable: "--font-data",
   display: "swap",
-  preload: false,
   fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
@@ -61,10 +62,15 @@ export const metadata: Metadata = {
     "date and confidence.",
 };
 
+/**
+ * Every page renders in the dusk scope (ADR-0021): the body carries `.dusk`,
+ * which re-points the system's token names at the dusk values, and each page
+ * draws its own world behind it (`site-shell.tsx`).
+ */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pl" className={`${display.variable} ${ui.variable} ${data.variable}`}>
-      <body>{children}</body>
+      <body className="dusk">{children}</body>
     </html>
   );
 }

@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import {
   COMPARISON_METADATA,
+  ComparePicker,
   ComparisonView,
-  firstParam,
   loadComparison,
 } from "../../../lib/compare-page.js";
+import { comparisonRequest } from "../../../lib/compare-request.js";
 import { siteOrigin } from "../../../lib/surname-page.js";
 
 /** `/en/compare?a={slug}&b={slug}` — surname comparison (TASK-025). Never indexed. */
@@ -18,7 +20,19 @@ interface Props {
 }
 
 export default async function Page({ searchParams }: Props) {
-  const params = await searchParams;
-  const { a, b } = await loadComparison(firstParam(params["a"]), firstParam(params["b"]), "en");
+  const request = comparisonRequest(await searchParams, "en");
+  // Typed surnames become addresses first (TASK-052); `redirect` throws.
+  if (request.kind === "REDIRECT") redirect(request.to);
+  if (request.kind === "PICK") {
+    return (
+      <ComparePicker
+        lang="en"
+        first={request.first}
+        second={request.second}
+        error={request.error}
+      />
+    );
+  }
+  const { a, b } = await loadComparison(request.a, request.b, "en");
   return <ComparisonView a={a} b={b} lang="en" origin={siteOrigin()} />;
 }

@@ -62,6 +62,35 @@
   --map-4: #1438a0;
   --map-no-data: #e8e5dc; /* no data is not zero */
 
+  /* Dusk (ADR-0021, TASK-052): the landing hero and the surname journey. The
+     values and their contrast notes are in design-tokens.ts. */
+  --dusk-surface: #1f071f;
+  --dusk-surface-raised: #32112a;
+  --dusk-surface-sunk: #170a17;
+  --dusk-sky-wine: #7d2833;
+  --dusk-sky-ember: #b15439;
+  --dusk-amber: #fcbf5b;
+  --dusk-amber-hover: #ffd98a;
+  --dusk-glow: #fcbf5b59;
+  --dusk-sun: #fdf8ad;
+  --dusk-ink: #fffaf3;
+  --dusk-ink-soft: #f0d6db;
+  --dusk-ink-muted: #d9b8c4;
+  --dusk-on-amber: #230312;
+  --dusk-shell: #f7e4da;
+  --dusk-warning: #f2a86a;
+  --dusk-glass: #fffaf31a;
+  --dusk-line: #fffaf32e;
+  --dusk-line-control: #9e6e80;
+  --dusk-map-glow: #fff7d1;
+  --dusk-map-dim: #7e3b25;
+  --dusk-map-0: #6e3524;
+  --dusk-map-1: #9a5230;
+  --dusk-map-2: #c77a3e;
+  --dusk-map-3: #e9a24f;
+  --dusk-map-4: #fcd27a;
+  --dusk-map-no-data: #2a1424;
+
   /* Shape and space */
   --radius-xs: 2px;
   --radius-sm: 4px;
@@ -125,67 +154,6 @@ summary:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
-}
-
-/* --- header ------------------------------------------------------------ */
-
-/* Centre, not baseline: the h1 is a flex row that starts with the mark, so its
-   baseline is the mark's bottom edge, which set the language switch 10px below
-   the wordmark. Centred, the two baselines land within 2px (measured). */
-.masthead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-5);
-  margin-bottom: var(--space-2);
-}
-
-/* The wordmark: the name in the display face, beside the Name Print mark. */
-.masthead h1 {
-  margin: 0;
-  font-family: var(--font-display, Georgia, serif);
-  font-size: 1.5rem;
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.masthead h1 a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* The Name Print mark beside the wordmark (apps/web/assets/brand/README.md). */
-.masthead h1,
-.masthead h1 a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4em;
-}
-
-.logo-mark {
-  flex: none;
-  width: 1.35em;
-  height: 1.35em;
-  color: var(--text-primary);
-}
-
-.masthead > a {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
-.masthead > a:hover {
-  text-decoration: underline;
-}
-
-.tagline {
-  margin: 0 0 var(--space-7);
-  color: var(--text-secondary);
-  font-size: 0.9375rem;
 }
 
 /* --- search: an editorial underline, not a boxed form --------------------- */
@@ -1262,258 +1230,6 @@ p {
 
 .compare-maps .vmap {
   margin-bottom: var(--space-2);
-}
-
-/* --- landing: the bare home page (Visual System §39 screen 01) ------------ */
-
-/* A large serif line, the surname field as the second-largest object, open
-   Paper, and an extremely subtle Atlas Thread in the lower right. Results keep
-   the reading width; only the bare page widens. */
-main.landing {
-  max-width: 72rem;
-}
-
-.landing-stage {
-  position: relative;
-  padding: clamp(var(--space-8), 9vh, 7rem) 0 clamp(var(--space-7), 7vh, 5rem);
-}
-
-.landing-headline {
-  margin: 0;
-  font-family: var(--font-display, Georgia, serif);
-  /* 44px on phones, 120px on a wide desktop. */
-  font-size: clamp(2.75rem, 1.1667rem + 7.037vw, 7.5rem);
-  font-weight: 500;
-  line-height: 0.95;
-  letter-spacing: -0.045em;
-  text-wrap: balance;
-}
-
-.landing-headline em {
-  display: block;
-  font-style: italic;
-  letter-spacing: -0.035em;
-}
-
-.landing-lede {
-  max-width: 46ch;
-  margin: var(--space-6) 0 clamp(var(--space-8), 7vh, var(--space-9));
-  font-size: 1.125rem;
-  line-height: 1.55;
-  color: var(--text-secondary);
-  text-wrap: pretty;
-}
-
-.landing .search {
-  flex-wrap: wrap;
-  max-width: 44rem;
-  margin-bottom: var(--space-3);
-}
-
-/* The label takes its own row; the field and the button share the next. */
-.landing .combobox {
-  flex-basis: 0;
-}
-
-/* On the landing the label is shown, as a small eyebrow above the field. */
-.landing .search label {
-  position: static;
-  flex: 1 0 100%;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  clip-path: none;
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-/* The mirror must match the input exactly: it measures the thread and becomes
-   the result heading in the transition. */
-.landing .search input,
-.landing .combobox-mirror {
-  font-size: clamp(1.5rem, 1rem + 2.5vw, 3rem);
-}
-
-.landing-hint {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-}
-
-/* The Atlas field. Not a map and no data: see `atlas-field.tsx`. */
-.atlas-field {
-  display: none;
-}
-
-@media (min-width: 900px) {
-  .landing .search {
-    max-width: 60%;
-  }
-
-  .atlas-field {
-    display: block;
-    position: absolute;
-    inset-inline-end: 0;
-    inset-block-end: var(--space-7);
-    inline-size: 34%;
-    block-size: auto;
-    overflow: visible;
-    pointer-events: none;
-  }
-}
-
-.atlas-links line {
-  stroke: var(--border-soft);
-  stroke-width: 1;
-}
-
-.atlas-points circle {
-  fill: var(--border-default);
-}
-
-.atlas-line {
-  fill: none;
-  stroke: var(--border-default);
-  stroke-width: 1;
-}
-
-/* The segment that fills with Atlas Blue on submit. */
-.atlas-fill {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-}
-
-.atlas-tick {
-  fill: none;
-  stroke: var(--text-tertiary);
-  stroke-width: 1;
-}
-
-.atlas-second {
-  fill: var(--text-tertiary);
-}
-
-/* Ring = possible / uncertain (§8, §11): dotted, never filled. */
-.atlas-possible {
-  fill: var(--surface-primary);
-  stroke: var(--text-tertiary);
-  stroke-width: 1.25;
-  stroke-dasharray: 2 2.4;
-}
-
-.atlas-lead {
-  fill: var(--surface-primary);
-  stroke: var(--border-strong);
-  stroke-width: 1.5;
-}
-
-.atlas-halo {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 1;
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: scale(0.6);
-}
-
-/* While a name is typed, one node becomes active (§39 screen 01). */
-.landing:has(.combobox input:not(:placeholder-shown)) .atlas-lead {
-  fill: var(--accent);
-  stroke: var(--accent);
-}
-
-.landing:has(.combobox input:not(:placeholder-shown)) .atlas-halo {
-  opacity: 0.35;
-  transform: scale(1);
-}
-
-:root[data-searching] .atlas-fill {
-  stroke-dashoffset: 0;
-}
-
-/* Drawing and connecting (§23), once, on arrival. Without motion the field
-   simply shows its final state. */
-@media (prefers-reduced-motion: no-preference) {
-  .atlas-links line,
-  .atlas-line {
-    stroke-dasharray: 1;
-    animation: atlas-draw 1600ms var(--ease-primary) both;
-  }
-
-  .atlas-line {
-    animation-duration: 900ms;
-    animation-delay: 200ms;
-  }
-
-  .atlas-points circle {
-    animation: atlas-appear var(--duration-standard) var(--ease-primary) both;
-  }
-
-  .atlas-tick {
-    animation: atlas-appear var(--duration-fast) var(--ease-primary) 520ms both;
-  }
-
-  .atlas-second,
-  .atlas-possible,
-  .atlas-lead {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: atlas-pop var(--duration-standard) var(--ease-primary) both;
-  }
-
-  .atlas-second {
-    animation-delay: 700ms;
-  }
-
-  .atlas-possible {
-    animation-delay: 900ms;
-  }
-
-  .atlas-lead {
-    animation-delay: 200ms;
-    transition:
-      fill var(--duration-fast) var(--ease-primary),
-      stroke var(--duration-fast) var(--ease-primary);
-  }
-
-  .atlas-halo {
-    transition:
-      opacity var(--duration-standard) var(--ease-primary),
-      transform var(--duration-standard) var(--ease-primary);
-  }
-
-  .atlas-fill {
-    transition: stroke-dashoffset var(--duration-narrative) var(--ease-primary);
-  }
-}
-
-@keyframes atlas-draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes atlas-appear {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes atlas-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
-  }
 }
 
 /* --- the surname profile: the result page's editorial layout ------------- */
@@ -3656,4 +3372,961 @@ span.lf-alt {
 .result-actions .report {
   margin: 0;
   align-self: center;
+}
+
+/* --- dusk (ADR-0021, TASK-052): the whole site ----------------------------- */
+
+/*
+ * The body is the dusk scope (`layout.tsx`). It re-points the system's token
+ * names at the dusk values, so every component — the claim unit, the tables,
+ * the map, the sources, the plates — keeps its markup and its rules and takes
+ * the dark palette from the same names. The `:root` block above stays the one
+ * source of every value (TASK-034).
+ *
+ * Confidence keeps its symbols; only the tints change: verified is the light,
+ * likely is ink, possible is soft ink, unconfirmed is muted. The map ramp runs
+ * dim to lit, and "not listed" is the sunk ground with a muted hatch.
+ */
+html {
+  background: var(--dusk-surface);
+  color-scheme: dark;
+}
+
+body.dusk {
+  --surface-primary: var(--dusk-surface);
+  --surface-elevated: var(--dusk-surface-raised);
+  --surface-inverse: var(--dusk-ink);
+  --text-primary: var(--dusk-ink);
+  --text-secondary: var(--dusk-ink-soft);
+  --text-tertiary: var(--dusk-ink-muted);
+  --text-inverse: var(--dusk-surface);
+  --border-soft: var(--dusk-line);
+  --border-default: var(--dusk-line-control);
+  --border-strong: var(--dusk-ink-muted);
+  --accent: var(--dusk-amber);
+  --on-accent: var(--dusk-on-amber);
+  --hover-light: var(--dusk-surface-raised);
+  --hover-blue: var(--dusk-amber-hover);
+  --state-warning: var(--dusk-warning);
+  --confidence-verified: var(--dusk-amber);
+  --confidence-likely: var(--dusk-ink);
+  --confidence-possible: var(--dusk-ink-soft);
+  --confidence-unconfirmed: var(--dusk-ink-muted);
+  --map-0: var(--dusk-map-0);
+  --map-1: var(--dusk-map-1);
+  --map-2: var(--dusk-map-2);
+  --map-3: var(--dusk-map-3);
+  --map-4: var(--dusk-map-4);
+  --map-no-data: var(--dusk-map-no-data);
+  /* The page's gutter and the width its content keeps. */
+  --gutter: clamp(var(--space-5), 4.6vw, var(--space-9));
+  --site-width: 78rem;
+  /* The world's geometry: the map's width, and where the camera rests. */
+  --dusk-mapw: min(44vw, 620px);
+  --dusk-hero-tx: 1.5vw;
+  --dusk-hero-ty: 33vh;
+  --dusk-hero-tilt: 71deg;
+  --dusk-zoom-tx: 24vw;
+  --dusk-zoom-ty: 3vh;
+  padding: 0;
+  background: var(--dusk-surface);
+  color: var(--dusk-ink);
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 1.0625rem;
+}
+
+.dusk a {
+  color: var(--dusk-amber);
+}
+
+/* Its own stacking context, so the world's negative layer paints above the
+   body's ground and below everything the page puts in flow. */
+.site {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding-inline: var(--gutter);
+}
+
+.site > main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--site-width);
+  margin-inline: auto;
+}
+
+/* --- the world: sky, sun, ground and Poland as points --- */
+
+/* Painted below the page's own content, inside `.site`'s stacking context. */
+.dusk-world {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    var(--dusk-surface) 0%,
+    var(--dusk-sky-wine) 46%,
+    var(--dusk-sky-ember) 70%,
+    var(--dusk-amber) 84%
+  );
+}
+
+.dusk-deep {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, var(--dusk-surface) 0%, var(--dusk-sky-wine) 170%);
+  opacity: 0;
+}
+
+/* The sun sits on the horizon at the right, a flare more than a disc. */
+.dusk-sun {
+  position: absolute;
+  right: -4%;
+  top: calc(72% - 90px);
+  width: 360px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    var(--dusk-sun) 0%,
+    var(--dusk-amber) 22%,
+    transparent 68%
+  );
+  opacity: 0.95;
+}
+
+/* The ground: a wide curve whose rim catches the last light. */
+.dusk-ground {
+  position: absolute;
+  left: -30%;
+  right: -30%;
+  top: 72%;
+  height: 90%;
+  border-radius: 50% / 14%;
+  /* The near side of the horizon still holds a little of the light. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--dusk-amber) 16%, var(--dusk-surface-sunk)) 0%,
+    var(--dusk-surface-sunk) 22%
+  );
+  box-shadow:
+    0 -2px 0 0 var(--dusk-amber),
+    0 -10px 40px -6px var(--dusk-amber);
+}
+
+.dusk-map {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--dusk-mapw);
+  height: calc(var(--dusk-mapw) * 0.948);
+  margin-left: calc(var(--dusk-mapw) / -2);
+  margin-top: calc(var(--dusk-mapw) * -0.474);
+  transform-origin: 50% 50%;
+  transform: translate(var(--dusk-hero-tx), var(--dusk-hero-ty)) perspective(1400px)
+    rotateX(var(--dusk-hero-tilt));
+}
+
+.dusk-map canvas,
+.dusk-map svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.dusk-edge {
+  filter: blur(0.4px);
+}
+
+.dusk-borders path {
+  fill: none;
+  stroke: var(--dusk-amber);
+  stroke-opacity: 0.6;
+  stroke-width: 0.7;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.dusk-borders path.is-lit {
+  fill: var(--dusk-amber);
+  fill-opacity: 0;
+}
+
+/* The camera down: the landing after a submitted search, and every answer. */
+:root[data-dusk-zoom] .dusk-deep,
+.dusk-world-journey .dusk-deep,
+.dusk-world-quiet .dusk-deep {
+  opacity: 0.94;
+}
+
+:root[data-dusk-zoom] .dusk-sun,
+.dusk-world-journey .dusk-sun,
+.dusk-world-quiet .dusk-sun {
+  opacity: 0;
+}
+
+:root[data-dusk-zoom] .dusk-ground,
+.dusk-world-journey .dusk-ground,
+.dusk-world-quiet .dusk-ground {
+  transform: translateY(80%);
+}
+
+:root[data-dusk-zoom] .dusk-map,
+.dusk-world-journey .dusk-map {
+  transform: translate(var(--dusk-zoom-tx), var(--dusk-zoom-ty)) perspective(1400px) rotateX(0deg);
+}
+
+:root[data-dusk-zoom] .dusk-edge,
+.dusk-world-journey .dusk-edge {
+  opacity: 0;
+}
+
+:root[data-dusk-zoom] .dusk-borders path,
+.dusk-world-journey .dusk-borders path {
+  stroke-dashoffset: 0;
+}
+
+:root[data-dusk-zoom] .dusk-borders path.is-lit,
+.dusk-world-journey .dusk-borders path.is-lit {
+  fill-opacity: 0.2;
+}
+
+/* On an answer the map is atmosphere at the side; the chapter's own
+   choropleth and table carry the figures. Past the first screen it steps back
+   (`dusk-world.tsx`), so the chapters never read over two maps. */
+.dusk-world-journey .dusk-map {
+  opacity: 0.75;
+}
+
+.dusk-world-journey.is-past .dusk-map {
+  opacity: 0.14;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dusk-deep {
+    transition: opacity 1.4s ease 0.2s;
+  }
+
+  .dusk-sun {
+    transition: opacity 0.9s ease;
+  }
+
+  .dusk-ground {
+    transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .dusk-map {
+    transition:
+      transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 0.6s ease;
+  }
+
+  .dusk-edge {
+    transition: opacity 0.9s ease;
+  }
+
+  .dusk-borders path {
+    transition:
+      stroke-dashoffset 1.2s ease 0.5s,
+      fill-opacity 0.8s ease 1.6s;
+  }
+
+  /* The hero's words step aside as the camera comes down; the status line stays. */
+  :root[data-dusk-zoom] .landing-stage > :not(.landing-status),
+  :root[data-dusk-zoom] .landing-atlas {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.35s ease,
+      transform 0.35s ease;
+  }
+
+  /* An answer rises in, chapter by chapter, from a visible resting state. */
+  .site-journey .snapshot,
+  .site-journey .result section.chapter {
+    animation: dusk-rise 0.5s ease both;
+  }
+}
+
+@keyframes dusk-rise {
+  from {
+    opacity: 0.4;
+    transform: translateY(12px);
+  }
+}
+
+/* --- the header --- */
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5) var(--space-7);
+  width: 100%;
+  max-width: var(--site-width);
+  margin-inline: auto;
+  padding-block: var(--space-6);
+}
+
+.site-nav .wordmark {
+  flex: none;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 1.625rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+  text-decoration: none;
+}
+
+.site-links {
+  display: flex;
+  gap: var(--space-7);
+  margin-left: auto;
+  font-size: 1.0625rem;
+}
+
+.site-links a,
+.nav-menu nav a {
+  color: var(--dusk-ink);
+  text-decoration: none;
+}
+
+.site-links a:hover,
+.nav-menu nav a:hover {
+  color: var(--dusk-amber);
+}
+
+.site-links a[aria-current="page"],
+.nav-menu nav a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-color: var(--dusk-amber);
+  text-underline-offset: 8px;
+}
+
+.lang-switch {
+  flex: none;
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-soft);
+}
+
+.lang-switch a {
+  color: var(--dusk-ink-soft);
+  text-decoration: none;
+}
+
+.lang-switch a:hover {
+  color: var(--dusk-ink);
+}
+
+.lang-switch [aria-current] {
+  color: var(--dusk-amber);
+}
+
+/* The phone's menu: a native disclosure, hidden on wider screens. */
+.nav-menu {
+  display: none;
+  position: relative;
+}
+
+.nav-menu summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  list-style: none;
+  font-weight: 600;
+  color: var(--dusk-ink);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.nav-menu summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-menu[open] summary {
+  border-color: var(--dusk-ink);
+}
+
+.nav-menu nav {
+  position: absolute;
+  z-index: 20;
+  right: 0;
+  top: calc(100% + var(--space-3));
+  display: flex;
+  flex-direction: column;
+  min-width: 14rem;
+  padding: var(--space-3) 0;
+  background: var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: var(--radius-md);
+}
+
+.nav-menu nav a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+}
+
+/* --- the search, as a pill --- */
+
+.dusk .search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-6);
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.dusk .search:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.search-icon {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--dusk-ink-soft);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dusk .search label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.dusk .combobox::before,
+.dusk .combobox::after {
+  display: none;
+}
+
+.dusk .search input,
+.dusk .combobox-mirror {
+  min-height: 48px;
+  padding: var(--space-2) 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 1.1875rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+  color: var(--dusk-ink);
+  border: 0;
+}
+
+.dusk .search input:focus {
+  border: 0;
+}
+
+.dusk .search input::placeholder {
+  color: var(--dusk-ink-muted);
+}
+
+.dusk .search button {
+  flex: none;
+  min-height: 56px;
+  padding: 0 var(--space-8);
+  font-size: 1.1875rem;
+  font-weight: 600;
+  color: var(--dusk-on-amber);
+  background: var(--dusk-shell);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.dusk .search button:hover {
+  background: var(--dusk-shell);
+  box-shadow: 0 0 48px var(--dusk-glow);
+}
+
+.dusk .combobox-list {
+  background: var(--dusk-surface-raised);
+  border-color: var(--dusk-line-control);
+}
+
+.dusk .combobox-list li a {
+  color: var(--dusk-ink);
+}
+
+/* The header's search: compact, between the wordmark and the places. */
+.dusk .search-compact {
+  flex: 1 1 18rem;
+  max-width: 26rem;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5);
+}
+
+.search-compact .search-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.dusk .search-compact input,
+.dusk .search-compact .combobox-mirror {
+  min-height: 36px;
+  font-size: 0.9375rem;
+}
+
+.dusk .search-compact button {
+  min-height: 36px;
+  padding: 0 var(--space-5);
+  font-size: 0.9375rem;
+}
+
+/* --- the landing --- */
+
+.site > main.landing {
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-stage {
+  display: flex;
+  flex-direction: column;
+  border-top: 0;
+  min-height: calc(100svh - 7rem);
+  padding-top: clamp(var(--space-6), 6vh, var(--space-9));
+}
+
+.landing-eyebrow {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-muted);
+}
+
+.landing-headline {
+  max-width: 14ch;
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 1.3rem + 4.7vw, 5.6rem);
+  /* The text cut of the face: rounder and lower in contrast than the display
+     cut, as the mockup sets it. */
+  font-variation-settings: "opsz" 28;
+  font-weight: 440;
+  line-height: 1.04;
+  letter-spacing: -0.005em;
+  color: var(--dusk-ink);
+}
+
+.landing-headline span {
+  display: block;
+}
+
+.landing-lede {
+  max-width: 38rem;
+  margin: var(--space-5) 0 var(--space-6);
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.3125rem);
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
+}
+
+.landing-stage .search-hero {
+  width: 100%;
+  max-width: 52rem;
+}
+
+/* Empty until a search leaves the page (`dusk-zoom.tsx`). */
+.landing-status {
+  min-height: 1.5em;
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink);
+}
+
+.landing-trust {
+  margin: auto 0 0;
+  padding-block: var(--space-6) var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-soft);
+}
+
+/* Below the hero: the most common surnames and the atlas's plates, read on the
+   sky. A ground of their own so the plates' figures never sit on the land. */
+.landing-atlas {
+  position: relative;
+  margin-inline: calc(var(--gutter) * -1);
+  padding: var(--space-9) var(--gutter) var(--space-8);
+  background: var(--dusk-surface);
+  scroll-margin-top: var(--space-5);
+}
+
+.landing-atlas > * {
+  max-width: var(--site-width);
+  margin-inline: auto;
+}
+
+/* --- reading pages: how it works, contact, privacy, terms, not found --- */
+
+.site > main.reading {
+  max-width: 46rem;
+  padding-block: var(--space-7) var(--space-9);
+}
+
+.page-title,
+.reading h2 {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+}
+
+.page-lede {
+  max-width: 40ch;
+  margin: 0 0 var(--space-8);
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
+}
+
+.reading section {
+  padding-top: var(--space-6);
+}
+
+/* A page whose title sits inside its one section opens on the title, not a rule. */
+.reading > section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.reading section h3 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.625rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dusk-ink);
+}
+
+.reading p,
+.reading li {
+  line-height: 1.6;
+  color: var(--dusk-ink-soft);
+}
+
+.reading .search {
+  max-width: 40rem;
+}
+
+.legal-updated {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+}
+
+/* --- answers: the surname page and the search's own answers --- */
+
+.site > main.profile,
+.site > main.answer {
+  padding-bottom: var(--space-9);
+}
+
+.site-journey .snapshot {
+  min-height: calc(100svh - 9rem);
+  padding-top: var(--space-6);
+}
+
+.site-journey .eyebrow,
+.site-journey .hero-label,
+.site-journey .hero-line,
+.site-journey .tally {
+  font-family: var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-muted);
+}
+
+.site-journey .hero-line {
+  color: var(--dusk-ink-soft);
+}
+
+.site-journey .hero-number {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3.25rem, 2rem + 5vw, 6.5rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--dusk-ink);
+}
+
+.site-journey .hero-list {
+  margin: 0 0 var(--space-2);
+  color: var(--dusk-ink-soft);
+}
+
+/* Held at the top while the chapters scroll under it, so it needs a ground. */
+.site-journey .chapter-nav {
+  background: color-mix(in srgb, var(--dusk-surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-color: var(--dusk-line);
+}
+
+.site-journey .chapter-nav a {
+  color: var(--dusk-ink);
+}
+
+.site-journey .chapter-nav a:hover {
+  color: var(--dusk-amber);
+}
+
+/* One chapter per screen on a wide screen, the copy at the left and the
+   world at the right. */
+.site-journey .result section.chapter {
+  min-height: 100svh;
+  grid-template-columns: minmax(0, 40rem);
+  align-content: start;
+}
+
+.site-journey .result section.chapter-wide {
+  grid-template-columns: minmax(0, 66rem);
+}
+
+.site-journey .result section.chapter-empty {
+  min-height: 0;
+}
+
+.site-journey .result .chapter-rail h3 {
+  font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+}
+
+.site-journey .chapter-lede {
+  font-size: 1.125rem;
+  color: var(--dusk-ink-soft);
+}
+
+.site-journey .claim-statement {
+  font-size: 1.25rem;
+  color: var(--dusk-ink);
+}
+
+.site-journey .result .claim-meta {
+  font-family: var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-muted);
+}
+
+.dusk .warning {
+  color: var(--dusk-ink);
+  background: var(--dusk-surface-raised);
+  border-color: var(--dusk-warning);
+  border-radius: var(--radius-md);
+}
+
+/* The map island, on the dusk ramp. Regions are separated by the page's ground. */
+.dusk .vmap-region {
+  stroke: var(--dusk-surface);
+}
+
+.dusk .vmap-highlight {
+  stroke: var(--dusk-ink);
+}
+
+.dusk .vmap-none-line {
+  stroke: var(--dusk-ink-muted);
+}
+
+.dusk .rb-track {
+  background: var(--dusk-line);
+}
+
+/* The page's secondary actions are ghost pills; the search stays the primary. */
+.dusk .share button,
+.dusk .again a {
+  color: var(--dusk-ink);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.dusk .share button:hover,
+.dusk .again a:hover {
+  background: transparent;
+  border-color: var(--dusk-ink);
+}
+
+/* --- the comparison and its picker --- */
+
+.site > main.compare {
+  padding-bottom: var(--space-9);
+}
+
+.compare-pick {
+  max-width: 46rem;
+}
+
+.compare-form {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 34rem;
+  margin-top: var(--space-7);
+}
+
+.compare-form label {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-muted);
+}
+
+.compare-form input {
+  min-height: 52px;
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: var(--radius-md);
+}
+
+.compare-form input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.compare-form input::placeholder {
+  color: var(--dusk-ink-muted);
+}
+
+.compare-form button {
+  justify-self: start;
+  min-height: 52px;
+  padding: 0 var(--space-8);
+  font: inherit;
+  font-weight: 600;
+  color: var(--dusk-on-amber);
+  background: var(--dusk-shell);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.compare-error {
+  margin: 0;
+  color: var(--dusk-warning);
+}
+
+/* --- the footer --- */
+
+/* The same width under every page; the older per-page footer widths (the
+   comparison's, the profile's) no longer apply. */
+.site > footer,
+.site > main + footer {
+  width: 100%;
+  max-width: var(--site-width);
+  margin: 0 auto;
+  padding-block: var(--space-6) var(--space-7);
+  color: var(--dusk-ink-muted);
+  border-top: 1px solid var(--dusk-line);
+}
+
+/* --- phones --- */
+
+@media (max-width: 760px) {
+  body.dusk {
+    --dusk-mapw: 88vw;
+    --dusk-hero-tx: 0px;
+    --dusk-hero-ty: 32.5vh;
+    --dusk-zoom-tx: 0px;
+    --dusk-zoom-ty: 12vh;
+  }
+
+  .dusk-sun {
+    right: -30%;
+    width: 300px;
+  }
+
+  .dusk-ground {
+    top: 76%;
+  }
+
+  /* The map sits behind the copy, dimmed, so the chapters read over it. */
+  .dusk-world-journey .dusk-map {
+    opacity: 0.3;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    padding-block: var(--space-4);
+    gap: var(--space-4);
+  }
+
+  .site-links {
+    display: none;
+  }
+
+  .nav-menu {
+    display: block;
+  }
+
+  .lang-switch {
+    margin-left: auto;
+  }
+
+  /* The compact search takes its own row under the wordmark. */
+  .dusk .search-compact {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .dusk .search-hero {
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+  }
+
+  .search-hero .combobox {
+    flex: 1 1 60%;
+  }
+
+  .dusk .search-hero button {
+    flex: 1 1 100%;
+    min-height: 52px;
+    margin-top: var(--space-2);
+  }
+
+  .landing-stage {
+    min-height: calc(100svh - 5rem);
+  }
+
+  .landing-headline {
+    font-size: clamp(2.6rem, 11vw, 3.4rem);
+  }
+
+  .site-journey .snapshot {
+    min-height: 0;
+  }
+
+  .site-journey .result section.chapter {
+    min-height: 0;
+  }
 }

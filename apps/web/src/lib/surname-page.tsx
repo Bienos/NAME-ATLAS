@@ -7,21 +7,14 @@ import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { assessIndexability, indexingEnabled } from "./seo.js";
 import { seoGatesFor } from "./seo-surface.js";
 import { currentPathFor, pathForSlug, resolveSlug } from "./slug.js";
-import {
-  formatDate,
-  formatInteger,
-  htmlLang,
-  parseIntent,
-  partitionLabel,
-  UI,
-} from "./messages.js";
+import { formatDate, formatInteger, parseIntent, partitionLabel, UI } from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
 import { Result } from "./result-view.js";
-import { SearchForm } from "./search-form.js";
 import { ShareButton } from "./share-button.js";
 import { ReportLink } from "./report-link.js";
-import { NamePrint } from "./name-print.js";
-import { SiteFooter } from "./site-footer.js";
+import { SiteShell } from "./site-shell.js";
+import { comparePagePath } from "./site-links.js";
+import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
 
 /**
  * The canonical surname page (TASK-024, ADR-0009), shared by
@@ -289,49 +282,49 @@ export function CanonicalSurnamePage({
   const otherPath =
     (answer.kind === "RESULT" ? answer.otherLangPath : null) ??
     (otherLang === "en" ? "/?lang=en" : "/");
+  // The dusk world behind the journey (ADR-0021, TASK-052): the camera already
+  // down, the register as points, and the surname's own regional shares — the
+  // validated ones the chapter prints — as its light. Nothing else is derived.
+  const world = answer.kind === "RESULT" ? worldInput(answer.response) : EMPTY_WORLD;
 
   return (
-    <>
-      <main lang={htmlLang(lang)} className="profile">
-        <div className="masthead">
-          <h1>
-            <a href={lang === "en" ? "/?lang=en" : "/"}>
-              <NamePrint className="logo-mark" size="small" />
-              {t.title}
-            </a>
-          </h1>
-          <a href={otherPath}>{t.langSwitch}</a>
-        </div>
-        <SearchForm lang={lang} query={answer.kind === "RESULT" ? answer.display : ""} />
-        {answer.kind === "INVALID_SLUG" || answer.kind === "UNKNOWN" ? (
-          <section>
-            <h3>{t.unresolvedHeading}</h3>
-            <p className="absent">{t.slugUnknownBody}</p>
-          </section>
-        ) : answer.kind === "UNAVAILABLE" ? (
-          <section>
-            <h3>{t.unavailableHeading}</h3>
-            <p className="absent">{t.unavailableBody}</p>
-          </section>
-        ) : answer.kind === "RESULT" ? (
-          <>
-            <Result response={answer.response} lang={lang} intent={intent} />
-            <div className="result-actions">
-              {shareUrl === null ? null : (
-                <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
-              )}
-              <p className="again">
-                <a href="#surname">{t.searchAnother}</a>
-              </p>
-              <ReportLink surnames={[answer.display]} pageUrl={shareUrl ?? path} lang={lang} />
-            </div>
-          </>
-        ) : // `MOVED`. The route answers a permanent redirect before rendering, so
-        // this branch exists only to keep the union exhaustive.
-        null}
-      </main>
-      <SiteFooter lang={lang} />
-    </>
+    <SiteShell
+      lang={lang}
+      otherPath={otherPath}
+      world={{ mode: "journey", weights: world.weights, lit: world.lit }}
+      search={{ query: answer.kind === "RESULT" ? answer.display : "" }}
+      mainClassName="profile"
+    >
+      {answer.kind === "INVALID_SLUG" || answer.kind === "UNKNOWN" ? (
+        <section>
+          <h3>{t.unresolvedHeading}</h3>
+          <p className="absent">{t.slugUnknownBody}</p>
+        </section>
+      ) : answer.kind === "UNAVAILABLE" ? (
+        <section>
+          <h3>{t.unavailableHeading}</h3>
+          <p className="absent">{t.unavailableBody}</p>
+        </section>
+      ) : answer.kind === "RESULT" ? (
+        <>
+          <Result response={answer.response} lang={lang} intent={intent} />
+          <div className="result-actions">
+            {shareUrl === null ? null : (
+              <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
+            )}
+            <p className="again">
+              <a href="#surname">{t.searchAnother}</a>
+              <a href={`${comparePagePath(lang)}?a=${encodeURIComponent(answer.slug)}`}>
+                {t.compareFromHere}
+              </a>
+            </p>
+            <ReportLink surnames={[answer.display]} pageUrl={shareUrl ?? path} lang={lang} />
+          </div>
+        </>
+      ) : // `MOVED`. The route answers a permanent redirect before rendering, so
+      // this branch exists only to keep the union exhaustive.
+      null}
+    </SiteShell>
   );
 }
 

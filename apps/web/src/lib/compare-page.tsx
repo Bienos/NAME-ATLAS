@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
-import { ComparisonView } from "./compare-view.js";
+import { ComparePicker, ComparisonView } from "./compare-view.js";
 import type { ComparisonSide } from "./compare-view.js";
 import { currentPathFor, resolveSlug } from "./slug.js";
 import type { Lang } from "./messages.js";
@@ -63,10 +63,5 @@ export async function loadComparison(
   }
 }
 
-export function firstParam(value: string | string[] | undefined): string {
-  if (Array.isArray(value)) return value[0] ?? "";
-  return value ?? "";
-}
-
-export { ComparisonView };
+export { ComparePicker, ComparisonView };
 export type { Lang };

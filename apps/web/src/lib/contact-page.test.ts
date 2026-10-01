@@ -21,9 +21,9 @@ describe("contact pages (TASK-047)", () => {
 
   it("switch language to the other contact page", () => {
     const pl = renderToStaticMarkup(createElement(ContactView, { lang: "pl" }));
-    expect(pl).toContain('href="/en/contact">English</a>');
+    expect(pl).toContain('href="/en/contact" hrefLang="en" lang="en" aria-label="English">EN</a>');
     const en = renderToStaticMarkup(createElement(ContactView, { lang: "en" }));
-    expect(en).toContain('href="/pl/kontakt">Polski</a>');
+    expect(en).toContain('href="/pl/kontakt" hrefLang="pl" lang="pl" aria-label="Polski">PL</a>');
   });
 
   it("name their own canonical address", () => {
