@@ -21,6 +21,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import type { EffectiveRights } from "./rights.js";
+import type { ShiftGap, ShiftPoint, ShiftRole, ShiftSummary } from "./shift.js";
 
 /** One persisted claim, with everything a projection needs. */
 export interface PersistedCurrentPopulation {
@@ -734,4 +735,151 @@ export async function readSurnameMeaning(
     ...claim,
     citation_rights: rightsByClaim.get(claim.claim_id) ?? [claim.rights],
   }));
+}
+
+/** One persisted `SURNAME_DISTRIBUTION_SHIFT` claim: a surname's count across one list's editions (TASK-051). */
+export interface PersistedDistributionShift {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly role: ShiftRole;
+  readonly points: readonly ShiftPoint[];
+  readonly gaps: readonly ShiftGap[];
+  readonly summary: ShiftSummary;
+  readonly rounding: string;
+  readonly algorithm_version: string;
+  readonly country_code: string;
+  readonly scope_label_code: string;
+  readonly confidence_status: string;
+  readonly assessment_method: string;
+  readonly assessment_version: string;
+  readonly citation_id: string;
+  readonly citation_title: string;
+  readonly citation_publisher: string | null;
+  readonly citation_publication_date: string | null;
+  readonly citation_url: string | null;
+  readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
+  readonly citation_source_page_url: string | null;
+  readonly source_type: string;
+  readonly attribution_text: string | null;
+  readonly terms_version: string | null;
+  readonly rights: EffectiveRights;
+}
+
+interface ShiftReadRow {
+  readonly claim_id: string;
+  readonly claim_key: string;
+  readonly structured_value: Record<string, unknown>;
+  readonly confidence_status: string;
+  readonly assessment_method: string;
+  readonly assessment_version: string;
+  readonly citation_id: string;
+  readonly citation_title: string;
+  readonly citation_publisher: string | null;
+  readonly citation_publication_date: string | null;
+  readonly citation_url: string | null;
+  readonly citation_locator: string | null;
+  readonly citation_retrieved_at: string | null;
+  readonly citation_source_page_url: string | null;
+  readonly source_type: string;
+  readonly attribution_text: string | null;
+  readonly terms_version: string | null;
+  readonly automated_access: string;
+  readonly commercial_use: string;
+  readonly redistribution: string;
+  readonly metadata_rights: string;
+  readonly review_status: string;
+}
+
+/**
+ * Reads every ACTIVE `SURNAME_DISTRIBUTION_SHIFT` claim for a surname, one per
+ * list, with its confidence, citation and the rights in force. Read-only;
+ * derives nothing.
+ *
+ * The claim type is compared as text, not as the enum: a database that has
+ * not yet run migration 0024 has no such enum value, and comparing against it
+ * would make Postgres refuse the statement. As text, that database simply
+ * holds no such claim, and the page answers "no change section" (ADR-0020 §2.10).
+ */
+export async function readDistributionShift(
+  db: Kysely<DB>,
+  surnameId: string,
+): Promise<PersistedDistributionShift[]> {
+  const result = await sql<ShiftReadRow>`
+    SELECT
+      c.claim_id::text                                   AS claim_id,
+      c.claim_key                                        AS claim_key,
+      c.structured_value                                 AS structured_value,
+      ca.status::text                                    AS confidence_status,
+      ca.assessment_method                               AS assessment_method,
+      ca.assessment_version                              AS assessment_version,
+      cit.citation_id::text                              AS citation_id,
+      cit.title                                          AS citation_title,
+      cit.publisher                                      AS citation_publisher,
+      cit.publication_date                               AS citation_publication_date,
+      cit.url_or_reference                               AS citation_url,
+      cit.supporting_locator                             AS citation_locator,
+      to_char(cit.accessed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                                         AS citation_retrieved_at,
+      src.homepage_or_reference_url                      AS citation_source_page_url,
+      src.source_type::text                              AS source_type,
+      rp.attribution_text                                AS attribution_text,
+      rp.terms_version                                   AS terms_version,
+      rp.automated_access::text                          AS automated_access,
+      rp.commercial_use::text                            AS commercial_use,
+      rp.redistribution::text                            AS redistribution,
+      rp.metadata_rights::text                           AS metadata_rights,
+      rp.review_status::text                             AS review_status
+    FROM claims c
+    JOIN confidence_assessments ca ON ca.claim_id = c.claim_id
+    JOIN citations cit             ON cit.claim_id = c.claim_id
+    JOIN sources src               ON src.source_id = cit.source_id
+    JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
+    WHERE c.subject_entity_id = ${surnameId}::uuid
+      AND c.claim_type::text = 'SURNAME_DISTRIBUTION_SHIFT'
+      AND c.claim_status = 'ACTIVE'
+    -- The men's list first, as every other section orders its two lists.
+    ORDER BY c.structured_value->>'role' DESC, c.claim_key
+  `.execute(db);
+
+  return result.rows.map((row) => {
+    const value = row.structured_value;
+    const role = value["role"];
+    if (role !== "national_male" && role !== "national_female") {
+      throw new Error(`claim ${row.claim_id}: unknown list "${String(role)}" in a change claim`);
+    }
+    return {
+      claim_id: row.claim_id,
+      claim_key: row.claim_key,
+      role,
+      points: value["points"] as readonly ShiftPoint[],
+      gaps: value["gaps"] as readonly ShiftGap[],
+      summary: value["summary"] as ShiftSummary,
+      rounding: String(value["rounding"]),
+      algorithm_version: String(value["algorithm_version"]),
+      country_code: String(value["country_code"]),
+      scope_label_code: String(value["scope_label_code"]),
+      confidence_status: row.confidence_status,
+      assessment_method: row.assessment_method,
+      assessment_version: row.assessment_version,
+      citation_id: row.citation_id,
+      citation_title: row.citation_title,
+      citation_publisher: row.citation_publisher,
+      citation_publication_date: row.citation_publication_date,
+      citation_url: row.citation_url,
+      citation_locator: row.citation_locator,
+      citation_retrieved_at: row.citation_retrieved_at,
+      citation_source_page_url: row.citation_source_page_url,
+      source_type: row.source_type,
+      attribution_text: row.attribution_text,
+      terms_version: row.terms_version,
+      rights: {
+        automated_access: row.automated_access,
+        commercial_use: row.commercial_use,
+        redistribution: row.redistribution,
+        metadata_rights: row.metadata_rights,
+        review_status: row.review_status,
+      },
+    };
+  });
 }

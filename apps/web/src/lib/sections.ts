@@ -68,6 +68,15 @@ export const SECTIONS = [
     lede: "chapterWhereLede",
   },
   {
+    key: "change",
+    field: "change",
+    anchor: "change",
+    intent: "change",
+    nav: "navChange",
+    title: "chapterChangeTitle",
+    lede: "chapterChangeLede",
+  },
+  {
     key: "meaning",
     field: "meaning",
     anchor: "meaning",

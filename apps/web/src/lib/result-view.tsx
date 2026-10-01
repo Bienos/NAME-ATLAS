@@ -22,6 +22,8 @@ import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type {
   ArchiveSection,
+  ChangeEntry,
+  ChangeSection,
   CitationDto,
   DistributionEntry,
   MeaningSection,
@@ -38,6 +40,9 @@ import {
   archivePeriodLabel,
   archiveSentence,
   assessmentWord,
+  changeGapNote,
+  changeListLabel,
+  changeSentence,
   coverageWarning,
   distributionSentence,
   explanationText,
@@ -381,6 +386,130 @@ function Distribution({
   );
 }
 
+/**
+ * The change-over-time table: one row per edition in date order, the surname's
+ * share of that edition's list beside its count, and a row in place of any
+ * resource that is not an edition. The bar is the point's own share against the
+ * largest of the entry's, as the voivodeship bars are: a scale, not a derived
+ * fact. A surname a list does not name is a row that says so, never a zero.
+ */
+function ChangeTable({ entry, lang }: { entry: ChangeEntry; lang: Lang }) {
+  const t = UI[lang];
+  const shares = entry.points.flatMap((point) => (point.status === "KNOWN" ? [point.share] : []));
+  const largest = Math.max(...shares);
+  const rows = [
+    ...entry.points.map((point) => ({ date: point.data_date, point, gap: null })),
+    ...entry.gaps.map((gap) => ({ date: gap.data_date, point: null, gap })),
+  ].sort((a, b) => a.date.localeCompare(b.date));
+  return (
+    <div className="table-scroll" tabIndex={0} role="region" aria-label={t.changeTableLabel}>
+      <table className="rank-bars change-table">
+        <thead>
+          <tr>
+            <th scope="col">{t.changeEditionColumn}</th>
+            <th scope="col">{t.changeShareColumn}</th>
+            <th scope="col">{t.changeCountColumn}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(({ date, point, gap }) =>
+            gap !== null || point === null ? (
+              <tr key={`gap-${date}`} className="change-gap">
+                <th scope="row">{formatDate(date, lang)}</th>
+                <td colSpan={2}>{changeGapNote(date, lang)}</td>
+              </tr>
+            ) : point.status === "KNOWN" ? (
+              <tr key={point.data_date}>
+                <th scope="row">
+                  {formatDate(point.data_date, lang)}
+                  {point.note_code === null ? null : <sup aria-label={t.changeNoteMark}>*</sup>}
+                </th>
+                <td className="rb-share">
+                  <span className="rb-track">
+                    <span
+                      className="rb-fill"
+                      style={
+                        { "--w": `${((point.share / largest) * 100).toFixed(1)}%` } as CSSProperties
+                      }
+                    />
+                  </span>
+                  <span className="rb-value">
+                    {t.compareOneIn} {formatInteger(point.one_in_x, lang)}
+                  </span>
+                </td>
+                <td className="rb-count">{formatInteger(point.count, lang)}</td>
+              </tr>
+            ) : (
+              <tr key={point.data_date} className="change-absent">
+                <th scope="row">
+                  {formatDate(point.data_date, lang)}
+                  {point.note_code === null ? null : <sup aria-label={t.changeNoteMark}>*</sup>}
+                </th>
+                <td colSpan={2}>{t.changeNotOnList}</td>
+              </tr>
+            ),
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+/**
+ * The change chapter (TASK-051, ADR-0020): per list, the sentence, then the
+ * table, then the notes a reader needs next to it. Not shown where there is no
+ * claim, which is most surnames until they are on two editions of a list: an
+ * absence is not a chapter.
+ */
+function Change({
+  section,
+  surname,
+  number,
+  next,
+  lang,
+}: {
+  section: ChangeSection;
+  surname: string;
+  number: number;
+  next: Step | null;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  return (
+    <Chapter
+      chapter="change"
+      number={number}
+      next={next}
+      lang={lang}
+      empty={section.state !== "READY"}
+    >
+      {section.state !== "READY" ? (
+        <Absent state={section.state} reason={section.reason_code} lang={lang} />
+      ) : (
+        <div className="lists lists-change">
+          {section.entries.map((entry) => {
+            const flagged = entry.points.some((point) => point.note_code !== null);
+            return (
+              <div className="list" key={entry.list}>
+                <p className="list-label">{changeListLabel(entry.list, lang)}</p>
+                <Claim
+                  statement={changeSentence(entry, surname, lang)}
+                  evidence={changeEvidence(entry, lang)}
+                  country_code={entry.country_code}
+                  lang={lang}
+                >
+                  <ChangeTable entry={entry} lang={lang} />
+                  {flagged ? <p className="note">* {t.change2019Note}</p> : null}
+                </Claim>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Chapter>
+  );
+}
+
 /** A work as a citation, so a meaning claim is cited at the foot of the page like every other. */
 function workCitation(interpretation: MeaningSection["interpretations"][number]): CitationDto {
   const { author_or_publisher, title, year } = interpretation.work;
@@ -656,6 +785,16 @@ function distributionEvidence(entry: DistributionEntry, lang: Lang): ClaimEviden
   };
 }
 
+function changeEvidence(entry: ChangeEntry, lang: Lang): ClaimEvidence {
+  const t = UI[lang];
+  return {
+    citation: entry.citation,
+    underlying_date: entry.summary.last.data_date,
+    confidence: entry.confidence,
+    notes: [t.changeListNote, t.limitationRounded, t.limitationSuppressed],
+  };
+}
+
 function meaningEvidence(
   section: MeaningSection,
   interpretation: MeaningSection["interpretations"][number],
@@ -689,6 +828,7 @@ function pageEvidence(response: SurnameResultResponse, lang: Lang): ClaimEvidenc
     ...observations.map((o) => populationEvidence(o, observations.length > 1, lang)),
     ...(response.rarity?.entries ?? []).map((e) => rarityEvidence(e, lang)),
     ...(response.distribution?.entries ?? []).map((e) => distributionEvidence(e, lang)),
+    ...(response.change?.entries ?? []).map((e) => changeEvidence(e, lang)),
     ...(meaning === null
       ? []
       : meaning.interpretations.map((i) => meaningEvidence(meaning, i, lang))),
@@ -860,7 +1000,7 @@ export function Result({
 
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
-    const { population, rarity, distribution, meaning, archive } = response;
+    const { population, rarity, distribution, change, meaning, archive } = response;
     const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
       {
         count:
@@ -892,6 +1032,14 @@ export function Result({
                   next={next}
                   lang={lang}
                 />
+              ),
+        // Hidden, not stated, when there is no claim: most surnames have none until
+        // they are on two editions of a list, and a chapter saying so would be noise.
+        change:
+          change === null || change.state === "UNAVAILABLE"
+            ? null
+            : (n, next) => (
+                <Change section={change} surname={surname} number={n} next={next} lang={lang} />
               ),
         meaning:
           meaning === null

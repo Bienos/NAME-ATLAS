@@ -72,7 +72,8 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.8",
+  schema_version: "1.9",
+  change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -197,7 +198,13 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.8",
+  schema_version: "1.9",
+  change: {
+    state: "RIGHTS_BLOCKED",
+    entries: [],
+    reason_code: "COMMERCIAL_USE_UNKNOWN",
+    surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
+  },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
   population: {
@@ -245,7 +252,8 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.8",
+  schema_version: "1.9",
+  change: null,
   status: "UNRESOLVED",
   surname: null,
   population: null,
@@ -293,7 +301,8 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.8",
+  schema_version: "1.9",
+  change: null,
   status: "AMBIGUOUS",
   surname: null,
   population: null,
@@ -1272,5 +1281,249 @@ describe("TASK-054: the archive chapter", () => {
     const t = text(render(none, "pl"));
     expect(t).toContain("Wyszukiwarka Polony nie zwróciła żadnego wyniku dla słowa NOWAK");
     expect(t).not.toContain(UI.pl.archiveNotSearched);
+  });
+});
+
+/**
+ * TASK-051, ADR-0020: the change-over-time chapter, from the contract alone.
+ *
+ * The counts and list totals below are SYNTHETIC, chosen so the arithmetic is
+ * checkable by eye (a count of 100 on a list of 1,000 is one in 10). The
+ * builders compute `one_in_x` and `share` by the contract's own rule, which the
+ * schema then re-checks when the fixture is parsed.
+ */
+function known(date: string, count: number, total: number, note = false) {
+  return {
+    status: "KNOWN",
+    data_date: date,
+    note_code: note ? "UNIVERSE_DESCRIPTION_DIFFERS" : null,
+    source_url: null,
+    count,
+    list_total: total,
+    one_in_x: Math.floor(total / count + 0.5),
+    share: Number((count / total).toFixed(9)),
+  };
+}
+const absent = (date: string) => ({
+  status: "NOT_ON_LIST",
+  data_date: date,
+  note_code: null,
+  source_url: null,
+});
+
+function changeEntry(
+  list: "MALE" | "FEMALE",
+  points: { status: string; data_date: string; count?: number; list_total?: number }[],
+  gaps: { data_date: string; reason_code: "PUBLISHER_DUPLICATE" }[],
+) {
+  const knownPoints = points.filter((p) => p.status === "KNOWN") as {
+    data_date: string;
+    count: number;
+    list_total: number;
+  }[];
+  const first = knownPoints[0]!;
+  const last = knownPoints[knownPoints.length - 1]!;
+  const percent = (from: number, to: number) => Math.round(((to - from) / from) * 1000) / 10;
+  return {
+    list,
+    points,
+    gaps,
+    summary: {
+      known_points: knownPoints.length,
+      first: { data_date: first.data_date, count: first.count, list_total: first.list_total },
+      last: { data_date: last.data_date, count: last.count, list_total: last.list_total },
+      count_change_percent: percent(first.count, last.count),
+      list_change_percent: percent(first.list_total, last.list_total),
+    },
+    methodology_code: "distribution_shift@1",
+    scope_label_code: "PESEL_CURRENT_SURNAME",
+    country_code: "PL",
+    confidence: CONFIDENCE,
+    citation: CITATION,
+  };
+}
+
+// Men: the 2019 edition flagged, the 2020 one without the surname, a fall and a larger list.
+const MALE_CHANGE = changeEntry(
+  "MALE",
+  [
+    known("2019-06-30", 1000, 1_000_000, true),
+    absent("2020-01-22"),
+    known("2021-02-01", 900, 1_050_000),
+    known("2026-01-20", 800, 1_200_000),
+  ],
+  [],
+);
+// Women: no 2022 edition, which the publisher's duplicate of 2021 stands in for.
+const FEMALE_CHANGE = changeEntry(
+  "FEMALE",
+  [known("2021-02-02", 2000, 1_250_000), known("2023-01-30", 2000, 1_300_000)],
+  [{ data_date: "2022-01-27", reason_code: "PUBLISHER_DUPLICATE" }],
+);
+
+function withChange(change: unknown): unknown {
+  return { ...(structuredClone(RESOLVED) as object), change };
+}
+const CHANGE_READY = withChange({
+  state: "READY",
+  entries: [MALE_CHANGE, FEMALE_CHANGE],
+  reason_code: null,
+  surface: SURFACE,
+});
+
+describe("TASK-051: the change-over-time chapter", () => {
+  it("renders, in Polish, what changed between the first and last edition and what the list did", () => {
+    const body = text(render(CHANGE_READY, "pl"));
+    expect(body).toContain("Zmiany w czasie");
+    expect(body).toContain("Jak zmieniała się ta liczba w kolejnych edycjach listy?");
+    // 1,000 → 800 is −20.0%, and the list 1,000,000 → 1,200,000 is +20.0%.
+    expect(body).toContain(
+      "Liczba osób o nazwisku NOWAK (mężczyźni) w rejestrze PESEL zmieniła się z 1\u00a0000 na dzień 30 czerwca 2019 r. na 800 na dzień 20 stycznia 2026 r.: −20,0%. Cała lista zmieniła się między tymi edycjami o +20,0%.",
+    );
+    // The women's counts are equal: the sentence says so rather than "changed by 0".
+    expect(body).toContain(
+      "była taka sama (2\u00a0000) na dzień 2 lutego 2021 r. i na dzień 30 stycznia 2023 r.",
+    );
+  });
+
+  it("renders the same in English", () => {
+    const body = text(render(CHANGE_READY, "en"));
+    expect(body).toContain("Change over time");
+    expect(body).toContain(
+      "The number of people with the surname NOWAK (male) in the PESEL register changed from 1,000 on 30 June 2019 to 800 on 20 January 2026: −20.0%. The whole list changed by +20.0% between those editions.",
+    );
+  });
+
+  it("shows each edition as a row with its count and its share of that edition's list", () => {
+    const body = text(render(CHANGE_READY, "en"));
+    // 1,000,000 / 1,000 = 1 in 1,000; 1,050,000 / 900 = 1 in 1,167; 1,200,000 / 800 = 1 in 1,500.
+    for (const figure of ["1 in 1,000", "1 in 1,167", "1 in 1,500"]) expect(body).toContain(figure);
+    expect(body).toContain("30 June 2019");
+    expect(body).toContain("1 February 2021");
+  });
+
+  it("states an edition without the surname, never as zero", () => {
+    for (const [lang, words] of [
+      ["pl", "brak na liście — nie oznacza zera"],
+      ["en", "not on the list — not zero"],
+    ] as const) {
+      expect(text(render(CHANGE_READY, lang))).toContain(words);
+    }
+    const markup = render(CHANGE_READY, "en");
+    const row = markup.slice(
+      markup.indexOf("22 January 2020"),
+      markup.indexOf("</tr>", markup.indexOf("22 January 2020")),
+    );
+    expect(row).not.toMatch(/>0</u);
+  });
+
+  it("explains the publisher's duplicate where it falls, and flags the 2019 edition", () => {
+    const pl = text(render(CHANGE_READY, "pl"));
+    expect(pl).toContain(
+      "Plik wydawcy z dnia 27 stycznia 2022 r. powtarza dane poprzedniej edycji",
+    );
+    expect(pl).toContain("Pliki z 2019 roku opisują swoją zawartość krótszym opisem");
+    const en = text(render(CHANGE_READY, "en"));
+    expect(en).toContain(
+      "The publisher's file dated 27 January 2022 repeats the data of the previous edition",
+    );
+    expect(en).toContain("The 2019 files describe their contents in fewer words");
+    // The women's list has no 2019 edition here, so its column carries no 2019 note.
+    const markup = render(CHANGE_READY, "en");
+    expect(markup.match(/The 2019 files describe/gu)).toHaveLength(1);
+  });
+
+  it("puts it after the geography and before the meaning, in the page and in its links", () => {
+    const markup = render(CHANGE_READY, "en");
+    const order = [
+      'id="today-count"',
+      'id="rarity"',
+      'id="where"',
+      'id="change"',
+      'id="meaning"',
+    ].map((id) => markup.indexOf(id));
+    expect(order.every((i) => i > -1)).toBe(true);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    expect(markup).toContain('href="#change"');
+    // Numbered as it appears: the fourth of five chapters.
+    expect(markup.slice(markup.indexOf('id="change"'))).toMatch(
+      /^id="change"[^>]*><div class="chapter-rail"><p class="chapter-number">04<\/p>/u,
+    );
+  });
+
+  it("moves first for ?intent=change, and changes only the order", () => {
+    const parsed = surnameResultResponseSchema.parse(CHANGE_READY) as SurnameResultResponse;
+    const first = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "change" }),
+    );
+    expect(first.indexOf('id="change"')).toBeLessThan(first.indexOf('id="today-count"'));
+  });
+
+  it("is not a chapter at all where there is no claim: no chapter, no link, no sentence about it", () => {
+    for (const reason of ["NO_CHANGE_DERIVED", "NOT_DERIVED_YET"]) {
+      const markup = render(
+        withChange({ state: "UNAVAILABLE", entries: [], reason_code: reason, surface: SURFACE }),
+        "en",
+      );
+      expect(markup).not.toContain('id="change"');
+      expect(markup).not.toContain('href="#change"');
+      expect(text(markup)).not.toContain("Change over time");
+    }
+    // RESOLVED fixtures in the rest of this file carry no claim and render as before.
+    expect(render(RESOLVED, "en")).not.toContain('id="change"');
+  });
+
+  it("carries no figure when the surface is rights-blocked", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const markup = render(RIGHTS_BLOCKED, lang);
+      expect(markup).toContain('id="change"');
+      expect(markup).not.toContain("rb-fill");
+      expect(text(markup)).toMatch(
+        lang === "pl" ? /Licencja źródła nie pozwala/u : /licence does not permit/u,
+      );
+    }
+  });
+
+  it("cites the dataset once, however many claims cite it", () => {
+    const markup = render(CHANGE_READY, "en");
+    const from = markup.indexOf('<ul class="sources">');
+    const sources = markup.slice(from, markup.indexOf("</ul>", from));
+    expect(sources.match(/<li>/gu)).toHaveLength(1);
+  });
+
+  it("says nothing of why: no cause, no popularity, no decline, no fashion, no percentage of confidence", () => {
+    const causal = [
+      /popular/iu,
+      /declin/iu,
+      /\brising\b/iu,
+      /\bfell\b/iu,
+      /fashion/iu,
+      /because/iu,
+      /due to/iu,
+      /migrat/iu,
+      /birth/iu,
+      /death/iu,
+      /trend/iu,
+      /popularn/iu,
+      /spad/iu,
+      /wzrost|wzrosł/iu,
+      /moda|modn/iu,
+      /przyczyn/iu,
+      /migrac/iu,
+      /urodzen/iu,
+      /zgon/iu,
+    ];
+    for (const lang of ["pl", "en"] as const) {
+      const body = text(render(CHANGE_READY, lang));
+      for (const pattern of causal) expect(body, `${lang} ${String(pattern)}`).not.toMatch(pattern);
+      expect(body).not.toMatch(/confidence[^.]{0,20}\d/iu);
+    }
+  });
+
+  it("shows the sign of every change, with a true minus", () => {
+    const body = text(render(CHANGE_READY, "en"));
+    expect(body).toContain("−20.0%");
+    expect(body).toContain("+20.0%");
+    expect(body).not.toMatch(/-\d+\.\d%/u);
   });
 });

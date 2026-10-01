@@ -24,6 +24,8 @@ import type { Kysely } from "kysely";
 import { archiveSectionFor } from "./archive.js";
 import type { DB } from "@name-atlas/db";
 import type {
+  ChangeEntry,
+  ChangeSection,
   DistributionEntry,
   DistributionSection,
   Suggestion,
@@ -43,19 +45,21 @@ import {
   hasNationalRegisterCount,
   readCurrentDistribution,
   readCurrentPopulation,
+  readDistributionShift,
   readRarityContext,
   readSurnameMeaning,
 } from "./read.js";
 import type {
   PersistedCurrentDistribution,
   PersistedCurrentPopulation,
+  PersistedDistributionShift,
   PersistedInterpretation,
   PersistedRarityContext,
   PersistedSurnameMeaning,
 } from "./read.js";
 import { evaluateSurface, sectionEligibility } from "./rights.js";
 import type { EffectiveRights, Surface } from "./rights.js";
-import { RARITY_METHODOLOGY_CODE } from "./version.js";
+import { DISTRIBUTION_SHIFT_METHOD_VERSION, RARITY_METHODOLOGY_CODE } from "./version.js";
 
 /**
  * The unit PESEL-derived values carry.
@@ -106,6 +110,14 @@ function emptyRarity(
   reasonCode: string,
   surface: SurfaceEligibilityDto,
 ): RaritySection {
+  return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+function emptyChange(
+  state: "UNAVAILABLE" | "RIGHTS_BLOCKED",
+  reasonCode: string,
+  surface: SurfaceEligibilityDto,
+): ChangeSection {
   return { state, entries: [], reason_code: reasonCode, surface };
 }
 
@@ -366,6 +378,60 @@ function toDistributionEntry(claim: PersistedCurrentDistribution): DistributionE
   };
 }
 
+/**
+ * Projects one persisted change claim into the contract's shape (TASK-051).
+ *
+ * The stored payload carries the row ids each point was read from; they are
+ * lineage, not something a reader needs, and stay behind. Every figure here
+ * was computed when the claim was derived — this function only renames.
+ */
+function toChangeEntry(claim: PersistedDistributionShift): ChangeEntry {
+  return {
+    list: claim.role === "national_male" ? "MALE" : "FEMALE",
+    points: claim.points.map((p) =>
+      p.status === "KNOWN"
+        ? {
+            status: "KNOWN" as const,
+            data_date: p.data_date,
+            note_code: p.note_code as "UNIVERSE_DESCRIPTION_DIFFERS" | null,
+            source_url: p.source_url,
+            count: p.count,
+            list_total: p.list_total,
+            one_in_x: p.one_in_x,
+            share: p.share,
+          }
+        : {
+            status: "NOT_ON_LIST" as const,
+            data_date: p.data_date,
+            note_code: p.note_code as "UNIVERSE_DESCRIPTION_DIFFERS" | null,
+            source_url: p.source_url,
+          },
+    ),
+    gaps: claim.gaps.map((g) => ({ data_date: g.data_date, reason_code: g.reason_code })),
+    summary: claim.summary,
+    methodology_code: DISTRIBUTION_SHIFT_METHOD_VERSION,
+    scope_label_code: claim.scope_label_code,
+    country_code: claim.country_code,
+    confidence: {
+      status: claim.confidence_status as ChangeEntry["confidence"]["status"],
+      methodology_code: `${claim.assessment_method}@${claim.assessment_version}`,
+    },
+    citation: {
+      id: claim.citation_id,
+      title: claim.citation_title,
+      publisher: claim.citation_publisher,
+      publication_date: claim.citation_publication_date,
+      source_type: claim.source_type,
+      locator: claim.citation_locator,
+      url: claim.citation_url,
+      attribution: claim.attribution_text,
+      terms: claim.terms_version,
+      retrieved_at: claim.citation_retrieved_at,
+      source_page_url: claim.citation_source_page_url,
+    },
+  };
+}
+
 /** Projects one persisted rarity claim into canonical/16 §27's shape (TASK-014). */
 function toRarityEntry(claim: PersistedRarityContext): RarityEntry {
   return {
@@ -479,6 +545,7 @@ export async function querySurnameResult(
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
         meaning: null,
+        change: null,
         archive: null,
       },
     };
@@ -499,6 +566,7 @@ export async function querySurnameResult(
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
         meaning: null,
+        change: null,
         archive: null,
       },
     };
@@ -511,6 +579,7 @@ export async function querySurnameResult(
   const archiveSection = await archiveSectionFor(db, surnameId, surface);
   const rarityClaims = await readRarityContext(db, surnameId);
   const distributionClaims = await readCurrentDistribution(db, surnameId);
+  const changeClaims = await readDistributionShift(db, surnameId);
 
   const identity = {
     id: surnameId,
@@ -551,6 +620,7 @@ export async function querySurnameResult(
         // A meaning comes from a different source with different rights, so it
         // is present or absent on its own terms even where no count exists.
         meaning: meaningSection,
+        change: emptyChange("UNAVAILABLE", reason, noRights),
         archive: archiveSection,
       },
     };
@@ -583,6 +653,7 @@ export async function querySurnameResult(
         distribution: emptyDistribution("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         suggestions: null,
         meaning: meaningSection,
+        change: emptyChange("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         archive: archiveSection,
       },
     };
@@ -599,6 +670,11 @@ export async function querySurnameResult(
   const distributionEligibility = sectionEligibility(
     eligibility,
     distributionClaims.map((c) => c.rights),
+    surface,
+  );
+  const changeEligibility = sectionEligibility(
+    eligibility,
+    changeClaims.map((c) => c.rights),
     surface,
   );
 
@@ -657,6 +733,21 @@ export async function querySurnameResult(
       // (docs/canonical/13 §32.3).
       suggestions: null,
       meaning: meaningSection,
+      // A change needs two stored editions of one list, which a surname listed
+      // once has not got: the section says no change was derived, and does not
+      // guess why (a surname on one edition and one the batch has not reached
+      // look the same from here). Never an empty chart, never a zero.
+      change:
+        changeClaims.length === 0
+          ? emptyChange("UNAVAILABLE", "NO_CHANGE_DERIVED", changeEligibility)
+          : changeEligibility.decision === "BLOCKED"
+            ? emptyChange("RIGHTS_BLOCKED", changeEligibility.reason_code, changeEligibility)
+            : {
+                state: "READY",
+                entries: changeClaims.map(toChangeEntry),
+                reason_code: null,
+                surface: changeEligibility,
+              },
       archive: archiveSection,
     },
   };

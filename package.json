@@ -24,6 +24,7 @@
     "local:setup": "bash scripts/local-setup.sh",
     "seo:backfill-slugs": "pnpm --filter @name-atlas/seo run backfill-slugs",
     "truth:derive-batch": "pnpm --filter @name-atlas/truth run derive-batch",
+    "truth:derive-shift": "pnpm --filter @name-atlas/truth run derive-shift",
     "truth:list-facts": "pnpm --filter @name-atlas/truth run build-list-facts",
     "truth:archive-load": "pnpm --filter @name-atlas/truth run archive-load",
     "coverage:report": "pnpm --silent --filter @name-atlas/truth run coverage-report",

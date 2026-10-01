@@ -14,9 +14,11 @@ name: Register VM
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
 #   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
 #   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
-#   archive    ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
+#   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
+#   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
+#   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
 #
-# provision, status, finalize, editions, extras and archive end by connecting the way the web app does.
+# provision, status, finalize, editions, extras, shift-finish and archive end by connecting the way the web app does.
 
 on:
   push:
@@ -28,7 +30,19 @@ on:
         description: Which step to run
         required: true
         type: choice
-        options: [check, provision, build, status, finalize, editions, extras, archive]
+        options:
+          [
+            check,
+            provision,
+            build,
+            status,
+            finalize,
+            editions,
+            extras,
+            shift,
+            shift-finish,
+            archive,
+          ]
 
 concurrency:
   group: register-vm
@@ -64,7 +78,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | archive) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -187,6 +201,21 @@ jobs:
           scp -q ops/vm/extras.sh vm:name-atlas-ops/extras.sh
           ssh vm 'sudo bash ~/name-atlas-ops/extras.sh'
 
+      - name: shift
+        if: steps.step.outputs.step == 'shift'
+        run: |
+          # The pushed commit's tree: the registry, the derivation and the
+          # migration it needs are newer than the one the build unpacked.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/shift.sh vm:name-atlas-ops/shift.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/shift.sh start ~/name-atlas-ops/app.tar.gz'
+
+      - name: shift-finish
+        if: steps.step.outputs.step == 'shift-finish'
+        run: |
+          scp -q ops/vm/shift.sh vm:name-atlas-ops/shift.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/shift.sh finish'
+
       - name: archive
         if: steps.step.outputs.step == 'archive'
         run: |
@@ -199,7 +228,8 @@ jobs:
         if: >-
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
           steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions' ||
-          steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'archive'
+          steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'shift-finish' ||
+          steps.step.outputs.step == 'archive'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
@@ -222,6 +252,8 @@ jobs:
             p -c "SELECT 'places ' || count(*) FROM places"
             p -c "SELECT 'SURNAME_MEANING claims ' || count(*) FROM claims
                   WHERE claim_type = 'SURNAME_MEANING' AND claim_status = 'ACTIVE'"
+            p -c "SELECT 'change claims ' || count(*) FROM claims
+                  WHERE claim_type::text = 'SURNAME_DISTRIBUTION_SHIFT' AND claim_status = 'ACTIVE'"
           fi
           if p -c 'CREATE TABLE public.web_role_must_not_write (x int)' 2> write.err; then
             echo "::error::the web role could create a table"

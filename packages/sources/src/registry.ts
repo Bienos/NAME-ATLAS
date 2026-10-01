@@ -197,6 +197,20 @@ export interface PeselResourceDescriptor {
    * header is `nazwisko,liczba` (TASK-045 §2). Absent means `PESEL_HEADER`.
    */
   readonly header?: string;
+  /**
+   * The sum of every count in the official file: the edition's published total
+   * of people (TASK-051), pinned from the file's bytes on 2026-09-30. A trend
+   * needs it as the denominator of one in X, and cannot sum stored rows for an
+   * edition, which keeps only the surnames the current register has (TASK-045).
+   * National resources only.
+   */
+  readonly official_people_sum?: number;
+  /**
+   * Set where a resource's published description differs from the series' and
+   * the owner ruled it the same universe: `UNIVERSE_DESCRIPTION_DIFFERS`, for the
+   * 2019 pair (ADR-0020 §2.2). A reader of the edition must say so.
+   */
+  readonly universe_note_code?: "UNIVERSE_DESCRIPTION_DIFFERS";
 }
 
 /**
@@ -236,6 +250,7 @@ export const PESEL_NATIONAL_MALE_2026: PeselResourceDescriptor = {
   official_sha256: "ce4238feda85e75c73b16a229eb8afc1dfccb8854a7809111ab85fb8672b62f4",
   official_byte_size: 5_293_415,
   official_row_count: 408_182,
+  official_people_sum: 21197537,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026",
   methodology_key: "pesel_current_surname_national_2026_male_resource",
@@ -258,6 +273,7 @@ export const PESEL_NATIONAL_FEMALE_2026: PeselResourceDescriptor = {
   official_sha256: "c508680d084dd21949ca7c817339fd63d31342ee5318320c5266c6bf4909f6e6",
   official_byte_size: 5_592_881,
   official_row_count: 420_082,
+  official_people_sum: 21560302,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 20.01.2026",
   methodology_key: "pesel_current_surname_national_2026_female_resource",
@@ -417,6 +433,7 @@ export const PESEL_NATIONAL_MALE_2020: PeselResourceDescriptor = {
   official_sha256: "a6af514f921c30771591bced6785c6559d63f5e88868e25eaad130eb36fd805d",
   official_byte_size: 3_662_490,
   official_row_count: 283_221,
+  official_people_sum: 19879045,
   universe_description:
     "Wykaz nazwisk męskie osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020",
   methodology_key: "pesel_current_surname_national_2020_male_resource",
@@ -439,6 +456,7 @@ export const PESEL_NATIONAL_MALE_2021: PeselResourceDescriptor = {
   official_sha256: "ea466f2b8611be038913c6354bb13a5d029f5ff0ced07eea7ef282f5f52c215c",
   official_byte_size: 3_859_773,
   official_row_count: 298_692,
+  official_people_sum: 19987207,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 01.02.2021",
   methodology_key: "pesel_current_surname_national_2021_male_resource",
@@ -461,6 +479,7 @@ export const PESEL_NATIONAL_MALE_2022: PeselResourceDescriptor = {
   official_sha256: "4389d8964dd37c7ab71306d537e98b365e171831d2be9e63b84bdcaaf33ca68d",
   official_byte_size: 4_160_756,
   official_row_count: 322_232,
+  official_people_sum: 20203548,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 27.01.2022",
   methodology_key: "pesel_current_surname_national_2022_male_resource",
@@ -483,6 +502,7 @@ export const PESEL_NATIONAL_MALE_2023: PeselResourceDescriptor = {
   official_sha256: "7e95c307a2ebf62b1ea14b936925c46cc0b6db960dec8fc98c6b5fe8980f9af0",
   official_byte_size: 4_692_377,
   official_row_count: 363_360,
+  official_people_sum: 20808071,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023",
   methodology_key: "pesel_current_surname_national_2023_male_resource",
@@ -505,6 +525,7 @@ export const PESEL_NATIONAL_MALE_2024: PeselResourceDescriptor = {
   official_sha256: "3c722cada73f0b52184931a4cc521a5c7d6905683f5103a417f867fd9547be0e",
   official_byte_size: 4_904_484,
   official_row_count: 379_712,
+  official_people_sum: 20976785,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024",
   methodology_key: "pesel_current_surname_national_2024_male_resource",
@@ -527,6 +548,7 @@ export const PESEL_NATIONAL_MALE_2025: PeselResourceDescriptor = {
   official_sha256: "079695630265bf0bcb2f944743799850465123fbd280ead736f3274d867818cb",
   official_byte_size: 5_114_559,
   official_row_count: 395_127,
+  official_people_sum: 21096170,
   universe_description:
     "Wykaz nazwisk męskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025",
   methodology_key: "pesel_current_surname_national_2025_male_resource",
@@ -549,6 +571,7 @@ export const PESEL_NATIONAL_FEMALE_2020: PeselResourceDescriptor = {
   official_sha256: "b0ede69ca79698cd8f6b09462916234be67dd4322d888e6a9263b89a52bfd99b",
   official_byte_size: 3_988_200,
   official_row_count: 299_612,
+  official_people_sum: 20220345,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2020",
   methodology_key: "pesel_current_surname_national_2020_female_resource",
@@ -571,6 +594,7 @@ export const PESEL_NATIONAL_FEMALE_2021: PeselResourceDescriptor = {
   official_sha256: "9af26480ed3035e7e6b9349033c4ccd76bee3eeb5e8ac7ce299a8d00ba0b62e0",
   official_byte_size: 4_141_803,
   official_row_count: 311_240,
+  official_people_sum: 20263212,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 02.02.2021",
   methodology_key: "pesel_current_surname_national_2021_female_resource",
@@ -593,6 +617,7 @@ export const PESEL_NATIONAL_FEMALE_2023: PeselResourceDescriptor = {
   official_sha256: "326bfc3dcf2b55886073a46780acaefec3fb2bc4444f6ddbc052938c1aa05cb2",
   official_byte_size: 5_169_657,
   official_row_count: 389_365,
+  official_people_sum: 21369477,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 30.01.2023",
   methodology_key: "pesel_current_surname_national_2023_female_resource",
@@ -615,6 +640,7 @@ export const PESEL_NATIONAL_FEMALE_2024: PeselResourceDescriptor = {
   official_sha256: "7988d01d8f85f84cd84bb0069b9129c9b3944aba5349709cffca21555d6fcf28",
   official_byte_size: 5_324_053,
   official_row_count: 400_764,
+  official_people_sum: 21479386,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 19.01.2024",
   methodology_key: "pesel_current_surname_national_2024_female_resource",
@@ -637,6 +663,7 @@ export const PESEL_NATIONAL_FEMALE_2025: PeselResourceDescriptor = {
   official_sha256: "9ac287db5266fc03d3e24a497244d071b3ef2fb4907c43c2b07844912db0d27a",
   official_byte_size: 5_465_724,
   official_row_count: 411_012,
+  official_people_sum: 21535515,
   universe_description:
     "Wykaz nazwisk żeńskich osób żyjących (wg pola nazwisko aktualne) występujących w rejestrze PESEL, stan na 22.01.2025",
   methodology_key: "pesel_current_surname_national_2025_female_resource",
@@ -755,12 +782,14 @@ export const PESEL_NATIONAL_MALE_2019: PeselResourceDescriptor = {
   official_sha256: "e975ecc4226aec76a5144ce17ca32612e4aaba058dd9589f6b4cbd2db3e4a4bb",
   official_byte_size: 3_610_164,
   official_row_count: 277_108,
+  official_people_sum: 19859783,
   universe_description: "lista nazwisk m\u0119skich w rejestrze PESEL stan na 30.06.2019",
   methodology_key: "pesel_current_surname_national_2019_male_resource",
   comparability_group: "pesel_2019_national_male",
   coverage_notes: `${PARTITION_NOT_DISAMBIGUATED} ${EDITION_2019_NOTE}`,
   series: null,
   header: "nazwisko,liczba",
+  universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
 };
 
 /**
@@ -781,12 +810,14 @@ export const PESEL_NATIONAL_FEMALE_2019: PeselResourceDescriptor = {
   official_sha256: "c35e44779eb3e655f66c453a71b1c8db192b309375e828f16893864822fdbba8",
   official_byte_size: 3_993_861,
   official_row_count: 297_456,
+  official_people_sum: 20249319,
   universe_description: "lista nazwisk \u017ce\u0144skich w rejestrze PESEL stan na 30.06.2019",
   methodology_key: "pesel_current_surname_national_2019_female_resource",
   comparability_group: "pesel_2019_national_female",
   coverage_notes: `${PARTITION_NOT_DISAMBIGUATED} ${EDITION_2019_NOTE}`,
   series: null,
   header: "nazwisko,liczba",
+  universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
 };
 
 /** The 2025-02-24 regional pair: the only earlier regional edition the publisher lists. */
@@ -865,3 +896,22 @@ export function isPeselEdition(resourceId: string | null): boolean {
     PESEL_EDITIONS.some((r) => r.resource_id === resourceId)
   );
 }
+
+/**
+ * The editions a surname's change over time reads, per list, in date order
+ * (ADR-0020 §2.2): ADR-0019's series, 2020-01-22 to 2026-01-20, preceded by the
+ * 2019-06-30 edition of the list. The 2019 pair is in no series (ADR-0019
+ * §2.2), so the landing's panel does not read it; a surname's section does, on
+ * the project owner's ruling of 2026-09-30.
+ *
+ * The female list has no 2022 edition: its resource is a publisher duplicate
+ * of the 2021 one, listed in {@link PESEL_REFUSED_RESOURCES} and carried by a
+ * claim as a gap.
+ */
+export const PESEL_TREND_EDITIONS: {
+  readonly national_male: readonly PeselResourceDescriptor[];
+  readonly national_female: readonly PeselResourceDescriptor[];
+} = {
+  national_male: [PESEL_NATIONAL_MALE_2019, ...PESEL_NATIONAL_SERIES.national_male],
+  national_female: [PESEL_NATIONAL_FEMALE_2019, ...PESEL_NATIONAL_SERIES.national_female],
+};

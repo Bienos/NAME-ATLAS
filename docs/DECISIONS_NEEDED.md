@@ -73,6 +73,7 @@ Neither changes any behaviour today.
 **Raised by:** TASK-031, 2026-09-29. Evidence: `docs/sources/polona.md` §4, §11 and §12, and `packages/truth/src/polona-rights.test.ts`.
 
 1. **May a connector query Polona automatically, and may it keep what it retrieves?** RESOLVED 2026-10-01 by ADR-0024 §2.1–2.2: yes, for search, object records, OCR and IIIF, at a polite rate, and what is retrieved may be kept. The owner's judgement, not Biblioteka Narodowa's confirmation.
+   - An earlier answer, "approve poona" on 2026-09-30, was recorded on #43's branch as option (b): the documented search API only, at a polite rate, with `automated_access` and `local_cache` left `UNKNOWN`. The owner's "Everything allowed" of 2026-10-01 supersedes it.
    - Polona's terms ("Regulamin e-usługi Biblioteka Cyfrowa Polona", read 2026-09-29) never mention automated querying, request rates or caching.
    - Its user manual calls the search API an "otwarte API" (open API) and links developer instructions. Those instructions state no licence, rate or caching rule.
    - The object-metadata, IIIF and OCR-download endpoints a connector also needs are documented nowhere; they are the web app's own requests.

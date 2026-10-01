@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01
-- **Schema version:** `1.8` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01
+- **Schema version:** `1.9` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.6",
+  "schema_version": "1.9",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -166,11 +166,46 @@ An `AVAILABLE` meaning carries one entry per work, unmerged and unranked:
 }
 ```
 
+A resolved surname on two or more stored editions of a list carries its change over time (1.9), one entry per list, the men's first:
+
+```jsonc
+"change": {
+  "state": "READY",              // | "UNAVAILABLE" (reason_code NO_CHANGE_DERIVED) | "RIGHTS_BLOCKED"
+  "reason_code": null,
+  "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" },
+  "entries": [
+    {
+      "list": "MALE",            // | "FEMALE"; two entries, never added
+      "points": [                // ascending by date; every stored edition of the list
+        { "status": "KNOWN", "data_date": "2019-06-30", "note_code": "UNIVERSE_DESCRIPTION_DIFFERS",
+          "source_url": "https://api.dane.gov.pl/…", "count": 101473, "list_total": 19859783,
+          "one_in_x": 196, "share": 0.005109 },
+        { "status": "NOT_ON_LIST", "data_date": "2020-01-22", "note_code": null, "source_url": "https://…" }
+        // a NOT_ON_LIST point has no count field at all, and the schema is strict about it
+      ],
+      "gaps": [ { "data_date": "2022-01-27", "reason_code": "PUBLISHER_DUPLICATE" } ],
+      "summary": {
+        "known_points": 7,
+        "first": { "data_date": "2019-06-30", "count": 101473, "list_total": 19859783 },
+        "last":  { "data_date": "2025-01-22", "count": 98859,  "list_total": 21096170 },
+        "count_change_percent": -2.6,   // signed, per cent, one decimal, half away from zero
+        "list_change_percent": 6.2      // the whole list's total over the same two editions
+      },
+      "methodology_code": "distribution_shift@1",
+      "scope_label_code": "PESEL_CURRENT_SURNAME",
+      "country_code": "PL",
+      "confidence": { "status": "VERIFIED", "methodology_code": "derived_statistic_rule@derived_confidence@1" },
+      "citation": { "…": "as above; the locator names every edition read" }
+    }
+  ]
+}
+```
+
 For an input that did not resolve, the fact sections are null and `suggestions` carries the answer:
 
 ```jsonc
 {
-  "schema_version": "1.8",
+  "schema_version": "1.9",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -218,6 +253,11 @@ These are schema constraints, not conventions — a violating payload fails vali
 21. **`NOT_SEARCHED` is not zero.** Added in 1.8. A surname not yet searched carries no query, date, count or source; a `READY` section with zero matches is an answer. A section that is not `READY` carries no figure and no example.
 22. **An example is quoted only from a public-domain work.** Added in 1.8. At most three, each excerpt at most 300 characters, each linked to the page in Polona's viewer; a hit whose rights do not classify as public domain is counted and never quoted (ADR-0024 §2.7).
 14. **`regions` is never empty and never zero-filled.** A voivodeship the publisher did not list for a surname has no entry at all (`docs/canonical/16` §28's prohibition on fabricated empty map features; `ARCHITECTURE.md` §10 invariant 4).
+20. **A change is over one list, and two lists are two entries.** Added in 1.7. `change.entries[].list` is `MALE` or `FEMALE`, each over its own list's editions; nothing sums them (ADR-0020 §2.1).
+21. **A `NOT_ON_LIST` point has no count, and a known point has a real one.** Added in 1.7. A surname an edition does not list is below the publisher's floor of 2 or not listed, never zero; the point schema is strict, so a payload putting `count: 0` on it fails validation. A known point's `count`, `list_total` and `one_in_x` are positive integers and its `count` never exceeds its own `list_total`.
+22. **One in X and the share follow the point's own count and list total.** Added in 1.7. `one_in_x` is `list_total / count` rounded half up and `share` is `count / list_total` to nine places, re-checked on every point, so a point whose figure does not follow its inputs fails validation. The total is that edition's own (ADR-0020 §2.3), never the current list's.
+23. **A change has at least two known points, in date order, and its summary describes them.** Added in 1.7. `points` are strictly ascending by date with at least two `KNOWN`; `summary.known_points`, `first` and `last` equal the known points' own count and first and last values; each change's sign agrees with its own first and last values (a change of 0.0 means they differ by less than 0.05% of the start). One edition is a count, not a change.
+24. **A gap is reported only between the first and the last known point.** Added in 1.7. The publisher's resource that repeats an earlier edition (the women's 2022 file) is a gap, never a point and never a count.
 
 ## Accepted rendering of a rarity entry
 
@@ -255,6 +295,16 @@ and a below-threshold entry says so **before** any figure:
   where a person lives and is not where a surname comes from.
 - The two sexes are two entries and two sentences. Nothing sums them.
 
+## Accepted rendering of a change entry
+
+Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between the first and the last known edition and what the whole list did over the same two, with each change signed; it never says why, and uses no word of popularity, decline or fashion:
+
+- EN: `The number of people with the surname {surname} ({sex}) in the PESEL register changed from {a} on {date} to {b} on {date}: {change}. The whole list changed by {list} between those editions.` — e.g. *… changed from 101,473 on 30 June 2019 to 98,859 on 22 January 2025: −2.6%. The whole list changed by +6.2% between those editions.*
+- PL: `Liczba osób o nazwisku {surname} ({sex}) w rejestrze PESEL zmieniła się z {a} na dzień {date} na {b} na dzień {date}: {change}. Cała lista zmieniła się między tymi edycjami o {list}.`
+- Equal counts say so (*was the same*), not "changed by 0".
+- Changes carry their sign, a true minus and one decimal. The table below the sentence has one row per edition with its count and its share of that edition's list ("1 in X"), a row saying *not on the list — not zero* for an absent edition, a row in place of a publisher's duplicate saying it repeats the previous edition, and a note that the 2019 files describe their contents in fewer words and are read as the same list.
+- The chapter is shown only for a `READY` section; `UNAVAILABLE` is not a chapter.
+
 ## Recorded deviations
 
 - **`unit` is a two-member enum, and PESEL now emits `PEOPLE`.** `docs/canonical/16` §26 fixes the unit as the single literal `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widened it to `"PEOPLE" | "SURNAME_OCCURRENCES"` while TASK-004 §14 U-4 was open. On 2026-09-20 the project owner decided U-4 on the field's definition — the counted field is *nazwisko aktualne*, of which every living person in PESEL has exactly one, so an occurrence among living persons is one person — and PESEL-derived values emit `"PEOPLE"` since then (ADR-0004, amendment of 2026-09-20). `"SURNAME_OCCURRENCES"` stays in the enum for a source whose counted field is not one-per-person. Not a breaking change: the enum is unchanged, only the emitted value.
@@ -270,6 +320,8 @@ and a below-threshold entry says so **before** any figure:
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.8 → 1.9 (2026-10-01, TASK-051, ADR-0020).** Adds the `change` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule the other fact sections follow. A consumer written against 1.8 is unaffected; a producer must now supply it. The section is `UNAVAILABLE` with `reason_code = NO_CHANGE_DERIVED` for a surname with no claim. That code does not say why: a surname on one edition only and a surname the batch has not reached look the same to the request path, which derives nothing. It was numbered 1.7 on TASK-051's own branch; TASK-054 reached `main` first as 1.8, so 1.9 is the first version on `main` carrying both.
 
 **1.6 → 1.8 (2026-10-01, TASK-054, ADR-0024).** Adds the `archive` section, required and nullable, present exactly when `status` is `RESOLVED`, as every fact section is. A consumer written against 1.6 is unaffected; a producer must now supply it. 1.7 is reserved by TASK-051 (#43), which has not merged; whichever lands second takes the next number above both.
 
@@ -287,4 +339,4 @@ Breaking this contract requires a `schema_version` bump and a stated compatibili
 
 ## Not covered
 
-Autocomplete and prefix search (now their own contract, `surname-prefix.md`), a caller-settable similarity threshold, confirming a suggestion as a resolution, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT`, `CURRENT_DISTRIBUTION` and `SURNAME_MEANING`. `LINGUISTIC_ORIGIN`, `GEOGRAPHIC_ORIGIN`, `SURNAME_FORMATION_TYPE` and `ROOT_INTERPRETATION` are separate canonical claim types and are not in this contract. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.
+Autocomplete and prefix search (now their own contract, `surname-prefix.md`), a caller-settable similarity threshold, confirming a suggestion as a resolution, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, a change over time of the regional distribution (2025 to 2026), and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT`, `CURRENT_DISTRIBUTION`, `SURNAME_MEANING` and `SURNAME_DISTRIBUTION_SHIFT`. `LINGUISTIC_ORIGIN`, `GEOGRAPHIC_ORIGIN`, `SURNAME_FORMATION_TYPE` and `ROOT_INTERPRETATION` are separate canonical claim types and are not in this contract. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.
