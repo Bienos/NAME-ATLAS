@@ -649,7 +649,12 @@ function end(
     const lead = response.rarity.entries[0];
     const x = lead === undefined ? null : oneInOf(lead);
     const rank = lead === undefined ? null : rankOf(lead);
-    if (x !== null) cells.push({ k: t.deckRarity, v: oneInText(x, lang) });
+    if (x !== null && lead !== undefined) {
+      cells.push({
+        k: `${t.deckRarity} · ${partitionLabel(lead.comparability_group, lang) ?? ""}`,
+        v: oneInText(x, lang),
+      });
+    }
     if (rank !== null && lead !== undefined) {
       cells.push({
         k: `${t.rankCaption} · ${partitionLabel(lead.comparability_group, lang) ?? ""}`,
