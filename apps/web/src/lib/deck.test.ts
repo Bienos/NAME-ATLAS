@@ -689,6 +689,20 @@ describe("TASK-056: the deck links each card to its image", () => {
   });
 });
 
+describe("TASK-057 AC-3: the deck's last card leads to the offer", () => {
+  it("links the summary to the offer page in the page's language", () => {
+    for (const [lang, href] of [
+      ["pl", "/pl/oferta"],
+      ["en", "/en/offer"],
+    ] as const) {
+      const cards = deckCards(FULL, lang, LINKS);
+      const end = cards[cards.length - 1];
+      expect(end?.key).toBe("end");
+      expect(faces(end === undefined ? [] : [end])).toContain(`href="${href}"`);
+    }
+  });
+});
+
 describe("TASK-055: the deck is drawn by script only", () => {
   it("renders nothing on the server, so the page alone is what a reader without script gets", () => {
     const html = renderToStaticMarkup(

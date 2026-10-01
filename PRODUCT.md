@@ -89,10 +89,16 @@ Rules:
 
 - Premium is offered **only** when coverage and the DiscoveryIndex show real inventory exists for that surname.
 - The report is an immutable, versioned artifact with claim references and citations.
-- A premium report never implies anything about the buyer's specific family.
-- One-time guest purchase, in PLN. No subscription and no credits. Two products (ADR-0023):
-  - **Raport nazwiska**, 24.99 zł: the report above.
-  - **Badanie eksperckie**, 149.99 zł: the report, plus research by a person into the surname's historical forms, places and archive references. It stays about the surname and never traces the buyer's family.
+- The surname report never implies anything about the buyer's specific family. Only what the reader enters into their own tree, or asks a genealogist to research, is about their family.
+- Three tiers, in PLN (ADR-0026, which supersedes ADR-0023's two products):
+  - **Free.** The cards, a share card for each answer, the full page and the comparison. Later, a free account to keep and share cards.
+  - **Nazwisko i rodzina**, 29.99 zł:
+    - the report above;
+    - famous bearers ("shares the surname — not your relative");
+    - a family tree the reader builds and may connect to other readers' trees;
+    - more inputs and extra research from the sources the site holds.
+  - **Genealogia z DNA**, 499 zł. Research into the reader's family by professional genealogists, with DNA analysis, through a partner. Enquiries go to the owner by email.
+- Both paid tiers show "Wkrótce" until they exist and can lawfully be sold. Whether each is one payment or recurring is open (D-024).
 
 ## 7. Trust and evidence rules
 
@@ -110,7 +116,12 @@ These are product promises, not implementation details.
 
 ## 8. Explicit non-goals
 
-Not in the surname MVP, and not on its critical path:
+Not in the free surname product, and not on its critical path. ADR-0026 lifts 1–3 for the paid tiers only:
+- a tree the reader builds holds living people only after they accept terms that say so;
+- connecting trees matches only people who have died;
+- DNA analysis is a partner genealogist's service; Name Atlas does not ingest DNA data.
+
+Whether 11 is lifted for the 29.99 zł tier is D-024.
 
 1. Automatic ancestor identification or confirmed family relationships.
 2. Family tree construction, FamilyBranch, person-level record matching.

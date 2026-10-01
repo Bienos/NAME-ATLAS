@@ -1,10 +1,10 @@
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { atlasPath, comparePagePath, homePath, howPath } from "./site-links.js";
+import { atlasPath, comparePagePath, homePath, howPath, offerPath } from "./site-links.js";
 import { SearchForm } from "./search-form.js";
 
 /** Which of the header's places the page is, for `aria-current`. */
-export type NavPlace = "atlas" | "compare" | "how" | null;
+export type NavPlace = "atlas" | "compare" | "how" | "offer" | null;
 
 function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
   const t = UI[lang];
@@ -12,6 +12,7 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
     ["atlas", atlasPath(lang), t.navAtlas],
     ["compare", comparePagePath(lang), t.navCompare],
     ["how", howPath(lang), t.navHow],
+    ["offer", offerPath(lang), t.navOffer],
   ];
   return (
     <>
@@ -57,12 +58,13 @@ function LangSwitch({ lang, otherPath }: { lang: Lang; otherPath: string }) {
 
 /**
  * The header every page opens with (TASK-052, ADR-0021): the wordmark in plain
- * type, the three places — the atlas, the comparison, how it works — and the
- * language switch. A page that answers a surname also carries the search here,
- * compact, so a second search is one keystroke away (TASK-023 §2.6).
+ * type, the four places — the atlas, the comparison, how it works and the
+ * offer (TASK-057) — and the language switch. A page that answers a surname
+ * also carries the search here, compact, so a second search is one keystroke
+ * away (TASK-023 §2.6).
  *
- * On a phone the three places fold into a native disclosure, so the menu
- * needs no script and works with a keyboard and a screen reader as is.
+ * On a phone the places fold into a native disclosure, so the menu needs no
+ * script and works with a keyboard and a screen reader as is.
  */
 export function SiteNav({
   lang,

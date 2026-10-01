@@ -724,6 +724,11 @@ export const UI = {
     navAtlas: "Atlas",
     navCompare: "Porównaj",
     navHow: "Jak to działa",
+    navOffer: "Oferta",
+    // The deck's last card, to the offer (TASK-057).
+    deckOffer: "Więcej: Twoja rodzina i DNA",
+    // The footer's blog and social links (TASK-057).
+    followLabel: "Blog i media społecznościowe",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1255,6 +1260,11 @@ export const UI = {
     navAtlas: "Atlas",
     navCompare: "Compare",
     navHow: "How it works",
+    navOffer: "Offer",
+    // The deck's last card, to the offer (TASK-057).
+    deckOffer: "More: your family and DNA",
+    // The footer's blog and social links (TASK-057).
+    followLabel: "Blog and social media",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
