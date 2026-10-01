@@ -55,6 +55,8 @@ import type { Intent, Lang } from "./messages.js";
 import { SOURCES_ANCHOR, anchorOf, sectionOf, sectionOrder } from "./sections.js";
 import type { SectionKey } from "./sections.js";
 import { Snapshot } from "./snapshot.js";
+import { NextStep } from "./next-step.js";
+import type { Step } from "./next-step.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { RarityScale } from "./rarity-scale.js";
@@ -74,6 +76,7 @@ export function href(surname: string, lang: Lang): string {
 function Chapter({
   chapter,
   number,
+  next,
   lang,
   wide = false,
   empty = false,
@@ -82,6 +85,8 @@ function Chapter({
   /** Which chapter: its anchor, question and reading note come from the registry. */
   chapter: SectionKey;
   number: number;
+  /** The step after this one, linked at the chapter's foot. */
+  next: Step | null;
   lang: Lang;
   wide?: boolean;
   /** No figures to read: the absence is stated, compactly, and there is nothing to explain. */
@@ -99,6 +104,7 @@ function Chapter({
         {empty ? null : <p className="chapter-lede">{t[lede]}</p>}
       </div>
       <div className="chapter-body">{children}</div>
+      <NextStep next={next} />
     </section>
   );
 }
@@ -124,17 +130,25 @@ function Population({
   section,
   surname,
   number,
+  next,
   lang,
 }: {
   section: PopulationSection;
   surname: string;
   number: number;
+  next: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
   const several = section.observations.length > 1;
   return (
-    <Chapter chapter="count" number={number} lang={lang} empty={section.state !== "READY"}>
+    <Chapter
+      chapter="count"
+      number={number}
+      next={next}
+      lang={lang}
+      empty={section.state !== "READY"}
+    >
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -167,16 +181,24 @@ function Rarity({
   section,
   surname,
   number,
+  next,
   lang,
 }: {
   section: RaritySection;
   surname: string;
   number: number;
+  next: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
   return (
-    <Chapter chapter="rarity" number={number} lang={lang} empty={section.state !== "READY"}>
+    <Chapter
+      chapter="rarity"
+      number={number}
+      next={next}
+      lang={lang}
+      empty={section.state !== "READY"}
+    >
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -322,15 +344,24 @@ function Distribution({
   section,
   surname,
   number,
+  next,
   lang,
 }: {
   section: NonNullable<SurnameResultResponse["distribution"]>;
   surname: string;
   number: number;
+  next: Step | null;
   lang: Lang;
 }) {
   return (
-    <Chapter chapter="map" number={number} lang={lang} wide empty={section.state !== "READY"}>
+    <Chapter
+      chapter="map"
+      number={number}
+      next={next}
+      lang={lang}
+      wide
+      empty={section.state !== "READY"}
+    >
       {section.state !== "READY" ? (
         <Absent state={section.state} reason={section.reason_code} lang={lang} />
       ) : (
@@ -377,10 +408,12 @@ function workCitation(interpretation: MeaningSection["interpretations"][number])
 function Meaning({
   section,
   number,
+  next,
   lang,
 }: {
   section: MeaningSection;
   number: number;
+  next: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
@@ -392,14 +425,14 @@ function Meaning({
           ? t.meaningBlocked
           : t.meaningUnavailable;
     return (
-      <Chapter chapter="meaning" number={number} lang={lang}>
+      <Chapter chapter="meaning" number={number} next={next} lang={lang}>
         <p className="absent">{body}</p>
       </Chapter>
     );
   }
   const conflicting = section.confidence === "CONFLICTING";
   return (
-    <Chapter chapter="meaning" number={number} lang={lang}>
+    <Chapter chapter="meaning" number={number} next={next} lang={lang}>
       {/* Before the readings, not after: a reader must know these are
           interpretations before they read one as a fact. */}
       <p className="caveat">{t.meaningInterpretationNote}</p>
@@ -556,7 +589,15 @@ function siteName(url: string, fallback: string): string {
  * entry), which is where a reader finds it. The notes the claims carry follow,
  * each once, one disclosure away, as they were inside the per-claim panels.
  */
-function Sources({ response, lang }: { response: SurnameResultResponse; lang: Lang }) {
+function Sources({
+  response,
+  next,
+  lang,
+}: {
+  response: SurnameResultResponse;
+  next: Step | null;
+  lang: Lang;
+}) {
   const t = UI[lang];
   const evidence = pageEvidence(response, lang);
   if (evidence.length === 0) return null;
@@ -610,6 +651,7 @@ function Sources({ response, lang }: { response: SurnameResultResponse; lang: La
           </ul>
         </details>
       )}
+      <NextStep next={next} />
     </section>
   );
 }
@@ -682,41 +724,82 @@ export function Result({
   response,
   lang,
   intent = "default",
+  after = null,
 }: {
   response: SurnameResultResponse;
   lang: Lang;
   intent?: Intent;
+  /** The step the page adds after the sources, if any (the surname page's summary). */
+  after?: Step | null;
 }) {
   const t = UI[lang];
 
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
     const { population, rarity, distribution, meaning } = response;
-    const chapters: Record<SectionKey, ((number: number) => ReactNode) | null> = {
-      count:
-        population === null
-          ? null
-          : (n) => <Population section={population} surname={surname} number={n} lang={lang} />,
-      rarity:
-        rarity === null
-          ? null
-          : (n) => <Rarity section={rarity} surname={surname} number={n} lang={lang} />,
-      map:
-        distribution === null
-          ? null
-          : (n) => <Distribution section={distribution} surname={surname} number={n} lang={lang} />,
-      meaning:
-        meaning === null ? null : (n) => <Meaning section={meaning} number={n} lang={lang} />,
-    };
+    const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
+      {
+        count:
+          population === null
+            ? null
+            : (n, next) => (
+                <Population
+                  section={population}
+                  surname={surname}
+                  number={n}
+                  next={next}
+                  lang={lang}
+                />
+              ),
+        rarity:
+          rarity === null
+            ? null
+            : (n, next) => (
+                <Rarity section={rarity} surname={surname} number={n} next={next} lang={lang} />
+              ),
+        map:
+          distribution === null
+            ? null
+            : (n, next) => (
+                <Distribution
+                  section={distribution}
+                  surname={surname}
+                  number={n}
+                  next={next}
+                  lang={lang}
+                />
+              ),
+        meaning:
+          meaning === null
+            ? null
+            : (n, next) => <Meaning section={meaning} number={n} next={next} lang={lang} />,
+      };
     const order = sectionOrder(intent).filter((key) => chapters[key] !== null);
+    const hasSources = pageEvidence(response, lang).length > 0;
+    // The journey's steps in page order (TASK-053): each chapter, the sources,
+    // then whatever the page adds. Each screen links to the one after it.
+    const steps: Step[] = [
+      ...order.map((key) => ({ href: `#${anchorOf(key)}`, label: t[sectionOf(key).title] })),
+      ...(hasSources ? [{ href: `#${SOURCES_ANCHOR}`, label: t.chapterSourcesQuestion }] : []),
+      ...(after === null ? [] : [after]),
+    ];
+    const nextAfter = (index: number): Step | null => steps[index + 1] ?? null;
     return (
       <div className="result">
-        <Snapshot response={{ ...response, status: "RESOLVED" }} lang={lang} />
-        <ChapterNav order={order} sources={pageEvidence(response, lang).length > 0} lang={lang} />
+        <Snapshot
+          response={{ ...response, status: "RESOLVED" }}
+          next={steps[0] ?? null}
+          lang={lang}
+        />
+        <ChapterNav order={order} sources={hasSources} lang={lang} />
         {order.map((key, index) => (
-          <Fragment key={key}>{chapters[key]?.(index + 1)}</Fragment>
+          <Fragment key={key}>{chapters[key]?.(index + 1, nextAfter(index))}</Fragment>
         ))}
-        <Sources response={response} lang={lang} />
+        <Sources
+          response={response}
+          next={hasSources ? nextAfter(order.length) : null}
+          lang={lang}
+        />
       </div>
     );
   }

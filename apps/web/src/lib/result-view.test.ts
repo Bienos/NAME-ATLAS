@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import { Result } from "./result-view.js";
+import { UI } from "./messages.js";
 
 /**
  * TASK-017's acceptance criteria, asserted against **rendered markup**.
@@ -1052,5 +1053,49 @@ describe("the profile layout", () => {
     const blocked = render(RIGHTS_BLOCKED, "en");
     expect(blocked).toContain('<section id="today-count" class="chapter chapter-empty">');
     expect(blocked).not.toContain("The PESEL register publishes two separate surname lists");
+  });
+});
+
+/**
+ * TASK-053: the surname page as a journey. Each screen ends on the question
+ * the next one answers, in the order the page shows them; the links are
+ * presentation only and point at the registry's anchors.
+ */
+describe("the journey's steps", () => {
+  const steps = (markup: string): [string, string][] =>
+    [...markup.matchAll(/<p class="chapter-next"><a href="(#[^"]+)">([^<]+)<\/a><\/p>/gu)].map(
+      (m) => [m[1] ?? "", m[2] ?? ""],
+    );
+  const after = { href: "#summary", label: "Twój wynik" };
+
+  it("lead from the snapshot through every chapter and the sources to what the page adds", () => {
+    const parsed = surnameResultResponseSchema.parse(RESOLVED) as SurnameResultResponse;
+    const markup = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "pl", after }),
+    );
+    const t = UI.pl;
+    expect(steps(markup)).toEqual([
+      ["#today-count", t.chapterCountTitle],
+      ["#rarity", t.chapterRarityTitle],
+      ["#where", t.chapterWhereTitle],
+      ["#meaning", t.chapterMeaningTitle],
+      ["#sources", t.chapterSourcesQuestion],
+      ["#summary", "Twój wynik"],
+    ]);
+  });
+
+  it("follow an intent's order, and stop at the sources when the page adds nothing", () => {
+    const parsed = surnameResultResponseSchema.parse(RESOLVED) as SurnameResultResponse;
+    const markup = renderToStaticMarkup(
+      createElement(Result, { response: parsed, lang: "en", intent: "map" }),
+    );
+    expect(steps(markup).map(([href]) => href)).toEqual([
+      "#where",
+      "#today-count",
+      "#rarity",
+      "#meaning",
+      "#sources",
+    ]);
+    expect(steps(markup)[4]?.[1]).toBe(UI.en.chapterSourcesQuestion);
   });
 });

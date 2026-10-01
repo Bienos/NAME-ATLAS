@@ -16,6 +16,9 @@ import {
 } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { surnameEm } from "./surname-fit.js";
+import { NextStep } from "./next-step.js";
+import { SNAPSHOT_ANCHOR } from "./sections.js";
+import type { Step } from "./next-step.js";
 
 /**
  * The surname snapshot (TASK-023, directive §16): the first useful fact above
@@ -93,9 +96,12 @@ function tallyLine(response: SurnameResultResponse, lang: Lang): string | null {
 
 export function Snapshot({
   response,
+  next = null,
   lang,
 }: {
   response: SurnameResultResponse & { status: "RESOLVED" };
+  /** The journey's first step, linked at the foot of the first screen (TASK-053). */
+  next?: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
@@ -140,7 +146,7 @@ export function Snapshot({
     `${top.display_name} (${formatPercent(top.share_of_covered, lang)}, ${formatDate(entry.snapshot_date, lang)})`;
 
   return (
-    <header className="snapshot" id="today">
+    <header className="snapshot" id={SNAPSHOT_ANCHOR}>
       <p className="eyebrow">{t.searchLabel}</p>
       {/* Its measured width, for the stylesheet to fit it to one line (`surname-fit.ts`). */}
       <h2
@@ -229,6 +235,7 @@ export function Snapshot({
           );
         })}
       {rarityEntries.length > 1 ? <p className="note hero-note">{t.rarityNotComparable}</p> : null}
+      <NextStep next={next} />
     </header>
   );
 }

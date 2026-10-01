@@ -1,5 +1,6 @@
 import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
@@ -13,6 +14,7 @@ import { Result } from "./result-view.js";
 import { ShareButton } from "./share-button.js";
 import { ReportLink } from "./report-link.js";
 import { SiteShell } from "./site-shell.js";
+import { SUMMARY_ANCHOR } from "./sections.js";
 import { comparePagePath } from "./site-links.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
 
@@ -307,11 +309,43 @@ export function CanonicalSurnamePage({
         </section>
       ) : answer.kind === "RESULT" ? (
         <>
-          <Result response={answer.response} lang={lang} intent={intent} />
-          <div className="result-actions">
-            {shareUrl === null ? null : (
-              <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
-            )}
+          <Result
+            response={answer.response}
+            lang={lang}
+            intent={intent}
+            after={{ href: `#${SUMMARY_ANCHOR}`, label: t.summaryHeading }}
+          />
+          {/* The journey's last screen (TASK-053): the share card the page
+              already serves for this address, drawn only from validated
+              facts (`og-card.tsx`), to share or save; then where to go next. */}
+          <section
+            id={SUMMARY_ANCHOR}
+            className="result-actions summary"
+            aria-labelledby="summary-heading"
+          >
+            <h3 id="summary-heading">{t.summaryHeading}</h3>
+            <p className="summary-lede">{t.summaryLede}</p>
+            {/* Served as is: the card is already a generated PNG at its final size. */}
+            <Image
+              className="summary-card"
+              src={`${path}/opengraph-image`}
+              alt={`${t.summaryCardAlt}: ${answer.display}`}
+              width={1200}
+              height={630}
+              unoptimized
+            />
+            <div className="summary-share">
+              {shareUrl === null ? null : (
+                <ShareButton url={shareUrl} title={`${answer.display} — ${t.title}`} lang={lang} />
+              )}
+              <a
+                className="save-image"
+                href={`${path}/opengraph-image`}
+                download={`${answer.slug}.png`}
+              >
+                {t.saveImage}
+              </a>
+            </div>
             <p className="again">
               <a href="#surname">{t.searchAnother}</a>
               <a href={`${comparePagePath(lang)}?a=${encodeURIComponent(answer.slug)}`}>
@@ -319,7 +353,7 @@ export function CanonicalSurnamePage({
               </a>
             </p>
             <ReportLink surnames={[answer.display]} pageUrl={shareUrl ?? path} lang={lang} />
-          </div>
+          </section>
         </>
       ) : // `MOVED`. The route answers a permanent redirect before rendering, so
       // this branch exists only to keep the union exhaustive.

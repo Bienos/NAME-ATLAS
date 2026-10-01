@@ -518,6 +518,30 @@ export const UI = {
     landingAsOf: "stan na",
     landingSearching: "Sprawdzamy rejestr PESEL…",
     landingTrust: "Źródło przy każdym fakcie · Brak danych to też odpowiedź",
+    // The journey (TASK-053). What the one request reads while the camera comes
+    // down: each line is a part of the answer it fetches, none is ticked off.
+    analysisLabel: "Co sprawdzamy",
+    analysisSteps: [
+      "Sprawdzamy rejestr PESEL",
+      "Odczytujemy rzadkość",
+      "Sprawdzamy województwa",
+      "Szukamy znaczenia",
+    ],
+    // The question that leads from the last chapter to the evidence, and the
+    // journey's last screen.
+    chapterSourcesQuestion: "Skąd to wiemy?",
+    summaryHeading: "Twój wynik",
+    summaryLede:
+      "Najważniejsze liczby na jednej karcie, z datą rejestru. Udostępnij ją albo zapisz.",
+    summaryCardAlt: "Karta nazwiska z liczbami z rejestru PESEL",
+    saveImage: "Zapisz obraz",
+    // The landing's last two sections, after the atlas (TASK-053).
+    landingHowPoints: [
+      "Każda liczba ma źródło i datę.",
+      "Brak danych to też odpowiedź.",
+      "Mówimy o nazwisku, nie o Twojej rodzinie.",
+    ],
+    landingHowMore: "Skąd są liczby i co znaczą słowa pewności",
     // The site's header (TASK-052).
     siteNavLabel: "Nawigacja",
     navAtlas: "Atlas",
@@ -947,6 +971,24 @@ export const UI = {
     landingAsOf: "as of",
     landingSearching: "Checking the PESEL register…",
     landingTrust: "A source on every fact · No data is also an answer",
+    analysisLabel: "What we are checking",
+    analysisSteps: [
+      "Checking the PESEL register",
+      "Reading the rarity",
+      "Checking the voivodeships",
+      "Looking for a meaning",
+    ],
+    chapterSourcesQuestion: "How do we know?",
+    summaryHeading: "Your result",
+    summaryLede: "The key figures on one card, with the register's date. Share it or save it.",
+    summaryCardAlt: "Surname card with figures from the PESEL register",
+    saveImage: "Save image",
+    landingHowPoints: [
+      "Every figure has a source and a date.",
+      "No data is also an answer.",
+      "We speak about the surname, never about your family.",
+    ],
+    landingHowMore: "Where the figures come from and what the confidence words mean",
     siteNavLabel: "Site",
     navAtlas: "Atlas",
     navCompare: "Compare",
