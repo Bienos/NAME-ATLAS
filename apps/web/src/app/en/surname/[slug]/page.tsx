@@ -9,6 +9,7 @@ import {
   referrerPath,
   requestOrigin,
 } from "../../../../lib/surname-page.js";
+import { deckRequested } from "../../../../lib/deck-target.js";
 import { pageSlug } from "../../../../lib/slug.js";
 
 /** `/en/surname/{slug}` — the English rendering of the canonical page (ADR-0009). */
@@ -51,6 +52,7 @@ export default async function Page({ params, searchParams }: Props) {
       slug={slug}
       intent={intent}
       origin={requestOrigin(h.get("host"))}
+      cards={deckRequested(query["view"])}
     />
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { searchTarget } from "./deck-target.js";
 import type { KeyboardEvent } from "react";
 
 /**
@@ -180,9 +181,12 @@ export function SurnameCombobox({
     return () => clearTimeout(timer);
   }, [value, lang]);
 
+  // A picked surname is a search on the site: its page opens with the deck of
+  // cards (TASK-055, ADR-0025 §2.2), as the search redirect does.
   const hrefOf = (item: Item) =>
-    item.path ??
-    `/?${new URLSearchParams({ surname: item.display_name, ...(lang === "en" ? { lang } : {}) }).toString()}`;
+    item.path === null
+      ? `/?${new URLSearchParams({ surname: item.display_name, ...(lang === "en" ? { lang } : {}) }).toString()}`
+      : searchTarget(item.path, "default");
 
   const shown = [...value.trim()].length >= MIN_LENGTH ? items : [];
   const expanded = open && shown.length > 0;

@@ -50,7 +50,14 @@ function rarity(x: number, group: string, denominator = 21_197_537, date = "2026
 }
 function side(observations: unknown[], rarities: unknown[] = []): SurnameResultResponse {
   return {
-    schema_version: "1.9",
+    schema_version: "1.10",
+    neighbours: {
+      state: "UNAVAILABLE",
+      lists: [],
+      reason_code: "NO_COMPLETE_UNIVERSE",
+      surface: SURFACE,
+    },
+    other_form: null,
     change: {
       state: "UNAVAILABLE",
       entries: [],

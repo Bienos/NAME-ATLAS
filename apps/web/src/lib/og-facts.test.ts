@@ -20,7 +20,14 @@ const citation = {
 };
 
 const RESOLVED = {
-  schema_version: "1.9",
+  schema_version: "1.10",
+  neighbours: {
+    state: "UNAVAILABLE",
+    lists: [],
+    reason_code: "NO_COMPLETE_UNIVERSE",
+    surface: SURFACE,
+  },
+  other_form: null,
   change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },

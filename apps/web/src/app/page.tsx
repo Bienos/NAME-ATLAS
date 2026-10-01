@@ -2,6 +2,7 @@ import { db as sharedDb } from "../lib/db.js";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { searchTarget } from "../lib/deck-target.js";
 import { createLogger } from "@name-atlas/logging";
 import { listFacts, mostCommonSurnames, querySurnameResult } from "@name-atlas/truth";
 import { currentSlugsFor } from "@name-atlas/seo";
@@ -224,7 +225,8 @@ export default async function HomePage({ searchParams }: PageProps) {
     // canonical URL does not change (canonical/21 §35). A surname with no
     // stored address yet is answered here rather than sent to an address that
     // would not resolve.
-    redirect(intent === "default" ? given.path : `${given.path}?intent=${intent}`);
+    // The search opens the deck of cards over it (TASK-055, ADR-0025 §2.2).
+    redirect(searchTarget(given.path, intent));
   }
 
   const otherLang: Lang = lang === "pl" ? "en" : "pl";

@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01
-- **Schema version:** `1.9` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01
+- **Schema version:** `1.10` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.9",
+  "schema_version": "1.10",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -201,11 +201,41 @@ A resolved surname on two or more stored editions of a list carries its change o
 }
 ```
 
+A resolved surname also carries its neighbours on each list it is ranked on, and its other grammatical form when it has one (1.10). Both are read from the active `CURRENT_RANK` claims and follow the rarity section: they are `READY` exactly when rarity is, on rarity's surface.
+
+```jsonc
+"neighbours": {
+  "state": "READY",              // | "UNAVAILABLE" | "RIGHTS_BLOCKED", as rarity is
+  "reason_code": null,
+  "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" },
+  "lists": [
+    {
+      "comparability_group": "pesel_2026_national_male",
+      "snapshot_date": "2026-01-20",
+      "entries": [               // rank order; the surname once, up to two places either side
+        { "surname": { "id": "…", "display_name": "NOWAK", "script": "Latn" }, "rank": 1, "count": 98387, "is_self": false },
+        { "surname": { "id": "…", "display_name": "KOWALSKI", "script": "Latn" }, "rank": 2, "count": 66589, "is_self": true },
+        { "surname": { "id": "…", "display_name": "WIŚNIEWSKI", "script": "Latn" }, "rank": 3, "count": 53079, "is_self": false }
+      ]
+    }
+  ]
+},
+"other_form": {                  // null unless the -ski/-cki/-dzki rule pairs it and the form is ranked
+  "surname": { "id": "…", "display_name": "KOWALSKA", "script": "Latn" },
+  "rule_code": "ADJECTIVAL_SKI_CKI_DZKI",
+  "comparability_group": "pesel_2026_national_female",
+  "snapshot_date": "2026-01-20",
+  "rank": 2,
+  "count": 67308,
+  "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
+}
+```
+
 For an input that did not resolve, the fact sections are null and `suggestions` carries the answer:
 
 ```jsonc
 {
-  "schema_version": "1.9",
+  "schema_version": "1.10",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -258,6 +288,10 @@ These are schema constraints, not conventions — a violating payload fails vali
 22. **One in X and the share follow the point's own count and list total.** Added in 1.7. `one_in_x` is `list_total / count` rounded half up and `share` is `count / list_total` to nine places, re-checked on every point, so a point whose figure does not follow its inputs fails validation. The total is that edition's own (ADR-0020 §2.3), never the current list's.
 23. **A change has at least two known points, in date order, and its summary describes them.** Added in 1.7. `points` are strictly ascending by date with at least two `KNOWN`; `summary.known_points`, `first` and `last` equal the known points' own count and first and last values; each change's sign agrees with its own first and last values (a change of 0.0 means they differ by less than 0.05% of the start). One edition is a count, not a change.
 24. **A gap is reported only between the first and the last known point.** Added in 1.7. The publisher's resource that repeats an earlier edition (the women's 2022 file) is a gap, never a point and never a count.
+25. **A neighbour list holds the surname exactly once, in rank order.** Added in 1.10. At most five entries, exactly one `is_self`, ranks never falling and counts never rising down the list. A tie at the surname's own place is not listed. Where more surnames share a neighbouring place than fit, which of them are listed is fixed by the surname id, not ranked (ADR-0025 §2.4).
+26. **Neighbours are `READY` exactly when they hold a list.** Added in 1.10. Not `READY` carries no list and a reason; `READY` carries no reason. The section is present exactly when `status` is `RESOLVED`.
+27. **The other form is a form, by one fixed rule, and never the surname itself.** Added in 1.10. `rule_code` is the literal `ADJECTIVAL_SKI_CKI_DZKI`: -ski, -cki and -dzki pair with -ska, -cka and -dzka on the other list, and no other ending is paired. No field states a relation between the people who bear the two forms (ADR-0025 §2.5).
+28. **The other form is present only on a resolved surname.** Added in 1.10. It is null on every other status, and null where the rule does not pair the ending or the paired form has no rank on the other list.
 
 ## Accepted rendering of a rarity entry
 
@@ -320,6 +354,8 @@ Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.9 → 1.10 (2026-10-01, TASK-055, ADR-0025).** Adds `neighbours` (required, nullable, present exactly when `status` is `RESOLVED`) and `other_form` (required, nullable, null unless `RESOLVED`). A consumer written against 1.9 is unaffected; a producer must now supply both. Both are read from rank claims that already exist, so no new derivation comes with them; migration 0026 adds an index so that the neighbours of a rare surname, whose place is shared by tens of thousands, are read without a sort.
 
 **1.8 → 1.9 (2026-10-01, TASK-051, ADR-0020).** Adds the `change` section, required and nullable, present exactly when `status` is `RESOLVED` — the same rule the other fact sections follow. A consumer written against 1.8 is unaffected; a producer must now supply it. The section is `UNAVAILABLE` with `reason_code = NO_CHANGE_DERIVED` for a surname with no claim. That code does not say why: a surname on one edition only and a surname the batch has not reached look the same to the request path, which derives nothing. It was numbered 1.7 on TASK-051's own branch; TASK-054 reached `main` first as 1.8, so 1.9 is the first version on `main` carrying both.
 

@@ -72,7 +72,14 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.9",
+  schema_version: "1.10",
+  neighbours: {
+    state: "UNAVAILABLE",
+    lists: [],
+    reason_code: "NO_COMPLETE_UNIVERSE",
+    surface: SURFACE,
+  },
+  other_form: null,
   change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
@@ -198,7 +205,14 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.9",
+  schema_version: "1.10",
+  neighbours: {
+    state: "RIGHTS_BLOCKED",
+    lists: [],
+    reason_code: "COMMERCIAL_USE_UNKNOWN",
+    surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
+  },
+  other_form: null,
   change: {
     state: "RIGHTS_BLOCKED",
     entries: [],
@@ -252,7 +266,9 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.9",
+  schema_version: "1.10",
+  neighbours: null,
+  other_form: null,
   change: null,
   status: "UNRESOLVED",
   surname: null,
@@ -301,7 +317,9 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.9",
+  schema_version: "1.10",
+  neighbours: null,
+  other_form: null,
   change: null,
   status: "AMBIGUOUS",
   surname: null,

@@ -27,9 +27,10 @@ import { z } from "zod";
 /**
  * 1.7 adds `change` (TASK-051, ADR-0020) and 1.8 adds `archive` (TASK-054).
  * TASK-054 reached `main` first, as 1.8, while TASK-051 was still open as 1.7,
- * so 1.9 is the first version on `main` that carries both.
+ * so 1.9 is the first version on `main` that carries both. 1.10 adds
+ * `neighbours` and `other_form` (TASK-055, ADR-0025).
  */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.9";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.10";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -739,6 +740,72 @@ export const suggestionsSectionSchema = z
  */
 export const resultStatusSchema = z.enum(["RESOLVED", "UNRESOLVED", "AMBIGUOUS"]);
 
+/** One surname on a list near the surname asked about (TASK-055). */
+export const neighbourEntrySchema = z.object({
+  surname: publicSurnameIdentitySchema,
+  rank: z.number().int().positive(),
+  count: z.number().int().positive(),
+  /** The surname the response is about. Exactly one entry per list. */
+  is_self: z.boolean(),
+});
+
+/**
+ * One list's neighbourhood: the surname, and up to two surnames ranked above
+ * it and two below, by rank then canonical key. Read from active
+ * `CURRENT_RANK` claims, never computed by a surface (ADR-0025 §2.4).
+ */
+export const neighbourListSchema = z
+  .object({
+    comparability_group: z.string().min(1),
+    snapshot_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+    entries: z.array(neighbourEntrySchema).min(1).max(5),
+  })
+  .refine((l) => l.entries.filter((e) => e.is_self).length === 1, {
+    message: "exactly one entry is the surname itself",
+  })
+  .refine((l) => l.entries.every((e, i) => i === 0 || e.rank >= (l.entries[i - 1]?.rank ?? 0)), {
+    message: "entries run from the best rank down",
+  })
+  .refine(
+    (l) =>
+      l.entries.every(
+        (e, i) => i === 0 || e.count <= (l.entries[i - 1]?.count ?? Number.POSITIVE_INFINITY),
+      ),
+    { message: "a worse rank never has a larger count" },
+  );
+
+export const neighboursStateSchema = z.enum(["READY", "UNAVAILABLE", "RIGHTS_BLOCKED"]);
+
+/** Added in 1.10 (TASK-055). It follows the rights of the rarity section's rank claims. */
+export const neighboursSectionSchema = z
+  .object({
+    state: neighboursStateSchema,
+    lists: z.array(neighbourListSchema),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine((n) => (n.state === "READY") === n.lists.length > 0, {
+    message: "lists are present exactly when READY",
+  })
+  .refine((n) => (n.state === "READY") === (n.reason_code === null), {
+    message: "reason_code is null exactly when READY",
+  });
+
+/**
+ * The surname's other grammatical form (ADR-0025 §2.5): KOWALSKI and KOWALSKA.
+ * A fixed -ski/-cki/-dzki rule over the register, with the other form's rank
+ * and count on its own list. It states a form, never kinship.
+ */
+export const otherFormSchema = z.object({
+  surname: publicSurnameIdentitySchema,
+  rule_code: z.literal("ADJECTIVAL_SKI_CKI_DZKI"),
+  comparability_group: z.string().min(1),
+  snapshot_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+  rank: z.number().int().positive(),
+  count: z.number().int().positive(),
+  surface: surfaceEligibilitySchema,
+});
+
 export const surnameResultResponseSchema = z
   .object({
     schema_version: z.literal(SURNAME_RESULT_SCHEMA_VERSION),
@@ -778,6 +845,10 @@ export const surnameResultResponseSchema = z
      * archive search has not run.
      */
     archive: archiveSectionSchema.nullable(),
+    /** Added in 1.10 (TASK-055). Present exactly when RESOLVED. */
+    neighbours: neighboursSectionSchema.nullable(),
+    /** Added in 1.10 (TASK-055). Null unless RESOLVED, and null where no other form is paired. */
+    other_form: otherFormSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -802,6 +873,15 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.archive !== null : r.archive === null), {
     message: "archive section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.neighbours !== null : r.neighbours === null), {
+    message: "neighbours section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => r.status === "RESOLVED" || r.other_form === null, {
+    message: "an other form is present only when status is RESOLVED",
+  })
+  .refine((r) => r.other_form === null || r.other_form.surname.id !== r.surname?.id, {
+    message: "the other form is a different surname",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -854,6 +934,10 @@ export type ArchivePeriod = z.infer<typeof archivePeriodSchema>;
 export type ArchiveExample = z.infer<typeof archiveExampleSchema>;
 export type ArchiveState = z.infer<typeof archiveStateSchema>;
 export type ArchiveSection = z.infer<typeof archiveSectionSchema>;
+export type NeighbourEntry = z.infer<typeof neighbourEntrySchema>;
+export type NeighbourList = z.infer<typeof neighbourListSchema>;
+export type NeighboursSection = z.infer<typeof neighboursSectionSchema>;
+export type OtherForm = z.infer<typeof otherFormSchema>;
 export type MeaningInterpretation = z.infer<typeof meaningInterpretationSchema>;
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type SuggestionsSection = z.infer<typeof suggestionsSectionSchema>;

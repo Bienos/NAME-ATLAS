@@ -29,6 +29,7 @@ import type {
   ArchiveSection,
   ChangeEntry,
   DistributionEntry,
+  OtherForm,
   PopulationObservation,
   RarityEntry,
 } from "@name-atlas/contracts";
@@ -371,6 +372,49 @@ export function rankSentence(entry: RarityEntry, surname: string, lang: Lang): s
       ? `${surname}${sex} zajmowało miejsce ${position} wśród nazwisk w tym zbiorze`
       : `${surname}${sex} ranked ${position} among the surnames in this dataset`,
   );
+}
+
+/**
+ * The other grammatical form's line (ADR-0025 §2.5): its count and place on its
+ * own list, with the list's date. It states a form, never a relation.
+ */
+export function otherFormSentence(other: OtherForm, lang: Lang): string {
+  const sex = parenthetical(partitionLabel(other.comparability_group, lang));
+  const count = formatInteger(other.count, lang);
+  const rank = formatInteger(other.rank, lang);
+  const on = formatDate(other.snapshot_date, lang);
+  return terminate(
+    lang === "pl"
+      ? `${other.surname.display_name}${sex}: ${count} ${other.count === 1 ? "osoba" : "osób"}, miejsce ${rank} na liście nazwisk na dzień ${on}`
+      : `${other.surname.display_name}${sex}: ${count} ${other.count === 1 ? "person" : "people"}, rank ${rank} on the surname list on ${on}`,
+  );
+}
+
+/**
+ * Polona's own names for its catalogue's kinds, in English. The Polish page
+ * shows them as Polona prints them; an unknown one is shown as printed.
+ */
+const POLONA_CATEGORY_EN: Readonly<Record<string, string>> = {
+  Czasopisma: "Periodicals",
+  Książki: "Books",
+  Nuty: "Sheet music",
+  "Druki ulotne": "Ephemera",
+  Artykuły: "Articles",
+  Fotografia: "Photographs",
+  Rękopisy: "Manuscripts",
+  "Mapy i Atlasy": "Maps and atlases",
+  Pocztówki: "Postcards",
+  Ebooki: "E-books",
+  "Grafika i Rysunek": "Prints and drawings",
+  Prasa: "Newspapers",
+  Dokumenty: "Documents",
+  Muzealia: "Museum objects",
+  Audiobooki: "Audiobooks",
+  Mikrofilmy: "Microfilms",
+};
+
+export function archiveCategoryLabel(label: string, lang: Lang): string {
+  return lang === "en" ? (POLONA_CATEGORY_EN[label] ?? label) : label;
 }
 
 /**
@@ -776,6 +820,52 @@ export const UI = {
     navArchive: "W archiwach",
     navSources: "Źródła",
     rankCaption: "miejsce na liście nazwisk",
+    neighboursHeading: "Sąsiedzi na liście",
+    neighboursNote:
+      "Dwa miejsca wyżej i dwa niżej na tej samej liście. Nazwiska z tą samą liczbą osób " +
+      "dzielą miejsce.",
+    neighboursSelf: "to nazwisko",
+    otherFormHeading: "Druga forma gramatyczna",
+    otherFormNote:
+      "To samo nazwisko w drugim rodzaju gramatycznym, na drugiej liście. Nie mówi nic " +
+      "o pokrewieństwie.",
+    archiveByCategory: "Rekordy katalogu według rodzaju",
+    deckOpen: "Zobacz karty",
+    deckClose: "Cała strona",
+    deckLabel: "Karty nazwiska",
+    deckCards: "Karty",
+    deckOf: "z",
+    deckPrev: "Poprzednia karta",
+    deckNext: "Następna karta",
+    deckHintKeys: "Strzałki ← → · Esc: cała strona",
+    deckHintTouch: "Przesuń kartę lub dotknij jej krawędzi",
+    deckHello: "Nazwisko",
+    deckHelloEyebrow: "Twoje nazwisko",
+    deckPeopleInRegister: "osób w rejestrze PESEL",
+    deckRarity: "Rzadkość",
+    deckRarityHeading: "Mniej więcej jedna na tyle osób z listy nosi to nazwisko.",
+    deckNeighbours: "Sąsiedzi",
+    deckNeighboursHeading: "Tuż obok na liście nazwisk.",
+    deckWhere: "Województwa",
+    deckWhereHeading: "Gdzie mieszka najwięcej osób z tym nazwiskiem?",
+    deckWhereTop: "Najwięcej",
+    deckChange: "Zmiany w czasie",
+    deckChangeSurname: "to nazwisko",
+    deckChangeList: "cała lista",
+    deckChangeWhy: "Mówimy, co się zmieniło, nie dlaczego.",
+    deckOther: "Druga forma",
+    deckOtherHeading: "Na drugiej liście to nazwisko ma formę",
+    deckMeaning: "Znaczenie",
+    deckInterpretation: "interpretacja",
+    deckPrint: "Dawne druki",
+    deckPrintPages: "stron dzieł w domenie publicznej",
+    deckCatalogue: "W katalogu",
+    deckCatalogueHeading: "Rekordy katalogu Polony, w których pada to słowo.",
+    deckCatalogueTotal: "rekordów łącznie",
+    deckEnd: "Podsumowanie",
+    deckEndHeading: "w liczbach.",
+    deckFullPage: "Zobacz całą stronę",
+    deckCompareForms: "Porównaj obie formy",
     scaleLabel: "Skala rzadkości",
     scaleCommon: "częstsze",
     scaleRare: "rzadsze",
@@ -1251,6 +1341,52 @@ export const UI = {
     navArchive: "In archives",
     navSources: "Sources",
     rankCaption: "rank on the surname list",
+    neighboursHeading: "Neighbours on the list",
+    neighboursNote:
+      "Two places above and two below on the same list. Surnames with the same count share " +
+      "a place.",
+    neighboursSelf: "this surname",
+    otherFormHeading: "The other grammatical form",
+    otherFormNote:
+      "The same surname in the other grammatical gender, on the other list. It says nothing " +
+      "about kinship.",
+    archiveByCategory: "Catalogue records by kind",
+    deckOpen: "See the cards",
+    deckClose: "Full page",
+    deckLabel: "The surname's cards",
+    deckCards: "Cards",
+    deckOf: "of",
+    deckPrev: "Previous card",
+    deckNext: "Next card",
+    deckHintKeys: "Arrow keys ← → · Esc: full page",
+    deckHintTouch: "Swipe the card or tap its edge",
+    deckHello: "Surname",
+    deckHelloEyebrow: "Your surname",
+    deckPeopleInRegister: "people in the PESEL register",
+    deckRarity: "Rarity",
+    deckRarityHeading: "Roughly one in this many people on the list has this surname.",
+    deckNeighbours: "Neighbours",
+    deckNeighboursHeading: "Right beside it on the surname list.",
+    deckWhere: "Voivodeships",
+    deckWhereHeading: "Where do most people with this surname live?",
+    deckWhereTop: "Most",
+    deckChange: "Change over time",
+    deckChangeSurname: "this surname",
+    deckChangeList: "the whole list",
+    deckChangeWhy: "We say what changed, not why.",
+    deckOther: "Other form",
+    deckOtherHeading: "On the other list this surname takes the form",
+    deckMeaning: "Meaning",
+    deckInterpretation: "interpretation",
+    deckPrint: "Old print",
+    deckPrintPages: "pages of public-domain works",
+    deckCatalogue: "In the catalogue",
+    deckCatalogueHeading: "Records in Polona's catalogue in which the word appears.",
+    deckCatalogueTotal: "records in all",
+    deckEnd: "Summary",
+    deckEndHeading: "in numbers.",
+    deckFullPage: "See the full page",
+    deckCompareForms: "Compare both forms",
     scaleLabel: "Rarity scale",
     scaleCommon: "more common",
     scaleRare: "rarer",

@@ -31,6 +31,14 @@ export type {
 } from "./read.js";
 export { querySurnameResult } from "./query.js";
 export {
+  NEIGHBOUR_SPAN,
+  OTHER_FORM_RULE,
+  otherGrammaticalForm,
+  readOtherForm,
+  readRankNeighbours,
+} from "./neighbours.js";
+export type { OtherForm, RankNeighbour, RankNeighbourList } from "./neighbours.js";
+export {
   archiveAvailabilityClaimKey,
   archiveSectionFor,
   deriveArchiveAvailability,

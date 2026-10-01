@@ -559,7 +559,7 @@ describe("SURNAME_DISTRIBUTION_SHIFT against a real PostgreSQL", () => {
       const parsed = surnameResultResponseSchema.parse(
         JSON.parse(JSON.stringify(outcome.response)),
       );
-      expect(parsed.schema_version).toBe("1.9");
+      expect(parsed.schema_version).toBe("1.10");
       expect(parsed.change?.state).toBe("READY");
       expect(parsed.change?.entries.map((e) => e.list).sort()).toEqual(["FEMALE", "MALE"]);
       const male = parsed.change?.entries.find((e) => e.list === "MALE");

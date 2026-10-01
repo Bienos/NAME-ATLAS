@@ -142,8 +142,11 @@ describe("mostCommonSurnames", () => {
             AND (c.structured_value->>'rank')::int <= 10
         `.execute(trx);
       });
-    expect(plan.rows.map((r) => r["QUERY PLAN"]).join("\n")).toContain(
-      "claims_current_rank_value_idx",
+    // Either partial rank index serves it. On these few rows the planner may
+    // take 0026's (list, rank, surname); on the full register it takes 0021's,
+    // checked on 828,264 rank claims on 2026-10-01 (TASK-055).
+    expect(plan.rows.map((r) => r["QUERY PLAN"]).join("\n")).toMatch(
+      /claims_current_rank_(value|list)_idx/u,
     );
   });
 });

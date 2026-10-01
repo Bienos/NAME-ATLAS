@@ -22,6 +22,7 @@
  */
 import type { Kysely } from "kysely";
 import { archiveSectionFor } from "./archive.js";
+import { OTHER_FORM_RULE, readOtherForm, readRankNeighbours } from "./neighbours.js";
 import type { DB } from "@name-atlas/db";
 import type {
   ChangeEntry,
@@ -38,6 +39,8 @@ import type {
   RaritySection,
   MeaningSection,
   MeaningInterpretation as MeaningInterpretationDto,
+  NeighboursSection,
+  OtherForm as OtherFormDto,
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname, suggestSurnames } from "@name-atlas/resolver";
@@ -119,6 +122,75 @@ function emptyChange(
   surface: SurfaceEligibilityDto,
 ): ChangeSection {
   return { state, entries: [], reason_code: reasonCode, surface };
+}
+
+function emptyNeighbours(
+  state: "UNAVAILABLE" | "RIGHTS_BLOCKED",
+  reasonCode: string,
+  surface: SurfaceEligibilityDto,
+): NeighboursSection {
+  return { state, lists: [], reason_code: reasonCode, surface };
+}
+
+/**
+ * The deck's neighbours and other grammatical form (TASK-055, ADR-0025). Both
+ * are read from rank claims on the same national lists as the rarity section,
+ * so they are shown exactly when rarity is, on rarity's rights.
+ */
+async function rankExtras(
+  db: Kysely<DB>,
+  surnameId: string,
+  displayName: string,
+  rarity: RaritySection,
+): Promise<{ neighbours: NeighboursSection; other_form: OtherFormDto | null }> {
+  if (rarity.state !== "READY") {
+    return {
+      neighbours: emptyNeighbours(
+        rarity.state === "RIGHTS_BLOCKED" ? "RIGHTS_BLOCKED" : "UNAVAILABLE",
+        rarity.reason_code ?? "NO_RANK",
+        rarity.surface,
+      ),
+      other_form: null,
+    };
+  }
+  const lists = await readRankNeighbours(db, surnameId);
+  const other = await readOtherForm(db, displayName);
+  return {
+    neighbours:
+      lists.length === 0
+        ? emptyNeighbours("UNAVAILABLE", "NO_RANK", rarity.surface)
+        : {
+            state: "READY",
+            lists: lists.map((l) => ({
+              comparability_group: l.comparability_group,
+              snapshot_date: l.snapshot_date,
+              entries: l.entries.map((e) => ({
+                surname: { id: e.surname_id, display_name: e.display_name, script: e.script },
+                rank: e.rank,
+                count: e.count,
+                is_self: e.is_self,
+              })),
+            })),
+            reason_code: null,
+            surface: rarity.surface,
+          },
+    other_form:
+      other === null || other.surname_id === surnameId
+        ? null
+        : {
+            surname: {
+              id: other.surname_id,
+              display_name: other.display_name,
+              script: other.script,
+            },
+            rule_code: OTHER_FORM_RULE,
+            comparability_group: other.comparability_group,
+            snapshot_date: other.snapshot_date,
+            rank: other.rank,
+            count: other.count,
+            surface: rarity.surface,
+          },
+  };
 }
 
 /**
@@ -547,6 +619,8 @@ export async function querySurnameResult(
         meaning: null,
         change: null,
         archive: null,
+        neighbours: null,
+        other_form: null,
       },
     };
   }
@@ -568,6 +642,8 @@ export async function querySurnameResult(
         meaning: null,
         change: null,
         archive: null,
+        neighbours: null,
+        other_form: null,
       },
     };
   }
@@ -622,6 +698,8 @@ export async function querySurnameResult(
         meaning: meaningSection,
         change: emptyChange("UNAVAILABLE", reason, noRights),
         archive: archiveSection,
+        neighbours: emptyNeighbours("UNAVAILABLE", reason, noRights),
+        other_form: null,
       },
     };
   }
@@ -655,6 +733,8 @@ export async function querySurnameResult(
         meaning: meaningSection,
         change: emptyChange("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         archive: archiveSection,
+        neighbours: emptyNeighbours("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
+        other_form: null,
       },
     };
   }
@@ -678,6 +758,23 @@ export async function querySurnameResult(
     surface,
   );
 
+  // Rarity needs a complete universe as well as a count, so it can be
+  // absent where population is present. Absence is stated, never a
+  // figure invented.
+  const rarity: RaritySection =
+    rarityClaims.length === 0
+      ? emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", rarityEligibility)
+      : rarityEligibility.decision === "BLOCKED"
+        ? emptyRarity("RIGHTS_BLOCKED", rarityEligibility.reason_code, rarityEligibility)
+        : {
+            state: "READY",
+            entries: rarityClaims.map(toRarityEntry),
+            reason_code: null,
+            surface: rarityEligibility,
+          };
+  // The deck's neighbours and other form follow the rarity section (ADR-0025).
+  const extras = await rankExtras(db, surnameId, identity.display_name, rarity);
+
   // ALLOWED and CONDITIONAL both surface the values; CONDITIONAL carries its
   // reason so a caller can apply the condition (docs/canonical/12 §6.3).
   return {
@@ -692,20 +789,7 @@ export async function querySurnameResult(
         reason_code: null,
         surface: eligibility,
       },
-      // Rarity needs a complete universe as well as a count, so it can be
-      // absent where population is present. Absence is stated, never a
-      // figure invented.
-      rarity:
-        rarityClaims.length === 0
-          ? emptyRarity("UNAVAILABLE", "NO_COMPLETE_UNIVERSE", rarityEligibility)
-          : rarityEligibility.decision === "BLOCKED"
-            ? emptyRarity("RIGHTS_BLOCKED", rarityEligibility.reason_code, rarityEligibility)
-            : {
-                state: "READY",
-                entries: rarityClaims.map(toRarityEntry),
-                reason_code: null,
-                surface: rarityEligibility,
-              },
+      rarity,
       // The geography chapter needs a complete *regional* resource version,
       // which is a different universe from the national one, so it too can be
       // absent where population is present. docs/canonical/16 §28: state the
@@ -749,6 +833,8 @@ export async function querySurnameResult(
                 surface: changeEligibility,
               },
       archive: archiveSection,
+      neighbours: extras.neighbours,
+      other_form: extras.other_form,
     },
   };
 }

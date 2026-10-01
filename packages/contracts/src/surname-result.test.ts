@@ -13,6 +13,9 @@ import {
   populationValueSchema,
   surnameResultResponseSchema,
   archiveSectionSchema,
+  neighbourListSchema,
+  neighboursSectionSchema,
+  otherFormSchema,
 } from "./surname-result.js";
 
 /**
@@ -270,6 +273,8 @@ describe("top-level response", () => {
         meaning: null,
         archive: null,
         change: null,
+        neighbours: null,
+        other_form: null,
       }).success,
     ).toBe(true);
   });
@@ -951,6 +956,8 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
       suggestions: NO_SUGGESTIONS,
       meaning: null,
       archive: null,
+      neighbours: null,
+      other_form: null,
     };
     expect(surnameResultResponseSchema.safeParse({ ...base, change: null }).success).toBe(true);
     expect(
@@ -959,11 +966,150 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
         change: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
       }).success,
     ).toBe(false);
-    // Missing altogether is not the same as null: a 1.6 producer fails against 1.9.
+    // Missing altogether is not the same as null: a 1.6 producer fails against 1.10.
     expect(surnameResultResponseSchema.safeParse(base).success).toBe(false);
   });
 
-  it("is schema version 1.9", () => {
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.9");
+  it("is schema version 1.10", () => {
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.10");
+  });
+});
+
+describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () => {
+  const SURFACE = { surface: "FREE" as const, decision: "ALLOWED" as const, reason_code: "X" };
+  const who = (n: number, display_name: string) => ({
+    id: `01a0b9e3-34f3-7633-a239-2b8596dfc0${String(n).padStart(2, "0")}`,
+    display_name,
+    script: "Latn",
+  });
+  // Synthetic ranks and counts.
+  const LIST = {
+    comparability_group: "g_male",
+    snapshot_date: "2026-01-20",
+    entries: [
+      { surname: who(1, "A"), rank: 2, count: 500, is_self: false },
+      { surname: who(2, "B"), rank: 3, count: 400, is_self: true },
+      { surname: who(3, "C"), rank: 3, count: 400, is_self: false },
+      { surname: who(4, "D"), rank: 5, count: 300, is_self: false },
+    ],
+  };
+  const OTHER = {
+    surname: who(9, "BSKA"),
+    rule_code: "ADJECTIVAL_SKI_CKI_DZKI" as const,
+    comparability_group: "g_female",
+    snapshot_date: "2026-01-20",
+    rank: 7,
+    count: 250,
+    surface: SURFACE,
+  };
+
+  it("accepts a list with the surname once, ties sharing a rank", () => {
+    expect(neighbourListSchema.safeParse(LIST).success).toBe(true);
+  });
+
+  it("refuses a list without the surname itself, or with it twice", () => {
+    const none = LIST.entries.map((e) => ({ ...e, is_self: false }));
+    expect(neighbourListSchema.safeParse({ ...LIST, entries: none }).success).toBe(false);
+    const twice = LIST.entries.map((e, i) => ({ ...e, is_self: i < 2 }));
+    expect(neighbourListSchema.safeParse({ ...LIST, entries: twice }).success).toBe(false);
+  });
+
+  it("refuses a list out of rank order, or with a count rising down the list", () => {
+    const reversed = [...LIST.entries].reverse();
+    expect(neighbourListSchema.safeParse({ ...LIST, entries: reversed }).success).toBe(false);
+    const rising = LIST.entries.map((e, i) => (i === 3 ? { ...e, count: 450 } : e));
+    expect(neighbourListSchema.safeParse({ ...LIST, entries: rising }).success).toBe(false);
+  });
+
+  it("refuses more than two places either side", () => {
+    const six = [...LIST.entries, { surname: who(5, "E"), rank: 6, count: 200, is_self: false }];
+    six.push({ surname: who(6, "F"), rank: 7, count: 100, is_self: false });
+    expect(neighbourListSchema.safeParse({ ...LIST, entries: six }).success).toBe(false);
+  });
+
+  it("is READY exactly when it holds lists, and gives a reason otherwise", () => {
+    const ready = { state: "READY", lists: [LIST], reason_code: null, surface: SURFACE };
+    expect(neighboursSectionSchema.safeParse(ready).success).toBe(true);
+    expect(neighboursSectionSchema.safeParse({ ...ready, lists: [] }).success).toBe(false);
+    expect(neighboursSectionSchema.safeParse({ ...ready, reason_code: "X" }).success).toBe(false);
+    const none = { state: "UNAVAILABLE", lists: [], reason_code: "NO_RANK", surface: SURFACE };
+    expect(neighboursSectionSchema.safeParse(none).success).toBe(true);
+    expect(neighboursSectionSchema.safeParse({ ...none, lists: [LIST] }).success).toBe(false);
+    expect(neighboursSectionSchema.safeParse({ ...none, reason_code: null }).success).toBe(false);
+  });
+
+  it("names the other form only by the fixed rule", () => {
+    expect(otherFormSchema.safeParse(OTHER).success).toBe(true);
+    expect(otherFormSchema.safeParse({ ...OTHER, rule_code: "ANY_ENDING" }).success).toBe(false);
+  });
+
+  const resolved = {
+    schema_version: SURNAME_RESULT_SCHEMA_VERSION,
+    status: "RESOLVED" as const,
+    surname: who(2, "B"),
+    population: {
+      state: "UNAVAILABLE",
+      observations: [],
+      reason_code: "X",
+      surface: SURFACE,
+    },
+    rarity: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
+    distribution: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
+    suggestions: null,
+    meaning: {
+      state: "NO_SOURCED_MEANING",
+      interpretations: [],
+      confidence: null,
+      methodology_code: null,
+      reason_code: "X",
+      surface: SURFACE,
+    },
+    change: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
+    archive: {
+      state: "NOT_SEARCHED",
+      query: null,
+      searched_on: null,
+      catalogue_records: null,
+      catalogue_by_category: [],
+      pages: null,
+      pages_by_period: [],
+      pages_by_place: [],
+      examples: [],
+      confidence: null,
+      citation: null,
+      reason_code: "X",
+      surface: SURFACE,
+    },
+    neighbours: { state: "READY", lists: [LIST], reason_code: null, surface: SURFACE },
+    other_form: OTHER,
+  };
+
+  it("carries both on a resolved surname, and refuses an other form that is the surname itself", () => {
+    const check = (r: unknown) => surnameResultResponseSchema.safeParse(r);
+    expect(check(resolved).success).toBe(true);
+    expect(check({ ...resolved, neighbours: null }).success).toBe(false);
+    const self = { ...OTHER, surname: resolved.surname };
+    expect(check({ ...resolved, other_form: self }).success).toBe(false);
+  });
+
+  it("refuses either on a surname that did not resolve", () => {
+    const unresolved = {
+      ...resolved,
+      status: "UNRESOLVED" as const,
+      surname: null,
+      population: null,
+      rarity: null,
+      distribution: null,
+      suggestions: NO_SUGGESTIONS,
+      meaning: null,
+      change: null,
+      archive: null,
+      neighbours: null,
+      other_form: null,
+    };
+    const check = (r: unknown) => surnameResultResponseSchema.safeParse(r);
+    expect(check(unresolved).success).toBe(true);
+    expect(check({ ...unresolved, neighbours: resolved.neighbours }).success).toBe(false);
+    expect(check({ ...unresolved, other_form: OTHER }).success).toBe(false);
   });
 });
