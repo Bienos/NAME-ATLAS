@@ -19,6 +19,8 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `editions.sh` | Every earlier PESEL edition (2019, 2020–2025, the 2025 regional pair) as dated snapshots, through `scripts/import-editions.sh`, with a gate that proves the surnames and every claim count unchanged, then grants, `VACUUM ANALYZE` and a third dump (TASK-045). Takes the pushed commit's archive, like `build.sh`, and leaves the register build alone. |
 | `shift.sh` | TASK-051, after `finalize` and `editions`: `start` unpacks the pushed commit, records the surnames and claim counts the gate must find unchanged, runs the migration that adds `SURNAME_DISTRIBUTION_SHIFT`, and starts the batch (`pnpm truth:derive-shift`, one claim per surname and list) in the unit `name-atlas-shift-batch`, which survives the SSH session and resumes after a failure or a reboot; `finish` refuses until the batch has completed, runs the gate (one active claim per surname and list, none with fewer than two known points, every claim with its citation, confidence and evidence, nothing else changed, a second batch run finding nothing to do), grants, `VACUUM ANALYZE` and a fourth dump. |
 | `archive.sh` | TASK-054, after `finalize`: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate` (migration 0025, the `ARCHIVE_AVAILABILITY` claim type), checks the web role can read every table, starts the `name-atlas-archive-load` unit (`pnpm truth:archive-load --top-rank 2000`) and returns. The load asks Polona eight paced questions per surname, about 7 s each, so it takes hours; it resumes after a restart and writes `/var/lib/name-atlas/archive/loaded` only when a pass completes. |
+| `accounts.sh` | TASK-063, after `provision` and `build`: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate` (migration `0027` makes schema `accounts`; any earlier one still pending, `0026`'s index at the time of writing, comes with it), runs `accounts-roles.sql`, sets the role `nameatlas_app`'s password (from stdin, only if it does not already work), writes PgBouncer's user list for the web role and that role and reloads it only if the file changed, then checks, by the catalog and by connecting as the role through the pooler, that it writes `accounts` and nothing else. Repeatable: a second run changes nothing. |
+| `accounts-roles.sql` | The role `nameatlas_app` and its grants on schema `accounts`, idempotent; `accounts.sh` runs it from the copy the workflow stages. |
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 
@@ -42,6 +44,7 @@ Nobody pastes a secret into a chat. Secrets go into GitHub and Vercel only, and 
 4. **GitHub secrets.** In the repository: Settings → Secrets and variables → Actions → New repository secret.
    - `VM_HOST`: the instance's public IP address.
    - `VM_SSH_KEY`: the whole text of the private key file saved in step 2, including the `BEGIN` and `END` lines.
+   - `VM_DB_APP_PASSWORD` (TASK-063, only when accounts are to go live): the accounts role's password, again 40 random letters and digits, and **a different one** from the web role's. Keep a copy in a password manager: the Vercel variable below needs it.
    - `VM_DB_WEB_PASSWORD`: 40 random characters, letters and digits only (the password goes into a URL). **Keep a copy in a password manager**: step 5 needs it again, and GitHub never shows a saved secret. If it is lost, save a new `VM_DB_WEB_PASSWORD` and run `provision` again before step 5; that is safe at any time and changes the database role's password.
 5. **Vercel**, only when the build is finalized: in the `name-atlas` project, Settings → Environment Variables, edit `DATABASE_URL` for Production to
 
@@ -64,7 +67,27 @@ Each step is one push that changes `request`, or one `workflow_dispatch`:
 7. `editions`, any time after `finalize` (and after `extras`, if it ran): the fifteen earlier editions. Its output ends with "done: every edition is loaded; the pages read the current resources only". About 15 downloads and imports; expect it to take a while.
 8. `shift` then `shift-finish` (TASK-051), after `editions`: the change-over-time claims. `shift` returns in minutes; the batch runs for hours (about 830,000 claims; `status` reports the unit and its marker). `shift-finish` refuses until `shift batch complete: yes`, and ends with "done: every surname's change over time is derived". Run the web deploy only after it: the order is migration, batch, deploy (ADR-0020 §2.10).
 9. `archive` (TASK-054), any time after `finalize`: migrates, then starts Polona's archive load and returns. `status` shows its progress under "archive load", one log line per surname, and `loaded:` once a pass completes. Ten Polona failures in a row stop the loader; the unit restarts it after ten minutes, at most six times in 12 hours. Running `archive` again later starts a new pass that searches only the surnames last searched more than 90 days earlier.
-10. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
+10. `accounts` (TASK-063), any time after `build`, and only when the owner has set the secret `VM_DB_APP_PASSWORD`: makes the production database ready for accounts and ends by connecting over the public port as `nameatlas_app`, the way Vercel will. It refuses while the register build, the archive load or the change-over-time batch is running. It is safe to run again, for example after `provision`, which keeps the role in PgBouncer's user list. Nothing in the web app uses the role until the owner sets the five Vercel variables (`ACCOUNTS_DATABASE_URL` is below).
+11. The owner's step 5 above, then a production redeploy of the current production deployment (Vercel → Deployments, the one marked Current), so the app itself does not change. On 2026-09-30 that was `dpl_HbrhnkXxmSzU7PRjzr6hZA1KLyvu` (`main` @ `03d1efb`). Do not redeploy an older one: `0eb4814`, named here when this was first written, predates the landing atlas.
+
+## Turning accounts on: the owner's part (ADR-0027, TASK-062, TASK-063)
+
+Accounts are off until all of this is done, and nothing on the site changes before then.
+
+1. A Resend account, an API key, and a sending domain verified in Resend (SPF and DKIM records on the domain's DNS). Without a verified domain Resend delivers only to the account's own address.
+2. The GitHub secret `VM_DB_APP_PASSWORD` (above), then the `accounts` step of the `Register VM` workflow. Its output ends with the lines "ok through PgBouncer: ..." and then "done"; its last job step connects as `nameatlas_app` over the public port.
+3. In Vercel (Production), Settings → Environment Variables, five variables, then a redeploy of the current production deployment, because the header link and the legal text are read at build:
+
+   ```
+   ACCOUNTS_DATABASE_URL=postgresql://nameatlas_app:<VM_DB_APP_PASSWORD>@<VM_HOST>:6432/name_atlas?uselibpqcompat=true&sslmode=require
+   RESEND_API_KEY=<the API key>
+   ACCOUNTS_MAIL_FROM=Name Atlas <konto@your-verified-domain>
+   SITE_ORIGIN=https://<the site's address, no trailing slash>
+   CRON_SECRET=<any long random string>
+   ```
+
+   `ACCOUNTS_DATABASE_URL` is the one that names the accounts role: never put these credentials in `DATABASE_URL`, whose read-only role has no grant on schema `accounts`.
+4. Under Settings → Cron Jobs, `/api/cron/accounts-purge` is listed (it deletes sign-ups that were never confirmed after 7 days, which the privacy notice promises). It is read from `apps/web/vercel.json` only if `apps/web` is the project's root directory.
 
 ## Going back
 
@@ -76,4 +99,4 @@ Vercel keeps the previous production deployment with the old `DATABASE_URL` in i
 - **The account.** Oracle may suspend an account left idle for 30 days. Sign in to the console now and then.
 - **Firewall.** Never enable UFW on this image. Oracle's known issue: it can remove the rules the instance needs to reach its boot volume. `provision.sh` inserts its rule into iptables, limits one address to 200 connections, and saves both with `netfilter-persistent`.
 - **Updates.** Security updates for the OS, PostgreSQL and PgBouncer install themselves nightly (`unattended-upgrades`, including the PostgreSQL repository). PgBouncer restarts itself after a crash. `status` lists any upgrade still waiting.
-- **Backups.** `finalize.sh` leaves one `pg_dump` on the VM, `extras.sh` a second one with TERYT and Buryan in it, `editions.sh` a third, with the editions, and `shift.sh finish` a fourth, with the change claims. Restoring any of them has not been tested, and there is no copy off the VM.
+- **Backups.** None of the four dumps below contains a row of schema `accounts` (`--exclude-table-data='accounts.*'`, held by `pnpm check:vm`): they keep its definition, so a restore leaves accounts empty and consistent with the migrations table. Accounts exist only in the database until TASK-049's off-host, encrypted backup, which has to include them. `finalize.sh` leaves one `pg_dump` on the VM, `extras.sh` a second one with TERYT and Buryan in it, `editions.sh` a third, with the editions, and `shift.sh finish` a fourth, with the change claims. Restoring any of them has not been tested, and there is no copy off the VM.

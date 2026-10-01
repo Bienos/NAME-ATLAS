@@ -68,6 +68,11 @@ jobs:
       - name: Unique task, ADR, migration and decision numbers
         run: pnpm check:ids
 
+      # The database VM's scripts parse, and none of their dumps copies the rows
+      # of schema accounts (TASK-063).
+      - name: VM scripts and dumps
+        run: pnpm check:vm
+
       - name: Unit tests
         run: pnpm test
 

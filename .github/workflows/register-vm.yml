@@ -17,8 +17,10 @@ name: Register VM
 #   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
+#   accounts       ops/vm/accounts.sh (TASK-063): migrate, the role nameatlas_app and its password, PgBouncer's user list, the isolation checks; repeatable
 #
-# provision, status, finalize, editions, extras, shift-finish and archive end by connecting the way the web app does.
+# provision, status, finalize, editions, extras, shift-finish and archive end by connecting the way the web app does;
+# accounts ends by connecting the way the accounts connection does (nameatlas_app, with its own secret).
 
 on:
   push:
@@ -42,6 +44,7 @@ on:
             shift,
             shift-finish,
             archive,
+            accounts,
           ]
 
 concurrency:
@@ -78,7 +81,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | accounts) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -224,6 +227,28 @@ jobs:
           scp -q ops/vm/archive.sh vm:name-atlas-ops/archive.sh
           ssh vm 'sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz'
 
+      - name: accounts
+        if: steps.step.outputs.step == 'accounts'
+        env:
+          VM_DB_APP_PASSWORD: ${{ secrets.VM_DB_APP_PASSWORD }}
+        run: |
+          [ -n "$VM_DB_APP_PASSWORD" ] ||
+            { echo "::error::repository secret VM_DB_APP_PASSWORD is not set"; exit 1; }
+          # A copied secret often carries a trailing newline or space; those are dropped.
+          pw=$(printf '%s' "$VM_DB_APP_PASSWORD" | tr -d '[:space:]')
+          [ "${#pw}" = "${#VM_DB_APP_PASSWORD}" ] ||
+            echo "::notice::VM_DB_APP_PASSWORD had whitespace in it; it was removed"
+          if ! [[ "$pw" =~ ^[A-Za-z0-9]{24,128}$ ]]; then
+            echo "::error::VM_DB_APP_PASSWORD has ${#pw} characters and must be 24 to 128 letters and" \
+              "digits only: no symbols, dashes or spaces, because it goes into a URL"
+            exit 1
+          fi
+          # The pushed commit's tree: the migrations it needs are newer than the one the build unpacked.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/accounts.sh ops/vm/accounts-roles.sql vm:name-atlas-ops/
+          # The password goes to the script's stdin, never into a command line.
+          ssh vm 'sudo bash ~/name-atlas-ops/accounts.sh ~/name-atlas-ops/app.tar.gz ~/name-atlas-ops/accounts-roles.sql' <<< "$pw"
+
       - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
         if: >-
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
@@ -260,3 +285,27 @@ jobs:
             exit 1
           fi
           echo "a write as the web role is refused: $(head -n 1 write.err)"
+
+      - name: Connect as the accounts connection does (TLS, SCRAM, PgBouncer, accounts only)
+        if: steps.step.outputs.step == 'accounts'
+        env:
+          PGPASSWORD: ${{ secrets.VM_DB_APP_PASSWORD }}
+        run: |
+          PGPASSWORD=$(printf '%s' "$PGPASSWORD" | tr -d '[:space:]')
+          export PGPASSWORD
+          conn="host=$VM_HOST port=6432 dbname=name_atlas user=nameatlas_app sslmode=require connect_timeout=15"
+          p() { psql "$conn" -X -v ON_ERROR_STOP=1 -tA "$@"; }
+          p -c '\conninfo'
+          p -c "SELECT current_user, current_setting('statement_timeout'), version()"
+          p -c "SELECT 'accounts.users ' || count(*) FROM accounts.users"
+          if p -c 'SELECT 1 FROM public.kysely_migration LIMIT 1' 2> read.err; then
+            echo "::error::the accounts role could read a table of the register"
+            exit 1
+          fi
+          echo "a read of the register as the accounts role is refused: $(head -n 1 read.err)"
+          # In a transaction that is rolled back, so a role wrongly allowed to create leaves nothing.
+          if p -c 'BEGIN; CREATE TABLE accounts.must_not_exist (x int); ROLLBACK' 2> write.err; then
+            echo "::error::the accounts role could create a table"
+            exit 1
+          fi
+          echo "creating a table as the accounts role is refused: $(head -n 1 write.err)"

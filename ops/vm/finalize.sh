@@ -113,7 +113,10 @@ log "5/5 pg_dump to $BACKUP_DIR"
 install -d -o root -g root -m 755 "$STATE"
 install -d -o postgres -g postgres -m 700 "$BACKUP_DIR"
 dump=$BACKUP_DIR/name_atlas-register-2026-01-20.dump
-runuser -u postgres -- pg_dump --format=custom -d "$DB" -f "$dump.partial"
+# The definition of schema accounts goes in, its rows never do (TASK-063, ADR-0027 §5.2): a restore
+# leaves accounts empty and consistent with the migrations table, and no address or password
+# hash is copied into a file here. scripts/check-vm-dumps.sh holds every dump to it.
+runuser -u postgres -- pg_dump --format=custom --exclude-table-data='accounts.*' -d "$DB" -f "$dump.partial"
 mv "$dump.partial" "$dump"
 log "  $(du -h "$dump" | cut -f1) $dump"
 
