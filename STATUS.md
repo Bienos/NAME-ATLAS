@@ -2,15 +2,15 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-01, by TASK-054: Polona archive availability on the surname page (ADR-0023, ADR-0024; `docs/progress/2026-10-01-polona-archive-availability.md`).
+**Last rewritten:** 2026-10-01, by migration 0024 on `main`, which TASK-054's production load needs (`docs/progress/2026-10-01-migration-0024-on-main.md`).
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed | `dpl_BAKBufvy6tMNrQXyYVhaoQgTBwet`, `main` @ `9c3c08d` (#52, TASK-053), READY on production, created 07:26 UTC on 2026-10-01, per Vercel's deployment list read at 08:36 UTC. The project is on Vercel Hobby: on 2026-09-30 its 100 deployments a day were used up, mostly by branch previews |
-| Database | PostgreSQL 17 with PostGIS behind PgBouncer on the Oracle Cloud Always Free VM (Frankfurt; ADR-0017). Vercel's `DATABASE_URL` has pointed at it since 17:42 UTC on 2026-09-30. It holds the complete 2026-01-20 register (598,476 surnames; claims `CURRENT_POPULATION`, `CURRENT_RANK` and `RARITY_CONTEXT` 828,262 each, `CURRENT_DISTRIBUTION` 395,216), TERYT's places and 25 Buryan 1933 meanings (the owner's report; the meanings are live on the pages), and the fifteen earlier PESEL editions as dated snapshots that no page reads (5,713,465 values). 17 GB. Two surnames flagged mixed-script at import have no figures by design. Supabase still holds the old seven-surname slice as the rollback |
+| Deployed | `dpl_fKPGptqcWfw8NQ5syw666CJbBvEM`, `main` @ `8121138` (#53, TASK-054), READY on production, created 08:49 UTC on 2026-10-01. At 08:51 UTC its `/api/v1/surname-results` answered schema 1.8 with `archive` `NOT_SEARCHED` for NOWAK and ZAREMBA, and `/pl/nazwisko/nowak` answered 200 with the archive chapter's not-searched line, on a database without migration 0025. The project is on Vercel Hobby: on 2026-09-30 its 100 deployments a day were used up, mostly by branch previews |
+| Database | PostgreSQL 17 with PostGIS behind PgBouncer on the Oracle Cloud Always Free VM (Frankfurt; ADR-0017). Vercel's `DATABASE_URL` has pointed at it since 17:42 UTC on 2026-09-30. It holds the complete 2026-01-20 register (598,476 surnames; claims `CURRENT_POPULATION`, `CURRENT_RANK` and `RARITY_CONTEXT` 828,262 each, `CURRENT_DISTRIBUTION` 395,216), TERYT's places and 25 Buryan 1933 meanings (the owner's report; the meanings are live on the pages), and the fifteen earlier PESEL editions as dated snapshots that no page reads (5,713,465 values). #43's branch ran its own migration 0024 and derived 807,358 `SURNAME_DISTRIBUTION_SHIFT` claims there at 00:39–00:47 UTC on 2026-10-01; no page reads them until #43 merges. 17 GB. Two surnames flagged mixed-script at import have no figures by design. Supabase still holds the old seven-surname slice as the rollback |
 | Deploys | From `main`, automatically. The project owner set Vercel's production branch to `main` on 2026-09-30 |
 
 ## Built
@@ -32,14 +32,14 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 - **The trend feature** ("how a surname changed"): not written. The editions are loaded; the feature needs a claim type, a contract change, an ADR and a page section, and ADR-0019 §2.2 to be amended for 2019. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`; the load's record). There is no 2022 women's edition: resource 38772 is the 2021 data.
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`). Approved in scope by the project owner on 2026-09-30, unnumbered and unscheduled. Its §4 leaves two preconditions to confirm in preflight. Release is gated on a privacy sign-off (its §13 U-6).
-- **Load Polona on production.** After TASK-054 merges: one `Register VM` run of `archive` (migration 0025, then `--top-rank 2000`, roughly 3,000–3,500 surnames at about 7 s each), then `status` until it prints `loaded:`. The archive read finds nothing rather than failing until the migration has run.
+- **Load Polona on production.** The first `Register VM` run of `archive` on `main` (run 36838776848, 08:49 UTC) stopped at `db:migrate` with "previously executed migration 0024_distribution_shift is missing" and applied nothing, because the VM had run #43's 0024 and `main` did not have it. With 0024 on `main`: one more run of `archive` (migration 0025, then `--top-rank 2000`, roughly 3,000–3,500 surnames at about 7 s each), then `status` until it prints `loaded:`.
 - **The paid report, in order (ADR-0023):** the premium inventory and eligibility over `ARCHIVE_AVAILABILITY` and the other claims (M4), the report with a test entitlement (M5), then Stripe checkout in test mode for both products and the expert-research order flow (M6).
 
 ## Open pull requests
 
 Checked 2026-10-01, about 08:30 UTC:
 
-- #43 (TASK-051, change over time) holds ADR-0020, migration 0024 and schema 1.7. TASK-054 lands migration 0025 and schema 1.8 first, so #43 must renumber its migration to 0026 (Kysely refuses a migration older than one already run) and its schema to 1.9.
+- #43 (TASK-051, change over time) holds ADR-0020, migration 0024 and schema 1.7. Its 0024 has already run on the production database and is now on `main` byte for byte, so #43 keeps the number 0024. Its schema must move to 1.9, because `main` is at 1.8 (TASK-054).
 - #44 reuses the number TASK-046, which `main` already gives the privacy and terms pages; it needs a free number.
 - #30 from `claude/funny-allen-vrp074`, a code-review clean-up. Reviewed on 2026-09-30 and parked (see "Blocked on the project owner", Branches).
 
