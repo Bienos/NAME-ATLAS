@@ -2,14 +2,14 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-01, by TASK-055: after a search the surname opens as a deck of cards over the full page, with neighbours on the list and the other grammatical form, under schema 1.10 (`docs/progress/2026-10-01-cards-first-surname-view.md`).
+**Last rewritten:** 2026-10-01, by a TASK-055 follow-up: the deck leads each card with the list that holds most of the surname's people (`docs/progress/2026-10-01-deck-main-list-first.md`).
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed | `dpl_DVzgej2yzCag57KDRNBrqWyGguUT`, `main` @ `02e988f` (#55, TASK-051 beside TASK-054), READY on production, created 11:04 UTC on 2026-10-01. At 14:13 UTC its `/api/v1/surname-results` answered schema 1.9 with `change` and `archive` both `READY` for NOWAK, KOWALSKI and ZAREMBA. The project is on Vercel Hobby: on 2026-09-30 its 100 deployments a day were used up, mostly by branch previews |
+| Deployed | `dpl_2DYWbooH6tjdYdM3BpTZMdHwkDGh`, `main` @ `34bb1d1` (#56, TASK-055), READY on production, created 14:45 UTC on 2026-10-01. At 14:46 UTC its `/api/v1/surname-results` answered schema 1.10 with `neighbours` and `other_form`, and a search for Kowalski opened `/pl/nazwisko/kowalski?view=cards` with nine cards (headless Chromium, desktop and phone). The project is on Vercel Hobby: on 2026-09-30 its 100 deployments a day were used up, mostly by branch previews |
 | Database | PostgreSQL 17 with PostGIS behind PgBouncer on the Oracle Cloud Always Free VM (Frankfurt; ADR-0017). Vercel's `DATABASE_URL` has pointed at it since 17:42 UTC on 2026-09-30. It holds the complete 2026-01-20 register (598,476 surnames; claims `CURRENT_POPULATION`, `CURRENT_RANK` and `RARITY_CONTEXT` 828,262 each, `CURRENT_DISTRIBUTION` 395,216), TERYT's places and 25 Buryan 1933 meanings (the owner's report; the meanings are live on the pages), and the fifteen earlier PESEL editions as dated snapshots that no page reads (5,713,465 values). #43's branch ran its own migration 0024 and derived 807,358 `SURNAME_DISTRIBUTION_SHIFT` claims there (gate passed 00:39–00:47 UTC on 2026-10-01). Since 09:05 UTC on 2026-10-01 the `name-atlas-archive-load` unit has been loading Polona for the 2,723 surnames ranked within 2,000 on either list. 17 GB. Two surnames flagged mixed-script at import have no figures by design. Supabase still holds the old seven-surname slice as the rollback |
 | Deploys | From `main`, automatically. The project owner set Vercel's production branch to `main` on 2026-09-30 |
 
@@ -29,6 +29,7 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 
 ## Next
 
+- **Migration 0026 on production.** Its index makes a rare surname's neighbours a 1–2 ms read instead of hundreds of milliseconds. It is applied by the Register VM `archive` step, once the Polona load in progress has finished; a fresh pass then ends at once.
 - **Now that GitHub Actions runs again:** one `Register VM` run of `status` on `main`, to read the finalize and extras markers, the counts and the stored password's connection step from the VM.
 - **Launch hygiene, TASK-046–050** (specified 2026-09-30; 046, 047, 048 and 050 implemented, 049 not started): privacy notice and terms pages (046, done: `/pl/prywatnosc`, `/en/privacy`, `/pl/regulamin`, `/en/terms`; controller Patryk Cicbowski, Iława), a published contact address and `security.txt` (047, done). The address `cihypatryk@gmail.com` is on `/pl/kontakt`, `/en/contact`, every footer and in `security.txt`, which expires on 2027-09-30 and must be renewed before then; security headers and a report-only CSP (048, done; enforcing the CSP needs a way to allow the App Router's inline scripts, nonces or hashes), an encrypted off-host database backup with one restore drill (049), and a report-a-problem link (050, done: a prefilled `mailto:`; nothing is stored on the server). Still needed from the owner: a Cloudflare R2 credential and an encryption public key (049). 049's destination (R2) and 050's channel (a prefilled email) were decided on 2026-09-30. The VM's dumps have never been restored and none is off the VM.
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.

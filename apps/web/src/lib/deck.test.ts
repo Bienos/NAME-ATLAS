@@ -436,6 +436,134 @@ describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
   });
 });
 
+/**
+ * KOWALSKA's shape, with the figures production served on 2026-10-01: 3 men
+ * and 67,308 women, about 1 in 7,065,846 men (#247 412) and 1 in 320 women
+ * (#2). The list totals of the change entries are synthetic.
+ */
+function kowalskaShape(): SurnameResultResponse {
+  const input = structuredClone(FULL_INPUT) as typeof FULL_INPUT & Record<string, unknown>;
+  const [obs] = input.population.observations;
+  const [rar] = input.rarity.entries;
+  const [chg] = input.change.entries;
+  if (obs === undefined || rar === undefined || chg === undefined) throw new Error("fixture");
+  const observation = (n: number, group: string) => ({
+    ...obs,
+    value: { ...obs.value, value: n },
+    comparability_group: group,
+  });
+  const rarityOf = (x: number, rank: number, n: number, group: string) => ({
+    ...rar,
+    primary: { metric: "ONE_IN_X", value: x },
+    supporting: [{ metric: "RANK", value: rank }],
+    numerator: n,
+    comparability_group: group,
+  });
+  const point = (date: string, count: number, total: number) => ({
+    status: "KNOWN",
+    data_date: date,
+    note_code: null,
+    source_url: null,
+    count,
+    list_total: total,
+    one_in_x: Math.floor(total / count + 0.5),
+    share: Number((count / total).toFixed(9)),
+  });
+  const changeOf = (list: "MALE" | "FEMALE", a: number, b: number, pct: number) => ({
+    ...chg,
+    list,
+    points: [point("2019-06-30", a, 20_000_000), point("2026-01-20", b, 21_000_000)],
+    summary: {
+      known_points: 2,
+      first: { data_date: "2019-06-30", count: a, list_total: 20_000_000 },
+      last: { data_date: "2026-01-20", count: b, list_total: 21_000_000 },
+      count_change_percent: pct,
+      list_change_percent: 5,
+    },
+  });
+  return surnameResultResponseSchema.parse({
+    ...input,
+    surname: who(5, "KOWALSKA"),
+    population: {
+      ...input.population,
+      observations: [
+        observation(3, "pesel_2026_national_male"),
+        observation(67_308, "pesel_2026_national_female"),
+      ],
+    },
+    rarity: {
+      ...input.rarity,
+      entries: [
+        rarityOf(7_065_846, 247_412, 3, "pesel_2026_national_male"),
+        rarityOf(320, 2, 67_308, "pesel_2026_national_female"),
+      ],
+    },
+    neighbours: {
+      ...input.neighbours,
+      lists: [
+        {
+          comparability_group: "pesel_2026_national_female",
+          snapshot_date: "2026-01-20",
+          entries: [
+            { surname: who(2, "NOWAK"), rank: 1, count: 99_738, is_self: false },
+            { surname: who(5, "KOWALSKA"), rank: 2, count: 67_308, is_self: true },
+          ],
+        },
+        {
+          comparability_group: "pesel_2026_national_male",
+          snapshot_date: "2026-01-20",
+          entries: [
+            { surname: who(5, "KOWALSKA"), rank: 247_412, count: 3, is_self: true },
+            { surname: who(6, "AA"), rank: 301_370, count: 2, is_self: false },
+          ],
+        },
+      ],
+    },
+    other_form: { ...input.other_form, surname: who(1, "KOWALSKI"), comparability_group: MALE },
+    change: {
+      ...input.change,
+      entries: [changeOf("MALE", 2, 3, 50), changeOf("FEMALE", 69_920, 67_308, -3.7)],
+    },
+  });
+}
+
+describe("TASK-055: every card leads with the list the surname mostly lives on", () => {
+  const cards = deckCards(kowalskaShape(), "pl", LINKS);
+  const face = (key: string) => {
+    const card = cards.find((c) => c.key === key);
+    return faces(card === undefined ? [] : [card]);
+  };
+
+  it("leads rarity with the women's 1 in 320, not the men's 1 in 7 million", () => {
+    const html = face("rarity");
+    expect(html.indexOf("1 na 320")).toBeGreaterThan(-1);
+    expect(html.indexOf("1 na 320")).toBeLessThan(html.indexOf("1 na 7\u00a0065\u00a0846"));
+    expect(text(html)).toContain("#2 miejsce na liście nazwisk");
+  });
+
+  it("opens the neighbours on the women's list", () => {
+    const html = face("neighbours");
+    const first = /<input[^>]*id="dk-nb-0"[^>]*>/u.exec(html)?.[0] ?? "";
+    expect(first).toContain('checked=""');
+    expect(html.indexOf("NOWAK")).toBeLessThan(html.indexOf("AA<"));
+  });
+
+  it("leads change with the women's −3,7%, not the men's 2 to 3", () => {
+    const body = text(face("change"));
+    expect(body.indexOf("−3,7%")).toBeGreaterThan(-1);
+    expect(body.indexOf("−3,7%")).toBeLessThan(body.indexOf("+50,0%"));
+  });
+
+  it("keeps the contract's order on the page", () => {
+    const page = text(
+      renderToStaticMarkup(createElement(Result, { response: kowalskaShape(), lang: "pl" })),
+    );
+    expect(page.indexOf("około 1 na 7\u00a0065\u00a0846")).toBeLessThan(
+      page.indexOf("około 1 na 320"),
+    );
+  });
+});
+
 describe("TASK-055: the deck is drawn by script only", () => {
   it("renders nothing on the server, so the page alone is what a reader without script gets", () => {
     const html = renderToStaticMarkup(
