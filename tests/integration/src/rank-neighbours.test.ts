@@ -238,7 +238,7 @@ describe("rank neighbours and the other form", () => {
     const outcome = await querySurnameResult(db(), "KOWALSKI", { surface: "FREE" });
     if (outcome.kind !== "OK") throw new Error("expected OK");
     const parsed = surnameResultResponseSchema.parse(outcome.response);
-    expect(parsed.schema_version).toBe("1.10");
+    expect(parsed.schema_version).toBe("1.11");
     // The excerpt has no complete universe, so rarity, and with it the
     // neighbours and the other form, is unavailable here.
     expect(parsed.rarity?.state).toBe("UNAVAILABLE");

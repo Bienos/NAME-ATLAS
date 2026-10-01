@@ -8,6 +8,28 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-030 — `pl_teryt`'s redistribution, and the SEO surface for the localities section
+
+**Status:** NON-BLOCKING NOW. It blocks nothing: the surname page is rendered on the free surface, where the stored profile allows the section, and the page's indexability folds the rights of the surname's claims, which the localities lookup is not.
+**Owner:** project owner.
+**Raised by:** TASK-066's session, 2026-10-01.
+
+Facts, as the code and the stored data stand:
+
+- TASK-038 seeds `pl_teryt` with `commercial_use = ALLOWED`, `automated_access = ALLOWED`, every other permission `UNKNOWN`, `review_status = LEGAL_REVIEW_REQUIRED`, no legal review. `evaluateSurface` answers `ALLOWED` for `FREE` and `BLOCKED` for `SEO` (`REDISTRIBUTION_UNRESOLVED`) on that profile. TASK-066's localities section follows it: shown on the free page, `RIGHTS_BLOCKED` when queried on the SEO surface.
+- `apps/web/src/lib/seo-surface.ts` decides a page's indexability by folding the rights profiles behind the surname's **claims**. The localities are a lookup, not a claim, so a page with a matching locality is indexable exactly as before and shows TERYT data whose own SEO surface is blocked.
+- GUS's terms, quoted in `fixtures/teryt/source-manifest.json` (read 2026-09-30): "Rejestr terytorialny TERYT jest jawny", and the TERC, SIMC and ULIC files "udostępniane są bezpłatnie wszystkim użytkownikom", including "pobieranie zbiorów pełnych". No attribution wording and no redistribution wording is on either page.
+
+To decide, one of:
+
+1. Set `pl_teryt`'s `redistribution` to `ALLOWED` on those terms, as a data migration recorded as the owner's judgement (the shape of migration 0008 for PESEL's D-007). The section's SEO surface then opens and the question closes.
+2. Fold the sections that are not claims (today only the localities) into the page's SEO gate. Every page with a matching locality then becomes `noindex` until (1).
+3. Leave it: the free page shows the section, an explicit SEO-surface query is refused, and indexability ignores it.
+
+The assistant's recommendation, not a decision: (1). The terms quoted say the register is public and its full files are free for every user to download; nothing on them restricts redistribution.
+
+---
+
 ## D-026 — the product's name and domain
 
 **Status:** NON-BLOCKING NOW. It blocks the sending domain for account mail (a Resend domain must be verified) and any rename of the site.

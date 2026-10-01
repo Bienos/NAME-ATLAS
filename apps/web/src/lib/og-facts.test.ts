@@ -20,7 +20,7 @@ const citation = {
 };
 
 const RESOLVED = {
-  schema_version: "1.10",
+  schema_version: "1.11",
   neighbours: {
     state: "UNAVAILABLE",
     lists: [],
@@ -28,6 +28,16 @@ const RESOLVED = {
     surface: SURFACE,
   },
   other_form: null,
+  localities: {
+    state: "NOT_LOADED",
+    reference_date: null,
+    places: [],
+    total: null,
+    confidence: null,
+    citation: null,
+    reason_code: "TERYT_NOT_LOADED",
+    surface: SURFACE,
+  },
   change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },

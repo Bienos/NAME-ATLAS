@@ -38,6 +38,7 @@ export {
   readRankNeighbours,
 } from "./neighbours.js";
 export type { OtherForm, RankNeighbour, RankNeighbourList } from "./neighbours.js";
+export { TERYT_NOT_LOADED, localitiesSectionFor } from "./localities.js";
 export {
   archiveAvailabilityClaimKey,
   archiveSectionFor,
