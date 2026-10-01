@@ -8,6 +8,28 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
+
+**Status:** NON-BLOCKING NOW. It blocks the checkout task, not the offer page.
+**Owner:** project owner.
+**Raised by:** TASK-057 (ADR-0026 §4), 2026-10-01.
+
+ADR-0026 sets the prices: 29.99 zł for "Nazwisko i rodzina" and 499 zł for "Genealogia z DNA". It does not settle how each is paid:
+
+- **29.99 zł.** The tier holds a tree the reader keeps building, so it could be:
+  - (a) one payment for lasting access;
+  - (b) one payment per surname report, with the tree free to keep;
+  - (c) a recurring payment. That would lift `PRODUCT.md` §8's non-goal 11 (no subscriptions) for this tier.
+- **499 zł.** A partner does the research:
+  - (a) the reader pays Name Atlas, which pays the partner;
+  - (b) the reader pays the partner directly, and Name Atlas only passes the enquiry on.
+
+  (a) makes Name Atlas the seller of a person's service, with the consumer terms ADR-0023 §2.5 lists.
+
+The offer page states only the prices, so either answer leaves it true.
+
+---
+
 ## D-023 — TERYT external-id namespaces: `TERYT` (code) or `TERYT_TERC` (`docs/canonical/12` §11.3)?
 
 **Status:** NON-BLOCKING NOW. Nothing is built or blocked on it.

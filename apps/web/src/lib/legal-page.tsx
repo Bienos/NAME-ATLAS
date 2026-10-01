@@ -32,7 +32,8 @@ export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly l
     >
       <h2>{doc.title}</h2>
       <p className="legal-updated">
-        {doc.updatedLabel}: <time dateTime={LEGAL_UPDATED}>{formatDate(LEGAL_UPDATED, lang)}</time>
+        {doc.updatedLabel}:{" "}
+        <time dateTime={LEGAL_UPDATED[kind]}>{formatDate(LEGAL_UPDATED[kind], lang)}</time>
       </p>
       {doc.sections.map((section) => (
         <section key={section.heading}>

@@ -17,8 +17,11 @@ import type { Lang } from "./messages.js";
 export const CONTROLLER_NAME = "Patryk Cicbowski";
 export const CONTROLLER_PLACE = "Iława";
 
-/** The date both documents were last changed, ISO. */
-export const LEGAL_UPDATED = "2026-09-30";
+/** The date each document was last changed, ISO. The privacy notice changed for the offer's forms (TASK-057). */
+export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
+  privacy: "2026-10-01",
+  terms: "2026-09-30",
+};
 
 export interface LegalSection {
   readonly heading: string;
@@ -50,7 +53,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Czego nie robimy",
         paragraphs: [
-          "Name Atlas nie ma kont, formularzy, reklam ani zewnętrznych narzędzi analitycznych. Serwis nie zapisuje w przeglądarce plików cookie ani podobnych danych. Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+          "Name Atlas nie ma kont, reklam ani zewnętrznych narzędzi analitycznych. Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Serwis nie zapisuje w przeglądarce plików cookie ani podobnych danych. Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
         ],
       },
       {
@@ -69,6 +72,8 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
           "Jeśli napiszesz do nas e-mail, przetwarzamy Twój adres i treść wiadomości, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie.",
+          "Jeśli zapiszesz się na listę oczekujących albo zapytasz o badanie genealogiczne, przetwarzamy Twój adres i to, co napiszesz, żeby odpowiedzieć i dać znać, gdy usługa ruszy. Podstawą jest działanie na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO). Nie wysyłaj nam wyników testu DNA ani informacji o zdrowiu: to dane szczególnie chronione, a do pierwszej odpowiedzi nie są potrzebne.",
+          "Zanim przekażemy Twoje dane genealogom, którzy prowadzą badanie, zapytamy Cię o zgodę i powiemy, kim są.",
         ],
       },
       {
@@ -76,7 +81,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "Do limitu zapytań adres IP jest trzymany tylko w pamięci serwera, na czas jednominutowego okna limitu, i nasz kod nigdzie go nie zapisuje. Własne dzienniki serwisu nie zawierają adresu IP ani wyszukiwanego nazwiska.",
           "Dostawca hostingu (Vercel) przechowuje dziennik żądań, w tym adres strony, od jednej godziny do jednego dnia, zależnie od planu usługi.",
-          "Wiadomości e-mail przechowujemy tak długo, jak to potrzebne do załatwienia sprawy.",
+          "Wiadomości e-mail przechowujemy tak długo, jak to potrzebne do załatwienia sprawy. Zapis na listę oczekujących trzymamy do startu usługi albo do Twojej prośby o wypisanie.",
         ],
       },
       {
@@ -116,7 +121,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "What we do not do",
         paragraphs: [
-          "Name Atlas has no accounts, forms, advertising or third-party analytics. The site stores no cookies or similar data in your browser. We do not profile anyone and make no automated decisions.",
+          "Name Atlas has no accounts, advertising or third-party analytics. The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. The site stores no cookies or similar data in your browser. We do not profile anyone and make no automated decisions.",
         ],
       },
       {
@@ -133,6 +138,8 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
           "If you email us, we process your address and your message to reply and deal with the matter, on the same basis.",
+          "If you join the waiting list or ask about genealogy research, we process your address and what you write to reply and to tell you when the service starts. The basis is taking steps at your request before entering into a contract (Article 6(1)(b) GDPR). Do not send us DNA results or health information: they are specially protected data, and a first reply does not need them.",
+          "Before we pass your details to the genealogists who carry out the research, we will ask for your consent and tell you who they are.",
         ],
       },
       {
@@ -140,7 +147,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         paragraphs: [
           "For the request limit, the IP address is held in the server's memory only, for the limit's one-minute window, and our code never writes it anywhere. The site's own logs contain neither the IP address nor the surname searched for.",
           "The hosting provider (Vercel) keeps a request log, including the page address, for between one hour and one day, depending on the service plan.",
-          "Emails are kept as long as needed to deal with the matter.",
+          "Emails are kept as long as needed to deal with the matter. A place on the waiting list is kept until the service starts or until you ask to be taken off.",
         ],
       },
       {

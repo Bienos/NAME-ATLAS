@@ -20,3 +20,22 @@ export function comparePagePath(lang: Lang): string {
 export function howPath(lang: Lang): string {
   return lang === "en" ? "/en/how-it-works" : "/pl/jak-to-dziala";
 }
+
+/** The offer: the free tier and the two coming ones (TASK-057, ADR-0026). */
+export function offerPath(lang: Lang): string {
+  return lang === "en" ? "/en/offer" : "/pl/oferta";
+}
+
+/**
+ * The footer's blog and social links (TASK-057). The owner asked for all four
+ * to lead to the home page until each has an address of its own; when one
+ * does, its address replaces `homePath` here and nowhere else.
+ */
+export function followLinks(
+  lang: Lang,
+): readonly { readonly label: string; readonly href: string }[] {
+  return ["Blog", "Instagram", "TikTok", "YouTube"].map((label) => ({
+    label,
+    href: homePath(lang),
+  }));
+}

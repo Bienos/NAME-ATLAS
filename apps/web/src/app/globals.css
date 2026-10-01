@@ -4221,6 +4221,195 @@ body.dusk {
   font-size: 0.875rem;
 }
 
+/* --- the offer (TASK-057): three tiers side by side, stacked on a phone --- */
+
+.site > main.offer {
+  padding-block: var(--space-7) var(--space-9);
+}
+
+.offer-tiers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.offer-tier {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 20px;
+}
+
+/* The free tier is the one on offer now: it carries the amber edge. */
+.offer-free {
+  border-color: var(--dusk-amber);
+}
+
+.offer-tier h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.875rem;
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--dusk-ink);
+}
+
+.offer-status {
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+  background: var(--dusk-amber-wash);
+  border-radius: 999px;
+}
+
+.offer-price {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 2rem + 2vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--dusk-amber);
+}
+
+.offer-lede {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+}
+
+.offer-tier ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+.offer-tier li,
+.offer-note,
+.offer-ask p,
+.offer-small p {
+  line-height: 1.55;
+  color: var(--dusk-ink-soft);
+}
+
+.offer-tier li + li {
+  margin-top: var(--space-2);
+}
+
+.offer-note {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.offer-ask {
+  margin-top: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--dusk-tile-line);
+}
+
+.offer-ask h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dusk-ink);
+}
+
+.offer-ask p {
+  margin: 0 0 var(--space-3);
+}
+
+.offer-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.offer-form label {
+  display: grid;
+  gap: calc(var(--space-2) / 2);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+}
+
+.offer-form input,
+.offer-form textarea,
+.offer-form select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: 1rem;
+  color: var(--dusk-ink);
+  background: var(--dusk-surface-sunk);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 10px;
+}
+
+.offer-form textarea {
+  resize: vertical;
+}
+
+.offer-form :focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+/* The send control is the page's one action per tier, drawn as the search's
+   button: a link before the script runs, the form's button after. */
+.offer-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: var(--dusk-on-amber);
+  text-decoration: none;
+  background: var(--dusk-shell);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.offer-send:hover {
+  box-shadow: 0 0 48px var(--dusk-glow);
+}
+
+.offer-form .offer-send {
+  justify-self: start;
+  margin-top: calc(var(--space-2) / 2);
+}
+
+.offer-fallback {
+  margin: 0;
+}
+
+.offer-small {
+  max-width: 46rem;
+  margin-top: var(--space-7);
+  font-size: 0.9375rem;
+}
+
+.offer-small p {
+  margin: 0 0 var(--space-2);
+}
+
+/* The footer's blog and social links, after the contact line (TASK-057). */
+.footer-follow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-top: var(--space-3);
+}
+
 /* --- answers: the surname page and the search's own answers --- */
 
 .site > main.profile,
@@ -4889,7 +5078,7 @@ body.dusk {
   grid-template-columns: 3.5rem minmax(0, 1fr) auto;
   align-items: baseline;
   gap: var(--space-3);
-  padding: var(--space-1) var(--space-2);
+  padding: calc(var(--space-2) / 2) var(--space-2);
   border-radius: var(--radius-sm);
 }
 
@@ -5086,7 +5275,7 @@ body.dusk {
   align-items: center;
   gap: var(--space-5);
   min-height: 0;
-  padding: var(--space-1) var(--space-4) 0;
+  padding: calc(var(--space-2) / 2) var(--space-4) 0;
 }
 
 .deck-toc {
@@ -5378,7 +5567,7 @@ body.dusk {
 }
 
 .dk-v {
-  margin: var(--space-1) 0 0;
+  margin: calc(var(--space-2) / 2) 0 0;
   font-family: var(--font-display, Georgia, serif);
   font-size: clamp(1.9rem, 4.6vh, 2.5rem);
   font-weight: 500;
@@ -5388,7 +5577,7 @@ body.dusk {
 
 .dk-v small {
   display: block;
-  margin-top: var(--space-1);
+  margin-top: calc(var(--space-2) / 2);
   font-family: var(--font-ui, system-ui, sans-serif);
   font-size: 0.8125rem;
   font-weight: 400;
@@ -5528,7 +5717,7 @@ body.dusk {
 }
 
 .dk-map .vmap-readout {
-  margin: var(--space-1) 0 0;
+  margin: calc(var(--space-2) / 2) 0 0;
   font-size: 0.75rem;
   color: var(--dusk-ink-muted);
 }
@@ -5656,7 +5845,7 @@ body.dusk {
 
 .dk-kinds span {
   display: block;
-  margin-top: var(--space-1);
+  margin-top: calc(var(--space-2) / 2);
   font-size: 0.8125rem;
   color: var(--dusk-ink-soft);
 }
@@ -5716,7 +5905,7 @@ body.dusk {
 
 .dk-actions .share {
   display: grid;
-  gap: var(--space-1);
+  gap: calc(var(--space-2) / 2);
   margin: 0;
 }
 

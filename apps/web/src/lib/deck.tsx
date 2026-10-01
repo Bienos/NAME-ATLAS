@@ -37,7 +37,7 @@ import { RarityScale } from "./rarity-scale.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { ShareButton } from "./share-button.js";
-import { comparePagePath } from "./site-links.js";
+import { comparePagePath, offerPath } from "./site-links.js";
 import { inDeckOrder, oneInOf, rankOf } from "./deck-order.js";
 import { shareCardFor, shareCardPath, shareFacts } from "./share-facts.js";
 
@@ -697,6 +697,9 @@ function end(
           </a>
           <a href="#surname" data-deck-close="">
             {t.searchAnother} <span aria-hidden="true">→</span>
+          </a>
+          <a href={offerPath(lang)}>
+            {t.deckOffer} <span aria-hidden="true">→</span>
           </a>
         </div>
       </Face>

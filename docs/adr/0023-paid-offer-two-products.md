@@ -2,6 +2,7 @@
 
 - **Status:** Accepted 2026-10-01, by the project owner's decision in the session that wrote it.
 - **Date:** 2026-10-01
+- **Superseded in part by:** ADR-0026 (2026-10-01). Three tiers replace §2.1–§2.3's two products: free, 29.99 zł and 499 zł genealogy with DNA. §2.4–§2.5 still hold.
 - **Deciders:** the project owner: "Price is 24.99 and 149.99 for some extra pro research". Asked what the higher price buys, they chose "A person researches". Asked whether a business and a Stripe account exist, they chose "Not yet, build in test".
 - **Supersedes:** `PRODUCT.md` §6's "No subscription, no credits, no tiers at MVP", for the second product only; and `docs/canonical/23`'s commerce scope of "one product: `FULL_SURNAME_REPORT`". `docs/canonical/23` is not edited; this ADR records what the product now does instead.
 - **Relates to:** `PRODUCT.md` §6 (premium scope) and §10 (paid MVP readiness), `docs/canonical/23` M4–M6, ADR-0007 and ADR-0014 (rights).
