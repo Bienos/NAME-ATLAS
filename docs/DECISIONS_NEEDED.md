@@ -8,6 +8,32 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-025 — the tiers the owner named on 2026-10-01 evening, against ADR-0026's
+
+**Status:** NON-BLOCKING NOW. It blocks any change to the offer page and the checkout task.
+**Owner:** project owner.
+**Raised by:** ADR-0028's session, 2026-10-01.
+
+ADR-0026 (accepted 2026-10-01, live on `/pl/oferta`) has three tiers: free, "Nazwisko i rodzina" 29,99 zł, "Genealogia z DNA" 499 zł. Later the same day, in a chat outside this repository, the owner described a different set, reached after sign-in from the download or share button:
+
+- "smaller research", 28,99 zł;
+- "couple", 89,99 zł;
+- "family review", 199 zł;
+- "genealogist research", 800 zł, "coming soon".
+
+What each holds was drafted in that chat and not yet confirmed by the owner.
+
+To supersede ADR-0026, the owner needs to confirm:
+
+1. that this set replaces ADR-0026's tiers, and the offer page follows it;
+2. whether the 800 zł genealogist tier replaces the 499 zł "Genealogia z DNA" tier, and whether DNA stays in it;
+3. where the tree and famous bearers sit: ADR-0026 put both in the 29,99 zł tier;
+4. D-024's question again, for each new price: one payment or recurring, and who takes the 800 zł.
+
+ADR-0028 (what may be shown) names no price, so it holds under either set.
+
+---
+
 ## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
 
 **Status:** NON-BLOCKING NOW. It blocks the checkout task, not the offer page.
