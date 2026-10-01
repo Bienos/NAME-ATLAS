@@ -4093,7 +4093,7 @@ body.dusk {
 }
 
 .landing-headline {
-  max-width: 14ch;
+  max-width: 16ch;
   margin: 0;
   font-family: var(--font-display, Georgia, serif);
   font-size: clamp(3rem, 1.3rem + 4.7vw, 5.6rem);
@@ -4132,13 +4132,99 @@ body.dusk {
   color: var(--dusk-ink);
 }
 
-.landing-trust {
+/* The foot of the stage (TASK-065): the two promises and the link down the
+   page, under the horizon so neither is read over the map. */
+.landing-foot {
+  display: grid;
+  gap: var(--space-4);
   margin: auto 0 0;
-  padding-block: var(--space-6) var(--space-5);
+  padding-block: var(--space-7) var(--space-5);
+}
+
+.landing-trust {
+  max-width: 22rem;
+  margin: 0;
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.875rem;
+  line-height: 1.6;
   letter-spacing: 0.02em;
   color: var(--dusk-ink-soft);
+}
+
+/* The hero's example surnames (TASK-065): one tap opens a deck. */
+.landing-try {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 52rem;
+  margin: var(--space-5) 0 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-muted);
+}
+
+.landing-try a {
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  color: var(--dusk-ink);
+  text-decoration: none;
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.landing-try a:hover,
+.landing-try a:focus-visible {
+  color: var(--dusk-amber-hover);
+  border-color: var(--dusk-amber);
+}
+
+/* The link down the page at the foot of the stage. */
+.landing-cue {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  justify-self: start;
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-soft);
+  text-decoration: none;
+}
+
+.landing-cue:hover,
+.landing-cue:focus-visible {
+  color: var(--dusk-amber-hover);
+}
+
+.landing-cue svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-cue svg {
+    animation: landing-cue-bob 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes landing-cue-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
 }
 
 /* Below the hero: the most common surnames and the atlas's plates, read on the
@@ -4152,6 +4238,10 @@ body.dusk {
      horizontal scrollbar: a shadow spread past the box, clipped to its rows. */
   box-shadow: 0 0 0 100vmax var(--dusk-surface);
   clip-path: inset(0 -100vmax);
+}
+
+/* The atlas's plates, where the header's "Atlas" lands (TASK-065). */
+.landing-plates {
   scroll-margin-top: var(--space-5);
 }
 
@@ -4934,15 +5024,21 @@ body.dusk {
   border-color: var(--dusk-ink);
 }
 
-/* The landing's last two sections, on the atlas's ground. */
+/* The landing's sections on the ground: what you get, how it works, the
+   offer and compare (TASK-053, TASK-065). */
+.landing-preview,
 .landing-how,
+.landing-offer,
 .landing-compare {
   display: grid;
   gap: var(--space-5);
   padding-top: var(--space-9);
+  scroll-margin-top: var(--space-5);
 }
 
+.landing-preview > h2,
 .landing-how > h2,
+.landing-offer > h2,
 .landing-compare > h2 {
   margin: 0;
   font-family: var(--font-display, Georgia, serif);
@@ -4982,7 +5078,139 @@ body.dusk {
 }
 
 .landing-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  align-items: baseline;
   margin: 0;
+}
+
+.landing-preview-lede,
+.landing-offer-lede {
+  max-width: 46ch;
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
+}
+
+/* What you get (TASK-065): the example's faces laid flat on the ground. On a
+   phone they are a row to swipe, as the deck is; from a tablet up, three
+   abreast. `.preview-card` undoes what `.dk-card` sets for the pile. */
+.preview-cards {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: min(78vw, 21rem);
+  gap: var(--space-5);
+  margin: var(--space-3) calc(var(--gutter) * -1) 0;
+  padding: var(--space-2) var(--gutter) var(--space-4);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
+  scrollbar-width: none;
+}
+
+.preview-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-cards > li {
+  display: grid;
+  scroll-snap-align: start;
+}
+
+/* The pile gives a card a fixed height and clips it; here the row grows to
+   its tallest face (the map's legend is the tallest), and the others stretch
+   to match, their bodies centred as in the pile. */
+.dk-card.preview-card {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  min-height: 36rem;
+  opacity: 1;
+  transform: none;
+  transition: none;
+  will-change: auto;
+}
+
+@media (min-width: 64rem) {
+  .preview-cards {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, 22rem));
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+}
+
+.landing-preview-share {
+  color: var(--dusk-ink-muted);
+}
+
+/* The offer's strip (TASK-065): the tiers as the offer page words them. */
+.offer-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offer-strip li {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--dusk-line);
+}
+
+.offer-strip .is-now {
+  border-top-color: var(--dusk-amber);
+}
+
+.strip-status {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+}
+
+.is-soon .strip-status {
+  color: var(--dusk-ink-muted);
+}
+
+.offer-strip h3 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--dusk-ink);
+}
+
+.strip-price {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 2.25rem;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--dusk-amber);
+}
+
+.is-soon .strip-price {
+  color: var(--dusk-ink);
+}
+
+.strip-lede {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
 }
 
 .landing-compare > p {
@@ -5070,8 +5298,24 @@ body.dusk {
     margin-top: var(--space-2);
   }
 
+  /* A little taller than the screen, so the foot sits under the map, as it
+     did before the example surnames; the cue is for wider screens, where the
+     fold hides the ground (TASK-065). */
   .landing-stage {
-    min-height: calc(100svh - 5rem);
+    min-height: calc(100svh - 3rem);
+  }
+
+  .landing-cue {
+    display: none;
+  }
+
+  .landing-trust {
+    font-size: 0.8125rem;
+  }
+
+  .landing-try a {
+    padding: 5px 11px;
+    font-size: 0.8125rem;
   }
 
   .landing-headline {

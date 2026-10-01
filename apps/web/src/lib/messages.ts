@@ -683,18 +683,29 @@ export const UI = {
   pl: {
     title: "Name Atlas",
     tagline: "Uczciwe, udokumentowane odpowiedzi o polskich nazwiskach.",
-    landingHeadline: "Każde nazwisko",
-    landingHeadlineEm: "gdzieś się zaczęło.",
+    landingHeadline: "Ile osób nosi",
+    landingHeadlineEm: "Twoje nazwisko?",
     landingLede:
-      "Wpisz nazwisko. Sprawdź, ile osób je nosi, jak jest rzadkie, skąd może pochodzić i skąd " +
-      "to wiemy.",
+      "Wpisz nazwisko. Rejestr PESEL odpowie, ile osób je nosi, jak jest rzadkie, gdzie jest " +
+      "najczęstsze i jak zmieniało się od 2019 r. Gdzie są źródła, dodamy znaczenie i dawne druki.",
     landingHint: "Wpisz dokładnie tak, jak się pisze — z polskimi znakami.",
     // The dusk hero (TASK-052): the register line above the headline, the
     // status line while a search leaves the page, and the two promises.
     landingEyebrow: "Rejestr PESEL",
     landingAsOf: "stan na",
     landingSearching: "Sprawdzamy rejestr PESEL…",
-    landingTrust: "Źródło przy każdym fakcie · Brak danych to też odpowiedź",
+    landingTrust: "Za darmo · bez konta · źródło przy każdym fakcie · brak danych to też odpowiedź",
+    // The hero's example surnames, the link down the page, what you get and
+    // the offer's strip (TASK-065).
+    landingTry: "Spróbuj:",
+    landingCue: "Co dostaniesz",
+    previewHeading: "Co dostaniesz po wpisaniu nazwiska",
+    previewLede: "Karty z odpowiedziami, każda z datą i źródłem. Trzy z nich, dla nazwiska",
+    previewAll: "Zobacz wszystkie karty:",
+    previewShare: "Każdą kartę udostępnisz jako obraz albo zapiszesz na telefonie.",
+    offerHeading: "Dziś za darmo. Wkrótce więcej.",
+    offerAll: "Cała oferta",
+    offerWaitlist: "Zapisz się na listę oczekujących",
     // The journey (TASK-053). What the one request reads while the camera comes
     // down: each line is a part of the answer it fetches, none is ticked off.
     analysisLabel: "Co sprawdzamy",
@@ -1229,16 +1240,26 @@ export const UI = {
   en: {
     title: "Name Atlas",
     tagline: "Honest, sourced answers about Polish surnames.",
-    landingHeadline: "Every surname",
-    landingHeadlineEm: "begins somewhere.",
+    landingHeadline: "How many share",
+    landingHeadlineEm: "your surname?",
     landingLede:
-      "Type a Polish surname. See how many people carry it, how rare it is, where it may come " +
-      "from, and how we know.",
+      "Type a Polish surname. The PESEL register answers how many people carry it, how rare it " +
+      "is, where it is most common and how it has changed since 2019. Where sources exist, we " +
+      "add its meaning and old prints.",
     landingHint: "Exactly as it's written — Polish letters welcome.",
     landingEyebrow: "PESEL register",
     landingAsOf: "as of",
     landingSearching: "Checking the PESEL register…",
-    landingTrust: "A source on every fact · No data is also an answer",
+    landingTrust: "Free · no account · a source on every fact · no data is also an answer",
+    landingTry: "Try:",
+    landingCue: "What you get",
+    previewHeading: "What you get after typing a surname",
+    previewLede: "Cards with the answers, each with its date and source. Three of them, for",
+    previewAll: "See every card:",
+    previewShare: "Share any card as an image or save it to your phone.",
+    offerHeading: "Free today. More soon.",
+    offerAll: "The full offer",
+    offerWaitlist: "Join the waiting list",
     analysisLabel: "What we are checking",
     analysisSteps: [
       "Checking the PESEL register",
