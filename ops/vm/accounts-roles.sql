@@ -11,7 +11,8 @@
 --
 -- What the grants mean:
 --   nameatlas_app  reads and writes the tables of schema accounts, and holds no
---                  privilege on any table of public.
+--                  privilege on any table of public beyond what PUBLIC itself holds
+--                  (PostGIS's own catalog; none of the register).
 --   nameatlas_web  has no grant on schema accounts (it is only ever granted
 --                  `public`'s tables).
 
