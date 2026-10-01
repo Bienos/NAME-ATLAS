@@ -65,6 +65,48 @@ function figureSize(figure: string): number {
   return Math.max(96, Math.min(210, Math.floor(MEASURE / (n * 0.56))));
 }
 
+/**
+ * A figure in the display face with its sign drawn in the interface face.
+ *
+ * The static Fraunces this app ships (`assets/fonts/`) draws "+" as a bar
+ * with its vertical stroke displaced under the next digit, so "+0,9%" reads
+ * as "−0,9%", the opposite change. Instrument Sans draws both signs
+ * correctly, so the sign is set apart and the digits stay in the display face.
+ */
+export function Figure({
+  text,
+  size,
+  color,
+}: {
+  text: string;
+  size: number;
+  color: string;
+}): ReactNode {
+  const sign = text.startsWith("+") || text.startsWith("\u2212") ? text.slice(0, 1) : null;
+  const base = {
+    fontFamily: TYPE_FAMILIES.display,
+    fontSize: size,
+    lineHeight: 1.08,
+    color,
+  } as const;
+  if (sign === null) return <div style={base}>{text}</div>;
+  return (
+    <div style={{ ...base, display: "flex", alignItems: "baseline" }}>
+      <div
+        style={{
+          fontFamily: TYPE_FAMILIES.ui,
+          fontWeight: 600,
+          fontSize: Math.round(size * 0.78),
+          marginRight: Math.round(size * 0.06),
+        }}
+      >
+        {sign}
+      </div>
+      <div>{text.slice(1)}</div>
+    </div>
+  );
+}
+
 function Visual({ visual, paper }: { visual: ShareVisual; paper: boolean }): ReactNode {
   const ink = paper ? PAPER.ink : DUSK.ink;
   const muted = paper ? PAPER.muted : DUSK.muted;
@@ -458,16 +500,11 @@ export async function renderShareCard(
         )}
         {facts.visual?.kind === "map" ? <Visual visual={facts.visual} paper={paper} /> : null}
         {facts.figure === null ? null : (
-          <div
-            style={{
-              fontFamily: TYPE_FAMILIES.display,
-              fontSize: figureSize(facts.figure),
-              lineHeight: 1.08,
-              color: paper ? PAPER.ink : DUSK.light,
-            }}
-          >
-            {facts.figure}
-          </div>
+          <Figure
+            text={facts.figure}
+            size={figureSize(facts.figure)}
+            color={paper ? PAPER.ink : DUSK.light}
+          />
         )}
         {facts.figureNote === null ? null : (
           <div style={{ fontSize: 44, lineHeight: 1.25, color: soft }}>{facts.figureNote}</div>
