@@ -16,7 +16,8 @@
     "demo:surname-meaning": "tsx bin/surname-meaning.ts",
     "derive-batch": "tsx bin/derive-batch.ts",
     "coverage-report": "tsx bin/coverage-report.ts",
-    "build-list-facts": "tsx bin/build-list-facts.ts"
+    "build-list-facts": "tsx bin/build-list-facts.ts",
+    "archive-load": "tsx bin/archive-load.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",

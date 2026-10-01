@@ -66,13 +66,13 @@ Neither changes any behaviour today.
 
 ---
 
-## D-021 — Polona: may a connector query it automatically, and what is its source default? (items 2 and 3 RESOLVED by ADR-0014)
+## D-021 — RESOLVED (2026-10-01): Polona: may a connector query it automatically, and what is its source default? (items 2 and 3 by ADR-0014, items 1 and 4 by ADR-0024)
 
-**Status:** BLOCKS the Polona connector task (M3), which is not written. NON-BLOCKING for everything else. Items 1 and 4 are open.
+**Status:** RESOLVED. The project owner decided items 1 and 4 on 2026-10-01 ("Everything allowed"; ADR-0024). Items 2 and 3 were decided on 2026-09-29 (ADR-0014).
 **Owner:** project owner. For confirmation from the rights holder, Polona's FAQ names Biblioteka Narodowa's Pracownia Praw Autorskich, `ppa@bn.org.pl`.
 **Raised by:** TASK-031, 2026-09-29. Evidence: `docs/sources/polona.md` §4, §11 and §12, and `packages/truth/src/polona-rights.test.ts`.
 
-1. **May a connector query Polona automatically, and may it keep what it retrieves?** Open.
+1. **May a connector query Polona automatically, and may it keep what it retrieves?** RESOLVED 2026-10-01 by ADR-0024 §2.1–2.2: yes, for search, object records, OCR and IIIF, at a polite rate, and what is retrieved may be kept. The owner's judgement, not Biblioteka Narodowa's confirmation.
    - Polona's terms ("Regulamin e-usługi Biblioteka Cyfrowa Polona", read 2026-09-29) never mention automated querying, request rates or caching.
    - Its user manual calls the search API an "otwarte API" (open API) and links developer instructions. Those instructions state no licence, rate or caching rule.
    - The object-metadata, IIIF and OCR-download endpoints a connector also needs are documented nowhere; they are the web app's own requests.
@@ -95,7 +95,7 @@ Neither changes any behaviour today.
    - The connector stores a per-object `attribution_text`: the creator when Polona names one, the title, then "Polona, Biblioteka Narodowa", with values as Polona serves them.
    - ADR-0007 §5 displays it verbatim.
 
-4. **What is Polona's source-level default?** Open.
+4. **What is Polona's source-level default?** RESOLVED 2026-10-01 by ADR-0024 §2.3: every dimension allowed, attribution required; each object's licence tightens it.
    - Polona states rights per object and states no source-wide default.
    - ADR-0007 §6 lets an object layer only tighten its source. Under a `Source` default of `UNKNOWN`, even a public-domain object stays `UNKNOWN`, as the test pins.
    - The connector's `RightsProfile` default therefore decides whether per-object rights can have any effect. It must be chosen deliberately, not left to `completeRights`' defaults.

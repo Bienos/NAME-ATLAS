@@ -50,7 +50,7 @@ function rarity(x: number, group: string, denominator = 21_197_537, date = "2026
 }
 function side(observations: unknown[], rarities: unknown[] = []): SurnameResultResponse {
   return {
-    schema_version: "1.6",
+    schema_version: "1.8",
     status: "RESOLVED",
     surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "X", script: "Latn" },
     population: {
@@ -78,6 +78,21 @@ function side(observations: unknown[], rarities: unknown[] = []): SurnameResultR
       confidence: null,
       methodology_code: null,
       reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
+      surface: SURFACE,
+    },
+    archive: {
+      state: "NOT_SEARCHED",
+      query: null,
+      searched_on: null,
+      catalogue_records: null,
+      catalogue_by_category: [],
+      pages: null,
+      pages_by_period: [],
+      pages_by_place: [],
+      examples: [],
+      confidence: null,
+      citation: null,
+      reason_code: "ARCHIVE_NOT_SEARCHED",
       surface: SURFACE,
     },
   } as unknown as SurnameResultResponse;

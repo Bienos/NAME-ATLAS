@@ -4,7 +4,7 @@ import type { UI } from "./messages.js";
 /**
  * The surname page's sections, declared once (TASK-034).
  *
- * Each of the four chapters goes by four names:
+ * Each chapter goes by four names:
  *
  *   - the contract field that carries it;
  *   - the view's key, which the page orders by;
@@ -75,6 +75,16 @@ export const SECTIONS = [
     nav: "navMeaning",
     title: "chapterMeaningTitle",
     lede: "chapterMeaningLede",
+  },
+  // TASK-054: what Polona's search returns for the surname (ADR-0024).
+  {
+    key: "archive",
+    field: "archive",
+    anchor: "archive",
+    intent: "archive",
+    nav: "navArchive",
+    title: "chapterArchiveTitle",
+    lede: "chapterArchiveLede",
   },
 ] as const satisfies readonly SectionEntry[];
 

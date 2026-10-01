@@ -24,7 +24,13 @@
  * Nothing here computes a fact. Every number it formats arrives already derived,
  * already validated against the contract, and already carrying its own scope.
  */
-import type { DistributionEntry, PopulationObservation, RarityEntry } from "@name-atlas/contracts";
+import type {
+  ArchivePeriod,
+  ArchiveSection,
+  DistributionEntry,
+  PopulationObservation,
+  RarityEntry,
+} from "@name-atlas/contracts";
 
 export type Lang = "pl" | "en";
 
@@ -284,6 +290,63 @@ export function raritySentence(entry: RarityEntry, surname: string, lang: Lang):
       ? `Około 1 na ${x} osób ujętych w rejestrze PESEL${sex} nosiło nazwisko ${surname} na dzień ${date}`
       : `About 1 in ${x} people counted in the PESEL register${sex} bore the surname ${surname} on ${date}`,
   );
+}
+
+/**
+ * The archive sentence (TASK-054, ADR-0024 §2.5): how many pages and catalogue
+ * records Polona's search returned for the word, and when. Never people, never
+ * mentions of a family; the chapter's caveat says what a match is. Zero is an
+ * answer and is said as one. Null when the section holds no search.
+ */
+export function archiveSentence(
+  section: ArchiveSection,
+  surname: string,
+  lang: Lang,
+): string | null {
+  if (
+    section.state !== "READY" ||
+    section.pages === null ||
+    section.catalogue_records === null ||
+    section.searched_on === null
+  ) {
+    return null;
+  }
+  const date = formatDate(section.searched_on, lang);
+  if (section.pages === 0 && section.catalogue_records === 0) {
+    return terminate(
+      lang === "pl"
+        ? `Wyszukiwarka Polony nie zwróciła żadnego wyniku dla słowa ${surname} (wyszukiwanie z ${date})`
+        : `Polona's search returned no result for the word ${surname} (searched on ${date})`,
+    );
+  }
+  const pages = formatInteger(section.pages, lang);
+  const records = formatInteger(section.catalogue_records, lang);
+  if (lang === "pl") {
+    const onPages = section.pages === 1 ? "stronie" : "stronach";
+    const inRecords = section.catalogue_records === 1 ? "rekordzie" : "rekordach";
+    return terminate(
+      `Słowo ${surname} występuje na ${pages} ${onPages} dzieł niechronionych prawem autorskim i w ` +
+        `${records} ${inRecords} katalogu Polony (wyszukiwanie z ${date})`,
+    );
+  }
+  return terminate(
+    `The word ${surname} appears on ${pages} ${section.pages === 1 ? "page" : "pages"} of works ` +
+      `not under copyright and in ${records} catalogue ${section.catalogue_records === 1 ? "record" : "records"} ` +
+      `in Polona (searched on ${date})`,
+  );
+}
+
+/** A period of publication as a reader says it: `przed 1800`, `1800–1849`, `od 1940`. */
+export function archivePeriodLabel(period: ArchivePeriod, lang: Lang): string {
+  if (period.from_year === null && period.to_year !== null) {
+    return lang === "pl"
+      ? `przed ${String(period.to_year + 1)}`
+      : `before ${String(period.to_year + 1)}`;
+  }
+  if (period.to_year === null && period.from_year !== null) {
+    return lang === "pl" ? `od ${String(period.from_year)}` : `${String(period.from_year)} on`;
+  }
+  return `${String(period.from_year ?? "")}–${String(period.to_year ?? "")}`;
 }
 
 /**
@@ -614,11 +677,28 @@ export const UI = {
     chapterMeaningTitle: "Co oznacza to nazwisko?",
     chapterMeaningLede:
       "Znaczenie podajemy tylko wtedy, gdy stoi za nim opracowanie naukowe. Nie zgadujemy.",
+    // TASK-054: the archive chapter (ADR-0024).
+    chapterArchiveTitle: "Gdzie pojawia się w dawnych drukach?",
+    chapterArchiveLede:
+      "Polona, cyfrowa biblioteka Biblioteki Narodowej, przeszukuje swój katalog i tekst " +
+      "zeskanowanych stron. Pokazujemy, ile wyników zwraca dla tego słowa i z jakich lat.",
+    archiveWordCaveat:
+      "To wyniki wyszukiwania słowa w każdej odmianie. Mogą dotyczyć innego znaczenia tej " +
+      "samej pisowni i nie są liczbą osób ani wzmianek o czyjejś rodzinie.",
+    archiveByPeriod: "Strony według daty wydania",
+    archiveByPlace: "Najczęstsze miejsca wydania",
+    archiveExamples: "Przykładowe strony z domeny publicznej",
+    archiveOpen: "Otwórz stronę w Polonie",
+    archivePage: "s.",
+    archiveNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w zbiorach Polony.",
+    archiveUnavailable: "Wyników z Polony nie można teraz pokazać.",
+    archiveBlocked: "Wyników z Polony nie można pokazać tutaj z powodu licencji źródła.",
     navLabel: "Na tej stronie",
     navCount: "Liczba osób",
     navRarity: "Rzadkość",
     navWhere: "Województwa",
     navMeaning: "Znaczenie",
+    navArchive: "W archiwach",
     navSources: "Źródła",
     rankCaption: "miejsce na liście nazwisk",
     scaleLabel: "Skala rzadkości",
@@ -634,6 +714,9 @@ export const UI = {
       "Zameldowanie na pobyt stały to adres w rejestrze — nie faktyczny adres i nie informacja " +
       "o korzeniach rodziny.",
     limitationInterpretation: "To interpretacja naukowa, nie zmierzona wartość.",
+    limitationArchiveWord:
+      "Liczby z Polony to wyniki wyszukiwania słowa w każdej odmianie, w katalogu i w tekście " +
+      "stron dzieł, które nie są chronione prawem autorskim; nie każdy wynik dotyczy nazwiska.",
     limitationRounded: "Wartość „1 na X” jest zaokrąglona; liczba osób jest dokładna.",
     limitationPartition:
       "Wydawca nie podaje, czy podział dotyczy płci osoby, czy rodzaju gramatycznego nazwiska. " +
@@ -1053,11 +1136,27 @@ export const UI = {
       "the share.",
     chapterMeaningTitle: "What does this surname mean?",
     chapterMeaningLede: "We give a meaning only when a scholarly work supports it. We don't guess.",
+    chapterArchiveTitle: "Where does it appear in old print?",
+    chapterArchiveLede:
+      "Polona, the National Library's digital library, searches its catalogue and the text of " +
+      "its scanned pages. We show how many results it returns for this word, and from which years.",
+    archiveWordCaveat:
+      "These are search results for the word in any inflected form. Some may be another meaning " +
+      "of the same spelling, and they are not a count of people or of mentions of anyone's family.",
+    archiveByPeriod: "Pages by date of publication",
+    archiveByPlace: "Most common places of publication",
+    archiveExamples: "Example pages in the public domain",
+    archiveOpen: "Open the page in Polona",
+    archivePage: "p.",
+    archiveNotSearched: "We have not searched Polona's collections for this surname yet.",
+    archiveUnavailable: "Results from Polona cannot be shown right now.",
+    archiveBlocked: "Results from Polona cannot be shown here because of the source's licence.",
     navLabel: "On this page",
     navCount: "Count",
     navRarity: "Rarity",
     navWhere: "Voivodeships",
     navMeaning: "Meaning",
+    navArchive: "In archives",
     navSources: "Sources",
     rankCaption: "rank on the surname list",
     scaleLabel: "Rarity scale",
@@ -1073,6 +1172,9 @@ export const UI = {
       "A permanent registered residence is an address in the register — not an actual address, " +
       "and not information about a family's roots.",
     limitationInterpretation: "This is a scholarly interpretation, not a measured value.",
+    limitationArchiveWord:
+      "Polona's figures are search results for the word in any inflected form, in the catalogue " +
+      "and in the text of pages of works not under copyright; not every result is the surname.",
     limitationRounded: "The 1-in-X figure is rounded; the count of people is exact.",
     limitationPartition:
       "The publisher does not state whether the split is by a person's sex or by the grammatical " +

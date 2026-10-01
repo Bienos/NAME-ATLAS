@@ -21,6 +21,7 @@
 import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type {
+  ArchiveSection,
   CitationDto,
   DistributionEntry,
   MeaningSection,
@@ -34,6 +35,8 @@ import type {
 import { Claim } from "./claim.js";
 import type { ClaimEvidence } from "./claim.js";
 import {
+  archivePeriodLabel,
+  archiveSentence,
   assessmentWord,
   coverageWarning,
   distributionSentence,
@@ -475,6 +478,126 @@ function Meaning({
  * One builder per kind, so the two can never disagree.
  */
 
+/**
+ * What Polona's search returns for the surname (TASK-054, ADR-0024): how many
+ * pages and records carry the word, when and where those pages were printed,
+ * and a few public-domain pages quoted. The caveat sits with the figure, so a
+ * reader meets it before reading a count as people.
+ */
+function Archive({
+  section,
+  surname,
+  number,
+  next,
+  lang,
+}: {
+  section: ArchiveSection;
+  surname: string;
+  number: number;
+  next: Step | null;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const statement = archiveSentence(section, surname, lang);
+  if (section.state !== "READY" || statement === null) {
+    const body =
+      section.state === "NOT_SEARCHED"
+        ? t.archiveNotSearched
+        : section.state === "RIGHTS_BLOCKED"
+          ? t.archiveBlocked
+          : t.archiveUnavailable;
+    return (
+      <Chapter chapter="archive" number={number} next={next} lang={lang} empty>
+        <p className="absent">{body}</p>
+      </Chapter>
+    );
+  }
+  const largest = Math.max(1, ...section.pages_by_period.map((p) => p.count));
+  return (
+    <Chapter chapter="archive" number={number} next={next} lang={lang}>
+      <Claim
+        statement={statement}
+        evidence={archiveEvidence(section, lang)}
+        country_code="PL"
+        lang={lang}
+      >
+        <p className="note archive-caveat">{t.archiveWordCaveat}</p>
+      </Claim>
+      {section.pages_by_period.length > 0 ? (
+        <figure className="archive-periods">
+          <figcaption>{t.archiveByPeriod}</figcaption>
+          <ol>
+            {section.pages_by_period.map((p) => (
+              <li key={`${String(p.from_year)}-${String(p.to_year)}`}>
+                <span className="archive-period">{archivePeriodLabel(p, lang)}</span>
+                <span
+                  className="archive-bar"
+                  style={{ "--share": String(p.count / largest) } as CSSProperties}
+                />
+                <span className="archive-count">{formatInteger(p.count, lang)}</span>
+              </li>
+            ))}
+          </ol>
+        </figure>
+      ) : null}
+      {section.pages_by_place.length > 0 ? (
+        <div className="archive-places">
+          <p className="archive-heading">{t.archiveByPlace}</p>
+          <ul>
+            {section.pages_by_place.slice(0, 6).map((place) => (
+              <li key={place.label}>
+                <span>{place.label}</span>
+                <span className="archive-count">{formatInteger(place.count, lang)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {section.examples.length > 0 ? (
+        <div className="archive-examples">
+          <p className="archive-heading">{t.archiveExamples}</p>
+          {section.examples.map((example) => {
+            const year = archiveYear(example.date);
+            return (
+              <figure key={example.url} className="archive-example">
+                <blockquote cite={example.url}>
+                  <p>„{example.excerpt}”</p>
+                </blockquote>
+                <figcaption>
+                  <span className="archive-title">{example.title}</span>
+                  <span className="archive-where">
+                    {year === null ? "" : `${year} · `}
+                    {t.archivePage} {String(example.page_number)} ·{" "}
+                    {section.citation?.attribution ?? "Polona"}
+                  </span>
+                  <a href={example.url} rel="noopener noreferrer">
+                    {t.archiveOpen}
+                  </a>
+                </figcaption>
+              </figure>
+            );
+          })}
+        </div>
+      ) : null}
+    </Chapter>
+  );
+}
+
+/** The year in a catalogue date as it was stated ("1931-01-01", "[ca 1890]"); null when there is none. */
+function archiveYear(date: string | null): string | null {
+  return /\b(1[0-9]{3}|20[0-9]{2})\b/u.exec(date ?? "")?.[1] ?? null;
+}
+
+function archiveEvidence(section: ArchiveSection, lang: Lang): ClaimEvidence {
+  return {
+    // `archiveSentence` is only rendered for READY, where both are present.
+    citation: section.citation as CitationDto,
+    underlying_date: section.searched_on ?? "",
+    confidence: section.confidence ?? { status: "INSUFFICIENT_DATA", methodology_code: "—" },
+    notes: [UI[lang].limitationArchiveWord],
+  };
+}
+
 function populationEvidence(
   observation: PopulationObservation,
   several: boolean,
@@ -569,6 +692,7 @@ function pageEvidence(response: SurnameResultResponse, lang: Lang): ClaimEvidenc
     ...(meaning === null
       ? []
       : meaning.interpretations.map((i) => meaningEvidence(meaning, i, lang))),
+    ...(response.archive?.state === "READY" ? [archiveEvidence(response.archive, lang)] : []),
   ];
 }
 
@@ -736,7 +860,7 @@ export function Result({
 
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
-    const { population, rarity, distribution, meaning } = response;
+    const { population, rarity, distribution, meaning, archive } = response;
     const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
       {
         count:
@@ -773,6 +897,12 @@ export function Result({
           meaning === null
             ? null
             : (n, next) => <Meaning section={meaning} number={n} next={next} lang={lang} />,
+        archive:
+          archive === null
+            ? null
+            : (n, next) => (
+                <Archive section={archive} surname={surname} number={n} next={next} lang={lang} />
+              ),
       };
     const order = sectionOrder(intent).filter((key) => chapters[key] !== null);
     const hasSources = pageEvidence(response, lang).length > 0;

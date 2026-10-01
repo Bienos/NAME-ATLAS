@@ -32,6 +32,8 @@ describe("MIGRATIONS_DIR", () => {
       "0021_current_rank_top_index.ts", // home page — the most common surnames, from rank claims
       "0022_universe_evidence_lookup_index.ts", // TASK-036 — the universe evidence item, without a scan
       "0023_administrative_memberships.ts", // TASK-039 — the TERC/SIMC place hierarchy
+      // 0024 is held by TASK-051 (#43), not merged.
+      "0025_archive_availability.ts", // TASK-054 — the ARCHIVE_AVAILABILITY claim type
     ]);
   });
 });

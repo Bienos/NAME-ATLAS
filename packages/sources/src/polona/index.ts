@@ -6,7 +6,13 @@
 
 export { PolonaShapeError } from "./errors.js";
 export type { PolonaDriftReason } from "./errors.js";
-export { parsePolonaFulltextSearch, parsePolonaSimpleSearch } from "./search.js";
+export {
+  parsePolonaFulltextHit,
+  parsePolonaFulltextSearch,
+  parsePolonaMetadataHit,
+  parsePolonaSearchEnvelope,
+  parsePolonaSimpleSearch,
+} from "./search.js";
 export type {
   ParsePolonaSearchOptions,
   PolonaFacetValue,
@@ -15,6 +21,7 @@ export type {
   PolonaFulltextHit,
   PolonaMetadataHit,
   PolonaObjectType,
+  PolonaSearchEnvelope,
   PolonaSearchPage,
 } from "./search.js";
 export {
@@ -50,3 +57,41 @@ export type {
   PolonaRightsObservation,
   PolonaStatementKey,
 } from "./rights.js";
+export {
+  POLONA_API_BASE,
+  POLONA_EXAMPLES_KEPT,
+  POLONA_EXCERPT_MAX_CHARS,
+  POLONA_INVENTORY_REQUEST_COUNT,
+  POLONA_INVENTORY_VERSION,
+  POLONA_PERIODS,
+  polonaExcerpt,
+  polonaInventoryRequests,
+  polonaQuery,
+  summarisePolonaInventory,
+} from "./inventory.js";
+export type {
+  PolonaCount,
+  PolonaExample,
+  PolonaInventory,
+  PolonaPeriodCount,
+  PolonaRequest,
+} from "./inventory.js";
+export {
+  POLONA_MIN_INTERVAL_MS,
+  POLONA_USER_AGENT,
+  PolonaPacer,
+  PolonaRequestError,
+  defaultPolonaFetchDeps,
+  fetchPolonaInventory,
+} from "./fetch.js";
+export type { FetchedPolonaInventory, PolonaFetchDeps } from "./fetch.js";
+export {
+  POLONA_RIGHTS_PROFILE,
+  POLONA_SOURCE,
+  POLONA_SOURCE_KEY,
+  ensurePolonaSource,
+  polonaInventoryHash,
+  polonaInventoryRecordId,
+  storePolonaInventory,
+} from "./source.js";
+export type { StoredPolonaInventory } from "./source.js";

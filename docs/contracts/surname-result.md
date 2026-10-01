@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21
-- **Schema version:** `1.6` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01
+- **Schema version:** `1.8` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -120,6 +120,26 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
     "methodology_code": null,        // added in 1.5; present exactly when AVAILABLE
     "reason_code": "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     "surface": { "surface": "FREE", "decision": "BLOCKED", "reason_code": "COMMERCIAL_USE_UNRESOLVED" }
+  },
+  "archive": {                  // added in 1.8; present exactly when RESOLVED
+    "state": "READY",                // READY | NOT_SEARCHED | RIGHTS_BLOCKED | UNAVAILABLE
+    "query": "\"NOWAK\"",            // as sent, quotes included; null unless READY
+    "searched_on": "2026-10-01",     // null unless READY
+    "catalogue_records": 8237,       // catalogue records matching the word, every licence
+    "catalogue_by_category": [{ "label": "Czasopisma", "count": 894 }],
+    "pages": 160571,                 // pages of works not under copyright containing the word
+    "pages_by_period": [{ "from_year": null, "to_year": 1799, "count": 20 }],
+    "pages_by_place": [{ "label": "Warszawa", "count": 61608 }],
+    "examples": [                    // at most 3, public-domain works only
+      { "title": "Rocznik Kolejowy …", "date": "1931-01-01", "page_number": 795,
+        "excerpt": "… Nowak Walenty …",   // at most 300 characters
+        "url": "https://polona.pl/item-view/a7ed43f7-…?page=794" }
+    ],
+    "confidence": { "status": "VERIFIED", "methodology_code": "archive_search_scope@archive_scope@1" },
+    "citation": { "title": "Polona", "publisher": "Biblioteka Narodowa", "attribution": "Polona, Biblioteka Narodowa",
+                  "source_page_url": "https://polona.pl/", "…": "as above" },
+    "reason_code": null,             // ARCHIVE_NOT_SEARCHED when NOT_SEARCHED; non-null exactly when not READY
+    "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
   }
 }
 ```
@@ -150,7 +170,7 @@ For an input that did not resolve, the fact sections are null and `suggestions` 
 
 ```jsonc
 {
-  "schema_version": "1.6",
+  "schema_version": "1.8",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -194,6 +214,9 @@ These are schema constraints, not conventions — a violating payload fails vali
 17. **A meaning can never be `VERIFIED`.** Added in 1.4. `docs/canonical/11` §8 types `SURNAME_MEANING` as an `INTERPRETATION`, and the enum simply has no such member — an interpretation of a name's origin is not a measurement (ADR-0008 §5).
 18. **Competing interpretations are both present, and `confidence` is `CONFLICTING`.** Added in 1.4. The contract has no field for a preferred reading, a rank or a weight, so a producer cannot express "this one wins"; onomastic disagreement travels as disagreement.
 19. **A meaning's `surface` is evaluated against its own source's rights.** Added in 1.4. A scholarly work and the PESEL register carry different rights profiles, so `meaning.surface` and `population.surface` can legitimately differ in the same response, and `RIGHTS_BLOCKED` carries no interpretation text at all.
+20. **An archive count is a count of word matches, never of people.** Added in 1.8. `pages` and `catalogue_records` are what Polona's search returned for the quoted word, in any inflected form, within the searched scope (ADR-0024 §2.5). No field names people, ancestors or mentions of a family, and the page states the caveat beside the figure.
+21. **`NOT_SEARCHED` is not zero.** Added in 1.8. A surname not yet searched carries no query, date, count or source; a `READY` section with zero matches is an answer. A section that is not `READY` carries no figure and no example.
+22. **An example is quoted only from a public-domain work.** Added in 1.8. At most three, each excerpt at most 300 characters, each linked to the page in Polona's viewer; a hit whose rights do not classify as public domain is counted and never quoted (ADR-0024 §2.7).
 14. **`regions` is never empty and never zero-filled.** A voivodeship the publisher did not list for a surname has no entry at all (`docs/canonical/16` §28's prohibition on fabricated empty map features; `ARCHITECTURE.md` §10 invariant 4).
 
 ## Accepted rendering of a rarity entry
@@ -247,6 +270,8 @@ and a below-threshold entry says so **before** any figure:
 ## Compatibility
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
+
+**1.6 → 1.8 (2026-10-01, TASK-054, ADR-0024).** Adds the `archive` section, required and nullable, present exactly when `status` is `RESOLVED`, as every fact section is. A consumer written against 1.6 is unaffected; a producer must now supply it. 1.7 is reserved by TASK-051 (#43), which has not merged; whichever lands second takes the next number above both.
 
 **1.5 → 1.6 (2026-09-24, ADR-0012).** One additive field, required and nullable. `citation.source_page_url` carries the source registry's `homepage_or_reference_url`: the public page of the source a record was taken from, which for PESEL is the dataset's page on dane.gov.pl. `url` is unchanged and stays the exact resource retrieved, which for a dataset is a file download. The page links a reader to `source_page_url`, because the surname page now points at the source's own website instead of showing a per-claim evidence panel (ADR-0012). A consumer written against 1.5 is unaffected; a producer must now supply it.
 

@@ -21,6 +21,7 @@
  *     dataset date and scope (invariant 5).
  */
 import type { Kysely } from "kysely";
+import { archiveSectionFor } from "./archive.js";
 import type { DB } from "@name-atlas/db";
 import type {
   DistributionEntry,
@@ -478,6 +479,7 @@ export async function querySurnameResult(
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
         meaning: null,
+        archive: null,
       },
     };
   }
@@ -497,6 +499,7 @@ export async function querySurnameResult(
         distribution: null,
         suggestions: await suggestionsFor(db, rawInput, status),
         meaning: null,
+        archive: null,
       },
     };
   }
@@ -504,6 +507,8 @@ export async function querySurnameResult(
   const surnameId = resolution.resolved_surname_id;
   const claims = await readCurrentPopulation(db, surnameId);
   const meaningSection = await meaningSectionFor(db, surnameId, surface);
+  // Polona's search output, on its own source's rights like the meaning (TASK-054).
+  const archiveSection = await archiveSectionFor(db, surnameId, surface);
   const rarityClaims = await readRarityContext(db, surnameId);
   const distributionClaims = await readCurrentDistribution(db, surnameId);
 
@@ -546,6 +551,7 @@ export async function querySurnameResult(
         // A meaning comes from a different source with different rights, so it
         // is present or absent on its own terms even where no count exists.
         meaning: meaningSection,
+        archive: archiveSection,
       },
     };
   }
@@ -577,6 +583,7 @@ export async function querySurnameResult(
         distribution: emptyDistribution("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         suggestions: null,
         meaning: meaningSection,
+        archive: archiveSection,
       },
     };
   }
@@ -650,6 +657,7 @@ export async function querySurnameResult(
       // (docs/canonical/13 §32.3).
       suggestions: null,
       meaning: meaningSection,
+      archive: archiveSection,
     },
   };
 }

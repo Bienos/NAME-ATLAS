@@ -16,6 +16,11 @@ export const CONTRACT_PACKAGE_VERSION = "0.0.0";
 export {
   SURNAME_RESULT_SCHEMA_VERSION,
   apiErrorResponseSchema,
+  archiveCountSchema,
+  archiveExampleSchema,
+  archivePeriodSchema,
+  archiveSectionSchema,
+  archiveStateSchema,
   citationSchema,
   confidenceSchema,
   distributionCoverageStateSchema,
@@ -46,6 +51,11 @@ export {
 } from "./surname-result.js";
 export type {
   ApiErrorResponse,
+  ArchiveCount,
+  ArchiveExample,
+  ArchivePeriod,
+  ArchiveSection,
+  ArchiveState,
   CitationDto,
   ConfidenceDto,
   DistributionCoverageState,
