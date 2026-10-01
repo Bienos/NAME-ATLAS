@@ -15,9 +15,11 @@ import {
   shareCardFor,
   shareCardPath,
   shareFacts,
+  summaryFacts,
 } from "./share-facts.js";
 import type { ShareFacts } from "./share-facts.js";
 import { shareCardResponse } from "./share-route.js";
+import { Recap } from "./share-card.js";
 
 /**
  * TASK-055 AC-3 and AC-4, against rendered markup: the deck has a card for each
@@ -686,6 +688,181 @@ describe("TASK-056: the deck links each card to its image", () => {
   it("answers 404 for a card that does not exist, before it reads anything", async () => {
     const response = await shareCardResponse("kowalski", "horoscope", "pl", null);
     expect(response.status).toBe(404);
+  });
+});
+
+/** FULL with the map's coverage above its threshold, so the summary may show the map. */
+const COVERED: SurnameResultResponse = surnameResultResponseSchema.parse({
+  ...FULL_INPUT,
+  distribution: {
+    ...FULL_INPUT.distribution,
+    entries: [
+      {
+        ...FULL_INPUT.distribution.entries[0],
+        coverage_state: "READY",
+        regions: [
+          {
+            place_id: "01a0c057-0000-7000-8000-000000000014",
+            terc_code: "14",
+            display_name: "MAZOWIECKIE",
+            count: 36_000,
+            share_of_covered: 0.6,
+          },
+          {
+            place_id: "01a0c057-0000-7000-8000-000000000012",
+            terc_code: "12",
+            display_name: "MAŁOPOLSKIE",
+            count: 24_000,
+            share_of_covered: 0.4,
+          },
+        ],
+        covered_count: 60_000,
+        coverage_ratio: 0.901,
+      },
+    ],
+  },
+});
+
+describe("TASK-060 AC-1: the summary card's figures are the page's own", () => {
+  // A figure: digits, grouped by a no-break space (Polish) or a comma
+  // (English), with a decimal part, a sign or a per cent sign where it has one.
+  const FIGURE = /[\u2212+]?\d(?:[\d\u00a0,]*\d)?(?:[.,]\d+)?%?/gu;
+
+  for (const lang of ["pl", "en"] as const) {
+    it(`holds in ${lang === "pl" ? "Polish" : "English"}`, () => {
+      const page = text(renderToStaticMarkup(createElement(Result, { response: COVERED, lang })));
+      const summary = summaryFacts(COVERED, lang);
+      expect(summary).not.toBeNull();
+      if (summary === null) return;
+      const { counts, rarity, where, change, print } = summary;
+      expect(counts.length).toBeGreaterThan(0);
+      expect(rarity).not.toBeNull();
+      expect(where).not.toBeNull();
+      expect(change).not.toBeNull();
+      expect(print).not.toBeNull();
+      const shown = [
+        ...counts.map((c) => c.value),
+        rarity?.figure ?? "",
+        rarity?.rank ?? "",
+        where?.share ?? "",
+        change?.figure ?? "",
+        change?.span ?? "",
+        print?.pages ?? "",
+      ];
+      const figures = [...new Set(shown.flatMap((x) => x.match(FIGURE) ?? []))];
+      expect(figures.length).toBeGreaterThan(8);
+      expect(figures.filter((figure) => !page.includes(figure))).toEqual([]);
+    });
+  }
+
+  it("leaves the map out where the coverage is low, as the page withholds its figures", () => {
+    for (const lang of ["pl", "en"] as const) {
+      expect(summaryFacts(FULL, lang)?.where).toBeNull();
+      expect(summaryFacts(COVERED, lang)?.where?.region).not.toBe("");
+    }
+  });
+
+  it("leads with the surname's main list, names the list on every figure that has one", () => {
+    const s = summaryFacts(kowalskaShape(), "pl");
+    expect(s?.counts.map((c) => c.list)).toEqual(["kobiety", "mężczyźni"]);
+    expect(s?.rarity?.figure).toBe("1 na 320");
+    expect(s?.rarity?.list).toBe("kobiety");
+    expect(s?.change?.figure).toBe("\u22123,7%");
+    expect(s?.change?.list).toBe("kobiety");
+    expect(s?.where?.list).not.toBe("");
+  });
+
+  it("keeps the meaning's own source out of the figures' sources, and on the story card's line", () => {
+    const s = summaryFacts(FULL, "pl");
+    expect(s?.meaning).not.toBeNull();
+    const own = s?.meaning?.source ?? "";
+    expect(own).not.toBe("");
+    expect(s?.sources.join(" ")).not.toContain(own);
+    const facts = shareFacts(FULL, "summary", "pl");
+    expect(facts?.source).toContain(own);
+    for (const source of s?.sources ?? []) expect(facts?.source).toContain(source);
+  });
+
+  it("names the list beside the rarity on the deck's last card too", () => {
+    const end = deckCards(FULL, "pl", LINKS).at(-1);
+    const html = faces(end === undefined ? [] : [end]);
+    expect(html).toMatch(/Rzadkość · (mężczyźni|kobiety)/u);
+  });
+});
+
+describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () => {
+  it("has only the counts, and a name for them, when only the count is ready", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const s = summaryFacts(COUNT_ONLY, lang);
+      expect(s).not.toBeNull();
+      expect(s?.counts.length).toBeGreaterThan(0);
+      expect(s?.rarity).toBeNull();
+      expect(s?.where).toBeNull();
+      expect(s?.change).toBeNull();
+      expect(s?.print).toBeNull();
+      expect(s?.meaning).toBeNull();
+      expect(s?.sources.every((x) => x.startsWith("PESEL"))).toBe(true);
+    }
+  });
+
+  it("is nothing for a surname that did not resolve", () => {
+    const unresolved = surnameResultResponseSchema.parse({
+      schema_version: "1.10",
+      status: "UNRESOLVED",
+      surname: null,
+      population: null,
+      rarity: null,
+      distribution: null,
+      suggestions: {
+        state: "UNAVAILABLE",
+        outcome: null,
+        decision_mode: null,
+        reason_code: "INPUT_TOO_SHORT",
+        suggestions: [],
+      },
+      meaning: null,
+      change: null,
+      archive: null,
+      neighbours: null,
+      other_form: null,
+    });
+    expect(summaryFacts(unresolved, "pl")).toBeNull();
+    expect(shareFacts(unresolved, "summary", "pl")).toBeNull();
+  });
+});
+
+describe("TASK-060 AC-1 + TASK-059: the story card's chip draws a change's sign in the interface face", () => {
+  it("sets a growing surname's plus in Instrument Sans, never in Fraunces", () => {
+    const base = summaryFacts(FULL, "pl");
+    expect(base?.change).not.toBeNull();
+    if (base === null || base.change === null) return;
+    const grown = { ...base, change: { ...base.change, figure: "+0,9%" } };
+    const html = renderToStaticMarkup(createElement(Recap, { summary: grown }));
+    expect(html).toMatch(/font-family:Instrument Sans[^>]*>\+<\/div>/u);
+    expect(html).toContain(">0,9%</div>");
+    expect(html).not.toContain(">+0,9%<");
+  });
+
+  it("draws every slot of a full summary, and only those that have facts", () => {
+    const full = summaryFacts(COVERED, "pl");
+    expect(full).not.toBeNull();
+    if (full === null) return;
+    const all = text(renderToStaticMarkup(createElement(Recap, { summary: full })));
+    const parts = [
+      full.counts[0]?.value,
+      full.rarity?.figure,
+      full.where?.region,
+      full.print?.pages,
+      full.meaning?.gloss,
+    ];
+    expect(parts.every((x) => x !== undefined && x !== "")).toBe(true);
+    for (const part of parts) expect(all).toContain(part);
+    const bare = summaryFacts(COUNT_ONLY, "pl");
+    if (bare === null) throw new Error("count-only summary expected");
+    const some = renderToStaticMarkup(createElement(Recap, { summary: bare }));
+    expect(some).toContain(bare.counts[0]?.value);
+    expect(some).not.toContain("<svg");
+    expect(some).not.toContain("Instrument Sans");
   });
 });
 

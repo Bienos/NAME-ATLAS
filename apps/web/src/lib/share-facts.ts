@@ -1,6 +1,7 @@
-import type { SurnameResultResponse } from "@name-atlas/contracts";
+import type { DistributionEntry, SurnameResultResponse } from "@name-atlas/contracts";
 import {
   archivePeriodLabel,
+  assessmentWord,
   changeListLabel,
   coverageWarning,
   formatDate,
@@ -86,10 +87,58 @@ export type ShareVisual =
       }[];
       readonly quote: { readonly text: string; readonly ref: string } | null;
     }
-  | {
-      readonly kind: "recap";
-      readonly cells: readonly { readonly k: string; readonly v: string }[];
-    };
+  | { readonly kind: "recap"; readonly summary: SummaryFacts };
+
+/**
+ * The summary card's whole vocabulary (TASK-060): the page's key figures on one
+ * card, for the story-size image and the page's 1200 × 630 preview alike. Every
+ * figure is one the page prints, the main list leads, each figure that belongs
+ * to a list names it, and a slot whose section is not ready is null: a card
+ * never fills a gap.
+ */
+export interface SummaryFacts {
+  readonly surname: string;
+  /** "osób" or "people", after each count. */
+  readonly countUnit: string;
+  /** Each list's count, the main list first; a null count (absent) is never shown as zero. */
+  readonly counts: readonly { readonly list: string; readonly value: string }[];
+  readonly rarity: {
+    readonly figure: string;
+    readonly list: string;
+    /** "#2", with its caption "miejsce na liście nazwisk". */
+    readonly rank: string | null;
+    readonly rankCaption: string;
+    /** Where the figure sits on the page's logarithmic scale, 0 to 1, and its ticks. */
+    readonly at: number;
+    readonly ticks: readonly string[];
+  } | null;
+  readonly where: {
+    readonly caption: string;
+    readonly region: string;
+    readonly share: string;
+    readonly list: string;
+    readonly bands: Readonly<Record<string, number>>;
+  } | null;
+  readonly change: {
+    readonly caption: string;
+    readonly figure: string;
+    readonly span: string;
+    readonly list: string;
+  } | null;
+  readonly print: {
+    readonly caption: string;
+    readonly pages: string;
+    readonly unit: string;
+  } | null;
+  readonly meaning: {
+    readonly caption: string;
+    readonly gloss: string;
+    readonly confidence: string;
+    readonly source: string;
+  } | null;
+  /** The sources and dates of the figures above, not of the meaning (which carries its own). */
+  readonly sources: readonly string[];
+}
 
 export interface ShareFacts {
   readonly card: ShareCardKey;
@@ -120,6 +169,8 @@ const EXPLAIN = {
     print: "To wyniki wyszukiwania słowa w każdej odmianie w zbiorach Polony, nie liczba osób.",
     summary: "Każda liczba ma źródło i datę. Listy męska i żeńska nigdy nie są sumowane.",
     page: "s.",
+    mostIn: "najczęściej",
+    people: "osób",
     cta: "Sprawdź swoje nazwisko",
     interpretation: "interpretacja",
     regionShare: "udział",
@@ -139,6 +190,8 @@ const EXPLAIN = {
     summary:
       "Every figure has a source and a date. The men's and women's lists are never added up.",
     page: "p.",
+    mostIn: "most common in",
+    people: "people",
     cta: "Look up your surname",
     interpretation: "interpretation",
     regionShare: "share",
@@ -149,6 +202,26 @@ const EXPLAIN = {
 function oneIn(x: number, lang: Lang): string {
   const n = formatInteger(x, lang);
   return lang === "pl" ? `1 na ${n}` : `1 in ${n}`;
+}
+
+/** A point on the page's logarithmic rarity scale: 0 is 1 in 100, 1 is 1 in 10 million. */
+function rarityScale(x: number, lang: Lang): { at: number; ticks: readonly string[] } {
+  return {
+    at: Math.min(1, Math.max(0, (Math.log10(x) - 2) / 5)),
+    ticks:
+      lang === "pl"
+        ? ["100", "1 tys.", "10 tys.", "100 tys.", "1 mln", "10 mln"]
+        : ["100", "1k", "10k", "100k", "1m", "10m"],
+  };
+}
+
+/** The map's bands by TERC code, as the page's map draws them; null when a region has no code. */
+function regionBands(entry: DistributionEntry, lang: Lang): Record<string, number> | null {
+  const input = mapInputs([entry], lang);
+  if (input === null) return null;
+  const bands: Record<string, number> = {};
+  for (const region of input.maps[0] ?? []) bands[region.terc_code] = region.band;
+  return bands;
 }
 
 function clip(text: string, max: number): string {
@@ -194,14 +267,7 @@ export function shareFacts(
         figure: oneIn(x, lang),
         figureNote:
           rank === null ? null : `#${formatInteger(rank, lang)} ${t.rankCaption} · ${list}`,
-        visual: {
-          kind: "scale",
-          at: Math.min(1, Math.max(0, (Math.log10(x) - 2) / 5)),
-          ticks:
-            lang === "pl"
-              ? ["100", "1 tys.", "10 tys.", "100 tys.", "1 mln", "10 mln"]
-              : ["100", "1k", "10k", "100k", "1m", "10m"],
-        },
+        visual: { kind: "scale", ...rarityScale(x, lang) },
         explanation:
           e.rarity(formatInteger(x, lang), list) +
           (otherX === null || other === undefined
@@ -244,16 +310,14 @@ export function shareFacts(
       if (entry === undefined) return null;
       const top = [...entry.regions].sort((a, b) => b.share_of_covered - a.share_of_covered)[0];
       if (top === undefined) return null;
-      const input = mapInputs([entry], lang);
-      const bands: Record<string, number> = {};
-      for (const region of input?.maps[0] ?? []) bands[region.terc_code] = region.band;
+      const bands = regionBands(entry, lang);
       return {
         ...base,
         eyebrow: t.deckWhere,
         warning: coverageWarning(entry, lang),
         figure: formatPercent(top.share_of_covered, lang),
         figureNote: e.whereTop(top.display_name),
-        visual: input === null ? null : { kind: "map", bands },
+        visual: bands === null ? null : { kind: "map", bands },
         explanation: e.where,
         source: `${entry.citation.publisher ?? entry.citation.title} · ${formatDate(entry.snapshot_date, lang)}`,
       };
@@ -384,57 +448,131 @@ export function shareFacts(
     }
 
     case "summary": {
-      const cells: { k: string; v: string }[] = [];
-      const dates = new Set<string>();
-      if (response.population?.state === "READY") {
-        for (const o of response.population.observations) {
-          if (o.value.value === null) continue;
-          cells.push({
-            k: partitionLabel(o.comparability_group, lang) ?? t.navCount,
-            v: formatInteger(o.value.value, lang),
-          });
-          dates.add(o.snapshot_date);
-        }
-      }
-      if (response.rarity?.state === "READY") {
-        const lead = response.rarity.entries[0];
-        const x = lead === undefined ? null : oneInOf(lead);
-        const rank = lead === undefined ? null : rankOf(lead);
-        if (rank !== null) cells.push({ k: t.rankCaption, v: `#${formatInteger(rank, lang)}` });
-        if (x !== null) cells.push({ k: t.deckRarity, v: oneIn(x, lang) });
-      }
-      const where =
-        response.distribution?.state === "READY" ? response.distribution.entries[0] : undefined;
-      const top =
-        where?.coverage_state === "READY"
-          ? [...where.regions].sort((a, b) => b.share_of_covered - a.share_of_covered)[0]
-          : undefined;
-      if (top !== undefined) {
-        cells.push({
-          k: lang === "pl" ? "najczęściej" : "most common in",
-          v: lang === "pl" ? top.display_name.toLocaleLowerCase("pl") : top.display_name,
-        });
-      }
-      const archive = response.archive;
-      if (archive?.state === "READY" && archive.pages !== null && archive.pages > 0) {
-        cells.push({ k: t.deckPrint, v: `${formatInteger(archive.pages, lang)} ${e.pages}` });
-      }
-      if (cells.length === 0) return null;
-      const sources = [...dates].map((d) => `PESEL ${formatDate(d, lang)}`);
-      if (archive?.state === "READY" && archive.searched_on !== null) {
-        sources.push(`Polona ${formatDate(archive.searched_on, lang)}`);
-      }
+      const summary = summaryFacts(given, lang);
+      if (summary === null) return null;
       return {
         ...base,
         eyebrow: t.deckEnd,
         figure: null,
         figureNote: null,
-        visual: { kind: "recap", cells: cells.slice(0, 6) },
+        visual: { kind: "recap", summary },
         explanation: e.summary,
-        source: sources.join(" · "),
+        source: [
+          ...summary.sources,
+          ...(summary.meaning === null ? [] : [summary.meaning.source]),
+        ].join(" · "),
       };
     }
   }
+}
+
+/**
+ * The summary's facts, or null when the surname did not resolve or the page
+ * has nothing ready to say. Pure: `share-card.tsx` and `og-card.tsx` decide
+ * only how it looks.
+ */
+export function summaryFacts(given: SurnameResultResponse, lang: Lang): SummaryFacts | null {
+  if (given.status !== "RESOLVED" || given.surname === null) return null;
+  const response = inDeckOrder(given);
+  const surname = response.surname?.display_name ?? given.surname.display_name;
+  const t = UI[lang];
+  const e = EXPLAIN[lang];
+
+  const counts: { list: string; value: string }[] = [];
+  const dates = new Set<string>();
+  if (response.population?.state === "READY") {
+    for (const o of response.population.observations) {
+      if (o.value.value === null) continue;
+      counts.push({
+        list: partitionLabel(o.comparability_group, lang) ?? t.navCount,
+        value: formatInteger(o.value.value, lang),
+      });
+      dates.add(o.snapshot_date);
+    }
+  }
+
+  let rarity: SummaryFacts["rarity"] = null;
+  if (response.rarity?.state === "READY") {
+    const lead = response.rarity.entries.find((x) => oneInOf(x) !== null);
+    const x = lead === undefined ? null : oneInOf(lead);
+    if (lead !== undefined && x !== null) {
+      const rank = rankOf(lead);
+      rarity = {
+        figure: oneIn(x, lang),
+        list: partitionLabel(lead.comparability_group, lang) ?? "",
+        rank: rank === null ? null : `#${formatInteger(rank, lang)}`,
+        rankCaption: t.rankCaption,
+        ...rarityScale(x, lang),
+      };
+    }
+  }
+
+  let where: SummaryFacts["where"] = null;
+  const distribution =
+    response.distribution?.state === "READY" ? response.distribution.entries[0] : undefined;
+  if (distribution?.coverage_state === "READY") {
+    const top = [...distribution.regions].sort(
+      (a, b) => b.share_of_covered - a.share_of_covered,
+    )[0];
+    const bands = regionBands(distribution, lang);
+    if (top !== undefined && bands !== null) {
+      where = {
+        caption: e.mostIn,
+        region: lang === "pl" ? top.display_name.toLocaleLowerCase("pl") : top.display_name,
+        share: formatPercent(top.share_of_covered, lang),
+        list: partitionLabel(distribution.comparability_group, lang) ?? "",
+        bands,
+      };
+    }
+  }
+
+  let change: SummaryFacts["change"] = null;
+  const changeEntry = response.change?.state === "READY" ? response.change.entries[0] : undefined;
+  if (changeEntry !== undefined) {
+    const { summary } = changeEntry;
+    change = {
+      caption: t.deckChange,
+      figure: formatPercentChange(summary.count_change_percent, lang),
+      span: `${summary.first.data_date.slice(0, 4)} → ${summary.last.data_date.slice(0, 4)}`,
+      list: changeListLabel(changeEntry.list, lang),
+    };
+  }
+
+  const archive = response.archive;
+  const print =
+    archive?.state === "READY" && archive.pages !== null && archive.pages > 0
+      ? { caption: t.deckPrint, pages: formatInteger(archive.pages, lang), unit: e.pages }
+      : null;
+
+  const lead =
+    response.meaning?.state === "AVAILABLE" ? response.meaning.interpretations[0] : undefined;
+  const meaning =
+    lead === undefined
+      ? null
+      : {
+          caption: t.deckMeaning,
+          gloss: `„${clip(lead.literal_gloss, 110)}”`,
+          confidence: assessmentWord(response.meaning?.confidence ?? "INSUFFICIENT_DATA", lang),
+          source: `${lead.work.author_or_publisher} ${String(lead.work.year)}`,
+        };
+
+  if (
+    counts.length === 0 &&
+    rarity === null &&
+    where === null &&
+    change === null &&
+    print === null &&
+    meaning === null
+  ) {
+    return null;
+  }
+
+  const sources = [...dates].map((d) => `PESEL ${formatDate(d, lang)}`);
+  if (print !== null && archive?.state === "READY" && archive.searched_on !== null) {
+    sources.push(`Polona ${formatDate(archive.searched_on, lang)}`);
+  }
+
+  return { surname, countUnit: e.people, counts, rarity, where, change, print, meaning, sources };
 }
 
 /** The card a deck card shares: its own image, or the summary for one without (the surname, the catalogue). */

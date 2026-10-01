@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { ImageResponse } from "next/og";
-import type { ShareFacts, ShareVisual } from "./share-facts.js";
+import type { ShareFacts, ShareVisual, SummaryFacts } from "./share-facts.js";
 import { TOKENS, TYPE_FAMILIES } from "./design-tokens.js";
 import { graphemeCount, loadFonts } from "./og-card.js";
 import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
@@ -392,18 +392,74 @@ function Visual({ visual, paper }: { visual: ShareVisual; paper: boolean }): Rea
         </div>
       );
     case "recap":
-      return (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 22, width: MEASURE }}>
-          {visual.cells.map((cell) => (
+      return <Recap summary={visual.summary} />;
+  }
+}
+
+/** A small stacked figure: what it is, the figure, and what it is of. */
+function Chip({
+  caption,
+  value,
+  sub,
+  size = 44,
+}: {
+  caption: string;
+  value: string;
+  sub: string;
+  size?: number;
+}): ReactNode {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div
+        style={{
+          fontFamily: TYPE_FAMILIES.data,
+          fontSize: 22,
+          letterSpacing: 2,
+          textTransform: "uppercase",
+          color: DUSK.muted,
+        }}
+      >
+        {caption}
+      </div>
+      {/* A change is signed: `Figure` keeps its "+" out of Fraunces (TASK-059). */}
+      <Figure text={value} size={size} color={DUSK.ink} />
+      <div style={{ fontSize: 26, lineHeight: 1.25, color: DUSK.soft }}>{sub}</div>
+    </div>
+  );
+}
+
+/** A region's name, smaller the longer it is ("warmińsko-mazurskie" must stay on its chip). */
+function regionSize(name: string): number {
+  return Math.max(32, Math.min(44, Math.floor(430 / (Math.max(1, graphemeCount(name)) * 0.5))));
+}
+
+/**
+ * The summary card's body (TASK-060): the page's key figures on one card. The
+ * rarity is the hero on its scale; both counts sit above it, the map with its
+ * lit region and the change and old-print figures below, and the meaning's
+ * line closes. A slot with no facts is left out, never filled.
+ */
+export function Recap({ summary }: { summary: SummaryFacts }): ReactNode {
+  const { counts, rarity, where, change, print, meaning } = summary;
+  const mapWidth = 300;
+  const hasSide = where !== null || change !== null || print !== null;
+  // A name long enough to wrap takes a second line of the card: the meaning waits for a roomier one.
+  const compact = graphemeCount(summary.surname) > 17;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 26, width: MEASURE }}>
+      {counts.length === 0 ? null : (
+        <div style={{ display: "flex", gap: 22 }}>
+          {counts.map((c) => (
             <div
-              key={cell.k}
+              key={c.list}
               style={{
                 display: "flex",
                 flexDirection: "column",
-                width: (MEASURE - 22) / 2,
-                padding: 32,
+                flex: 1,
+                padding: "16px 28px",
                 borderRadius: 28,
                 background: DUSK.tile,
+                border: `2px solid ${DUSK.tileLine}`,
               }}
             >
               <div
@@ -412,19 +468,113 @@ function Visual({ visual, paper }: { visual: ShareVisual; paper: boolean }): Rea
                   fontSize: 24,
                   letterSpacing: 2,
                   textTransform: "uppercase",
-                  color: muted,
+                  color: DUSK.muted,
                 }}
               >
-                {cell.k}
+                {c.list}
               </div>
-              <div style={{ fontFamily: TYPE_FAMILIES.display, fontSize: 62, lineHeight: 1.1 }}>
-                {cell.v}
+              <div style={{ fontFamily: TYPE_FAMILIES.display, fontSize: 60, lineHeight: 1.1 }}>
+                {c.value}
               </div>
             </div>
           ))}
         </div>
-      );
-  }
+      )}
+
+      {rarity === null ? null : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div
+            style={{
+              fontFamily: TYPE_FAMILIES.display,
+              fontSize: Math.min(128, figureSize(rarity.figure)),
+              lineHeight: 1.08,
+              color: DUSK.light,
+            }}
+          >
+            {rarity.figure}
+          </div>
+          <div style={{ fontSize: 32, lineHeight: 1.25, color: DUSK.soft, marginBottom: 8 }}>
+            {[rarity.rank === null ? null : `${rarity.rank} ${rarity.rankCaption}`, rarity.list]
+              .filter((x) => x !== null && x !== "")
+              .join(" · ")}
+          </div>
+          <Visual visual={{ kind: "scale", at: rarity.at, ticks: rarity.ticks }} paper={false} />
+        </div>
+      )}
+
+      {!hasSide ? null : (
+        <div style={{ display: "flex", alignItems: "center", gap: 36 }}>
+          {where === null ? null : (
+            <svg
+              viewBox={VOIVODESHIP_VIEWBOX}
+              width={mapWidth}
+              height={Math.round(mapWidth * (531 / 560))}
+            >
+              {Object.entries(VOIVODESHIPS).map(([terc, shape]) => {
+                const band = where.bands[terc];
+                return (
+                  <path
+                    key={terc}
+                    d={shape.d}
+                    fill={band === undefined ? DUSK.noData : (DUSK.map[band] ?? DUSK.noData)}
+                    stroke={DUSK.ground}
+                    strokeWidth={1.4}
+                  />
+                );
+              })}
+            </svg>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 18, flex: 1 }}>
+            {where === null ? null : (
+              <Chip
+                caption={where.caption}
+                value={where.region}
+                sub={[where.share, where.list].filter((x) => x !== "").join(" · ")}
+                size={regionSize(where.region)}
+              />
+            )}
+            {change === null ? null : (
+              <Chip
+                caption={change.caption}
+                value={change.figure}
+                sub={[change.span, change.list].filter((x) => x !== "").join(" · ")}
+              />
+            )}
+            {print === null ? null : (
+              <Chip caption={print.caption} value={print.pages} sub={print.unit} />
+            )}
+          </div>
+        </div>
+      )}
+
+      {meaning === null || compact ? null : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div
+            style={{
+              fontFamily: TYPE_FAMILIES.display,
+              fontSize: 34,
+              lineHeight: 1.28,
+              borderLeft: `6px solid ${DUSK.light}`,
+              paddingLeft: 26,
+            }}
+          >
+            {meaning.gloss}
+          </div>
+          <div
+            style={{
+              fontFamily: TYPE_FAMILIES.data,
+              fontSize: 22,
+              letterSpacing: 2,
+              textTransform: "uppercase",
+              color: DUSK.muted,
+            }}
+          >
+            {`${meaning.caption} · ${meaning.confidence}`}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export async function renderShareCard(
@@ -491,7 +641,7 @@ export async function renderShareCard(
           justifyContent: "center",
           gap: 30,
           flex: 1,
-          paddingTop: 40,
+          paddingTop: facts.visual?.kind === "recap" ? 28 : 40,
         }}
       >
         {/* A coverage warning comes before any figure (TASK-012 §3). */}
@@ -514,7 +664,14 @@ export async function renderShareCard(
         )}
       </div>
 
-      <div style={{ marginTop: 40, fontSize: 44, lineHeight: 1.34, color: soft }}>
+      <div
+        style={{
+          marginTop: facts.visual?.kind === "recap" ? 28 : 40,
+          fontSize: facts.visual?.kind === "recap" ? 34 : 44,
+          lineHeight: 1.34,
+          color: soft,
+        }}
+      >
         {facts.explanation}
       </div>
 

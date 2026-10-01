@@ -709,7 +709,7 @@ export const UI = {
     chapterSourcesQuestion: "Skąd to wiemy?",
     summaryHeading: "Twój wynik",
     summaryLede:
-      "Najważniejsze liczby na jednej karcie, z datą rejestru. Udostępnij ją albo zapisz.",
+      "Liczby, rzadkość, mapa i zmiana na jednej karcie, każda z datą i źródłem. Udostępnij ją albo zapisz.",
     summaryCardAlt: "Karta nazwiska z liczbami z rejestru PESEL",
     saveImage: "Zapisz obraz",
     // The landing's last two sections, after the atlas (TASK-053).
@@ -1247,7 +1247,8 @@ export const UI = {
     ],
     chapterSourcesQuestion: "How do we know?",
     summaryHeading: "Your result",
-    summaryLede: "The key figures on one card, with the register's date. Share it or save it.",
+    summaryLede:
+      "Counts, rarity, the map and the change on one card, each with its date and source. Share it or save it.",
     summaryCardAlt: "Surname card with figures from the PESEL register",
     saveImage: "Save image",
     landingHowPoints: [
