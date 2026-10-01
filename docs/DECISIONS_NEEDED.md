@@ -107,7 +107,7 @@ Consequence if unresolved:
 
 ---
 
-## D-020 — RESOLVED (2026-09-24): light only; superseded for the landing and the surname page by ADR-0021 (2026-10-01)
+## D-020 — RESOLVED (2026-09-24): light only; superseded for the whole site by ADR-0021 (2026-10-01)
 
 **Resolution**, decided by the project owner 2026-09-24 ("why can't I change it to white", asked of
 a page that followed the operating system into Archive Night): option 1, **light only**. The two

@@ -9,21 +9,21 @@ import { surnameEm } from "./surname-fit.js";
 const appRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
 describe("the surname hero's measured width", () => {
-  it("is measured from the pages' 16 pt cut, not the share card's display cut", () => {
-    // The card's Newsreader is the 72 pt cut, about 3% wider; metrics taken
-    // from it would fit every page surname to the wrong width.
-    const card = readFileSync(path.join(appRoot, "assets/fonts/Newsreader-Medium.ttf"));
-    expect(createHash("sha256").update(card).digest("hex")).not.toBe(DISPLAY_FONT_SHA256);
+  it("is measured from the committed Fraunces Medium, the face the pages and the card share", () => {
+    // The pages load Fraunces with its optical-size axis; a surname at 56–96px
+    // is drawn near the 72 pt cut this file is (TASK-052, ADR-0021).
+    const card = readFileSync(path.join(appRoot, "assets/fonts/Fraunces-Medium.ttf"));
+    expect(createHash("sha256").update(card).digest("hex")).toBe(DISPLAY_FONT_SHA256);
     expect(DISPLAY_FONT_SHA256).toBe(
-      "68c4493c7c6c9aaff48defeeb6408e7ce705efc4c33363de4d9d6f5e07775064",
+      "934b0448ec4605c4b10dc43b1f2d6b95aeb4e121d58e48ce6ee4a6ca046004d8",
     );
   });
 
   it("uses real advance widths, so two ten-letter names differ", () => {
-    // Checked against fontTools on the same file: NOWAK's advances sum to
-    // 4.035 em, WAWRZYNIAK's to 7.35 em; the tracking is -0.04 em per letter.
-    expect(surnameEm("NOWAK")).toBeCloseTo(4.035 - 5 * 0.04, 3);
-    expect(surnameEm("WAWRZYNIAK")).toBeCloseTo(7.35 - 10 * 0.04, 3);
+    // Summed from the file's hmtx: NOWAK's advances are 3.883 em, WAWRZYNIAK's
+    // 7.082 em; the tracking is -0.04 em per letter.
+    expect(surnameEm("NOWAK")).toBeCloseTo(3.883 - 5 * 0.04, 3);
+    expect(surnameEm("WAWRZYNIAK")).toBeCloseTo(7.082 - 10 * 0.04, 3);
     expect(surnameEm("WAWRZYNIAK")).toBeGreaterThan(surnameEm("WIŚNIEWSKI"));
   });
 

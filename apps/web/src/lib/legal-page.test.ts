@@ -46,9 +46,9 @@ describe("legal pages (TASK-046)", () => {
 
   it("switch language to the same document, and name their canonical address", () => {
     const pl = renderToStaticMarkup(createElement(LegalView, { kind: "privacy", lang: "pl" }));
-    expect(pl).toContain('href="/en/privacy">English</a>');
+    expect(pl).toContain('href="/en/privacy" hrefLang="en" lang="en" aria-label="English">EN</a>');
     const en = renderToStaticMarkup(createElement(LegalView, { kind: "terms", lang: "en" }));
-    expect(en).toContain('href="/pl/regulamin">Polski</a>');
+    expect(en).toContain('href="/pl/regulamin" hrefLang="pl" lang="pl" aria-label="Polski">PL</a>');
     expect(legalMetadata("privacy", "pl").alternates?.canonical).toBe("/pl/prywatnosc");
     expect(legalMetadata("terms", "en").alternates?.canonical).toBe("/en/terms");
   });

@@ -122,12 +122,12 @@ export const MAP_BANDS = [
 ] as const satisfies readonly TokenName[];
 
 /**
- * The three type voices (Visual System v1 §6) by family name. The page sets
- * them with `next/font/google` in `layout.tsx`. The share card loads the files
- * in `assets/fonts/` under these names.
+ * The three type voices (ADR-0021) by family name. The page sets them with
+ * `next/font/google` in `layout.tsx`. The share card loads the files in
+ * `assets/fonts/` under these names.
  */
 export const TYPE_FAMILIES = {
-  display: "Newsreader",
-  ui: "Inter",
+  display: "Fraunces",
+  ui: "Instrument Sans",
   data: "IBM Plex Mono",
 } as const;

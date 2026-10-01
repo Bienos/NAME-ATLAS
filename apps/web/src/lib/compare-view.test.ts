@@ -22,11 +22,15 @@ describe("ComparisonView masthead", () => {
     const pl = renderToStaticMarkup(
       createElement(ComparisonView, { a: side("nowak"), b: side("kowalczyk"), lang: "pl" }),
     );
-    expect(pl).toContain('href="/en/compare?a=nowak&amp;b=kowalczyk">English</a>');
+    expect(pl).toContain(
+      'href="/en/compare?a=nowak&amp;b=kowalczyk" hrefLang="en" lang="en" aria-label="English">EN</a>',
+    );
     const en = renderToStaticMarkup(
       createElement(ComparisonView, { a: side("nowak"), b: side("kowalczyk"), lang: "en" }),
     );
-    expect(en).toContain('href="/pl/porownaj?a=nowak&amp;b=kowalczyk">Polski</a>');
+    expect(en).toContain(
+      'href="/pl/porownaj?a=nowak&amp;b=kowalczyk" hrefLang="pl" lang="pl" aria-label="Polski">PL</a>',
+    );
   });
 });
 

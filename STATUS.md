@@ -2,14 +2,14 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-01, by TASK-052: the dusk landing and the surname journey (ADR-0021; `docs/progress/2026-10-01-dusk-landing-and-journey.md`).
+**Last rewritten:** 2026-10-01, by TASK-052: the dusk site, every page (ADR-0021; `docs/progress/2026-10-01-dusk-landing-and-journey.md`).
 
 ## Production
 
 | | |
 |---|---|
 | App | Vercel project `name-atlas`, region `fra1`, alias `name-atlas-two.vercel.app` |
-| Deployed | `dpl_53JaT2k3SEFZnVAoBuJcYAzAremE`, `main` @ `107ff65` (#42), per Vercel's deployment list read at 22:48 UTC on 2026-09-30. None of #45–#48 is deployed: the project is on Vercel Hobby, and its 100 deployments a day were used up, mostly by branch previews. A production deployment requested through the API was refused with `api-deployments-free-per-day` (the limit resets at 22:48 UTC on 2026-10-01). `curl /pl/prywatnosc` on production returned 404 then |
+| Deployed | `dpl_53JaT2k3SEFZnVAoBuJcYAzAremE`, `main` @ `107ff65` (#42), per Vercel's deployment list read at 02:36 UTC on 2026-10-01: no production deployment after it, so none of #45–#50 is live. On 2026-09-30 the project, on Vercel Hobby, had used its 100 deployments a day, mostly on branch previews, and a production deployment requested through the API was refused with `api-deployments-free-per-day`. Preview deployments were built again at 00:53 and 01:58 UTC on 2026-10-01 |
 | Database | PostgreSQL 17 with PostGIS behind PgBouncer on the Oracle Cloud Always Free VM (Frankfurt; ADR-0017). Vercel's `DATABASE_URL` has pointed at it since 17:42 UTC on 2026-09-30. It holds the complete 2026-01-20 register (598,476 surnames; claims `CURRENT_POPULATION`, `CURRENT_RANK` and `RARITY_CONTEXT` 828,262 each, `CURRENT_DISTRIBUTION` 395,216), TERYT's places and 25 Buryan 1933 meanings (the owner's report; the meanings are live on the pages), and the fifteen earlier PESEL editions as dated snapshots that no page reads (5,713,465 values). 17 GB. Two surnames flagged mixed-script at import have no figures by design. Supabase still holds the old seven-surname slice as the rollback |
 | Deploys | From `main`, automatically. The project owner set Vercel's production branch to `main` on 2026-09-30 |
 
@@ -17,7 +17,7 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 
 - Milestones M0–M2 are complete.
 - Implemented: TASK-001–006, 008–028, 030–034, 036–040, 042–045 and 052, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.
-- The site's look: the landing hero and the surname page render the dusk direction (ADR-0021, TASK-052); the comparison, legal and contact pages, the search page's unresolved answers and the share card stay on Visual System v1's Paper until a later task.
+- The site's look: every page and the share card render the dusk direction in Fraunces, Instrument Sans and IBM Plex Mono, with one header, footer and world (ADR-0021, TASK-052). The site has a how-it-works page and a comparison picker.
 - Ahead of `PLAN.md`'s milestone order: the async runtime (TASK-020), rights per asset and surface (TASK-021), the meaning chain (TASK-022), slugs and the sitemap (TASK-027), `pnpm coverage:report`, the visual system, evidence linked to the source's website (ADR-0012), and the landing atlas's seven plates (TASK-040, 043, 044; ADR-0018, ADR-0019).
 - Local suite on `main` @ `61ffc49`, run 2026-09-30: `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` all exit 0. `test:integration` and `test:golden` were not run.
 

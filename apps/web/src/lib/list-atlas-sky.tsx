@@ -55,7 +55,7 @@ export interface SkyList {
   readonly surnames: readonly number[];
   /** Where the dashed ring runs: the q = 0.5 concentration set's surnames, or null. */
   readonly half: number | null;
-  /** How many of the most common surnames the legend names; they are drawn in Atlas Blue. */
+  /** How many of the most common surnames the legend names; they are drawn in amber. */
   readonly named: number;
 }
 
@@ -67,11 +67,13 @@ const SLICE_MS = 8;
 
 /** How the dot of a surname with `count` bearers at `rank` is shaded, in draw order. */
 function shade(rank: number, count: number, named: number, k: number) {
-  if (rank < named) return { key: 0, colour: TOKENS.accent, alpha: 1 };
-  if (count >= 1000) return { key: 1, colour: TOKENS["text-primary"], alpha: 0.88 };
-  if (count >= 100) return { key: 2, colour: TOKENS["text-primary"], alpha: 0.42 * k ** 1.5 };
-  if (count >= 10) return { key: 3, colour: TOKENS["text-primary"], alpha: 0.2 * k };
-  return { key: 4, colour: TOKENS["text-tertiary"], alpha: 0.13 * k * k };
+  // The dusk palette (ADR-0021): the named surnames in the one light, the rest
+  // in cream, dimmer as they get rarer — the sky the landing's hero is drawn in.
+  if (rank < named) return { key: 0, colour: TOKENS["dusk-amber"], alpha: 1 };
+  if (count >= 1000) return { key: 1, colour: TOKENS["dusk-ink"], alpha: 0.88 };
+  if (count >= 100) return { key: 2, colour: TOKENS["dusk-ink"], alpha: 0.42 * k ** 1.5 };
+  if (count >= 10) return { key: 3, colour: TOKENS["dusk-ink"], alpha: 0.2 * k };
+  return { key: 4, colour: TOKENS["dusk-ink-muted"], alpha: 0.13 * k * k };
 }
 
 /**
@@ -159,7 +161,7 @@ export function ListAtlasSky({ list }: { list: SkyList }) {
         }
         if (list.half !== null && list.half < n) {
           ctx.globalAlpha = 1;
-          ctx.strokeStyle = TOKENS["text-primary"];
+          ctx.strokeStyle = TOKENS["dusk-ink"];
           ctx.lineWidth = 1.25;
           ctx.setLineDash([5, 5]);
           ctx.beginPath();
