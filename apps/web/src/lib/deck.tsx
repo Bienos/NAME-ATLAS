@@ -706,18 +706,107 @@ function end(
   };
 }
 
+type Side = "male" | "female";
+
+function sideOf(group: string | null): Side | null {
+  if (group === null) return null;
+  if (group.endsWith("_female")) return "female";
+  if (group.endsWith("_male")) return "male";
+  return null;
+}
+
+/**
+ * The list that holds most of the surname's people: KOWALSKA's is the women's
+ * (67,308 against 3 men), KOWALSKI's the men's. Null when nothing says.
+ */
+export function mainSide(response: SurnameResultResponse): Side | null {
+  const counts =
+    response.population?.state === "READY"
+      ? response.population.observations.map((o) => ({
+          side: sideOf(o.comparability_group),
+          n: o.value.value ?? 0,
+        }))
+      : [];
+  const best = [...counts].sort((a, b) => b.n - a.n)[0];
+  return best === undefined || best.n === 0 ? null : best.side;
+}
+
+/** Stable: the main list's items first, everything else in its order. */
+function mainFirst<T>(
+  items: readonly T[],
+  side: Side | null,
+  sideOfItem: (item: T) => Side | null,
+): T[] {
+  if (side === null) return [...items];
+  return [
+    ...items.filter((i) => sideOfItem(i) === side),
+    ...items.filter((i) => sideOfItem(i) !== side),
+  ];
+}
+
+/**
+ * The same response with each section's lists in the deck's order: the main
+ * list first, so a card leads with the list the surname mostly lives on. The
+ * page keeps the contract's order; nothing is dropped or changed.
+ */
+function inDeckOrder(response: SurnameResultResponse): SurnameResultResponse {
+  const side = mainSide(response);
+  if (side === null) return response;
+  const { population, rarity, neighbours, distribution, change } = response;
+  return {
+    ...response,
+    population:
+      population === null
+        ? null
+        : {
+            ...population,
+            observations: mainFirst(population.observations, side, (o) =>
+              sideOf(o.comparability_group),
+            ),
+          },
+    rarity:
+      rarity === null
+        ? null
+        : {
+            ...rarity,
+            entries: mainFirst(rarity.entries, side, (e) => sideOf(e.comparability_group)),
+          },
+    neighbours:
+      neighbours === null
+        ? null
+        : {
+            ...neighbours,
+            lists: mainFirst(neighbours.lists, side, (l) => sideOf(l.comparability_group)),
+          },
+    distribution:
+      distribution === null
+        ? null
+        : {
+            ...distribution,
+            entries: mainFirst(distribution.entries, side, (e) => sideOf(e.comparability_group)),
+          },
+    change:
+      change === null
+        ? null
+        : {
+            ...change,
+            entries: mainFirst(change.entries, side, (e) =>
+              e.list === "MALE" ? "male" : "female",
+            ),
+          },
+  };
+}
+
 /**
  * The cards for a resolved surname, in ADR-0025 §2.3's order: the surname,
  * rarity, neighbours, where, change, the other form, meaning, old print,
- * Polona's catalogue, the summary. Empty for anything that did not resolve.
+ * Polona's catalogue, the summary. Each card leads with the surname's main
+ * list. Empty for anything that did not resolve.
  */
-export function deckCards(
-  response: SurnameResultResponse,
-  lang: Lang,
-  links: DeckLinks,
-): DeckCard[] {
-  if (response.status !== "RESOLVED" || response.surname === null) return [];
-  const surname = response.surname.display_name;
+export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckLinks): DeckCard[] {
+  if (given.status !== "RESOLVED" || given.surname === null) return [];
+  const surname = given.surname.display_name;
+  const response = inDeckOrder(given);
   const archive = response.archive;
   const cards = [
     hello(response, surname, lang),
