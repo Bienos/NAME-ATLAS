@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { TOKENS } from "./design-tokens.js";
 import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
@@ -225,11 +226,12 @@ function paint(
 }
 
 /**
- * The dusk world (TASK-052, ADR-0021): the sky, the sun, the curved ground and
- * Poland as a landmass of points, fixed behind the page.
+ * The dusk world (TASK-052, ADR-0021): the landing's cinematic horizon and
+ * Poland as a landmass of points behind the journey.
  *
  * In `hero` mode the land lies on the horizon under the landing's search
- * field, its edge lit; a submitted search sets `data-dusk-zoom` on `<html>`
+ * field, its edge lit, in the owner's reference-derived background. A
+ * submitted search sets `data-dusk-zoom` on `<html>`
  * (`dusk-zoom.tsx`) and the stylesheet brings the camera down to the map and
  * draws the sixteen voivodeship borders. In `journey` mode — a surname's
  * answer — it is already down, at the side. In `quiet` mode — the reading
@@ -297,6 +299,17 @@ export function DuskWorld({
       data-step={mode === "journey" ? step : undefined}
       aria-hidden="true"
     >
+      {mode === "hero" ? (
+        <div className="dusk-horizon">
+          <Image
+            src="/images/landing-dusk.png"
+            alt=""
+            fill
+            preload
+            sizes="(max-width: 760px) 100vh, 100vw"
+          />
+        </div>
+      ) : null}
       <div className="dusk-deep" />
       <div className="dusk-sun" />
       <div className="dusk-ground" />
