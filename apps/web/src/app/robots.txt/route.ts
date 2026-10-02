@@ -17,6 +17,29 @@ import { siteOrigin } from "../../lib/surname-page.js";
 
 export const dynamic = "force-dynamic";
 
+/** Sharing crawlers may read public pages while search engines remain governed by the flag. */
+const previewAgents = [
+  "facebookexternalhit",
+  "Facebot",
+  "Twitterbot",
+  "LinkedInBot",
+  "Slackbot",
+  "Discordbot",
+  "WhatsApp",
+  "TelegramBot",
+];
+
+const previewRules = [
+  ...previewAgents.map((agent) => `User-agent: ${agent}`),
+  "Allow: /",
+  "Disallow: /api/",
+  "Disallow: /pl/konto",
+  "Disallow: /en/account",
+  "Disallow: /?",
+  "Allow: /?lang=en$",
+  "",
+].join("\n");
+
 export function GET(): Response {
   const origin = siteOrigin();
   const sitemap = origin === null ? null : `${origin}/sitemap.xml`;
@@ -42,7 +65,7 @@ export function GET(): Response {
         "",
       ].join("\n");
 
-  return new Response(body, {
+  return new Response(`${previewRules}\n${body}`, {
     status: 200,
     headers: {
       "content-type": "text/plain; charset=utf-8",

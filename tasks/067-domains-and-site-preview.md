@@ -7,10 +7,11 @@
 
 ## In scope
 
-- A site-level 1200 × 630 PNG preview, in the existing fonts and palette, available without a database or account. Editorial cover copy and a decorative atlas; no invented surname facts.
+- A site-level 1200 × 630 preview (direct public JPEG for sharing, legacy PNG endpoint retained), in the existing fonts and palette, available without a database or account. Editorial cover copy and a decorative atlas; no invented surname facts.
 - Polish and English landing title, description, canonical and Open Graph / Twitter metadata. The English landing remains `/?lang=en`.
 - Host-specific permanent redirects for the three alternate addresses. Leave Vercel preview addresses usable.
 - Connect domains to the existing Vercel project and set production `SITE_ORIGIN=https://name-atlas.pl` when access and DNS permit; otherwise document exactly what is pending.
+- Explicit access for messaging preview crawlers in `robots.txt`, while preserving the general search-indexing policy.
 - A home.pl / Vercel setup guide and observed verification record.
 
 ## Out of scope
@@ -20,7 +21,7 @@
 
 ## Acceptance and verification
 
-1. Bare site links carry a branded PNG (1200 × 630) and complete large-card metadata in server HTML; the image renders without `DATABASE_URL` and uses bundled fonts.
+1. Bare site links carry a branded JPEG (1200 × 630) and complete large-card metadata in server HTML; the image renders without `DATABASE_URL` and uses bundled fonts.
 2. Polish / English metadata is localized; internal searches remain `noindex`; surname pages keep their own preview images.
 3. Alternate hosts return a permanent redirect to `name-atlas.pl`, with path and query retained, without redirecting localhost or Vercel previews.
 4. Run `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm check:ids`, `pnpm test`, `pnpm build`. Inspect the rendered card and probe metadata and redirects from the built server. Verify the root image's output trace contains the font files.
