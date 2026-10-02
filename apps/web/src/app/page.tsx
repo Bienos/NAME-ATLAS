@@ -15,7 +15,8 @@ import { SearchForm } from "../lib/search-form.js";
 import { CommonSurnames } from "../lib/common-surnames.js";
 import type { CommonList } from "../lib/common-surnames.js";
 import { currentPathFor, pathForSlug } from "../lib/slug.js";
-import { referrerPath, requestOrigin, searchOrigin } from "../lib/surname-page.js";
+import { referrerPath, requestOrigin, searchOrigin, siteOrigin } from "../lib/surname-page.js";
+import { landingMetadata } from "../lib/site-metadata.js";
 import { DuskZoom } from "../lib/dusk-zoom.js";
 import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
@@ -69,7 +70,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const params = await searchParams;
   const searched = first(params["surname"])?.trim() ?? "";
-  return searched === "" ? {} : { robots: { index: false, follow: true } };
+  const metadata = landingMetadata(parseLang(first(params["lang"])), siteOrigin());
+  return searched === "" ? metadata : { ...metadata, robots: { index: false, follow: true } };
 }
 
 interface PageProps {

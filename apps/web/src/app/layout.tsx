@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { SiteAnalytics } from "../lib/site-analytics.js";
+import { SITE_COPY } from "../lib/site-metadata.js";
+import { siteOrigin } from "../lib/surname-page.js";
 import "./globals.css";
 
 /**
@@ -55,12 +57,13 @@ const data = IBM_Plex_Mono({
  * `<main>` — the nearest `lang` wins, which is exactly what HTML specifies.
  * `htmlLang` in `lib/messages.ts` is the single source of the value.
  */
+const origin = siteOrigin();
 export const metadata: Metadata = {
+  ...(origin === null ? {} : { metadataBase: new URL(origin) }),
   title: "Name Atlas",
-  description:
-    "Honest, sourced answers about Polish surnames: how many people are registered with one, " +
-    "how rare it is, and where its bearers have a registered residence — each with its source, " +
-    "date and confidence.",
+  description: SITE_COPY.pl.description,
+  openGraph: { ...SITE_COPY.pl, siteName: "Name Atlas", type: "website", locale: "pl_PL" },
+  twitter: { card: "summary_large_image" },
 };
 
 /**
