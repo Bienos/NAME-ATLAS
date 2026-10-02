@@ -23,7 +23,12 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
   return (
     <>
       {links.map(([place, href, label]) => (
-        <a key={place} href={href} aria-current={place === current ? "page" : undefined}>
+        <a
+          key={place}
+          className={`nav-${place}`}
+          href={href}
+          aria-current={place === current ? "page" : undefined}
+        >
           {label}
         </a>
       ))}
