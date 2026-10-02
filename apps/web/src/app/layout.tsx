@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { SiteAnalytics } from "../lib/site-analytics.js";
-import { SITE_COPY } from "../lib/site-metadata.js";
+import { SITE_COPY, SITE_PREVIEW_IMAGE } from "../lib/site-metadata.js";
 import { siteOrigin } from "../lib/surname-page.js";
 import "./globals.css";
 
@@ -62,7 +62,13 @@ export const metadata: Metadata = {
   ...(origin === null ? {} : { metadataBase: new URL(origin) }),
   title: "Name Atlas",
   description: SITE_COPY.pl.description,
-  openGraph: { ...SITE_COPY.pl, siteName: "Name Atlas", type: "website", locale: "pl_PL" },
+  openGraph: {
+    ...SITE_COPY.pl,
+    siteName: "Name Atlas",
+    type: "website",
+    locale: "pl_PL",
+    images: [SITE_PREVIEW_IMAGE],
+  },
   twitter: { card: "summary_large_image" },
 };
 

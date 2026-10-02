@@ -17,6 +17,15 @@ export const SITE_COPY = {
   },
 } as const;
 
+/** Public asset: no function invocation or image query string for a preview crawler. */
+export const SITE_PREVIEW_IMAGE = {
+  url: "/share/name-atlas-v2.jpg",
+  width: 1200,
+  height: 630,
+  type: "image/jpeg",
+  alt: "Name Atlas — Każde nazwisko gdzieś się zaczęło. Sprawdź swoje nazwisko.",
+} as const;
+
 export function landingMetadata(lang: Lang, origin: string | null): Metadata {
   const copy = SITE_COPY[lang];
   const path = lang === "pl" ? "/" : "/?lang=en";
@@ -37,7 +46,17 @@ export function landingMetadata(lang: Lang, origin: string | null): Metadata {
       type: "website",
       locale: lang === "pl" ? "pl_PL" : "en_GB",
       url,
+      images: [
+        {
+          ...SITE_PREVIEW_IMAGE,
+          url: origin === null ? SITE_PREVIEW_IMAGE.url : `${origin}${SITE_PREVIEW_IMAGE.url}`,
+        },
+      ],
     },
-    twitter: { ...copy, card: "summary_large_image" },
+    twitter: {
+      ...copy,
+      card: "summary_large_image",
+      images: [origin === null ? SITE_PREVIEW_IMAGE.url : `${origin}${SITE_PREVIEW_IMAGE.url}`],
+    },
   };
 }
