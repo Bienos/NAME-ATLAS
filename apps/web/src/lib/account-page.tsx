@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { isTokenShape } from "@name-atlas/accounts";
-import { accountPath, actionPath, stepFromSlug } from "./account-paths.js";
+import { accountPath, actionPath, safeNext, stepFromSlug } from "./account-paths.js";
 import type { AccountAction, AccountStep } from "./account-paths.js";
 import { ACCOUNT_TEXT, statusWords } from "./account-text.js";
 import { accountsEnabled } from "./accounts-config.js";
@@ -46,6 +46,8 @@ export interface AccountPageData {
   /** A well-formed token for `confirm` and `new-password`, or null. */
   readonly token: string | null;
   readonly session: SessionView | null;
+  /** The surname page a sign-in returns to (TASK-064), only on the sign-in step, or null. */
+  readonly next: string | null;
 }
 
 export type AccountPageDecision =
@@ -80,10 +82,13 @@ export function decideAccountPage(input: {
   const step = stepFromSlug(lang, input.segments);
   if (step === null) return { kind: "not-found" };
 
+  // Only the sign-in step honours it, and only for a page of this site (`safeNext`).
+  const next = step === "sign-in" ? safeNext(first(input.query, "next")) : null;
+
   if (step === "account") {
     if (session === null) return { kind: "redirect", to: accountPath(lang, "sign-in") };
   } else if ((step === "sign-in" || step === "sign-up") && session !== null) {
-    return { kind: "redirect", to: accountPath(lang, "account") };
+    return { kind: "redirect", to: next ?? accountPath(lang, "account") };
   }
 
   const word = first(input.query, "status");
@@ -93,7 +98,7 @@ export function decideAccountPage(input: {
   // A link with no usable token cannot do anything but say so.
   const needsToken = step === "confirm" || step === "new-password";
   const status = needsToken && token === null && known === null ? "expired" : known;
-  return { kind: "view", data: { lang, step, status, token, session } };
+  return { kind: "view", data: { lang, step, status, token, session, next } };
 }
 
 export function accountMetadata(lang: Lang, step: AccountStep): Metadata {
@@ -215,6 +220,7 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
         {step === "sign-in" ? (
           <>
             <Form action="sign-in" lang={lang} label={heading}>
+              {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
               <Field
                 name="email"
                 label={t.email}

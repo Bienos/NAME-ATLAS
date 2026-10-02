@@ -5,6 +5,7 @@ import {
   accountPath,
   actionPath,
   isAccountAction,
+  safeNext,
   stepFromSlug,
 } from "./account-paths.js";
 
@@ -63,5 +64,75 @@ describe("the account's addresses (TASK-062)", () => {
     for (const word of ["", "constructor", "SIGN-IN", "sign-in/x", "__proto__"]) {
       expect(isAccountAction(word), word).toBe(false);
     }
+  });
+});
+
+describe("where a sign-in may return to (TASK-064, AC-5)", () => {
+  it("takes a surname page of this site, with or without the deck", () => {
+    for (const page of [
+      "/pl/nazwisko/kowalski",
+      "/pl/nazwisko/kowalski?view=cards",
+      "/en/surname/nowak-k3m9qp",
+      "/en/surname/o'neil?view=cards",
+      // `canonicalSlug` keeps a surname's letters and the address carries them encoded.
+      "/pl/nazwisko/%C5%82uczak",
+      "/pl/nazwisko/%C5%82uczak?view=cards",
+    ]) {
+      expect(safeNext(page), page).toBe(page);
+    }
+  });
+
+  it("takes whatever the page's own address builder makes for a surname", () => {
+    // `pathForSlug` is `encodeURIComponent` of the slug: the pattern must take its output.
+    for (const slug of ["kowalski", "łuczak", "o'neil", "żółć-nowak", "smith-jones-k3m9qp"]) {
+      const page = `/pl/nazwisko/${encodeURIComponent(slug)}?view=cards`;
+      expect(safeNext(page), slug).toBe(page);
+    }
+  });
+
+  it("refuses everything else", () => {
+    const refused: unknown[] = [
+      undefined,
+      null,
+      42,
+      ["/pl/nazwisko/kowalski"],
+      "",
+      "/",
+      "https://evil.test/pl/nazwisko/kowalski",
+      "//evil.test",
+      "//evil.test/pl/nazwisko/kowalski",
+      "/\\evil.test",
+      "/pl/nazwisko/kowalski/../../konto",
+      "/pl/nazwisko/..",
+      "/pl/nazwisko/.",
+      "/pl/nazwisko/%2e%2e",
+      "/pl/nazwisko/%2E%2e",
+      "/pl/nazwisko/a%2fb",
+      "/pl/nazwisko/a%5cb",
+      "/pl/nazwisko/kowalski%0a",
+      "/pl/nazwisko/kowalski%0d%0aSet-Cookie:x=y",
+      "/pl/nazwisko/kowalski%00",
+      "/pl/nazwisko/%FF",
+      "/pl/nazwisko/%zz",
+      "/pl/nazwisko/",
+      "/pl/nazwisko",
+      "/pl/nazwisko/kowalski/",
+      "/pl/nazwisko/kowalski/karta/summary",
+      "/pl/nazwisko/kowalski#karty",
+      "/pl/nazwisko/kowalski?view=page",
+      "/pl/nazwisko/kowalski?view=cards&next=/x",
+      "/pl/nazwisko/kowalski?",
+      "/pl/konto",
+      "/pl/konto/zaloguj",
+      "/api/account/delete",
+      "/pl/oferta",
+      "/de/nachname/kowalski",
+      " /pl/nazwisko/kowalski",
+      "/pl/nazwisko/kowalski ",
+      "/pl/nazwisko/ko walski",
+      "javascript:alert(1)",
+      `/pl/nazwisko/${"a".repeat(200)}`,
+    ];
+    for (const value of refused) expect(safeNext(value), String(value)).toBeNull();
   });
 });

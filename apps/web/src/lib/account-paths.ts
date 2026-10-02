@@ -91,3 +91,35 @@ export function isAccountAction(value: string): value is AccountAction {
 export function actionPath(action: AccountAction): string {
   return `${ACCOUNT_API_PREFIX}${action}`;
 }
+
+/**
+ * Where a sign-in may send the reader on (TASK-064): the surname page they came
+ * from, which the deck's prompt names, and nothing else. It is checked again
+ * by the sign-in action, because a form field can say anything, and a redirect
+ * to an address a stranger chose is how a sign-in page is turned into a trap.
+ *
+ * Only a surname's page of this site is accepted, `/pl/nazwisko/{slug}` or
+ * `/en/surname/{slug}`, with `?view=cards` if the deck was open. The slug is
+ * one path segment as `canonicalSlug` writes it (letters percent-encoded, the
+ * apostrophe and hyphen kept); an encoded slash, backslash, dot or control
+ * character is not a slug, and neither is a segment of dots (`..` would leave
+ * the page).
+ */
+const NEXT_MAX_LENGTH = 200;
+const NEXT_PATTERN =
+  /^\/(?:pl\/nazwisko|en\/surname)\/((?:[A-Za-z0-9_~'-]|%[0-9A-Fa-f]{2})+)(?:\?view=cards)?$/u;
+
+export function safeNext(value: unknown): string | null {
+  if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
+  const match = NEXT_PATTERN.exec(value);
+  if (match === null) return null;
+  const segment = match[1] ?? "";
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+  if (/[\p{C}/\\]/u.test(decoded) || /^\.*$/u.test(decoded)) return null;
+  return value;
+}

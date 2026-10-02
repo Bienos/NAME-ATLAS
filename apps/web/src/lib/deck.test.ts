@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
-import { deckCards } from "./deck.js";
+import { safeNext } from "./account-paths.js";
+import { deckCards, deckSignIn } from "./deck.js";
 import type { DeckCard } from "./deck.js";
 import { DECK_PARAM, deckRequested, searchTarget } from "./deck-target.js";
 import { Result } from "./result-view.js";
@@ -939,5 +940,32 @@ describe("TASK-055 AC-4: the search opens the deck; the canonical URL does not c
     const canonical = String(metadata.alternates?.canonical ?? "");
     expect(canonical).toBe("/pl/nazwisko/kowalski");
     expect(canonical).not.toContain(DECK_PARAM);
+  });
+});
+
+describe("TASK-064 AC-8: what the deck says to a reader the image route turned away", () => {
+  it("says nothing when accounts are off", () => {
+    expect(deckSignIn("pl", "/pl/nazwisko/kowalski", false)).toBeNull();
+    expect(deckSignIn("en", "/en/surname/kowalski", false)).toBeNull();
+  });
+
+  it("leads to the sign-in page in the page's language and back to this deck", () => {
+    const pl = deckSignIn("pl", "/pl/nazwisko/kowalski", true);
+    expect(pl?.href).toBe("/pl/konto/zaloguj?next=%2Fpl%2Fnazwisko%2Fkowalski%3Fview%3Dcards");
+    expect(pl?.text).toBe("Obraz zapiszesz po zalogowaniu.");
+    const en = deckSignIn("en", "/en/surname/nowak", true);
+    expect(en?.href).toBe("/en/account/sign-in?next=%2Fen%2Fsurname%2Fnowak%3Fview%3Dcards");
+    expect(en?.text).toBe("Sign in to save the image.");
+    expect(pl?.link).not.toBe("");
+    expect(en?.link).not.toBe("");
+  });
+
+  it("builds an address the sign-in will follow, for what the page's own path builder makes", () => {
+    for (const slug of ["kowalski", "łuczak", "o'neil", "smith-jones-k3m9qp"]) {
+      const page = `/pl/nazwisko/${encodeURIComponent(slug)}`;
+      const href = deckSignIn("pl", page, true)?.href ?? "";
+      const next = new URL(href, "https://atlas.test").searchParams.get("next");
+      expect(safeNext(next), slug).toBe(`${page}?view=cards`);
+    }
   });
 });

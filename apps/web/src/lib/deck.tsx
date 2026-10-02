@@ -33,6 +33,8 @@ import {
   UI,
 } from "./messages.js";
 import type { Lang } from "./messages.js";
+import { accountPath } from "./account-paths.js";
+import type { DeckSignIn } from "./deck-client.js";
 import { RarityScale } from "./rarity-scale.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
@@ -746,4 +748,20 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
   return cards
     .filter((card): card is CardFace => card !== null)
     .map((card) => ({ ...card, share: shareOf(card.key) }));
+}
+
+/**
+ * What the deck says to a reader whose image request the route turns away for
+ * want of a session (TASK-064): given only when accounts are on, which is when
+ * the route can say so. The link leads to the sign-in page and back to this
+ * surname's deck, which is open when they return.
+ */
+export function deckSignIn(lang: Lang, pagePath: string, accountsOn: boolean): DeckSignIn | null {
+  if (!accountsOn) return null;
+  const t = UI[lang];
+  return {
+    text: t.deckSignInToSave,
+    link: t.deckSignIn,
+    href: accountPath(lang, "sign-in", { next: `${pagePath}?view=cards` }),
+  };
 }

@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { isTokenShape, MailError } from "@name-atlas/accounts";
 import type { Accounts, Mailer, OutgoingMail } from "@name-atlas/accounts";
-import { accountPath, isAccountAction } from "./account-paths.js";
+import { accountPath, isAccountAction, safeNext } from "./account-paths.js";
 import type { AccountAction, AccountStep } from "./account-paths.js";
 import type { Lang } from "./messages.js";
 import {
@@ -152,9 +152,16 @@ function sendAfter(deps: AccountRouteDeps, mail: OutgoingMail | null): void {
 }
 
 /** The page a failed action returns to, with the token kept so the reader can try again. */
-function back(step: AccountStep, lang: Lang, status: string, token?: string): Response {
+function back(
+  step: AccountStep,
+  lang: Lang,
+  status: string,
+  token?: string,
+  next?: string | null,
+): Response {
   const query: Record<string, string> = { status };
   if (token !== undefined && isTokenShape(token)) query["token"] = token;
+  if (next !== undefined && next !== null) query["next"] = next;
   return see(accountPath(lang, step, query));
 }
 
@@ -195,13 +202,18 @@ async function run(
     }
 
     case "sign-in": {
+      // The surname page the reader came from (TASK-064), if the form names a
+      // page of this site; anything else is dropped, not followed.
+      const next = safeNext(field(form, "next"));
       const result = await accounts.signIn({
         email: field(form, "email"),
         password: field(form, "password"),
       });
-      if (result.kind === "THROTTLED") return back("sign-in", lang, "throttled");
-      if (result.kind === "REJECTED") return back("sign-in", lang, "rejected");
-      return see(accountPath(lang, "account"), [sessionCookie(result.sessionToken, secure)]);
+      if (result.kind === "THROTTLED") return back("sign-in", lang, "throttled", undefined, next);
+      if (result.kind === "REJECTED") return back("sign-in", lang, "rejected", undefined, next);
+      return see(next ?? accountPath(lang, "account"), [
+        sessionCookie(result.sessionToken, secure),
+      ]);
     }
 
     case "sign-out": {
