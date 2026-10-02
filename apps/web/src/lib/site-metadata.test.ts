@@ -1,0 +1,44 @@
+import { describe, expect, it } from "vitest";
+import { landingMetadata, SITE_COPY } from "./site-metadata.js";
+
+describe("landing link metadata", () => {
+  it("shares the Polish landing at its configured public origin", () => {
+    const metadata = landingMetadata("pl", "https://atlasname.pl");
+    expect(metadata.title).toBe(SITE_COPY.pl.title);
+    expect(metadata.alternates?.canonical).toBe("https://atlasname.pl/");
+    expect(metadata.openGraph).toMatchObject({
+      url: "https://atlasname.pl/",
+      locale: "pl_PL",
+      siteName: "Name Atlas",
+      type: "website",
+      description: SITE_COPY.pl.description,
+    });
+    expect(metadata.twitter).toMatchObject({
+      card: "summary_large_image",
+      title: SITE_COPY.pl.title,
+      description: SITE_COPY.pl.description,
+    });
+  });
+
+  it("keeps the English landing and its language alternatives on the same domain", () => {
+    const metadata = landingMetadata("en", "https://atlasname.pl");
+    expect(metadata.alternates).toEqual({
+      canonical: "https://atlasname.pl/?lang=en",
+      languages: {
+        "pl-PL": "https://atlasname.pl/",
+        "en-GB": "https://atlasname.pl/?lang=en",
+        "x-default": "https://atlasname.pl/",
+      },
+    });
+    expect(metadata.openGraph).toMatchObject({
+      title: SITE_COPY.en.title,
+      locale: "en_GB",
+      url: "https://atlasname.pl/?lang=en",
+    });
+  });
+
+  it("leaves canonical paths relative until SITE_ORIGIN is configured", () => {
+    expect(landingMetadata("pl", null).alternates?.canonical).toBe("/");
+    expect(landingMetadata("en", null).alternates?.canonical).toBe("/?lang=en");
+  });
+});

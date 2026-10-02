@@ -93,6 +93,9 @@ TEST_DATABASE_URL=postgres://user:pass@localhost:5432/postgres pnpm test:integra
 
 `.env.example` documents every variable the code reads. The ones that change behaviour:
 
+For the owner's `atlasname.pl` / `atlas-name.pl` domains, their home.pl DNS records and the
+public link preview, see [docs/DOMAIN_SETUP.md](docs/DOMAIN_SETUP.md).
+
 | Variable | Effect |
 |---|---|
 | `DATABASE_URL` | Required. Everything else refuses to start without it. |

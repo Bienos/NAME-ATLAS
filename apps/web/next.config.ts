@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
    * `docs/DECISIONS_NEEDED.md`. Do not change this block without that
    * decision.
    *
-   * Build configuration only: no domain logic, no rewrites.
+   * Build configuration only: no surname logic, no rewrites.
    */
   transpilePackages: [
     "@name-atlas/accounts",
@@ -65,10 +65,20 @@ const nextConfig: NextConfig = {
    * character class, hence the wildcard.
    */
   outputFileTracingIncludes: {
+    "/opengraph-image": ["./assets/fonts/*.ttf"],
     "/**/opengraph-image": ["./assets/fonts/*.ttf"],
     // The share cards (TASK-056) read the same files.
     "/pl/nazwisko/**/karta/**": ["./assets/fonts/*.ttf"],
     "/en/surname/**/card/**": ["./assets/fonts/*.ttf"],
+  },
+  /** Keep shared links, including their surname path and query, on one public domain. */
+  async redirects() {
+    return ["atlas-name.pl", "www.atlas-name.pl", "www.atlasname.pl"].map((host) => ({
+      source: "/:path*",
+      has: [{ type: "host" as const, value: host }],
+      destination: "https://atlasname.pl/:path*",
+      permanent: true,
+    }));
   },
   /**
    * The security headers (TASK-048) on every path: pages, the API and the share
