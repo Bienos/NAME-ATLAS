@@ -73,10 +73,10 @@ const nextConfig: NextConfig = {
   },
   /** Keep shared links, including their surname path and query, on one public domain. */
   async redirects() {
-    return ["atlas-name.pl", "www.atlas-name.pl", "www.atlasname.pl"].map((host) => ({
+    return ["nameatlas.pl", "www.nameatlas.pl", "www.name-atlas.pl"].map((host) => ({
       source: "/:path*",
       has: [{ type: "host" as const, value: host }],
-      destination: "https://atlasname.pl/:path*",
+      destination: "https://name-atlas.pl/:path*",
       permanent: true,
     }));
   },
