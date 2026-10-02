@@ -695,6 +695,35 @@ export const UI = {
     landingAsOf: "stan na",
     landingSearching: "Sprawdzamy rejestr PESEL…",
     landingTrust: "Źródło przy każdym fakcie · Brak danych to też odpowiedź",
+    // The second screen (TASK-065): what you get, in plain commercial terms,
+    // then the surnames to try, the example's cards and the offer's strip.
+    pitchEyebrow: "Co dostaniesz · za darmo · bez konta",
+    pitchHeading: "Wpisz nazwisko i dostań karty z odpowiedziami.",
+    pitchLede:
+      "Name Atlas czyta rejestr PESEL i zbiory Polony i odpowiada na sześć pytań o nazwisko. " +
+      "Każda odpowiedź to jedna karta z datą i źródłem: do przeczytania, udostępnienia albo " +
+      "zapisania na telefonie.",
+    pitchAnswers: [
+      ["Ile osób je nosi?", "Liczba z rejestru PESEL, osobno dla kobiet i mężczyzn."],
+      ["Jak jest rzadkie?", "Miejsce na liście i „1 na X” na tle całej listy."],
+      ["Gdzie jest najczęstsze?", "Mapa województw, z udziałem każdego z nich."],
+      [
+        "Jak zmieniało się od 2019 r.?",
+        "Liczba w każdym wydaniu listy, rok po roku, obok zmiany całej listy.",
+      ],
+      ["Co może znaczyć?", "Hasło ze słownika, gdy je ma, ze słowem pewności."],
+      [
+        "Gdzie jest w dawnych drukach?",
+        "Strony z Polony według okresu i miejsca wydania, z cytatem.",
+      ],
+    ],
+    pitchNote: "Tam, gdzie źródła milczą, karta mówi to wprost. Brak danych to też odpowiedź.",
+    landingTry: "Spróbuj:",
+    previewLede: "Trzy z kart dla nazwiska",
+    previewAll: "Zobacz wszystkie karty:",
+    offerHeading: "Dziś za darmo. Wkrótce więcej.",
+    offerAll: "Cała oferta",
+    offerWaitlist: "Zapisz się na listę oczekujących",
     // The journey (TASK-053). What the one request reads while the camera comes
     // down: each line is a part of the answer it fetches, none is ticked off.
     analysisLabel: "Co sprawdzamy",
@@ -1239,6 +1268,36 @@ export const UI = {
     landingAsOf: "as of",
     landingSearching: "Checking the PESEL register…",
     landingTrust: "A source on every fact · No data is also an answer",
+    pitchEyebrow: "What you get · free · no account",
+    pitchHeading: "Type a surname and get cards with the answers.",
+    pitchLede:
+      "Name Atlas reads the PESEL register and Polona's collections and answers six questions " +
+      "about a surname. Each answer is one card with its date and source: to read, to share or " +
+      "to save to your phone.",
+    pitchAnswers: [
+      [
+        "How many people carry it?",
+        "The count from the PESEL register, women and men listed separately.",
+      ],
+      ["How rare is it?", "Its rank and “1 in X” against the whole list."],
+      ["Where is it most common?", "A map of the voivodeships, with each one's share."],
+      [
+        "How has it changed since 2019?",
+        "The count on every edition of the list, year by year, beside the whole list's change.",
+      ],
+      ["What might it mean?", "A dictionary entry, where one exists, with its confidence word."],
+      [
+        "Where is it in old prints?",
+        "Pages from Polona by period and place of publication, with a quote.",
+      ],
+    ],
+    pitchNote: "Where the sources are silent, the card says so. No data is also an answer.",
+    landingTry: "Try:",
+    previewLede: "Three of the cards for",
+    previewAll: "See every card:",
+    offerHeading: "Free today. More soon.",
+    offerAll: "The full offer",
+    offerWaitlist: "Join the waiting list",
     analysisLabel: "What we are checking",
     analysisSteps: [
       "Checking the PESEL register",
