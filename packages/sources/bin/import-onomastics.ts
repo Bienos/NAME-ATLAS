@@ -51,7 +51,8 @@ async function main(): Promise<void> {
     if (outcome.kind === "REFUSED") {
       process.stderr.write(`REFUSED (${outcome.reason_code})\n`);
       for (const problem of outcome.problems) process.stderr.write(`  - ${problem}\n`);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     if (outcome.kind === "ALREADY_IMPORTED") {
       process.stdout.write(

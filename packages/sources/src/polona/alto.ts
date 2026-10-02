@@ -233,6 +233,7 @@ const RULES: Readonly<Record<string, ElementRule>> = {
 };
 
 const INTEGER = /^[0-9]+$/;
+const INTEGER_ATTRIBUTES: ReadonlySet<string> = new Set([...BOX, "PHYSICAL_IMG_NR"]);
 
 function validate(element: XmlElement): void {
   const rule = RULES[element.name];
@@ -268,7 +269,7 @@ function validate(element: XmlElement): void {
         `${JSON.stringify(element.attributes[key])} was not observed`,
       );
     }
-    if ([...BOX, "PHYSICAL_IMG_NR"].includes(key) && !INTEGER.test(element.attributes[key]!)) {
+    if (INTEGER_ATTRIBUTES.has(key) && !INTEGER.test(element.attributes[key]!)) {
       throw new PolonaShapeError(
         "wrong_type",
         `${element.path}@${key}`,

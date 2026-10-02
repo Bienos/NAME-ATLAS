@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "check:ids": "bash scripts/check-unique-ids.sh",
     "check:vm": "bash scripts/check-vm-dumps.sh",
+    "test:backup": "python3 scripts/test-backup.py",
     "test": "pnpm -r --if-present run test",
     "test:integration": "pnpm --filter @name-atlas/integration-tests run test:integration",
     "test:golden": "pnpm --filter @name-atlas/golden-tests run test:golden",

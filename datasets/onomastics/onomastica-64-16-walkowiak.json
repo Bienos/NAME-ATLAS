@@ -1,0 +1,1364 @@
+{
+  "format_version": 1,
+  "synthetic": false,
+  "_note": "Real source, curated 2026-09-30 (TASK-046). The work is the article's list of headword surnames (pp. 213–223), each followed by the author's etymology in parentheses. Every literal_gloss is that parenthetical, verbatim: the text inside the outer parentheses, with line breaks joined, typographic hyphenation removed and nothing else changed. It is a reproduction in part, which CC BY-ND 4.0 permits, not an adaptation. Where a headword line names several surnames (e.g. DAJNA, DOJNIA, DAJNOWSKI), each one in the register gets the same gloss. The locator is the printed page on which the headword stands. root_form and root_language are null and formation_type is UNKNOWN throughout: the author proposes chains of forms and often several readings, and choosing one would be this project's interpretation, not the author's (ADR-0008 §2). The author states that the proposed etymologies are often hypotheses (p. 213); a single work gives POSSIBLE. Bytes: the OJS galley https://onomastica.ijppan.pl/index.php/ONOM/article/download/284/288, SHA-256 b9b6fefcbd1f31c153f4d2933d51b0ff6687ae7dd13483d5acfc906153945897, identical to TASK-032's record (docs/sources/acquisition/2026-09-29-onomastica/SHA256SUMS.txt). The journals.pan.pl copy, which prints a conflicting licence URL, is not used. Register: the 2026-01-20 PESEL national lists (resources 1148808 and 1148811, checksums as in fixtures/pesel/source-manifest.json). Not included — no parenthetical etymology: AUSZTOL; the author states the etymology is unclear: DEPKUN, JAKAĆ, KIERUN, SEREWIS, SZCZESIUL, SZTURGULEWSKI, WALIO, WERELIS; the PDF's text layer garbles the Lithuanian accent marks, so a verbatim quotation could not be verified from text: CZYŻELSKI, ĆWIRBUT, DYKANIEC, KIRCIO, KORSZUŃ, ŁOKUĆ, MARGATIS, PULAKIS, SARGALIS, SARGIALIS, SERGIALIS, SIERGIALIS, SIERGIEL, SUDAJTIS, SZUKIANIEC, UNDRUNAS, WERKUN, WIEKSZA; not in either 2026-01-20 register list: AUKSCHLAT, BAŁTUK, BRAZGALSKI, CYLWIŃSKI, CZEPOLONIS, DIEWS, GERUSCHKAT, GRUSZTEL, JANCZUKAJTIS, JONAN, JUNAJTYS, KONTRAT, KOSPAT, MEJŁUK, MIEGAS, MIEGUĆ, MISIULANIEC, MUSIULANIEC, NARWAT, OŻKAŁO, PANELAS, PEKUTIEN, PEKUTIEŃ, PERSZTEL, ROWBUĆ, RODAJTYS, SKORWID, STRASDUN, SZAWDYLAS, SZERSZNOWICZ, SZWIRAKIS, TRIBIŁO, WEZALIS, WIDRUK, WOJTKIEŁO.",
+  "work": {
+    "source_key": "onomastica_64_16",
+    "title": "Współczesne nazwiska Polaków o możliwej genezie litewskiej nieobecne w LPŽ, poświadczone w kartotece antroponimicznej LKI",
+    "author_or_publisher": "Justyna B. Walkowiak",
+    "year": 2020,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "OPEN_LICENCE",
+      "licence": "CC BY-ND 4.0 International (https://creativecommons.org/licenses/by-nd/4.0/), as printed on the article's first page (p. 211) and declared in the journal's policy for vol. 64 (2020) onward; relied on by the project owner's decision D-022 (2026-09-30)"
+    },
+    "reference_url": "https://doi.org/10.17651/ONOMAST.64.16",
+    "rights": {
+      "terms_version": "CC-BY-ND-4.0",
+      "terms_hash": null,
+      "checked_at": "2026-09-30T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "UNKNOWN",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": true,
+      "attribution_text": "Justyna B. Walkowiak, „Współczesne nazwiska Polaków o możliwej genezie litewskiej nieobecne w LPŽ, poświadczone w kartotece antroponimicznej LKI”, Onomastica LXIV (2020), s. 211–228, DOI 10.17651/ONOMAST.64.16. © Instytut Języka Polskiego PAN; licencja CC BY-ND 4.0",
+      "source_owner": "Instytut Języka Polskiego PAN",
+      "rights_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "contact_required": false,
+      "review_status": "LEGAL_REVIEW_REQUIRED",
+      "valid_from": "2020-01-01",
+      "valid_to": null,
+      "notes": "The article prints CC BY-ND 4.0 International and the journal's 'Essential facts' page and DOAJ declare it for vol. 64 onward. Other pages of the journal's site state otherwise (docs/sources/onomastica.md §8). The project owner decided on 2026-09-30 to rely on the printed licence (D-022, option (b)); no lawyer has reviewed it, hence LEGAL_REVIEW_REQUIRED. The permissions are the licence's own grants. Metadata ALLOWED: author, title, year and DOI are bibliographic facts, and citing them is what the licence's attribution requires. image_rights UNKNOWN and automated_access UNKNOWN: no image is reproduced and no connector exists. Only verbatim excerpts are published, never an adaptation (NoDerivatives)."
+    }
+  },
+  "entries": [
+    {
+      "surname": "ALKA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Alke, Trautmann, 1974, s. 12",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 213",
+      "quotation": null
+    },
+    {
+      "surname": "ALKE",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Alke, Trautmann, 1974, s. 12",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 213",
+      "quotation": null
+    },
+    {
+      "surname": "BAKSA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Baxe, Trautmann, 1974, s. 16",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BARAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Baraitis < Bãras?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BIERAGA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Beragis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BILMON",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Bīlmanis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BITAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "łot. n. Bitāns, Bitainis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BIWAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. n. złoż. Bìvainis, Bivaĩnis, Bývainis, Byvaĩnis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BOLENAJC",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Bolenaitis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BOŁTUN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. n. lit. Baltunis i ap. bołtun/bałtun ʽmieszanina wody z otrębami, grubą mąką razową z dodatkiem drobno posiekanych ziemniaków lub warzyw (karma dla bydła)’, Rieger, 1996, s. 84",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BOŁZAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Bolzanas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BOMBLIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. n. Bumblỹs? Por. też lit. bamblỹs ʽrozpieszczone, rozpuszczone dziecko; dziecko lub dorosły z dużym brzuchem; papla, pleciuch; płaksa, mazgaj, beksa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BORGULAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Bargulaitis? Por. lit. n. Bargáila, Bargelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BROLNICKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. brólis ʽbrat’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BUJWICKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "n. m. Bujwidze, lit. Buivydžiai, i Bujwidy, lit. Buivydai, oba od lit. n. o. Bùivydas, Buĩvydas, Buividas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BUMBIERYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Bimberis, łot. n. Bumberis, Bumbieris",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BUSE",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Buse, Busse, Buze, Trautmann, 1974, s. 21; jednak prus. n. o. Bawse ma zapewne inną genezę, por. Ivoška, 2018, s. 56, 68",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "BUTRYN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Butrinas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "CIWIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Civilis < Čivìlis, Čivỹlis < lit. čivỹlis ʽmakolągwa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 214",
+      "quotation": null
+    },
+    {
+      "surname": "CZEKIEŃ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Čekenis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DAGIL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Dagil (Trautmann, 1974, s. 22), ale też lit. n. Dagìlis, Dagilỹs, Dagìlius < lit. dagìlis ʽoset; rzep, np. łopianu; ostrożeń (roślina, łac. Cirsium); szczygieł (łac. Carduelis carduelis)’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DAJNA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Dainỹs, Daĩnius, lit. daina ʽpieśń’, dainỹs, daĩnius ʽśpiewak, piewca’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DOJNIA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Dainỹs, Daĩnius, lit. daina ʽpieśń’, dainỹs, daĩnius ʽśpiewak, piewca’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DAJNOWSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Dainỹs, Daĩnius, lit. daina ʽpieśń’, dainỹs, daĩnius ʽśpiewak, piewca’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DIETRICHKEIT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "niem. n. o. Dittrich, Dietrich ze skróconym lit. sufiksem patronimicznym -aitis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DOGWIŁŁO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *lit. n. o. złoż. Daũgvilas, Dòvgvilas, Daugvilà < lit. daũg ʽdużo, wiele, wielu’, viltìs ʽnadzieja’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DOWGAJŁO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. im. męskie Daugáila i n. Dowgiałło < Daugėla, Daugela, por. też Dowgiało 1693 K (Ragauskaitė, 2005, s. 132)",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DOWGUN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "od imion skróconych na Daũg- < lit. daũg ʽdużo, wiele, wielu’ — por. Sinkevičiūtė, 2006, s. 119, Zinkevičius, 2008, s. 199",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DRUCIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Drūtỹs",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DULGIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "łot. n. m. Duļgis, bagno w Kurlandii na Łotwie",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DUMALEWSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. m. Dumele < prus. dumis ʽdym’, lit. dūmẽlis ʽdymek, mgiełka’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DYRSOWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. dirsė ʽstokłosa, łac. Bromus’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DZIADEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Dėdẽlis? < Dėdẽlė < lit. dė̃dė ʽwujek, stryjek; każdy starszy mężczyzna’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 215",
+      "quotation": null
+    },
+    {
+      "surname": "DZIEWGUĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Devgutis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "EITEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< prus. n. o. Eytil, Eytel, Trautmann, 1974, s. 27, lub ew. niem. eitel ʽzarozumiały, nadęty’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GEŻYŃSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Gežinis < Gežỹs?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIEREJKO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. n. Geraitis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIERUKAS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. gẽras ʽdobry’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIEWIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Ģēvelis, Gēvelis, Gevelis, lit. gėvelis, gėvelỹs ʽszczyt dachu; chudy człowiek lub zwierzę; człowiek słabego zdrowia; głupek, gamoń, gapa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIEZGAŁA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. n. o. Gezgailas, Kęzgaila, Kęzgailas, Kęzgilas? Zinkevičius, 2008, s. 205, 212",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIRGEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Girgelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIRSA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "pol. gw. girsa < lit. girsė, girsa, dirsė, dirsa ʽstokłosa, łac. Bromus’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIRYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Gìris < lit. gìrti(s) ʽchwalić (się)’ lub lit. dial. gìrti ʽpić’; Zinkevičius, 2008, s. 94, 283",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GIWOJNO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Gývainas, Zinkevičius, 2008, s. 613",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GORGEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. gõrgelis ʽpijak’ lub gargãlis ʽbeksa; ktoś, kto chrapie; ktoś, kto krzyczy ochrypłym głosem’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GRAUŻLIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Graužlys, lit. graũžlas, graužlỹs ʽogryzek; zeschnięta kromka chleba’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GRECZAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. grečionis ʽGreczyn, Grek’?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GRODEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Grodelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GRYKIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Grikelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GRYSZKUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. *Griškutis < Grìškus < Griškà < Григорий?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GUDWIŁOWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. im. złoż. Gùdvilas, Zinkevičius, 2008, s. 96",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GULAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "łot. n. Guļāns, Gulāns",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "GURGIELEWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Gurgeláitis < lit. gurglỹs ʽktoś, kto burczy, bulgocze, gulgocze’? Zinkevičius, 2008, s. 579",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "JAGUCZAŃSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Jagutte, Jagotthe, Jagawde, Trautmann, 1974, s. 38",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 216",
+      "quotation": null
+    },
+    {
+      "surname": "JAKUBIAŁOJĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Jokubelaitis < lit. Jãkubas ʽJakub’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "JASIUNIEC",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. n. Jasiunis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "JAWID",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. n. o. złoż. Jóvydas, Zinkevičius, 2008, s. 72",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "JEŚMAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. złoż. Jasmanas, Jašmanas i wsp. lit. i łot. n. Jesmanas, Jasmanis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "JODDA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. m. Juoda < lit. júodas ʽczarny’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KANTEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Cantele, Kantele, Cantelyn, Trautmann, 1974, s. 42",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KARNAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Karnaitis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KARTUNOWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. kartūnis, kartūninis obuolỹs ʽgorzkie jabłko’; w polszczyźnie okolic Puńska kartuny, kartunki to ʽgorzkie jabłka’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KARUK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. kariukai ʽlekki paradny wóz; siedzenie z oparciem na wozie, z resorami; sanie do przewozu belek, kłód’, Rieger, 1996, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KAUKEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. kaukelis ʽmandragora lekarska, łac. Mandragora officinarum’ lub d. lit. n. o. Kaukẽlė < lit. kaukas, kaũkas ʽduch domowy, skrzat domowy przynoszący domowi bogactwo; diabeł; starszy człowiek o czerstwej cerze, z rozczochranymi włosami’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KAUSZEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. i n. m. Kaušelis < lit. kaušẽlis ʽmałżowina uszna; daszek od czapki; część kosiarki do siana’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KIEMEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. kiemelis ʽdziedziniec, podwórko’ i lit. n. m. Kiemeliai (rejon poswolski) oraz kilka d. n. m.",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KIERA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "może pokrewne lit. n. Kẽras, Kė̃ras, Kerỹs < lit. kẽras ʽobcięty lub złamany pień drzewa ze wszystkimi korzeniami; roślina z pniem i korzeniami; krzew, krzak’, keróti, dobrze się rozwijać, rosnąć; rozrastać się, rozgałęziać się’, kerùs ʽkłótliwy, pyskaty, zaczepny, zadziorny’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 217",
+      "quotation": null
+    },
+    {
+      "surname": "KIERKLA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. kerklỹs ʽkrzykacz’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KIEZA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "może od lit. n. o. Kežà, Kė́žas, Kežỹs < lit. kẽžas ʽkarzeł’, Zinkevičius, 2008, s. 557",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KIRPSZA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Kìrpša < lit. kìrpša ʽczłowiek z krótko obciętymi włosami’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KIWERSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Kìveris, Kìvaras, łot. n. Ķivers — może z lit. kìveras ʽrodzaj dawnego żołnierskiego nakrycia głowy’, kìveris ʽdawna wysoka żołnierska czapka’, łot. ķivere ʽwojskowy hełm; głowa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KIWIEROWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Kìveris, Kìvaras, łot. n. Ķivers — może z lit. kìveras ʽrodzaj dawnego żołnierskiego nakrycia głowy’, kìveris ʽdawna wysoka żołnierska czapka’, łot. ķivere ʽwojskowy hełm; głowa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KRAWEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Kravelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KRAWIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Kravelis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KRYSZAJTYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "może związek z lit. n. o. Kriščaitis lub Krišas, Zinkevičius, 2008, s. 411, 285",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "KULWEIT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Kulvaitis, Kulveitis < Kùlvis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "LAMUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. im. Lamutis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "LANKAJTES",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Lankaitis < Lánkas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "LEJSZA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. leišà, leĩšis ʽpowolny, ciężki, ślamazarny człowiek; (pej.) Litwin; mieszkaniec Auksztoty’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "ŁOWKIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Laũkis (of. Lawkis), Laukỹs < lit. laũkis ʽłysy; goły; (zwierzę) z białą plamką na czole’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MAJNO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Maine (?), Mainote (Lewy, 1904, s. 52) i dawna n. m. Słubice-Mayno; por. też Ivoška, 2018, s. 94",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MAJNA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Maine (?), Mainote (Lewy, 1904, s. 52) i dawna n. m. Słubice-Mayno; por. też Ivoška, 2018, s. 94",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MAKSZYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. makšỹs ʽczłowiek wyrządzający drugim szkody, szkodnik’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MIEJŁUK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Meiliukas < lit. meilius ʽfajtłapa, ciapa’ i sufiks deminutywny -ukas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MEŁGAŁW",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Melgalvis < łot. melns ʽczarny’, galva ʽgłowa’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 218",
+      "quotation": null
+    },
+    {
+      "surname": "MIKOŁUĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Mikaluitis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MIKUŁANIEC",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Mikulanis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MIŁEJSZO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Mileiša, Mileišis i n. m. Mileišiškės — ob. dzielnica Wilna",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MIŁONAJĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Milanaitis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MINAUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Minaute, Mynawthe, Mynawte, Mynaute, Mynauthe, Mynnaudt, Minawte, Menawthe, Menaute, Trautmann, 1974, s. 60",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MINKSZTYN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. minkštas ʽmiękki’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "MISIUKAJTIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Misiukaitis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "OSZKIEWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Oškevičius < *Ožkevičius < lit. ožkà ʽkoza’?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "OSZKAŁO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. (gw.?) ožkela < ožkelė, ožkà ʽkózka, koza’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PAPUCIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. ap. paputis ʽnadęty’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PAPUCZYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. ap. paputis ʽnadęty’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PIEKUTIEN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Piekutienė < Piekutis?",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PIERSZTEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. pirštẽlis ʽmały palec’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PIWISZKIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "zniekształcone n. Pieviškis? < *pieviškis ʽmieszkaniec łąki’ < lit. pìeva ʽłąka’, analogicznie do ap. typu kalniškis ʽmieszkaniec gór’ < kalnai ʽgóry’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 219",
+      "quotation": null
+    },
+    {
+      "surname": "PLIKUS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. plìkas ʽłysy, goły’, plìkis ʽczłowiek łysy; człowiek nagi; biedak, nędzarz’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "PREDYKAJT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "*Pridikaitis < lit. im. Prydikis < niem. im. Friedrich? Por. też łot. n. Priede < łot. priede ʽsosna, świerk’ itp.",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "PRESKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. prėskas ʽprzaśny, bez zakwasu, niekwaśny; niesłony, o delikatnym smaku’; por. lit. n. Prėskiẽnis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RADYKO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Radìkas (pot. też Radýka), Radỹkas, Radìkis, Radỹkis, Rodikis < Radỹs, Rãdis, etymologia niepewna — por. też Radyk 1811, Paštuva/Kvesai w rej. kowieńskim (Maciejauskienė, 1993, s. 104)",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RAPOTA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "(n. m. Rapaty) < prus. n. o. Rapote, Rapotho, Rappoth, Trautmann, 1974, s. 82, Bijak, 2001, s. 171, por. też prus. rapa ʽanioł’ (EV) oraz prus. n. o. Rapotin 1352 (Ivoška, 2018, s. 99)",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RAPOTI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "(n. m. Rapaty) < prus. n. o. Rapote, Rapotho, Rappoth, Trautmann, 1974, s. 82, Bijak, 2001, s. 171, por. też prus. rapa ʽanioł’ (EV) oraz prus. n. o. Rapotin 1352 (Ivoška, 2018, s. 99)",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RAPACKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "(n. m. Rapaty) < prus. n. o. Rapote, Rapotho, Rappoth, Trautmann, 1974, s. 82, Bijak, 2001, s. 171, por. też prus. rapa ʽanioł’ (EV) oraz prus. n. o. Rapotin 1352 (Ivoška, 2018, s. 99)",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RASZAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Rašaitis, etymologia niepewna",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RAUBUĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Raubutas, Raubutis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RIEKEIT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "riekas, griekas ʽgrzech’, więc riekaitis ʽgrzesznik’? Por. też rẽkas = rėksnys ʽkrzykacz’; rė̃kas ʽkrzyk, wrzask’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "RUSKUL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Ruskulis, łot. n. Ruskulis, Ruskuls, Ruskuļs",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SAUGUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Sawgut(t)e, Sawgotthe, Sowgutte, Saugutte, Trautmann, 1974, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SAŁGUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Sawgut(t)e, Sawgotthe, Sowgutte, Saugutte, Trautmann, 1974, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SOŁGUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Sawgut(t)e, Sawgotthe, Sowgutte, Saugutte, Trautmann, 1974, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SUŁGUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Sawgut(t)e, Sawgotthe, Sowgutte, Saugutte, Trautmann, 1974, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SUŁGUTT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Sawgut(t)e, Sawgotthe, Sowgutte, Saugutte, Trautmann, 1974, s. 90",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SAWUĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "*Savutis, zapewne od Sãvas < brus. i ros. im. Савва, Сава",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SILKE",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. silk̃is ʽśledź’, silk̃ė ʽśledź, łac. Clupea; chudy człowiek’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SKORULSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Skorule, lit. Skaruliai, dawna wieś i posiadłość rodu Skorulskich, ob. dzielnica miasta Jonava k. Kowna < lit. skarà ʽduża, zwykle wełniana chusta na plecy, głowę; ścierka, szmata, łachman, gałgan; marna, znoszona, pozdzierana odzież’, skãris ʽcoś znoszonego, zniszczonego, obszarpanego, oberwanego’, skárti ʽ(o odzieży) strzępić się, pruć się’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "SOWUL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Savùlis < Sãvas < brus. i ros. im. Савва, Сава, lub od im. Savẽlijus",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 220",
+      "quotation": null
+    },
+    {
+      "surname": "STANKUĆ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Stankutis < Stankus < pol. im. Stanisław lub jego odpowiedniki w innych językach słowiańskich",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "SUREL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "może od skróconej lit. n. o. złoż. na Sur-; por. też lit. sūrelis < sūris ʽser’ i sufiks deminutywny -elis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "SWIRKAITIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. o. Svìrka, zapewne poch. słow., i wsp. lit. n. Svirkas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "SZALUNAS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Šaliūnas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "SZAMEITAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< lit. n. Žemaitáitis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "SZEJBUT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Šeibutas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "TANANIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< Tananas, of. też Tanano, pochodzenie słowiańskie lub od lit. imienia Tãnas < Antãnas ʽAntoni’; możliwy też związek ze skróconymi lit. n. o. na Tan-, Zinkevičius, 2010, s. 30",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "TOMSZYS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "d. lit. n. Tamšys, Tomšis, zapewne od lit. imienia Tòmas ʽTomasz’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "TREKIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "*Trekelis, może od Trakẽlis < Trãkas < trãkas ʽleśna polana, przecinka’, (gw.) trãkas ʽłysy; oszalały’, trakùs ʽ(o wietrze) porywisty, (o koniu) porywczy, gwałtowny, narowisty’, tràkti ʽszaleć, dokazywać, wariować’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "UNDRUL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Undrulis, por. też lit. Undráitis < Andráitis, Uñdrius < Añdrius ʽAndrzej’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 221",
+      "quotation": null
+    },
+    {
+      "surname": "UZULIN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "łot. n. Uzuls, Uzols, Ūzuls, Uzulāns (Ūzulāns), Uzuleņš (Ūzuleņš) < łot. ozols, łatg. ūzuls ʽdąb’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WASKIAN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. Vasas < Vosỹlius, ros. Василий, brus. Василiй",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WEITUSCHAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Vaitušaitis < lit. vaitas ʽwójt’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WEZEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. ap. vėzas, vėzdas ʽkij, laska’ i sufiks deminutywny -elis, lub Vėžẽlis < Vėžỹs < lit. ap. vėžỹs ʽrak’; jak się wydaje, z oraz ź są w poświadczeniach używane wymiennie",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WIDEN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. im. Vydẽnis i prus. n. o. Wydenne, Kuzavinis i Savukynas, 2009, s. 326, Trautmann, 1974, s. 117",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WIĘCKIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Venckelis < Veñckus < Veñcius, zapewne pochodzenie słowiańskie z lit. sufiksem",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WILMONT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. im. złoż. Vìlmantas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WILNAT",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "< *Vilnaitis < Vil̃nius? Por. lit. vìlna ʽwełna’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WIRBUŁ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. łot. n. Virbulis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WOITUN",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Voitunas, Vaitūnas, Vaitunas",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WOJCIANIS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Vaičionis",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 222",
+      "quotation": null
+    },
+    {
+      "surname": "WOJTOKAS",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "zapewne od Vaĩtkus, Vaitiẽkus, Vaitiẽkas, Vaitiekà < pol. imię Wojciech",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "WYSKIEL",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. n. Viskelis i prus. n. o. Wyske, Trautmann, 1974, s. 119",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "ŻARNIEWICZ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. ap. žarnà ʽjelito’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "ŻELWETRO",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "wsp. lit. i łot. n. Želvetro",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "ŻYNDA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Žìnda, Žiñdis < lit. žìndyti ʽ(o kobiecie) karmić piersią; (o samicy zwierzęcia) karmić młode’ oraz lit. ap. žindà ʽdawny rodzaj uspokajającego smoczka dla niemowlęcia (zwykle kawałek posłodzonego chleba owinięty w szmatkę); odłamki, okruchy powstające przy krojeniu tępym ostrzem’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "ŻENDA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "lit. n. Žìnda, Žiñdis < lit. žìndyti ʽ(o kobiecie) karmić piersią; (o samicy zwierzęcia) karmić młode’ oraz lit. ap. žindà ʽdawny rodzaj uspokajającego smoczka dla niemowlęcia (zwykle kawałek posłodzonego chleba owinięty w szmatkę); odłamki, okruchy powstające przy krojeniu tępym ostrzem’",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    },
+    {
+      "surname": "ŻYWANOWSKI",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "prus. n. o. Zivan, Dziwan, Trautmann, 1974, s. 25",
+      "formation_type": "UNKNOWN",
+      "locator": "s. 223",
+      "quotation": null
+    }
+  ]
+}

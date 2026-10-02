@@ -69,17 +69,11 @@ export async function lookupSlug(
     };
   }
 
-  const current = await db
-    .selectFrom("surname_slugs")
-    .select(["slug"])
-    .where("locale", "=", locale)
-    .where("surname_id", "=", row.surname_id)
-    .where("is_current", "=", true)
-    .executeTakeFirst();
+  const current = await currentSlugFor(db, locale, row.surname_id);
 
   // A superseded slug whose entity has no current address is not a redirect to
   // nowhere; it is simply gone.
-  return current ? { kind: "MOVED", current_slug: current.slug } : { kind: "UNKNOWN" };
+  return current !== null ? { kind: "MOVED", current_slug: current } : { kind: "UNKNOWN" };
 }
 
 /** This surname's current address in one locale, or `null` if it has none. */

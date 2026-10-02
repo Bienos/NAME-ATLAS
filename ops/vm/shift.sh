@@ -209,7 +209,7 @@ finish)
   # The definition of schema accounts goes in, its rows never do (TASK-063, ADR-0027 §5.2): a restore
   # leaves accounts empty and consistent with the migrations table, and no address or password
   # hash is copied into a file here. scripts/check-vm-dumps.sh holds every dump to it.
-  runuser -u postgres -- pg_dump --format=custom --exclude-table-data='accounts.*' -d "$DB" -f "$dump.partial"
+  runuser -u postgres -- pg_dump --format=custom --exclude-table-data='accounts.*' --exclude-table-data='family.*' -d "$DB" -f "$dump.partial"
   mv "$dump.partial" "$dump"
   log "  $(du -h "$dump" | cut -f1) $dump"
 

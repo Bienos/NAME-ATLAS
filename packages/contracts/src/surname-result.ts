@@ -28,9 +28,10 @@ import { z } from "zod";
  * 1.7 adds `change` (TASK-051, ADR-0020) and 1.8 adds `archive` (TASK-054).
  * TASK-054 reached `main` first, as 1.8, while TASK-051 was still open as 1.7,
  * so 1.9 is the first version on `main` that carries both. 1.10 adds
- * `neighbours` and `other_form` (TASK-055, ADR-0025).
+ * `neighbours` and `other_form` (TASK-055, ADR-0025). 1.11 adds `localities`
+ * (TASK-066, ADR-0025 §2.7).
  */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.10";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.11";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -806,6 +807,89 @@ export const otherFormSchema = z.object({
   surface: surfaceEligibilitySchema,
 });
 
+/** How many localities a section lists; the total says how many there are. */
+export const LOCALITIES_LIMIT = 20;
+
+/** TASK-039's classification of a SIMC row: `96 miasto`, `01 wieś`, anything else. */
+export const localityKindSchema = z.enum(["CITY", "VILLAGE", "OTHER"]);
+
+/**
+ * One whole locality in the TERYT register whose official name is the surname
+ * (TASK-066, ADR-0025 §2.7), with the gmina, powiat and voivodeship it belongs
+ * to on the register's reference date. A part of a locality is never listed.
+ */
+export const localityEntrySchema = z.object({
+  place: z.object({
+    id: z.string().min(1),
+    /** The official name, as the register writes it. */
+    name: z.string().min(1),
+    kind: localityKindSchema,
+    /** The register's own seven-digit SIMC identifier. */
+    teryt_simc: z.string().regex(/^\d{7}$/u),
+  }),
+  gmina: z.string().min(1),
+  powiat: z.string().min(1),
+  voivodeship: z.string().min(1),
+});
+
+export const localitiesStateSchema = z.enum([
+  "READY",
+  /** The database holds no TERYT SIMC file. Never an empty list. */
+  "NOT_LOADED",
+  "RIGHTS_BLOCKED",
+]);
+
+/**
+ * The localities whose name is the surname (TASK-066). A lookup in an official
+ * register by the resolver's own canonical key, never a claim about the
+ * surname: a shared name is a coincidence in the register, and no field here
+ * says, and no surface may say, that the surname began in or is connected
+ * with any of these places (`docs/sources/INVENTORY.md` §4). `READY` with no
+ * place is an answer; `NOT_LOADED` is the absence of one.
+ */
+export const localitiesSectionSchema = z
+  .object({
+    state: localitiesStateSchema,
+    /** The register's reference date (`STAN_NA`), ISO 8601. */
+    reference_date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/u)
+      .nullable(),
+    /** In a fixed order: cities, villages, the rest; then voivodeship, powiat, gmina, name. */
+    places: z.array(localityEntrySchema).max(LOCALITIES_LIMIT),
+    /** How many localities match, listed or not. */
+    total: z.number().int().nonnegative().nullable(),
+    confidence: confidenceSchema.nullable(),
+    citation: citationSchema.nullable(),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine(
+    (l) =>
+      l.state === "READY"
+        ? l.reference_date !== null &&
+          l.total !== null &&
+          l.confidence !== null &&
+          l.citation !== null
+        : l.reference_date === null &&
+          l.total === null &&
+          l.confidence === null &&
+          l.citation === null,
+    { message: "date, total, confidence and citation are present exactly when READY" },
+  )
+  .refine((l) => (l.state === "READY") === (l.reason_code === null), {
+    message: "reason_code is null exactly when READY",
+  })
+  .refine((l) => l.state === "READY" || l.places.length === 0, {
+    message: "places are listed only when READY",
+  })
+  .refine((l) => l.total === null || l.places.length <= l.total, {
+    message: "the list is never longer than its total",
+  })
+  .refine((l) => new Set(l.places.map((p) => p.place.id)).size === l.places.length, {
+    message: "a locality is listed once",
+  });
+
 export const surnameResultResponseSchema = z
   .object({
     schema_version: z.literal(SURNAME_RESULT_SCHEMA_VERSION),
@@ -849,6 +933,8 @@ export const surnameResultResponseSchema = z
     neighbours: neighboursSectionSchema.nullable(),
     /** Added in 1.10 (TASK-055). Null unless RESOLVED, and null where no other form is paired. */
     other_form: otherFormSchema.nullable(),
+    /** Added in 1.11 (TASK-066). Present exactly when RESOLVED. */
+    localities: localitiesSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -882,6 +968,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => r.other_form === null || r.other_form.surname.id !== r.surname?.id, {
     message: "the other form is a different surname",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.localities !== null : r.localities === null), {
+    message: "localities section is present exactly when status is RESOLVED",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -938,6 +1027,10 @@ export type NeighbourEntry = z.infer<typeof neighbourEntrySchema>;
 export type NeighbourList = z.infer<typeof neighbourListSchema>;
 export type NeighboursSection = z.infer<typeof neighboursSectionSchema>;
 export type OtherForm = z.infer<typeof otherFormSchema>;
+export type LocalityKind = z.infer<typeof localityKindSchema>;
+export type LocalityEntry = z.infer<typeof localityEntrySchema>;
+export type LocalitiesState = z.infer<typeof localitiesStateSchema>;
+export type LocalitiesSection = z.infer<typeof localitiesSectionSchema>;
 export type MeaningInterpretation = z.infer<typeof meaningInterpretationSchema>;
 export type Suggestion = z.infer<typeof suggestionSchema>;
 export type SuggestionsSection = z.infer<typeof suggestionsSectionSchema>;

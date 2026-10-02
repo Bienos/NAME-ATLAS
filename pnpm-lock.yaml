@@ -189,6 +189,15 @@ importers:
         specifier: 14.0.2
         version: 14.0.2
 
+  packages/family:
+    dependencies:
+      '@name-atlas/db':
+        specifier: workspace:*
+        version: link:../db
+      kysely:
+        specifier: 0.29.6
+        version: 0.29.6
+
   packages/logging:
     dependencies:
       '@name-atlas/domain':
@@ -206,9 +215,6 @@ importers:
       '@name-atlas/logging':
         specifier: workspace:*
         version: link:../logging
-      bullmq:
-        specifier: 6.3.8
-        version: 6.3.8(ioredis@5.9.0)(pg@8.23.0)
       ioredis:
         specifier: 5.9.0
         version: 5.9.0
@@ -340,6 +346,9 @@ importers:
       '@name-atlas/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@name-atlas/family':
+        specifier: workspace:*
+        version: link:../../packages/family
       '@name-atlas/queue':
         specifier: workspace:*
         version: link:../../packages/queue

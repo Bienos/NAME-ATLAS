@@ -141,17 +141,21 @@ interface ResolvedIdentity {
 
 function collectDistinct(rows: readonly LinedRow[]): {
   distinct: DistinctSurname[];
+  keys: ReadonlyMap<PeselSourceRow, string>;
   duplicate: { key: string; first: string; second: string } | null;
 } {
+  const keys = new Map<PeselSourceRow, string>();
   const byKey = new Map<string, DistinctSurname>();
   for (const { row, line } of rows) {
     const key = canonicalKey(row.surname);
+    keys.set(row, key);
     const existing = byKey.get(key);
     if (existing) {
       // Two rows in one official file sharing a canonical key is a change in
       // the source's shape, not data to reconcile. Fail closed.
       return {
         distinct: [],
+        keys,
         duplicate: { key, first: existing.surname, second: row.surname },
       };
     }
@@ -160,7 +164,7 @@ function collectDistinct(rows: readonly LinedRow[]): {
     // the wrong line is a false provenance claim.
     byKey.set(key, { surname: row.surname, key, firstLine: line });
   }
-  return { distinct: [...byKey.values()], duplicate: null };
+  return { distinct: [...byKey.values()], keys, duplicate: null };
 }
 
 /**
@@ -201,11 +205,10 @@ export interface IdentityRows {
  * caller (TASK-013). Nothing about the rows changed with batching — the
  * display is NFC only, the key is the resolver's, the flags are as detected.
  */
-export function identityRows(sourceString: string): IdentityRows {
+export function identityRows(sourceString: string, key = canonicalKey(sourceString)): IdentityRows {
   const surnameId = uuidv7();
   const nameFormId = uuidv7();
   const display = toNfc(sourceString);
-  const key = canonicalKey(sourceString);
   const detection = detectScripts(display);
   const script = detection.primary_script;
   return {
@@ -394,7 +397,7 @@ export async function importPeselResource(
   // 4. Duplicate canonical keys within one file are schema drift.
   const collected = collectDistinct(rows);
   let { distinct } = collected;
-  const { duplicate } = collected;
+  const { duplicate, keys } = collected;
   if (duplicate) {
     return {
       kind: "FAILED",
@@ -493,7 +496,7 @@ export async function importPeselResource(
     }
     for (const key of absent) identities.delete(key);
     distinct = distinct.filter((entry) => !absent.has(entry.key));
-    const kept = rows.filter(({ row }) => !absent.has(canonicalKey(row.surname)));
+    const kept = rows.filter(({ row }) => !absent.has(keys.get(row)!));
     rowsNotInCurrentRegister = rows.length - kept.length;
     rows = kept;
   }
@@ -588,7 +591,7 @@ export async function importPeselResource(
           surnamesReused += 1;
           continue;
         }
-        const built = identityRows(entry.surname);
+        const built = identityRows(entry.surname, entry.key);
         surnameIdByKey.set(entry.key, built.surnameId);
         newEntities.push(...built.entities);
         newSurnames.push(built.surname);
@@ -610,7 +613,7 @@ export async function importPeselResource(
       const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
       const newValues: Insertable<DB["distribution_values"]>[] = [];
       for (const { row } of rows) {
-        const key = canonicalKey(row.surname);
+        const key = keys.get(row)!;
         const surnameId = surnameIdByKey.get(key);
         if (!surnameId) {
           throw new Error(`no identity resolved for canonical key ${JSON.stringify(key)}`);

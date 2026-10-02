@@ -81,33 +81,39 @@ interface DistinctSurname {
  */
 function collectRegional(rows: readonly PeselRegionalSourceRow[]): {
   readonly distinct: DistinctSurname[];
+  readonly keys: ReadonlyMap<PeselRegionalSourceRow, string>;
   readonly duplicateCell: {
     readonly geography: string;
     readonly key: string;
     readonly line: number;
   } | null;
 } {
+  const keys = new Map<PeselRegionalSourceRow, string>();
   const byKey = new Map<string, DistinctSurname>();
   const seenCells = new Set<string>();
   for (const [index, row] of rows.entries()) {
     const key = canonicalKey(row.surname);
+    keys.set(row, key);
     // U+0000 cannot occur in either field (validation rejects control
     // characters), so it is a safe separator for the composite cell key.
     const cell = `${row.geography}\u0000${key}`;
     if (seenCells.has(cell)) {
-      return { distinct: [], duplicateCell: { geography: row.geography, key, line: index + 2 } };
+      return {
+        distinct: [],
+        keys,
+        duplicateCell: { geography: row.geography, key, line: index + 2 },
+      };
     }
     seenCells.add(cell);
     if (!byKey.has(key)) {
       byKey.set(key, { surname: row.surname, key, firstLine: index + 2 });
     }
   }
-  return { distinct: [...byKey.values()], duplicateCell: null };
+  return { distinct: [...byKey.values()], keys, duplicateCell: null };
 }
 
 /**
- * Imports one regional resource version. Returns a typed outcome in every
- * case; nothing is written unless the whole import succeeds.
+ * Imports one regional resource version. Returns typed source and database failure outcomes; unexpected errors propagate; nothing is written unless the whole import succeeds.
  */
 export async function importPeselRegionalResource(
   db: Kysely<DB>,
@@ -164,7 +170,7 @@ export async function importPeselRegionalResource(
   // 4. A repeated (voivodeship, surname) cell is schema drift.
   const collected = collectRegional(rows);
   let { distinct } = collected;
-  const { duplicateCell } = collected;
+  const { duplicateCell, keys } = collected;
   if (duplicateCell) {
     return {
       kind: "FAILED",
@@ -243,207 +249,232 @@ export async function importPeselRegionalResource(
     }
     for (const key of absent) identities.delete(key);
     distinct = distinct.filter((entry) => !absent.has(entry.key));
-    const kept = rows.filter((row) => !absent.has(canonicalKey(row.surname)));
+    const kept = rows.filter((row) => !absent.has(keys.get(row)!));
     rowsNotInCurrentRegister = rows.length - kept.length;
     rows = kept;
   }
 
   // 6. Write pass: one transaction for the whole resource.
-  return db.transaction().execute(async (trx) => {
-    const sourceId = await ensureRegistry(trx, profile);
+  try {
+    return await db.transaction().execute(async (trx) => {
+      const sourceId = await ensureRegistry(trx, profile);
 
-    const alreadyImported = await trx
-      .selectFrom("source_records")
-      .select(["source_record_id"])
-      .where("source_id", "=", sourceId)
-      .where("external_record_id", "=", resource.resource_id)
-      .where("content_hash", "=", actualSha256)
-      .executeTakeFirst();
-    if (alreadyImported) {
-      return {
-        kind: "ALREADY_IMPORTED" as const,
-        sourceRecordId: alreadyImported.source_record_id,
-        report: { ...blank, rowsRead, rowsNotInCurrentRegister },
-      };
-    }
+      const alreadyImported = await trx
+        .selectFrom("source_records")
+        .select(["source_record_id"])
+        .where("source_id", "=", sourceId)
+        .where("external_record_id", "=", resource.resource_id)
+        .where("content_hash", "=", actualSha256)
+        .executeTakeFirst();
+      if (alreadyImported) {
+        return {
+          kind: "ALREADY_IMPORTED" as const,
+          sourceRecordId: alreadyImported.source_record_id,
+          report: { ...blank, rowsRead, rowsNotInCurrentRegister },
+        };
+      }
 
-    const previous = await trx
-      .selectFrom("source_records")
-      .select(["source_record_id"])
-      .where("source_id", "=", sourceId)
-      .where("external_record_id", "=", resource.resource_id)
-      .where("record_status", "=", "ACTIVE")
-      .orderBy("retrieved_at", "desc")
-      .executeTakeFirst();
+      const previous = await trx
+        .selectFrom("source_records")
+        .select(["source_record_id"])
+        .where("source_id", "=", sourceId)
+        .where("external_record_id", "=", resource.resource_id)
+        .where("record_status", "=", "ACTIVE")
+        .orderBy("retrieved_at", "desc")
+        .executeTakeFirst();
 
-    const sourceRecordId = uuidv7();
-    await trx
-      .insertInto("source_records")
-      .values({
-        source_record_id: sourceRecordId,
-        source_id: sourceId,
-        external_record_id: resource.resource_id,
-        external_parent_id: null,
-        record_type: "API_OBJECT",
-        source_url: resource.official_source_url,
-        raw_payload: JSON.stringify(rawPayload),
-        raw_text_ref: null,
-        content_hash: actualSha256,
-        retrieved_at: resource.retrieved_at,
-        source_modified_at: resource.portal_modified_at,
-        rights_profile_id: null,
-        record_status: "ACTIVE",
-        supersedes_source_record_id: previous?.source_record_id ?? null,
-        // The resource's own descriptive text, stored once (TASK-030). The
-        // registered-residence restriction and the residual travel with it.
-        dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
-        universe_description: resource.universe_description,
-        methodology_key: resource.methodology_key,
-        comparability_group: resource.comparability_group,
-        coverage_notes: resource.coverage_notes,
-      })
-      .execute();
-    if (previous) {
+      const sourceRecordId = uuidv7();
       await trx
-        .updateTable("source_records")
-        .set({ record_status: "UPDATED" })
-        .where("source_record_id", "=", previous.source_record_id)
+        .insertInto("source_records")
+        .values({
+          source_record_id: sourceRecordId,
+          source_id: sourceId,
+          external_record_id: resource.resource_id,
+          external_parent_id: null,
+          record_type: "API_OBJECT",
+          source_url: resource.official_source_url,
+          raw_payload: JSON.stringify(rawPayload),
+          raw_text_ref: null,
+          content_hash: actualSha256,
+          retrieved_at: resource.retrieved_at,
+          source_modified_at: resource.portal_modified_at,
+          rights_profile_id: null,
+          record_status: "ACTIVE",
+          supersedes_source_record_id: previous?.source_record_id ?? null,
+          // The resource's own descriptive text, stored once (TASK-030). The
+          // registered-residence restriction and the residual travel with it.
+          dataset_version: `${resource.resource_id}@${actualSha256.slice(0, 12)}`,
+          universe_description: resource.universe_description,
+          methodology_key: resource.methodology_key,
+          comparability_group: resource.comparability_group,
+          coverage_notes: resource.coverage_notes,
+        })
         .execute();
-    }
-
-    // --- Places: the 16 voivodeships, from the recorded TERC correspondence.
-    // Inside this transaction, so places and values land or roll back together.
-    const places = await seedVoivodeshipPlacesIn(trx);
-
-    // --- Identities, created only where they do not exist yet.
-    let surnamesCreated = 0;
-    let surnamesReused = 0;
-    const surnameIdByKey = new Map<string, string>();
-    const newEntities: Insertable<DB["knowledge_entities"]>[] = [];
-    const newSurnames: Insertable<DB["surnames"]>[] = [];
-    const newForms: Insertable<DB["name_forms"]>[] = [];
-    for (const entry of distinct) {
-      const identity = identities.get(entry.key);
-      if (identity?.surnameId) {
-        surnameIdByKey.set(entry.key, identity.surnameId);
-        surnamesReused += 1;
-        continue;
+      if (previous) {
+        await trx
+          .updateTable("source_records")
+          .set({ record_status: "UPDATED" })
+          .where("source_record_id", "=", previous.source_record_id)
+          .execute();
       }
-      const built = identityRows(entry.surname);
-      surnameIdByKey.set(entry.key, built.surnameId);
-      newEntities.push(...built.entities);
-      newSurnames.push(built.surname);
-      newForms.push(built.nameForm);
-      surnamesCreated += 1;
-    }
-    await insertChunked(trx, "knowledge_entities", newEntities);
-    await insertChunked(trx, "surnames", newSurnames);
-    await insertChunked(trx, "name_forms", newForms);
 
-    // --- One surname-scoped snapshot per surname (docs/canonical/11 §6.1),
-    //     one value per (surname, voivodeship) cell with its place.
-    const snapshotIdByKey = new Map<string, string>();
-    const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
-    for (const entry of distinct) {
-      const surnameId = surnameIdByKey.get(entry.key);
-      if (!surnameId) {
-        throw new Error(`no identity resolved for canonical key ${JSON.stringify(entry.key)}`);
+      // --- Places: the 16 voivodeships, from the recorded TERC correspondence.
+      // Inside this transaction, so places and values land or roll back together.
+      const places = await seedVoivodeshipPlacesIn(trx);
+
+      // --- Identities, created only where they do not exist yet.
+      let surnamesCreated = 0;
+      let surnamesReused = 0;
+      const surnameIdByKey = new Map<string, string>();
+      const newEntities: Insertable<DB["knowledge_entities"]>[] = [];
+      const newSurnames: Insertable<DB["surnames"]>[] = [];
+      const newForms: Insertable<DB["name_forms"]>[] = [];
+      for (const entry of distinct) {
+        const identity = identities.get(entry.key);
+        if (identity?.surnameId) {
+          surnameIdByKey.set(entry.key, identity.surnameId);
+          surnamesReused += 1;
+          continue;
+        }
+        const built = identityRows(entry.surname, entry.key);
+        surnameIdByKey.set(entry.key, built.surnameId);
+        newEntities.push(...built.entities);
+        newSurnames.push(built.surname);
+        newForms.push(built.nameForm);
+        surnamesCreated += 1;
       }
-      const snapshotId = uuidv7();
-      snapshotIdByKey.set(entry.key, snapshotId);
-      newSnapshots.push({
-        distribution_snapshot_id: snapshotId,
-        surname_id: surnameId,
-        source_id: sourceId,
-        source_record_id: sourceRecordId,
-        as_of_date: resource.data_date,
-        geography_level: "REGION",
-        // Not verified for the regional universe either; U-6's published-
-        // universe denominator is a derived claim input, not a source fact.
-        universe_size: null,
-        // The counts live in the values below. One source fact, one place.
-        surname_total_count: null,
-        // TASK-030: the resource's descriptive text — including the
-        // registered-residence restriction and the residual — is written once on
-        // the source record, not 646,052 times here.
-      });
-    }
-    await insertChunked(trx, "distribution_snapshots", newSnapshots);
+      await insertChunked(trx, "knowledge_entities", newEntities);
+      await insertChunked(trx, "surnames", newSurnames);
+      await insertChunked(trx, "name_forms", newForms);
 
-    const referencedPlaces = new Set<string>();
-    let regionalCountSum = 0;
-    const newValues: Insertable<DB["distribution_values"]>[] = [];
-    for (const row of rows) {
-      const key = canonicalKey(row.surname);
-      const snapshotId = snapshotIdByKey.get(key);
-      const placeId = places.placeIdByGeographyValue.get(row.geography);
-      if (!snapshotId) {
-        throw new Error(`no snapshot for canonical key ${JSON.stringify(key)}`);
+      // --- One surname-scoped snapshot per surname (docs/canonical/11 §6.1),
+      //     one value per (surname, voivodeship) cell with its place.
+      const snapshotIdByKey = new Map<string, string>();
+      const newSnapshots: Insertable<DB["distribution_snapshots"]>[] = [];
+      for (const entry of distinct) {
+        const surnameId = surnameIdByKey.get(entry.key);
+        if (!surnameId) {
+          throw new Error(`no identity resolved for canonical key ${JSON.stringify(entry.key)}`);
+        }
+        const snapshotId = uuidv7();
+        snapshotIdByKey.set(entry.key, snapshotId);
+        newSnapshots.push({
+          distribution_snapshot_id: snapshotId,
+          surname_id: surnameId,
+          source_id: sourceId,
+          source_record_id: sourceRecordId,
+          as_of_date: resource.data_date,
+          geography_level: "REGION",
+          // Not verified for the regional universe either; U-6's published-
+          // universe denominator is a derived claim input, not a source fact.
+          universe_size: null,
+          // The counts live in the values below. One source fact, one place.
+          surname_total_count: null,
+          // TASK-030: the resource's descriptive text — including the
+          // registered-residence restriction and the residual — is written once on
+          // the source record, not 646,052 times here.
+        });
       }
-      if (!placeId) {
-        // Unreachable while the parser's closed value set holds; a place that
-        // is missing anyway is a refusal, never a null place_id on a regional
-        // value (docs/canonical/11 §6.2: null means national).
-        throw new Error(
-          `no voivodeship place for geography value ${JSON.stringify(row.geography)}`,
-        );
+      await insertChunked(trx, "distribution_snapshots", newSnapshots);
+
+      const referencedPlaces = new Set<string>();
+      let regionalCountSum = 0;
+      const newValues: Insertable<DB["distribution_values"]>[] = [];
+      for (const row of rows) {
+        const key = keys.get(row)!;
+        const snapshotId = snapshotIdByKey.get(key);
+        const placeId = places.placeIdByGeographyValue.get(row.geography);
+        if (!snapshotId) {
+          throw new Error(`no snapshot for canonical key ${JSON.stringify(key)}`);
+        }
+        if (!placeId) {
+          // Unreachable while the parser's closed value set holds; a place that
+          // is missing anyway is a refusal, never a null place_id on a regional
+          // value (docs/canonical/11 §6.2: null means national).
+          throw new Error(
+            `no voivodeship place for geography value ${JSON.stringify(row.geography)}`,
+          );
+        }
+        referencedPlaces.add(placeId);
+        regionalCountSum += row.count;
+        newValues.push({
+          distribution_value_id: uuidv7(),
+          distribution_snapshot_id: snapshotId,
+          place_id: placeId,
+          // The publisher's own string, kept beside the resolved place so the
+          // mapping stays auditable (docs/canonical/11 §6.2).
+          source_geography_key: row.geography,
+          count: BigInt(row.count),
+          population_denominator: null,
+          surname_share: null,
+          population_rate: null,
+          rank: null,
+          derivation_version: null,
+        });
       }
-      referencedPlaces.add(placeId);
-      regionalCountSum += row.count;
-      newValues.push({
-        distribution_value_id: uuidv7(),
-        distribution_snapshot_id: snapshotId,
-        place_id: placeId,
-        // The publisher's own string, kept beside the resolved place so the
-        // mapping stays auditable (docs/canonical/11 §6.2).
-        source_geography_key: row.geography,
-        count: BigInt(row.count),
-        population_denominator: null,
-        surname_share: null,
-        population_rate: null,
-        rank: null,
-        derivation_version: null,
-      });
+      await insertChunked(trx, "distribution_values", newValues);
+
+      // --- Reported, not asserted: how many of these surnames have no national
+      //     row at all. TASK-008 observed zero; a non-zero count is a finding.
+      const nationalKeys = await trx
+        .selectFrom("distribution_snapshots as s")
+        .innerJoin("surnames as sn", "sn.surname_id", "s.surname_id")
+        .select(["sn.canonical_key"])
+        .where("s.geography_level", "=", "NATIONAL")
+        .distinct()
+        .execute();
+      const nationalKeySet = new Set(nationalKeys.map((row) => row.canonical_key));
+      const surnamesWithoutNationalRow = distinct.filter(
+        (entry) => !nationalKeySet.has(entry.key),
+      ).length;
+
+      const report: RegionalReconciliationReport = {
+        resourceId: resource.resource_id,
+        rowsRead,
+        rowsImported: rows.length,
+        rowsNotInCurrentRegister,
+        rowsQuarantined: 0,
+        quarantinedByReason: {},
+        surnamesCreated,
+        surnamesReused,
+        snapshotsWritten: newSnapshots.length,
+        valuesWritten: newValues.length,
+        placesReferenced: referencedPlaces.size,
+        mixedScriptRows,
+        regionalCountSum,
+        surnamesWithoutNationalRow,
+      };
+      assertRegionalReconciles(report);
+
+      return {
+        kind: "IMPORTED" as const,
+        sourceRecordId,
+        supersededSourceRecordId: previous?.source_record_id ?? null,
+        report,
+      };
+    });
+  } catch (cause: unknown) {
+    const code =
+      typeof cause === "object" && cause !== null ? (cause as { code?: unknown }).code : undefined;
+    // PostgreSQL SQLSTATE or a driver connection failure. A programming or
+    // reconciliation error must retain its identity instead of claiming that
+    // the database failed. The transaction has rolled back in either case.
+    if (
+      typeof code !== "string" ||
+      !(
+        /^[0-9A-Z]{5}$/u.test(code) ||
+        ["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND", "EPIPE"].includes(code)
+      )
+    ) {
+      throw cause;
     }
-    await insertChunked(trx, "distribution_values", newValues);
-
-    // --- Reported, not asserted: how many of these surnames have no national
-    //     row at all. TASK-008 observed zero; a non-zero count is a finding.
-    const nationalKeys = await trx
-      .selectFrom("distribution_snapshots as s")
-      .innerJoin("surnames as sn", "sn.surname_id", "s.surname_id")
-      .select(["sn.canonical_key"])
-      .where("s.geography_level", "=", "NATIONAL")
-      .distinct()
-      .execute();
-    const nationalKeySet = new Set(nationalKeys.map((row) => row.canonical_key));
-    const surnamesWithoutNationalRow = distinct.filter(
-      (entry) => !nationalKeySet.has(entry.key),
-    ).length;
-
-    const report: RegionalReconciliationReport = {
-      resourceId: resource.resource_id,
-      rowsRead,
-      rowsImported: rows.length,
-      rowsNotInCurrentRegister,
-      rowsQuarantined: 0,
-      quarantinedByReason: {},
-      surnamesCreated,
-      surnamesReused,
-      snapshotsWritten: newSnapshots.length,
-      valuesWritten: newValues.length,
-      placesReferenced: referencedPlaces.size,
-      mixedScriptRows,
-      regionalCountSum,
-      surnamesWithoutNationalRow,
-    };
-    assertRegionalReconciles(report);
-
     return {
-      kind: "IMPORTED" as const,
-      sourceRecordId,
-      supersededSourceRecordId: previous?.source_record_id ?? null,
-      report,
+      kind: "FAILED",
+      reason: "DATABASE_ERROR",
+      message: "regional import database transaction failed",
+      quarantined: [],
+      report: null,
+      cause,
     };
-  });
+  }
 }

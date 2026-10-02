@@ -42,7 +42,10 @@ export async function loadComparison(
   bSlug: string,
   lang: Lang,
 ): Promise<{ readonly a: ComparisonSide; readonly b: ComparisonSide }> {
-  const log = createLogger({ service: "web", base: { route: "/pl/porownaj" } });
+  const log = createLogger({
+    service: "web",
+    base: { route: lang === "en" ? "/en/compare" : "/pl/porownaj" },
+  });
   const startedAt = Date.now();
   try {
     const db = sharedDb();
@@ -64,4 +67,3 @@ export async function loadComparison(
 }
 
 export { ComparePicker, ComparisonView };
-export type { Lang };

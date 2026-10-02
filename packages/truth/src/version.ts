@@ -332,3 +332,12 @@ export const ARCHIVE_CONFIDENCE_ASSESSMENT_VERSION = "archive_scope@1";
 
 /** A surname searched more recently than this is not searched again (ADR-0024 §2.6). */
 export const ARCHIVE_REFRESH_DAYS = 90;
+
+/**
+ * The localities lookup (TASK-066): a locality is listed when its official
+ * name's canonical key is the surname's, by the resolver's own key. Not a
+ * derivation and not a claim; the code names the match rule so a reader of
+ * the section knows what "the same name" means.
+ */
+export const LOCALITY_MATCH_METHOD = "official_name_exact_key";
+export const LOCALITY_MATCH_VERSION = "locality_match@1";

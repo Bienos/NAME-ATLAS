@@ -1,7 +1,8 @@
 import { uuidv7 } from "@name-atlas/domain";
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
-import { canonicalSlug, SHORT_SLUG_ID_LENGTH, shortSlugId, SLUG_LOCALES } from "./slug.js";
+import { currentSlugsFor } from "./lookup.js";
+import { canonicalSlug, SHORT_SLUG_ID_LENGTH, SLUG_LOCALES, suffixedSlug } from "./slug.js";
 import type { SlugLocale } from "./slug.js";
 
 /**
@@ -133,20 +134,11 @@ async function assignBatch(
 ): Promise<BatchOutcome> {
   if (batch.length === 0) return { created: 0, suffixed: 0, unchanged: 0, stale: [] };
 
-  const existing = new Map<string, string>();
-  for (const row of await db
-    .selectFrom("surname_slugs")
-    .select(["surname_id", "slug"])
-    .where("locale", "=", locale)
-    .where("is_current", "=", true)
-    .where(
-      "surname_id",
-      "in",
-      batch.map((b) => b.row.surname_id),
-    )
-    .execute()) {
-    existing.set(row.surname_id, row.slug);
-  }
+  const existing = await currentSlugsFor(
+    db,
+    locale,
+    batch.map((b) => b.row.surname_id),
+  );
 
   const stale: { surname_id: string; stored: string; computed: string }[] = [];
   const pending: { row: SurnameRow; base: string }[] = [];
@@ -190,7 +182,7 @@ async function assignBatch(
   for (const item of collided) {
     let placed = false;
     for (let length = SHORT_SLUG_ID_LENGTH; length <= MAX_SUFFIX_LENGTH; length += 1) {
-      const slug = `${item.base}-${shortSlugId(item.row.surname_id, length)}`;
+      const slug = suffixedSlug(item.base, item.row.surname_id, length);
       const got = await insertSlugs(db, locale, [{ surname_id: item.row.surname_id, slug }]);
       if (got.size === 1) {
         created += 1;

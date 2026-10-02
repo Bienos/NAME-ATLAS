@@ -40,6 +40,11 @@ export {
   neighboursSectionSchema,
   neighboursStateSchema,
   otherFormSchema,
+  LOCALITIES_LIMIT,
+  localitiesSectionSchema,
+  localitiesStateSchema,
+  localityEntrySchema,
+  localityKindSchema,
   meaningInterpretationSchema,
   meaningSectionSchema,
   meaningStateSchema,
@@ -85,6 +90,10 @@ export type {
   NeighbourList,
   NeighboursSection,
   OtherForm,
+  LocalitiesSection,
+  LocalitiesState,
+  LocalityEntry,
+  LocalityKind,
   NumericValueStatus,
   PlaceStat,
   PopulationObservation,
@@ -178,3 +187,18 @@ export type {
   NamedSurname,
   OnBothTop,
 } from "./list-facts.js";
+
+// --- TASK-068: the family tree (ADR-0029) --------------------------------
+export {
+  TREE_SCHEMA_VERSION,
+  lifeEventSchema,
+  livingStatusSchema,
+  parentRoleSchema,
+  treeMemberSchema,
+  treeParentageSchema,
+  treePersonSchema,
+  treePlaceSchema,
+  treeResponseSchema,
+  treeRoleSchema,
+} from "./tree.js";
+export type { TreeParentage, TreePerson, TreeResponse } from "./tree.js";

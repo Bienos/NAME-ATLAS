@@ -8,7 +8,7 @@ import {
 } from "./schema.js";
 import type { PeselSourceRow } from "./schema.js";
 
-const COUNT_PATTERN = /^[0-9]+$/;
+export const COUNT_PATTERN = /^[0-9]+$/;
 
 /**
  * Splits decoded resource text into lines on the confirmed CRLF
@@ -20,7 +20,7 @@ const COUNT_PATTERN = /^[0-9]+$/;
  * both files) produces one trailing empty string, which is dropped; any
  * other empty line is a violation, not a trailing artefact.
  */
-function splitPeselLines(text: string): string[] {
+export function splitPeselLines(text: string): string[] {
   const withoutTerminators = text.replaceAll(PESEL_LINE_TERMINATOR, "");
   if (withoutTerminators.includes("\n") || withoutTerminators.includes("\r")) {
     throw new PeselSchemaError(
@@ -29,14 +29,16 @@ function splitPeselLines(text: string): string[] {
     );
   }
 
+  // `split` with a non-empty separator always returns at least one element.
   const lines = text.split(PESEL_LINE_TERMINATOR);
-  if (lines.length === 0 || lines[lines.length - 1] !== "") {
+  if (lines.at(-1) !== "") {
     throw new PeselSchemaError(
       "missing_trailing_terminator",
       "resource does not end with the confirmed trailing line terminator",
     );
   }
-  return lines.slice(0, -1);
+  lines.pop();
+  return lines;
 }
 
 function parseDataLine(line: string, lineNumber: number): PeselSourceRow {

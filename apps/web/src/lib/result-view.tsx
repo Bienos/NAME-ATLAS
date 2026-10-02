@@ -26,6 +26,7 @@ import type {
   ChangeSection,
   CitationDto,
   DistributionEntry,
+  LocalitiesSection,
   MeaningSection,
   NeighbourList,
   NeighboursSection,
@@ -54,6 +55,10 @@ import {
   formationWord,
   formatInteger,
   formatPercent,
+  localitiesMore,
+  localitiesSentence,
+  localityAdminLine,
+  localityKindLabel,
   otherFormSentence,
   partitionLabel,
   populationSentence,
@@ -801,6 +806,63 @@ function archiveYear(date: string | null): string | null {
   return /\b(1[0-9]{3}|20[0-9]{2})\b/u.exec(date ?? "")?.[1] ?? null;
 }
 
+/**
+ * The localities whose official name is the surname (TASK-066, ADR-0025
+ * §2.7): the statement, then the warning line, then the list as the register
+ * writes it. The caller renders the chapter only when at least one matches.
+ */
+function Localities({
+  section,
+  surname,
+  number,
+  next,
+  lang,
+}: {
+  section: LocalitiesSection;
+  surname: string;
+  number: number;
+  next: Step | null;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const statement = localitiesSentence(section, surname, lang);
+  if (statement === null) return null;
+  const more = (section.total ?? 0) - section.places.length;
+  return (
+    <Chapter chapter="places" number={number} next={next} lang={lang}>
+      <Claim
+        statement={statement}
+        evidence={localitiesEvidence(section, lang)}
+        country_code="PL"
+        lang={lang}
+      >
+        <p className="note places-note">{t.placesNote}</p>
+      </Claim>
+      <ul className="places">
+        {section.places.map((entry) => (
+          <li key={entry.place.id}>
+            <span className="place-name">{entry.place.name}</span>
+            <span className="place-kind">{localityKindLabel(entry.place.kind, lang)}</span>
+            <span className="place-admin">{localityAdminLine(entry, lang)}</span>
+          </li>
+        ))}
+      </ul>
+      {more > 0 ? <p className="note">{localitiesMore(more, lang)}</p> : null}
+    </Chapter>
+  );
+}
+
+function localitiesEvidence(section: LocalitiesSection, lang: Lang): ClaimEvidence {
+  const t = UI[lang];
+  return {
+    // `localitiesSentence` is only rendered for READY, where both are present.
+    citation: section.citation as CitationDto,
+    underlying_date: section.reference_date ?? "",
+    confidence: section.confidence ?? { status: "INSUFFICIENT_DATA", methodology_code: "—" },
+    notes: [t.placesNote, t.placesWhole],
+  };
+}
+
 function archiveEvidence(section: ArchiveSection, lang: Lang): ClaimEvidence {
   return {
     // `archiveSentence` is only rendered for READY, where both are present.
@@ -917,6 +979,9 @@ function pageEvidence(response: SurnameResultResponse, lang: Lang): ClaimEvidenc
       ? []
       : meaning.interpretations.map((i) => meaningEvidence(meaning, i, lang))),
     ...(response.archive?.state === "READY" ? [archiveEvidence(response.archive, lang)] : []),
+    ...(response.localities?.state === "READY" && response.localities.places.length > 0
+      ? [localitiesEvidence(response.localities, lang)]
+      : []),
   ];
 }
 
@@ -938,16 +1003,15 @@ function siteName(url: string, fallback: string): string {
  * each once, one disclosure away, as they were inside the per-claim panels.
  */
 function Sources({
-  response,
+  evidence,
   next,
   lang,
 }: {
-  response: SurnameResultResponse;
+  evidence: readonly ClaimEvidence[];
   next: Step | null;
   lang: Lang;
 }) {
   const t = UI[lang];
-  const evidence = pageEvidence(response, lang);
   if (evidence.length === 0) return null;
   // One line per source as a reader sees it: the same page, title, publisher,
   // date, licence and attribution are one source, however many claims cite it.
@@ -1085,7 +1149,7 @@ export function Result({
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
     const { population, rarity, distribution, change, meaning, archive } = response;
-    const { neighbours, other_form: otherForm } = response;
+    const { neighbours, other_form: otherForm, localities } = response;
     const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
       {
         count:
@@ -1144,9 +1208,23 @@ export function Result({
             : (n, next) => (
                 <Archive section={archive} surname={surname} number={n} next={next} lang={lang} />
               ),
+        // Shown only when a locality matches: no locality is not a chapter (TASK-066).
+        places:
+          localities === null || localities.state !== "READY" || localities.places.length === 0
+            ? null
+            : (n, next) => (
+                <Localities
+                  section={localities}
+                  surname={surname}
+                  number={n}
+                  next={next}
+                  lang={lang}
+                />
+              ),
       };
     const order = sectionOrder(intent).filter((key) => chapters[key] !== null);
-    const hasSources = pageEvidence(response, lang).length > 0;
+    const evidence = pageEvidence(response, lang);
+    const hasSources = evidence.length > 0;
     // The journey's steps in page order (TASK-053): each chapter, the sources,
     // then whatever the page adds. Each screen links to the one after it.
     const steps: Step[] = [
@@ -1167,7 +1245,7 @@ export function Result({
           <Fragment key={key}>{chapters[key]?.(index + 1, nextAfter(index))}</Fragment>
         ))}
         <Sources
-          response={response}
+          evidence={evidence}
           next={hasSources ? nextAfter(order.length) : null}
           lang={lang}
         />

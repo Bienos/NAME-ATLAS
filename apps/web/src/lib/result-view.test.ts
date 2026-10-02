@@ -71,8 +71,61 @@ function rarity(x: number, numerator: number, group: string) {
 }
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
+/** TERYT's own record for the localities chapter (TASK-066): the real file record's shape. */
+const TERYT_CITATION = {
+  id: "cit-teryt",
+  title: "TERYT",
+  publisher: "GUS",
+  publication_date: "2026-01-01",
+  source_type: "OFFICIAL_DATASET",
+  locator: "TERYT SIMC, wersja urzędowa, STAN_NA 2026-01-01",
+  url: "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+  attribution: null,
+  terms: null,
+  retrieved_at: "2026-09-30T01:26:29Z",
+  source_page_url: "https://api.stat.gov.pl/Home/TerytApi?lang=en",
+};
+
+/**
+ * SYNTHETIC: two real localities of the TERYT excerpt (TASK-039) stand in for
+ * the chapter's shape under NOWAK; nothing here asserts a locality named NOWAK.
+ */
+const LOCALITIES_READY = {
+  state: "READY",
+  reference_date: "2026-01-01",
+  places: [
+    {
+      place: {
+        id: "01a0b9e3-34f3-7633-a239-2b8596dfc0a1",
+        name: "Jemna",
+        kind: "VILLAGE",
+        teryt_simc: "0855434",
+      },
+      gmina: "Stoszowice",
+      powiat: "ząbkowicki",
+      voivodeship: "DOLNOŚLĄSKIE",
+    },
+    {
+      place: {
+        id: "01a0b9e3-34f3-7633-a239-2b8596dfc0a2",
+        name: "Ząbkowice Śląskie",
+        kind: "CITY",
+        teryt_simc: "0984692",
+      },
+      gmina: "Ząbkowice Śląskie",
+      powiat: "ząbkowicki",
+      voivodeship: "DOLNOŚLĄSKIE",
+    },
+  ],
+  total: 3,
+  confidence: { status: "VERIFIED", methodology_code: "official_name_exact_key@locality_match@1" },
+  citation: TERYT_CITATION,
+  reason_code: null,
+  surface: SURFACE,
+};
+
 const RESOLVED: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.11",
   neighbours: {
     state: "UNAVAILABLE",
     lists: [],
@@ -80,6 +133,7 @@ const RESOLVED: unknown = {
     surface: SURFACE,
   },
   other_form: null,
+  localities: LOCALITIES_READY,
   change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
   surname: { id: "01a0b9e3-34f3-7633-a239-2b8596dfc088", display_name: "NOWAK", script: "Latn" },
@@ -205,7 +259,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.11",
   neighbours: {
     state: "RIGHTS_BLOCKED",
     lists: [],
@@ -213,6 +267,16 @@ const RIGHTS_BLOCKED: unknown = {
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
   other_form: null,
+  localities: {
+    state: "NOT_LOADED",
+    reference_date: null,
+    places: [],
+    total: null,
+    confidence: null,
+    citation: null,
+    reason_code: "TERYT_NOT_LOADED",
+    surface: SURFACE,
+  },
   change: {
     state: "RIGHTS_BLOCKED",
     entries: [],
@@ -266,9 +330,10 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.11",
   neighbours: null,
   other_form: null,
+  localities: null,
   change: null,
   status: "UNRESOLVED",
   surname: null,
@@ -317,9 +382,10 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.11",
   neighbours: null,
   other_form: null,
+  localities: null,
   change: null,
   status: "AMBIGUOUS",
   surname: null,
@@ -767,8 +833,9 @@ describe("AC-10: an available meaning renders its work and its caveat", () => {
 describe("TASK-023 AC-1, ADR-0012: every figure is a claim; its evidence is at the foot", () => {
   it("renders each observation, rarity entry and distribution entry as a claim, with no panel", () => {
     const markup = render(RESOLVED, "pl");
-    // 2 population + 2 rarity + 1 distribution entries in the fixture.
-    expect(markup.match(/class="claim"/gu)?.length).toBe(5);
+    // 2 population + 2 rarity + 1 distribution entries in the fixture, and the
+    // localities statement (TASK-066).
+    expect(markup.match(/class="claim"/gu)?.length).toBe(6);
     expect(markup).not.toContain('class="evidence"');
     expect(markup).not.toContain("Zobacz dowody");
     // The one disclosure left is the notes, inside #sources.
@@ -788,9 +855,11 @@ describe("TASK-023 AC-1, ADR-0012: every figure is a claim; its evidence is at t
     const markup = render(RESOLVED, "en");
     const from = markup.indexOf('<ul class="sources">');
     const list = markup.slice(from, markup.indexOf("</ul>", from));
-    expect(list.match(/<li>/gu)?.length).toBe(1);
+    // PESEL once, and TERYT once for the localities chapter (TASK-066).
+    expect(list.match(/<li>/gu)?.length).toBe(2);
     expect(list).toContain(`href="${CITATION.source_page_url}"`);
     expect(list).toContain(">dane.gov.pl</a>");
+    expect(list).toContain(">api.stat.gov.pl</a>");
     // The retrieved file is provenance, not a destination: nothing links to it.
     expect(markup).not.toContain(CITATION.url);
   });
@@ -987,7 +1056,8 @@ describe("TASK-023: sources section and anchors", () => {
     // The source list only: the notes below it are a list of their own.
     const from = m.indexOf('<ul class="sources">');
     const sources = m.slice(from, m.indexOf("</ul>", from));
-    expect(sources.match(/<li>/gu)?.length).toBe(1);
+    // PESEL once for every register figure, and TERYT once for the localities (TASK-066).
+    expect(sources.match(/<li>/gu)?.length).toBe(2);
   });
 
   it("carries the locale-neutral anchors", () => {
@@ -1139,6 +1209,7 @@ describe("the journey's steps", () => {
       ["#where", t.chapterWhereTitle],
       ["#meaning", t.chapterMeaningTitle],
       ["#archive", t.chapterArchiveTitle],
+      ["#places", t.chapterPlacesTitle],
       ["#sources", t.chapterSourcesQuestion],
       ["#summary", "Twój wynik"],
     ]);
@@ -1155,9 +1226,10 @@ describe("the journey's steps", () => {
       "#rarity",
       "#meaning",
       "#archive",
+      "#places",
       "#sources",
     ]);
-    expect(steps(markup)[5]?.[1]).toBe(UI.en.chapterSourcesQuestion);
+    expect(steps(markup)[6]?.[1]).toBe(UI.en.chapterSourcesQuestion);
   });
 });
 
@@ -1506,7 +1578,9 @@ describe("TASK-051: the change-over-time chapter", () => {
     const markup = render(CHANGE_READY, "en");
     const from = markup.indexOf('<ul class="sources">');
     const sources = markup.slice(from, markup.indexOf("</ul>", from));
-    expect(sources.match(/<li>/gu)).toHaveLength(1);
+    // PESEL once for every register figure; TERYT once for the localities (TASK-066).
+    expect(sources.match(/<li>/gu)).toHaveLength(2);
+    expect(sources.match(/>dane\.gov\.pl<\/a>/gu)).toHaveLength(1);
   });
 
   it("says nothing of why: no cause, no popularity, no decline, no fashion, no percentage of confidence", () => {
@@ -1543,5 +1617,91 @@ describe("TASK-051: the change-over-time chapter", () => {
     expect(body).toContain("−20.0%");
     expect(body).toContain("+20.0%");
     expect(body).not.toMatch(/-\d+\.\d%/u);
+  });
+});
+
+/**
+ * TASK-066 AC-3: the localities chapter. The fixture's places are the TERYT
+ * excerpt's real localities under a surname they do not match (SYNTHETIC).
+ */
+describe("TASK-066: localities with the same name", () => {
+  const withLocalities = (localities: unknown): unknown => ({
+    ...(RESOLVED as Record<string, unknown>),
+    localities,
+  });
+
+  it("states the register, the count and the date, then the warning line, then the list", () => {
+    const markup = render(RESOLVED, "pl");
+    const body = text(markup);
+    expect(markup).toContain('<section id="places" class="chapter">');
+    expect(body).toContain(
+      "Rejestr TERYT wymienia 3 miejscowości o nazwie NOWAK (stan na 1 stycznia 2026 r.).",
+    );
+    const note = markup.indexOf("Zbieżność nazw w rejestrze.");
+    const list = markup.indexOf('<ul class="places">');
+    expect(note).toBeGreaterThan(markup.indexOf('id="places"'));
+    expect(note).toBeLessThan(list);
+    expect(body).toContain("Jemna");
+    expect(body).toContain("wieś");
+    expect(body).toContain("gm. Stoszowice, pow. ząbkowicki, woj. DOLNOŚLĄSKIE");
+    expect(body).toContain("Ząbkowice Śląskie");
+    expect(body).toContain("miasto");
+    expect(body).toContain("i jeszcze 1");
+  });
+
+  it("says the same in English", () => {
+    const body = text(render(RESOLVED, "en"));
+    expect(body).toContain(
+      "The TERYT register lists 3 localities named NOWAK (as of 1 January 2026).",
+    );
+    expect(body).toContain("A shared name in the register.");
+    expect(body).toContain("gmina Stoszowice, powiat ząbkowicki, DOLNOŚLĄSKIE voivodeship");
+    expect(body).toContain("and 1 more");
+  });
+
+  it("lists TERYT once at the foot, linked to the register's own website", () => {
+    const m = render(RESOLVED, "en");
+    const from = m.indexOf('<ul class="sources">');
+    const sources = m.slice(from, m.indexOf("</ul>", from));
+    expect(sources.match(/GUS — TERYT/gu)?.length).toBe(1);
+    expect(sources).toContain('href="https://api.stat.gov.pl/Home/TerytApi?lang=en"');
+    expect(sources).toContain(">api.stat.gov.pl<");
+    expect(sources).not.toContain("pliki_pelne.aspx");
+  });
+
+  it("has no chapter when no locality matches, when the register is not loaded, or when rights block it", () => {
+    const ready = LOCALITIES_READY as Record<string, unknown>;
+    const none = withLocalities({ ...ready, places: [], total: 0 });
+    const notLoaded = withLocalities({
+      ...ready,
+      state: "NOT_LOADED",
+      reference_date: null,
+      places: [],
+      total: null,
+      confidence: null,
+      citation: null,
+      reason_code: "TERYT_NOT_LOADED",
+    });
+    const blocked = withLocalities({
+      ...ready,
+      state: "RIGHTS_BLOCKED",
+      reference_date: null,
+      places: [],
+      total: null,
+      confidence: null,
+      citation: null,
+      reason_code: "REDISTRIBUTION_UNRESOLVED",
+      surface: { surface: "SEO", decision: "BLOCKED", reason_code: "REDISTRIBUTION_UNRESOLVED" },
+    });
+    for (const [name, payload] of [
+      ["none", none],
+      ["not loaded", notLoaded],
+      ["blocked", blocked],
+    ] as const) {
+      const m = render(payload, "pl");
+      expect(m, name).not.toContain('id="places"');
+      expect(m, name).not.toContain("TERYT");
+      expect(m, name).not.toContain("Jemna");
+    }
   });
 });

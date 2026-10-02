@@ -197,11 +197,12 @@ check "accounts tables $WEB_ROLE has any privilege on" 0 "$(q "
      AND has_table_privilege('$WEB_ROLE', c.oid, '$priv_any')")"
 check "grants to PUBLIC on schema accounts" 0 "$(q "
   SELECT count(*) FROM aclexplode((SELECT nspacl FROM pg_namespace WHERE nspname = 'accounts')) a WHERE a.grantee = 0")"
-check "foreign keys between accounts and any other schema" 0 "$(q "
+check "foreign keys from private schemas to the register" 0 "$(q "
   SELECT count(*) FROM pg_constraint k
     JOIN pg_class r ON r.oid = k.conrelid JOIN pg_class f ON f.oid = k.confrelid
     JOIN pg_namespace rn ON rn.oid = r.relnamespace JOIN pg_namespace fn ON fn.oid = f.relnamespace
-   WHERE k.contype = 'f' AND ((rn.nspname = 'accounts') <> (fn.nspname = 'accounts'))")"
+   WHERE k.contype = 'f'
+     AND ((rn.nspname IN ('accounts', 'family')) <> (fn.nspname IN ('accounts', 'family')))")"
 
 # Now as the app connects: TLS, SCRAM, through PgBouncer on its own port.
 conn="host=127.0.0.1 port=$POOLER_PORT dbname=$DB user=$APP_ROLE sslmode=require connect_timeout=10"

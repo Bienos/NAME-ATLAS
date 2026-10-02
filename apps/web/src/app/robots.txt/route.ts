@@ -1,5 +1,4 @@
-import { indexingEnabled } from "../../lib/seo.js";
-import { siteOrigin } from "../../lib/surname-page.js";
+import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
 
 /**
  * `/robots.txt` (TASK-027; `docs/canonical/21` §36, §40).
