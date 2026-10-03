@@ -12,6 +12,7 @@ import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
+import { TreeConstellation } from "./tree-stars.js";
 import { loadTreePage } from "./tree-load.js";
 import type { PersonFormData, Query, TreePageData, TreeSession } from "./tree-load.js";
 import { DRAFT_FIELDS, draftQuery, treeActionPath, treePath, treeTarget } from "./tree-paths.js";
@@ -28,7 +29,7 @@ import { searchPlaces } from "./tree-places.js";
 import { statusChip, TREE_TEXT, treeStatusWords, yearsLine } from "./tree-text.js";
 
 /**
- * The tree's five pages (TASK-076): `/pl/konto/drzewa/[[...rest]]` and
+ * The tree's pages (TASK-076; the Konstelacja, TASK-084): `/pl/konto/drzewa/[[...rest]]` and
  * `/en/account/trees/[[...rest]]`. Plain HTML forms that post to
  * `/api/tree/<action>` and need no script, drawn in the dusk direction
  * (ADR-0021) after the chosen mockups: the dashboard, the consent step, the
@@ -445,6 +446,78 @@ function TreesView({ data }: { data: Extract<TreePageData, { kind: "trees" }> })
   );
 }
 
+/** Rodowód · Konstelacja (TASK-084): the two views of one tree, the page's own marked. */
+function ViewSwitch({
+  lang,
+  treeId,
+  current,
+}: {
+  lang: Lang;
+  treeId: string;
+  current: "tree" | "constellation";
+}) {
+  const t = TREE_TEXT[lang].constellation;
+  return (
+    <nav className="tree-seg" aria-label={t.viewsLabel}>
+      <a
+        href={treePath(lang, { page: "tree", treeId })}
+        aria-current={current === "tree" ? "page" : undefined}
+      >
+        {t.views.tree}
+      </a>
+      <a
+        href={treePath(lang, { page: "constellation", treeId })}
+        aria-current={current === "constellation" ? "page" : undefined}
+      >
+        {t.views.constellation}
+      </a>
+    </nav>
+  );
+}
+
+function ConstellationView({ data }: { data: Extract<TreePageData, { kind: "constellation" }> }) {
+  const { lang, tree } = data;
+  const t = TREE_TEXT[lang];
+  const treeId = tree.tree.id;
+  const canEdit = tree.tree.role !== "VIEWER";
+  return (
+    <section className="tree-wide">
+      <p className="tree-eyebrow">
+        <a href={treePath(lang, { page: "trees" })}>{t.pedigree.back}</a>
+      </p>
+      <h2>{tree.tree.title}</h2>
+      <p className="page-lede">{t.constellation.lede}</p>
+      <ViewSwitch lang={lang} treeId={treeId} current="constellation" />
+      {canEdit ? null : <p className="account-status">{t.pedigree.viewer}</p>}
+      {tree.hidden_living_count > 0 ? (
+        <p className="account-status">{t.pedigree.hiddenCount(tree.hidden_living_count)}</p>
+      ) : null}
+      {data.slots.length === 0 ? (
+        <p className="account-links">
+          {t.question.startLede}{" "}
+          {canEdit ? (
+            <a href={treePath(lang, { page: "add", treeId })}>{t.pedigree.addFirst}</a>
+          ) : null}
+        </p>
+      ) : (
+        <TreeConstellation
+          lang={lang}
+          treeId={treeId}
+          canEdit={canEdit}
+          slots={data.slots}
+          picked={data.picked}
+        />
+      )}
+      {data.unplacedCount > 0 ? (
+        <p className="account-status">
+          {t.constellation.outside(data.unplacedCount)}{" "}
+          <a href={treePath(lang, { page: "tree", treeId })}>{t.constellation.outsideLink}</a>
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
 function TreeView({ data }: { data: Extract<TreePageData, { kind: "tree" }> }) {
   const { lang, tree } = data;
   const t = TREE_TEXT[lang];
@@ -468,6 +541,7 @@ function TreeView({ data }: { data: Extract<TreePageData, { kind: "tree" }> }) {
         </p>
         <h2>{tree.tree.title}</h2>
         <p className="page-lede">{t.pedigree.lede}</p>
+        <ViewSwitch lang={lang} treeId={treeId} current="tree" />
         <Status lang={lang} page="tree" word={data.status} text={addedText} />
         {canEdit ? null : <p className="account-status">{t.pedigree.viewer}</p>}
         {tree.hidden_living_count > 0 ? (
@@ -843,9 +917,11 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
         ? { page: "trees" }
         : data.kind === "tree"
           ? { page: "tree", treeId: data.tree.tree.id }
-          : data.kind === "add"
-            ? { page: "add", treeId: data.tree.tree.id }
-            : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
+          : data.kind === "constellation"
+            ? { page: "constellation", treeId: data.tree.tree.id }
+            : data.kind === "add"
+              ? { page: "add", treeId: data.tree.tree.id }
+              : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
   return (
     <SiteShell
       lang={lang}
@@ -856,6 +932,7 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
     >
       {data.kind === "trees" ? <TreesView data={data} /> : null}
       {data.kind === "tree" ? <TreeView data={data} /> : null}
+      {data.kind === "constellation" ? <ConstellationView data={data} /> : null}
       {data.kind === "add" ? <AddView data={data} /> : null}
       {data.kind === "person" ? <PersonView data={data} /> : null}
       {data.kind === "consent" ? <ConsentView data={data} /> : null}

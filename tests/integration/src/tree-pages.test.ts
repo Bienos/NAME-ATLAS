@@ -323,6 +323,38 @@ describe("the tree pages over a real database (TASK-076)", () => {
       null,
       null,
     ]);
+    // The Konstelacja (TASK-084) draws the same slots for both, and the member's hidden count.
+    const sky = await loadTreePage({
+      enabled: true,
+      lang: "pl",
+      segments: [treeId, "konstelacja"],
+      query: { sel: "3" },
+      session: { userId: OWNER, termsVersion: CLAUSE },
+      deps: { family, places: null },
+    });
+    if (sky.kind !== "view" || sky.data.kind !== "constellation")
+      throw new Error("expected the owner's constellation");
+    expect(sky.data.slots.map((s) => s.n)).toEqual(owner.data.slots.map((s) => s.n));
+    expect(sky.data.picked).toBe(3);
+    expect(sky.data.unplacedCount).toBe(0);
+    const memberSky = await loadTreePage({
+      enabled: true,
+      lang: "en",
+      segments: [treeId, "constellation"],
+      query: { sel: "3" },
+      session: { userId: MEMBER, termsVersion: OLD_TERMS },
+      deps: { family, places: null },
+    });
+    if (memberSky.kind !== "view" || memberSky.data.kind !== "constellation")
+      throw new Error("expected the member's constellation");
+    expect(memberSky.data.slots.map((s) => s.person?.given_names ?? null)).toEqual([
+      "Józef",
+      null,
+      null,
+    ]);
+    expect(memberSky.data.picked).toBe(3);
+    expect(memberSky.data.tree.hidden_living_count).toBe(2);
+
     // The member's forms are not pages, and the member's routes are refused by the policies.
     const form = await loadTreePage({
       enabled: true,

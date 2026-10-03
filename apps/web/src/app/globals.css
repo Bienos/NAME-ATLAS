@@ -5150,6 +5150,315 @@ a.tree-card:hover {
   padding-left: 1.2em;
 }
 
+/* The Konstelacja view (TASK-084): the view switch, the dusk sky with the
+   stars on their arcs, the legend, and the panel of the picked person. On a
+   narrow screen the sky scrolls inside itself, never the page. */
+.tree-seg {
+  display: inline-flex;
+  gap: 2px;
+  margin: 0 0 var(--space-5);
+  padding: 2px;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.tree-seg a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+  text-decoration: none;
+  border-radius: 999px;
+}
+
+.tree-seg a[aria-current="page"] {
+  color: var(--dusk-on-amber);
+  background: var(--dusk-amber);
+}
+
+.tree-seg a:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+/* The view needs more than the reading column: the sky beside the panel. */
+.site > main.tree-constellation {
+  max-width: 76rem;
+}
+
+.tree-stars {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  margin: 0 0 var(--space-6);
+}
+
+@media (min-width: 64rem) {
+  .tree-stars {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+    align-items: start;
+  }
+}
+
+.tree-sky-section {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.tree-sky {
+  overflow-x: auto;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 100%, var(--dusk-sky-ember) 0%, transparent 70%),
+    linear-gradient(180deg, var(--dusk-surface-sunk) 0%, var(--dusk-sky-wine) 100%);
+  border: 1px solid var(--dusk-line);
+  border-radius: 12px;
+}
+
+.tree-sky svg {
+  display: block;
+  width: 100%;
+  min-width: 40rem;
+  height: auto;
+}
+
+.tree-sun-core {
+  stop-color: var(--dusk-sun);
+  stop-opacity: 0.9;
+}
+
+.tree-sun-mid {
+  stop-color: var(--dusk-amber);
+  stop-opacity: 0.45;
+}
+
+.tree-sun-edge {
+  stop-color: var(--dusk-amber);
+  stop-opacity: 0;
+}
+
+.tree-arc {
+  fill: none;
+  stroke: var(--dusk-ink);
+  stroke-opacity: 0.16;
+  stroke-width: 1;
+  stroke-dasharray: 2 8;
+}
+
+.tree-sky text {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  fill: var(--dusk-ink);
+  pointer-events: none;
+}
+
+.tree-arc-label {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--dusk-ink-muted);
+}
+
+.tree-line {
+  fill: none;
+}
+
+.tree-line-open {
+  stroke: var(--dusk-ink-muted);
+  stroke-opacity: 0.4;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 6;
+}
+
+.tree-line-solid {
+  stroke: var(--dusk-amber);
+  stroke-opacity: 0.5;
+  stroke-width: 1.2;
+}
+
+.tree-line-hot {
+  stroke: var(--dusk-amber);
+  stroke-opacity: 0.95;
+  stroke-width: 1.8;
+}
+
+.tree-star {
+  cursor: pointer;
+  outline: none;
+}
+
+.tree-star-hit {
+  fill: transparent;
+}
+
+.tree-star-core {
+  fill: var(--dusk-ink-soft);
+}
+
+.tree-star-source .tree-star-core {
+  fill: var(--dusk-amber);
+}
+
+.tree-star-halo {
+  fill: var(--dusk-amber);
+  fill-opacity: 0.22;
+}
+
+.tree-star-ring {
+  fill: var(--dusk-surface-sunk);
+  stroke: var(--dusk-ink-soft);
+  stroke-width: 1.5;
+}
+
+.tree-star-hidden .tree-star-ring,
+.tree-star-empty .tree-star-ring {
+  fill: transparent;
+  stroke: var(--dusk-line-control);
+}
+
+.tree-lock {
+  fill: none;
+  stroke: var(--dusk-ink);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tree-star-picked {
+  fill: none;
+  stroke: var(--dusk-amber);
+  stroke-width: 1.5;
+}
+
+.tree-star:focus-visible .tree-star-picked,
+.tree-star:focus-visible .tree-star-ring,
+.tree-star:focus-visible .tree-star-core {
+  stroke: var(--dusk-amber-hover);
+  stroke-width: 3;
+}
+
+.tree-star:hover .tree-star-name {
+  text-decoration: underline;
+}
+
+.tree-star-name {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.tree-star-empty .tree-star-name,
+.tree-star-hidden .tree-star-name {
+  font-weight: 500;
+  fill: var(--dusk-ink-soft);
+}
+
+.tree-star-sub {
+  font-size: 15px;
+  fill: var(--dusk-ink-muted);
+}
+
+.tree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+  list-style: none;
+}
+
+.tree-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: var(--dusk-ink-soft);
+  border-radius: 50%;
+}
+
+.tree-swatch-source {
+  background: var(--dusk-amber);
+  box-shadow: 0 0 8px var(--dusk-amber);
+}
+
+.tree-swatch-living {
+  background: transparent;
+  border: 1.5px solid var(--dusk-ink-soft);
+}
+
+.tree-swatch-empty {
+  background: transparent;
+  border: 1.5px dashed var(--dusk-line-control);
+}
+
+.tree-sky-note {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-panel {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-line);
+  border-radius: 12px;
+}
+
+.tree-panel h3,
+.tree-panel p,
+.tree-panel dl {
+  margin: 0;
+}
+
+.tree-panel .tree-eyebrow {
+  margin: 0;
+}
+
+.tree-panel-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tree-chip-source {
+  color: var(--dusk-amber);
+  border-color: var(--dusk-amber);
+}
+
+.tree-panel dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+}
+
+.tree-panel dt {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-panel dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.tree-panel-note {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+  background: var(--dusk-surface-sunk);
+  border-radius: 10px;
+}
+
 /* The tree's landing page (TASK-076, the "Horyzont" direction): a dusk hero
    whose sample pedigree recedes to the horizon, then the reading. Full width;
    the reading shell's measure is applied inside each section. */

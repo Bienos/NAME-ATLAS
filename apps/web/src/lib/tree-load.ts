@@ -12,6 +12,7 @@ import {
   treeTarget,
 } from "./tree-paths.js";
 import type { PersonDraft, SlotRole, TreeTarget } from "./tree-paths.js";
+import { pickSlot } from "./tree-constellation.js";
 import { nextQuestion, parentsOf, pedigree, unplaced } from "./tree-pedigree.js";
 import type { Question, Slot } from "./tree-pedigree.js";
 import type { PlaceMatch } from "./tree-places.js";
@@ -95,6 +96,16 @@ export type TreePageData =
       readonly question: Question;
       /** The person a status word is about, when the address names one the tree has. */
       readonly person: TreePersonRead | null;
+    }
+  | {
+      /** The Konstelacja view (TASK-084): the same slots as the pedigree, and the picked one. */
+      readonly kind: "constellation";
+      readonly lang: Lang;
+      readonly status: string | null;
+      readonly tree: TreeRead;
+      readonly slots: readonly Slot[];
+      readonly picked: number;
+      readonly unplacedCount: number;
     }
   | {
       readonly kind: "add";
@@ -249,6 +260,22 @@ export async function loadTreePage(input: {
         unplaced: unplaced(tree, slots),
         question: nextQuestion(tree, slots),
         person: personId === null ? null : (tree.persons.find((p) => p.id === personId) ?? null),
+      },
+    };
+  }
+
+  if (target.page === "constellation") {
+    const slots = pedigree(tree);
+    return {
+      kind: "view",
+      data: {
+        kind: "constellation",
+        lang,
+        status: null,
+        tree,
+        slots,
+        picked: pickSlot(slots, first(query, "sel")),
+        unplacedCount: unplaced(tree, slots).length,
       },
     };
   }

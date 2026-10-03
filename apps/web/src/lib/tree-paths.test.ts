@@ -176,3 +176,25 @@ describe("the one-question flow's draft (TASK-076, AC-6)", () => {
     expect(draftOf(read)).toEqual(full);
   });
 });
+
+describe("the Konstelacja's address (TASK-084, AC-1)", () => {
+  it("is the tree's address with the view's slug, in both languages, and nothing else under a tree", () => {
+    expect(treePath("pl", { page: "constellation", treeId: TREE })).toBe(
+      `/pl/konto/drzewa/${TREE}/konstelacja`,
+    );
+    expect(treePath("en", { page: "constellation", treeId: TREE })).toBe(
+      `/en/account/trees/${TREE}/constellation`,
+    );
+    expect(treeTarget("pl", [TREE, "konstelacja"])).toEqual({
+      page: "constellation",
+      treeId: TREE,
+    });
+    expect(treeTarget("en", [TREE, "constellation"])).toEqual({
+      page: "constellation",
+      treeId: TREE,
+    });
+    expect(treeTarget("pl", [TREE, "constellation"])).toBeNull();
+    expect(treeTarget("pl", [TREE, "konstelacja", "x"])).toBeNull();
+    expect(treeTarget("pl", ["konstelacja"])).toBeNull();
+  });
+});
