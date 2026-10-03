@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-03, by the blog's third post (TASK-074, `docs/progress/2026-10-03-blog-post-finding-ancestors.md`).
+**Last rewritten:** 2026-10-03, by the adoption of the SEO and content strategy (ADR-0031, `docs/progress/2026-10-03-seo-content-strategy.md`).
 
 ## Production
 
@@ -39,6 +39,7 @@ The current state on one page: what is live, what is next, what is blocked. **Re
 - **The landing atlas, further plates.** TASK-040 §6 U-3 (a method and wording for per-voivodeship leaders) and U-4 (a lookup through the resolver) need a decision.
 - **The family surnames view** (`tasks/drafts/family-surnames-stateless.md`). Approved in scope by the project owner on 2026-09-30, unnumbered and unscheduled. Its §4 leaves two preconditions to confirm in preflight. Release is gated on a privacy sign-off (its §13 U-6).
 - **More cards** (ADR-0025 §2.7; the owner's 2026-10-01 answers): famous bearers of the surname from Wikidata (CC0; needs a source registration and a decision about living people), and localities with the same name from TERYT under a line saying it is not where the surname comes from. Each is its own task. Publication languages stay off the page. A recap video of the cards with music needs the owner's choice of a licensed track.
+- **Search and editorial content** (ADR-0031, `docs/SEO_CONTENT_PLAN.md`, adopted 2026-10-03): the next blog tasks take their topic from the plan's §4 queue (first: "Jak sprawdzić pochodzenie nazwiska?"), and the first data study, the Polish Surname Index 2026, needs a task that fixes its method first. Regional studies wait on `docs/sources/pesel-regional.md` item 9. None of it is indexed until the owner sets `SEO_INDEXING_ENABLED` (`PLAN.md` M8).
 - **Change over time, open ends.** The landing's Plate VII reads 2020–2026 while the surname page reads 2019–2026; ADR-0019 §2.2 needs amending for 2019 there. `PRAWDA` has no 2020–2022 data point: those files print it as `True`, which no importer may map to it without the publisher's confirmation (`docs/sources/pesel-earlier-editions.md`). There is no 2022 women's edition: resource 38772 is the 2021 data.
 - **Accounts and the paid tiers, in order (ADR-0023 §2.4, ADR-0026, ADR-0027):** switching accounts on (the owner's Resend key, sending domain and five Vercel variables; the VM step has run and the card download's gate is built, TASK-064; D-025 changes what it leads to), and the clause on living people with the tree. **An off-host, restore-tested backup (TASK-049) must come before the tree, and it must include accounts:** they are the first user-written data on the VM, whose own dumps now leave their rows out, and which has no copy off it and a dump that has never been restored (TASK-049 §2.3's "no user-written data" is no longer true once accounts are on). Then the premium inventory and eligibility over `ARCHIVE_AVAILABILITY` and the other claims (M4), the report with a test entitlement (M5), then Stripe checkout in test mode (M6). D-024 blocks checkout, not the tiers' pages.
 
