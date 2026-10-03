@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-03, by TASK-078, the PESEL given-name lists imported (`docs/progress/2026-10-03-given-name-ingestion.md`).
+**Last rewritten:** 2026-10-03, by TASK-085: no years for a well-known bearer whose death Wikidata dates before the birth (`docs/progress/2026-10-03-bearer-years.md`).
 
 ## Production
 

@@ -266,6 +266,8 @@ export interface WikidataCandidate {
   readonly name: string;
   readonly born: number | null;
   readonly died: number | null;
+  /** Wikidata states a date of death, whether or not the years are shown (see {@link statedYears}). */
+  readonly death_recorded: boolean;
   readonly sitelinks: number;
   readonly polish_citizen: boolean;
 }
@@ -296,11 +298,12 @@ export function exactBearers(
     if (sitelinks === null || sitelinks < 1) {
       throw new WikidataShapeError(`${path}.sitelinks`, "missing or below one");
     }
+    const died = integer(b, "died", path);
     out.push({
       qid,
       name: bareName(name),
-      born: integer(b, "born", path),
-      died: integer(b, "died", path),
+      ...statedYears(integer(b, "born", path), died),
+      death_recorded: died !== null,
       sitelinks,
       polish_citizen: polishCitizen(b, path),
     });
@@ -322,6 +325,22 @@ function polishCitizen(b: Binding, path: string): boolean {
     throw new WikidataShapeError(`${path}.polish`, `not a Polish state: ${value}`);
   }
   return true;
+}
+
+/**
+ * The years a person is shown with (TASK-085). Wikidata can state a death
+ * before the birth: it gives Tomasz II Zaremba born 1300, died 1292, the
+ * earliest of several values for each. Which year is wrong cannot be told from
+ * the answer, so neither is shown; the person still counts, and still counts
+ * as having a date of death.
+ */
+export function statedYears(
+  born: number | null,
+  died: number | null,
+): { readonly born: number | null; readonly died: number | null } {
+  return born !== null && died !== null && died < born
+    ? { born: null, died: null }
+    : { born, died };
 }
 
 /** The people a summary keeps: the ids the details query is asked for. */
@@ -371,8 +390,8 @@ export function summariseWikidataBearers(
     surname,
     labels: wikidataFamilyNameLabels(surname),
     total: candidates.length,
-    with_death_date: candidates.filter((c) => c.died !== null).length,
-    bearers: kept.map((c) => {
+    with_death_date: candidates.filter((c) => c.death_recorded).length,
+    bearers: kept.map(({ death_recorded: _recorded, ...c }) => {
       const d = details.get(c.qid);
       if (d === undefined) throw new WikidataShapeError("details", `no row for ${c.qid}`);
       const pl = wikipediaUrl(text(d, "plwiki"), "pl.wikipedia.org", `details.${c.qid}.plwiki`);

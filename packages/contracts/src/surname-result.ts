@@ -662,7 +662,10 @@ export const bearerSchema = z.object({
   /** Wikidata's one-line description, in Polish and in English, where it has one. */
   description_pl: z.string().min(1).max(200).nullable(),
   description_en: z.string().min(1).max(200).nullable(),
-  /** Years as Wikidata states them. A null `died` is not "living": it may just not be recorded. */
+  /**
+   * Years as Wikidata states them, or both null where it states a death before
+   * the birth (TASK-085). A null `died` is not "living": it may just not be recorded.
+   */
   born: z.number().int().nullable(),
   died: z.number().int().nullable(),
   /** The person's article in the Polish Wikipedia, else the English one. */
