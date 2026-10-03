@@ -78,6 +78,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0026_rank_neighbours_index",
       "0027_accounts_schema",
       "0028_family_schema",
+      "0029_given_names",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -93,7 +94,9 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // TASK-011 added `places`, `place_names` and `entity_external_ids`: the
     // voivodeship Place foundation D-004's adoption required, pulled forward
     // from M3 for exactly that reason and no wider. TASK-039 added
-    // `administrative_memberships`, the TERC/SIMC hierarchy.
+    // `administrative_memberships`, the TERC/SIMC hierarchy. TASK-073 added
+    // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
+    // from surnames.
     //
     // Anything beyond this set is an accidental table. TASK-009 added
     // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
@@ -114,6 +117,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "evidence_items", table_type: "BASE TABLE" },
       { table_name: "geography_columns", table_type: "VIEW" },
       { table_name: "geometry_columns", table_type: "VIEW" },
+      { table_name: "given_name_counts", table_type: "BASE TABLE" },
+      { table_name: "given_names", table_type: "BASE TABLE" },
       { table_name: "knowledge_entities", table_type: "BASE TABLE" },
       { table_name: "kysely_migration", table_type: "BASE TABLE" },
       { table_name: "kysely_migration_lock", table_type: "BASE TABLE" },

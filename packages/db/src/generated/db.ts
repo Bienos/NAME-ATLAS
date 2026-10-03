@@ -21,7 +21,7 @@ export type ConfidenceStatus = "CONFLICTING" | "INSUFFICIENT_DATA" | "LIKELY" | 
 
 export type EntityStatus = "ACTIVE" | "MERGED" | "RETRACTED" | "SUPERSEDED";
 
-export type EntityType = "NAME_FORM" | "PLACE" | "SURNAME";
+export type EntityType = "GIVEN_NAME" | "NAME_FORM" | "PLACE" | "SURNAME";
 
 export type EpistemicType = "FACT" | "HYPOTHESIS" | "INTERPRETATION" | "UNKNOWN";
 
@@ -79,7 +79,7 @@ export type RightsPermission = "ALLOWED" | "CONDITIONAL" | "PROHIBITED" | "UNKNO
 
 export type RightsReviewStatus = "APPROVED" | "BLOCKED" | "CONDITIONAL" | "EXPIRED" | "LEGAL_REVIEW_REQUIRED";
 
-export type SourceGranularity = "DOCUMENT" | "MIXED" | "PERSON" | "PLACE" | "SURNAME";
+export type SourceGranularity = "DOCUMENT" | "GIVEN_NAME" | "MIXED" | "PERSON" | "PLACE" | "SURNAME";
 
 export type SourceProductionStatus = "APPROVED" | "BLOCKED" | "DEPRECATED" | "LEGAL_REVIEW_REQUIRED" | "PARTNERSHIP_REQUIRED";
 
@@ -242,6 +242,25 @@ export interface GeometryColumns {
   f_table_schema: string | null;
   srid: number | null;
   type: string | null;
+}
+
+export interface GivenNameCounts {
+  count: number;
+  created_at: Generated<Timestamp>;
+  given_name_count_id: string;
+  given_name_id: string;
+  source_record_id: string;
+}
+
+export interface GivenNames {
+  canonical_display: string;
+  canonical_key: string;
+  canonical_key_version: string;
+  created_at: Generated<Timestamp>;
+  form_review: string | null;
+  given_name_id: string;
+  primary_script: string;
+  updated_at: Generated<Timestamp>;
 }
 
 export interface KnowledgeEntities {
@@ -454,6 +473,8 @@ export interface DB {
   evidence_items: EvidenceItems;
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;
+  given_name_counts: GivenNameCounts;
+  given_names: GivenNames;
   knowledge_entities: KnowledgeEntities;
   name_forms: NameForms;
   place_names: PlaceNames;

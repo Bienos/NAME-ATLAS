@@ -13,7 +13,8 @@
     "import-pesel-regional": "tsx bin/import-pesel-regional.ts",
     "import-onomastics": "tsx bin/import-onomastics.ts",
     "seed-sources": "tsx bin/seed-source-catalogue.ts",
-    "import-teryt": "tsx bin/import-teryt.ts"
+    "import-teryt": "tsx bin/import-teryt.ts",
+    "import-given-names": "tsx bin/import-given-names.ts"
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",

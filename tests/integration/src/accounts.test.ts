@@ -860,8 +860,12 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   describe("the migration (AC-8)", () => {
     it("refuses to go down while a user is stored, and removes the schema when none is", async () => {
       const migrator = createMigrator(db().db);
-      // `0028` (the family schema, TASK-068) sits above and holds no tree here,
-      // so it steps off first; the refusal under test is `0027`'s.
+      // `0029` (given names, TASK-073) and `0028` (the family schema, TASK-068)
+      // sit above and hold nothing here, so they step off first; the refusal
+      // under test is `0027`'s.
+      const givenNames = await migrator.migrateDown();
+      expect(givenNames.error).toBeUndefined();
+      expect(givenNames.results?.map((r) => r.migrationName)).toEqual(["0029_given_names"]);
       const family = await migrator.migrateDown();
       expect(family.error).toBeUndefined();
       expect(family.results?.map((r) => r.migrationName)).toEqual(["0028_family_schema"]);

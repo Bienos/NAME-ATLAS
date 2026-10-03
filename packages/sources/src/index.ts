@@ -121,3 +121,4 @@ export * from "./catalogue/index.js";
 // TERYT localities — TASK-039: TERC + SIMC into places, names, external ids
 // and administrative memberships. Geography infrastructure, never surname evidence.
 export * from "./teryt/index.js";
+export * from "./given-names/index.js";

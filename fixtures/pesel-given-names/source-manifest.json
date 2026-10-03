@@ -1,0 +1,31 @@
+{
+  "$comment": "TASK-073 (ADR-0030). GENUINE excerpts of two PESEL given-name files: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. Kept: each list's 12 most common names, then the names the tests need (a name on both lists, the publisher's placeholders, one-character and abbreviated forms, foreign diacritics). The full files were downloaded by the TASK-073 session on 2026-10-03 from each resource's csv_download_url; their checksums are the registry's official_sha256.",
+  "dataset": {
+    "dataset_id": "1667",
+    "dataset_title": "Lista imion występujących w rejestrze PESEL",
+    "publishing_institution_name": "Ministerstwo Cyfryzacji",
+    "licence": "CC0 1.0",
+    "update_frequency": "Rocznie",
+    "official_dataset_metadata_url": "https://api.dane.gov.pl/1.4/datasets/1667"
+  },
+  "fixtures": [
+    {
+      "file": "first-male-2026-01-20.csv",
+      "resource_id": "1159669",
+      "sha256": "066828bab3deaaf9b7f1cf416f8a2178753fd04becb1f62fd6e8a20aa891a17f",
+      "rows_excluding_header": 23,
+      "people_on_rows": 5861812,
+      "full_file_sha256": "6a6e30832a880d5006ac5b884828235599cd5180aa2b4bb92e69adf004ca7853",
+      "full_file_rows_excluding_header": 46202
+    },
+    {
+      "file": "first-female-2026-01-20.csv",
+      "resource_id": "1159670",
+      "sha256": "8d077fa8309f2f55abc235ad4643dc2ed9f60a53459715a1007292f04526a970",
+      "rows_excluding_header": 21,
+      "people_on_rows": 6302429,
+      "full_file_sha256": "95dcfa121ef81d2102705e865744cfa433dcecd4a582157881f94cbde339f73a",
+      "full_file_rows_excluding_header": 28786
+    }
+  ]
+}
