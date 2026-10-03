@@ -124,9 +124,9 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
       SELECT canonical_key, canonical_key_version FROM surnames ORDER BY canonical_key
     `.execute(db);
 
-    // `0029` down to `0007` sit above `0006` and revert cleanly (a constraint,
-    // the accounts schema, which refuses only while a user is stored and none
-    // is here, two
+    // `0029` down to `0007` sit above `0006` and revert cleanly (a claim type, the
+    // family and accounts schemas, which refuse only while a tree or a user is
+    // stored and none is here, two
     // constraints, the membership table, four indexes, the slug table, two
     // index swaps, a dropped constraint, six enum additions that cannot be
     // removed, the place tables, a data update and two dropped columns). They
@@ -136,6 +136,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     const migrator = createMigrator(db);
     for (const expected of [
       "0029_notable_bearers",
+      "0028_family_schema",
       "0027_accounts_schema",
       "0026_rank_neighbours_index",
       "0025_archive_availability",

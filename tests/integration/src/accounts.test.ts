@@ -830,23 +830,38 @@ describe("accounts (TASK-061, ADR-0027)", () => {
         "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('users','sessions','email_tokens','sign_in_failures')",
       );
       expect(inPublic).toEqual([]);
-      const references = await rows<{ n: string }>(`
+      // No foreign key crosses the register's boundary in either direction, and
+      // the only references into `accounts` come from the other private schema,
+      // `family` (TASK-066, ADR-0029 §2.1), never from `public`.
+      const crossing = await rows<{ n: string }>(`
         SELECT count(*)::text AS n
         FROM pg_constraint c
         JOIN pg_class f ON f.oid = c.conrelid
         JOIN pg_namespace fn ON fn.oid = f.relnamespace
         JOIN pg_class t ON t.oid = c.confrelid
         JOIN pg_namespace tn ON tn.oid = t.relnamespace
-        WHERE c.contype = 'f' AND ((fn.nspname = 'accounts') <> (tn.nspname = 'accounts'))
+        WHERE c.contype = 'f' AND ((fn.nspname = 'public') <> (tn.nspname = 'public'))
       `);
-      expect(references[0]?.n).toBe("0");
+      expect(crossing[0]?.n).toBe("0");
+      const intoAccounts = await rows<{ nspname: string }>(`
+        SELECT DISTINCT fn.nspname
+        FROM pg_constraint c
+        JOIN pg_class f ON f.oid = c.conrelid
+        JOIN pg_namespace fn ON fn.oid = f.relnamespace
+        JOIN pg_class t ON t.oid = c.confrelid
+        JOIN pg_namespace tn ON tn.oid = t.relnamespace
+        WHERE c.contype = 'f' AND tn.nspname = 'accounts' AND fn.nspname <> 'accounts'
+        ORDER BY 1
+      `);
+      expect(intoAccounts.map((r) => r.nspname)).toEqual(["family"]);
     });
   });
 
   describe("the migration (AC-8)", () => {
     it("refuses to go down while a user is stored, and removes the schema when none is", async () => {
       const migrator = createMigrator(db().db);
-      // Step past the migrations above 0027 first (TASK-073's 0029).
+      // Step past the migrations above 0027 first (0028, the family schema, which
+      // holds no tree here, and 0029).
       await migrator.migrateTo("0027_accounts_schema");
       const refused = await migrator.migrateDown();
       expect(String(refused.error)).toMatch(/refusing to drop schema accounts/u);
