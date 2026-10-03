@@ -34,7 +34,7 @@ The assistant's recommendation, not a decision: option 1 first; option 3 until a
 
 **Status:** NON-BLOCKING NOW. It blocks nothing: the surname page is rendered on the free surface, where the stored profile allows the section, and the page's indexability folds the rights of the surname's claims, which the localities lookup is not.
 **Owner:** project owner.
-**Raised by:** the localities task's session (TASK-066 then, TASK-082 now), 2026-10-01.
+**Raised by:** the localities task's session (TASK-066 then, TASK-086 now), 2026-10-01.
 
 Facts, as the code and the stored data stand:
 

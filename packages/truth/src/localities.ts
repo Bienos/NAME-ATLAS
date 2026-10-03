@@ -16,7 +16,7 @@ import { LOCALITY_MATCH_METHOD, LOCALITY_MATCH_VERSION } from "./version.js";
 
 /**
  * The localities in the TERYT register whose official name is the surname
- * (TASK-082, ADR-0025 §2.7): a lookup, never a claim.
+ * (TASK-086, ADR-0025 §2.7): a lookup, never a claim.
  *
  * A locality and a surname compare by the resolver's canonical key, which the
  * TERYT importer stores as `place_names.normalized_name` (TASK-039). Only a

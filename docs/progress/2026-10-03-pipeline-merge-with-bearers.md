@@ -146,3 +146,13 @@ The web files #92 changed (`globals.css`, `messages.ts`, `request-policy.ts`, `l
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0 |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Eleventh merge: `main` after #94 (TASK-082, a blog post), 2026-10-03
+
+#94 took TASK-082, which this branch had given the localities task. TASK-084 and TASK-085 are held on other sessions' branches (`claude/tender-curie-ybiyaj`, `claude/blissful-johnson-450rie`), so the localities task becomes **TASK-086** (`tasks/086-localities-with-the-same-name.md`), with its code comments, contract notes, `STATUS.md`, `docs/CODEMAP.md`, D-032's line and TASK-070. Only `STATUS.md`'s "Last rewritten" line conflicted.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
