@@ -640,7 +640,7 @@ function catalogue(archive: ArchiveSection, lang: Lang): CardFace | null {
 /** How many localities the card names; the total says what it leaves out. */
 const PLACES_ON_CARD = 5;
 
-/** TERYT's localities with the surname's name (TASK-079), the warning line on the card itself. */
+/** TERYT's localities with the surname's name (TASK-082), the warning line on the card itself. */
 function places(response: SurnameResultResponse, lang: Lang): CardFace | null {
   const t = UI[lang];
   const section: LocalitiesSection | null = response.localities;
@@ -814,7 +814,7 @@ function end(
 /**
  * The cards for a resolved surname, in ADR-0025 §2.3's order: the surname,
  * rarity, neighbours, where, change, the other form, meaning, old print,
- * Polona's catalogue, the localities with the same name (TASK-079), the known
+ * Polona's catalogue, the localities with the same name (TASK-082), the known
  * people with the surname (TASK-073) and the summary. Each card leads with the
  * surname's main list. Empty for anything that did not resolve.
  */

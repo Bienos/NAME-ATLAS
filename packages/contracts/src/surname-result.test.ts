@@ -1144,7 +1144,7 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
     expect(check({ ...unresolved, other_form: OTHER }).success).toBe(false);
   });
 
-  describe("localities with the surname's name (TASK-079, ADR-0025 §2.7; schema 1.11)", () => {
+  describe("localities with the surname's name (TASK-082, ADR-0025 §2.7; schema 1.11)", () => {
     // SYNTHETIC ids; the place is the real Jemna of the TERYT excerpt (TASK-039).
     const id = (n: number) => `01a0b9e3-34f3-7633-a239-2b8596dfc0${String(n).padStart(2, "0")}`;
     const place = (n: number, name: string, kind: "CITY" | "VILLAGE" | "OTHER") => ({
