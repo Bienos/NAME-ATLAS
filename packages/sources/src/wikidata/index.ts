@@ -14,6 +14,7 @@ export {
   exactBearers,
   keptBearers,
   nameEndsWithSurname,
+  statedYears,
   summariseWikidataBearers,
   wikidataBearersQuery,
   wikidataDetailsQuery,

@@ -8,6 +8,7 @@ import {
   WikidataShapeError,
   exactBearers,
   nameEndsWithSurname,
+  statedYears,
   summariseWikidataBearers,
   wikidataBearersQuery,
   wikidataDetailsQuery,
@@ -129,6 +130,17 @@ describe("ZAREMBA's bearers", () => {
     });
   });
 
+  it("show no years where Wikidata states a death before the birth, and still count the death", () => {
+    // Wikidata's answer gives Tomasz II Zaremba born 1300 and died 1292.
+    const tomasz = summary.bearers.find((b) => b.qid === "Q331544");
+    expect(tomasz).toMatchObject({ name: "Tomasz II Zaremba", born: null, died: null });
+    expect(tomasz).not.toHaveProperty("death_recorded");
+    expect(summary.with_death_date).toBe(37);
+    expect(
+      summary.bearers.every((b) => b.born === null || b.died === null || b.died >= b.born),
+    ).toBe(true);
+  });
+
   it("link a Wikipedia article in Polish or English, and nothing else", () => {
     for (const b of summary.bearers) {
       if (b.article_url !== null) {
@@ -152,6 +164,16 @@ describe("ZAREMBA's bearers", () => {
         [first],
       ),
     ).toThrow(/no row for/u);
+  });
+});
+
+describe("the years", () => {
+  it("are kept as stated unless the death comes before the birth", () => {
+    expect(statedYears(1863, 1942)).toEqual({ born: 1863, died: 1942 });
+    expect(statedYears(1942, 1942)).toEqual({ born: 1942, died: 1942 });
+    expect(statedYears(1973, null)).toEqual({ born: 1973, died: null });
+    expect(statedYears(null, 1938)).toEqual({ born: null, died: 1938 });
+    expect(statedYears(1300, 1292)).toEqual({ born: null, died: null });
   });
 });
 
