@@ -3577,11 +3577,6 @@ span.lf-alt {
   }
 }
 
-/* TASK-047: the contact line under the footer's data note. */
-.footer-contact {
-  margin: var(--space-3) 0 0;
-}
-
 /* TASK-046: the privacy notice and the terms. */
 .legal-updated {
   color: var(--text-secondary);
@@ -5842,14 +5837,6 @@ a.tree-card:hover {
   }
 }
 
-/* The footer's blog and social links, after the contact line (TASK-057). */
-.footer-follow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2) var(--space-5);
-  margin-top: var(--space-3);
-}
-
 /* --- answers: the surname page and the search's own answers --- */
 
 .site > main.profile,
@@ -6046,15 +6033,432 @@ a.tree-card:hover {
 /* --- the footer --- */
 
 /* The same width under every page; the older per-page footer widths (the
-   comparison's, the profile's) no longer apply. */
+   comparison's, the profile's) no longer apply. A lit horizon line opens it:
+   amber at the middle, gone at the edges. */
 .site > footer,
 .site > main + footer {
+  position: relative;
   width: 100%;
   max-width: var(--site-width);
-  margin: 0 auto;
-  padding-block: var(--space-6) var(--space-7);
+  margin: var(--space-9) auto 0;
+  padding-block: var(--space-8) var(--space-6);
+  font-size: 0.9375rem;
   color: var(--dusk-ink-muted);
+  border-top: 0;
+}
+
+.site-footer::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--dusk-amber) 50%, transparent);
+  opacity: 0.55;
+}
+
+/* The call to write: one wide card, the question in the display face, the
+   action as the site's pill. The whole card is the link. */
+.footer-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5) var(--space-7);
+  padding: var(--space-7) clamp(var(--space-6), 4vw, var(--space-8));
+  margin-bottom: var(--space-8);
+  text-decoration: none;
+  background:
+    radial-gradient(120% 160% at 100% 0%, var(--dusk-amber-wash), transparent 60%),
+    radial-gradient(90% 140% at 0% 100%, #7d283340, transparent 70%), var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 28px;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.dusk .footer-cta {
+  color: var(--dusk-ink);
+}
+
+.footer-cta:hover,
+.footer-cta:focus-visible {
+  border-color: var(--dusk-amber);
+  box-shadow: 0 0 64px var(--dusk-glow);
+}
+
+.footer-cta:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 4px;
+}
+
+.footer-cta-title {
+  max-width: 22ch;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.625rem, 1.1rem + 2vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.footer-cta-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font-weight: 600;
+  color: var(--dusk-on-amber);
+  background: var(--dusk-amber);
+  border-radius: 999px;
+}
+
+.footer-cta-action span {
+  transition: transform 200ms ease;
+}
+
+.footer-cta:hover .footer-cta-action span {
+  transform: translateX(4px);
+}
+
+/* On the contact page the form is already above: no call to it. */
+.site:has(> main.contact) .footer-cta {
+  display: none;
+}
+
+/* The wordmark and the data note, then the four groups. */
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) repeat(4, minmax(0, 1fr));
+  gap: var(--space-7) var(--space-6);
+}
+
+.dusk .footer-wordmark {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+  text-decoration: none;
+}
+
+.footer-tagline {
+  margin: var(--space-3) 0 var(--space-4);
+  color: var(--dusk-ink-soft);
+}
+
+.footer-note {
+  max-width: 44ch;
+  margin: 0;
+  padding-left: var(--space-4);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  border-left: 2px solid var(--dusk-amber-wash);
+}
+
+.footer-group h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+}
+
+.footer-group ul {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dusk .footer-group a {
+  color: var(--dusk-ink-soft);
+  text-decoration: none;
+  background: linear-gradient(var(--dusk-amber), var(--dusk-amber)) 0 100% / 0 1px no-repeat;
+  transition:
+    color 160ms ease,
+    background-size 200ms ease;
+}
+
+.dusk .footer-group a:hover,
+.dusk .footer-group a:focus-visible {
+  color: var(--dusk-ink);
+  background-size: 100% 1px;
+}
+
+/* The social links as small pills. */
+.footer-follow ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.dusk .footer-follow a {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.875rem;
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 999px;
+}
+
+.dusk .footer-follow a:hover,
+.dusk .footer-follow a:focus-visible {
+  border-color: var(--dusk-amber);
+  background-size: auto;
+}
+
+.footer-base {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+  padding-top: var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
   border-top: 1px solid var(--dusk-line);
+}
+
+.footer-base p {
+  margin: 0;
+}
+
+.dusk .footer-top {
+  color: var(--dusk-ink-muted);
+  text-decoration: none;
+}
+
+.dusk .footer-top:hover {
+  color: var(--dusk-amber);
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-cta,
+  .footer-cta-action span,
+  .dusk .footer-group a {
+    transition: none;
+  }
+}
+
+/* --- the contact page: what to write about beside the form --- */
+
+.site > main.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: var(--space-8);
+  align-items: start;
+  padding-block: var(--space-7) var(--space-9);
+}
+
+.contact h2 {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+}
+
+.contact-intro p,
+.contact-intro li {
+  line-height: 1.6;
+  color: var(--dusk-ink-soft);
+}
+
+.contact-intro .contact-lede {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  color: var(--dusk-ink);
+}
+
+.contact-direct {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  font-size: 0.9375rem;
+  border-top: 1px solid var(--dusk-line);
+}
+
+.contact-card {
+  position: sticky;
+  top: var(--space-6);
+  padding: clamp(var(--space-6), 3vw, var(--space-7));
+  background:
+    radial-gradient(120% 100% at 100% 0%, var(--dusk-amber-wash), transparent 55%),
+    var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 28px;
+}
+
+.contact-form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.contact-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.contact-form label,
+.contact-topics legend {
+  display: grid;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+}
+
+.contact-form input:not([type="radio"]),
+.contact-form textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-4);
+  font: inherit;
+  font-size: 1rem;
+  color: var(--dusk-ink);
+  background: var(--dusk-surface-sunk);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 14px;
+}
+
+.contact-form textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.contact-form :focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+.contact-count {
+  justify-self: end;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--dusk-ink-muted);
+}
+
+.contact-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.contact-topics legend {
+  margin-bottom: var(--space-3);
+}
+
+.contact-form .contact-chip {
+  position: relative;
+  display: inline-flex;
+}
+
+.contact-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.contact-chip span {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.contact-chip input:checked + span {
+  color: var(--dusk-on-amber);
+  background: var(--dusk-amber);
+  border-color: var(--dusk-amber);
+}
+
+.contact-chip input:focus-visible + span {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+/* The field a person never sees, kept out of view and out of the tab order. */
+.contact-form .contact-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-5);
+}
+
+.contact-actions .offer-send:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.contact-privacy {
+  flex: 1 1 14rem;
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.contact-status p {
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border-radius: 14px;
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  color: var(--dusk-ink);
+}
+
+.contact-status .contact-status-sent {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber-wash);
+}
+
+.contact-status .contact-status-invalid,
+.contact-status .contact-status-failed,
+.contact-status .contact-status-unavailable {
+  border-color: var(--dusk-warning);
+}
+
+@media (max-width: 900px) {
+  .site > main.contact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .contact-card {
+    position: static;
+  }
+}
+
+@media (max-width: 560px) {
+  .contact-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* --- the journey (TASK-053) --- */

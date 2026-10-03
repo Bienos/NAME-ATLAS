@@ -6,3 +6,6 @@
  * importing each other.
  */
 export const CONTACT_EMAIL = "cihypatryk@gmail.com";
+
+/** The longest message the contact form takes, in characters (form and route alike). */
+export const CONTACT_MESSAGE_MAX = 5_000;

@@ -26,6 +26,11 @@ export function offerPath(lang: Lang): string {
   return lang === "en" ? "/en/offer" : "/pl/oferta";
 }
 
+/** The contact page, with its form (TASK-047). */
+export function contactPath(lang: Lang): string {
+  return lang === "en" ? "/en/contact" : "/pl/kontakt";
+}
+
 /** The blog's index, and one post of it (TASK-071). Slugs are shared by a post's two languages. */
 export function blogPath(lang: Lang): string {
   return lang === "en" ? "/en/blog" : "/pl/blog";
