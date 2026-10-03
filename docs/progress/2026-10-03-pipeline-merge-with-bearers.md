@@ -78,3 +78,11 @@ Local PostgreSQL 16 with PostGIS.
 | `bash -n` on every `ops/vm/*.sh` | no errors |
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup` | exit 0 |
 | `register-vm.yml` parsed as YAML | parses |
+
+## Fifth merge: `main` after #85 (ADR-0031, search and editorial content), 2026-10-03
+
+Only `STATUS.md` conflicted: the "Last rewritten" line, and the More-cards line, which keeps TASK-079 beside `main`'s new search-and-content line.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test` | exit 0 |
