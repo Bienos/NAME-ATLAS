@@ -91,10 +91,19 @@ function falling(x: number, n: number): bigint {
   return out;
 }
 
-/** num / den to double precision: 40 exact decimals, parsed (JS parsing rounds correctly). */
+/**
+ * num / den to double precision: at least 20 significant decimal digits, parsed
+ * in exponent form (JS parsing rounds correctly, down into the denormals). An
+ * earlier version kept 40 decimal *places*, which left a share near 1e-30 ten
+ * significant digits and made one near 1e-40 zero: the property below then
+ * measured this helper, not the implementation, on the rare list that drew
+ * such a share, and CI failed by the seed.
+ */
 function toDouble(num: bigint, den: bigint): number {
-  const scaled = ((num * 10n ** 40n) / den).toString().padStart(41, "0");
-  return Number(`${scaled.slice(0, -40)}.${scaled.slice(-40)}`);
+  if (num === 0n) return 0;
+  const shift = Math.max(0, den.toString().length - num.toString().length + 20);
+  const scaled = (num * 10n ** BigInt(shift)) / den;
+  return Number(`${scaled.toString()}e-${shift}`);
 }
 
 /** num / den rounded half up to nine decimals, exactly. */
@@ -177,8 +186,14 @@ describe("expectedDistinct and shareWithoutNamesake against exact rational arith
           expect(Math.abs(expectedDistinct(hist, n) - exact.distinct)).toBeLessThanOrEqual(
             1e-15 * exact.distinct,
           );
+          // The share is exp(log-ratio) and carries about |log| ulps of relative
+          // error, so its bound follows |ln share|: a flat 1e-15 was exceeded by
+          // 11 of 30,000 random lists (up to 2.8e-15 at a share near 3e-20), and
+          // CI drew one of them ([33, 58], n = 21: 1.03e-15). Below 1e-300 the
+          // doubles themselves run out, so an absolute floor stands in.
+          const share = Math.max(exact.share, Number.MIN_VALUE);
           expect(Math.abs(shareWithoutNamesake(hist, n) - exact.share)).toBeLessThanOrEqual(
-            1e-15 * Math.max(exact.share, Number.MIN_VALUE),
+            Math.max((4 + Math.abs(Math.log(share))) * 2.3e-16 * share, 1e-300),
           );
         },
       ),

@@ -10,11 +10,12 @@
 -- way it sets the web role's, and PgBouncer's user list gets its SCRAM secret.
 --
 -- What the grants mean:
---   nameatlas_app  reads and writes the tables of schema accounts, and holds no
---                  privilege on any table of public beyond what PUBLIC itself holds
---                  (PostGIS's own catalog; none of the register).
---   nameatlas_web  has no grant on schema accounts (it is only ever granted
---                  `public`'s tables).
+--   nameatlas_app  reads and writes the tables of schemas accounts and family
+--                  (TASK-066, ADR-0029), and holds no privilege on any table of
+--                  public beyond what PUBLIC itself holds (PostGIS's own catalog;
+--                  none of the register).
+--   nameatlas_web  has no grant on schema accounts or family (it is only ever
+--                  granted `public`'s tables).
 
 DO $$
 BEGIN
@@ -43,6 +44,16 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA accounts TO nameatl
 -- Tables the build role creates in this schema later (a new migration) are
 -- covered without another run of this file.
 ALTER DEFAULT PRIVILEGES FOR ROLE nameatlas IN SCHEMA accounts
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nameatlas_app;
+
+-- The family tree (TASK-066, ADR-0029 §2.1): the same role, the same grants, a
+-- second schema. Its tables carry row-level security policies (migration 0028),
+-- which apply to this role because it does not own the tables.
+CREATE SCHEMA IF NOT EXISTS family AUTHORIZATION nameatlas;
+REVOKE ALL ON SCHEMA family FROM PUBLIC;
+GRANT USAGE ON SCHEMA family TO nameatlas_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA family TO nameatlas_app;
+ALTER DEFAULT PRIVILEGES FOR ROLE nameatlas IN SCHEMA family
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nameatlas_app;
 
 -- The role may connect to this database.
