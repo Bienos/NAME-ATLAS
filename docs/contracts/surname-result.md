@@ -1,7 +1,7 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-086 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-090 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03
 - **Schema version:** `1.12` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
@@ -389,7 +389,7 @@ Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between
 
 ## Accepted rendering of a localities section
 
-Decided with TASK-086 (2026-10-01, ADR-0025 §2.7: localities "under a line saying it is not where the surname comes from"). The statement names the register, the count and the date; the warning line comes before the list; and the list gives each locality's kind and its gmina, powiat and voivodeship as the register writes them:
+Decided with TASK-090 (2026-10-01, ADR-0025 §2.7: localities "under a line saying it is not where the surname comes from"). The statement names the register, the count and the date; the warning line comes before the list; and the list gives each locality's kind and its gmina, powiat and voivodeship as the register writes them:
 
 - EN: `The TERYT register lists {n} {locality|localities} named {surname} (as of {date}).` then *A shared name in the register. It does not say where the surname began, or that the surname and these places are connected.*
 - PL: `Rejestr TERYT wymienia {n} {miejscowość|miejscowości} o nazwie {surname} (stan na {date}).` then *Zbieżność nazw w rejestrze. Nie mówi ona, skąd wzięło się nazwisko, ani że ma ono związek z tymi miejscami.*
@@ -412,8 +412,8 @@ Decided with TASK-086 (2026-10-01, ADR-0025 §2.7: localities "under a line sayi
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
 
-**1.10 → 1.11 (2026-10-01, TASK-086, ADR-0025 §2.7).** Adds `localities` (required, nullable, present exactly when `status` is `RESOLVED`). A consumer written against 1.10 is unaffected; a producer must now supply it. It is a lookup in the TERYT register TASK-039 loads, through the indexes migrations 0010 and 0023 made, so no new derivation, claim or migration comes with it; its state and surface come from `pl_teryt`'s stored rights profile, as the archive's do from Polona's.
-**1.11 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.11 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-086, #70 and #77), not on `main` when this was written; whichever lands second carries both.
+**1.10 → 1.11 (2026-10-01, TASK-090, ADR-0025 §2.7).** Adds `localities` (required, nullable, present exactly when `status` is `RESOLVED`). A consumer written against 1.10 is unaffected; a producer must now supply it. It is a lookup in the TERYT register TASK-039 loads, through the indexes migrations 0010 and 0023 made, so no new derivation, claim or migration comes with it; its state and surface come from `pl_teryt`'s stored rights profile, as the archive's do from Polona's.
+**1.11 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.11 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-090, #70 and #77), not on `main` when this was written; whichever lands second carries both.
 
 **1.9 → 1.10 (2026-10-01, TASK-055, ADR-0025).** Adds `neighbours` (required, nullable, present exactly when `status` is `RESOLVED`) and `other_form` (required, nullable, null unless `RESOLVED`). A consumer written against 1.9 is unaffected; a producer must now supply both. Both are read from rank claims that already exist, so no new derivation comes with them; migration 0026 adds an index so that the neighbours of a rare surname, whose place is shared by tens of thousands, are read without a sort.
 

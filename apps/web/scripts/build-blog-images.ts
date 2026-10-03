@@ -54,8 +54,11 @@ function random(seed: number): () => number {
 
 const f = (n: number) => n.toFixed(1);
 
-/** The sky, a low sun at the horizon, faint stars and the ground's curve. */
-function scene(seed: number, horizon: number, body: string): string {
+/**
+ * The sky, a low sun at the horizon, faint stars and the ground's curve; `front`
+ * is drawn over the ground.
+ */
+function scene(seed: number, horizon: number, body: string, front = ""): string {
   const rnd = random(seed);
   const stars = Array.from({ length: 70 }, () => {
     const x = rnd() * W;
@@ -91,6 +94,7 @@ ${stars}
 ${body}
 <path d="M0 ${horizon} Q ${W / 2} ${horizon - 46} ${W} ${horizon} L ${W} ${H} L 0 ${H} Z" fill="url(#ground)"/>
 <path d="M0 ${horizon} Q ${W / 2} ${horizon - 46} ${W} ${horizon}" fill="none" stroke="${C.amber}" stroke-opacity="0.45" stroke-width="2"/>
+${front}
 </svg>`;
 }
 
@@ -268,12 +272,53 @@ function ciekawostki(): string {
   );
 }
 
+/**
+ * jak-sprawdzic-pochodzenie-nazwiska: layers of ground under the horizon and a
+ * thin line sounding down through them, lit where it meets each of seven layers.
+ */
+function jakSprawdzic(): string {
+  const rnd = random(82);
+  const horizon = 400;
+  const layers: string[] = [];
+  const pebbles: string[] = [];
+  const marks: string[] = [];
+  const tones = [C.raised, C.wine, C.mapDim, C.wine, C.raised, C.mapDim, C.wine];
+  const depth = (H - horizon) / tones.length;
+  const x = W * 0.5;
+  tones.forEach((tone, i) => {
+    const top = horizon + 18 + i * depth;
+    const a = (rnd() - 0.5) * 50;
+    const b = (rnd() - 0.5) * 50;
+    layers.push(
+      `<path d="M0 ${f(top + 26)} C ${f(W * 0.3)} ${f(top - 30 + a)} ${f(W * 0.7)} ${f(top - 30 + b)} ${W} ${f(top + 26)}" fill="none" stroke="${tone}" stroke-width="${f(depth * 0.5)}" stroke-opacity="${f(0.45 + rnd() * 0.3)}" stroke-linecap="round"/>`,
+    );
+    for (let k = 0; k < 9; k += 1) {
+      pebbles.push(
+        `<ellipse cx="${f(rnd() * W)}" cy="${f(top + rnd() * depth)}" rx="${f(4 + rnd() * 10)}" ry="${f(2 + rnd() * 4)}" fill="${C.inkMuted}" opacity="${f(0.06 + rnd() * 0.1)}"/>`,
+      );
+    }
+    marks.push(
+      `<circle cx="${f(x)}" cy="${f(top + depth * 0.1)}" r="${f(4 + (tones.length - i) * 0.9)}" fill="${C.sun}" opacity="${f(1 - i * 0.08)}"/>`,
+    );
+  });
+  // `#sun` is centred on the bottom edge of its box, so the box ends at the horizon.
+  const glow = `<rect x="${x - W * 0.36}" y="${horizon - H * 0.4}" width="${W * 0.72}" height="${H * 0.4}" fill="url(#sun)"/>`;
+  const line = `<line x1="${f(x)}" y1="${horizon - 30}" x2="${f(x)}" y2="${H}" stroke="${C.amber}" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round" opacity="0.85"/>`;
+  return scene(
+    82,
+    horizon,
+    glow,
+    `<g>${layers.join("")}${pebbles.join("")}</g>${line}<g filter="url(#glow)">${marks.join("")}</g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
   "jak-szukac-przodkow": jakSzukac,
   "historia-genealogii": historia,
   "imie-i-nazwisko-ciekawostki": ciekawostki,
+  "jak-sprawdzic-pochodzenie-nazwiska": jakSprawdzic,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));

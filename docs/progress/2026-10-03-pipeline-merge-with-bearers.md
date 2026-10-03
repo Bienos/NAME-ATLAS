@@ -156,3 +156,13 @@ The web files #92 changed (`globals.css`, `messages.ts`, `request-policy.ts`, `l
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build` | exit 0 |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Twelfth merge: `main` after #93 (TASK-086, a blog post), 2026-10-03
+
+#93 took TASK-086 twenty minutes after this branch gave it to the localities task, and a third branch (`tasks/086-archive-rank-limit.md`) holds it too. The localities task becomes **TASK-090**, past 087–089, which no branch held on 2026-10-03 at 17:40 UTC; the other sessions take the next number free on `main`, so a gap keeps this one clear. `STATUS.md` conflicted in three lines: "Last rewritten", the More-cards line (this branch's, now TASK-090) and the search-and-content line (`main`'s, which names TASK-086 as piece 1).
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
