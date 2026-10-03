@@ -812,6 +812,14 @@ export const UI = {
     blogEmpty: "Nie ma jeszcze żadnych wpisów.",
     blogListLabel: "Wpisy",
     blogBack: "Wszystkie wpisy",
+    // The blog's redesign (TASK-075). The two headings name the posts' own
+    // sections, which get their own styling.
+    blogMore: "Więcej wpisów",
+    blogFaqHeading: "Najczęstsze pytania",
+    blogSourcesHeading: "Źródła",
+    blogCtaTitle: "Sprawdź swoje nazwisko",
+    blogCtaBody:
+      "Zobacz, ile osób nosi je dziś, jak jest rzadkie i gdzie występuje najczęściej. Za darmo i bez konta.",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -899,7 +907,7 @@ export const UI = {
     archiveNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w zbiorach Polony.",
     archiveUnavailable: "Wyników z Polony nie można teraz pokazać.",
     archiveBlocked: "Wyników z Polony nie można pokazać tutaj z powodu licencji źródła.",
-    // TASK-077: localities with the same name (ADR-0025 §2.7).
+    // TASK-079: localities with the same name (ADR-0025 §2.7).
     chapterPlacesTitle: "Które miejscowości tak się nazywają?",
     chapterPlacesLede:
       "Rejestr TERYT, urzędowy wykaz miejscowości, zawiera miejscowości o nazwie takiej samej " +
@@ -1428,6 +1436,14 @@ export const UI = {
     blogEmpty: "There are no posts yet.",
     blogListLabel: "Posts",
     blogBack: "All posts",
+    // The blog's redesign (TASK-075). The two headings name the posts' own
+    // sections, which get their own styling.
+    blogMore: "More posts",
+    blogFaqHeading: "Frequently asked questions",
+    blogSourcesHeading: "Sources",
+    blogCtaTitle: "Look up your surname",
+    blogCtaBody:
+      "See how many people bear it today, how rare it is and where it is most common. Free, no account needed.",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1507,7 +1523,7 @@ export const UI = {
     archiveNotSearched: "We have not searched Polona's collections for this surname yet.",
     archiveUnavailable: "Results from Polona cannot be shown right now.",
     archiveBlocked: "Results from Polona cannot be shown here because of the source's licence.",
-    // TASK-077: localities with the same name (ADR-0025 §2.7).
+    // TASK-079: localities with the same name (ADR-0025 §2.7).
     chapterPlacesTitle: "Which localities have this name?",
     chapterPlacesLede:
       "The TERYT register, Poland's official list of localities, holds localities named the " +
@@ -2021,7 +2037,7 @@ export function rightsBlockedText(lang: Lang): string {
     : "The source's licence does not permit showing this value on this page.";
 }
 
-/* --- localities with the same name (TASK-077, ADR-0025 §2.7) ------------- */
+/* --- localities with the same name (TASK-079, ADR-0025 §2.7) ------------- */
 
 /** The register's kinds, by TASK-039's classification of SIMC's `RM`. */
 export function localityKindLabel(kind: LocalityKind, lang: Lang): string {

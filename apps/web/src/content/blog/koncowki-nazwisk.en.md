@@ -4,6 +4,8 @@ description: What does a Polish surname ending tell you? Where -ski, -wicz, -ak,
 date: 2026-10-03
 slug: koncowki-nazwisk
 lang: en
+image: /images/blog/koncowki-nazwisk.webp
+imageAlt: Illustration: rows of rounded bars against a dusk sky; the last bar in each row glows gold.
 ---
 
 Many people try to guess where a Polish surname comes from by its ending. Kowalski sounds noble, Mickiewicz sounds like the old eastern borderlands, Kowalczyk sounds homely. Some of these impressions have a basis in history, but an ending mostly tells you how the surname was formed. It does not tell you where your family came from.

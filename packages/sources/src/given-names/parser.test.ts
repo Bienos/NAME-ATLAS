@@ -35,7 +35,7 @@ describe("parseGivenNameFile (TASK-078)", () => {
   });
 });
 
-describe("needsFormReview (ADR-0031 §4)", () => {
+describe("needsFormReview (ADR-0032 §4)", () => {
   it("flags one character and a full stop, and nothing else", () => {
     expect(["I", "E", "MD.", "MA. CRISTINA", "ROMEO JR."].map(needsFormReview)).toEqual([
       true,

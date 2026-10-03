@@ -2,8 +2,8 @@
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`). Not on production.
 - **Requested by:** the project owner, 2026-10-03: "start the first-name statistics", the first phase of the full-name report design.
-- **Decision:** ADR-0031 (proposed with this task).
-- **Number:** 078. Drafted as 073, then 075, then 076; while this was open `main` gave 073 and 074 to #84 and #83, 076 to the tree pages (#67), #79 took 075 and the localities task became 077 in #76. 078 is the next number free on `main` and in the open pull requests on 2026-10-03, 16:00 UTC. ADR-0031 and migration 0031 are unchanged: `main` took ADR-0030 and migration 0029 (#84), and #76 carries migration 0030 (the family safeguards).
+- **Decision:** ADR-0032 (proposed with this task).
+- **Number:** 078. Drafted as 073, then 075, then 076; while this was open `main` gave 073 and 074 to #84 and #83, 075 to the blog's redesign (#86) and 076 to the tree pages (#67); #87 claims 077, the localities task became 079 in #76 and the coverage assessment 080 in #79. 078 stays free on `main` and in the open pull requests on 2026-10-03. The decision is ADR-0032, since #85 claims ADR-0031; migration 0031 is unchanged: `main` took migration 0029 (#84), and #76 carries migration 0030 (the family safeguards).
 - **Depends on:** #79's branch (migration 0031 must follow `main`'s 0029 and #76's 0030).
 - **Model guidance:** implementation session.
 
@@ -25,7 +25,7 @@ The register holds the publisher's first-name counts for living people, one list
 
 ## 3. In scope
 
-- **ADR-0031:** given names as a separate name type.
+- **ADR-0032:** given names as a separate name type.
 - **Migration 0031:** `GIVEN_NAME` in `entity_type` and `source_granularity`; `given_names`; `given_name_counts`.
 - **`packages/sources/src/given-names/`:** the source, rights profile and descriptors; a fail-closed parser; the importer, which checks rights, then the checksum, then parses in one transaction. It is idempotent and supersedes a changed version.
 - **`pnpm import:given-names`.**

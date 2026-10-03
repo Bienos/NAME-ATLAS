@@ -14,7 +14,7 @@ import {
 } from "@name-atlas/sources";
 
 /**
- * TASK-078 (ADR-0031): the PESEL given-name lists into a real PostgreSQL.
+ * TASK-078 (ADR-0032): the PESEL given-name lists into a real PostgreSQL.
  *
  * GENUINE data: `fixtures/pesel-given-names/` holds whole lines of the two
  * 2026-01-20 first-name files, and the payloads are the publisher's own

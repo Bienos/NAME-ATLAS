@@ -4,7 +4,7 @@ The first phase of the full-name report design: the register holds the 2026-01-2
 
 ## What changed
 
-- **ADR-0031 (proposed):** given names are a second name type, kept apart from surnames, with given-name-scoped counts. Placeholders are never names, doubtful forms are flagged, and there is no claim yet.
+- **ADR-0032 (proposed):** given names are a second name type, kept apart from surnames, with given-name-scoped counts. Placeholders are never names, doubtful forms are flagged, and there is no claim yet.
 - **Migration 0031:** `GIVEN_NAME` in `entity_type` and `source_granularity`; `given_names` (canonical key unique, `form_review`); `given_name_counts` (one per name and source record, count ≥ 2). The generated database types were regenerated with `pnpm db:generate-types`.
 - **`packages/sources/src/given-names/`:** registry (source `pl_pesel_given_names`, a CC0 profile, two descriptors pinned to the bytes), parser, importer and index. `pnpm import:given-names` is the CLI.
 - **Fixtures:**

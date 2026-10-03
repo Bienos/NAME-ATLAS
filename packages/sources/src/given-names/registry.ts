@@ -1,5 +1,5 @@
 /**
- * The PESEL given-name lists (ADR-0031, TASK-078): the source, its rights
+ * The PESEL given-name lists (ADR-0032, TASK-078): the source, its rights
  * profile, and the two resources this task imports, each pinned to the bytes
  * the project read on 2026-10-03.
  */
@@ -12,7 +12,7 @@ export const GIVEN_NAMES_SOURCE_KEY = "pl_pesel_given_names";
 export const GIVEN_NAMES_FIRST_HEADER = "IMIĘ_PIERWSZE,PŁEĆ,LICZBA_WYSTĄPIEŃ";
 
 /**
- * The publisher's placeholders: rows that hold no name (ADR-0031 §3). Read,
+ * The publisher's placeholders: rows that hold no name (ADR-0032 §3). Read,
  * counted and reported; never a given name. Exact strings only, read from the
  * 2026-01-20 files; a new placeholder is a finding to add here by review.
  */
@@ -25,7 +25,7 @@ export const GIVEN_NAME_PLACEHOLDERS: ReadonlySet<string> = new Set([
   "XXX",
 ]);
 
-/** ADR-0031 §4: one character, or a full stop. Stored, flagged, never shown unreviewed. */
+/** ADR-0032 §4: one character, or a full stop. Stored, flagged, never shown unreviewed. */
 export function needsFormReview(name: string): boolean {
   return [...name].length === 1 || name.includes(".");
 }
@@ -73,7 +73,7 @@ export const GIVEN_NAMES_SOURCE: GivenNameSourceSeed = {
     "position. Single occurrences and deceased persons are left out by the publisher " +
     "('Pojedyncze wystąpienia oraz dane dot. osób zmarłych nie zostały umieszczone na " +
     "liście'): absence is never a confirmed zero. The lists carry placeholder rows " +
-    "('BRAK DANYCH' and others) that are not names (ADR-0031 §3).",
+    "('BRAK DANYCH' and others) that are not names (ADR-0032 §3).",
   authority_tier: "A_PRIMARY_OFFICIAL",
   production_status: "LEGAL_REVIEW_REQUIRED",
   homepage_or_reference_url:

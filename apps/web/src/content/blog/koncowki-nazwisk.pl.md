@@ -4,6 +4,8 @@ description: Co mówi końcówka nazwiska? Skąd się wzięły nazwiska na -ski,
 date: 2026-10-03
 slug: koncowki-nazwisk
 lang: pl
+image: /images/blog/koncowki-nazwisk.webp
+imageAlt: Ilustracja: rzędy zaokrąglonych pasków na tle zmierzchu; ostatni pasek w każdym rzędzie świeci na złoto.
 ---
 
 Po końcówce wiele osób próbuje odgadnąć pochodzenie nazwiska. Kowalski brzmi szlachecko, Mickiewicz kresowo, Kowalczyk swojsko. Część tych skojarzeń ma podstawy w historii, ale końcówka mówi przede wszystkim, jak nazwisko utworzono. Nie mówi, skąd pochodzi Twoja rodzina.

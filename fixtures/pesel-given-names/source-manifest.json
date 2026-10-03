@@ -1,5 +1,5 @@
 {
-  "$comment": "TASK-078 (ADR-0031). GENUINE excerpts of two PESEL given-name files: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. Kept: each list's 12 most common names, then the names the tests need (a name on both lists, the publisher's placeholders, one-character and abbreviated forms, foreign diacritics). The full files were downloaded by the TASK-078 session on 2026-10-03 from each resource's csv_download_url; their checksums are the registry's official_sha256.",
+  "$comment": "TASK-078 (ADR-0032). GENUINE excerpts of two PESEL given-name files: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. Kept: each list's 12 most common names, then the names the tests need (a name on both lists, the publisher's placeholders, one-character and abbreviated forms, foreign diacritics). The full files were downloaded by the TASK-078 session on 2026-10-03 from each resource's csv_download_url; their checksums are the registry's official_sha256.",
   "dataset": {
     "dataset_id": "1667",
     "dataset_title": "Lista imion występujących w rejestrze PESEL",

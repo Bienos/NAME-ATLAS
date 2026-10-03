@@ -1,6 +1,6 @@
 # PESEL given-name lists (dane.gov.pl dataset 1667)
 
-Source record for TASK-078 (ADR-0031). Read on 2026-10-03.
+Source record for TASK-078 (ADR-0032). Read on 2026-10-03.
 
 - **Dataset:** "Lista imion występujących w rejestrze PESEL", Ministerstwo Cyfryzacji, https://dane.gov.pl/pl/dataset/1667,lista-imion-wystepujacych-w-rejestrze-pesel (API: `https://api.dane.gov.pl/1.4/datasets/1667`).
 - **Licence:** "CC0 1.0", as the dataset's metadata states. Update frequency "Rocznie" (yearly).
@@ -15,7 +15,7 @@ Source record for TASK-078 (ADR-0031). Read on 2026-10-03.
   - The header is `IMIĘ_PIERWSZE,PŁEĆ,LICZBA_WYSTĄPIEŃ`.
   - The sex column is `MĘŻCZYZNA` or `KOBIETA` and is constant per file.
   - The count is at least 2, and rows are ordered by count.
-- **What the lists hold besides names (ADR-0031 §3–4):**
+- **What the lists hold besides names (ADR-0032 §3–4):**
   - **Placeholders:** `BRAK DANYCH` (male 1,001; female 128), `BRAK IMIENIA`, `BRAK`, `BRAKDANYCH`, `-` and `XXX`.
   - **One-character forms:** `I`, `M`, `E`.
   - **Abbreviated forms:** `MD.`, `MA.`, `MA. CRISTINA`, `ROMEO JR.`.

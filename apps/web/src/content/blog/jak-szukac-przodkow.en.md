@@ -4,6 +4,8 @@ description: How to find Polish ancestors: from documents at home to Geneteka, s
 date: 2026-10-03
 slug: jak-szukac-przodkow
 lang: en
+image: /images/blog/jak-szukac-przodkow.webp
+imageAlt: Illustration: a shelf of book spines at dusk and a magnifying glass lighting up one of them.
 ---
 
 Our [first post](/en/blog/genealogia) listed the sources worth starting with. This one shows how to use them in order, from a drawer at home to the scan of a record a hundred years old. You can do most of the steps online.

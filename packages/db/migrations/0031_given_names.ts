@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * Given names, a second name type kept apart from surnames (ADR-0031, TASK-078).
+ * Given names, a second name type kept apart from surnames (ADR-0032, TASK-078).
  *
  * - `given_names`: one identity per written form under the resolver's
  *   canonical key, as `surnames` has. No column joins it to a surname.
@@ -32,7 +32,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       canonical_key          text        NOT NULL UNIQUE,
       canonical_key_version  text        NOT NULL,
       primary_script         text        NOT NULL,
-      -- A form a surface must not show until reviewed (ADR-0031 §4).
+      -- A form a surface must not show until reviewed (ADR-0032 §4).
       form_review            text,
       created_at             timestamptz NOT NULL DEFAULT now(),
       updated_at             timestamptz NOT NULL DEFAULT now(),
