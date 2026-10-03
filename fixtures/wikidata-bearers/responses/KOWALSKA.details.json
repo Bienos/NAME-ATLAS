@@ -6,25 +6,89 @@
     "bindings" : [ {
       "person" : {
         "type" : "uri",
-        "value" : "http://www.wikidata.org/entity/Q2955939"
+        "value" : "http://www.wikidata.org/entity/Q293102"
       },
       "description_pl" : {
         "xml:lang" : "pl",
         "type" : "literal",
-        "value" : "polska malarka żydowskiego pochodzenia"
+        "value" : "polska piosenkarka"
       },
       "description_en" : {
         "xml:lang" : "en",
         "type" : "literal",
-        "value" : "Polish painter (1899-1942)"
+        "value" : "Polish singer"
       },
       "plwiki" : {
         "type" : "uri",
-        "value" : "https://pl.wikipedia.org/wiki/Chana_Kowalska"
+        "value" : "https://pl.wikipedia.org/wiki/Kasia_Kowalska"
       },
       "enwiki" : {
         "type" : "uri",
-        "value" : "https://en.wikipedia.org/wiki/Chana_Kowalska"
+        "value" : "https://en.wikipedia.org/wiki/Kasia_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q456986"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska kierowca wyścigowa"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish racing driver"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Natalia_Kowalska_(kierowca)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Natalia_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q458585"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish steeplechaser"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Katarzyna_Kowalska_(lekkoatletka)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Katarzyna_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18978"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska zakonnica katolicka, mistyczka, święta (1905–1938)"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "nun and saint from Poland (1905–1938)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Faustyna_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Faustina_Kowalska"
       }
     }, {
       "person" : {
@@ -185,93 +249,6 @@
     }, {
       "person" : {
         "type" : "uri",
-        "value" : "http://www.wikidata.org/entity/Q293102"
-      },
-      "description_pl" : {
-        "xml:lang" : "pl",
-        "type" : "literal",
-        "value" : "polska piosenkarka"
-      },
-      "description_en" : {
-        "xml:lang" : "en",
-        "type" : "literal",
-        "value" : "Polish singer"
-      },
-      "plwiki" : {
-        "type" : "uri",
-        "value" : "https://pl.wikipedia.org/wiki/Kasia_Kowalska"
-      },
-      "enwiki" : {
-        "type" : "uri",
-        "value" : "https://en.wikipedia.org/wiki/Kasia_Kowalska"
-      }
-    }, {
-      "person" : {
-        "type" : "uri",
-        "value" : "http://www.wikidata.org/entity/Q456986"
-      },
-      "description_pl" : {
-        "xml:lang" : "pl",
-        "type" : "literal",
-        "value" : "polska kierowca wyścigowa"
-      },
-      "description_en" : {
-        "xml:lang" : "en",
-        "type" : "literal",
-        "value" : "Polish racing driver"
-      },
-      "plwiki" : {
-        "type" : "uri",
-        "value" : "https://pl.wikipedia.org/wiki/Natalia_Kowalska_(kierowca)"
-      },
-      "enwiki" : {
-        "type" : "uri",
-        "value" : "https://en.wikipedia.org/wiki/Natalia_Kowalska"
-      }
-    }, {
-      "person" : {
-        "type" : "uri",
-        "value" : "http://www.wikidata.org/entity/Q458585"
-      },
-      "description_en" : {
-        "xml:lang" : "en",
-        "type" : "literal",
-        "value" : "Polish steeplechaser"
-      },
-      "plwiki" : {
-        "type" : "uri",
-        "value" : "https://pl.wikipedia.org/wiki/Katarzyna_Kowalska_(lekkoatletka)"
-      },
-      "enwiki" : {
-        "type" : "uri",
-        "value" : "https://en.wikipedia.org/wiki/Katarzyna_Kowalska"
-      }
-    }, {
-      "person" : {
-        "type" : "uri",
-        "value" : "http://www.wikidata.org/entity/Q18978"
-      },
-      "description_pl" : {
-        "xml:lang" : "pl",
-        "type" : "literal",
-        "value" : "polska zakonnica katolicka, mistyczka, święta (1905–1938)"
-      },
-      "description_en" : {
-        "xml:lang" : "en",
-        "type" : "literal",
-        "value" : "nun and saint from Poland (1905–1938)"
-      },
-      "plwiki" : {
-        "type" : "uri",
-        "value" : "https://pl.wikipedia.org/wiki/Faustyna_Kowalska"
-      },
-      "enwiki" : {
-        "type" : "uri",
-        "value" : "https://en.wikipedia.org/wiki/Faustina_Kowalska"
-      }
-    }, {
-      "person" : {
-        "type" : "uri",
         "value" : "http://www.wikidata.org/entity/Q4225512"
       },
       "description_pl" : {
@@ -415,6 +392,25 @@
       "plwiki" : {
         "type" : "uri",
         "value" : "https://pl.wikipedia.org/wiki/Beata_Kowalska_(socjolog)"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q122972986"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska aktorka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish actress"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Maria_Kowalska_(aktorka)"
       }
     } ]
   }

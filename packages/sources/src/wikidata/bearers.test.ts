@@ -105,13 +105,23 @@ describe("ZAREMBA's bearers", () => {
     expect(summary.with_death_date).toBe(37);
   });
 
-  it("keep at most twenty, most written about first, each named ZAREMBA", () => {
+  it("keep at most twenty, Polish citizens first, then most written about, each named ZAREMBA", () => {
     expect(summary.bearers).toHaveLength(WIKIDATA_BEARERS_KEPT);
     for (const [i, b] of summary.bearers.entries()) {
       expect(nameEndsWithSurname(b.name, "ZAREMBA")).toBe(true);
-      if (i > 0) expect(summary.bearers[i - 1]!.sitelinks).toBeGreaterThanOrEqual(b.sitelinks);
+      const before = summary.bearers[i - 1];
+      if (before !== undefined && before.polish_citizen === b.polish_citizen) {
+        expect(before.sitelinks).toBeGreaterThanOrEqual(b.sitelinks);
+      }
+      if (before !== undefined) expect(before.polish_citizen || !b.polish_citizen).toBe(true);
     }
-    expect(summary.bearers[1]).toMatchObject({
+    // Ota Zaremba has more sitelinks (22) but no Polish citizenship in Wikidata.
+    const all = exactBearers("ZAREMBA", response("ZAREMBA", "bearers"));
+    expect(all.find((c) => c.name === "Ota Zaremba")).toMatchObject({
+      sitelinks: 22,
+      polish_citizen: false,
+    });
+    expect(summary.bearers[0]).toMatchObject({
       name: "Stanisław Zaremba",
       born: 1863,
       died: 1942,
@@ -142,6 +152,44 @@ describe("ZAREMBA's bearers", () => {
         [first],
       ),
     ).toThrow(/no row for/u);
+  });
+});
+
+describe("the order", () => {
+  const row = (qid: string, name: string, sitelinks: number, polish?: string) => ({
+    person: { value: `http://www.wikidata.org/entity/${qid}` },
+    label_pl: { value: name },
+    sitelinks: { value: String(sitelinks) },
+    ...(polish === undefined ? {} : { polish: { value: polish } }),
+  });
+  const POLAND = "http://www.wikidata.org/entity/Q36";
+
+  it("puts Polish citizens first, then the most written about", () => {
+    const answer = JSON.stringify({
+      results: {
+        bindings: [
+          row("Q1", "Lisa Nowak", 39),
+          row("Q2", "Kazimierz Nowak", 31, POLAND),
+          row("Q3", "Piotr Nowak", 18, POLAND),
+          row("Q4", "Hans Nowak", 19),
+        ],
+      },
+    });
+    expect(exactBearers("NOWAK", answer).map((c) => [c.name, c.polish_citizen])).toEqual([
+      ["Kazimierz Nowak", true],
+      ["Piotr Nowak", true],
+      ["Lisa Nowak", false],
+      ["Hans Nowak", false],
+    ]);
+  });
+
+  it("refuses a citizenship the query did not ask for", () => {
+    const answer = JSON.stringify({
+      results: {
+        bindings: [row("Q2", "Jan Nowak", 3, "http://www.wikidata.org/entity/Q30")],
+      },
+    });
+    expect(() => exactBearers("NOWAK", answer)).toThrow(/not a Polish state/u);
   });
 });
 

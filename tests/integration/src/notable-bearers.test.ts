@@ -224,7 +224,7 @@ describe("NOTABLE_BEARERS against a real PostgreSQL", () => {
     expect(free?.with_death_date).toBe(37);
     expect(free?.people).toHaveLength(3);
     expect(free?.more).toBe(56);
-    expect(free?.people[1]).toMatchObject({
+    expect(free?.people[0]).toMatchObject({
       wikidata_id: "Q896660",
       name: "Stanisław Nowak",
       born: 1863,
@@ -283,7 +283,7 @@ describe("NOTABLE_BEARERS against a real PostgreSQL", () => {
         "claim_type = 'NOTABLE_BEARERS' AND claim_status = 'ACTIVE' AND supersedes_claim_id IS NOT NULL",
       ),
     ).toBe(1);
-    expect((await bearersOn("FREE"))?.people[1]?.died).toBe(1943);
+    expect((await bearersOn("FREE"))?.people[0]?.died).toBe(1943);
   });
 
   it("refuses the section, people and all, when the source's rights are blocked", async () => {

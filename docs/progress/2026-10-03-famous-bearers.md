@@ -4,7 +4,7 @@ Scope authority: `tasks/073-famous-bearers.md`. Decision: ADR-0030 (the source, 
 
 ## What changed
 
-- `packages/sources/src/wikidata/` (new). `bearers.ts`, pure: the people query (humans with a Wikipedia article filed under family-name items labelled with the surname, plus the masculine item for a -ska/-cka/-dzka form), the details query for those kept, and `summariseWikidataBearers`, which counts only people whose own name ends with exactly the surname, keeps the 20 with the most sitelinks, drops `WIKIDATA_EXCLUDED_PEOPLE` (empty), cuts descriptions at 200 characters and refuses an answer that does not parse. `fetch.ts`: at least 1 s between queries, a 60 s timeout, three tries, `Retry-After` honoured, user agent `NameAtlas/1.0 (surname research; +https://name-atlas.pl/pl/kontakt)`. `source.ts`: inserts the catalogue's `global_wikidata` on first use and stores a surname's summary as one `API_OBJECT` source record, refreshed when unchanged and superseded when changed.
+- `packages/sources/src/wikidata/` (new). `bearers.ts`, pure: the people query (humans with a Wikipedia article filed under family-name items labelled with the surname, plus the masculine item for a -ska/-cka/-dzka form), the details query for those kept, and `summariseWikidataBearers`, which counts only people whose own name ends with exactly the surname, keeps 20: Polish citizens (`P27`: Poland or a Polish state before it) first (the owner's follow-up the same day), then the most sitelinks, drops `WIKIDATA_EXCLUDED_PEOPLE` (empty), cuts descriptions at 200 characters and refuses an answer that does not parse. `fetch.ts`: at least 1 s between queries, a 60 s timeout, three tries, `Retry-After` honoured, user agent `NameAtlas/1.0 (surname research; +https://name-atlas.pl/pl/kontakt)`. `source.ts`: inserts the catalogue's `global_wikidata` on first use and stores a surname's summary as one `API_OBJECT` source record, refreshed when unchanged and superseded when changed.
 - `fixtures/wikidata-bearers/`: ZAREMBA's and KOWALSKA's answers as the query service served them on 2026-10-03, pinned by SHA-256; excluded from Prettier.
 - `packages/db/migrations/0029_notable_bearers.ts`: the `NOTABLE_BEARERS` claim type, `SURNAME_LEVEL` only. Generated types updated.
 - `packages/truth/src/bearers.ts` (new): derive, read by key and as text, project (three people on `FREE` and `SEO`, all kept on `PAID` and `INTERNAL`), select candidates (30-day refresh). `bin/bearers-load.ts` (new): `pnpm truth:bearers-load`.
@@ -19,7 +19,9 @@ Scope authority: `tasks/073-famous-bearers.md`. Decision: ADR-0030 (the source, 
 - One query joining every person's labels, descriptions and articles timed out at 60 s; the people query alone answered in 2–5 s, and the details query for 20 ids in under a second.
 - `wbgetentities` answered "You are making too many requests to the API" from this network, so the details come from the query service too.
 - ZAREMBA: 59 exact bearers with a Wikipedia article, 37 with a date of death. KOWALSKA: 55 and 25; the items "Kowalska" and "Kowalski" together returned rows for every Kowalski, of which 325 are named exactly KOWALSKI.
-- NOWAK, live: 451 people, 168 with a date of death. Ordered by sitelinks, the first three are Lisa Nowak (an American astronaut), Kazimierz Nowak and Cécile Nowak (a French judoka): the order favours people written about in many languages, not Polish fame.
+- NOWAK, live: 451 people, 168 with a date of death. Ordered by sitelinks alone, the first three were Lisa Nowak (an American astronaut), Kazimierz Nowak and Cécile Nowak (a French judoka). The owner asked for Polish Wikipedia first; that changed nothing (361 of NOWAK's 491 people have a Polish article, all three of these among them). Ordered by Polish citizenship first, as the owner then chose, they are Kazimierz Nowak, Piotr Nowak and Julian Nowak; KOWALSKI's are Stanisław, Władysław and Józef Kowalski.
+- Citizenship in Wikidata follows the state of the time: Saint Faustyna Kowalska is recorded under the Second Polish Republic, not Poland (Q36), so the Polish states before 1989 count too (`WIKIDATA_POLISH_STATES`, six ids, labels checked).
+- Wikidata states Tomasz II Zaremba's years as born 1300, died 1292 (the earliest of its values for each); the page shows them as stated.
 
 ## Verification (run 2026-10-03, on this branch; the checks, unit tests, build and integration tests re-run after the rebase onto `main` @ `619d365`)
 
@@ -29,6 +31,12 @@ Scope authority: `tasks/073-famous-bearers.md`. Decision: ADR-0030 (the source, 
 - Against a local PostgreSQL 16 with PostGIS 3 (installed in this session from Ubuntu packages): `TEST_DATABASE_URL=… pnpm test:integration` exit 0, 31 files, 373 tests. The first full run failed four tests that pin the migration list, the `claim_type` values, or migrate down from the top (`extensions`, `current-rank`, `canonical-key-v2`, `accounts`); they were updated. `pnpm test:golden`: exit 0, 364 tests.
 - Live, against a scratch database seeded with the committed PESEL male fixture: `pnpm db:migrate` applied 0029; `pnpm truth:bearers-load --surname NOWAK` printed "stored, claim derived, 451 people, 168 with a date of death, 20 kept, 4355 ms"; a second run printed "unchanged, claim unchanged".
 - Headless Chromium at 1440 × 900 and 390 × 844 against `next dev` and that database: `/pl/nazwisko/nowak`'s chapter, sentence, caveat, three people and both links, with no horizontal overflow at either width; with `?view=cards` at 1440 the deck holds the card "Znane osoby" before the summary. The scratch database was dropped.
+
+## The ranking change (same day, after #84 was opened)
+
+- `pnpm --filter @name-atlas/sources exec vitest run src/wikidata`: 22 passed, on fixtures re-captured with the citizenship query.
+- `TEST_DATABASE_URL=… vitest run src/notable-bearers.test.ts`: 7 passed.
+- Live, scratch database: NOWAK "stored, claim derived, 451 people, 168 with a date of death, 20 kept, 1870 ms"; KOWALSKI 325 people, 159 with a date of death.
 
 ## Not verified
 

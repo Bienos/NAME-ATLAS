@@ -9,7 +9,7 @@
 
 ## 1. Goal
 
-Each loaded surname's page answers "who well known has this surname?" from Wikidata: how many people with exactly this surname have a Wikipedia article, and the most widely written about of them, each with years, a one-line description and a link. Living people are included (ADR-0030 §2.4). The answer is a claim like every other figure, loaded ahead of time, never fetched when a page is viewed.
+Each loaded surname's page answers "who well known has this surname?" from Wikidata: how many people with exactly this surname have a Wikipedia article, Polish citizens first, then the most widely written about, each with years, a one-line description and a link. Living people are included (ADR-0030 §2.4). The answer is a claim like every other figure, loaded ahead of time, never fetched when a page is viewed.
 
 ## 2. Facts (checked on `main` @ `41d00d9` and `619d365`, 2026-10-03)
 
@@ -38,7 +38,7 @@ Each loaded surname's page answers "who well known has this surname?" from Wikid
 
 ## 5. Acceptance criteria
 
-- **AC-1.** The summary of ZAREMBA's and KOWALSKA's captured answers counts exact bearers only, keeps at most 20 most-sitelinked first, links only Polish or English Wikipedia, honours the exclusion list, and refuses an answer that does not parse (unit tests over pinned fixtures).
+- **AC-1.** The summary of ZAREMBA's and KOWALSKA's captured answers counts exact bearers only, keeps at most 20, Polish citizens first and then the most sitelinked, links only Polish or English Wikipedia, honours the exclusion list, and refuses an answer that does not parse (unit tests over pinned fixtures).
 - **AC-2.** The fetcher sends queries at least a second apart, names Name Atlas, honours `Retry-After`, and gives up after three tries (unit tests with a fake clock and network).
 - **AC-3.** Against PostgreSQL: not queried reads `NOT_SEARCHED`; Wikidata is registered once from the catalogue; a stored answer derives one claim and reads back `READY` with three people on `FREE` and 20 on `PAID`; the same answer adds nothing; a changed one supersedes; blocked rights refuse the section; candidates come best rank first and skip one queried within the window (integration tests).
 - **AC-4.** The chapter renders the sentence in both languages, the caveat before the people, years for the living and the dead, the remainder and removal links, the not-searched state, and a zero as an answer; the deck card lists the people with the count and date, and is absent with nobody (unit tests on rendered markup).

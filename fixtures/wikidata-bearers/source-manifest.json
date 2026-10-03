@@ -18,29 +18,29 @@
       "surname": "ZAREMBA",
       "query": "bearers",
       "path": "responses/ZAREMBA.bearers.json",
-      "bytes": 49718,
-      "sha256": "1836d036e1b11cf556f9eee140a3bf48686f4fbc7d73de0b9d2aad3fc1625ccc"
+      "bytes": 54586,
+      "sha256": "fd7e0a3c4475af56a91f27ecbfc8117e89b64bdc4b005bc23fbe2323a02dc58f"
     },
     {
       "surname": "ZAREMBA",
       "query": "details",
       "path": "responses/ZAREMBA.details.json",
-      "bytes": 11222,
-      "sha256": "1a64d84758ee951ad2d6be19f9d0600d31f7c15ea94267370ce88eaf892a4990"
+      "bytes": 11941,
+      "sha256": "9b8d937a6df9d8b56fd7baeb00df7a6a6251a1d47069825f78789104a91b38c3"
     },
     {
       "surname": "KOWALSKA",
       "query": "bearers",
       "path": "responses/KOWALSKA.bearers.json",
-      "bytes": 317096,
-      "sha256": "92a04b9bcd03cef06aa17bacb028951bb7af5f618524a972e3d6898f5ed8d2ab"
+      "bytes": 347748,
+      "sha256": "2d5a0fdf5a2289cd5649e7f0a30e39274cd22028288513681fc841fc52ab781d"
     },
     {
       "surname": "KOWALSKA",
       "query": "details",
       "path": "responses/KOWALSKA.details.json",
-      "bytes": 11538,
-      "sha256": "07082e7e4e8efe9ef4bd365d96074027c107bf4e44aea183f4dd696680dd592f"
+      "bytes": 11396,
+      "sha256": "55f43eb930fbe8ac4dd0918bb2976a6aa9940b668aeb38e72841aca1d3861ff8"
     }
   ]
 }

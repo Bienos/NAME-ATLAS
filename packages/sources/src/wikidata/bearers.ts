@@ -23,7 +23,7 @@ export const WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql";
 /** The summary's shape version, stored with it. */
 export const WIKIDATA_BEARERS_VERSION = "wikidata_bearers@1";
 
-/** How many bearers a summary keeps, most widely written about first. */
+/** How many bearers a summary keeps: Polish citizens first, then the most widely written about. */
 export const WIKIDATA_BEARERS_KEPT = 20;
 
 /** The longest description kept. Wikidata's own guideline is a short phrase. */
@@ -42,6 +42,23 @@ export const WIKIDATA_FAMILY_NAME_CLASSES: readonly string[] = [
   "Q29042997",
   "Q106319018",
   "Q60558422",
+];
+
+/**
+ * The states whose citizens rank first (ADR-0030 §2.3): Poland and the Polish
+ * states before it, as Wikidata records citizenship (`P27`). Labels checked
+ * 2026-10-03: Poland, Second Polish Republic, Polish People's Republic,
+ * Polish–Lithuanian Commonwealth, Kingdom of Poland (1386–1569) and Kingdom
+ * of Poland (1025–1385). Saint Faustyna Kowalska is recorded under the Second
+ * Polish Republic, not Q36.
+ */
+export const WIKIDATA_POLISH_STATES: readonly string[] = [
+  "Q36",
+  "Q207272",
+  "Q211274",
+  "Q172107",
+  "Q1649871",
+  "Q577867",
 ];
 
 /**
@@ -74,6 +91,8 @@ export interface WikidataBearer {
   readonly died: number | null;
   /** Wikimedia sites with a page on the person: how widely they are written about. */
   readonly sitelinks: number;
+  /** Whether Wikidata gives Poland, or a Polish state before it, as a citizenship: they rank first (ADR-0030 §2.3). */
+  readonly polish_citizen: boolean;
   /** The Polish Wikipedia article, else the English one, else null (an article elsewhere). */
   readonly article_url: string | null;
 }
@@ -88,7 +107,7 @@ export interface WikidataBearers {
   readonly total: number;
   /** Of those, how many have a date of death in Wikidata. */
   readonly with_death_date: number;
-  /** The first {@link WIKIDATA_BEARERS_KEPT}, most sitelinks first. */
+  /** The first {@link WIKIDATA_BEARERS_KEPT}: Polish citizens first, then most sitelinks. */
   readonly bearers: readonly WikidataBearer[];
 }
 
@@ -138,8 +157,10 @@ export function wikidataBearersQuery(labels: readonly string[]): string {
     .flatMap((label) => ["pl", "mul", "en"].map((lang) => `${sparqlString(label)}@${lang}`))
     .join(" ");
   const classes = WIKIDATA_FAMILY_NAME_CLASSES.map((q) => `wd:${q}`).join(" ");
+  const polishStates = WIKIDATA_POLISH_STATES.map((q) => `wd:${q}`).join(", ");
   return [
     "SELECT ?person (MAX(?links) AS ?sitelinks) (MIN(YEAR(?b)) AS ?born) (MIN(YEAR(?d)) AS ?died)",
+    "       (SAMPLE(?pc) AS ?polish)",
     "       (SAMPLE(?pl) AS ?label_pl) (SAMPLE(?mul) AS ?label_mul) (SAMPLE(?en) AS ?label_en) WHERE {",
     `  VALUES ?label { ${values} }`,
     `  VALUES ?cls { ${classes} }`,
@@ -148,6 +169,7 @@ export function wikidataBearersQuery(labels: readonly string[]): string {
     '  FILTER EXISTS { ?a schema:about ?person ; schema:isPartOf/wikibase:wikiGroup "wikipedia" . }',
     "  OPTIONAL { ?person wdt:P569 ?b }",
     "  OPTIONAL { ?person wdt:P570 ?d }",
+    `  OPTIONAL { ?person wdt:P27 ?pc FILTER(?pc IN (${polishStates})) }`,
     '  OPTIONAL { ?person rdfs:label ?pl FILTER(LANG(?pl) = "pl") }',
     '  OPTIONAL { ?person rdfs:label ?mul FILTER(LANG(?mul) = "mul") }',
     '  OPTIONAL { ?person rdfs:label ?en FILTER(LANG(?en) = "en") }',
@@ -245,11 +267,15 @@ export interface WikidataCandidate {
   readonly born: number | null;
   readonly died: number | null;
   readonly sitelinks: number;
+  readonly polish_citizen: boolean;
 }
 
 /**
  * The people the first answer names whose own name is the surname, minus the
- * excluded, most sitelinks first and then by id, so the order is stable.
+ * excluded: Polish citizens first, then most sitelinks, then by id, so the
+ * order is stable. A Polish reader is asking (the owner, 2026-10-03). A Polish
+ * Wikipedia article was tried first and does not do it: 361 of NOWAK's 491
+ * people have one, an American astronaut among them.
  */
 export function exactBearers(
   surname: string,
@@ -276,9 +302,26 @@ export function exactBearers(
       born: integer(b, "born", path),
       died: integer(b, "died", path),
       sitelinks,
+      polish_citizen: polishCitizen(b, path),
     });
   }
-  return out.sort((a, b) => b.sitelinks - a.sitelinks || qidNumber(a.qid) - qidNumber(b.qid));
+  return out.sort(
+    (a, b) =>
+      Number(b.polish_citizen) - Number(a.polish_citizen) ||
+      b.sitelinks - a.sitelinks ||
+      qidNumber(a.qid) - qidNumber(b.qid),
+  );
+}
+
+/** Whether the answer gives a Polish state as the person's citizenship; any other value is refused. */
+function polishCitizen(b: Binding, path: string): boolean {
+  const value = text(b, "polish");
+  if (value === null) return false;
+  const qid = /^http:\/\/www\.wikidata\.org\/entity\/(Q[1-9][0-9]*)$/u.exec(value)?.[1];
+  if (qid === undefined || !WIKIDATA_POLISH_STATES.includes(qid)) {
+    throw new WikidataShapeError(`${path}.polish`, `not a Polish state: ${value}`);
+  }
+  return true;
 }
 
 /** The people a summary keeps: the ids the details query is asked for. */

@@ -682,8 +682,8 @@ export const bearersStateSchema = z.enum([
 /**
  * Known people with the surname (TASK-073, ADR-0030): a `NOTABLE_BEARERS`
  * claim. People whose own name, in Wikidata, ends with exactly this surname
- * and who have an article in at least one Wikipedia, the most widely written
- * about first. Sharing a surname says nothing about family. A READY section
+ * and who have an article in at least one Wikipedia: Polish citizens first,
+ * then the most widely written about. Sharing a surname says nothing about family. A READY section
  * with a total of zero is an answer; NOT_SEARCHED is the absence of one.
  *
  * `people` is as long as the surface allows (the free page lists three, the

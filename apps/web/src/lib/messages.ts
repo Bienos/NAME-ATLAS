@@ -898,7 +898,8 @@ export const UI = {
     chapterBearersTitle: "Kto znany nosi to nazwisko?",
     chapterBearersLede:
       "Wikidane, otwarta baza wiedzy powiązana z Wikipedią, wymieniają osoby o tym nazwisku. " +
-      "Pokazujemy te, o których napisano najwięcej artykułów w Wikipediach.",
+      "Najpierw pokazujemy obywateli Polski, a wśród nich te osoby, o których napisano " +
+      "najwięcej artykułów w Wikipediach.",
     bearersCaveat:
       "To samo nazwisko nie oznacza pokrewieństwa. Wikidane redagują wolontariusze, więc " +
       "mogą zawierać błędy.",
@@ -1487,7 +1488,8 @@ export const UI = {
     chapterBearersTitle: "Who well known has this surname?",
     chapterBearersLede:
       "Wikidata, the open knowledge base behind Wikipedia, lists people with this surname. " +
-      "We show those the most Wikipedia articles are written about.",
+      "Polish citizens come first, and among them those the most Wikipedia articles are " +
+      "written about.",
     bearersCaveat:
       "Sharing a surname does not mean being related. Wikidata is edited by volunteers and " +
       "can be wrong.",
