@@ -4,8 +4,8 @@ Branch `claude/great-wozniak-5wwxf8`, on `origin/main` @ `7363889`. The owner su
 
 ## Changed
 
-- `docs/adr/0031-search-and-editorial-content.md`: the strategy's rules (one surname URL per surname, editorial pieces for general questions, original data studies, no separate GEO layer, extend rather than duplicate, the banned list) and nine review amendments. ADR-0028, 0029 and 0030 are held by open pull requests #65, #67 and #81, so this takes 0031.
-- `docs/SEO_CONTENT_PLAN.md`: the query → surface map, the surname-page intents, the thirty-piece queue with a status for each, four briefs, the data studies split into ungated and gated, the flagship index, the roadmap and the hundred-title backlog.
+- `docs/adr/0031-search-and-editorial-content.md`: the strategy's rules (one surname URL per surname, editorial pieces for general questions, original data studies, no separate GEO layer, extend rather than duplicate, the banned list) and nine review amendments. ADR-0028 and 0029 are held by open pull requests #65 and #67, and 0030 by #81 and, since #84, by `main`, so this takes 0031.
+- `docs/SEO_CONTENT_PLAN.md`: the query → surface map, the surname-page intents, the thirty-piece queue with a status for each, four briefs, the data studies split into national and regional (the latter under ADR-0031 §3.2's restrictions), the flagship index, the roadmap and the hundred-title backlog.
 - After #84 (TASK-073) reached `main`, this branch merged `origin/main` @ `63ed2a0`. The merge conflicted on `STATUS.md` ("Last rewritten", kept as this change's, and "Next", keeping #84's "More cards" line) and on `docs/CODEMAP.md`'s ADR row (keeping #84's 0030 entry and adding 0031).
 - `AGENTS.md` §1 (a row for the plan), `docs/CODEMAP.md` (the ADR and the plan), `STATUS.md` (a "Next" line and "Last rewritten").
 
