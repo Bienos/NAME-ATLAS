@@ -1,5 +1,5 @@
 /**
- * The family tree contract (TASK-068, ADR-0029 §2.5.16).
+ * The family tree contract (TASK-066, ADR-0029 §2.5.16).
  *
  * One object, `tree`, answered by `GET /api/v1/trees/{id}` to a signed-in
  * reader who owns the tree or is a member of it. The browser derives every

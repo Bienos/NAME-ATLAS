@@ -1,7 +1,7 @@
 # Contract — The family tree
 
 - **Status:** Accepted
-- **Accepted by:** TASK-068 (`tasks/065-family-tree-core.md`) with ADR-0029, 2026-10-01
+- **Accepted by:** TASK-066 (`tasks/065-family-tree-core.md`) with ADR-0029, 2026-10-01
 - **Schema version:** `1.0` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/tree.ts`
 - **Produced by:** `@name-atlas/family`'s `getTree` and `exportTree` (everything but `places`), and the route that resolves `place_codes` into `places` from the register.
@@ -13,7 +13,7 @@ GET /api/v1/trees/{tree_id}
 GET /api/v1/trees/{tree_id}/export
 ```
 
-Both need a signed-in session (ADR-0027). The route is not built by TASK-068; the shape is fixed so the pages and the package agree.
+Both need a signed-in session (ADR-0027). The route is not built by TASK-066; the shape is fixed so the pages and the package agree.
 
 ## Status codes
 

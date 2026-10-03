@@ -125,8 +125,8 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     `.execute(db);
 
     // `0030` down to `0007` sit above `0006` and revert cleanly (the family
-    // schema and the accounts schema, which refuse only while a tree or a user
-    // is stored and none is here, a constraint, two
+    // safeguards, a claim type, the family and accounts schemas, which refuse
+    // only while a tree or a user is stored and none is here, two
     // constraints, the membership table, four indexes, the slug table, two
     // index swaps, a dropped constraint, six enum additions that cannot be
     // removed, the place tables, a data update and two dropped columns). They
@@ -135,8 +135,9 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     // ask for the next step down.
     const migrator = createMigrator(db);
     for (const expected of [
-      "0030_family_schema",
+      "0030_family_safeguards",
       "0029_notable_bearers",
+      "0028_family_schema",
       "0027_accounts_schema",
       "0026_rank_neighbours_index",
       "0025_archive_availability",

@@ -11,7 +11,7 @@
 --
 -- What the grants mean:
 --   nameatlas_app  reads and writes the tables of schemas accounts and family
---                  (TASK-068, ADR-0029), and holds no privilege on any table of
+--                  (TASK-066, ADR-0029), and holds no privilege on any table of
 --                  public beyond what PUBLIC itself holds (PostGIS's own catalog;
 --                  none of the register).
 --   nameatlas_web  has no grant on schema accounts or family (it is only ever
@@ -46,8 +46,8 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA accounts TO nameatl
 ALTER DEFAULT PRIVILEGES FOR ROLE nameatlas IN SCHEMA accounts
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nameatlas_app;
 
--- The family tree (TASK-068, ADR-0029 §2.1): the same role, the same grants, a
--- second schema. Its tables carry row-level security policies (migration 0030),
+-- The family tree (TASK-066, ADR-0029 §2.1): the same role, the same grants, a
+-- second schema. Its tables carry row-level security policies (migration 0028),
 -- which apply to this role because it does not own the tables.
 CREATE SCHEMA IF NOT EXISTS family AUTHORIZATION nameatlas;
 REVOKE ALL ON SCHEMA family FROM PUBLIC;

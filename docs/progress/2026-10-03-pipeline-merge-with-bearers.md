@@ -32,3 +32,20 @@ Local PostgreSQL 16 with PostGIS.
 
 - Production: no migration was run.
 - #67 still carries the family schema as `0028_family_schema`. It must take this numbering, or drop its copy, before it merges.
+
+## Second merge: `main` after #67 (the family tree), 2026-10-03
+
+`main` took #67 at `4dce85f`. It holds the family schema as `0028_family_schema` (TASK-066) and the tree pages (TASK-076). This branch carried the same schema, so the merge:
+
+- **Keeps `main`'s `0028_family_schema` byte for byte** and deletes this branch's renamed copy, `0030_family_schema`.
+- **Adds `0030_family_safeguards`** with the two schema fixes from the #76 review: the partial unique index `parentage_one_mother_or_father` and the function `family.touch_tree`. The family service is this branch's: the serialized graph edits, plus the review's fixes to `deletePerson`, `touch()` and the parent roles.
+- **Adds `role-taken`** to the tree pages' status words in both languages, with a route test, so `setParent`'s `ROLE_TAKEN` answer is said plainly.
+- **Renumbers the localities task to TASK-077** (`tasks/077-localities-with-the-same-name.md`): `main` gave 066 to the family core. It also drops this branch's duplicate `tasks/068-family-tree-core.md` and `tasks/drafts/tree-pages.md`, both now on `main` as 066 and 076.
+- **`docs/DECISIONS_NEEDED.md`:** D-027 to D-031 from `main` go between D-032 and D-026.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test`, `build`, `test:backup` | exit 0 |
+| `pnpm test:integration` | exit 0; 408 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
+| `pnpm db:migrate` on an empty database, then `db:generate-types` | 0028, 0029 and 0030 applied in that order; the generated types unchanged |
