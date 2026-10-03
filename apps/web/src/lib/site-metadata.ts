@@ -19,7 +19,7 @@ export const SITE_COPY = {
 
 /** Public asset: no function invocation or image query string for a preview crawler. */
 export const SITE_PREVIEW_IMAGE = {
-  url: "/share/name-atlas-v2.jpg",
+  url: "/share/name-atlas-v3.jpg",
   width: 1200,
   height: 630,
   type: "image/jpeg",

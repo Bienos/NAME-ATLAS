@@ -50,7 +50,7 @@ Use the existing **name-atlas** project under **bienos**:
 - Polish and English landing HTML must contain localized metadata, an absolute `og:image`,
   `og:image:width=1200`, `og:image:height=630`, and `twitter:card=summary_large_image`, with
   canonical and image URLs under `name-atlas.pl`.
-- The landing card uses the public JPEG `/share/name-atlas-v2.jpg` without an account or function invocation; surname pages keep their own PNG images.
+- The landing card uses the public JPEG `/share/name-atlas-v3.jpg` (a metadata-free re-encode; `v2` stays for links already shared) without an account or function invocation; surname pages keep their own PNG images.
 - Once the two `www` CNAMEs resolve, check their HTTPS redirects as well.
 - Send a fresh link in the intended messaging apps. Apps can cache previous previews or let
   recipients disable them; metadata cannot force their UI to display a card.
@@ -59,7 +59,7 @@ Use the existing **name-atlas** project under **bienos**:
 
 The artwork source is `apps/web/src/lib/site-preview.tsx`, rendered with `next/og` and bundled
 brand fonts. The shared landing uses its exported 1200 × 630 JPEG at
-`apps/web/public/share/name-atlas-v2.jpg`. Open Graph and Twitter URLs are set in
+`apps/web/public/share/name-atlas-v3.jpg`, re-encoded with no EXIF or Photoshop blocks after Meta rejected `v2` as "Corrupted Image". Open Graph and Twitter URLs are set in
 `apps/web/src/lib/site-metadata.ts`; `layout.tsx` supplies the default image. The old
 `/opengraph-image` PNG endpoint remains for previously fetched image URLs, now as a normal route
 handler rather than a metadata-file convention. A surname page's own metadata-file image takes
