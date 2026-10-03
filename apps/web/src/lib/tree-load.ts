@@ -179,7 +179,13 @@ export async function loadTreePage(input: {
   if (!input.enabled) return { kind: "not-found" };
   const target: TreeTarget | null = treeTarget(lang, input.segments);
   if (target === null) return { kind: "not-found" };
-  if (session === null) return { kind: "redirect", to: accountPath(lang, "sign-in") };
+  // Back to the tree's own page after signing in (TASK-084).
+  if (session === null) {
+    return {
+      kind: "redirect",
+      to: accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) }),
+    };
+  }
   const { userId } = session;
 
   if (target.page === "trees") {

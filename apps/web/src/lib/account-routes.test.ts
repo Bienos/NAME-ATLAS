@@ -32,6 +32,7 @@ function fakes(secure = true): Fakes {
   const accounts = {
     signUp: vi.fn(),
     completeSignUp: vi.fn(),
+    completeGoogleSignUp: vi.fn(),
     signIn: vi.fn(),
     sessionFromToken: vi.fn(),
     signOut: vi.fn(() => Promise.resolve()),
@@ -550,7 +551,7 @@ describe("sign-out, reset and deletion (AC-7, AC-8)", () => {
 
   it("deletes the signed-in account (the session's user, never one the form names), clears the cookie, and logs the id", async () => {
     const f = fakes();
-    f.accounts.sessionFromToken.mockResolvedValue({ userId: "u-real" });
+    f.accounts.sessionFromToken.mockResolvedValue({ userId: "u-real", hasPassword: true });
     f.accounts.deleteAccount.mockResolvedValue({ kind: "DELETED" });
     const response = await handleAccountPost(
       "delete",
@@ -558,14 +559,18 @@ describe("sign-out, reset and deletion (AC-7, AC-8)", () => {
       f.deps,
     );
     expect(location(response)).toBe("/pl/konto/zaloguj?status=deleted");
-    expect(f.accounts.deleteAccount).toHaveBeenCalledWith({ userId: "u-real", password: PASSWORD });
+    expect(f.accounts.deleteAccount).toHaveBeenCalledWith({
+      userId: "u-real",
+      password: PASSWORD,
+      confirmed: false,
+    });
     expect(response.headers.get("set-cookie")).toContain("Max-Age=0");
     expect(f.logged).toEqual([{ event: "account_deleted", fields: { userId: "u-real" } }]);
   });
 
   it("keeps the account and the cookie when the password is wrong", async () => {
     const f = fakes();
-    f.accounts.sessionFromToken.mockResolvedValue({ userId: "u-real" });
+    f.accounts.sessionFromToken.mockResolvedValue({ userId: "u-real", hasPassword: true });
     f.accounts.deleteAccount.mockResolvedValue({ kind: "WRONG_PASSWORD" });
     const response = await handleAccountPost(
       "delete",
@@ -574,6 +579,121 @@ describe("sign-out, reset and deletion (AC-7, AC-8)", () => {
     );
     expect(location(response)).toBe("/en/account?status=wrong-password");
     expect(response.headers.get("set-cookie")).toBeNull();
+  });
+});
+
+describe("Google's terms step and accounts without a password (TASK-084)", () => {
+  const cookie = `__Host-na_session=${SESSION}`;
+
+  it("signs the reader in after the terms and goes on to the tree", async () => {
+    const f = fakes();
+    f.accounts.completeGoogleSignUp.mockResolvedValue({
+      kind: "SIGNED_IN",
+      userId: "u-g",
+      sessionToken: SESSION,
+      expiresAt: new Date(),
+    });
+    const response = await handleAccountPost(
+      "google-complete",
+      post("google-complete", {
+        token: TOKEN,
+        terms: "on",
+        next: "/pl/konto/drzewa",
+        termsVersion: "1999-01-01",
+        lang: "pl",
+      }),
+      f.deps,
+    );
+    expect(location(response)).toBe("/pl/konto/drzewa");
+    expect(f.accounts.completeGoogleSignUp).toHaveBeenCalledWith({
+      token: TOKEN,
+      termsVersion: "2026-10-01",
+      termsAccepted: true,
+    });
+    expect(response.headers.get("set-cookie")).toContain(`__Host-na_session=${SESSION}`);
+  });
+
+  it("goes to the account when there is no safe page to return to", async () => {
+    const f = fakes();
+    f.accounts.completeGoogleSignUp.mockResolvedValue({
+      kind: "SIGNED_IN",
+      userId: "u-g",
+      sessionToken: SESSION,
+      expiresAt: new Date(),
+    });
+    const response = await handleAccountPost(
+      "google-complete",
+      post("google-complete", { token: TOKEN, terms: "on", next: "https://evil.test", lang: "en" }),
+      f.deps,
+    );
+    expect(location(response)).toBe("/en/account?status=welcome");
+  });
+
+  it("returns an unticked box to the step with its token, and a lapsed one to sign-in", async () => {
+    const f = fakes();
+    f.accounts.completeGoogleSignUp.mockResolvedValue({ kind: "INVALID", problem: "TERMS" });
+    const refused = await handleAccountPost(
+      "google-complete",
+      post("google-complete", { token: TOKEN, lang: "pl", next: "/pl/konto/drzewa" }),
+      f.deps,
+    );
+    expect(location(refused)).toBe(
+      `/pl/konto/witaj?status=terms&token=${TOKEN}&next=%2Fpl%2Fkonto%2Fdrzewa`,
+    );
+    expect(refused.headers.get("set-cookie")).toBeNull();
+
+    f.accounts.completeGoogleSignUp.mockResolvedValue({ kind: "INVALID_OR_EXPIRED" });
+    const lapsed = await handleAccountPost(
+      "google-complete",
+      post("google-complete", { token: TOKEN, terms: "on", lang: "pl" }),
+      f.deps,
+    );
+    expect(location(lapsed)).toBe("/pl/konto/zaloguj?status=google-expired");
+  });
+
+  it("deletes an account without a password when the box is ticked, and says `unconfirmed` when not", async () => {
+    const f = fakes();
+    f.accounts.sessionFromToken.mockResolvedValue({ userId: "u-g", hasPassword: false });
+    f.accounts.deleteAccount.mockResolvedValue({ kind: "WRONG_PASSWORD" });
+    const refused = await handleAccountPost(
+      "delete",
+      post("delete", { lang: "pl" }, { cookie }),
+      f.deps,
+    );
+    expect(location(refused)).toBe("/pl/konto?status=unconfirmed");
+    expect(f.accounts.deleteAccount).toHaveBeenLastCalledWith({
+      userId: "u-g",
+      password: "",
+      confirmed: false,
+    });
+
+    f.accounts.deleteAccount.mockResolvedValue({ kind: "DELETED" });
+    const deleted = await handleAccountPost(
+      "delete",
+      post("delete", { confirm: "on", lang: "pl" }, { cookie }),
+      f.deps,
+    );
+    expect(location(deleted)).toBe("/pl/konto/zaloguj?status=deleted");
+    expect(f.accounts.deleteAccount).toHaveBeenLastCalledWith({
+      userId: "u-g",
+      password: "",
+      confirmed: true,
+    });
+  });
+
+  it("has no mail forms when only Google is configured", async () => {
+    const f = fakes();
+    const deps = { ...f.deps, mailer: null };
+    for (const action of ["sign-up", "reset-request"]) {
+      const response = await handleAccountPost(
+        action,
+        post(action, { email: EMAIL, lang: "pl" }),
+        deps,
+      );
+      expect(response.status, action).toBe(404);
+    }
+    expect(f.accounts.signUp).not.toHaveBeenCalled();
+    expect(f.accounts.requestPasswordReset).not.toHaveBeenCalled();
   });
 });
 

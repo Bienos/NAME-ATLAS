@@ -9,6 +9,7 @@ import type { TestDatabase } from "@name-atlas/testing";
 import {
   createAccounts,
   createAccountsDb,
+  GOOGLE_TERMS_HOURS,
   createPasswordHasher,
   emailKey,
   FAILURES_MAX,
@@ -16,7 +17,12 @@ import {
   MAIL_PER_HOUR,
   SESSION_DAYS,
 } from "@name-atlas/accounts";
-import type { AccountsDB, OutgoingMail, PasswordHasher } from "@name-atlas/accounts";
+import type {
+  AccountsDB,
+  GoogleIdentity,
+  OutgoingMail,
+  PasswordHasher,
+} from "@name-atlas/accounts";
 
 /**
  * TASK-061: accounts over a real PostgreSQL, as the role that will run them.
@@ -747,6 +753,221 @@ describe("accounts (TASK-061, ADR-0027)", () => {
     });
   });
 
+  describe("Google sign-in (TASK-084, ADR-0033)", () => {
+    const google = (subject: string, email: string, emailVerified = true): GoogleIdentity => ({
+      subject,
+      email,
+      emailVerified,
+    });
+
+    it("makes a new address a pending account with no session until the terms are accepted", async () => {
+      const first = await accounts.signInWithGoogle({
+        identity: google("g-new-1", "Nowa.Osoba@Example.com"),
+        language: "en",
+      });
+      expect(first.kind).toBe("NEEDS_TERMS");
+      if (first.kind !== "NEEDS_TERMS") return;
+      const [user] = await rows<Record<string, unknown>>(
+        "SELECT * FROM accounts.users WHERE email_normalised = 'nowa.osoba@example.com'",
+      );
+      expect(user).toMatchObject({
+        email: "Nowa.Osoba@Example.com",
+        language: "en",
+        password_hash: null,
+        email_verified_at: null,
+        terms_version: null,
+      });
+      expect(
+        await rows("SELECT 1 FROM accounts.sessions WHERE user_id = $1", [user?.["user_id"]]),
+      ).toHaveLength(0);
+      const [identity] = await rows<Record<string, unknown>>(
+        "SELECT provider, subject FROM accounts.identities WHERE user_id = $1",
+        [user?.["user_id"]],
+      );
+      expect(identity).toEqual({ provider: "GOOGLE", subject: "g-new-1" });
+
+      // Terms refused: the token is not spent.
+      expect(
+        await accounts.completeGoogleSignUp({
+          token: first.token,
+          termsVersion: TERMS,
+          termsAccepted: false,
+        }),
+      ).toEqual({ kind: "INVALID", problem: "TERMS" });
+
+      const done = await accounts.completeGoogleSignUp({
+        token: first.token,
+        termsVersion: TERMS,
+        termsAccepted: true,
+      });
+      expect(done.kind).toBe("SIGNED_IN");
+      if (done.kind !== "SIGNED_IN") return;
+      const session = await accounts.sessionFromToken(done.sessionToken);
+      expect(session).toMatchObject({
+        email: "Nowa.Osoba@Example.com",
+        hasPassword: false,
+        termsVersion: TERMS,
+      });
+      // The token is spent.
+      expect(
+        await accounts.completeGoogleSignUp({
+          token: first.token,
+          termsVersion: TERMS,
+          termsAccepted: true,
+        }),
+      ).toEqual({ kind: "INVALID_OR_EXPIRED" });
+
+      // The next time, Google signs the reader straight in.
+      const again = await accounts.signInWithGoogle({
+        identity: google("g-new-1", "Nowa.Osoba@Example.com"),
+        language: "pl",
+      });
+      expect(again.kind).toBe("SIGNED_IN");
+    });
+
+    it("cannot sign in with a password it never set, and refuses a password sign-in as for anyone", async () => {
+      expect(await accounts.signIn({ email: "nowa.osoba@example.com", password: GOOD })).toEqual({
+        kind: "REJECTED",
+      });
+    });
+
+    it("refuses an address Google has not verified, and stores nothing", async () => {
+      const before = await rows<{ n: string }>("SELECT count(*)::text AS n FROM accounts.users");
+      expect(
+        await accounts.signInWithGoogle({
+          identity: google("g-unverified", "unverified@example.com", false),
+          language: "pl",
+        }),
+      ).toEqual({ kind: "UNVERIFIED" });
+      expect(await rows<{ n: string }>("SELECT count(*)::text AS n FROM accounts.users")).toEqual(
+        before,
+      );
+      expect(
+        await rows("SELECT 1 FROM accounts.identities WHERE subject = 'g-unverified'"),
+      ).toHaveLength(0);
+    });
+
+    it("links a complete account with the same address and signs it in; its password still works", async () => {
+      const userId = await account("Linked.Person@Example.com");
+      const result = await accounts.signInWithGoogle({
+        identity: google("g-linked", "linked.person@example.com"),
+        language: "pl",
+      });
+      expect(result).toMatchObject({ kind: "SIGNED_IN", userId });
+      expect(
+        await rows(
+          "SELECT 1 FROM accounts.identities WHERE user_id = $1 AND subject = 'g-linked'",
+          [userId],
+        ),
+      ).toHaveLength(1);
+      expect(
+        (await accounts.signIn({ email: "linked.person@example.com", password: GOOD })).kind,
+      ).toBe("SIGNED_IN");
+    });
+
+    it("refuses a second Google account for an address already linked to another", async () => {
+      expect(
+        await accounts.signInWithGoogle({
+          identity: google("g-other", "linked.person@example.com"),
+          language: "pl",
+        }),
+      ).toEqual({ kind: "OTHER_GOOGLE" });
+    });
+
+    it("completes a pending email sign-up through Google, and spends the mailed link", async () => {
+      const signUp = await accounts.signUp({ email: "half.done@example.com", language: "pl" });
+      if (signUp.kind !== "CHECK_EMAIL") throw new Error("sign-up refused");
+      const mailed = tokenOf(signUp.mail);
+
+      const first = await accounts.signInWithGoogle({
+        identity: google("g-half", "half.done@example.com"),
+        language: "pl",
+      });
+      if (first.kind !== "NEEDS_TERMS")
+        throw new Error(`expected the terms step, got ${first.kind}`);
+      const done = await accounts.completeGoogleSignUp({
+        token: first.token,
+        termsVersion: TERMS,
+        termsAccepted: true,
+      });
+      expect(done.kind).toBe("SIGNED_IN");
+      // Whoever finds the old mail cannot now choose this account's password.
+      expect(
+        await accounts.completeSignUp({
+          token: mailed,
+          password: GOOD,
+          termsVersion: TERMS,
+          termsAccepted: true,
+        }),
+      ).toEqual({ kind: "INVALID_OR_EXPIRED" });
+    });
+
+    it("lets the terms token lapse after an hour", async () => {
+      const first = await accounts.signInWithGoogle({
+        identity: google("g-slow", "slow.reader@example.com"),
+        language: "pl",
+      });
+      if (first.kind !== "NEEDS_TERMS") throw new Error("expected the terms step");
+      advance(GOOGLE_TERMS_HOURS * HOUR + MINUTE);
+      expect(
+        await accounts.completeGoogleSignUp({
+          token: first.token,
+          termsVersion: TERMS,
+          termsAccepted: true,
+        }),
+      ).toEqual({ kind: "INVALID_OR_EXPIRED" });
+      // Signing in with Google again gives a fresh step.
+      const again = await accounts.signInWithGoogle({
+        identity: google("g-slow", "slow.reader@example.com"),
+        language: "pl",
+      });
+      expect(again.kind).toBe("NEEDS_TERMS");
+    });
+
+    it("lets an account without a password set one by the reset mail", async () => {
+      const { mail } = await accounts.requestPasswordReset({
+        email: "nowa.osoba@example.com",
+        language: "pl",
+      });
+      expect(mail).not.toBeNull();
+      expect(await accounts.resetPassword({ token: tokenOf(mail), newPassword: GOOD })).toEqual({
+        kind: "OK",
+      });
+      expect(
+        (await accounts.signIn({ email: "nowa.osoba@example.com", password: GOOD })).kind,
+      ).toBe("SIGNED_IN");
+    });
+
+    it("deletes an account without a password only when the deletion is confirmed", async () => {
+      const first = await accounts.signInWithGoogle({
+        identity: google("g-delete", "google.delete@example.com"),
+        language: "pl",
+      });
+      if (first.kind !== "NEEDS_TERMS") throw new Error("expected the terms step");
+      const done = await accounts.completeGoogleSignUp({
+        token: first.token,
+        termsVersion: TERMS,
+        termsAccepted: true,
+      });
+      if (done.kind !== "SIGNED_IN") throw new Error("completion refused");
+      expect(await accounts.deleteAccount({ userId: done.userId, password: "" })).toEqual({
+        kind: "WRONG_PASSWORD",
+      });
+      expect(
+        await accounts.deleteAccount({ userId: done.userId, password: "", confirmed: true }),
+      ).toEqual({ kind: "DELETED" });
+      expect(
+        await rows("SELECT 1 FROM accounts.identities WHERE subject = 'g-delete'"),
+      ).toHaveLength(0);
+    });
+
+    it("the web role reads nothing of the identities", async () => {
+      await expect(webPool?.query("SELECT 1 FROM accounts.identities")).rejects.toThrow(
+        /permission denied/u,
+      );
+    });
+  });
+
   describe("purging what has expired", () => {
     it("removes expired sessions, old tokens, old failures and a lapsed pending address, and keeps the rest (AC-5)", async () => {
       await account("purge.live@example.com");
@@ -858,10 +1079,29 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
+    it("0032 refuses to go down while a Google identity is stored", async () => {
+      const migrator = createMigrator(db().db);
+      await migrator.migrateTo("0032_accounts_google_identities");
+      const refused = await migrator.migrateTo("0031_given_names");
+      expect(String(refused.error)).toMatch(/refusing to undo 0032/u);
+      expect(await rows("SELECT 1 FROM accounts.identities LIMIT 1")).toHaveLength(1);
+
+      // Without identities or password-less accounts it goes down and up again.
+      await db().pool.query("DELETE FROM accounts.identities");
+      await db().pool.query(
+        "DELETE FROM accounts.users WHERE email_verified_at IS NOT NULL AND password_hash IS NULL",
+      );
+      const down = await migrator.migrateTo("0031_given_names");
+      expect(down.error).toBeUndefined();
+      expect(await rows("SELECT 1 FROM pg_tables WHERE tablename = 'identities'")).toHaveLength(0);
+      const up = await migrator.migrateToLatest();
+      expect(up.error).toBeUndefined();
+      await sql.raw(ROLES_SQL).execute(db().db);
+    });
     it("refuses to go down while a user is stored, and removes the schema when none is", async () => {
       const migrator = createMigrator(db().db);
       // Step past the migrations above 0027 first (0028, the family schema, which
-      // holds no tree here, 0029, 0030 and the given names' 0031).
+      // holds no tree here, 0029, 0030, the given names' 0031, and 0032, emptied of identities above).
       await migrator.migrateTo("0027_accounts_schema");
       const refused = await migrator.migrateDown();
       expect(String(refused.error)).toMatch(/refusing to drop schema accounts/u);

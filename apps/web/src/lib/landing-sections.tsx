@@ -1,9 +1,13 @@
 import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
+import { accountPath, googleStartPath } from "./account-paths.js";
+import { googleEnabled } from "./accounts-config.js";
+import { familyTreeEnabled } from "./family-config.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { offerDocument } from "./offer-text.js";
 import { comparePagePath, howPath, offerPath } from "./site-links.js";
+import { treeLandingPath, treePath } from "./tree-paths.js";
 
 /**
  * The landing's sections below the hero (TASK-053; extended and reordered in
@@ -276,6 +280,67 @@ export function LandingCompare({ lang }: { lang: Lang }) {
         />
         <button type="submit">{t.compareAction}</button>
       </form>
+    </section>
+  );
+}
+
+/** Sign-in that returns to the reader's trees (TASK-084). */
+function treeSignInPath(lang: Lang): string {
+  return accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) });
+}
+
+/**
+ * The family tree's quiet way in under the hero's search (TASK-084): one line,
+ * only when the tree is on. Searching a surname still needs no account.
+ */
+export function LandingTreeLine({ lang }: { lang: Lang }) {
+  if (!familyTreeEnabled()) return null;
+  const t = UI[lang];
+  return (
+    <p className="landing-tree-line">
+      {t.landingTreeLine} <a href={treeSignInPath(lang)}>{t.landingTreeStart}</a>
+      <span aria-hidden="true"> · </span>
+      <a href={treeSignInPath(lang)}>{t.landingTreeSignIn}</a>
+    </p>
+  );
+}
+
+/**
+ * The family tree's section on the landing (TASK-084), after what the cards
+ * give: what the tree is in three lines, then Google's one-click start (when
+ * Google is configured) and the other ways in. Only when the tree is on; it
+ * is free with an account (D-034).
+ */
+export function LandingTree({ lang }: { lang: Lang }) {
+  if (!familyTreeEnabled()) return null;
+  const t = UI[lang];
+  const next = treePath(lang, { page: "trees" });
+  return (
+    <section className="landing-tree" aria-labelledby="landing-tree-heading">
+      <p className="landing-tree-eyebrow">{t.landingTreeEyebrow}</p>
+      <h2 id="landing-tree-heading">{t.landingTreeHeading}</h2>
+      <ul>
+        {t.landingTreePoints.map((point) => (
+          <li key={point}>{point}</li>
+        ))}
+      </ul>
+      <p className="tree-actions">
+        {googleEnabled() ? (
+          <a className="offer-send" href={googleStartPath(lang, next)}>
+            {t.landingTreeGoogle}
+          </a>
+        ) : null}
+        <a
+          className={googleEnabled() ? "offer-send tree-ghost" : "offer-send"}
+          href={treeSignInPath(lang)}
+        >
+          {googleEnabled() ? t.landingTreeOther : t.landingTreeStart}
+        </a>
+      </p>
+      <p className="landing-more">
+        <a href={treeLandingPath(lang)}>{t.landingTreeMore}</a>
+      </p>
+      <p className="landing-tree-free">{t.landingTreeFree}</p>
     </section>
   );
 }

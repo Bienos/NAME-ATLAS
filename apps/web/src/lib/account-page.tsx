@@ -3,20 +3,31 @@ import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { isTokenShape } from "@name-atlas/accounts";
-import { accountPath, actionPath, safeNext, stepFromSlug } from "./account-paths.js";
+import {
+  accountPath,
+  actionPath,
+  googleStartPath,
+  isTreeNext,
+  safeNext,
+  stepFromSlug,
+} from "./account-paths.js";
 import type { AccountAction, AccountStep } from "./account-paths.js";
 import { ACCOUNT_TEXT, statusWords } from "./account-text.js";
-import { accountsEnabled } from "./accounts-config.js";
+import { accountsEnabled, googleEnabled, mailEnabled } from "./accounts-config.js";
 import { accountsRuntime } from "./accounts-runtime.js";
 import { legalPath } from "./legal-text.js";
+import { GOOGLE_MARK } from "./design-tokens.js";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
 
 /**
- * The account's six pages (TASK-062): `/pl/konto/[[...step]]` and
- * `/en/account/[[...step]]`.
+ * The account's pages (TASK-062): `/pl/konto/[[...step]]` and
+ * `/en/account/[[...step]]`. TASK-084 adds "Continue with Google" to sign-in
+ * and sign-up, and the terms step of a first Google sign-in (`welcome`). With
+ * Google only (no mail configured), the email forms and the mail's three
+ * steps are not there.
  *
  * Plain HTML forms that post to `/api/account/<action>` and need no script. The
  * pages are `noindex` and `no-store`. The two that carry a token in the address
@@ -33,6 +44,8 @@ import { SiteShell } from "./site-shell.js";
 
 export interface SessionView {
   readonly email: string;
+  /** False for an account made through Google with no password yet. */
+  readonly hasPassword: boolean;
   readonly termsVersion: string;
   /** ISO date, `YYYY-MM-DD`. */
   readonly termsAcceptedOn: string;
@@ -46,9 +59,18 @@ export interface AccountPageData {
   /** A well-formed token for `confirm` and `new-password`, or null. */
   readonly token: string | null;
   readonly session: SessionView | null;
-  /** The surname page a sign-in returns to (TASK-064), only on the sign-in step, or null. */
+  /** The page a sign-in returns to (a surname's, TASK-064; the tree's, TASK-084), on sign-in and welcome only, or null. */
   readonly next: string | null;
+  readonly ways: Ways;
 }
+
+/** Which ways in are configured (ADR-0033). */
+export interface Ways {
+  readonly mail: boolean;
+  readonly google: boolean;
+}
+
+const MAIL_ONLY: Ways = { mail: true, google: false };
 
 export type AccountPageDecision =
   | { readonly kind: "not-found" }
@@ -76,14 +98,22 @@ export function decideAccountPage(input: {
   readonly segments: readonly string[] | undefined;
   readonly query: Query;
   readonly session: SessionView | null;
+  readonly ways?: Ways;
 }): AccountPageDecision {
   const { lang, session } = input;
+  const ways = input.ways ?? MAIL_ONLY;
   if (!input.enabled) return { kind: "not-found" };
   const step = stepFromSlug(lang, input.segments);
   if (step === null) return { kind: "not-found" };
+  // The mail's steps without mail, and Google's step without Google, do not exist.
+  if (!ways.mail && (step === "reset" || step === "confirm" || step === "new-password")) {
+    return { kind: "not-found" };
+  }
+  if (!ways.google && step === "welcome") return { kind: "not-found" };
 
-  // Only the sign-in step honours it, and only for a page of this site (`safeNext`).
-  const next = step === "sign-in" ? safeNext(first(input.query, "next")) : null;
+  // Only sign-in and Google's terms step honour it, and only for a page of this site (`safeNext`).
+  const next =
+    step === "sign-in" || step === "welcome" ? safeNext(first(input.query, "next")) : null;
 
   if (step === "account") {
     if (session === null) return { kind: "redirect", to: accountPath(lang, "sign-in") };
@@ -96,13 +126,13 @@ export function decideAccountPage(input: {
   const given = first(input.query, "token");
   const token = given !== null && isTokenShape(given) ? given : null;
   // A link with no usable token cannot do anything but say so.
-  const needsToken = step === "confirm" || step === "new-password";
+  const needsToken = step === "confirm" || step === "new-password" || step === "welcome";
   const status = needsToken && token === null && known === null ? "expired" : known;
-  return { kind: "view", data: { lang, step, status, token, session, next } };
+  return { kind: "view", data: { lang, step, status, token, session, next, ways } };
 }
 
 export function accountMetadata(lang: Lang, step: AccountStep): Metadata {
-  const carriesToken = step === "confirm" || step === "new-password";
+  const carriesToken = step === "confirm" || step === "new-password" || step === "welcome";
   return {
     title: `${ACCOUNT_TEXT[lang].headings[step]} — Name Atlas`,
     robots: { index: false, follow: false },
@@ -185,8 +215,59 @@ function Send({
   );
 }
 
+/**
+ * "Continue with Google": a plain link to the start route, so it needs no
+ * script. Google's mark is drawn inline in its own four colours, on white, as
+ * its branding guidelines ask.
+ */
+function GoogleButton({ lang, next }: { readonly lang: Lang; readonly next: string | null }) {
+  return (
+    <a className="account-google" href={googleStartPath(lang, next)}>
+      <svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false">
+        <path
+          fill={GOOGLE_MARK.red}
+          d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"
+        />
+        <path
+          fill={GOOGLE_MARK.blue}
+          d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-16.8z"
+        />
+        <path
+          fill={GOOGLE_MARK.yellow}
+          d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z"
+        />
+        <path
+          fill={GOOGLE_MARK.green}
+          d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.9l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
+        />
+      </svg>
+      <span>{ACCOUNT_TEXT[lang].google.button}</span>
+    </a>
+  );
+}
+
+function TermsCheck({ lang }: { readonly lang: Lang }) {
+  const t = ACCOUNT_TEXT[lang];
+  return (
+    <label className="account-check">
+      <input type="checkbox" name="terms" value="on" required />
+      <span>
+        {t.terms.before}
+        <a href={legalPath("terms", lang)} target="_blank" rel="noopener">
+          {t.terms.termsLink}
+        </a>
+        {t.terms.between}
+        <a href={legalPath("privacy", lang)} target="_blank" rel="noopener">
+          {t.terms.privacyLink}
+        </a>
+        {t.terms.after}
+      </span>
+    </label>
+  );
+}
+
 export function AccountView({ data }: { readonly data: AccountPageData }) {
-  const { lang, step, token, session } = data;
+  const { lang, step, token, session, ways } = data;
   const t = ACCOUNT_TEXT[lang];
   const other: Lang = lang === "pl" ? "en" : "pl";
   const status = statusWords(lang, step, data.status);
@@ -195,7 +276,16 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
 
   // The two token steps show a form only while there is a token to spend.
   const showTokenForm =
-    (step === "confirm" || step === "new-password") && token !== null && data.status !== "expired";
+    (step === "confirm" || step === "new-password" || step === "welcome") &&
+    token !== null &&
+    data.status !== "expired";
+  const googleFirst =
+    ways.google && (step === "sign-in" || step === "sign-up") ? (
+      <>
+        <GoogleButton lang={lang} next={step === "sign-in" ? data.next : null} />
+        {ways.mail ? <p className="account-or">{t.google.or}</p> : null}
+      </>
+    ) : null;
 
   return (
     <SiteShell
@@ -207,6 +297,9 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
     >
       <section>
         <h2>{heading}</h2>
+        {step === "sign-in" && isTreeNext(data.next) ? (
+          <p className="account-context">{t.google.forTree}</p>
+        ) : null}
         {lede !== "" && step !== "account" ? <p>{lede}</p> : null}
         {status === null ? null : (
           <p
@@ -217,7 +310,9 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
           </p>
         )}
 
-        {step === "sign-in" ? (
+        {googleFirst}
+
+        {step === "sign-in" && ways.mail ? (
           <>
             <Form action="sign-in" lang={lang} label={heading}>
               {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
@@ -245,7 +340,7 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
           </>
         ) : null}
 
-        {step === "sign-up" ? (
+        {step === "sign-up" && ways.mail ? (
           <>
             <Form action="sign-up" lang={lang} label={heading}>
               <Field
@@ -293,22 +388,23 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
               minLength={10}
               maxLength={128}
             />
-            <label className="account-check">
-              <input type="checkbox" name="terms" value="on" required />
-              <span>
-                {t.terms.before}
-                <a href={legalPath("terms", lang)} target="_blank" rel="noopener">
-                  {t.terms.termsLink}
-                </a>
-                {t.terms.between}
-                <a href={legalPath("privacy", lang)} target="_blank" rel="noopener">
-                  {t.terms.privacyLink}
-                </a>
-                {t.terms.after}
-              </span>
-            </label>
+            <TermsCheck lang={lang} />
             <Send>{t.submit.confirm}</Send>
           </Form>
+        ) : null}
+
+        {step === "welcome" && showTokenForm ? (
+          <Form action="google-complete" lang={lang} label={heading}>
+            <input type="hidden" name="token" value={token ?? ""} />
+            {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
+            <TermsCheck lang={lang} />
+            <Send>{t.submit.welcome}</Send>
+          </Form>
+        ) : null}
+        {step === "welcome" && !showTokenForm ? (
+          <p className="account-links">
+            <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
+          </p>
         ) : null}
 
         {step === "new-password" && showTokenForm ? (
@@ -343,6 +439,17 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
             <p>
               {t.account.signedInAs} <strong>{session.email}</strong>
             </p>
+            {session.hasPassword ? null : (
+              <p>
+                {t.account.viaGoogle}
+                {ways.mail ? (
+                  <>
+                    {" "}
+                    <a href={accountPath(lang, "reset")}>{t.account.setPassword}</a>
+                  </>
+                ) : null}
+              </p>
+            )}
             <p>
               {t.account.termsAccepted(
                 formatDate(session.termsVersion, lang),
@@ -353,15 +460,22 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
               <Send>{t.account.signOut}</Send>
             </Form>
             <h3>{t.account.deleteHeading}</h3>
-            <p>{t.account.deleteLede}</p>
+            <p>{session.hasPassword ? t.account.deleteLede : t.account.deleteLedeNoPassword}</p>
             <Form action="delete" lang={lang} label={t.account.deleteHeading}>
-              <Field
-                name="password"
-                label={t.account.deletePassword}
-                type="password"
-                autoComplete="current-password"
-                maxLength={128}
-              />
+              {session.hasPassword ? (
+                <Field
+                  name="password"
+                  label={t.account.deletePassword}
+                  type="password"
+                  autoComplete="current-password"
+                  maxLength={128}
+                />
+              ) : (
+                <label className="account-check">
+                  <input type="checkbox" name="confirm" value="on" required />
+                  <span>{t.account.deleteConfirm}</span>
+                </label>
+              )}
               <Send danger>{t.account.deleteSubmit}</Send>
             </Form>
           </>
@@ -399,6 +513,7 @@ export async function AccountPage({
       if (found !== null) {
         session = {
           email: found.email,
+          hasPassword: found.hasPassword,
           termsVersion: found.termsVersion,
           termsAcceptedOn: found.termsAcceptedAt.toISOString().slice(0, 10),
         };
@@ -410,7 +525,8 @@ export async function AccountPage({
     }
   }
 
-  const decision = decideAccountPage({ enabled, lang, segments, query, session });
+  const ways: Ways = { mail: mailEnabled(), google: googleEnabled() };
+  const decision = decideAccountPage({ enabled, lang, segments, query, session, ways });
   if (decision.kind === "not-found") notFound();
   if (decision.kind === "redirect") redirect(decision.to);
   return <AccountView data={decision.data} />;

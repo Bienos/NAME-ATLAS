@@ -15,8 +15,12 @@ export interface UsersTable {
   email: string;
   email_normalised: string;
   language: Language;
-  /** Null while the account is pending: set, with the next three, when the mailbox's owner completes it. */
+  /**
+   * Null while the account is pending, and for a complete one made through
+   * Google until its owner sets a password by the reset mail (migration 0032).
+   */
   password_hash: string | null;
+  /** Set, with the two terms columns, when the account is completed. */
   email_verified_at: Date | null;
   terms_version: string | null;
   terms_accepted_at: Date | null;
@@ -34,7 +38,8 @@ export interface SessionsTable {
   expires_at: Date;
 }
 
-export type EmailTokenPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD";
+/** `GOOGLE_TERMS` (migration 0032) carries a first Google sign-in to the terms step; it is never mailed. */
+export type EmailTokenPurpose = "VERIFY_EMAIL" | "RESET_PASSWORD" | "GOOGLE_TERMS";
 
 export interface EmailTokensTable {
   token_id: string;
@@ -51,7 +56,19 @@ export interface SignInFailuresTable {
   failed_at: Date;
 }
 
+/** An outside account that may sign a user in (migration 0032, ADR-0033). Only Google today. */
+export interface IdentitiesTable {
+  identity_id: string;
+  user_id: string;
+  provider: "GOOGLE";
+  /** Google's `sub`: stable, never the address. */
+  subject: string;
+  created_at: Date;
+  last_used_at: Date;
+}
+
 export interface AccountsDB {
+  identities: IdentitiesTable;
   users: UsersTable;
   sessions: SessionsTable;
   email_tokens: EmailTokensTable;

@@ -35,14 +35,15 @@ describe("the header's trees link (TASK-076, AC-1)", () => {
     expect(nav("en")).not.toContain("/en/account/trees");
   });
 
-  it("is there, in each language, beside the account, to the landing page, when the tree is on", () => {
+  it("is there, in each language, before the account, to the landing page, when the tree is on", () => {
     for (const [name, value] of Object.entries(ON)) vi.stubEnv(name, value);
     vi.stubEnv("FAMILY_TREE_ENABLED", "1");
     const pl = nav("pl");
     expect(pl.split(`href="${treeLandingPath("pl")}"`)).toHaveLength(3);
     expect(pl).not.toContain('href="/pl/konto/drzewa"');
     expect(pl).toContain(">Drzewa<");
-    expect(pl.indexOf(">Konto<")).toBeLessThan(pl.indexOf(">Drzewa<"));
+    // The account is the header's last place, drawn as a button (TASK-084).
+    expect(pl.indexOf(">Drzewa<")).toBeLessThan(pl.indexOf(">Konto<"));
     expect(nav("en")).toContain(">Trees<");
     expect(nav("en")).toContain(`href="${treeLandingPath("en")}"`);
   });

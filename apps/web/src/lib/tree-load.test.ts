@@ -38,7 +38,7 @@ describe("the tree pages' decisions (TASK-076)", () => {
     expect(await load(["nope"])).toEqual({ kind: "not-found" });
     expect(await load(undefined, {}, deps(), null)).toEqual({
       kind: "redirect",
-      to: "/pl/konto/zaloguj",
+      to: "/pl/konto/zaloguj?next=%2Fpl%2Fkonto%2Fdrzewa",
     });
     const d = deps();
     d.family.getTree.mockResolvedValueOnce({ kind: "NOT_FOUND" });

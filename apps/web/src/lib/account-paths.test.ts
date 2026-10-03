@@ -55,8 +55,8 @@ describe("the account's addresses (TASK-062)", () => {
     expect(accountPath("pl", "account", { status: "a b&c" })).toBe("/pl/konto?status=a+b%26c");
   });
 
-  it("knows the seven actions and their routes", () => {
-    expect(ACCOUNT_ACTIONS).toHaveLength(7);
+  it("knows the eight actions and their routes (Google's terms step, TASK-084)", () => {
+    expect(ACCOUNT_ACTIONS).toHaveLength(8);
     for (const action of ACCOUNT_ACTIONS) {
       expect(isAccountAction(action)).toBe(true);
       expect(actionPath(action)).toBe(`/api/account/${action}`);

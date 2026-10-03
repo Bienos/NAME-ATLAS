@@ -2,7 +2,8 @@ import type { AccountStep } from "./account-paths.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The words of the account's six pages, in both languages (TASK-062).
+ * The words of the account's pages, in both languages (TASK-062; the Google
+ * terms step and buttons, TASK-084).
  *
  * A page prints its message from a *status word* in the address (`?status=…`),
  * never from text in it, and only from the words listed for that step: an
@@ -43,8 +44,21 @@ export interface AccountText {
     readonly forgot: string;
     readonly requestNew: string;
   };
+  readonly google: {
+    /** The button, in the words Google's branding guidelines allow. */
+    readonly button: string;
+    /** Between the button and the email form. */
+    readonly or: string;
+    /** On the sign-in page when the reader came from the family tree. */
+    readonly forTree: string;
+  };
   readonly account: {
     readonly signedInAs: string;
+    /** For an account made through Google that has no password yet. */
+    readonly viaGoogle: string;
+    readonly setPassword: string;
+    readonly deleteLedeNoPassword: string;
+    readonly deleteConfirm: string;
     readonly termsAccepted: (version: string, accepted: string) => string;
     readonly signOut: string;
     readonly deleteHeading: string;
@@ -80,6 +94,7 @@ const PL: AccountText = {
     reset: "Nie pamiętasz hasła?",
     confirm: "Dokończ zakładanie konta",
     "new-password": "Ustaw nowe hasło",
+    welcome: "Jeszcze tylko regulamin",
   },
   nav: "Konto",
   email: "Adres e-mail",
@@ -102,6 +117,8 @@ const PL: AccountText = {
     reset: "Podaj adres. Jeśli jest do niego konto, wyślemy link do ustawienia nowego hasła.",
     confirm: "Wybierz hasło i zaakceptuj regulamin. Link działa raz.",
     "new-password": "Wybierz nowe hasło. Po zmianie wszystkie sesje, także ta, zostaną zakończone.",
+    welcome:
+      "Logujesz się przez Google pierwszy raz. Zaakceptuj regulamin, żeby założyć konto. Od Google dostajemy tylko adres e-mail i identyfikator konta, nigdy hasło.",
   },
   submit: {
     "sign-in": "Zaloguj",
@@ -109,6 +126,12 @@ const PL: AccountText = {
     reset: "Wyślij link",
     confirm: "Utwórz konto",
     "new-password": "Zmień hasło",
+    welcome: "Załóż konto",
+  },
+  google: {
+    button: "Kontynuuj z Google",
+    or: "lub e-mailem",
+    forTree: "Zaloguj się, żeby zacząć drzewo rodzinne. Wrócisz do niego od razu.",
   },
   links: {
     noAccount: "Nie masz konta?",
@@ -120,6 +143,11 @@ const PL: AccountText = {
   },
   account: {
     signedInAs: "Zalogowano jako",
+    viaGoogle: "Logujesz się przez Google. Hasła nie masz, ale możesz je ustawić.",
+    setPassword: "Ustaw hasło",
+    deleteLedeNoPassword:
+      "Konto, wszystkie jego sesje, linki i połączenie z Google znikają z bazy od razu i nie da się tego cofnąć.",
+    deleteConfirm: "Rozumiem, że konto zniknie na stałe.",
     // Polish dates end in "r." already, so the sentence takes no full stop of its own.
     termsAccepted: (version, accepted) => `Regulamin z ${version}, zaakceptowany ${accepted}`,
     signOut: "Wyloguj",
@@ -133,6 +161,7 @@ const PL: AccountText = {
     account: {
       welcome: ok("Konto gotowe. Jesteś zalogowany."),
       "wrong-password": problem("Hasło się nie zgadza. Konto nie zostało usunięte."),
+      unconfirmed: problem("Zaznacz potwierdzenie. Konto nie zostało usunięte."),
       error: problem("Coś poszło nie tak po naszej stronie. Spróbuj za chwilę."),
     },
     "sign-in": {
@@ -145,6 +174,19 @@ const PL: AccountText = {
       signedout: ok("Wylogowano."),
       reset: ok("Hasło zmienione. Zaloguj się nowym."),
       deleted: ok("Konto usunięte."),
+      "google-cancelled": ok("Logowanie przez Google przerwane. Nic nie zostało zapisane."),
+      "google-failed": problem(
+        "Nie udało się zalogować przez Google. Spróbuj jeszcze raz za chwilę.",
+      ),
+      "google-unverified": problem(
+        "Google nie potwierdził tego adresu e-mail, więc nie możemy na nim założyć konta.",
+      ),
+      "google-other": problem(
+        "To konto jest już połączone z innym kontem Google. Zaloguj się tamtym albo hasłem.",
+      ),
+      "google-expired": problem(
+        "Minęła ponad godzina od wyboru konta Google. Zaloguj się przez Google jeszcze raz.",
+      ),
       error: problem("Coś poszło nie tak po naszej stronie. Spróbuj za chwilę."),
     },
     "sign-up": {
@@ -181,6 +223,13 @@ const PL: AccountText = {
       }),
       error: problem("Coś poszło nie tak po naszej stronie. Spróbuj za chwilę."),
     },
+    welcome: {
+      terms: problem("Żeby założyć konto, zaakceptuj regulamin."),
+      expired: problem(
+        "Minęła ponad godzina od wyboru konta Google. Zaloguj się przez Google jeszcze raz.",
+      ),
+      error: problem("Coś poszło nie tak po naszej stronie. Spróbuj za chwilę."),
+    },
   },
 };
 
@@ -192,6 +241,7 @@ const EN: AccountText = {
     reset: "Forgot your password?",
     confirm: "Finish creating your account",
     "new-password": "Set a new password",
+    welcome: "One last step: the terms",
   },
   nav: "Account",
   email: "Email address",
@@ -216,6 +266,8 @@ const EN: AccountText = {
     confirm: "Choose a password and accept the terms. The link works once.",
     "new-password":
       "Choose a new password. When you change it, every session, this one too, is ended.",
+    welcome:
+      "This is your first sign-in with Google. Accept the terms to create your account. Google gives us only your email address and an account identifier, never a password.",
   },
   submit: {
     "sign-in": "Sign in",
@@ -223,6 +275,12 @@ const EN: AccountText = {
     reset: "Send the link",
     confirm: "Create the account",
     "new-password": "Change the password",
+    welcome: "Create the account",
+  },
+  google: {
+    button: "Continue with Google",
+    or: "or with email",
+    forTree: "Sign in to start your family tree. You will go straight back to it.",
   },
   links: {
     noAccount: "No account?",
@@ -234,6 +292,11 @@ const EN: AccountText = {
   },
   account: {
     signedInAs: "Signed in as",
+    viaGoogle: "You sign in with Google. You have no password, but you can set one.",
+    setPassword: "Set a password",
+    deleteLedeNoPassword:
+      "The account, all its sessions, links and its Google connection leave the database at once, and this cannot be undone.",
+    deleteConfirm: "I understand the account will be gone for good.",
     termsAccepted: (version, accepted) => `Terms of ${version} accepted on ${accepted}.`,
     signOut: "Sign out",
     deleteHeading: "Delete the account",
@@ -246,6 +309,7 @@ const EN: AccountText = {
     account: {
       welcome: ok("Your account is ready. You are signed in."),
       "wrong-password": problem("The password does not match. The account was not deleted."),
+      unconfirmed: problem("Tick the confirmation. The account was not deleted."),
       error: problem("Something went wrong on our side. Try again in a moment."),
     },
     "sign-in": {
@@ -258,6 +322,17 @@ const EN: AccountText = {
       signedout: ok("Signed out."),
       reset: ok("Password changed. Sign in with the new one."),
       deleted: ok("Account deleted."),
+      "google-cancelled": ok("Signing in with Google was cancelled. Nothing was saved."),
+      "google-failed": problem("Signing in with Google did not work. Try again in a moment."),
+      "google-unverified": problem(
+        "Google has not verified this email address, so we cannot open an account for it.",
+      ),
+      "google-other": problem(
+        "This account is already connected to a different Google account. Sign in with that one or with your password.",
+      ),
+      "google-expired": problem(
+        "More than an hour has passed since you chose a Google account. Sign in with Google again.",
+      ),
       error: problem("Something went wrong on our side. Try again in a moment."),
     },
     "sign-up": {
@@ -292,6 +367,13 @@ const EN: AccountText = {
         sameAsEmail: "The password cannot be the same as the email address.",
         tooCommon: "That password is too common. Choose another.",
       }),
+      error: problem("Something went wrong on our side. Try again in a moment."),
+    },
+    welcome: {
+      terms: problem("To create an account, accept the terms."),
+      expired: problem(
+        "More than an hour has passed since you chose a Google account. Sign in with Google again.",
+      ),
       error: problem("Something went wrong on our side. Try again in a moment."),
     },
   },

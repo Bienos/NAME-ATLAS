@@ -1,12 +1,14 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   LANDING_TRIES,
   LandingCompare,
   LandingHow,
   LandingOffer,
   LandingPitch,
+  LandingTree,
+  LandingTreeLine,
   LandingTries,
   Scatter,
   trySearchPath,
@@ -180,5 +182,44 @@ describe("the landing's second screen and offer", () => {
       expect(html).not.toContain("<form");
       expect(html).not.toContain("<button");
     }
+  });
+});
+
+describe("the family tree's ways in on the landing (TASK-084)", () => {
+  const ON = {
+    ACCOUNTS_DATABASE_URL: "postgres://app@host/db",
+    SITE_ORIGIN: "https://atlas.example.test",
+    CRON_SECRET: "c",
+    RESEND_API_KEY: "re",
+    ACCOUNTS_MAIL_FROM: "a@example.test",
+  };
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("are absent while the tree is off", () => {
+    for (const [name, value] of Object.entries(ON)) vi.stubEnv(name, value);
+    expect(renderToStaticMarkup(createElement(LandingTree, { lang: "pl" }))).toBe("");
+    expect(renderToStaticMarkup(createElement(LandingTreeLine, { lang: "pl" }))).toBe("");
+  });
+
+  it("lead to sign-in that returns to the tree, and to Google when it is configured", () => {
+    for (const [name, value] of Object.entries(ON)) vi.stubEnv(name, value);
+    vi.stubEnv("FAMILY_TREE_ENABLED", "1");
+    const line = renderToStaticMarkup(createElement(LandingTreeLine, { lang: "pl" }));
+    expect(line).toContain('href="/pl/konto/zaloguj?next=%2Fpl%2Fkonto%2Fdrzewa"');
+    const noGoogle = renderToStaticMarkup(createElement(LandingTree, { lang: "pl" }));
+    expect(noGoogle).not.toContain("/api/account/google");
+    for (const point of UI.pl.landingTreePoints) expect(noGoogle).toContain(point);
+
+    vi.stubEnv("GOOGLE_CLIENT_ID", "id");
+    vi.stubEnv("GOOGLE_CLIENT_SECRET", "secret");
+    const html = renderToStaticMarkup(createElement(LandingTree, { lang: "en" }));
+    expect(html.replaceAll("&amp;", "&")).toContain(
+      'href="/api/account/google?lang=en&next=%2Fen%2Faccount%2Ftrees"',
+    );
+    expect(html).toContain(UI.en.landingTreeGoogle);
+    expect(html).toContain('href="/en/family-tree"');
   });
 });

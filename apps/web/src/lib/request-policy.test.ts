@@ -12,6 +12,9 @@ describe("what each request is held to (TASK-029, TASK-062 AC-11)", () => {
   it("gives the account's forms a bucket of their own, tighter than the API's", () => {
     expect(policyFor("/api/account/sign-in")).toBe(ACCOUNT_POLICY);
     expect(policyFor("/api/account/delete")).toBe(ACCOUNT_POLICY);
+    // Google sign-in's two routes share it (TASK-084).
+    expect(policyFor("/api/account/google")).toBe(ACCOUNT_POLICY);
+    expect(policyFor("/api/account/google/callback")).toBe(ACCOUNT_POLICY);
     expect(ACCOUNT_POLICY.limit).toBe(10);
     expect(ACCOUNT_POLICY.limit).toBeLessThan(API_POLICY.limit);
   });

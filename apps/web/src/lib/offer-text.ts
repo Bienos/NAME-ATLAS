@@ -81,7 +81,7 @@ export interface OfferDocument {
 
 const PL: OfferDocument = {
   title: "Oferta",
-  lede: "Odpowiedzi o nazwisku są za darmo. Wkrótce dojdzie Twoja rodzina: drzewo, które zbudujesz sam, i badania zawodowych genealogów z DNA.",
+  lede: "Odpowiedzi o nazwisku są za darmo, a wkrótce także drzewo, które zbudujesz sam. Potem łączenie drzew i badania zawodowych genealogów z DNA.",
   now: "Teraz",
   soon: "Wkrótce",
   freeCta: "Sprawdź nazwisko",
@@ -97,7 +97,8 @@ const PL: OfferDocument = {
         "Karta do udostępnienia z każdej odpowiedzi.",
         "Pełna strona ze źródłami i porównanie dwóch nazwisk.",
       ],
-      note: "Wkrótce darmowe konto: zachowasz karty i podzielisz się nimi ze znajomymi.",
+      // The tree is free with an account (D-034, 2026-10-04), no longer part of the 29,99 zł tier.
+      note: "Wkrótce darmowe konto, także przez Google: zachowasz karty i zbudujesz drzewo rodziny: rodzice, dziadkowie, miejsca, daty, nazwiska panieńskie.",
     },
     {
       key: "family",
@@ -108,7 +109,6 @@ const PL: OfferDocument = {
       items: [
         "Pełny raport nazwiska: dawne formy, wzmianki w archiwach i drukach, zmiany w czasie i wszystkie źródła.",
         "Znane osoby o tym nazwisku: tylko publiczne fakty i link do Wikipedii. To samo nazwisko, nie Twój krewny.",
-        "Drzewo rodziny, które budujesz sam: rodzice, dziadkowie, miejsca, daty, nazwiska panieńskie.",
         "Łączenie drzew z innymi osobami przez wspólnych przodków, którzy już nie żyją.",
         "Dodatkowe poszukiwania w źródłach serwisu dla miejsc i dat z Twojego drzewa.",
       ],
@@ -169,7 +169,7 @@ const PL: OfferDocument = {
 
 const EN: OfferDocument = {
   title: "Offer",
-  lede: "The answers about a surname are free. Your family comes next: a tree you build yourself, and research by professional genealogists with DNA.",
+  lede: "The answers about a surname are free, and soon so is a tree you build yourself. Then connecting trees, and research by professional genealogists with DNA.",
   now: "Now",
   soon: "Coming soon",
   freeCta: "Look up a surname",
@@ -185,7 +185,7 @@ const EN: OfferDocument = {
         "A card to share for each answer.",
         "The full page with its sources, and a comparison of two surnames.",
       ],
-      note: "Coming soon, a free account: keep your cards and share them with friends.",
+      note: "Coming soon, a free account, with Google too: keep your cards and build your family tree: parents, grandparents, places, dates, maiden names.",
     },
     {
       key: "family",
@@ -196,7 +196,6 @@ const EN: OfferDocument = {
       items: [
         "The full surname report: old forms, mentions in archives and print, change over time and every source.",
         "Famous people with the surname: public facts only, with a link to Wikipedia. The same surname, not your relative.",
-        "A family tree you build yourself: parents, grandparents, places, dates, maiden names.",
         "Connecting trees with other people through shared ancestors who have died.",
         "Extra searches in the site's sources for the places and dates in your tree.",
       ],

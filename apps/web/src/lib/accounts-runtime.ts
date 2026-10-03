@@ -3,9 +3,10 @@ import {
   createAccountsDb,
   createPasswordHasher,
   createResendMailer,
+  loadGoogleConfig,
   loadMailConfig,
 } from "@name-atlas/accounts";
-import type { AccountLinks, Accounts, Mailer } from "@name-atlas/accounts";
+import type { AccountLinks, Accounts, GoogleConfig, Mailer } from "@name-atlas/accounts";
 import { createPool, loadAccountsDbConfig } from "@name-atlas/db";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
@@ -31,7 +32,12 @@ export interface AccountsRuntime {
   readonly accounts: Accounts;
   /** The pool of schema `accounts`; the family tree's service shares it (TASK-076), as the same role. */
   readonly pool: ReturnType<typeof createPool>;
-  readonly mailer: Mailer;
+  /** Null when only Google sign-in is configured (ADR-0033). */
+  readonly mailer: Mailer | null;
+  /** Null when only email and password are configured. */
+  readonly google: GoogleConfig | null;
+  /** `SITE_ORIGIN`, without a trailing slash. */
+  readonly origin: string;
   /** Whether the site is served over HTTPS, which decides the cookie's name and `Secure`. */
   readonly secure: boolean;
   readonly cronSecret: string;
@@ -59,9 +65,12 @@ export function accountsRuntime(env: NodeJS.ProcessEnv = process.env): AccountsR
 
   const database = loadAccountsDbConfig(env);
   const mail = loadMailConfig(env);
+  const google = loadGoogleConfig(env);
   const origin = env["SITE_ORIGIN"]?.trim().replace(/\/+$/u, "");
   const cronSecret = env["CRON_SECRET"]?.trim();
-  if (database === null || mail === null || !origin || !cronSecret) return (cached = null);
+  if (database === null || (mail === null && google === null) || !origin || !cronSecret) {
+    return (cached = null);
+  }
 
   const pool = createPool(database, {
     max: MAX_CONNECTIONS_PER_INSTANCE,
@@ -76,7 +85,9 @@ export function accountsRuntime(env: NodeJS.ProcessEnv = process.env): AccountsR
   cached = {
     accounts,
     pool,
-    mailer: createResendMailer(mail),
+    mailer: mail === null ? null : createResendMailer(mail),
+    google,
+    origin,
     secure: origin.startsWith("https://"),
     cronSecret,
     termsVersion: familyTreeEnabled(env) ? TREE_LEGAL_UPDATED : ACCOUNTS_LEGAL_UPDATED,

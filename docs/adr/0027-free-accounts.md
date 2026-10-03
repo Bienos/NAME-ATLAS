@@ -10,6 +10,7 @@
 - **Relates to:** ADR-0026 (the tiers), `ARCHITECTURE.md` §7 (the public / private data boundary), `PRODUCT.md` §7.9, TASK-049 (the off-host backup), TASK-046 (the privacy notice), `docs/canonical/19`.
 - **Implemented by:** TASK-061 (the schema and the library, dark) and TASK-062 (the pages and routes, dark by configuration). The VM role (TASK-063) and the download gate (TASK-064) are their own tasks (§5).
 - **Amended by:** TASK-062, 2026-10-01, in §2.5 (the cookie's lifetime), §2.9 (the version recorded) and §5 (the owner's variables, the VM's dumps); TASK-063 in §5.2; TASK-064 in §5.4 (the gate); each change is marked where it is.
+- **Amended by ADR-0033 (2026-10-04):** §2.1's "no social sign-in" no longer holds. Google is a second way in; email and password stay. ADR-0033 says how a Google account is linked and why the order of §2.1 still protects an address.
 
 ## 1. Context
 

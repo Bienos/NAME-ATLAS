@@ -28,6 +28,8 @@ import {
   LandingHow,
   LandingOffer,
   LandingPitch,
+  LandingTree,
+  LandingTreeLine,
   Scatter,
 } from "../lib/landing-sections.js";
 import type { LandingExample } from "../lib/landing-sections.js";
@@ -323,6 +325,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           </h1>
           <p className="landing-lede">{t.landingLede}</p>
           <SearchForm lang={lang} query={query} />
+          <LandingTreeLine lang={lang} />
           {/* Empty until a search leaves the page: `dusk-zoom.tsx` fills it
               from `data-text`, so nothing is announced before it is true. */}
           <p
@@ -347,6 +350,7 @@ export default async function HomePage({ searchParams }: PageProps) {
         </section>
         <div className="landing-atlas">
           <LandingPitch example={example} lang={lang} />
+          <LandingTree lang={lang} />
           <LandingOffer lang={lang} />
           <LandingHow lang={lang} />
           <LandingCompare lang={lang} />

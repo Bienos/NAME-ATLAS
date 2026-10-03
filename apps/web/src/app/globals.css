@@ -3984,6 +3984,18 @@ body.dusk {
   text-underline-offset: 8px;
 }
 
+/* The account sits at the end of the header as a button (TASK-084), the one
+   way in to sign-in from every page. */
+.site-links a.nav-account {
+  padding: 0.3em 1em;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.site-links a.nav-account:hover {
+  border-color: var(--dusk-amber);
+}
+
 .lang-switch {
   flex: none;
   margin: 0;
@@ -4664,6 +4676,69 @@ body.dusk {
 .account-links {
   margin: var(--space-4) 0 0;
   font-size: 0.9375rem;
+}
+
+/* "Continue with Google" (TASK-084): Google's own white button with its four-
+   colour mark, as its branding guidelines ask, above the email form. */
+/* `a.` so it outweighs `.dusk a`'s amber. */
+.dusk a.account-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 24rem;
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: #1f1f1f;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #747775;
+  border-radius: 999px;
+}
+
+.dusk a.account-google:hover {
+  background: #f2f2f2;
+  box-shadow: 0 0 48px var(--dusk-glow);
+}
+
+.account-google:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 3px;
+}
+
+.account-google svg {
+  flex: none;
+}
+
+.account-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 24rem;
+  margin: var(--space-5) 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-soft);
+}
+
+.account-or::before,
+.account-or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--dusk-line);
+}
+
+.account-context {
+  padding: var(--space-3) var(--space-4);
+  color: var(--dusk-ink);
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line);
+  border-radius: 10px;
 }
 
 .account .offer-send.account-danger {
@@ -7038,6 +7113,7 @@ a.tree-card:hover {
 /* The landing's sections on the ground: what you get, the offer, how it
    works and compare (TASK-053, TASK-065). */
 .landing-pitch,
+.landing-tree,
 .landing-how,
 .landing-offer,
 .landing-compare {
@@ -7048,6 +7124,7 @@ a.tree-card:hover {
 }
 
 .pitch-head > h2,
+.landing-tree > h2,
 .landing-how > h2,
 .landing-offer > h2,
 .landing-compare > h2 {
@@ -7086,6 +7163,63 @@ a.tree-card:hover {
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.875rem;
   color: var(--dusk-amber);
+}
+
+/* The family tree's section (TASK-084): three lines and its ways in. */
+.landing-tree-eyebrow {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+}
+
+.landing-tree ul {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 52ch;
+  margin: 0;
+  padding-left: 1.2em;
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: var(--dusk-ink-soft);
+}
+
+.landing-tree .tree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* Buttons, not links: `.dusk a`'s amber would put amber on the shell. */
+.dusk .landing-tree a.offer-send {
+  color: var(--dusk-on-amber);
+}
+
+.dusk .landing-tree a.tree-ghost {
+  color: var(--dusk-ink);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+}
+
+.landing-tree-free {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+}
+
+/* Under the hero's search: one quiet line, only when the tree is on. */
+.landing-tree-line {
+  margin: var(--space-4) 0 0;
+  font-size: 0.9375rem;
+  color: var(--dusk-shell);
+}
+
+.landing-tree-line a {
+  color: var(--dusk-amber);
+  text-underline-offset: 3px;
 }
 
 .landing-more {

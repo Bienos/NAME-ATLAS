@@ -204,12 +204,18 @@ function Actions({ lang, t }: { readonly lang: Lang; readonly t: TreeLandingText
         <a className="offer-send" href={treePath(lang, { page: "trees" })}>
           {t.yourTrees}
         </a>
-        <a className="offer-send tree-ghost" href={accountPath(lang, "sign-up")}>
+        <a
+          className="offer-send tree-ghost"
+          href={accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) })}
+        >
           {t.signUp}
         </a>
       </p>
       <p className="tree-note">
-        {t.needsAccount} <a href={accountPath(lang, "sign-in")}>{t.signIn}</a>
+        {t.needsAccount}{" "}
+        <a href={accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) })}>
+          {t.signIn}
+        </a>
       </p>
     </>
   );
