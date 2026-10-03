@@ -62,7 +62,11 @@ async function main(): Promise<void> {
     }
     process.stdout.write(
       `IMPORTED — source ${outcome.source_id}, record ${outcome.source_record_id}, ` +
-        `${String(outcome.entries)} entries stored\n`,
+        `${String(outcome.entries)} entries stored` +
+        (outcome.supersedes_source_record_id
+          ? `; it replaces record ${outcome.supersedes_source_record_id}, now UPDATED`
+          : "") +
+        "\n",
     );
   } finally {
     await db.destroy();

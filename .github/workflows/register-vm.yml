@@ -18,9 +18,10 @@ name: Register VM
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
+#   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   accounts       ops/vm/accounts.sh (TASK-063): migrate, the role nameatlas_app and its password, PgBouncer's user list, the isolation checks; repeatable
 #
-# provision, status, finalize, editions, extras, shift-finish, archive and bearers end by connecting the way the web app does;
+# provision, status, finalize, editions, extras, shift-finish, archive, bearers and meanings end by connecting the way the web app does;
 # accounts ends by connecting the way the accounts connection does (nameatlas_app, with its own secret).
 
 on:
@@ -46,6 +47,7 @@ on:
             shift-finish,
             archive,
             bearers,
+            meanings,
             accounts,
           ]
 
@@ -83,7 +85,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | accounts) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | meanings | accounts) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -237,6 +239,14 @@ jobs:
           scp -q ops/vm/bearers.sh vm:name-atlas-ops/bearers.sh
           ssh vm 'sudo bash ~/name-atlas-ops/bearers.sh ~/name-atlas-ops/app.tar.gz'
 
+      - name: meanings
+        if: steps.step.outputs.step == 'meanings'
+        run: |
+          # The pushed commit's tree: the source file and the code that imports it.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/meanings.sh vm:name-atlas-ops/meanings.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/meanings.sh ~/name-atlas-ops/app.tar.gz'
+
       - name: accounts
         if: steps.step.outputs.step == 'accounts'
         env:
@@ -264,7 +274,8 @@ jobs:
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
           steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions' ||
           steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'shift-finish' ||
-          steps.step.outputs.step == 'archive' || steps.step.outputs.step == 'bearers'
+          steps.step.outputs.step == 'archive' || steps.step.outputs.step == 'bearers' ||
+          steps.step.outputs.step == 'meanings'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
