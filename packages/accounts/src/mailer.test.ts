@@ -41,6 +41,12 @@ describe("TASK-061 AC-9: the Resend mailer", () => {
     expect(call?.init.signal).toBeInstanceOf(AbortSignal);
   });
 
+  it("adds reply_to only when the message names one", async () => {
+    const { fn, calls } = fakeFetch(() => new Response('{"id":"1"}', { status: 200 }));
+    await createResendMailer(CONFIG, fn).send({ ...MAIL, replyTo: "ewa@example.com" });
+    expect(JSON.parse(String(calls[0]?.init.body))).toMatchObject({ reply_to: "ewa@example.com" });
+  });
+
   it("throws the status, and neither the key nor the provider's body, on a non-2xx answer", async () => {
     const { fn } = fakeFetch(
       () =>

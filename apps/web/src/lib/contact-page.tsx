@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
+import { ContactForm } from "./contact-form.js";
 import { CONTACT_EMAIL, contactPath } from "./site-footer.js";
 import { SiteShell } from "./site-shell.js";
 
 /**
- * `/pl/kontakt` and `/en/contact` (TASK-047): where to write, and about what.
- * Static: no database, no request data.
+ * `/pl/kontakt` and `/en/contact` (TASK-047): a form that sends the message to
+ * the owner's inbox (`/api/contact`), what to write about, and the address for
+ * anyone who prefers their own mail. Static: no database, no request data.
  */
 
 export function contactMetadata(lang: Lang): Metadata {
@@ -27,14 +29,11 @@ export function ContactView({ lang }: { readonly lang: Lang }) {
       lang={lang}
       otherPath={contactPath(other)}
       world={{ mode: "quiet" }}
-      mainClassName="reading"
+      mainClassName="contact"
     >
-      <section>
+      <section className="contact-intro">
         <h2>{t.contactHeading}</h2>
-        <p>{t.contactIntro}</p>
-        <p>
-          <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-        </p>
+        <p className="contact-lede">{t.contactIntro}</p>
         <p>{t.contactTopicsLead}</p>
         <ul>
           {t.contactTopics.map((topic) => (
@@ -43,6 +42,12 @@ export function ContactView({ lang }: { readonly lang: Lang }) {
         </ul>
         <p>{t.contactReportHint}</p>
         <p>{t.contactNoPromise}</p>
+        <p className="contact-direct">
+          {t.contactDirect} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        </p>
+      </section>
+      <section className="contact-card">
+        <ContactForm lang={lang} />
       </section>
     </SiteShell>
   );

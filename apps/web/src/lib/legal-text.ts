@@ -22,7 +22,7 @@ export const CONTROLLER_PLACE = "Iława";
 /**
  * The date each document was last changed, ISO. The privacy notice changed for
  * the offer's forms (TASK-057), then for the well-known people Wikidata names
- * (TASK-073, ADR-0030).
+ * (TASK-073, ADR-0030), and for the contact form.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
   privacy: "2026-10-03",
@@ -93,7 +93,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Po co i na jakiej podstawie",
         paragraphs: [
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
-          "Jeśli napiszesz do nas e-mail, przetwarzamy Twój adres i treść wiadomości, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie.",
+          "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz) i treść wiadomości, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę.",
           "Statystyki odwiedzin (które strony są oglądane, ile razy i skąd) prowadzimy na tej samej podstawie. Zbiera je Vercel Web Analytics: bez plików cookie; odwiedzający są rozróżniani skrótem obliczonym z żądania, kasowanym po 24 godzinach. Dla każdej odsłony zapisuje czas, adres strony, stronę odsyłającą, kraj, region i miasto, system, przeglądarkę i typ urządzenia. Zanim adres trafi do statystyk, nasz kod zastępuje w nim nazwisko oznaczeniem [slug] i usuwa parametry zapytania, więc statystyki nie zawierają wyszukiwanego nazwiska.",
           "Jeśli zapiszesz się na listę oczekujących albo zapytasz o badanie genealogiczne, przetwarzamy Twój adres i to, co napiszesz, żeby odpowiedzieć i dać znać, gdy usługa ruszy. Podstawą jest działanie na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO). Nie wysyłaj nam wyników testu DNA ani informacji o zdrowiu: to dane szczególnie chronione, a do pierwszej odpowiedzi nie są potrzebne.",
           "Zanim przekażemy Twoje dane genealogom, którzy prowadzą badanie, zapytamy Cię o zgodę i powiemy, kim są.",
@@ -114,6 +114,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "Vercel Inc. (USA) — hosting serwisu i statystyki odwiedzin (Vercel Web Analytics); strony są generowane we Frankfurcie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
           "Oracle — serwer bazy danych we Frankfurcie. Otrzymuje zapytanie o nazwisko, ale nie adres IP odwiedzającego.",
           "Google — skrzynka pocztowa, na którą przychodzą wiadomości.",
+          "Resend, Inc. (USA) — dostarczanie wiadomości z formularza kontaktowego na naszą skrzynkę. Przekazanie do USA opiera się na certyfikacji Resend w EU-U.S. Data Privacy Framework i na standardowych klauzulach umownych, jak Resend deklaruje.",
         ],
         paragraphs: [],
       },
@@ -162,7 +163,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Why, and on what basis",
         paragraphs: [
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
-          "If you email us, we process your address and your message to reply and deal with the matter, on the same basis.",
+          "If you email us or write through the contact form, we process your address, your name (if you give it) and your message to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox.",
           "Visit statistics (which pages are viewed, how often and from where) rest on the same basis. Vercel Web Analytics collects them: no cookies; visitors are told apart by a hash computed from the request, discarded after 24 hours. For each page view it records the time, the page address, the referring page, the country, region and city, the operating system, the browser and the device type. Before the address reaches the statistics, our code replaces the surname in it with [slug] and removes the query parameters, so the statistics never contain the surname searched for.",
           "If you join the waiting list or ask about genealogy research, we process your address and what you write to reply and to tell you when the service starts. The basis is taking steps at your request before entering into a contract (Article 6(1)(b) GDPR). Do not send us DNA results or health information: they are specially protected data, and a first reply does not need them.",
           "Before we pass your details to the genealogists who carry out the research, we will ask for your consent and tell you who they are.",
@@ -183,6 +184,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "Vercel Inc. (USA): hosting and visit statistics (Vercel Web Analytics); pages are generated in Frankfurt. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",
           "Oracle: the database server, in Frankfurt. It receives the query for a surname, not the visitor's IP address.",
           "Google: the mailbox that receives email.",
+          "Resend, Inc. (USA): delivering the contact form's messages to our mailbox. The transfer to the USA rests on Resend's certification under the EU-U.S. Data Privacy Framework and on standard contractual clauses, as Resend states.",
         ],
         paragraphs: [],
       },
