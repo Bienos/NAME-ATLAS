@@ -3,7 +3,7 @@ import type { Lang } from "./messages.js";
 
 /**
  * What the terms and the privacy notice say once the family tree exists
- * (TASK-073; ADR-0026 §2.5, ADR-0029 §2.4.12). Applied on top of the accounts
+ * (TASK-076; ADR-0026 §2.5, ADR-0029 §2.4.12). Applied on top of the accounts
  * variant (`legal-accounts.ts`), and only when the tree is on
  * (`family-config.ts`), so the base text and the accounts text are left as
  * they are. It **throws** when a heading it expects is not there.

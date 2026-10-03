@@ -37,7 +37,7 @@ export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
 export const ACCOUNTS_LEGAL_UPDATED = "2026-10-01";
 
 /**
- * The date of the tree variant (TASK-073): the terms gain the clause on living
+ * The date of the tree variant (TASK-076): the terms gain the clause on living
  * people and the notice a section on the tree. Shown, and recorded as the
  * version a reader accepted, only when the tree is on (`family-config.ts`).
  * It is also the version the consent step checks an account against

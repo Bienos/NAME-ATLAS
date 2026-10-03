@@ -22,7 +22,7 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
       ? ([["account", accountPath(lang, "account"), t.navAccount]] as const)
       : []),
     // And the tree's landing page beside it, only when the family tree is on
-    // (TASK-073): the pages themselves need a session, the landing says why.
+    // (TASK-076): the pages themselves need a session, the landing says why.
     ...(familyTreeEnabled() ? ([["trees", treeLandingPath(lang), t.navTrees]] as const) : []),
   ];
   return (

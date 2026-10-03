@@ -9,7 +9,7 @@ import { TREE_TEXT } from "./tree-text.js";
 import type { TreeLandingText } from "./tree-text.js";
 
 /**
- * The tree's landing page (TASK-073; the owner, 2026-10-03): `/pl/drzewo-rodzinne`
+ * The tree's landing page (TASK-076; the owner, 2026-10-03): `/pl/drzewo-rodzinne`
  * and `/en/family-tree`, where the header's "Drzewa" leads. Public, static,
  * no session, no form. It shows before it explains: the hero is a sample
  * pedigree drawn as the tree pages draw one (ADR-0021's dusk; the owner chose

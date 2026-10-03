@@ -8,7 +8,7 @@
  * (`?surname=…` on the landing, `?a=…&b=…` on the comparison) and the hash are
  * dropped. The card routes keep the card's name, which is not a surname.
  *
- * A tree page's address carries a tree's id and a person's id (TASK-073 AC-7);
+ * A tree page's address carries a tree's id and a person's id (TASK-076 AC-7);
  * both are replaced the same way, and the one-question flow's draft, which is
  * in the query, goes with the query.
  *

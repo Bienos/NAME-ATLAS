@@ -4,7 +4,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * The birthplace field's lookup in the TERYT register (TASK-073; ADR-0029
+ * The birthplace field's lookup in the TERYT register (TASK-076; ADR-0029
  * §2.1.2: a birthplace is a SIMC code, resolved through the read-only pool
  * with no user id in the query).
  *

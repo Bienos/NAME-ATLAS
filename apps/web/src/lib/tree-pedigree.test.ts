@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { fullName, nextQuestion, parentsOf, pedigree, unplaced } from "./tree-pedigree.js";
 import { ID, PEOPLE, tree, treeForMember } from "./tree-fixture.js";
 
-describe("the pedigree from the contract object (TASK-073, AC-3, AC-5)", () => {
+describe("the pedigree from the contract object (TASK-076, AC-3, AC-5)", () => {
   it("numbers the slots as an Ahnentafel from the root, four generations, and leaves empty places empty", () => {
     const slots = pedigree(tree());
     const byN = new Map(slots.map((s) => [s.n, s]));

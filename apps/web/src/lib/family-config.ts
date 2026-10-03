@@ -1,7 +1,7 @@
 import { accountsEnabled } from "./accounts-config.js";
 
 /**
- * Whether the family tree's pages exist (TASK-073, ADR-0029 §2.5.19: the tree
+ * Whether the family tree's pages exist (TASK-076, ADR-0029 §2.5.19: the tree
  * is paid, so it stays dark until checkout exists; D-029).
  *
  * On only when accounts are on (`accounts-config.ts`: a tree belongs to an

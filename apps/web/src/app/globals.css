@@ -4733,7 +4733,7 @@ body.dusk {
   white-space: nowrap;
 }
 
-/* The family tree's pages (TASK-073, ADR-0021): the account's forms, the
+/* The family tree's pages (TASK-076, ADR-0021): the account's forms, the
    pedigree as cards with dashed empty places, the chips of the design. */
 .tree section.tree-wide {
   max-width: none;
@@ -4979,7 +4979,7 @@ a.tree-card:hover {
   padding-left: 1.2em;
 }
 
-/* The tree's landing page (TASK-073, the "Horyzont" direction): a dusk hero
+/* The tree's landing page (TASK-076, the "Horyzont" direction): a dusk hero
    whose sample pedigree recedes to the horizon, then the reading. Full width;
    the reading shell's measure is applied inside each section. */
 .site > main.tree-landing {

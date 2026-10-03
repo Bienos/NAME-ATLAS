@@ -2,7 +2,7 @@ import type { LivingStatus, PersonInput, TreePersonRead } from "@name-atlas/fami
 import type { Lang } from "./messages.js";
 
 /**
- * The tree's addresses (TASK-073): the pages a reader opens, the routes their
+ * The tree's addresses (TASK-076): the pages a reader opens, the routes their
  * forms post to, and the one-question flow's draft, which lives in the page's
  * query and nowhere else. Pure, so the header, the pages, the redirects and
  * the tests all take them from here.
@@ -150,7 +150,7 @@ export function isLivingStatus(value: unknown): value is LivingStatus {
 
 /**
  * What the reader has typed about one person, as the one-question flow carries
- * it from page to page in the query (TASK-073 AC-6): the form's fields, as
+ * it from page to page in the query (TASK-076 AC-6): the form's fields, as
  * text, so a reload of any page loses nothing but what is in its own address,
  * and a page before the last POST stores nothing.
  */

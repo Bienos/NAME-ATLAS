@@ -12,7 +12,7 @@ import type { LegalKind } from "./legal-text.js";
  * Static: the text is in `legal-text.ts`; no database, no request data. When
  * accounts are on (`accounts-config.ts`, read at build) it says so
  * (`legal-accounts.ts`), and its date is the accounts variant's; when the
- * family tree is on too (TASK-073), it carries the tree's statements
+ * family tree is on too (TASK-076), it carries the tree's statements
  * (`legal-tree.ts`) and that variant's date.
  */
 

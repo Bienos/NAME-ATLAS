@@ -797,7 +797,7 @@ export const UI = {
     navHow: "Jak to działa",
     navOffer: "Oferta",
     navAccount: "Konto",
-    // Only when the family tree is on (TASK-073).
+    // Only when the family tree is on (TASK-076).
     navTrees: "Drzewa",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "Więcej: Twoja rodzina i DNA",

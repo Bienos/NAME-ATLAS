@@ -67,7 +67,7 @@ describe("TASK-058 AC-1: the analytics never sees a surname", () => {
   });
 });
 
-describe("TASK-073 AC-7: the analytics never sees a tree's or a person's id", () => {
+describe("TASK-076 AC-7: the analytics never sees a tree's or a person's id", () => {
   const TREE = "0199a1b2-0000-7000-8000-00000000aa01";
   const PERSON = "0199a1b2-0000-7000-8000-00000000bb01";
 

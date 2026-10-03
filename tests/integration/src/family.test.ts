@@ -463,6 +463,10 @@ describe("family tree (TASK-066, ADR-0029)", () => {
 
   it("0028 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
     const migrator = createMigrator(db().db);
+    // Step past the migrations above 0028 first (TASK-073's 0029); the refusal
+    // under test is 0028's.
+    const above = await migrator.migrateTo("0028_family_schema");
+    expect(above.error).toBeUndefined();
     const { error } = await migrator.migrateDown();
     expect(String(error)).toMatch(/refusing to drop schema family/u);
     const still = await sql<{ n: number }>`SELECT count(*)::int AS n FROM family.trees`.execute(

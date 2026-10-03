@@ -404,7 +404,7 @@ export function createAccounts(deps: AccountsDeps) {
 
     /**
      * Records that a signed-in reader accepted a newer version of the terms
-     * (ADR-0027 §2.9; TASK-073's consent step before the first living person
+     * (ADR-0027 §2.9; TASK-076's consent step before the first living person
      * in a tree). A pending account cannot accept anything.
      */
     async acceptTerms(input: {

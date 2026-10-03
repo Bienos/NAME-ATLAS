@@ -19,7 +19,7 @@ import {
 const TREE = "0199a1b2-0000-7000-8000-00000000aa01";
 const PERSON = "0199a1b2-0000-7000-8000-00000000bb01";
 
-describe("the tree's addresses (TASK-073)", () => {
+describe("the tree's addresses (TASK-076)", () => {
   it("names every page in both languages, under the account", () => {
     expect(treePath("pl", { page: "trees" })).toBe("/pl/konto/drzewa");
     expect(treePath("en", { page: "trees" })).toBe("/en/account/trees");
@@ -77,7 +77,7 @@ describe("the tree's addresses (TASK-073)", () => {
   });
 });
 
-describe("the one-question flow's draft (TASK-073, AC-6)", () => {
+describe("the one-question flow's draft (TASK-076, AC-6)", () => {
   const full = {
     given: "Halina",
     surname: "Zielińska",

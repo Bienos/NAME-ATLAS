@@ -6,7 +6,7 @@ import { familyTreeEnabled } from "./family-config.js";
 import { TREE_LEGAL_UPDATED } from "./legal-text.js";
 
 /**
- * The family tree the running site uses (TASK-073, ADR-0029 §2.1): the service
+ * The family tree the running site uses (TASK-076, ADR-0029 §2.1): the service
  * over schema `family`, on the **accounts pool**, made on first use. The same
  * role (`nameatlas_app`) reads and writes both schemas, and one pool per
  * instance is what the serverless host can afford (`accounts-runtime.ts`).

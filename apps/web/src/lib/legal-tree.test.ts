@@ -12,14 +12,14 @@ import type { LegalKind } from "./legal-text.js";
 const KINDS: readonly LegalKind[] = ["privacy", "terms"];
 const LANGS = ["pl", "en"] as const;
 
-describe("the legal texts with the tree (TASK-073, AC-1)", () => {
+describe("the legal texts with the tree (TASK-076, AC-1)", () => {
   it("read as before while the tree is off, with the accounts date", () => {
     for (const kind of KINDS) {
       for (const lang of LANGS) {
         expect(legalDocument(kind, lang, true)).toEqual(legalDocument(kind, lang, true, false));
         expect(legalDocument(kind, lang, false, true)).toEqual(legalDocument(kind, lang, false));
       }
-      // The later of the document's own date and the accounts variant's (TASK-073 moved the notice's own date past it).
+      // The later of the document's own date and the accounts variant's (TASK-073, the well-known bearers, moved the notice's own date past it).
       expect(legalUpdated(kind, true)).toBe(
         ACCOUNTS_LEGAL_UPDATED > LEGAL_UPDATED[kind] ? ACCOUNTS_LEGAL_UPDATED : LEGAL_UPDATED[kind],
       );

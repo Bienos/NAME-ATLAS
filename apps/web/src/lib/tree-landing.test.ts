@@ -14,7 +14,7 @@ const render = (lang: "pl" | "en") =>
 
 afterEach(() => vi.unstubAllEnvs());
 
-describe("the tree's landing page (TASK-073)", () => {
+describe("the tree's landing page (TASK-076)", () => {
   it("shows a sample pedigree first: four rows, every person a card, a lit question at an empty place, and says it is a sample", () => {
     for (const lang of LANGS) {
       const html = render(lang);

@@ -3,7 +3,7 @@ import type { Lang } from "./messages.js";
 import type { SlotRole, TreePage } from "./tree-paths.js";
 
 /**
- * The words of the tree's pages, in both languages (TASK-073). As the
+ * The words of the tree's pages, in both languages (TASK-076). As the
  * account's pages: a page prints its message from a *status word* in the
  * address, only from the words listed for that page, and never from text in
  * the address. The one message that names a person ("X is in the tree")

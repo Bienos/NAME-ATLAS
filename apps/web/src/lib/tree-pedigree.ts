@@ -3,7 +3,7 @@ import type { SlotRole } from "./tree-paths.js";
 
 /**
  * What the pedigree page and the dashboard derive from the contract's `tree`
- * object (TASK-073; ADR-0029 §2.5.16: no view is stored). Pure.
+ * object (TASK-076; ADR-0029 §2.5.16: no view is stored). Pure.
  *
  * The slots are numbered as an Ahnentafel: the root is 1, a person's father is
  * twice their number, the mother one more. A slot is a person, an empty place
