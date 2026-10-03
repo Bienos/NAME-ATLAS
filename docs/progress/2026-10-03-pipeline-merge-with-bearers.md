@@ -62,3 +62,19 @@ Local PostgreSQL 16 with PostGIS.
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build`, `test:backup` | exit 0 |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 408 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Fourth merge: `main` after #87 (the `bearers` VM step), 2026-10-03
+
+`main` took #87 at `b0dd8fa` as TASK-077. Three files conflicted:
+
+- **`.github/workflows/register-vm.yml`:** both new steps are kept, `bearers` (TASK-077) and `backup` (TASK-049 / TASK-070), in the header, the choice list and the step `case`.
+- **`docs/CODEMAP.md`:** the `ops/vm/` row is this branch's, with `bearers.sh` added from `main`.
+- **`STATUS.md`:** the "Last rewritten" line; the More-cards line keeps TASK-079.
+
+`ops/vm/accounts.sh` and `ops/vm/README.md` merged without conflict.
+
+| Command | Result |
+|---|---|
+| `bash -n` on every `ops/vm/*.sh` | no errors |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup` | exit 0 |
+| `register-vm.yml` parsed as YAML | parses |

@@ -37,7 +37,7 @@ APP=$OPS_HOME/app
 POOLER_PORT=6432
 PGB=/etc/pgbouncer
 # Long-running units that use the unpacked tree: unpacking now would change the code under them.
-UNITS=(name-atlas-register-build name-atlas-archive-load name-atlas-shift-batch)
+UNITS=(name-atlas-register-build name-atlas-archive-load name-atlas-shift-batch name-atlas-bearers-load)
 ARCHIVE=${1:-}
 ROLES_SQL=${2:-}
 
