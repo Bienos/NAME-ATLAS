@@ -329,7 +329,7 @@ function constellationData(
   };
 }
 
-describe("the Konstelacja view (TASK-084)", () => {
+describe("the Konstelacja view (TASK-091)", () => {
   it("draws every slot as a star that is a link to ?sel=n, the switch, the legend and the root's panel, in both languages (AC-4, AC-6)", () => {
     const shapes: string[] = [];
     for (const lang of LANGS) {

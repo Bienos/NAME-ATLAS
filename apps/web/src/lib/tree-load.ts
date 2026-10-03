@@ -98,7 +98,7 @@ export type TreePageData =
       readonly person: TreePersonRead | null;
     }
   | {
-      /** The Konstelacja view (TASK-084): the same slots as the pedigree, and the picked one. */
+      /** The Konstelacja view (TASK-091): the same slots as the pedigree, and the picked one. */
       readonly kind: "constellation";
       readonly lang: Lang;
       readonly status: string | null;

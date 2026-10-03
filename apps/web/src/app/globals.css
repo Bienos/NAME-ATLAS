@@ -5150,7 +5150,7 @@ a.tree-card:hover {
   padding-left: 1.2em;
 }
 
-/* The Konstelacja view (TASK-084): the view switch, the dusk sky with the
+/* The Konstelacja view (TASK-091): the view switch, the dusk sky with the
    stars on their arcs, the legend, and the panel of the picked person. On a
    narrow screen the sky scrolls inside itself, never the page. */
 .tree-seg {

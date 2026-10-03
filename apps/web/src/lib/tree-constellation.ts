@@ -1,7 +1,7 @@
 import type { Slot } from "./tree-pedigree.js";
 
 /**
- * The Konstelacja view's geometry (TASK-084), derived from the pedigree's
+ * The Konstelacja view's geometry (TASK-091), derived from the pedigree's
  * slots and nothing else (ADR-0029 §2.5.16: no view is stored). Pure, so the
  * server and the island draw the same sky and a test can check every star.
  *

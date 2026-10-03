@@ -29,7 +29,7 @@ import { searchPlaces } from "./tree-places.js";
 import { statusChip, TREE_TEXT, treeStatusWords, yearsLine } from "./tree-text.js";
 
 /**
- * The tree's pages (TASK-076; the Konstelacja, TASK-084): `/pl/konto/drzewa/[[...rest]]` and
+ * The tree's pages (TASK-076; the Konstelacja, TASK-091): `/pl/konto/drzewa/[[...rest]]` and
  * `/en/account/trees/[[...rest]]`. Plain HTML forms that post to
  * `/api/tree/<action>` and need no script, drawn in the dusk direction
  * (ADR-0021) after the chosen mockups: the dashboard, the consent step, the
@@ -446,7 +446,7 @@ function TreesView({ data }: { data: Extract<TreePageData, { kind: "trees" }> })
   );
 }
 
-/** Rodowód · Konstelacja (TASK-084): the two views of one tree, the page's own marked. */
+/** Rodowód · Konstelacja (TASK-091): the two views of one tree, the page's own marked. */
 function ViewSwitch({
   lang,
   treeId,

@@ -148,7 +148,7 @@ export interface TreeText {
     readonly deleteSubmit: string;
     readonly back: string;
   };
-  /** The Konstelacja view (TASK-084): the sky, the stars' words, the legend, the panel. */
+  /** The Konstelacja view (TASK-091): the sky, the stars' words, the legend, the panel. */
   readonly constellation: {
     readonly lede: string;
     readonly viewsLabel: string;

@@ -11,7 +11,7 @@ import type { Slot } from "./tree-pedigree.js";
 import { statusChip, TREE_TEXT, yearsLine } from "./tree-text.js";
 
 /**
- * The Konstelacja (TASK-084): the pedigree's slots as stars in a dusk sky,
+ * The Konstelacja (TASK-091): the pedigree's slots as stars in a dusk sky,
  * and a panel for the picked one. An island, but a small one: every star is
  * a link to `?sel=n`, so the page reads and works without script (the server
  * draws the picked star from the address); with script a click picks in

@@ -13,14 +13,14 @@ import { pedigree } from "./tree-pedigree.js";
 import { ID, person, tree, treeForMember } from "./tree-fixture.js";
 
 /**
- * TASK-084 AC-2 and AC-3: the stars stand where the artboard puts them, the
+ * TASK-091 AC-2 and AC-3: the stars stand where the artboard puts them, the
  * lines say what joins whom, a star's kind follows the slot.
  */
 
 const slots = () => pedigree(tree());
 const byN = (n: number) => slots().find((slot) => slot.n === n);
 
-describe("the constellation's geometry (TASK-084, AC-2)", () => {
+describe("the constellation's geometry (TASK-091, AC-2)", () => {
   it("puts the root at the bottom centre and the parents on the first arc, father left of mother", () => {
     expect(position(1)).toEqual({ x: SKY.cx, y: SKY.cy });
     const father = position(2);
@@ -96,7 +96,7 @@ describe("the constellation's geometry (TASK-084, AC-2)", () => {
   });
 });
 
-describe("a star's kind (TASK-084, AC-3)", () => {
+describe("a star's kind (TASK-091, AC-3)", () => {
   it("is living for a person treated as living, entered or from a source for the deceased, empty or hidden for a place", () => {
     expect(starKind(byN(1)!)).toBe("living");
     expect(starKind(byN(3)!)).toBe("living"); // no year of death: treated as living

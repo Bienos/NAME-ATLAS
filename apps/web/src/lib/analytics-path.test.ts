@@ -89,7 +89,7 @@ describe("TASK-076 AC-7: the analytics never sees a tree's or a person's id", ()
   });
 });
 
-describe("the Konstelacja's address in the statistics (TASK-084, AC-1)", () => {
+describe("the Konstelacja's address in the statistics (TASK-091, AC-1)", () => {
   it("keeps the view's slug and replaces the tree's id", () => {
     expect(
       redactTreePath("/pl/konto/drzewa/0199a1b2-0000-7000-8000-00000000aa01/konstelacja"),

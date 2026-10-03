@@ -182,7 +182,7 @@ describe("the tree pages' decisions (TASK-076)", () => {
   });
 });
 
-describe("the Konstelacja's decision (TASK-084)", () => {
+describe("the Konstelacja's decision (TASK-091)", () => {
   it("draws the same slots as the pedigree, picks the slot the address names or the root, and counts the unplaced", async () => {
     const root = await load([TREE_ID, "konstelacja"]);
     if (root.kind !== "view" || root.data.kind !== "constellation")

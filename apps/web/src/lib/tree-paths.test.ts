@@ -177,7 +177,7 @@ describe("the one-question flow's draft (TASK-076, AC-6)", () => {
   });
 });
 
-describe("the Konstelacja's address (TASK-084, AC-1)", () => {
+describe("the Konstelacja's address (TASK-091, AC-1)", () => {
   it("is the tree's address with the view's slug, in both languages, and nothing else under a tree", () => {
     expect(treePath("pl", { page: "constellation", treeId: TREE })).toBe(
       `/pl/konto/drzewa/${TREE}/konstelacja`,

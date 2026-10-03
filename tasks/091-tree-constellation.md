@@ -1,8 +1,8 @@
-# TASK-084 — The family tree, the Konstelacja view: ancestors as stars, with a side panel
+# TASK-091 — The family tree, the Konstelacja view: ancestors as stars, with a side panel
 
 - **Status:** IMPLEMENTED 2026-10-03; AC-1 to AC-8 verified (`docs/progress/2026-10-03-tree-constellation.md`).
 - **Requested by:** the project owner, 2026-10-03: "ok start konstelacja". The owner chose the tree's look on 2026-10-01 from the first round of mockups (ADR-0029's header): the artboard "A · Konstelacja" of the design canvas is the brief for this view.
-- **Number:** 084, the next free on `main` (up to 083) and in the open pull requests (070 in #76, 078 in #81, 080 in #79, 082 in #93 and #94).
+- **Number:** 091. It was 084 when opened (the next free on `main`, then up to 083); before the merge `main` reached 090 (#76 carries 070 and 090, #95 085, #93 086) and #96 and #99 claim 084 and #97 claims 087, so it took 091, the next number free on `main` and in the open pull requests.
 - **Builds on:** TASK-066 (the core), TASK-076 (the pages: `tree-load.ts` decides, `tree-page.tsx` renders, `tree-pedigree.ts` derives the Ahnentafel slots), ADR-0029 §2.5.16 (no view is stored; every view is derived from the contract's `tree` object), ADR-0021 (the dusk direction).
 - **Record:** `docs/progress/2026-10-03-tree-constellation.md`.
 
