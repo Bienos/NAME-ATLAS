@@ -402,6 +402,24 @@ export function createAccounts(deps: AccountsDeps) {
       };
     },
 
+    /**
+     * Records that a signed-in reader accepted a newer version of the terms
+     * (ADR-0027 §2.9; TASK-073's consent step before the first living person
+     * in a tree). A pending account cannot accept anything.
+     */
+    async acceptTerms(input: {
+      readonly userId: string;
+      readonly termsVersion: string;
+    }): Promise<void> {
+      const at = now();
+      await db
+        .updateTable("users")
+        .set({ terms_version: input.termsVersion, terms_accepted_at: at, updated_at: at })
+        .where("user_id", "=", input.userId)
+        .where("email_verified_at", "is not", null)
+        .execute();
+    },
+
     /** The session a cookie's token names, renewed when it is past half-life; null for none. */
     async sessionFromToken(token: unknown): Promise<Session | null> {
       if (!isTokenShape(token)) return null;

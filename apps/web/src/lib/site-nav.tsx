@@ -1,12 +1,14 @@
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
+import { familyTreeEnabled } from "./family-config.js";
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { atlasPath, comparePagePath, homePath, howPath, offerPath } from "./site-links.js";
+import { treeLandingPath } from "./tree-paths.js";
 import { SearchForm } from "./search-form.js";
 
 /** Which of the header's places the page is, for `aria-current`. */
-export type NavPlace = "atlas" | "compare" | "how" | "offer" | "account" | null;
+export type NavPlace = "atlas" | "compare" | "how" | "offer" | "account" | "trees" | null;
 
 function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
   const t = UI[lang];
@@ -19,6 +21,9 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
     ...(accountsEnabled()
       ? ([["account", accountPath(lang, "account"), t.navAccount]] as const)
       : []),
+    // And the tree's landing page beside it, only when the family tree is on
+    // (TASK-073): the pages themselves need a session, the landing says why.
+    ...(familyTreeEnabled() ? ([["trees", treeLandingPath(lang), t.navTrees]] as const) : []),
   ];
   return (
     <>

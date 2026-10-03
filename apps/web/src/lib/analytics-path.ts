@@ -8,6 +8,10 @@
  * (`?surname=…` on the landing, `?a=…&b=…` on the comparison) and the hash are
  * dropped. The card routes keep the card's name, which is not a surname.
  *
+ * A tree page's address carries a tree's id and a person's id (TASK-073 AC-7);
+ * both are replaced the same way, and the one-question flow's draft, which is
+ * in the query, goes with the query.
+ *
  * Pure: `site-analytics.tsx` hands it to `beforeSend`.
  */
 
@@ -15,6 +19,27 @@
 const SURNAME_PREFIXES = ["/pl/nazwisko/", "/en/surname/"] as const;
 
 export const SLUG_PLACEHOLDER = "[slug]";
+
+/** The routes under which the fourth segment is a tree's id and the sixth a person's. */
+const TREE_PREFIXES = ["/pl/konto/drzewa/", "/en/account/trees/"] as const;
+
+export const TREE_PLACEHOLDER = "[tree]";
+export const PERSON_PLACEHOLDER = "[person]";
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+/** The path with a tree's and a person's id replaced; other paths as they are. */
+export function redactTreePath(pathname: string): string {
+  for (const prefix of TREE_PREFIXES) {
+    if (!pathname.startsWith(prefix)) continue;
+    const parts = pathname.split("/");
+    // ["", "pl", "konto", "drzewa", tree, "osoba", person]
+    if (parts.length >= 5 && UUID.test(parts[4] ?? "")) parts[4] = TREE_PLACEHOLDER;
+    if (parts.length >= 7 && UUID.test(parts[6] ?? "")) parts[6] = PERSON_PLACEHOLDER;
+    return parts.join("/");
+  }
+  return pathname;
+}
 
 /** The path with the surname's slug replaced; other paths as they are. */
 export function redactSurnamePath(pathname: string): string {
@@ -43,6 +68,6 @@ export function analyticsUrl(url: string): string | null {
   }
   parsed.search = "";
   parsed.hash = "";
-  parsed.pathname = redactSurnamePath(parsed.pathname);
+  parsed.pathname = redactTreePath(redactSurnamePath(parsed.pathname));
   return absolute ? parsed.toString() : parsed.pathname;
 }

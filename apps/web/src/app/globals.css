@@ -4733,6 +4733,939 @@ body.dusk {
   white-space: nowrap;
 }
 
+/* The family tree's pages (TASK-073, ADR-0021): the account's forms, the
+   pedigree as cards with dashed empty places, the chips of the design. */
+.tree section.tree-wide {
+  max-width: none;
+}
+
+.tree-eyebrow {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-eyebrow a {
+  color: inherit;
+}
+
+.tree-list {
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.tree-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--dusk-line);
+}
+
+.tree-list li:last-child {
+  border-bottom: 1px solid var(--dusk-line);
+}
+
+.tree-list a {
+  display: grid;
+  gap: calc(var(--space-2) / 2);
+  min-height: 44px;
+  color: var(--dusk-ink);
+  text-decoration: none;
+}
+
+.tree-list a:hover .tree-card-name {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.tree-card-name {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--dusk-ink);
+}
+
+.tree-card-years,
+.tree-card-place {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 24px;
+  padding: 0 var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-soft);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.tree-chip-living {
+  color: var(--dusk-ink);
+  border-color: var(--dusk-ink-soft);
+}
+
+.tree-chip-deceased {
+  color: var(--dusk-amber);
+  border-color: var(--dusk-amber);
+}
+
+.tree-pedigree {
+  display: grid;
+  gap: var(--space-6);
+  margin: var(--space-6) 0;
+}
+
+.tree-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+}
+
+.tree-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-height: 7.5rem;
+  padding: var(--space-4);
+  color: var(--dusk-ink);
+  text-decoration: none;
+  background: var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-line);
+  border-radius: 12px;
+}
+
+a.tree-card:hover {
+  border-color: var(--dusk-amber);
+  box-shadow: 0 0 32px var(--dusk-glow);
+}
+
+.tree-card:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+.tree-card-empty {
+  justify-content: center;
+  align-content: center;
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--dusk-line-control);
+}
+
+.tree-card-empty .tree-card-name {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--dusk-ink-soft);
+}
+
+.tree-card-hidden {
+  background: var(--dusk-surface-sunk);
+  border-style: dotted;
+}
+
+.tree-card-hidden .tree-card-name {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-ask {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 34rem;
+  margin: var(--space-5) 0;
+  padding: var(--space-5);
+  background: var(--dusk-surface-raised);
+  border: 1px solid var(--dusk-line);
+  border-radius: 12px;
+}
+
+.tree-ask h3 {
+  margin: 0;
+}
+
+.tree-ask p,
+.tree-ask ul {
+  margin: 0;
+}
+
+.tree-ask ul {
+  padding-left: 1.2em;
+}
+
+.tree-ask .offer-send {
+  justify-self: start;
+}
+
+.tree-form .tree-year {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: end;
+}
+
+.tree-form .tree-year .account-check {
+  padding-bottom: var(--space-3);
+}
+
+.tree-form .tree-place {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.tree-form .tree-search {
+  min-height: 44px;
+  margin-top: 1.5rem;
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--dusk-ink);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tree-form fieldset {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--dusk-line);
+  border-radius: 10px;
+}
+
+.tree-form legend {
+  padding: 0 var(--space-2);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-soft);
+}
+
+.tree-form .tree-mono {
+  font-family: var(--font-data, ui-monospace, monospace);
+}
+
+.tree-form.tree-inline {
+  display: inline;
+}
+
+.tree-form.tree-inline .offer-send {
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  font-size: 0.875rem;
+}
+
+.tree-consent ul {
+  padding-left: 1.2em;
+}
+
+/* The tree's landing page (TASK-073, the "Horyzont" direction): a dusk hero
+   whose sample pedigree recedes to the horizon, then the reading. Full width;
+   the reading shell's measure is applied inside each section. */
+.site > main.tree-landing {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
+
+.tree-landing > section {
+  padding: var(--space-9) var(--gutter, var(--space-4));
+  border-top: 1px solid var(--dusk-line);
+}
+
+.tree-landing > section:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.tree-landing h2 {
+  margin: 0;
+}
+
+.tree-landing h3 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.125rem, 1.4rem + 2.4vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--dusk-ink);
+}
+
+.tree-landing p,
+.tree-landing li {
+  line-height: 1.6;
+  color: var(--dusk-ink-soft);
+}
+
+.tree-landing .page-lede {
+  margin-bottom: var(--space-5);
+}
+
+.tree-landing .tree-eyebrow-amber {
+  color: var(--dusk-amber);
+}
+
+.tree-landing .tree-sample {
+  margin: var(--space-4) 0 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-landing .tree-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+}
+
+.tree-landing .tree-ghost {
+  color: var(--dusk-ink);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+}
+
+.tree-landing .tree-note {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.tree-landing .tree-lock {
+  width: 10px;
+  height: 10px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The hero and the closing band: the dusk gradient, the sun, the ground. */
+.tree-landing .tree-hero {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-7) var(--gutter, var(--space-4)) var(--space-8);
+  background: linear-gradient(
+    180deg,
+    var(--dusk-surface) 0%,
+    var(--dusk-sky-wine) 56%,
+    var(--dusk-sky-ember) 86%,
+    var(--dusk-amber) 120%
+  );
+}
+
+.tree-landing .tree-hero-sun {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: min(760px, 120vw);
+  height: min(760px, 120vw);
+  margin-left: calc(min(760px, 120vw) / -2);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--dusk-sun) 0%, var(--dusk-amber) 24%, transparent 70%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.tree-landing .tree-hero-ground {
+  position: absolute;
+  left: -12%;
+  right: -12%;
+  bottom: -16%;
+  height: 30%;
+  border-radius: 50% 50% 0 0;
+  background: var(--dusk-surface-sunk);
+  border-top: 1px solid var(--dusk-line);
+  pointer-events: none;
+}
+
+.tree-landing .tree-hero-head {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+  gap: var(--space-6) var(--space-8);
+  align-items: end;
+  max-width: var(--site-width, 80rem);
+  margin: 0 auto;
+}
+
+.tree-landing .tree-hero-head h2 {
+  max-width: 13ch;
+  font-size: clamp(2.75rem, 1.4rem + 4.6vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+}
+
+/* The sample pedigree as rows receding to the horizon. */
+.tree-landing .tree-horizon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  max-width: var(--site-width, 80rem);
+  margin: var(--space-8) auto 0;
+  padding: 0;
+}
+
+.tree-landing .tree-horizon-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  transform-origin: 50% 100%;
+}
+
+.tree-landing .tree-horizon-row .tree-eyebrow {
+  margin: 0;
+}
+
+.tree-landing .tree-horizon-cards {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-landing .tree-sample-card {
+  width: 13rem;
+  min-height: 6rem;
+  flex: none;
+}
+
+.tree-landing .tree-horizon-row-0 {
+  transform: scale(0.62);
+  opacity: 0.62;
+  margin: -0.9rem 0;
+}
+
+.tree-landing .tree-horizon-row-1 {
+  transform: scale(0.8);
+  opacity: 0.85;
+  margin: -0.5rem 0;
+}
+
+.tree-landing .tree-horizon-row-2 {
+  transform: scale(0.92);
+}
+
+.tree-landing .tree-horizon-row-3 .tree-eyebrow {
+  color: var(--dusk-amber);
+}
+
+.tree-landing .tree-card-you {
+  border-color: var(--dusk-amber);
+  box-shadow: 0 0 56px var(--dusk-glow);
+}
+
+.tree-landing .tree-card-lit {
+  border-color: var(--dusk-amber);
+  box-shadow: 0 0 34px var(--dusk-amber-wash);
+}
+
+.tree-landing .tree-sample-ask {
+  position: relative;
+  border-color: var(--dusk-amber);
+  overflow: visible;
+}
+
+.tree-landing .tree-ask-chip {
+  position: absolute;
+  left: 50%;
+  top: -0.9rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--dusk-surface);
+  border: 1px solid var(--dusk-amber);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  white-space: nowrap;
+  color: var(--dusk-amber);
+  box-shadow: 0 0 24px var(--dusk-amber-wash);
+}
+
+.tree-landing .tree-ask-chip::before {
+  content: "?";
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-weight: 600;
+  font-size: 0.6875rem;
+}
+
+/* The reading sections: two columns on a wide screen, one on a phone. */
+.tree-landing .tree-why,
+.tree-landing .tree-what,
+.tree-landing .tree-who {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-8);
+  align-items: center;
+  max-width: var(--site-width, 80rem);
+  margin: 0 auto;
+}
+
+.tree-landing .tree-what,
+.tree-landing .tree-plans {
+  background: var(--dusk-surface-sunk);
+  max-width: none;
+}
+
+.tree-landing .tree-what > *,
+.tree-landing .tree-plans > * {
+  max-width: var(--site-width, 80rem);
+}
+
+.tree-landing .tree-what {
+  grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+}
+
+.tree-landing .tree-sub {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  line-height: 1.3;
+  max-width: 22ch;
+}
+
+.tree-landing .tree-pull {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--dusk-line);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  line-height: 1.3;
+  color: var(--dusk-ink);
+}
+
+.tree-landing .tree-marks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-landing .tree-marks li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.tree-landing .tree-marks li::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 0.6rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--dusk-amber);
+}
+
+.tree-landing .tree-marks-lit li::before {
+  background: var(--dusk-amber);
+}
+
+/* The phone frame with the question form, as a picture. */
+.tree-landing .tree-demo {
+  position: relative;
+  margin: 0;
+  padding: var(--space-5) 0;
+}
+
+.tree-landing .tree-frame {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 21rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  border-radius: 30px;
+  border: 1px solid var(--dusk-line-control);
+  background: var(--dusk-surface-sunk);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 42%);
+}
+
+.tree-landing .tree-frame p {
+  margin: 0;
+}
+
+.tree-landing .tree-frame-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tree-landing .tree-progress {
+  display: flex;
+  gap: 6px;
+}
+
+.tree-landing .tree-progress i {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--dusk-line);
+}
+
+.tree-landing .tree-progress i.on {
+  background: var(--dusk-amber);
+}
+
+.tree-landing .tree-frame-h {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.625rem;
+  line-height: 1.15;
+  color: var(--dusk-ink);
+}
+
+.tree-landing .tree-frame label {
+  display: grid;
+  gap: calc(var(--space-2) / 2);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+}
+
+.tree-landing .tree-frame input[type="text"] {
+  width: 100%;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-size: 0.9375rem;
+  color: var(--dusk-ink);
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 8px;
+}
+
+.tree-landing .tree-frame .tree-year {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: end;
+}
+
+.tree-landing .tree-frame .account-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 42px;
+}
+
+.tree-landing .tree-frame .account-check input {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--dusk-amber);
+}
+
+.tree-landing .tree-frame-matches {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--dusk-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.tree-landing .tree-frame-matches li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+  border-top: 1px solid var(--dusk-line);
+}
+
+.tree-landing .tree-frame-matches li:first-child {
+  border-top: 0;
+}
+
+.tree-landing .tree-frame-matches li.on {
+  color: var(--dusk-ink);
+  border-left: 2px solid var(--dusk-amber);
+}
+
+.tree-landing .tree-frame-matches small {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.6875rem;
+  color: var(--dusk-ink-muted);
+  white-space: nowrap;
+}
+
+.tree-landing .tree-frame-seg {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tree-landing .tree-frame-seg span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--dusk-ink);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: 999px;
+}
+
+.tree-landing .tree-frame-seg span.on {
+  color: var(--dusk-on-amber);
+  background: var(--dusk-shell);
+  border-color: transparent;
+}
+
+.tree-landing .tree-frame-send {
+  justify-content: center;
+  min-height: 46px;
+}
+
+/* Who sees it: the same person, sealed for everyone and sharp for you. */
+.tree-landing .tree-seen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.tree-landing .tree-seen figcaption {
+  grid-column: 1 / -1;
+}
+
+.tree-landing .tree-seen-label {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-landing .tree-seen-label-you {
+  color: var(--dusk-amber);
+}
+
+.tree-landing .tree-seen-card {
+  min-height: 8.5rem;
+  justify-content: center;
+}
+
+.tree-landing .tree-sealed {
+  display: grid;
+  gap: var(--space-2);
+  filter: blur(7px);
+  opacity: 0.55;
+  user-select: none;
+}
+
+/* What is planned: dashed cards, as the empty places of a pedigree. */
+.tree-landing .tree-plans-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+  margin: 0 auto var(--space-6);
+}
+
+.tree-landing .tree-plans-head p:last-child {
+  max-width: 46ch;
+  margin: 0;
+}
+
+.tree-landing .tree-plan-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--space-3);
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-landing .tree-plan-cards .tree-card-empty {
+  min-height: 7.5rem;
+  align-content: center;
+  gap: var(--space-2);
+}
+
+.tree-landing .tree-plan-cards .tree-card-name {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--dusk-ink);
+}
+
+/* The closing band. */
+.tree-landing .tree-cta {
+  padding: var(--space-9) var(--gutter, var(--space-4));
+}
+
+.tree-landing .tree-cta .tree-hero-sun {
+  left: auto;
+  right: -10%;
+  top: auto;
+  bottom: -46%;
+  width: min(560px, 110vw);
+  height: min(560px, 110vw);
+  margin: 0;
+  opacity: 0.9;
+}
+
+.tree-landing .tree-cta-body {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--site-width, 80rem);
+  margin: 0 auto;
+}
+
+.tree-landing .tree-cta h2 {
+  font-size: clamp(2.5rem, 1.4rem + 4vw, 4.5rem);
+  line-height: 0.98;
+}
+
+/* Motion: the hero's people appear in turn, the sections rise as they come
+   into view. The stylesheet alone; under reduced motion everything is where
+   it belongs from the start, and without scroll-driven animation the
+   sections simply show. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes tree-step-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.97);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes tree-ask-pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 24px var(--dusk-amber-wash);
+    }
+
+    50% {
+      box-shadow: 0 0 44px var(--dusk-glow);
+    }
+  }
+
+  @keyframes tree-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .tree-landing .tree-step {
+    animation: tree-step-in 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--i) * 1.1s);
+  }
+
+  .tree-landing .tree-ask-chip {
+    animation:
+      tree-step-in 600ms ease-out both,
+      tree-ask-pulse 2.4s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 1.1s), calc(var(--i) * 1.1s);
+  }
+
+  @supports (animation-timeline: view()) {
+    .tree-landing .tree-reveal {
+      animation: tree-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+
+@media (max-width: 56rem) {
+  .tree-landing .tree-hero-head,
+  .tree-landing .tree-why,
+  .tree-landing .tree-what,
+  .tree-landing .tree-who {
+    grid-template-columns: 1fr;
+  }
+
+  .tree-landing .tree-horizon {
+    overflow: hidden;
+    margin-top: var(--space-6);
+  }
+
+  .tree-landing .tree-sample-card {
+    width: 10.5rem;
+    min-height: 5.5rem;
+  }
+
+  .tree-landing .tree-horizon-row-0 {
+    transform: scale(0.5);
+    margin: -1.4rem 0;
+  }
+
+  .tree-landing .tree-horizon-row-1 {
+    transform: scale(0.72);
+    margin: -0.8rem 0;
+  }
+
+  .tree-landing .tree-horizon-row-2 {
+    transform: scale(0.88);
+  }
+
+  .tree-landing .tree-seen {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* The footer's blog and social links, after the contact line (TASK-057). */
 .footer-follow {
   display: flex;

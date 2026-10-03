@@ -32,17 +32,27 @@ export const PREFIX_PATH = "/api/v1/surname-prefix";
 export const ACCOUNT_POLICY: RateLimitPolicy = { limit: 10, windowMs: 60_000 };
 export const ACCOUNT_PATH = "/api/account/";
 
+/**
+ * The tree's forms (TASK-073): a person adding people one question at a time
+ * is a person at a keyboard; thirty a minute is above any hand, and the same
+ * per-instance ceiling holds a script. Its own bucket.
+ */
+export const TREE_POLICY: RateLimitPolicy = { limit: 30, windowMs: 60_000 };
+export const TREE_PATH = "/api/tree/";
+
 /** The longest window of any policy: what an eviction sweep keeps. */
 export const LONGEST_WINDOW_MS = Math.max(
   PAGE_POLICY.windowMs,
   API_POLICY.windowMs,
   PREFIX_POLICY.windowMs,
   ACCOUNT_POLICY.windowMs,
+  TREE_POLICY.windowMs,
 );
 
 /** The limit a path is held to. */
 export function policyFor(pathname: string): RateLimitPolicy {
   if (pathname === PREFIX_PATH) return PREFIX_POLICY;
   if (pathname.startsWith(ACCOUNT_PATH)) return ACCOUNT_POLICY;
+  if (pathname.startsWith(TREE_PATH)) return TREE_POLICY;
   return pathname.startsWith("/api/") ? API_POLICY : PAGE_POLICY;
 }

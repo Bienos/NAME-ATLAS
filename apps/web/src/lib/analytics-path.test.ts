@@ -66,3 +66,25 @@ describe("TASK-058 AC-1: the analytics never sees a surname", () => {
     expect(beforeSend({ type: "pageview", url: "http://" })).toBeNull();
   });
 });
+
+describe("TASK-073 AC-7: the analytics never sees a tree's or a person's id", () => {
+  const TREE = "0199a1b2-0000-7000-8000-00000000aa01";
+  const PERSON = "0199a1b2-0000-7000-8000-00000000bb01";
+
+  it("replaces both ids on the tree pages, in both languages, and drops the draft in the query", () => {
+    expect(analyticsUrl(`/pl/konto/drzewa/${TREE}`)).toBe("/pl/konto/drzewa/[tree]");
+    expect(analyticsUrl(`/en/account/trees/${TREE}/add?given=Halina&child=${PERSON}`)).toBe(
+      "/en/account/trees/[tree]/add",
+    );
+    expect(analyticsUrl(`/pl/konto/drzewa/${TREE}/osoba/${PERSON}?status=saved`)).toBe(
+      "/pl/konto/drzewa/[tree]/osoba/[person]",
+    );
+    expect(analyticsUrl(`${HOST}/en/account/trees/${TREE}/person/${PERSON}`)).toBe(
+      `${HOST}/en/account/trees/[tree]/person/[person]`,
+    );
+    expect(analyticsUrl("/pl/konto/drzewa")).toBe("/pl/konto/drzewa");
+    expect(analyticsUrl("/pl/konto/drzewa/zgoda?tree=x&given=Halina")).toBe(
+      "/pl/konto/drzewa/zgoda",
+    );
+  });
+});

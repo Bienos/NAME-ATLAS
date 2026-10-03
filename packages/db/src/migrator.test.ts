@@ -36,6 +36,7 @@ describe("MIGRATIONS_DIR", () => {
       "0025_archive_availability.ts", // TASK-054 — the ARCHIVE_AVAILABILITY claim type
       "0026_rank_neighbours_index.ts", // TASK-055 — a surname's neighbours on its list
       "0027_accounts_schema.ts", // TASK-061 / ADR-0027 — free accounts, in their own schema
+      "0028_family_schema.ts", // TASK-066 / ADR-0029 — the family tree, in its own schema
       "0029_notable_bearers.ts", // TASK-073 / ADR-0030 — the NOTABLE_BEARERS claim type
     ]);
   });
