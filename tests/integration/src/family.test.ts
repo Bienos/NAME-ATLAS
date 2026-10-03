@@ -11,7 +11,7 @@ import type { Family } from "@name-atlas/family";
 
 /**
  * TASK-068: the family tree over a real PostgreSQL, as the role that will run
- * it, with the row-level security policies of migration 0028 applied to it.
+ * it, with the row-level security policies of migration 0030 applied to it.
  *
  * As in `accounts.test.ts`, the roles come from `ops/vm/accounts-roles.sql`
  * itself. The three accounts below are inserted as the superuser, complete,
@@ -745,7 +745,7 @@ describe("family tree (TASK-068, ADR-0029)", () => {
     expect((await family.listTrees(MEMBER)).map((t) => t.title)).toEqual(["Linia Wróblów"]);
   });
 
-  it("0028 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
+  it("0030 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
     const migrator = createMigrator(db().db);
     const { error } = await migrator.migrateDown();
     expect(String(error)).toMatch(/refusing to drop schema family/u);

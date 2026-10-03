@@ -1,6 +1,6 @@
-# TASK-074 — Coverage per surname on the paid surface
+# TASK-075 — Coverage per surname on the paid surface
 
-M4's first step (`tasks/074-coverage-assessment.md`). The owner decided the rules on 2026-10-03: the proposed v0 tier rule, and Polona's raw hits at most PARTIAL. Built on #77's head. Nothing is deployed or run on production.
+M4's first step (`tasks/075-coverage-assessment.md`). The owner decided the rules on 2026-10-03: the proposed v0 tier rule, and Polona's raw hits at most PARTIAL. Built on #77's head. Nothing is deployed or run on production.
 
 ## What changed
 
@@ -23,7 +23,7 @@ M4's first step (`tasks/074-coverage-assessment.md`). The owner decided the rule
     - A source with UNKNOWN commercial use reads BLOCKED_RIGHTS.
     - A surname is MINIMAL without rarity and STANDARD with a READY rarity section put into its real response.
     - The register run counts every surname once.
-- `tasks/074-coverage-assessment.md`, this record and `STATUS.md`.
+- `tasks/075-coverage-assessment.md`, this record and `STATUS.md`.
 
 ## Verification, 2026-10-03
 

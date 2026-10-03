@@ -22,6 +22,8 @@ import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import type {
   ArchiveSection,
+  Bearer,
+  BearersSection,
   ChangeEntry,
   ChangeSection,
   CitationDto,
@@ -44,6 +46,8 @@ import {
   archiveCategoryLabel,
   archivePeriodLabel,
   archiveSentence,
+  bearerYears,
+  bearersSentence,
   assessmentWord,
   changeGapNote,
   changeListLabel,
@@ -78,6 +82,8 @@ import type { Step } from "./next-step.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { RarityScale } from "./rarity-scale.js";
+import { contactPath } from "./site-footer.js";
+import { offerPath } from "./site-links.js";
 
 export function href(surname: string, lang: Lang): string {
   const params = new URLSearchParams({ surname });
@@ -801,6 +807,104 @@ function Archive({
   );
 }
 
+function Bearers({
+  section,
+  surname,
+  number,
+  next,
+  lang,
+}: {
+  section: BearersSection;
+  surname: string;
+  number: number;
+  next: Step | null;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const statement = bearersSentence(section, surname, lang);
+  if (section.state !== "READY" || statement === null) {
+    const body =
+      section.state === "NOT_SEARCHED"
+        ? t.bearersNotSearched
+        : section.state === "RIGHTS_BLOCKED"
+          ? t.bearersBlocked
+          : t.bearersUnavailable;
+    return (
+      <Chapter chapter="bearers" number={number} next={next} lang={lang} empty>
+        <p className="absent">{body}</p>
+      </Chapter>
+    );
+  }
+  return (
+    <Chapter chapter="bearers" number={number} next={next} lang={lang}>
+      <Claim
+        statement={statement}
+        evidence={bearersEvidence(section, lang)}
+        country_code="GLOBAL"
+        lang={lang}
+      >
+        <p className="note bearers-caveat">{t.bearersCaveat}</p>
+      </Claim>
+      {section.people.length > 0 ? (
+        <ol className="bearers-list">
+          {section.people.map((person) => (
+            <BearerItem key={person.wikidata_id} person={person} lang={lang} />
+          ))}
+        </ol>
+      ) : null}
+      {section.more !== null && section.more > 0 ? (
+        <p className="note">
+          <a href={offerPath(lang)}>
+            {t.bearersMore.replace("{n}", formatInteger(section.more, lang))}
+          </a>
+        </p>
+      ) : null}
+      {section.people.length > 0 ? (
+        <p className="note bearers-removal">
+          <a href={contactPath(lang)}>{t.bearersRemoval}</a>
+        </p>
+      ) : null}
+    </Chapter>
+  );
+}
+
+/** One person: name, years, Wikidata's one-line description, and where to read more. */
+export function BearerItem({ person, lang }: { person: Bearer; lang: Lang }) {
+  const t = UI[lang];
+  const years = bearerYears(person, lang);
+  const description =
+    lang === "pl"
+      ? (person.description_pl ?? person.description_en)
+      : (person.description_en ?? person.description_pl);
+  return (
+    <li className="bearer">
+      <span className="bearer-name">{person.name}</span>
+      {years === null ? null : <span className="bearer-years">{years}</span>}
+      {description === null ? null : <span className="bearer-what">{description}</span>}
+      <span className="bearer-links">
+        {person.article_url === null ? null : (
+          <a href={person.article_url} rel="noopener noreferrer">
+            {t.bearersArticle}
+          </a>
+        )}
+        <a href={person.wikidata_url} rel="noopener noreferrer">
+          Wikidata
+        </a>
+      </span>
+    </li>
+  );
+}
+
+function bearersEvidence(section: BearersSection, lang: Lang): ClaimEvidence {
+  return {
+    // `bearersSentence` is only rendered for READY, where both are present.
+    citation: section.citation as CitationDto,
+    underlying_date: section.searched_on ?? "",
+    confidence: section.confidence ?? { status: "INSUFFICIENT_DATA", methodology_code: "—" },
+    notes: [UI[lang].limitationBearersFamily],
+  };
+}
+
 /** The year in a catalogue date as it was stated ("1931-01-01", "[ca 1890]"); null when there is none. */
 function archiveYear(date: string | null): string | null {
   return /\b(1[0-9]{3}|20[0-9]{2})\b/u.exec(date ?? "")?.[1] ?? null;
@@ -982,6 +1086,7 @@ function pageEvidence(response: SurnameResultResponse, lang: Lang): ClaimEvidenc
     ...(response.localities?.state === "READY" && response.localities.places.length > 0
       ? [localitiesEvidence(response.localities, lang)]
       : []),
+    ...(response.bearers?.state === "READY" ? [bearersEvidence(response.bearers, lang)] : []),
   ];
 }
 
@@ -1148,7 +1253,7 @@ export function Result({
 
   if (response.status === "RESOLVED" && response.surname !== null) {
     const surname = response.surname.display_name;
-    const { population, rarity, distribution, change, meaning, archive } = response;
+    const { population, rarity, distribution, change, meaning, archive, bearers } = response;
     const { neighbours, other_form: otherForm, localities } = response;
     const chapters: Record<SectionKey, ((number: number, next: Step | null) => ReactNode) | null> =
       {
@@ -1220,6 +1325,12 @@ export function Result({
                   next={next}
                   lang={lang}
                 />
+              ),
+        bearers:
+          bearers === null
+            ? null
+            : (n, next) => (
+                <Bearers section={bearers} surname={surname} number={n} next={next} lang={lang} />
               ),
       };
     const order = sectionOrder(intent).filter((key) => chapters[key] !== null);

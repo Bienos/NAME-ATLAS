@@ -835,6 +835,58 @@ footer {
   align-items: center;
 }
 
+/* --- well-known people (TASK-073, ADR-0030) ----------------------------- */
+
+/* One line per person: the name, Wikidata's years and description, and where
+   to read more. The caveat that a surname is not a family sits with the claim. */
+.bearers-list {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bearer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.bearer-name {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  color: var(--text-primary);
+}
+
+.bearer-years {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.bearer-what {
+  grid-column: 1 / -1;
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+}
+
+.bearer-links {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.875rem;
+}
+
+.bearer-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 @media (max-width: 480px) {
   .archive-periods li {
     grid-template-columns: 5.5rem minmax(0, 1fr) 4.5rem;
@@ -6799,6 +6851,14 @@ body.dusk {
   list-style: none;
 }
 
+.dk-bearers {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .dk-places li {
   padding: var(--space-2) var(--space-3);
   border: 1px solid #fffaf314;
@@ -6818,6 +6878,32 @@ body.dusk {
 .dk-places span {
   display: block;
   margin-top: calc(var(--space-2) / 2);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-soft);
+}
+
+.dk-bearers li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid #fffaf314;
+}
+
+.dk-bearers b {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.dk-bearers span {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--dusk-ink-soft);
+}
+
+.dk-bearers small {
+  grid-column: 1 / -1;
   font-size: 0.8125rem;
   color: var(--dusk-ink-soft);
 }

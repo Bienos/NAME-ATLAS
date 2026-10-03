@@ -1,0 +1,46 @@
+{
+  "$comment": "Raw Wikidata Query Service answers for two surnames' bearers, captured by TASK-073 with the loader's own fetcher (packages/sources/src/wikidata/fetch.ts). Every byte is what the service served; nothing was trimmed or reformatted, so the responses are excluded from Prettier. Wikidata's structured data is CC0.",
+  "source": {
+    "name": "Wikidata",
+    "operator": "Wikimedia Foundation",
+    "api": "https://query.wikidata.org/sparql",
+    "licence": "CC0 1.0"
+  },
+  "capture": {
+    "task": "TASK-073",
+    "date": "2026-10-03",
+    "surnames": ["ZAREMBA", "KOWALSKA"],
+    "client": "NameAtlas/1.0 fetcher, one query at a time, at least 1 s apart",
+    "authentication": "none"
+  },
+  "files": [
+    {
+      "surname": "ZAREMBA",
+      "query": "bearers",
+      "path": "responses/ZAREMBA.bearers.json",
+      "bytes": 54586,
+      "sha256": "fd7e0a3c4475af56a91f27ecbfc8117e89b64bdc4b005bc23fbe2323a02dc58f"
+    },
+    {
+      "surname": "ZAREMBA",
+      "query": "details",
+      "path": "responses/ZAREMBA.details.json",
+      "bytes": 11941,
+      "sha256": "9b8d937a6df9d8b56fd7baeb00df7a6a6251a1d47069825f78789104a91b38c3"
+    },
+    {
+      "surname": "KOWALSKA",
+      "query": "bearers",
+      "path": "responses/KOWALSKA.bearers.json",
+      "bytes": 347748,
+      "sha256": "2d5a0fdf5a2289cd5649e7f0a30e39274cd22028288513681fc841fc52ab781d"
+    },
+    {
+      "surname": "KOWALSKA",
+      "query": "details",
+      "path": "responses/KOWALSKA.details.json",
+      "bytes": 11396,
+      "sha256": "55f43eb930fbe8ac4dd0918bb2976a6aa9940b668aeb38e72841aca1d3861ff8"
+    }
+  ]
+}
