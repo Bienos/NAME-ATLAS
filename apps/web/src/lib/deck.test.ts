@@ -21,6 +21,7 @@ import {
 import type { ShareFacts } from "./share-facts.js";
 import { shareCardResponse } from "./share-route.js";
 import { Recap } from "./share-card.js";
+import { UI } from "./messages.js";
 
 /**
  * TASK-055 AC-3 and AC-4, against rendered markup: the deck has a card for each
@@ -50,7 +51,7 @@ const who = (n: number, display_name: string) => ({ id: id(n), display_name, scr
 const MALE = "pesel_2026_national_male";
 
 const FULL_INPUT = {
-  schema_version: "1.11",
+  schema_version: "1.12",
   status: "RESOLVED",
   surname: who(1, "KOWALSKI"),
   population: {
@@ -264,6 +265,63 @@ const FULL_INPUT = {
     reason_code: null,
     surface: SURFACE,
   },
+  // TASK-073: the first three KOWALSKI in Wikidata's answer captured on
+  // 2026-10-03 (`fixtures/wikidata-bearers`), without their descriptions.
+  bearers: {
+    state: "READY",
+    searched_on: "2026-10-03",
+    total: 325,
+    with_death_date: 159,
+    people: [
+      {
+        wikidata_id: "Q558544",
+        name: "Daniel Kowalski",
+        description_pl: null,
+        description_en: null,
+        born: 1975,
+        died: null,
+        article_url: null,
+        wikidata_url: "https://www.wikidata.org/wiki/Q558544",
+      },
+      {
+        wikidata_id: "Q17558303",
+        name: "Stanisław Kowalski",
+        description_pl: null,
+        description_en: null,
+        born: 1910,
+        died: 2022,
+        article_url: null,
+        wikidata_url: "https://www.wikidata.org/wiki/Q17558303",
+      },
+      {
+        wikidata_id: "Q86862",
+        name: "Kerstin Kowalski",
+        description_pl: null,
+        description_en: null,
+        born: 1976,
+        died: null,
+        article_url: null,
+        wikidata_url: "https://www.wikidata.org/wiki/Q86862",
+      },
+    ],
+    more: 322,
+    confidence: { status: "VERIFIED", methodology_code: "wikidata_query_scope@wikidata_scope@1" },
+    citation: {
+      id: "cit-wikidata",
+      title: "Wikidata",
+      publisher: null,
+      publication_date: null,
+      source_type: "OTHER",
+      locator: "Kowalski",
+      url: "https://query.wikidata.org/",
+      attribution: null,
+      terms: "CC0",
+      retrieved_at: "2026-10-03T12:05:00Z",
+      source_page_url: "https://www.wikidata.org/wiki/Wikidata:Licensing",
+    },
+    reason_code: null,
+    surface: SURFACE,
+  },
   archive: {
     state: "READY",
     query: '"KOWALSKI"',
@@ -350,6 +408,18 @@ const COUNT_ONLY: SurnameResultResponse = surnameResultResponseSchema.parse({
     reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     surface: SURFACE,
   },
+  bearers: {
+    state: "NOT_SEARCHED",
+    searched_on: null,
+    total: null,
+    with_death_date: null,
+    people: [],
+    more: null,
+    confidence: null,
+    citation: null,
+    reason_code: "BEARERS_NOT_SEARCHED",
+    surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "COMMERCIAL_USE_UNRESOLVED" },
+  },
   archive: {
     state: "NOT_SEARCHED",
     query: null,
@@ -404,6 +474,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
       "print",
       "catalogue",
       "places",
+      "bearers",
       "end",
     ]);
   });
@@ -415,7 +486,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
 
   it("gives no deck to a surname that did not resolve", () => {
     const unresolved = surnameResultResponseSchema.parse({
-      schema_version: "1.11",
+      schema_version: "1.12",
       status: "UNRESOLVED",
       surname: null,
       population: null,
@@ -431,6 +502,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
       meaning: null,
       change: null,
       archive: null,
+      bearers: null,
       neighbours: null,
       other_form: null,
       localities: null,
@@ -480,7 +552,7 @@ describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
     const sources = [...html.matchAll(/<p class="dk-source">(.*?)<\/p>/gu)].map((m) =>
       text(m[1] ?? ""),
     );
-    expect(sources).toHaveLength(11);
+    expect(sources).toHaveLength(12);
     for (const source of sources.slice(0, -1)) expect(source).toMatch(/\b(19|20)\d\d\b/u);
   });
 
@@ -890,7 +962,7 @@ describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () =>
 
   it("is nothing for a surname that did not resolve", () => {
     const unresolved = surnameResultResponseSchema.parse({
-      schema_version: "1.11",
+      schema_version: "1.12",
       status: "UNRESOLVED",
       surname: null,
       population: null,
@@ -906,6 +978,7 @@ describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () =>
       meaning: null,
       change: null,
       archive: null,
+      bearers: null,
       neighbours: null,
       other_form: null,
       localities: null,
@@ -1050,5 +1123,38 @@ describe("TASK-064 AC-8: what the deck says to a reader the image route turned a
       const next = new URL(href, "https://atlas.test").searchParams.get("next");
       expect(safeNext(next), slug).toBe(`${page}?view=cards`);
     }
+  });
+});
+
+describe("TASK-073: the known people's card", () => {
+  it("lists the first three with their years, the count and the date, and says a surname is not a family", () => {
+    const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
+    expect(card?.title).toBe(UI.pl.deckBearers);
+    const face = text(faces(card === undefined ? [] : [card]));
+    expect(face).toContain("Daniel Kowalski");
+    expect(face).toContain("ur. 1975");
+    expect(face).toContain("1910–2022");
+    expect(face).toContain("Wikidata · 325");
+    expect(face).toContain(UI.pl.bearersCaveat);
+  });
+
+  it("is left out when Wikidata names nobody, or has not been asked", () => {
+    const none = surnameResultResponseSchema.parse({
+      ...FULL_INPUT,
+      bearers: {
+        ...(FULL_INPUT as { bearers: Record<string, unknown> }).bearers,
+        total: 0,
+        with_death_date: 0,
+        people: [],
+        more: 0,
+      },
+    });
+    expect(deckCards(none, "pl", LINKS).map((c) => c.key)).not.toContain("bearers");
+    expect(deckCards(COUNT_ONLY, "pl", LINKS).map((c) => c.key)).not.toContain("bearers");
+  });
+
+  it("shares the summary, having no image of its own", () => {
+    const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
+    expect(card?.share).toMatch(/\/karta\/summary$/u);
   });
 });

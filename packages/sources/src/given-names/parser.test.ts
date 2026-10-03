@@ -16,7 +16,7 @@ function reason(text: string): string {
   return "parsed";
 }
 
-describe("parseGivenNameFile (TASK-075)", () => {
+describe("parseGivenNameFile (TASK-076)", () => {
   it("reads the name verbatim, the count, and the line", () => {
     expect(parseGivenNameFile(file("PIOTR,MĘŻCZYZNA,682516", "ALİ,MĘŻCZYZNA,459"), MALE)).toEqual([
       { name: "PIOTR", count: 682516, line: 2 },
@@ -35,7 +35,7 @@ describe("parseGivenNameFile (TASK-075)", () => {
   });
 });
 
-describe("needsFormReview (ADR-0030 §4)", () => {
+describe("needsFormReview (ADR-0031 §4)", () => {
   it("flags one character and a full stop, and nothing else", () => {
     expect(["I", "E", "MD.", "MA. CRISTINA", "ROMEO JR."].map(needsFormReview)).toEqual([
       true,

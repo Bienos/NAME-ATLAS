@@ -120,7 +120,9 @@ describe("the notice and the terms with accounts (AC-2)", () => {
   });
 
   it("carry the accounts date, which is also the version of the terms a reader accepts", () => {
-    expect(legalUpdated("privacy", true)).toBe(ACCOUNTS_LEGAL_UPDATED);
+    // The notice changed again after the accounts variant (TASK-073): it shows the later date.
+    expect(legalUpdated("privacy", true)).toBe(LEGAL_UPDATED.privacy);
+    expect(LEGAL_UPDATED.privacy > ACCOUNTS_LEGAL_UPDATED).toBe(true);
     expect(legalUpdated("terms", true)).toBe(ACCOUNTS_LEGAL_UPDATED);
     expect(ACCOUNTS_LEGAL_UPDATED).toMatch(/^\d{4}-\d{2}-\d{2}$/u);
   });
@@ -153,7 +155,7 @@ describe("the legal pages follow the gate", () => {
     for (const [name, value] of Object.entries(ON)) vi.stubEnv(name, value);
     for (const kind of KINDS) {
       const html = render(kind, "en");
-      expect(html).toContain(`dateTime="${ACCOUNTS_LEGAL_UPDATED}"`);
+      expect(html).toContain(`dateTime="${legalUpdated(kind, true)}"`);
     }
     expect(render("privacy", "pl")).toContain("Resend");
     expect(render("terms", "pl")).toContain("<h3>Konto</h3>");

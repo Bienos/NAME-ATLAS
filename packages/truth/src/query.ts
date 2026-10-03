@@ -23,6 +23,7 @@
 import type { Kysely } from "kysely";
 import { archiveSectionFor } from "./archive.js";
 import { localitiesSectionFor } from "./localities.js";
+import { bearersSectionFor } from "./bearers.js";
 import { OTHER_FORM_RULE, readOtherForm, readRankNeighbours } from "./neighbours.js";
 import type { DB } from "@name-atlas/db";
 import type {
@@ -620,6 +621,7 @@ export async function querySurnameResult(
         meaning: null,
         change: null,
         archive: null,
+        bearers: null,
         neighbours: null,
         other_form: null,
         localities: null,
@@ -644,6 +646,7 @@ export async function querySurnameResult(
         meaning: null,
         change: null,
         archive: null,
+        bearers: null,
         neighbours: null,
         other_form: null,
         localities: null,
@@ -656,6 +659,8 @@ export async function querySurnameResult(
   const meaningSection = await meaningSectionFor(db, surnameId, surface);
   // Polona's search output, on its own source's rights like the meaning (TASK-054).
   const archiveSection = await archiveSectionFor(db, surnameId, surface);
+  // Wikidata's known bearers, on Wikidata's own rights (TASK-073, ADR-0030).
+  const bearersSection = await bearersSectionFor(db, surnameId, surface);
   const rarityClaims = await readRarityContext(db, surnameId);
   const distributionClaims = await readCurrentDistribution(db, surnameId);
   const changeClaims = await readDistributionShift(db, surnameId);
@@ -704,6 +709,7 @@ export async function querySurnameResult(
         meaning: meaningSection,
         change: emptyChange("UNAVAILABLE", reason, noRights),
         archive: archiveSection,
+        bearers: bearersSection,
         neighbours: emptyNeighbours("UNAVAILABLE", reason, noRights),
         other_form: null,
         localities,
@@ -740,6 +746,7 @@ export async function querySurnameResult(
         meaning: meaningSection,
         change: emptyChange("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         archive: archiveSection,
+        bearers: bearersSection,
         neighbours: emptyNeighbours("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         other_form: null,
         localities,
@@ -841,6 +848,7 @@ export async function querySurnameResult(
                 surface: changeEligibility,
               },
       archive: archiveSection,
+      bearers: bearersSection,
       neighbours: extras.neighbours,
       other_form: extras.other_form,
       localities,

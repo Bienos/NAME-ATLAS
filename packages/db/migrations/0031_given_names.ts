@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * Given names, a second name type kept apart from surnames (ADR-0030, TASK-075).
+ * Given names, a second name type kept apart from surnames (ADR-0031, TASK-076).
  *
  * - `given_names`: one identity per written form under the resolver's
  *   canonical key, as `surnames` has. No column joins it to a surname.
@@ -12,7 +12,8 @@ import type { Kysely } from "kysely";
  *   No zero is stored: the lists leave out single occurrences, and an absent
  *   name has no row.
  *
- * Numbered 0029 because 0028 is #76's (`AGENTS.md` §11). The new enum values
+ * Numbered 0031: `main` gave 0029 to the well-known bearers (#84), and #76's
+ * family schema is 0030 (`AGENTS.md` §11). The new enum values
  * are compared as text in the constraints below: PostgreSQL refuses to use a
  * value added by `ALTER TYPE … ADD VALUE` in the transaction that added it
  * (see 0025).
@@ -31,7 +32,7 @@ export async function up(db: Kysely<any>): Promise<void> {
       canonical_key          text        NOT NULL UNIQUE,
       canonical_key_version  text        NOT NULL,
       primary_script         text        NOT NULL,
-      -- A form a surface must not show until reviewed (ADR-0030 §4).
+      -- A form a surface must not show until reviewed (ADR-0031 §4).
       form_review            text,
       created_at             timestamptz NOT NULL DEFAULT now(),
       updated_at             timestamptz NOT NULL DEFAULT now(),

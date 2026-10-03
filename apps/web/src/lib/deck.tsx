@@ -11,6 +11,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type {
   ArchiveSection,
+  BearersSection,
   ChangeEntry,
   CitationDto,
   DistributionEntry,
@@ -22,6 +23,7 @@ import type {
 import {
   archiveCategoryLabel,
   archivePeriodLabel,
+  bearerYears,
   changeListLabel,
   coverageWarning,
   formatDate,
@@ -684,6 +686,47 @@ function places(response: SurnameResultResponse, lang: Lang): CardFace | null {
   };
 }
 
+function bearers(section: BearersSection, lang: Lang): CardFace | null {
+  const t = UI[lang];
+  if (section.state !== "READY" || section.total === null || section.total === 0) return null;
+  if (section.searched_on === null || section.people.length === 0) return null;
+  return {
+    key: "bearers",
+    title: t.deckBearers,
+    face: (
+      <Face
+        eyebrow={t.deckBearers}
+        aside="Wikidata"
+        heading={t.chapterBearersTitle}
+        source={
+          <>
+            Wikidata · {formatInteger(section.total, lang)} ·{" "}
+            <b>{formatDate(section.searched_on, lang)}</b>
+          </>
+        }
+      >
+        <ol className="dk-bearers">
+          {section.people.map((person) => {
+            const years = bearerYears(person, lang);
+            const what =
+              lang === "pl"
+                ? (person.description_pl ?? person.description_en)
+                : (person.description_en ?? person.description_pl);
+            return (
+              <li key={person.wikidata_id}>
+                <b>{person.name}</b>
+                {years === null ? null : <span>{years}</span>}
+                {what === null ? null : <small>{what}</small>}
+              </li>
+            );
+          })}
+        </ol>
+        <p className="dk-note">{t.bearersCaveat}</p>
+      </Face>
+    ),
+  };
+}
+
 function end(
   response: SurnameResultResponse,
   surname: string,
@@ -771,9 +814,9 @@ function end(
 /**
  * The cards for a resolved surname, in ADR-0025 §2.3's order: the surname,
  * rarity, neighbours, where, change, the other form, meaning, old print,
- * Polona's catalogue, then the localities with the same name (TASK-066) and
- * the summary. Each card leads with the surname's main list. Empty for
- * anything that did not resolve.
+ * Polona's catalogue, the localities with the same name (TASK-066), the known
+ * people with the surname (TASK-073) and the summary. Each card leads with the
+ * surname's main list. Empty for anything that did not resolve.
  */
 export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckLinks): DeckCard[] {
   if (given.status !== "RESOLVED" || given.surname === null) return [];
@@ -791,6 +834,7 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
     archive === null ? null : print(archive, lang),
     archive === null ? null : catalogue(archive, lang),
     places(response, lang),
+    response.bearers === null ? null : bearers(response.bearers, lang),
     end(response, surname, links, lang),
   ];
   // Each card shares its own image, or the summary where it has none (TASK-056).

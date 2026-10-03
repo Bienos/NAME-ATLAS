@@ -14,7 +14,7 @@ import {
 } from "@name-atlas/sources";
 
 /**
- * TASK-075 (ADR-0030): the PESEL given-name lists into a real PostgreSQL.
+ * TASK-076 (ADR-0031): the PESEL given-name lists into a real PostgreSQL.
  *
  * GENUINE data: `fixtures/pesel-given-names/` holds whole lines of the two
  * 2026-01-20 first-name files, and the payloads are the publisher's own
@@ -31,7 +31,7 @@ const payload = (id: string): unknown =>
     ).toString("utf8"),
   );
 
-describe("given-name ingestion (TASK-075)", () => {
+describe("given-name ingestion (TASK-076)", () => {
   let database: TestDatabase | undefined;
   const db = (): TestDatabase["db"] => {
     if (!database) throw new Error("test database was not started");

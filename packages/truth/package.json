@@ -19,7 +19,8 @@
     "coverage-report": "tsx bin/coverage-report.ts",
     "coverage-assess": "tsx bin/coverage-assess.ts",
     "build-list-facts": "tsx bin/build-list-facts.ts",
-    "archive-load": "tsx bin/archive-load.ts"
+    "archive-load": "tsx bin/archive-load.ts",
+    "bearers-load": "tsx bin/bearers-load.ts"
   },
   "dependencies": {
     "@name-atlas/contracts": "workspace:*",

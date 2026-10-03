@@ -1,10 +1,10 @@
-# TASK-075 — The PESEL given-name lists, imported (first names, 2026-01-20)
+# TASK-076 — The PESEL given-name lists, imported (first names, 2026-01-20)
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`). Not on production.
 - **Requested by:** the project owner, 2026-10-03: "start the first-name statistics", the first phase of the full-name report design.
-- **Decision:** ADR-0030 (proposed with this task).
-- **Number:** 075. Drafted as 073, which #83 and #67 also claimed while this was open; 074 is #79. 075 is the next number free on `main` and in every open pull request on 2026-10-03, 12:30 UTC.
-- **Depends on:** #79's branch (migration 0029 must follow #76's 0028).
+- **Decision:** ADR-0031 (proposed with this task).
+- **Number:** 076. Drafted as 073, then 075; `main` gave 073 and 074 to #84 and #83, and #79 is 075. 076 is the next number free on `main` and in the open pull requests on 2026-10-03, 15:40 UTC. ADR-0031 and migration 0031 follow the same way: `main` took ADR-0030 and migration 0029 (#84), and #76 carries migration 0030.
+- **Depends on:** #79's branch (migration 0031 must follow `main`'s 0029 and #76's 0030).
 - **Model guidance:** implementation session.
 
 ## 1. Goal
@@ -25,8 +25,8 @@ The register holds the publisher's first-name counts for living people, one list
 
 ## 3. In scope
 
-- **ADR-0030:** given names as a separate name type.
-- **Migration 0029:** `GIVEN_NAME` in `entity_type` and `source_granularity`; `given_names`; `given_name_counts`.
+- **ADR-0031:** given names as a separate name type.
+- **Migration 0031:** `GIVEN_NAME` in `entity_type` and `source_granularity`; `given_names`; `given_name_counts`.
 - **`packages/sources/src/given-names/`:** the source, rights profile and descriptors; a fail-closed parser; the importer, which checks rights, then the checksum, then parses in one transaction. It is idempotent and supersedes a changed version.
 - **`pnpm import:given-names`.**
 - **Fixtures:** genuine excerpts, the publisher's metadata saved verbatim, unit tests and a real-database test.

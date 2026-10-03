@@ -218,7 +218,7 @@ describe("RARITY_CONTEXT against a real PostgreSQL", () => {
     expect(outcome.response.rarity?.entries).toHaveLength(0);
     // 1.3 since TASK-012 added the geography chapter and TASK-016 the
     // suggestions section; the rarity rules above are unchanged by both.
-    expect(outcome.response.schema_version).toBe("1.11");
+    expect(outcome.response.schema_version).toBe("1.12");
   });
 
   it("keys a rarity claim on the source record, so one exists per resource version", () => {
