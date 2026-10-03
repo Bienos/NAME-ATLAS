@@ -4,6 +4,8 @@ description: Dlaczego budujemy drzewo genealogiczne i pytamy, skąd pochodzi naz
 date: 2026-10-03
 slug: genealogia
 lang: pl
+image: /images/blog/genealogia.webp
+imageAlt: Ilustracja: drzewo z cienkich złotych gałęzi na tle zmierzchu, każda gałązka zakończona świecącym punktem.
 ---
 
 Prędzej czy później wiele osób pyta, kim byli ich przodkowie i skąd wzięło się nazwisko, które noszą. Czasem zaczyna się od starego zdjęcia bez podpisu. Czasem od babci, która pamięta nazwę wsi, ale nie wie, w której parafii szukać chrztu pradziadka. Tak zaczyna się genealogia, czyli badanie historii rodziny.

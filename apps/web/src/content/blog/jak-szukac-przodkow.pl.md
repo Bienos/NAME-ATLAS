@@ -4,6 +4,8 @@ description: Jak szukać przodków w Polsce: od dokumentów w domu, przez Genete
 date: 2026-10-03
 slug: jak-szukac-przodkow
 lang: pl
+image: /images/blog/jak-szukac-przodkow.webp
+imageAlt: Ilustracja: półka z grzbietami książek o zmierzchu i lupa, która podświetla jeden z nich.
 ---
 
 W [pierwszym wpisie](/pl/blog/genealogia) wymieniliśmy źródła, od których warto zacząć. Ten pokazuje, jak korzystać z nich po kolei: od domowej szuflady do skanu aktu sprzed stu lat. Większość kroków zrobisz w internecie.

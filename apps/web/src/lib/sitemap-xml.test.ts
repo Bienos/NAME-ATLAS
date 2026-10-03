@@ -105,6 +105,7 @@ describe("the blog's sitemap (TASK-071)", () => {
     slug,
     lang,
     body: [{ kind: "p", inlines: [{ kind: "text", text: "x" }] }],
+    image: null,
   });
 
   it("is named by the index only when asked, and the index is otherwise unchanged (AC-9)", () => {
