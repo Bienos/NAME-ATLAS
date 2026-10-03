@@ -38,3 +38,9 @@
 - The landing no longer renders `atlas-field.tsx`; the file and its styles are removed.
 - The comparison gains a picker and the site a how-it-works page; both restate rules the product already keeps.
 - The Paper tokens stay in the module and the `:root` block, under the names the dusk scope re-points.
+
+## 5. Landing refinement, 2026-10-02
+
+The owner supplied the polished `15-landing-zmierzch.png` reference and requested that the landing match it. The hero now uses a text-free background made from that reference with the built-in image generator: the plum sky, sunset, curved ground and lit Poland outline. It is stored at `apps/web/public/images/landing-dusk.png`, loaded through `next/image` with a preload and responsive optimization, and excluded from the accessibility tree. The headline, description, navigation and search remain HTML. No number is inferred from the illustration; the register line still follows decision 7.
+
+The landing's header shows the reference's three primary links. The offer remains in the phone menu, second screen and footer. The hero's spacing, cream typography and translucent search pill follow the reference; on a phone the scene occupies the lower part of the hero so the Poland outline fits. The illustration fades into the existing canvas world when a search starts. Journey and reading pages retain their existing world and data behavior; reduced motion still submits without the hold.
