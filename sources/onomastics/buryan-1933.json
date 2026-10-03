@@ -1,7 +1,7 @@
 {
   "format_version": 1,
   "synthetic": false,
-  "_note": "Real source. Every literal_gloss and quotation is verbatim from the 1933 print (original orthography kept; […] marks omitted list items), checked against the page images of the ZBC scan, not only its OCR. Locators give the printed page and the scan's PDF page. Formation types map Buryan's own section headings: 1 z imion → OTHER, odojcowskie → PATRONYMIC, 3 przydomki → DESCRIPTIVE, 4 zatrudnienie → OCCUPATIONAL, 5 narodowość → OTHER, 6 siedzibowe → TOPONYMIC. Root forms only where Buryan names the base himself. TASK-081 added every further surname chapter B (printed pp. 6–19) assigns to a given name, a formation or a section, that the 2026-01-20 PESEL register holds (male or female list): the first 25 entries are the original selection, the rest follow in the book's order. Each surname's spelling was checked against the page images; a name Buryan marks with '?', a place name ('(m)', 'miejscowości:'), a variant written only as a bracketed ending, and the anecdotes (Kruk, Musiał, Wydra, Sroka) and artificial names (Gwiazdowski, Orski…) are left out. Where one surname appears under several headings, the one naming a root is kept. The literal_gloss is the passage's own heading or sentence with the surname, '[…]' marking what is left out between them.",
+  "_note": "Real source. Every literal_gloss and quotation is verbatim from the 1933 print (original orthography kept; […] marks omitted list items), checked against the page images of the ZBC scan, not only its OCR. Locators give the printed page and the scan's PDF page. Formation types map Buryan's own section headings: 1 z imion → OTHER, odojcowskie → PATRONYMIC, 3 przydomki → DESCRIPTIVE, 4 zatrudnienie → OCCUPATIONAL, 5 narodowość → OTHER, 6 siedzibowe → TOPONYMIC. Root forms only where Buryan names the base himself. TASK-081 added every further surname chapter B (printed pp. 6–19) assigns to a given name, a formation or a section, that the 2026-01-20 PESEL register holds (male or female list): the first 25 entries are the original selection, the rest follow in the book's order. Each surname's spelling was checked against the page images; a name Buryan marks with '?', a place name ('(m)', 'miejscowości:'), a variant written only as a bracketed ending, and the anecdotes (Kruk, Musiał, Wydra, Sroka) and artificial names (Gwiazdowski, Orski…) are left out. Where one surname appears under several headings, the one naming a root is kept. The literal_gloss is the passage's own heading or sentence with the surname, '[…]' marking what is left out between them. A later pass (TASK-083) added the surnames chapters C–F name in passing, where Buryan names them as surnames: the 'kał' list (p. 23), Lendzion and Londzin (p. 24), Krak (p. 28), the 'cierlica' names (p. 32), Lubelczyk (p. 36), Bieszk (p. 37), Baćmaga (p. 39) and Roj (p. 42); names whose status as a surname the passage leaves open (the Pop- forms, Trawnik, the -awa list) are left out.",
   "work": {
     "source_key": "buryan_1933_skad_pochodzi",
     "title": "Skąd pochodzi twoje imię i nazwisko i nazwa miejscowości rodzinnej? (Zwięzły zarys imiennictwa polskiego)",
@@ -11771,6 +11771,186 @@
       "literal_gloss": "Nazwiska obce i sztuczne. […] Mamzer = przechrzta.",
       "formation_type": "OTHER",
       "locator": "s. 19 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 21)",
+      "quotation": null
+    },
+    {
+      "surname": "KALA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kala",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALUS",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kal-us",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KAŁUS",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kałus",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALUTA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kaluta",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALETA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kaleta",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALITA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kalita",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALATA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kalata",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALEMBA",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kalemba",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALISZ",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kalisz",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALISZEK",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kaliszek",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "KALISIEWICZ",
+      "root_form": "kał",
+      "root_language": null,
+      "literal_gloss": "Wielu nazwom dało początek błoto i kał (czyli miejsca błotniste, kałuże). Kał: nazwiska: […] Kalisiewicz",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 23 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 25)",
+      "quotation": null
+    },
+    {
+      "surname": "LENDZION",
+      "root_form": "lęda",
+      "root_language": null,
+      "literal_gloss": "Lęda, Ląd, (Lendak, m.), Lędzina, Lędziny, Landek = ugór, odłóg, przyłóg; por. nazwisko Lendzion, Londzin.",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 24 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 26)",
+      "quotation": null
+    },
+    {
+      "surname": "LONDZIN",
+      "root_form": "lęda",
+      "root_language": null,
+      "literal_gloss": "Lęda, Ląd, (Lendak, m.), Lędzina, Lędziny, Landek = ugór, odłóg, przyłóg; por. nazwisko Lendzion, Londzin.",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 24 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 26)",
+      "quotation": null
+    },
+    {
+      "surname": "KRAK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Kraków (Krak = Kruk, inni drak = smok). […] Nazwisko Krak i dzisiaj się napotyka.",
+      "formation_type": "OTHER",
+      "locator": "s. 28 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 30)",
+      "quotation": null
+    },
+    {
+      "surname": "TYRLIK",
+      "root_form": "cierlica",
+      "root_language": null,
+      "literal_gloss": "cierlica, tarlica dla tarcia lnu, — nazwy osobowe: Terlica, Tyrlik, Terlicki",
+      "formation_type": "OTHER",
+      "locator": "s. 32 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 34)",
+      "quotation": null
+    },
+    {
+      "surname": "TERLICKI",
+      "root_form": "cierlica",
+      "root_language": null,
+      "literal_gloss": "cierlica, tarlica dla tarcia lnu, — nazwy osobowe: Terlica, Tyrlik, Terlicki",
+      "formation_type": "OTHER",
+      "locator": "s. 32 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 34)",
+      "quotation": null
+    },
+    {
+      "surname": "LUBELCZYK",
+      "root_form": "Lublin",
+      "root_language": null,
+      "literal_gloss": "Tymczasem nazwa Lublin pochodzi od imienia Lub(y), zdrobniałe Lubel, z końcówką dzierżawczą -in. Przymiotnik brzmi: lubelski (por. nazwisko Lubelczyk).",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 36 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 38)",
+      "quotation": null
+    },
+    {
+      "surname": "BIESZK",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Biesk w albańskiem = szczyt. Jest i Bieszk nazwisko",
+      "formation_type": "OTHER",
+      "locator": "s. 37 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 39)",
+      "quotation": null
+    },
+    {
+      "surname": "BAĆMAGA",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Porównaj nazwisko Baćmaga, oznaczające również „obuwie” (Brückner, Słownik).",
+      "formation_type": "OTHER",
+      "locator": "s. 39 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 41)",
+      "quotation": null
+    },
+    {
+      "surname": "ROJ",
+      "root_form": null,
+      "root_language": null,
+      "literal_gloss": "Roj — Raj = zd-rój, wzd-rój, źródło; nazwy miejscowości i Roj, Roik, Rojek nazwiska.",
+      "formation_type": "TOPONYMIC",
+      "locator": "s. 42 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 44)",
       "quotation": null
     }
   ]

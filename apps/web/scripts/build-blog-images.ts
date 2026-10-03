@@ -225,11 +225,55 @@ function historia(): string {
   );
 }
 
+/**
+ * imie-i-nazwisko-ciekawostki: thin threads drifting in from the left, each
+ * on its own wave, that draw together and twist into one lit strand.
+ */
+function ciekawostki(): string {
+  const rnd = random(75);
+  const horizon = 700;
+  const meetX = 1180;
+  const meetY = 360;
+  const threads = 9;
+  const paths: string[] = [];
+  for (let t = 0; t < threads; t += 1) {
+    const y0 = 150 + (t * 430) / (threads - 1) + (rnd() - 0.5) * 30;
+    const amp = 18 + rnd() * 26;
+    const phase = rnd() * Math.PI * 2;
+    const pts: string[] = [];
+    for (let x = 0; x <= meetX; x += 20) {
+      const k = x / meetX;
+      const pull = k * k * (3 - 2 * k);
+      const y = y0 + (meetY - y0) * pull + Math.sin(x / 70 + phase) * amp * (1 - pull);
+      pts.push(`${f(x)},${f(y)}`);
+    }
+    paths.push(
+      `<polyline points="${pts.join(" ")}" fill="none" stroke="${C.amber}" stroke-width="2" stroke-linecap="round" opacity="${f(0.3 + rnd() * 0.35)}"/>`,
+    );
+  }
+  const strand: string[] = [];
+  for (const offset of [0, Math.PI]) {
+    const pts: string[] = [];
+    for (let x = meetX; x <= W; x += 10) {
+      pts.push(`${f(x)},${f(meetY + Math.sin((x - meetX) / 26 + offset) * 9)}`);
+    }
+    strand.push(
+      `<polyline points="${pts.join(" ")}" fill="none" stroke="${C.sun}" stroke-width="4" stroke-linecap="round"/>`,
+    );
+  }
+  return scene(
+    75,
+    horizon,
+    `<g>${paths.join("")}</g><g filter="url(#glow)">${strand.join("")}<circle cx="${meetX}" cy="${meetY}" r="9" fill="${C.sun}"/></g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
   "jak-szukac-przodkow": jakSzukac,
   "historia-genealogii": historia,
+  "imie-i-nazwisko-ciekawostki": ciekawostki,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));

@@ -99,7 +99,7 @@ export const SECTIONS = [
     title: "chapterArchiveTitle",
     lede: "chapterArchiveLede",
   },
-  // TASK-082: TERYT's localities with the surname's name (ADR-0025 §2.7),
+  // TASK-086: TERYT's localities with the surname's name (ADR-0025 §2.7),
   // shown only when one matches.
   {
     key: "places",

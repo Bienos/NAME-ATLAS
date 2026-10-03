@@ -3,7 +3,7 @@
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`). Not on production.
 - **Requested by:** the project owner, 2026-10-03: "start the first-name statistics", the first phase of the full-name report design.
 - **Decision:** ADR-0032 (proposed with this task).
-- **Number:** 078. Drafted as 073, then 075, then 076; while this was open `main` gave 073 and 074 to #84 and #83, 075 to the blog's redesign (#86) and 076 to the tree pages (#67); #87 took 077 and #90 took 079; the localities task is 082 in #76 and the coverage assessment 080 in #79. 078 stays free on `main` and in the open pull requests on 2026-10-03. The decision is ADR-0032, since #85 claims ADR-0031; migration 0031 is unchanged: `main` took migration 0029 (#84), and #76 carries migration 0030 (the family safeguards).
+- **Number:** 078. Drafted as 073, then 075, then 076; while this was open `main` gave 073 and 074 to #84 and #83, 075 to the blog's redesign (#86) and 076 to the tree pages (#67); #87 took 077 and #90 took 079; the localities task is 086 in #76 (#94 took 082) and the coverage assessment 080 in #79. 078 stays free on `main` and in the open pull requests on 2026-10-03. The decision is ADR-0032, since #85 claims ADR-0031; migration 0031 is unchanged: `main` took migration 0029 (#84), and #76 carries migration 0030 (the family safeguards).
 - **Depends on:** #79's branch (migration 0031 must follow `main`'s 0029 and #76's 0030).
 - **Model guidance:** implementation session.
 
