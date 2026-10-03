@@ -1,7 +1,7 @@
 # TASK-080 — Coverage per surname, and how much of the register could carry a paid report
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-coverage-assessment.md`); AC-3 on the full register and AC-5 on production are not run.
-- **Number:** 080. Drafted as 071, then 072, then 074, then 075; `main` gave 071, 072 and 074 to blog posts (#78, #80, #83), 073 to well-known bearers (#84) and 075 to the blog's redesign (#86) while this was open. 076 is `main`'s tree pages, 077 the bearers VM step (#87), 078 is claimed by #81 and 079 is a blog post (#90), so 080 stays free on `main` and in the open pull requests on 2026-10-03 (#76's localities are 082, #91 claims 083).
+- **Number:** 080. Drafted as 071, then 072, then 074, then 075; `main` gave 071, 072 and 074 to blog posts (#78, #80, #83), 073 to well-known bearers (#84) and 075 to the blog's redesign (#86) while this was open. 076 is `main`'s tree pages, 077 the bearers VM step (#87), 078 is claimed by #81 and 079 is a blog post (#90), so 080 stays free on `main` and in the open pull requests on 2026-10-03 (#94 and #91 later took 082 and 083 on `main`; #76's localities are 086).
 - **Requested by:** the project owner, 2026-10-03: "start M4 premium inventory".
 - **Milestone:** M4, first step (`PLAN.md` M4; `docs/canonical/23` §22, COV-001).
 - **Depends on:** built on #77's head (#76 with `main` merged in); #76 merged (the 147 Onomastica meanings and the localities read change what coverage finds).

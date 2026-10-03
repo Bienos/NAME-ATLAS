@@ -911,7 +911,7 @@ function archiveYear(date: string | null): string | null {
 }
 
 /**
- * The localities whose official name is the surname (TASK-082, ADR-0025
+ * The localities whose official name is the surname (TASK-086, ADR-0025
  * §2.7): the statement, then the warning line, then the list as the register
  * writes it. The caller renders the chapter only when at least one matches.
  */
@@ -1313,7 +1313,7 @@ export function Result({
             : (n, next) => (
                 <Archive section={archive} surname={surname} number={n} next={next} lang={lang} />
               ),
-        // Shown only when a locality matches: no locality is not a chapter (TASK-082).
+        // Shown only when a locality matches: no locality is not a chapter (TASK-086).
         places:
           localities === null || localities.state !== "READY" || localities.places.length === 0
             ? null

@@ -21,7 +21,7 @@ import { localitiesSectionFor, querySurnameResult, TERYT_NOT_LOADED } from "@nam
 import { localitiesSectionSchema, surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
- * TASK-082 AC-1: the localities whose official name is the surname, read from
+ * TASK-086 AC-1: the localities whose official name is the surname, read from
  * the TERYT places TASK-039 imports, in a real PostgreSQL.
  *
  * GENUINE: the two 14-line TERC and SIMC excerpts of GUS's official files
