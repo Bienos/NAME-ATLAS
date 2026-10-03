@@ -136,3 +136,13 @@ The web files #92 changed (`globals.css`, `messages.ts`, `request-policy.ts`, `l
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0 |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Tenth merge: `main` after #91 (TASK-083, Buryan 1933's chapters C–F), 2026-10-03
+
+#91 changed only `sources/onomastics/buryan-1933.json`, its README, its task and progress files and `STATUS.md`; only `STATUS.md`'s "Last rewritten" line conflicted. TASK-082 (localities) stays free on `main`.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
