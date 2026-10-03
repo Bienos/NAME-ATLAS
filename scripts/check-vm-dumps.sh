@@ -2,11 +2,13 @@
 # Holds the database VM's scripts to two rules (TASK-063, ADR-0027 §5.2):
 #
 #   1. every script in ops/vm parses (`bash -n`);
-#   2. data-load `pg_dump` invocations exclude `accounts` and `family` rows
-#      (both `--exclude-table-data` flags): the data-load steps dump the whole
-#      database, and without the flag each would copy readers' addresses and
-#      password hashes into a plain file on the VM, which an account's deletion
-#      would not reach. The off-host backup streams those rows into age.
+#   2. every `pg_dump` those scripts run excludes the rows of schemas `accounts`
+#      and `family` (`--exclude-table-data='accounts.*'` and `'family.*'`; TASK-066,
+#      ADR-0029): the data-load steps dump the whole database, and without the
+#      flags each would copy readers' addresses, password hashes and the people
+#      of their trees into a plain file on the VM, which an account's deletion
+#      would not reach. The exception is `backup.sh`'s one invocation, which
+#      streams them straight into age with pipefail (TASK-049 / TASK-070).
 #
 # `scripts/check-vm-dumps.sh [DIR]` checks DIR instead of ops/vm, which is how
 # a test breaks a copy on purpose. It finds the dumps by their options, so a
