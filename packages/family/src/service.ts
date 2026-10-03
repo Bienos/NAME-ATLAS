@@ -96,7 +96,8 @@ export type PersonWriteResult =
   | { readonly kind: "INVALID"; readonly problems: readonly PersonProblem[] }
   | NotFound
   | Forbidden;
-export type ParentProblem = "SAME_PERSON" | "DIFFERENT_TREES" | "TOO_MANY_PARENTS" | "WOULD_CYCLE";
+export type ParentProblem =
+  "SAME_PERSON" | "DIFFERENT_TREES" | "TOO_MANY_PARENTS" | "ROLE_TAKEN" | "WOULD_CYCLE";
 export type ParentResult =
   | { readonly kind: "OK" }
   | { readonly kind: "INVALID"; readonly problem: ParentProblem }
@@ -214,11 +215,9 @@ export function createFamily(deps: FamilyDeps) {
   }
 
   async function touch(trx: Trx, treeId: string): Promise<void> {
-    await trx
-      .updateTable("trees")
-      .set({ updated_at: now() })
-      .where("tree_id", "=", treeId)
-      .execute();
+    // Not an UPDATE: the policy lets only the owner update `trees`, and an
+    // editor's change must move `updated_at` too.
+    await sql`SELECT family.touch_tree(${treeId}::uuid, ${now()}::timestamptz)`.execute(trx);
   }
 
   async function read(trx: Trx, treeId: string, userId: string): Promise<TreeRead | null> {
@@ -472,6 +471,14 @@ export function createFamily(deps: FamilyDeps) {
           .where("person_id", "=", input.personId)
           .executeTakeFirst();
         if (before === undefined) return { kind: "NOT_FOUND" as const };
+        await lockTree(trx, before.tree_id);
+        // Deleting a person removes every parent link to and from them, the
+        // living ones the caller cannot see included, so it needs the same view
+        // of the tree that `setParent` needs.
+        const visible = await sql<{
+          allowed: boolean;
+        }>`SELECT family.sees_living(${before.tree_id}::uuid) AS allowed`.execute(trx);
+        if (!visible.rows[0]?.allowed) throw new ForbiddenError();
         const deleted = await trx
           .deleteFrom("persons")
           .where("person_id", "=", input.personId)
@@ -527,7 +534,7 @@ export function createFamily(deps: FamilyDeps) {
         ).map((p) => p.person_id);
         const edges = await trx
           .selectFrom("parentage")
-          .select(["child_id", "parent_id"])
+          .select(["child_id", "parent_id", "role"])
           .where("child_id", "in", ids)
           .execute();
         const existing = edges.some(
@@ -535,6 +542,17 @@ export function createFamily(deps: FamilyDeps) {
         );
         if (!existing && parentCount(edges, input.childId) >= 2) {
           return { kind: "INVALID" as const, problem: "TOO_MANY_PARENTS" as const };
+        }
+        if (
+          input.role !== "PARENT" &&
+          edges.some(
+            (e) =>
+              e.child_id === input.childId &&
+              e.parent_id !== input.parentId &&
+              e.role === input.role,
+          )
+        ) {
+          return { kind: "INVALID" as const, problem: "ROLE_TAKEN" as const };
         }
         if (wouldCycle(edges, input.childId, input.parentId)) {
           return { kind: "INVALID" as const, problem: "WOULD_CYCLE" as const };

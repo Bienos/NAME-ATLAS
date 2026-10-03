@@ -145,17 +145,23 @@ mapfile -t surnames < <(as_build node -e \
   "${onomastic_files[@]}" | sort -u)
 [ "${#surnames[@]}" -gt 0 ] || die "$ONOMASTICS_DIR lists no surnames"
 with_meaning=0 without_meaning=0 not_in_register=0
+# `sort -u` is byte-wise, so "ZAREMBA" and "Zaremba" both survive it while the register holds one
+# surname and one claim. The tool prints the register's own display form first; count each once.
+declare -A counted=()
 for s in "${surnames[@]}"; do
   out=$(as_build pnpm exec tsx packages/truth/bin/surname-meaning.ts "$s")
   first=${out%%$'\n'*}
   echo "[extras]   $first"
+  display=${first%%:*}
+  if [ -n "${counted[$display]:-}" ]; then continue; fi
+  counted[$display]=1
   case "$first" in
     *"interpretation(s))") with_meaning=$((with_meaning + 1)) ;;
     *"NO SOURCED MEANING"*) without_meaning=$((without_meaning + 1)) ;;
     *) not_in_register=$((not_in_register + 1)) ;;
   esac
 done
-log "  ${#surnames[@]} surnames: $with_meaning with a meaning, $without_meaning in the register without one, $not_in_register not resolved"
+log "  ${#counted[@]} distinct surnames ($((${#surnames[@]} - ${#counted[@]})) listed again in another form): $with_meaning with a meaning, $without_meaning in the register without one, $not_in_register not resolved"
 
 log "4/5 the gate"
 fail=0

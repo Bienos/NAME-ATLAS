@@ -50,10 +50,30 @@ Use the existing **name-atlas** project under **bienos**:
 - Polish and English landing HTML must contain localized metadata, an absolute `og:image`,
   `og:image:width=1200`, `og:image:height=630`, and `twitter:card=summary_large_image`, with
   canonical and image URLs under `name-atlas.pl`.
-- The root image returns a public PNG without an account; surname pages keep their own images.
+- The landing card uses the public JPEG `/share/name-atlas-v3.jpg` (a metadata-free re-encode; `v2` stays for links already shared) without an account or function invocation; surname pages keep their own PNG images.
 - Once the two `www` CNAMEs resolve, check their HTTPS redirects as well.
 - Send a fresh link in the intended messaging apps. Apps can cache previous previews or let
   recipients disable them; metadata cannot force their UI to display a card.
 
-The branded image uses `next/og` and bundled brand fonts, so it needs no image-generation service
-or database. Its atlas is decorative, not a population map.
+## Changing the site-link card
+
+The artwork source is `apps/web/src/lib/site-preview.tsx`, rendered with `next/og` and bundled
+brand fonts. The shared landing uses its exported 1200 × 630 JPEG at
+`apps/web/public/share/name-atlas-v3.jpg`, re-encoded with no EXIF or Photoshop blocks after Meta rejected `v2` as "Corrupted Image". Open Graph and Twitter URLs are set in
+`apps/web/src/lib/site-metadata.ts`; `layout.tsx` supplies the default image. The old
+`/opengraph-image` PNG endpoint remains for previously fetched image URLs, now as a normal route
+handler rather than a metadata-file convention. A surname page's own metadata-file image takes
+precedence over the brand cover.
+
+When changing the artwork, render the PNG from the source, export the JPEG, use a new asset
+filename, and update `SITE_PREVIEW_IMAGE.url`. Verify the production HTML's `og:image` points
+straight to that JPEG, and the asset returns 200 with `image/jpeg` and 1200 × 630 dimensions.
+The atlas is decorative, not a population map.
+
+The former closed robots policy also blocked preview crawlers. `robots.txt` now has a dedicated
+group for Facebook/Meta sharing, X, LinkedIn, Slack, Discord, WhatsApp and Telegram crawlers,
+allowing public pages and images while excluding account paths, API and internal searches.
+The wildcard search group remains controlled by `SEO_INDEXING_ENABLED`, which this change does
+not enable. Meta's own cached scrape/UI and messages already sent must be verified separately
+from HTTP output; a successful simulated user-agent request alone does not verify the card in a
+messaging app.

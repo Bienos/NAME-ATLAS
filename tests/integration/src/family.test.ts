@@ -209,6 +209,118 @@ describe("family tree (TASK-068, ADR-0029)", () => {
     }
   });
 
+  it("gives a child one mother and one father, and any other link a PARENT role", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Role fixture" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    try {
+      const ids: string[] = [];
+      for (const givenNames of ["Child", "A", "B"]) {
+        const person = await family.addPerson({
+          userId: OWNER,
+          treeId: created.treeId,
+          person: { givenNames, surname: "Fixture", deathYear: 1900 },
+        });
+        if (person.kind !== "OK") throw new Error("fixture person failed");
+        ids.push(person.personId);
+      }
+      const link = (parentId: string, role: "MOTHER" | "FATHER" | "PARENT") =>
+        family.setParent({ userId: OWNER, childId: ids[0]!, parentId, role });
+      expect(await link(ids[1]!, "MOTHER")).toEqual({ kind: "OK" });
+      expect(await link(ids[2]!, "MOTHER")).toEqual({ kind: "INVALID", problem: "ROLE_TAKEN" });
+      // The same parent keeps the right to change the role, and a second
+      // parent may be a father or a PARENT.
+      expect(await link(ids[1]!, "MOTHER")).toEqual({ kind: "OK" });
+      expect(await link(ids[2]!, "FATHER")).toEqual({ kind: "OK" });
+      // The database holds the same line when the service is not asked.
+      await expect(
+        sql`INSERT INTO family.parentage (child_id, parent_id, role, created_at)
+            VALUES (${ids[0]!}, ${ids[2]!}, 'MOTHER', now())`.execute(db().db),
+      ).rejects.toThrow();
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId: created.treeId });
+    }
+  });
+
+  it("does not let an editor who cannot see the living delete a person with hidden links", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Delete fixture" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    try {
+      const parent = await family.addPerson({
+        userId: OWNER,
+        treeId: created.treeId,
+        person: { givenNames: "Parent", surname: "Fixture", deathYear: 1900 },
+      });
+      const child = await family.addPerson({
+        userId: OWNER,
+        treeId: created.treeId,
+        person: { givenNames: "Child", surname: "Fixture", livingStatus: "LIVING" },
+      });
+      if (parent.kind !== "OK" || child.kind !== "OK") throw new Error("fixture person failed");
+      expect(
+        await family.setParent({
+          userId: OWNER,
+          childId: child.personId,
+          parentId: parent.personId,
+          role: "PARENT",
+        }),
+      ).toEqual({ kind: "OK" });
+      await family.addMember({
+        userId: OWNER,
+        treeId: created.treeId,
+        memberUserId: MEMBER,
+        role: "EDITOR",
+      });
+      expect(await family.deletePerson({ userId: MEMBER, personId: parent.personId })).toEqual({
+        kind: "FORBIDDEN",
+      });
+      const stored = await sql<{ n: string }>`
+        SELECT count(*)::text AS n FROM family.parentage WHERE parent_id = ${parent.personId}
+      `.execute(db().db);
+      expect(stored.rows[0]?.n).toBe("1");
+      await family.setSeesLiving({
+        userId: OWNER,
+        treeId: created.treeId,
+        memberUserId: MEMBER,
+        seesLiving: true,
+      });
+      expect(await family.deletePerson({ userId: MEMBER, personId: parent.personId })).toEqual({
+        kind: "OK",
+      });
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId: created.treeId });
+    }
+  });
+
+  it("moves the tree's updated_at when an editor changes it", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Touch fixture" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    try {
+      await family.addMember({
+        userId: OWNER,
+        treeId: created.treeId,
+        memberUserId: MEMBER,
+        role: "EDITOR",
+      });
+      const stamp = async (): Promise<string> => {
+        const row = await sql<{ at: string }>`
+          SELECT updated_at::text AS at FROM family.trees WHERE tree_id = ${created.treeId}
+        `.execute(db().db);
+        return row.rows[0]?.at ?? "";
+      };
+      const before = await stamp();
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      const added = await family.addPerson({
+        userId: MEMBER,
+        treeId: created.treeId,
+        person: { givenNames: "Added", surname: "ByEditor", deathYear: 1900 },
+      });
+      expect(added.kind).toBe("OK");
+      expect(await stamp()).not.toBe(before);
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId: created.treeId });
+    }
+  });
+
   it("rechecks living visibility after a graph edit waits for the tree lock", async () => {
     const created = await family.createTree({ userId: OWNER, title: "Permission concurrency" });
     if (created.kind !== "CREATED") throw new Error("tree refused");

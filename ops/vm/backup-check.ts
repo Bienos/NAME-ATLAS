@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { isDeepStrictEqual } from "node:util";
-import { createPool, createDb } from "../../packages/db/src/index.js";
+import { createPool, createDb, sql } from "../../packages/db/src/index.js";
 import { querySurnameResult } from "../../packages/truth/src/query.js";
 import { surnameResultResponseSchema } from "../../packages/contracts/src/surname-result.js";
 
@@ -45,7 +45,24 @@ async function run(): Promise<void> {
       "SELECT claim_type::text, count(*)::text AS n FROM public.claims WHERE claim_status = 'ACTIVE' GROUP BY claim_type ORDER BY claim_type",
     );
     const surname = process.env["BACKUP_SAMPLE_SURNAME"] ?? "ZAREMBA";
-    const outcome = await querySurnameResult(db, surname);
+    // In snapshot mode the payload is read inside the exported snapshot, so it
+    // describes the same instant as the counts and the dump. A restored database
+    // has no snapshot to join and is read as it stands.
+    const exported = snapshot.rows[0]?.id ?? "";
+    if (mode === "snapshot" && !/^[A-Fa-f0-9]+-[A-Fa-f0-9]+-[0-9]+$/.test(exported)) {
+      throw new Error("invalid exported snapshot");
+    }
+    const outcome =
+      mode === "snapshot"
+        ? await db
+            .transaction()
+            .setIsolationLevel("repeatable read")
+            .execute(async (trx) => {
+              // Must be the transaction's first statement.
+              await sql`SET TRANSACTION SNAPSHOT ${sql.lit(exported)}`.execute(trx);
+              return querySurnameResult(trx, surname);
+            })
+        : await querySurnameResult(db, surname);
     if (outcome.kind !== "OK" || outcome.response.status !== "RESOLVED") {
       throw new Error("sample surname could not be read");
     }
@@ -62,7 +79,7 @@ async function run(): Promise<void> {
         process.stdin.once("data", () => resolve());
         process.stdin.once("end", () => resolve());
       });
-      process.stdout.write(`${snapshot.rows[0]?.id ?? ""}\n${JSON.stringify(manifest)}\n`);
+      process.stdout.write(`${exported}\n${JSON.stringify(manifest)}\n`);
       await released;
     } else if (mode === "verify" && process.argv[3]) {
       const expected: unknown = JSON.parse(readFileSync(process.argv[3], "utf8"));

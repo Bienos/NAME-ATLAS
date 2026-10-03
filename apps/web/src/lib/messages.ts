@@ -762,6 +762,12 @@ export const UI = {
     deckOffer: "Więcej: Twoja rodzina i DNA",
     // The footer's blog and social links (TASK-057).
     followLabel: "Blog i media społecznościowe",
+    // The blog (TASK-071).
+    blogTitle: "Blog",
+    blogLede: "Wpisy o polskich nazwiskach i o Name Atlas.",
+    blogEmpty: "Nie ma jeszcze żadnych wpisów.",
+    blogListLabel: "Wpisy",
+    blogBack: "Wszystkie wpisy",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1349,6 +1355,12 @@ export const UI = {
     deckOffer: "More: your family and DNA",
     // The footer's blog and social links (TASK-057).
     followLabel: "Blog and social media",
+    // The blog (TASK-071).
+    blogTitle: "Blog",
+    blogLede: "Posts about Polish surnames and about Name Atlas.",
+    blogEmpty: "There are no posts yet.",
+    blogListLabel: "Posts",
+    blogBack: "All posts",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
