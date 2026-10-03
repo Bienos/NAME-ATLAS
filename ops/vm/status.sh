@@ -62,6 +62,21 @@ else
 fi
 
 echo
+echo "== bearers load (name-atlas-bearers-load, TASK-077)"
+if systemctl cat name-atlas-bearers-load >/dev/null 2>&1; then
+  systemctl show -p ActiveState,SubState,Result,NRestarts,ActiveEnterTimestamp name-atlas-bearers-load
+  echo "-- last 10 lines of its log"
+  journalctl -u name-atlas-bearers-load -o short-iso --no-pager -n 10
+  if [ -f /var/lib/name-atlas/bearers/loaded ]; then
+    echo "loaded: $(head -c 40 /var/lib/name-atlas/bearers/loaded)"
+  else
+    echo "loaded: no"
+  fi
+else
+  echo "not started"
+fi
+
+echo
 echo "== database"
 if [ "$(q "SELECT to_regclass('public.surnames') IS NOT NULL")" = t ]; then
   q "SELECT 'size ' || pg_size_pretty(pg_database_size(current_database()))"
