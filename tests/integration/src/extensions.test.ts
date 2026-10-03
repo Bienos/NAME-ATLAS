@@ -94,7 +94,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // TASK-011 added `places`, `place_names` and `entity_external_ids`: the
     // voivodeship Place foundation D-004's adoption required, pulled forward
     // from M3 for exactly that reason and no wider. TASK-039 added
-    // `administrative_memberships`, the TERC/SIMC hierarchy. TASK-073 added
+    // `administrative_memberships`, the TERC/SIMC hierarchy. TASK-075 added
     // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
     // from surnames.
     //

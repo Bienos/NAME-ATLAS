@@ -1,9 +1,9 @@
-# TASK-073 — The PESEL given-name lists, imported (first names, 2026-01-20)
+# TASK-075 — The PESEL given-name lists, imported (first names, 2026-01-20)
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`). Not on production.
 - **Requested by:** the project owner, 2026-10-03: "start the first-name statistics", the first phase of the full-name report design.
 - **Decision:** ADR-0030 (proposed with this task).
-- **Number:** 073. On `main` 071 is the blog; in open pull requests 072 is #79 and 068–070 are #76.
+- **Number:** 075. Drafted as 073, which #83 and #67 also claimed while this was open; 074 is #79. 075 is the next number free on `main` and in every open pull request on 2026-10-03, 12:30 UTC.
 - **Depends on:** #79's branch (migration 0029 must follow #76's 0028).
 - **Model guidance:** implementation session.
 

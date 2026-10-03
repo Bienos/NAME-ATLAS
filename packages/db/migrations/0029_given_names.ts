@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * Given names, a second name type kept apart from surnames (ADR-0030, TASK-073).
+ * Given names, a second name type kept apart from surnames (ADR-0030, TASK-075).
  *
  * - `given_names`: one identity per written form under the resolver's
  *   canonical key, as `surnames` has. No column joins it to a surname.

@@ -21,6 +21,7 @@ import {
   blogIndexMetadata,
   BlogPostView,
   blogPostMetadata,
+  keepSuffixes,
 } from "./blog-page.js";
 import { formatDate, htmlLang, UI } from "./messages.js";
 import { SiteFooter } from "./site-footer.js";
@@ -342,5 +343,38 @@ describe("the footer (AC-8)", () => {
         .slice(1)
         .map((l) => l.href),
     ).toEqual(["/?lang=en", "/?lang=en", "/?lang=en"]);
+  });
+});
+
+describe("suffixes stay on one line (TASK-072)", () => {
+  const html = (node: ReturnType<typeof keepSuffixes>) =>
+    renderToStaticMarkup(createElement("p", null, node));
+
+  it("wraps a suffix written on its own, and leaves a hyphen inside a word", () => {
+    expect(html(keepSuffixes("co znaczą -ski, -czyk i -uk"))).toBe(
+      '<p>co znaczą <span class="nobreak">-ski</span>, <span class="nobreak">-czyk</span> i <span class="nobreak">-uk</span></p>',
+    );
+    expect(keepSuffixes("Kowalska-Nowak, 1545-1563")).toBe("Kowalska-Nowak, 1545-1563");
+    expect(html(keepSuffixes("-owa i -ówna"))).toContain('<span class="nobreak">-ówna</span>');
+  });
+
+  it("applies to a post's title, headings, text and the index", () => {
+    const p = ok("## -ak i -czyk\n\nNazwiska na **-ski** i [-wicz](/pl).", "fixture-post.pl.md", {
+      ...HEADER,
+      title: "Fixture -czyk",
+    });
+    const page = renderToStaticMarkup(
+      createElement(BlogPostView, { post: p, pair: null, origin: null }),
+    );
+    expect(page).toContain(
+      '<h1 class="page-title">Fixture <span class="nobreak">-czyk</span></h1>',
+    );
+    expect(page).toContain(
+      '<h2><span class="nobreak">-ak</span> i <span class="nobreak">-czyk</span></h2>',
+    );
+    expect(page).toContain('<strong><span class="nobreak">-ski</span></strong>');
+    expect(page).toContain('<a href="/pl"><span class="nobreak">-wicz</span></a>');
+    const index = renderToStaticMarkup(createElement(BlogIndexView, { lang: "pl", posts: [p] }));
+    expect(index).toContain('Fixture <span class="nobreak">-czyk</span></a>');
   });
 });

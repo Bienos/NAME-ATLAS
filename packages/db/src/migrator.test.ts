@@ -37,7 +37,7 @@ describe("MIGRATIONS_DIR", () => {
       "0026_rank_neighbours_index.ts", // TASK-055 — a surname's neighbours on its list
       "0027_accounts_schema.ts", // TASK-061 / ADR-0027 — free accounts, in their own schema
       "0028_family_schema.ts", // TASK-068 / ADR-0029 — the family tree, in its own schema
-      "0029_given_names.ts", // TASK-073 / ADR-0030 — given names, apart from surnames
+      "0029_given_names.ts", // TASK-075 / ADR-0030 — given names, apart from surnames
     ]);
   });
 });

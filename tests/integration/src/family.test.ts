@@ -747,7 +747,7 @@ describe("family tree (TASK-068, ADR-0029)", () => {
 
   it("0028 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
     const migrator = createMigrator(db().db);
-    // `0029` (given names, TASK-073) sits above and holds nothing here.
+    // `0029` (given names, TASK-075) sits above and holds nothing here.
     const givenNames = await migrator.migrateDown();
     expect(givenNames.results?.map((r) => r.migrationName)).toEqual(["0029_given_names"]);
     const { error } = await migrator.migrateDown();

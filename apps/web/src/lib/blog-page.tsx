@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import type { ReactNode } from "react";
 import { formatDate, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -90,23 +91,49 @@ export function articleJsonLd(post: BlogPost, origin: string | null): string {
   return JSON.stringify(data).replace(/</gu, "\\u003c");
 }
 
+/** A suffix written on its own, like "-czyk": a hyphen with no letter or digit before it. */
+const SUFFIX = /(?<![\p{L}\p{N}])-\p{L}+/gu;
+
+/**
+ * Keeps a suffix such as "-czyk" on one line (TASK-072): a browser may break a
+ * line after any hyphen, which left "-" at the end of one line and "czyk" at the
+ * start of the next. A hyphen inside a word, as in a double-barrelled surname,
+ * is left as it is.
+ */
+export function keepSuffixes(text: string): ReactNode {
+  const parts: ReactNode[] = [];
+  let last = 0;
+  for (const match of text.matchAll(SUFFIX)) {
+    if (match.index > last) parts.push(text.slice(last, match.index));
+    parts.push(
+      <span key={match.index} className="nobreak">
+        {match[0]}
+      </span>,
+    );
+    last = match.index + match[0].length;
+  }
+  if (parts.length === 0) return text;
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
 function Inlines({ inlines }: { readonly inlines: readonly Inline[] }): ReactNode {
   return inlines.map((node, i) => {
     switch (node.kind) {
       case "text":
-        return node.text;
+        return <Fragment key={i}>{keepSuffixes(node.text)}</Fragment>;
       case "strong":
-        return <strong key={i}>{node.text}</strong>;
+        return <strong key={i}>{keepSuffixes(node.text)}</strong>;
       case "em":
-        return <em key={i}>{node.text}</em>;
+        return <em key={i}>{keepSuffixes(node.text)}</em>;
       case "code":
         return <code key={i}>{node.text}</code>;
       case "link":
         return node.href === null ? (
-          node.text
+          <Fragment key={i}>{keepSuffixes(node.text)}</Fragment>
         ) : (
           <a key={i} href={node.href}>
-            {node.text}
+            {keepSuffixes(node.text)}
           </a>
         );
     }
@@ -180,7 +207,7 @@ export function BlogIndexView({
             <li key={post.slug}>
               <article>
                 <h2 className="blog-entry-title">
-                  <a href={blogPostPath(lang, post.slug)}>{post.title}</a>
+                  <a href={blogPostPath(lang, post.slug)}>{keepSuffixes(post.title)}</a>
                 </h2>
                 <PostDate post={post} />
                 <p>{post.description}</p>
@@ -213,7 +240,7 @@ export function BlogPostView({
       mainClassName="reading blog"
     >
       <article className="blog-post">
-        <h1 className="page-title">{post.title}</h1>
+        <h1 className="page-title">{keepSuffixes(post.title)}</h1>
         <PostDate post={post} />
         <div className="blog-body">
           {post.body.map((block, i) => (

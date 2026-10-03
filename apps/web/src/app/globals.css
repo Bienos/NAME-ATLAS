@@ -4676,6 +4676,11 @@ body.dusk {
   margin-top: var(--space-8);
 }
 
+/* A suffix such as "-czyk" stays on one line (TASK-072). */
+.blog .nobreak {
+  white-space: nowrap;
+}
+
 /* The footer's blog and social links, after the contact line (TASK-057). */
 .footer-follow {
   display: flex;

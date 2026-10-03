@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * PESEL given-name list import CLI (TASK-073, ADR-0030).
+ * PESEL given-name list import CLI (TASK-075, ADR-0030).
  *
  *   pnpm import:given-names --resource 1159669 --file first-male.csv --metadata resource.json [--sha256 <hex>]
  *
