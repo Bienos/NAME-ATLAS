@@ -20,7 +20,7 @@ function dims(
 
 const STATISTICS = { POPULATION: "STRONG", RARITY: "STRONG" } as const;
 
-describe("coverageTier (TASK-071 §6 U-1, the owner's v0)", () => {
+describe("coverageTier (TASK-072 §6 U-1, the owner's v0)", () => {
   it("is RICH only with a strong meaning and strong archives", () => {
     expect(coverageTier(dims({ ...STATISTICS, ETYMOLOGY: "STRONG", ARCHIVES: "STRONG" }))).toBe(
       "RICH",

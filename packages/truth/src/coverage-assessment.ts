@@ -1,12 +1,12 @@
 /**
- * How much a surname's evidence could carry a paid report (TASK-071, M4's
+ * How much a surname's evidence could carry a paid report (TASK-072, M4's
  * first step; `docs/canonical/11` §23, `docs/canonical/23` §22 COV-001).
  *
  * Read from the validated response on the PAID surface, never from claims
  * directly: rights, confidence and "not searched" are decided once, in the
  * query service, and coverage only reads them. Nothing is stored.
  *
- * The rules are the project owner's of 2026-10-03 (TASK-071 §6):
+ * The rules are the project owner's of 2026-10-03 (TASK-072 §6):
  *
  * - a dimension is STRONG only when its section is ready on the PAID surface
  *   at VERIFIED or LIKELY confidence;
@@ -196,7 +196,7 @@ function dimensionsOf(r: SurnameResultResponse): CoverageDimension[] {
   }
 
   // One unit: a catalogue record matching the word. Matches are not verified
-  // occurrences, so this is never STRONG (TASK-071 §6 U-2).
+  // occurrences, so this is never STRONG (TASK-072 §6 U-2).
   const archive = r.archive;
   if (archive?.state === "READY") {
     const records = archive.catalogue_records ?? 0;
@@ -227,7 +227,7 @@ function dimensionsOf(r: SurnameResultResponse): CoverageDimension[] {
   return out;
 }
 
-/** The owner's v0 rule (TASK-071 §6 U-1). Localities never count. */
+/** The owner's v0 rule (TASK-072 §6 U-1). Localities never count. */
 export function coverageTier(dimensions: readonly CoverageDimension[]): CoverageTier {
   const is = (d: CoverageDimensionName) =>
     dimensions.find((x) => x.dimension === d)?.availability === "STRONG";

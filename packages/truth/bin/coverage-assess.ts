@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Assesses every surname's coverage on the PAID surface (TASK-071) and prints
+ * Assesses every surname's coverage on the PAID surface (TASK-072) and prints
  * the tally as Markdown.
  *
  *   pnpm coverage:assess > coverage-assessment.md

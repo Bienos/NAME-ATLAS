@@ -33,7 +33,7 @@ import type { CoverageAssessment, CoverageDimensionName } from "@name-atlas/trut
 import { raritySectionSchema, surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
- * TASK-071: coverage on the PAID surface, read through the query service from
+ * TASK-072: coverage on the PAID surface, read through the query service from
  * a real PostgreSQL.
  *
  * GENUINE surnames and counts (the committed PESEL national male excerpt).
@@ -92,7 +92,7 @@ const MALE_PAYLOAD: unknown = JSON.parse(
   ),
 );
 
-describe("coverage assessment (TASK-071)", () => {
+describe("coverage assessment (TASK-072)", () => {
   let database: TestDatabase | undefined;
   const db = (): TestDatabase["db"] => {
     if (!database) throw new Error("test database was not started");
@@ -172,7 +172,7 @@ describe("coverage assessment (TASK-071)", () => {
     });
   });
 
-  it("never reads Polona's search matches as STRONG (TASK-071 §6 U-2)", async () => {
+  it("never reads Polona's search matches as STRONG (TASK-072 §6 U-2)", async () => {
     expect(of(await assessed("KOWALCZYK"), "ARCHIVES")).toMatchObject({
       availability: "PARTIAL",
       reason_code: "UNVERIFIED_SEARCH_MATCHES",
