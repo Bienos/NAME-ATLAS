@@ -31,6 +31,7 @@
     "truth:archive-load": "pnpm --filter @name-atlas/truth run archive-load",
     "truth:bearers-load": "pnpm --filter @name-atlas/truth run bearers-load",
     "coverage:report": "pnpm --silent --filter @name-atlas/truth run coverage-report",
+    "coverage:assess": "pnpm --silent --filter @name-atlas/truth run coverage-assess",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
     "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",

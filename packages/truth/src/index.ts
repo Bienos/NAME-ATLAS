@@ -249,6 +249,28 @@ export type { UniverseSizeCache } from "./universe.js";
 export { mostCommonSurnames } from "./common.js";
 export type { CommonSurname, CommonSurnameList } from "./common.js";
 export { COVERAGE_BANDS, COVERAGE_FAMILIES, coverageMarkdown, coverageReport } from "./coverage.js";
+export {
+  assessCoverage,
+  assessResponse,
+  COVERAGE_ASSESSMENT_VERSION,
+  COVERAGE_AVAILABILITIES,
+  COVERAGE_DIMENSIONS,
+  COVERAGE_TIERS,
+  coverageRun,
+  coverageRunMarkdown,
+  coverageTier,
+} from "./coverage-assessment.js";
+export type {
+  CoverageAssessment,
+  CoverageAssessmentOutcome,
+  CoverageAvailability,
+  CoverageDimension,
+  CoverageDimensionName,
+  CoveragePeople,
+  CoverageRunOptions,
+  CoverageRunTally,
+  CoverageTier,
+} from "./coverage-assessment.js";
 export type { CoverageBand, CoverageCell, CoverageFamily, ResourceCoverage } from "./coverage.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
