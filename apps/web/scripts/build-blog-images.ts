@@ -182,10 +182,54 @@ function jakSzukac(): string {
   );
 }
 
+/**
+ * historia-genealogii: rows of points narrowing toward the sky, each point
+ * joined to two in the row above, so the lines from the many below meet in
+ * the few shared points at the top.
+ */
+function historia(): string {
+  const rnd = random(74);
+  const horizon = 690;
+  const counts = [14, 11, 8, 6, 4, 2];
+  const rows = counts.map((n, r) => {
+    const y = horizon - 60 - r * 100;
+    const span = 1180 - r * 150;
+    return Array.from({ length: n }, (_, i) => ({
+      x: (W - span) / 2 + (n === 1 ? span / 2 : (i * span) / (n - 1)) + (rnd() - 0.5) * 30,
+      y: y + (rnd() - 0.5) * 16,
+    }));
+  });
+  const lines: string[] = [];
+  rows.slice(0, -1).forEach((row, r) => {
+    const above = rows[r + 1]!;
+    row.forEach((p, i) => {
+      const near = Math.round((i / Math.max(1, row.length - 1)) * (above.length - 1));
+      const other = Math.min(above.length - 1, Math.max(0, near + (rnd() < 0.5 ? -1 : 1)));
+      for (const q of [above[near]!, above[other]!]) {
+        lines.push(
+          `<line x1="${f(p.x)}" y1="${f(p.y)}" x2="${f(q.x)}" y2="${f(q.y)}" stroke="${C.amber}" stroke-width="2" stroke-linecap="round" opacity="${f(0.3 + r * 0.08)}"/>`,
+        );
+      }
+    });
+  });
+  const points = rows.flatMap((row, r) =>
+    row.map(
+      (p) =>
+        `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(3 + r * 1.4)}" fill="${r === rows.length - 1 ? C.sun : C.amber}"/>`,
+    ),
+  );
+  return scene(
+    74,
+    horizon,
+    `<g>${lines.join("")}</g><g filter="url(#glow)">${points.join("")}</g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
   "jak-szukac-przodkow": jakSzukac,
+  "historia-genealogii": historia,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));
