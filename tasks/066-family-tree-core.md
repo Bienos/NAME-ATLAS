@@ -1,4 +1,4 @@
-# TASK-068 — The family tree, the core: schema, package and contract, dark
+# TASK-066 — The family tree, the core: schema, package and contract, dark
 
 - **Status:** IMPLEMENTED 2026-10-01 on `claude/sweet-feynman-wisze8`; record: `docs/progress/2026-10-01-family-tree-core.md`.
 - **Requested by:** the project owner, 2026-10-01: the tree's design chosen from the mockups; "do it now, we review later" after answering ADR-0029's decisions.

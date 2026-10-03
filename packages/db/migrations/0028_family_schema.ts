@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * The family tree (TASK-068, ADR-0029): its own schema, read and written by the
+ * The family tree (TASK-066, ADR-0029): its own schema, read and written by the
  * accounts role only.
  *
  * Everything lives in schema `family`, beside `accounts` and never in `public`.
@@ -129,13 +129,6 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
   `.execute(db);
   await sql`CREATE INDEX parentage_parent_idx ON family.parentage (parent_id)`.execute(db);
-  // A child has at most one mother and one father; any number of PARENT rows
-  // stay within the service's limit of two parents in all.
-  await sql`
-    CREATE UNIQUE INDEX parentage_one_mother_or_father
-      ON family.parentage (child_id, role)
-      WHERE role IN ('MOTHER', 'FATHER')
-  `.execute(db);
 
   await sql`
     CREATE TABLE family.members (
@@ -233,17 +226,6 @@ export async function up(db: Kysely<any>): Promise<void> {
           WHEN NOT family.can_read(t) OR family.sees_living(t) THEN 0
           ELSE (SELECT count(*)::int FROM family.persons WHERE tree_id = t AND living_status <> 'DECEASED')
         END
-      $$
-  `.execute(db);
-
-  // An editor's change also moves the tree's `updated_at`. The `trees_update`
-  // policy lets only the owner update a tree, so this function, and not a wider
-  // policy, sets that one column for anyone who may write the tree.
-  await sql`
-    CREATE FUNCTION family.touch_tree(t uuid, at timestamptz) RETURNS void
-      LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path = family, pg_temp
-      AS $$
-        UPDATE family.trees SET updated_at = at WHERE tree_id = t AND family.can_write(t)
       $$
   `.execute(db);
 

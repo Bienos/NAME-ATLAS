@@ -34,7 +34,7 @@ The assistant's recommendation, not a decision: option 1 first; option 3 until a
 
 **Status:** NON-BLOCKING NOW. It blocks nothing: the surname page is rendered on the free surface, where the stored profile allows the section, and the page's indexability folds the rights of the surname's claims, which the localities lookup is not.
 **Owner:** project owner.
-**Raised by:** TASK-066's session, 2026-10-01.
+**Raised by:** the localities task's session (TASK-066 then, TASK-077 now), 2026-10-01.
 
 Facts, as the code and the stored data stand:
 
@@ -49,6 +49,95 @@ To decide, one of:
 3. Leave it: the free page shows the section, an explicit SEO-surface query is refused, and indexability ignores it.
 
 The assistant's recommendation, not a decision: (1). The terms quoted say the register is public and its full files are free for every user to download; nothing on them restricts redistribution.
+
+---
+
+## D-031 — RESOLVED (2026-10-01): the proposal stands, subject to legal review
+
+**Resolution:** The project owner: "it's ok". A relative who declines contact stays as a row the owner alone sees, never shown to a member or matched, with the address suppressed per tree (ADR-0029 §2.6.23). The legal review `docs/canonical/19` §11 requires still precedes the invitation feature; its outcome may reduce the row further.
+
+### D-031 (original record) — a relative who says "nie chcę kontaktu": what may the owner keep?
+
+**Status:** NON-BLOCKING NOW. It blocks the invitation feature (ADR-0029 §2.6), not the tree.
+**Owner:** project owner, with legal review (`docs/canonical/19` §11: a lawful-basis assessment and an Article 14 assessment before person-level data about third parties).
+**Raised by:** ADR-0029 §2.6.23, 2026-10-01.
+
+A tree owner writes down a living relative. The relative, invited, answers that they want no contact. ADR-0029 proposes: the row stays visible to the owner alone, is never shown to a member or matched, and the address cannot be invited again. The open question is whether that is enough, or whether the relative's objection must also reduce the row (to a name and a relationship, or to nothing). The GDPR's household exemption covers the owner's own notes and does not obviously cover a platform that stores them; what Name Atlas, as the platform, must do on an objection is the legal question. The answer sets the "Nie chcę kontaktu" screen's text and what `contact_declined` does to the row.
+
+---
+
+## D-030 — RESOLVED (2026-10-01): mObywatel through an integrator, a bank identity as the fallback; the release stays with the verification task
+
+**Resolution:** The project owner: "ok" to the session's lean. The provider's terms and price are read on the day the verification task starts; nothing is recorded here. Verification is included in the 29,99 zł tier (resolved earlier the same day). Recorded in ADR-0029 §2.6.25.
+
+### D-030 (original record) — identity verification: which provider, and in which release
+
+**Status:** NON-BLOCKING NOW. It blocks "Czy jestem w czyimś drzewie?" (ADR-0029 §2.6.25), nothing earlier.
+**Owner:** project owner.
+**Raised by:** ADR-0029, 2026-10-01.
+
+The search for oneself across other people's trees is answered only to a person who has proved their name and birth date. The candidates, each to be read on the day with its terms and price (none is recorded here):
+
+- (a) **mObywatel's confirmation for businesses** (`info.mobywatel.gov.pl/dla-instytucji`): data straight from the state registers, by QR code, remotely; integration through the ministry's process, or through a Polish integrator that already offers it.
+- (b) **mojeID (KIR)**, identity confirmed through the person's bank;
+- (c) a **commercial provider** (document plus liveness), priced per check;
+- (d) the **European Digital Identity Wallet**, in test in Poland in 2026, with a free sandbox; not yet something to sell on.
+
+Whichever is chosen, the product stores the provider's reference, the verified name and birth date and the date of verification, never the document or the PESEL number, and the processing needs a DPIA screening (`docs/canonical/19` §11). Resolved on 2026-10-01 by the owner: verification is included in the 29,99 zł tier, not sold on its own. The provider and the release remain open.
+
+---
+
+## D-029 — RESOLVED (2026-10-01): paid; the tree stays dark until checkout exists
+
+**Resolution:** The project owner: "make it paid". The tree is built and tested (TASK-066 onward) and shown to nobody until the 29,99 zł tier can be sold (ADR-0023 §2.5, D-024). Recorded in ADR-0029 §2.5.19.
+
+### D-029 (original record) — the tree before checkout exists: dark, or free for every complete account?
+
+**Status:** NON-BLOCKING NOW. It blocks the first tree page, not the schema.
+**Owner:** project owner.
+**Raised by:** ADR-0029 §2.5.19, 2026-10-01.
+
+ADR-0026 puts the tree in the 29,99 zł tier. That tier cannot be sold until the items in ADR-0023 §2.5 exist (a business, Stripe, consumer terms), and D-024 is open. So when the tree pages are built, either:
+
+- (a) they are dark: built and tested, shown to nobody until checkout exists;
+- (b) every complete account may build one tree, free, until checkout exists, and the tiers are then told apart by a limit (one tree and a number of people on the free tier; more, documents and connections on the paid one). ADR-0026 §2.1 lets the free tier grow; `PRODUCT.md` §5 says the free answer is never put behind the paid tiers, which (b) keeps.
+
+(b) gives real readers to learn from and a backup that holds something worth restoring. It also means the privacy notice and the terms carry the tree from the first page.
+
+---
+
+## D-028 — RESOLVED (2026-10-01): never: a tree lives as long as its account
+
+**Resolution:** The project owner: "never". No expiry; a tree is deleted only with its account (cascade) or by its owner. The privacy notice states it so. Recorded in ADR-0029 §2.4.15.
+
+### D-028 (original record) — a tree's retention when its account goes quiet
+
+**Status:** NON-BLOCKING NOW. It blocks nothing until the first account is a year old; the answer goes into the privacy notice.
+**Owner:** project owner.
+**Raised by:** ADR-0029 §2.4.15, 2026-10-01.
+
+ADR-0029 ties a tree's life to its account: deleting the account deletes the tree, and nothing expires on its own. `docs/canonical/19` §4 asks for "shorter explicit retention" for family data. The choices:
+
+- (a) no expiry: a tree stays until its owner deletes the account;
+- (b) an account with no sign-in for N years (N to be chosen) is warned by email, and deleted with its trees M months later if nobody signs in.
+
+(b) is what the notice would state as a period. (a) states "for as long as the account exists".
+
+---
+
+## D-027 — documents in the tree: when, and where they are stored
+
+**Status:** NON-BLOCKING NOW. ADR-0029 §2.2.6 leaves uploads out of the first release; this decides whether and when they come.
+**Owner:** project owner.
+**Raised by:** ADR-0029, 2026-10-01.
+
+The chosen design marks a person *ze źródła* when a document (a scan of a record) is attached. Storing a file needs what the database does not: object storage in the EU (`docs/canonical/23` §6.3 names S3 in an EU region; TASK-049 chose Cloudflare R2 for backups), encryption, a size cap, a virus check, and a second backup. The questions:
+
+1. Is a document attached in the first paid release, or does `source_note` (a typed citation) do until readers ask?
+2. Where: the R2 account TASK-049 will create, with its EU jurisdiction setting, or S3 in Frankfurt?
+3. Are photographs of people documents? A photograph of a living person is personal data of a third party with no record behind it. The safer first answer is records only: birth, marriage, death, and the like.
+
+Until answered, nothing in the tree takes a file.
 
 ---
 
