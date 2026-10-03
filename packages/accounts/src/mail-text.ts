@@ -15,6 +15,8 @@ export interface OutgoingMail {
   /** The plain-text part. */
   readonly text: string;
   readonly html: string;
+  /** Where a reply goes, when not to the sender (the contact form: the writer's own address). */
+  readonly replyTo?: string;
 }
 
 function escapeHtml(value: string): string {

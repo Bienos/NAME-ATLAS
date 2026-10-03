@@ -10,10 +10,12 @@ import { htmlLang } from "./messages.js";
 const DAY_MS = 86_400_000;
 
 describe("contact pages (TASK-047)", () => {
-  it("show the address as a mailto link, in each language", () => {
+  it("show the form posting to /api/contact, and the address, in each language", () => {
     for (const lang of ["pl", "en"] as const) {
       const html = renderToStaticMarkup(createElement(ContactView, { lang }));
       expect(html).toContain(`<main lang="${htmlLang(lang)}"`);
+      expect(html).toContain('action="/api/contact" method="post"');
+      expect(html).toContain(`<input type="hidden" name="lang" value="${lang}"/>`);
       expect(html).toContain(`href="mailto:${CONTACT_EMAIL}"`);
       expect(html).toContain(lang === "pl" ? "<h2>Kontakt</h2>" : "<h2>Contact</h2>");
     }
@@ -33,11 +35,38 @@ describe("contact pages (TASK-047)", () => {
 });
 
 describe("SiteFooter", () => {
-  it("keeps the data note and adds the contact link and address", () => {
+  it("keeps the data note and leads to the contact page, not to a bare address", () => {
     const html = renderToStaticMarkup(createElement(SiteFooter, { lang: "pl" }));
     expect(html).toContain("Brak danych jest podany jako brak, nigdy jako zero.");
     expect(html).toContain(`href="${contactPath("pl")}">Kontakt</a>`);
-    expect(html).toContain(`href="mailto:${CONTACT_EMAIL}"`);
+    expect(html).toContain(`class="footer-cta" href="${contactPath("pl")}"`);
+    expect(html).not.toContain("mailto:");
+  });
+
+  it("groups the site's places and keeps every earlier link", () => {
+    const html = renderToStaticMarkup(createElement(SiteFooter, { lang: "en" }));
+    for (const href of [
+      "/en/offer",
+      "/en/compare",
+      "/en/how-it-works",
+      "/en/blog",
+      "/en/privacy",
+      "/en/terms",
+      "/en/contact",
+    ]) {
+      expect(html).toContain(`href="${href}"`);
+    }
+    for (const label of [
+      "Explore",
+      "Read",
+      "The site",
+      "Follow",
+      "Instagram",
+      "TikTok",
+      "YouTube",
+    ]) {
+      expect(html).toContain(`>${label}<`);
+    }
   });
 
   it("is the footer the comparison page renders", () => {

@@ -52,6 +52,7 @@ export function createResendMailer(
             subject: mail.subject,
             text: mail.text,
             html: mail.html,
+            ...(mail.replyTo === undefined ? {} : { reply_to: mail.replyTo }),
           }),
           signal: AbortSignal.timeout(timeoutMs),
         });
