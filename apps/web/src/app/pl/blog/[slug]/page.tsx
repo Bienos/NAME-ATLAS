@@ -26,5 +26,7 @@ export default async function Page({ params }: Props) {
   const posts = blogPosts();
   const post = findPost(posts, "pl", (await params).slug);
   if (post === null) notFound();
-  return <BlogPostView post={post} pair={pairedPost(posts, post)} origin={siteOrigin()} />;
+  return (
+    <BlogPostView post={post} pair={pairedPost(posts, post)} origin={siteOrigin()} posts={posts} />
+  );
 }

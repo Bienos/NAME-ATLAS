@@ -4,6 +4,8 @@ description: Why do people build family trees and ask where their surname comes 
 date: 2026-10-03
 slug: genealogia
 lang: en
+image: /images/blog/genealogia.webp
+imageAlt: Illustration: a tree of thin golden branches against a dusk sky, each twig ending in a point of light.
 ---
 
 Sooner or later many people ask who their ancestors were and where their surname came from. Sometimes it starts with an old photo that nobody labelled. Sometimes it starts with a grandmother who remembers the name of a village but not the parish where her grandfather was baptised. That is where genealogy, the study of family history, begins.

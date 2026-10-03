@@ -15,7 +15,13 @@ export type Inline =
   | { readonly kind: "em"; readonly text: string }
   | { readonly kind: "code"; readonly text: string }
   /** `href` is `null` when the address was not one this site links to. */
-  | { readonly kind: "link"; readonly text: string; readonly href: string | null };
+  | {
+      readonly kind: "link";
+      readonly text: string;
+      readonly href: string | null;
+      /** The link's own text with its bold, emphasis and code (TASK-075); never a link. */
+      readonly inlines: readonly Inline[];
+    };
 
 export type Block =
   | { readonly kind: "h2" | "h3" | "p"; readonly inlines: readonly Inline[] }
@@ -29,10 +35,20 @@ export interface BlogPost {
   readonly slug: string;
   readonly lang: Lang;
   readonly body: readonly Block[];
+  /**
+   * The feature image (TASK-075), or `null`. `src` is a path under
+   * `/images/blog/` in `public/`; `alt` describes it for assistive technology.
+   */
+  readonly image: { readonly src: string; readonly alt: string } | null;
 }
 
 const KEYS = ["title", "description", "date", "slug", "lang"] as const;
+/** Optional keys (TASK-075): `imageAlt` is required whenever `image` is set. */
+const OPTIONAL_KEYS = ["image", "imageAlt"] as const;
 type Key = (typeof KEYS)[number];
+
+/** A feature image's path: one file directly under `/images/blog/`. */
+const IMAGE_PATH = /^\/images\/blog\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:webp|png|jpe?g)$/u;
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 const FILE_NAME = /^([a-z0-9]+(?:-[a-z0-9]+)*)\.(pl|en)\.md$/u;
@@ -70,7 +86,10 @@ export function parseInlines(text: string): readonly Inline[] {
     const at = match.index;
     if (at > last) out.push({ kind: "text", text: text.slice(last, at) });
     if (match[1] !== undefined && match[2] !== undefined) {
-      out.push({ kind: "link", text: match[1], href: safeHref(match[2]) });
+      const inner = parseInlines(match[1]).map((node): Inline =>
+        node.kind === "link" ? { kind: "text", text: node.text } : node,
+      );
+      out.push({ kind: "link", text: match[1], href: safeHref(match[2]), inlines: inner });
     } else if (match[3] !== undefined) {
       out.push({ kind: "strong", text: match[3] });
     } else if (match[4] !== undefined) {
@@ -152,10 +171,10 @@ export function parseBlogFile(fileName: string, source: string): BlogPost {
   const values = new Map<string, string>();
   for (const line of header.split("\n")) {
     if (line.trim() === "") continue;
-    const pair = /^([a-z]+):\s*(.*)$/u.exec(line);
+    const pair = /^([a-zA-Z]+):\s*(.*)$/u.exec(line);
     if (!pair) return fail(`the header line "${line}" is not "key: value"`);
     const key = pair[1]!;
-    if (!(KEYS as readonly string[]).includes(key))
+    if (![...KEYS, ...OPTIONAL_KEYS].includes(key as Key))
       return fail(`the header key "${key}" is not allowed`);
     if (values.has(key)) return fail(`the header key "${key}" is given twice`);
     let value = pair[2]!.trim();
@@ -179,6 +198,16 @@ export function parseBlogFile(fileName: string, source: string): BlogPost {
   }
   const blocks = parseBody(body, fileName);
   if (blocks.length === 0) return fail("it has no body");
+  const image = values.get("image");
+  const imageAlt = values.get("imageAlt");
+  if (image !== undefined && !IMAGE_PATH.test(image)) {
+    return fail(
+      `the image "${image}" must be a file directly under /images/blog/ (.webp, .png or .jpg)`,
+    );
+  }
+  if (image !== undefined && imageAlt === undefined) return fail("the image needs an imageAlt");
+  if (image === undefined && imageAlt !== undefined)
+    return fail("imageAlt is set but there is no image");
   return {
     title: get("title"),
     description: get("description"),
@@ -186,6 +215,7 @@ export function parseBlogFile(fileName: string, source: string): BlogPost {
     slug,
     lang,
     body: blocks,
+    image: image === undefined ? null : { src: image, alt: imageAlt! },
   };
 }
 
