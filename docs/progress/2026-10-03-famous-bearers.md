@@ -21,10 +21,10 @@ Scope authority: `tasks/073-famous-bearers.md`. Decision: ADR-0030 (the source, 
 - ZAREMBA: 59 exact bearers with a Wikipedia article, 37 with a date of death. KOWALSKA: 55 and 25; the items "Kowalska" and "Kowalski" together returned rows for every Kowalski, of which 325 are named exactly KOWALSKI.
 - NOWAK, live: 451 people, 168 with a date of death. Ordered by sitelinks, the first three are Lisa Nowak (an American astronaut), Kazimierz Nowak and Cécile Nowak (a French judoka): the order favours people written about in many languages, not Polish fame.
 
-## Verification (run 2026-10-03, on this branch)
+## Verification (run 2026-10-03, on this branch; the checks, unit tests, build and integration tests re-run after the rebase onto `main` @ `619d365`)
 
 - `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm check:ids`: each exit 0.
-- `pnpm test`: exit 0. Among them `packages/sources` 583, `packages/truth` 375, `packages/contracts` 135, `apps/web` 588 (589 after the scope-line test, run alone: 7 TASK-073 chapter tests passed).
+- `pnpm test`: exit 0. Among them `packages/sources` 583, `packages/truth` 375, `packages/contracts` 135, `apps/web` 591 (final run, after rebasing onto `main` @ `619d365`).
 - `pnpm build`: exit 0.
 - Against a local PostgreSQL 16 with PostGIS 3 (installed in this session from Ubuntu packages): `TEST_DATABASE_URL=… pnpm test:integration` exit 0, 31 files, 373 tests. The first full run failed four tests that pin the migration list, the `claim_type` values, or migrate down from the top (`extensions`, `current-rank`, `canonical-key-v2`, `accounts`); they were updated. `pnpm test:golden`: exit 0, 364 tests.
 - Live, against a scratch database seeded with the committed PESEL male fixture: `pnpm db:migrate` applied 0029; `pnpm truth:bearers-load --surname NOWAK` printed "stored, claim derived, 451 people, 168 with a date of death, 20 kept, 4355 ms"; a second run printed "unchanged, claim unchanged".
