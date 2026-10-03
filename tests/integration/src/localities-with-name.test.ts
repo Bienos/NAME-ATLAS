@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { sql } from "kysely";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
@@ -109,6 +110,39 @@ describe("localities with the surname's name, on the TERYT excerpt", () => {
     });
     expect(section.citation?.retrieved_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/u);
     expect(section.citation?.url).toContain("eteryt.stat.gov.pl");
+  });
+
+  it("lists a place once when it carries two official names with the same key", async () => {
+    const db = requireDatabase(database);
+    const copy = await sql<{ id: string }>`
+      WITH entity AS (
+        INSERT INTO knowledge_entities (entity_id, entity_type, scope, privacy_class, lifecycle_status)
+        VALUES (gen_random_uuid(), 'PLACE', 'SHARED', 'PUBLIC', 'ACTIVE')
+        RETURNING entity_id
+      )
+      INSERT INTO place_names
+        (place_name_id, place_id, name, normalized_name, language_code, script, name_type, created_at)
+      SELECT entity.entity_id, pn.place_id, pn.name, pn.normalized_name, pn.language_code,
+             pn.script, pn.name_type, now()
+        FROM place_names pn, entity
+       WHERE pn.normalized_name = 'jemna' AND pn.name_type = 'OFFICIAL'
+       LIMIT 1
+      RETURNING place_name_id::text AS id
+    `.execute(db.db);
+    try {
+      expect(copy.rows).toHaveLength(1);
+      const section = await localitiesSectionFor(db.db, "JEMNA", "FREE");
+      expect(section.total).toBe(1);
+      expect(section.places).toHaveLength(1);
+      expect(localitiesSectionSchema.safeParse(section).success).toBe(true);
+    } finally {
+      await sql`DELETE FROM place_names WHERE place_name_id = ${copy.rows[0]?.id}::uuid`.execute(
+        db.db,
+      );
+      await sql`DELETE FROM knowledge_entities WHERE entity_id = ${copy.rows[0]?.id}::uuid`.execute(
+        db.db,
+      );
+    }
   });
 
   it("matches by the resolver's canonical key: a two-word city in upper case", async () => {

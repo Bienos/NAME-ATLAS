@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-02, by TASK-070: reconcile and verify the pending repository pipeline (`docs/progress/2026-10-02-pending-pipeline.md`).
+**Last rewritten:** 2026-10-03, by the review fixes for the pending pipeline (`docs/progress/2026-10-03-pending-pipeline-review-fixes.md`).
 
 ## Production
 
@@ -17,9 +17,9 @@ The Oracle VM connection is retained. The production observations below come fro
 
 ## Built
 
-- **Pending pipeline, locally implemented in TASK-070:** #70's TERYT locality chapter/card and contract 1.11 (TASK-066); #67's private, inactive family-tree schema/library/contract (TASK-068, renumbered from the duplicate 066); #65's source-display ADR-0028; #44's 147 verbatim Onomastica meanings (TASK-069, renumbered from the duplicate 046); the reviewed cleanup from #30, adapted to current imports and account/share behavior. Onomastica is in `datasets/onomastics/`; existing source references are unchanged. Family graph writes are serialized and require complete graph visibility. The localities decision is D-032, leaving D-030 to tree verification.
+- **Pending pipeline, locally implemented in TASK-070:** #70's TERYT locality chapter/card and contract 1.11 (TASK-066); #67's private, inactive family-tree schema/library/contract (TASK-068, renumbered from the duplicate 066); #65's source-display ADR-0028; #44's 147 verbatim Onomastica meanings (TASK-069, renumbered from the duplicate 046); the reviewed cleanup from #30, adapted to current imports and account/share behavior. Onomastica is in `datasets/onomastics/`; existing source references are unchanged. Family graph writes are serialized and require complete graph visibility; so does deleting a person; a child has one mother and one father at most; an editor's edit moves the tree's `updated_at`. The localities decision is D-032, leaving D-030 to tree verification.
 - **Backup tooling (TASK-049):** a fresh complete PostgreSQL snapshot streamed into age, accounts/family included, private R2 upload and read-back verification, retention, an empty-scratch restore command and count/payload verification. The production upload and PostgreSQL 17 restore drill have **not** run. Data-load dumps now exclude both private schemas. The Oracle hosting arrangement is unchanged.
-- **TASK-070 verification:** unit suite, 393 integration tests, 364 golden tests, typecheck, lint, format, IDs, VM dump guards, production build, shell/workflow checks and backup failure/retention tests pass locally; 147/147 Onomastica meanings were imported and derived against a disposable clone of the 598,476-surname local register. Exact commands and limits are in the progress record. These changes are prepared for review, not merged or live.
+- **TASK-070 verification:** unit suite, 397 integration tests, 364 golden tests, typecheck, lint, format, IDs, VM dump guards, production build, shell/workflow checks and backup failure/retention tests pass locally; 147/147 Onomastica meanings were imported and derived against a disposable clone of the 598,476-surname local register. Exact commands and limits are in the progress record. The review fixes of 2026-10-03 re-ran every suite and the build on `main` merged in (record: `docs/progress/2026-10-03-pending-pipeline-review-fixes.md`). These changes are prepared for review, not merged or live.
 
 - Milestones M0–M2 are complete.
 - Implemented: TASK-001–006, 008–028, 030–034, 036–040, 042–045 and 051–058, plus TASK-029, which has no task file. TASK-035 is parked and TASK-041 was stopped. Each task file's header holds its own status.

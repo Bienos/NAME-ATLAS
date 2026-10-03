@@ -137,7 +137,8 @@ async function readRegister(db: Kysely<DB>): Promise<RegisterRow | null> {
  * Whole localities whose official name has the surname's canonical key, in a
  * fixed order (cities, villages, the rest; then voivodeship, powiat, gmina,
  * name, id), at most {@link LOCALITIES_LIMIT}, each with the count of all of
- * them. Memberships closed on a later date are not followed.
+ * them. Memberships closed on a later date are not followed. A place with
+ * several official names that share the key is still one place.
  */
 async function readLocalities(db: Kysely<DB>, key: string): Promise<LocalityRow[]> {
   const result = await sql<LocalityRow>`
@@ -150,8 +151,7 @@ async function readLocalities(db: Kysely<DB>, key: string): Promise<LocalityRow[
            pw.current_display_name AS powiat,
            w.current_display_name AS voivodeship,
            count(*) OVER () AS total
-      FROM place_names pn
-      JOIN places p ON p.place_id = pn.place_id
+      FROM places p
       JOIN entity_external_ids eid
         ON eid.entity_id = p.place_id AND eid.provider_key = ${TERYT_SIMC_PROVIDER_KEY}
       JOIN administrative_memberships m1
@@ -163,8 +163,12 @@ async function readLocalities(db: Kysely<DB>, key: string): Promise<LocalityRow[
       JOIN administrative_memberships m3
         ON m3.child_place_id = pw.place_id AND m3.valid_to IS NULL
       JOIN places w ON w.place_id = m3.parent_place_id AND w.place_type = 'REGION'
-     WHERE pn.normalized_name = ${key}
-       AND pn.name_type = 'OFFICIAL'
+     WHERE EXISTS (
+             SELECT 1 FROM place_names pn
+              WHERE pn.place_id = p.place_id
+                AND pn.normalized_name = ${key}
+                AND pn.name_type = 'OFFICIAL'
+           )
        AND p.spatial_precision = 'LOCALITY'
        AND p.entity_status = 'ACTIVE'
      ORDER BY CASE p.place_type WHEN 'CITY' THEN 0 WHEN 'VILLAGE' THEN 1 ELSE 2 END,
