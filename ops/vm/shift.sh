@@ -206,10 +206,10 @@ finish)
   log "3/3 a dump beside the others"
   install -d -o postgres -g postgres -m 700 "$BACKUP_DIR"
   dump=$BACKUP_DIR/name_atlas-register-2026-01-20-change.dump
-  # The definition of schema accounts goes in, its rows never do (TASK-063, ADR-0027 §5.2): a restore
-  # leaves accounts empty and consistent with the migrations table, and no address or password
-  # hash is copied into a file here. scripts/check-vm-dumps.sh holds every dump to it.
-  runuser -u postgres -- pg_dump --format=custom --exclude-table-data='accounts.*' -d "$DB" -f "$dump.partial"
+  # The definitions of schemas accounts and family go in, their rows never do (TASK-063, ADR-0027 §5.2;
+  # ADR-0029): a restore leaves them empty and consistent with the migrations table, and no address,
+  # password hash or person of a tree is copied into a file here. scripts/check-vm-dumps.sh holds every dump to it.
+  runuser -u postgres -- pg_dump --format=custom --exclude-table-data='accounts.*' --exclude-table-data='family.*' -d "$DB" -f "$dump.partial"
   mv "$dump.partial" "$dump"
   log "  $(du -h "$dump" | cut -f1) $dump"
 

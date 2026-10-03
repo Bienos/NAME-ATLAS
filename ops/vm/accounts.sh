@@ -5,16 +5,18 @@
 #   1. unpack the pushed commit into $APP (data/ and node_modules/ kept) and
 #      pnpm install, as archive.sh does;
 #   2. pnpm db:migrate, as the build user: migration 0027 creates schema
-#      `accounts`, and any earlier migration that has not run comes with it;
+#      `accounts`, 0028 schema `family` (TASK-066, ADR-0029), and any other
+#      migration that has not run comes with them;
 #   3. the role: ops/vm/accounts-roles.sql as the superuser (the role
-#      `nameatlas_app` and its grants on `accounts` and nothing else), then the
+#      `nameatlas_app` and its grants on `accounts` and `family` and nothing
+#      else), then the
 #      role's password, set only when it does not already work, so a re-run
 #      does not change the SCRAM salt;
 #   4. PgBouncer: the user list gets a line for each of the web role and the
 #      accounts role, and PgBouncer is reloaded only if the file changed;
 #   5. the checks: by the catalog, then by connecting as the role through the
-#      pooler, that it writes `accounts` and nothing else, that the web role
-#      reads nothing of it, and that neither can create anything.
+#      pooler, that it writes `accounts` and `family` and nothing else, that
+#      the web role reads nothing of them, and that neither can create anything.
 #
 # It runs as root: `sudo bash accounts.sh ABSOLUTE_PATH_TO_ARCHIVE
 # ABSOLUTE_PATH_TO_ROLES_SQL <<<"$VM_DB_APP_PASSWORD"`. The password arrives on
@@ -159,22 +161,27 @@ check "$APP_ROLE logs in and has no power beyond its grants" t "$(q "
 check "$APP_ROLE belongs to no other role" 0 "$(q "
   SELECT count(*) FROM pg_auth_members
    WHERE member = (SELECT oid FROM pg_roles WHERE rolname = '$APP_ROLE')")"
-# At least the four of migration 0027: a later migration may add tables to the schema.
+# At least the four of migration 0027 and the five of 0028: a later migration may add tables.
 check "schema accounts has the tables of migration 0027" t "$(q "
   SELECT count(*) >= 4 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
    WHERE n.nspname = 'accounts' AND c.relkind IN ('r', 'p')")"
-check "accounts tables $APP_ROLE cannot read and write" 0 "$(q "
+check "schema family has the tables of migration 0028" t "$(q "
+  SELECT count(*) >= 5 FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+   WHERE n.nspname = 'family' AND c.relkind IN ('r', 'p')")"
+check "accounts and family tables $APP_ROLE cannot read and write" 0 "$(q "
   SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-   WHERE n.nspname = 'accounts' AND c.relkind IN ('r', 'p')
+   WHERE n.nspname IN ('accounts', 'family') AND c.relkind IN ('r', 'p')
      AND NOT (has_table_privilege('$APP_ROLE', c.oid, 'SELECT') AND has_table_privilege('$APP_ROLE', c.oid, 'INSERT')
           AND has_table_privilege('$APP_ROLE', c.oid, 'UPDATE') AND has_table_privilege('$APP_ROLE', c.oid, 'DELETE'))")"
-check "accounts tables $APP_ROLE may truncate, reference or put a trigger on" 0 "$(q "
+check "accounts and family tables $APP_ROLE may truncate, reference or put a trigger on" 0 "$(q "
   SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-   WHERE n.nspname = 'accounts' AND c.relkind IN ('r', 'p')
+   WHERE n.nspname IN ('accounts', 'family') AND c.relkind IN ('r', 'p')
      AND (has_table_privilege('$APP_ROLE', c.oid, 'TRUNCATE') OR has_table_privilege('$APP_ROLE', c.oid, 'REFERENCES')
           OR has_table_privilege('$APP_ROLE', c.oid, 'TRIGGER'))")"
 check "$APP_ROLE uses schema accounts and cannot create in it" "true|false" "$(q "
   SELECT has_schema_privilege('$APP_ROLE', 'accounts', 'USAGE') || '|' || has_schema_privilege('$APP_ROLE', 'accounts', 'CREATE')")"
+check "$APP_ROLE uses schema family and cannot create in it" "true|false" "$(q "
+  SELECT has_schema_privilege('$APP_ROLE', 'family', 'USAGE') || '|' || has_schema_privilege('$APP_ROLE', 'family', 'CREATE')")"
 check "$APP_ROLE cannot create in public" f "$(q "SELECT has_schema_privilege('$APP_ROLE', 'public', 'CREATE')")"
 # PostGIS grants SELECT on its own catalog (spatial_ref_sys, geometry_columns,
 # geography_columns) to everyone. That is not a table of the register and not the
@@ -191,17 +198,22 @@ everyone=$(q "
      AND EXISTS (SELECT 1 FROM aclexplode(c.relacl) a WHERE a.grantee = 0)")
 [ -z "$everyone" ] || log "  note: readable by everyone, as PostGIS ships them: $everyone"
 check "$WEB_ROLE has no use of schema accounts" f "$(q "SELECT has_schema_privilege('$WEB_ROLE', 'accounts', 'USAGE')")"
-check "accounts tables $WEB_ROLE has any privilege on" 0 "$(q "
+check "$WEB_ROLE has no use of schema family" f "$(q "SELECT has_schema_privilege('$WEB_ROLE', 'family', 'USAGE')")"
+check "accounts and family tables $WEB_ROLE has any privilege on" 0 "$(q "
   SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
-   WHERE n.nspname = 'accounts' AND c.relkind IN ('r', 'p')
+   WHERE n.nspname IN ('accounts', 'family') AND c.relkind IN ('r', 'p')
      AND has_table_privilege('$WEB_ROLE', c.oid, '$priv_any')")"
-check "grants to PUBLIC on schema accounts" 0 "$(q "
-  SELECT count(*) FROM aclexplode((SELECT nspacl FROM pg_namespace WHERE nspname = 'accounts')) a WHERE a.grantee = 0")"
-check "foreign keys between accounts and any other schema" 0 "$(q "
+check "grants to PUBLIC on schemas accounts and family" 0 "$(q "
+  SELECT count(*) FROM pg_namespace n, aclexplode(n.nspacl) a
+   WHERE n.nspname IN ('accounts', 'family') AND a.grantee = 0")"
+# The two private schemas reference each other (a tree belongs to a user; ADR-0029
+# §2.1.2) and nothing outside them: no key into the register, none out of it.
+check "foreign keys between the private schemas (accounts, family) and any other schema" 0 "$(q "
   SELECT count(*) FROM pg_constraint k
     JOIN pg_class r ON r.oid = k.conrelid JOIN pg_class f ON f.oid = k.confrelid
     JOIN pg_namespace rn ON rn.oid = r.relnamespace JOIN pg_namespace fn ON fn.oid = f.relnamespace
-   WHERE k.contype = 'f' AND ((rn.nspname = 'accounts') <> (fn.nspname = 'accounts'))")"
+   WHERE k.contype = 'f'
+     AND ((rn.nspname IN ('accounts', 'family')) <> (fn.nspname IN ('accounts', 'family')))")"
 
 # Now as the app connects: TLS, SCRAM, through PgBouncer on its own port.
 conn="host=127.0.0.1 port=$POOLER_PORT dbname=$DB user=$APP_ROLE sslmode=require connect_timeout=10"
@@ -218,6 +230,12 @@ if users=$(as_app -c "SELECT count(*) FROM accounts.users"); then
   log "  ok   through PgBouncer: accounts.users is readable ($users users)"
 else
   echo "[accounts]   FAIL through PgBouncer: accounts.users is not readable: $(head -n 1 "$errors")" >&2
+  fail=1
+fi
+if trees=$(as_app -c "SELECT count(*) FROM family.trees"); then
+  log "  ok   through PgBouncer: family.trees is readable ($trees trees)"
+else
+  echo "[accounts]   FAIL through PgBouncer: family.trees is not readable: $(head -n 1 "$errors")" >&2
   fail=1
 fi
 if as_app -c "BEGIN; INSERT INTO accounts.sign_in_failures (email_hash, failed_at)
