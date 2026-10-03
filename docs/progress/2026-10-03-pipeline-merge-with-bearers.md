@@ -116,3 +116,13 @@ The onomastics code, `ops/vm/README.md` and the surname-meaning test merged with
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0; `check:vm`: 13 scripts parse, 5 dumps pass |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Eighth merge: `main` after #90 (TASK-079, a blog post), 2026-10-03
+
+#90 took TASK-079, which this branch had given the localities task, and the open #91 claims TASK-083. The localities task becomes **TASK-082** (`tasks/082-localities-with-the-same-name.md`), free on `main` and in every open pull request; its code comments, contract notes, `STATUS.md`, `docs/CODEMAP.md`, D-032's line and TASK-070 follow. Only `STATUS.md`'s "Last rewritten" line conflicted.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
