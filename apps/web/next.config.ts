@@ -70,6 +70,13 @@ const nextConfig: NextConfig = {
     // The share cards (TASK-056) read the same files.
     "/pl/nazwisko/**/karta/**": ["./assets/fonts/*.ttf"],
     "/en/surname/**/card/**": ["./assets/fonts/*.ttf"],
+    // The blog (TASK-071) reads its posts from `src/content/blog/` at run time.
+    "/pl/blog": ["./src/content/blog/*.md"],
+    "/en/blog": ["./src/content/blog/*.md"],
+    "/pl/blog/**": ["./src/content/blog/*.md"],
+    "/en/blog/**": ["./src/content/blog/*.md"],
+    "/sitemap.xml": ["./src/content/blog/*.md"],
+    "/sitemap-blog.xml": ["./src/content/blog/*.md"],
   },
   /** Keep shared links, including their surname path and query, on one public domain. */
   async redirects() {

@@ -1,6 +1,9 @@
 import type { SitemapEntry } from "@name-atlas/seo";
 import { SITEMAP_PAGE_SIZE, surnameRoute } from "@name-atlas/seo";
 import type { SlugLocale } from "@name-atlas/seo";
+import { pairedPost } from "./blog.js";
+import type { BlogPost } from "./blog.js";
+import { blogPostPath } from "./site-links.js";
 
 /**
  * Sitemap serialisation (TASK-027, ADR-0010 §3).
@@ -29,13 +32,19 @@ export function pageCount(total: number): number {
  * a file at 50,000 URLs — so the root document names the pages.
  *
  * An index with no pages is valid and is what an alpha correctly serves.
+ *
+ * `extra` names further sitemaps by path, after the surname pages: the blog's
+ * (TASK-071) when it has posts. Without it the document is as it always was.
  */
-export function sitemapIndexXml(origin: string, pages: number): string {
-  const entries = Array.from(
-    { length: pages },
-    (_, i) =>
-      `  <sitemap><loc>${escapeXml(`${origin}/sitemap/${String(i + 1)}.xml`)}</loc></sitemap>`,
-  );
+export function sitemapIndexXml(
+  origin: string,
+  pages: number,
+  extra: readonly string[] = [],
+): string {
+  const entries = [
+    ...Array.from({ length: pages }, (_, i) => `/sitemap/${String(i + 1)}.xml`),
+    ...extra,
+  ].map((path) => `  <sitemap><loc>${escapeXml(`${origin}${path}`)}</loc></sitemap>`);
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
     '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
@@ -72,6 +81,40 @@ export function sitemapPageXml(
         : [
             `    <xhtml:link rel="alternate" hreflang="${other}" href="${escapeXml(`${origin}${alternate}`)}"/>`,
             `    <xhtml:link rel="alternate" hreflang="${locale}" href="${escapeXml(`${origin}${path}`)}"/>`,
+          ]),
+      "  </url>",
+    ];
+  });
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    ...urls,
+    "</urlset>",
+    "",
+  ].join("\n");
+}
+
+/** Where the blog's sitemap is served (TASK-071). */
+export const BLOG_SITEMAP_PATH = "/sitemap-blog.xml";
+
+/**
+ * The blog's sitemap (TASK-071): every post, its `lastmod` the post's date, and
+ * `hreflang` alternates when the post exists in both languages.
+ */
+export function blogSitemapXml(origin: string, posts: readonly BlogPost[]): string {
+  const urls = posts.flatMap((post) => {
+    const path = `${origin}${blogPostPath(post.lang, post.slug)}`;
+    const pair = pairedPost(posts, post);
+    return [
+      "  <url>",
+      `    <loc>${escapeXml(path)}</loc>`,
+      `    <lastmod>${escapeXml(post.date)}</lastmod>`,
+      ...(pair === null
+        ? []
+        : [
+            `    <xhtml:link rel="alternate" hreflang="${pair.lang}" href="${escapeXml(`${origin}${blogPostPath(pair.lang, pair.slug)}`)}"/>`,
+            `    <xhtml:link rel="alternate" hreflang="${post.lang}" href="${escapeXml(path)}"/>`,
           ]),
       "  </url>",
     ];
