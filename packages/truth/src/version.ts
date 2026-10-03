@@ -332,3 +332,25 @@ export const ARCHIVE_CONFIDENCE_ASSESSMENT_VERSION = "archive_scope@1";
 
 /** A surname searched more recently than this is not searched again (ADR-0024 §2.6). */
 export const ARCHIVE_REFRESH_DAYS = 90;
+
+// --- TASK-073: NOTABLE_BEARERS (ADR-0030) -----------------------------------
+
+/** The `NOTABLE_BEARERS` derivation method. */
+export const NOTABLE_BEARERS_METHOD_VERSION = "notable_bearers@1";
+
+/** Shape version of the `NOTABLE_BEARERS` claim payload. */
+export const NOTABLE_BEARERS_PAYLOAD_VERSION = "notable_bearers_payload@1";
+
+/**
+ * The confidence rule for what a query returned: `VERIFIED` within the queried
+ * scope, as `ARCHIVE_AVAILABILITY`'s. The claim states whom Wikidata names with
+ * the surname on the stated date, not that any of them is related to anyone.
+ */
+export const BEARERS_CONFIDENCE_ASSESSMENT_METHOD = "wikidata_query_scope";
+export const BEARERS_CONFIDENCE_ASSESSMENT_VERSION = "wikidata_scope@1";
+
+/** A surname queried more recently than this is not queried again (ADR-0030 §2.6). */
+export const BEARERS_REFRESH_DAYS = 30;
+
+/** How many bearers the free page and deck show; the rest are for the paid report (ADR-0030 §2.7). */
+export const BEARERS_SHOWN_FREE = 3;

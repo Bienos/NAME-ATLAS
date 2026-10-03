@@ -397,6 +397,7 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
       "SURNAME_MEANING", // 0014
       "SURNAME_DISTRIBUTION_SHIFT", // 0024
       "ARCHIVE_AVAILABILITY", // 0025
+      "NOTABLE_BEARERS", // 0029
     ]);
   });
 

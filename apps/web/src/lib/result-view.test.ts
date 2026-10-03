@@ -72,7 +72,7 @@ function rarity(x: number, numerator: number, group: string) {
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
 const RESOLVED: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.12",
   neighbours: {
     state: "UNAVAILABLE",
     lists: [],
@@ -150,6 +150,18 @@ const RESOLVED: unknown = {
     reason_code: "NO_ADMISSIBLE_ONOMASTIC_SOURCE",
     surface: SURFACE,
   },
+  bearers: {
+    state: "NOT_SEARCHED",
+    searched_on: null,
+    total: null,
+    with_death_date: null,
+    people: [],
+    more: null,
+    confidence: null,
+    citation: null,
+    reason_code: "BEARERS_NOT_SEARCHED",
+    surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "COMMERCIAL_USE_UNRESOLVED" },
+  },
   archive: {
     state: "NOT_SEARCHED",
     query: null,
@@ -205,7 +217,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.12",
   neighbours: {
     state: "RIGHTS_BLOCKED",
     lists: [],
@@ -248,6 +260,18 @@ const RIGHTS_BLOCKED: unknown = {
     reason_code: "COMMERCIAL_USE_UNKNOWN",
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
+  bearers: {
+    state: "NOT_SEARCHED",
+    searched_on: null,
+    total: null,
+    with_death_date: null,
+    people: [],
+    more: null,
+    confidence: null,
+    citation: null,
+    reason_code: "BEARERS_NOT_SEARCHED",
+    surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "COMMERCIAL_USE_UNRESOLVED" },
+  },
   archive: {
     state: "RIGHTS_BLOCKED",
     query: null,
@@ -266,7 +290,7 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.12",
   neighbours: null,
   other_form: null,
   change: null,
@@ -303,6 +327,7 @@ const WITH_SUGGESTIONS: unknown = {
   },
   meaning: null,
   archive: null,
+  bearers: null,
 };
 
 const NO_SUGGESTIONS: unknown = {
@@ -317,7 +342,7 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.10",
+  schema_version: "1.12",
   neighbours: null,
   other_form: null,
   change: null,
@@ -335,6 +360,7 @@ const MIXED_SCRIPT: unknown = {
   },
   meaning: null,
   archive: null,
+  bearers: null,
 };
 
 /** Parses first: a fixture the contract would reject cannot prove anything. */
@@ -1139,6 +1165,7 @@ describe("the journey's steps", () => {
       ["#where", t.chapterWhereTitle],
       ["#meaning", t.chapterMeaningTitle],
       ["#archive", t.chapterArchiveTitle],
+      ["#bearers", t.chapterBearersTitle],
       ["#sources", t.chapterSourcesQuestion],
       ["#summary", "Twój wynik"],
     ]);
@@ -1155,9 +1182,10 @@ describe("the journey's steps", () => {
       "#rarity",
       "#meaning",
       "#archive",
+      "#bearers",
       "#sources",
     ]);
-    expect(steps(markup)[5]?.[1]).toBe(UI.en.chapterSourcesQuestion);
+    expect(steps(markup)[6]?.[1]).toBe(UI.en.chapterSourcesQuestion);
   });
 });
 
@@ -1181,6 +1209,18 @@ const POLONA_CITATION = {
 
 const ARCHIVE_READY: unknown = {
   ...(RESOLVED as Record<string, unknown>),
+  bearers: {
+    state: "NOT_SEARCHED",
+    searched_on: null,
+    total: null,
+    with_death_date: null,
+    people: [],
+    more: null,
+    confidence: null,
+    citation: null,
+    reason_code: "BEARERS_NOT_SEARCHED",
+    surface: { surface: "FREE", decision: "CONDITIONAL", reason_code: "COMMERCIAL_USE_UNRESOLVED" },
+  },
   archive: {
     state: "READY",
     query: '"NOWAK"',
@@ -1543,5 +1583,125 @@ describe("TASK-051: the change-over-time chapter", () => {
     expect(body).toContain("−20.0%");
     expect(body).toContain("+20.0%");
     expect(body).not.toMatch(/-\d+\.\d%/u);
+  });
+});
+
+/**
+ * TASK-073: the known people's chapter, on this file's NOWAK page. The first
+ * person is ZAREMBA's second in Wikidata's answer of 2026-10-03
+ * (`fixtures/wikidata-bearers`); the second is SYNTHETIC (`Q1` is not a
+ * person), standing for a living person with only an English description. The
+ * chapter renders what the contract gives it and checks no name.
+ */
+const BEARERS_READY: unknown = {
+  ...(RESOLVED as Record<string, unknown>),
+  bearers: {
+    state: "READY",
+    searched_on: "2026-10-03",
+    total: 59,
+    with_death_date: 37,
+    people: [
+      {
+        wikidata_id: "Q896660",
+        name: "Stanisław Zaremba",
+        description_pl: "polski matematyk, profesor UJ",
+        description_en: null,
+        born: 1863,
+        died: 1942,
+        article_url: "https://pl.wikipedia.org/wiki/Stanis%C5%82aw_Zaremba_(1863%E2%80%931942)",
+        wikidata_url: "https://www.wikidata.org/wiki/Q896660",
+      },
+      {
+        wikidata_id: "Q1",
+        name: "Anna Zaremba",
+        description_pl: null,
+        description_en: "Polish singer",
+        born: 1980,
+        died: null,
+        article_url: null,
+        wikidata_url: "https://www.wikidata.org/wiki/Q1",
+      },
+    ],
+    more: 57,
+    confidence: { status: "VERIFIED", methodology_code: "wikidata_query_scope@wikidata_scope@1" },
+    citation: {
+      id: "cit-wikidata",
+      title: "Wikidata",
+      publisher: null,
+      publication_date: null,
+      source_type: "OTHER",
+      locator: "Zaremba",
+      url: "https://query.wikidata.org/",
+      attribution: null,
+      terms: "CC0",
+      retrieved_at: "2026-10-03T12:05:00Z",
+      source_page_url: "https://www.wikidata.org/wiki/Wikidata:Licensing",
+    },
+    reason_code: null,
+    surface: { surface: "FREE", decision: "ALLOWED", reason_code: "RIGHTS_PERMIT_FREE_SURFACE" },
+  },
+};
+
+describe("TASK-073: the known people's chapter", () => {
+  it("counts the people with the surname and a Wikipedia article, with the date, in both languages", () => {
+    expect(text(render(BEARERS_READY, "pl"))).toContain(
+      "Wikidane wymieniają 59 osób o nazwisku NOWAK z artykułem w Wikipedii (stan z 3 października 2026",
+    );
+    expect(text(render(BEARERS_READY, "en"))).toContain(
+      "Wikidata lists 59 people with the surname NOWAK who have a Wikipedia article",
+    );
+  });
+
+  it("scopes the claim to the world, not to Poland: the people are from anywhere", () => {
+    expect(text(render(BEARERS_READY, "pl"))).toContain("Świat · Wikidata · 3 października 2026");
+    expect(text(render(BEARERS_READY, "en"))).toContain("Worldwide · Wikidata · 3 October 2026");
+  });
+
+  it("says a shared surname is not a family, before the people", () => {
+    const markup = render(BEARERS_READY, "pl");
+    expect(text(markup)).toContain(UI.pl.bearersCaveat);
+    expect(markup.indexOf("bearers-caveat")).toBeLessThan(markup.indexOf("bearers-list"));
+    expect(text(markup)).toContain(UI.pl.limitationBearersFamily);
+  });
+
+  it("names each person with their years, description and links, in the reader's language first", () => {
+    const markup = render(BEARERS_READY, "pl");
+    const t = text(markup);
+    expect(t).toContain("Stanisław Zaremba");
+    expect(t).toContain("1863–1942");
+    expect(t).toContain("polski matematyk, profesor UJ");
+    // A living person: a year of birth, and no claim that they are alive.
+    expect(t).toContain("ur. 1980");
+    expect(t).toContain("Polish singer");
+    expect(markup).toContain('href="https://www.wikidata.org/wiki/Q1"');
+    expect(markup).toContain(
+      'href="https://pl.wikipedia.org/wiki/Stanis%C5%82aw_Zaremba_(1863%E2%80%931942)"',
+    );
+    expect(text(render(BEARERS_READY, "en"))).toContain("b. 1980");
+  });
+
+  it("says how many more the report will hold, and how to be taken off the list", () => {
+    const markup = render(BEARERS_READY, "pl");
+    expect(text(markup)).toContain("Pozostałe osoby (57) pokażemy w raporcie");
+    expect(markup).toContain('href="/pl/oferta"');
+    expect(markup).toContain('href="/pl/kontakt"');
+    expect(text(markup)).toContain(UI.pl.bearersRemoval);
+  });
+
+  it("says a surname not yet looked up is not looked up, and names nobody", () => {
+    const markup = render(RESOLVED, "pl");
+    expect(text(markup)).toContain(UI.pl.bearersNotSearched);
+    expect(markup).not.toContain("bearers-list");
+  });
+
+  it("says nobody is listed as an answer, not a gap", () => {
+    const bearers = (BEARERS_READY as { bearers: Record<string, unknown> }).bearers;
+    const none = {
+      ...(BEARERS_READY as Record<string, unknown>),
+      bearers: { ...bearers, total: 0, with_death_date: 0, people: [], more: 0 },
+    };
+    const markup = render(none, "pl");
+    expect(text(markup)).toContain("Wikidane nie wymieniają nikogo o nazwisku NOWAK");
+    expect(markup).not.toContain("bearers-removal");
   });
 });

@@ -18,9 +18,13 @@ import type { Lang } from "./messages.js";
 export const CONTROLLER_NAME = "Patryk Cicbowski";
 export const CONTROLLER_PLACE = "Iława";
 
-/** The date each document was last changed, ISO. The privacy notice changed for the offer's forms (TASK-057). */
+/**
+ * The date each document was last changed, ISO. The privacy notice changed for
+ * the offer's forms (TASK-057), then for the well-known people Wikidata names
+ * (TASK-073, ADR-0030).
+ */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
-  privacy: "2026-10-01",
+  privacy: "2026-10-03",
   terms: "2026-09-30",
 };
 
@@ -113,7 +117,8 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Dane pokazywane w serwisie",
         paragraphs: [
-          "Liczby na stronach nazwisk pochodzą z publicznych zestawień rejestru PESEL i innych opublikowanych źródeł. To liczby zbiorcze, na przykład ile osób nosi dane nazwisko. Serwis nie pokazuje danych żadnej konkretnej osoby.",
+          "Liczby na stronach nazwisk pochodzą z publicznych zestawień rejestru PESEL i innych opublikowanych źródeł. To liczby zbiorcze, na przykład ile osób nosi dane nazwisko.",
+          "Jedyne osoby wymienione z imienia i nazwiska to znane osoby noszące dane nazwisko, z Wikidanych (wolnej bazy wiedzy na licencji CC0): tylko te, które mają artykuł w Wikipedii, i tylko to, co Wikidane podają publicznie: imię i nazwisko, krótki opis, rok urodzenia i śmierci oraz odnośnik do artykułu. Wśród nich mogą być osoby żyjące. Podstawą jest prawnie uzasadniony interes administratora (art. 6 ust. 1 lit. f RODO): pokazanie, kto znany nosi nazwisko, o które pyta czytelnik. Każda z tych osób może sprzeciwić się temu, pisząc na adres podany na stronie kontaktowej. Usuniemy ją z serwisu przy następnym odświeżeniu danych.",
         ],
       },
     ],
@@ -181,7 +186,8 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "The data the site shows",
         paragraphs: [
-          "The figures on surname pages come from public PESEL register summaries and other published sources. They are aggregate figures, such as how many people bear a surname. The site shows no data about any individual.",
+          "The figures on surname pages come from public PESEL register summaries and other published sources. They are aggregate figures, such as how many people bear a surname.",
+          "The only people named are well-known bearers of a surname, from Wikidata (a free knowledge base under CC0): only those with a Wikipedia article, and only what Wikidata states publicly: name, a short description, years of birth and death, and a link to the article. Some of them may be living. The basis is the controller's legitimate interest (Article 6(1)(f) GDPR): showing who well known bears the surname a reader asks about. Any of these people may object by writing to the address on the contact page. We remove them from the site at the next data refresh.",
         ],
       },
     ],
@@ -322,8 +328,14 @@ export function legalDocument(kind: LegalKind, lang: Lang, accounts = false): Le
 }
 
 /** The date the document last changed, for the page and for the version recorded. */
+/**
+ * The date shown on a document: its own, or the accounts variant's when that
+ * is later. Display only; the version a reader accepts is
+ * {@link ACCOUNTS_LEGAL_UPDATED} (`accounts-runtime.ts`).
+ */
 export function legalUpdated(kind: LegalKind, accounts = false): string {
-  return accounts ? ACCOUNTS_LEGAL_UPDATED : LEGAL_UPDATED[kind];
+  const own = LEGAL_UPDATED[kind];
+  return accounts && ACCOUNTS_LEGAL_UPDATED > own ? ACCOUNTS_LEGAL_UPDATED : own;
 }
 
 export function legalPath(kind: LegalKind, lang: Lang): string {

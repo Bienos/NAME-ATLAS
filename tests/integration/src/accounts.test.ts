@@ -846,6 +846,8 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   describe("the migration (AC-8)", () => {
     it("refuses to go down while a user is stored, and removes the schema when none is", async () => {
       const migrator = createMigrator(db().db);
+      // Step past the migrations above 0027 first (TASK-073's 0029).
+      await migrator.migrateTo("0027_accounts_schema");
       const refused = await migrator.migrateDown();
       expect(String(refused.error)).toMatch(/refusing to drop schema accounts/u);
       expect(await rows("SELECT 1 FROM accounts.users LIMIT 1")).toHaveLength(1);
