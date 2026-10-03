@@ -51,6 +51,16 @@ export type {
   ArchiveDerivation,
   PersistedArchiveAvailability,
 } from "./archive.js";
+export {
+  bearersSectionFor,
+  bearersShownOn,
+  deriveNotableBearers,
+  notableBearersClaimKey,
+  projectBearersSection,
+  readNotableBearers,
+  selectBearersCandidates,
+} from "./bearers.js";
+export type { BearersCandidate, BearersDerivation, PersistedNotableBearers } from "./bearers.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
 export {
   buildRankTable,
@@ -210,6 +220,11 @@ export {
   ARCHIVE_CONFIDENCE_ASSESSMENT_METHOD,
   ARCHIVE_CONFIDENCE_ASSESSMENT_VERSION,
   ARCHIVE_REFRESH_DAYS,
+  BEARERS_CONFIDENCE_ASSESSMENT_METHOD,
+  BEARERS_CONFIDENCE_ASSESSMENT_VERSION,
+  BEARERS_REFRESH_DAYS,
+  BEARERS_SHOWN_FREE,
+  NOTABLE_BEARERS_METHOD_VERSION,
 } from "./version.js";
 
 // The SURNAME_MEANING chain — TASK-022, ADR-0008.

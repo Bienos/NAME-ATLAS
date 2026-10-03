@@ -121,3 +121,7 @@ export * from "./catalogue/index.js";
 // TERYT localities — TASK-039: TERC + SIMC into places, names, external ids
 // and administrative memberships. Geography infrastructure, never surname evidence.
 export * from "./teryt/index.js";
+
+// Wikidata — TASK-073 (ADR-0030): famous bearers of a surname, as a source
+// record per surname. Queried ahead of time, never when a page is viewed.
+export * from "./wikidata/index.js";

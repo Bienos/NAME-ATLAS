@@ -99,6 +99,16 @@ export const SECTIONS = [
     title: "chapterArchiveTitle",
     lede: "chapterArchiveLede",
   },
+  // TASK-073: the known people Wikidata names with the surname (ADR-0030).
+  {
+    key: "bearers",
+    field: "bearers",
+    anchor: "bearers",
+    intent: "bearers",
+    nav: "navBearers",
+    title: "chapterBearersTitle",
+    lede: "chapterBearersLede",
+  },
 ] as const satisfies readonly SectionEntry[];
 
 export type Section = (typeof SECTIONS)[number];

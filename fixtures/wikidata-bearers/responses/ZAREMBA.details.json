@@ -1,0 +1,405 @@
+{
+  "head" : {
+    "vars" : [ "person", "description_pl", "description_en", "plwiki", "enwiki" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q331544"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "biskup katolicki"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish religious servant"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Tomasz_II_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Tomasz_II,_bishop_of_Wroc%C5%82aw"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q522270"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "amerykański lekkoatleta, młociarz"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "American hammer thrower (1908-1994)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Peter_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Peter_Zaremba_(hammer_thrower)"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q578192"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish general"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/J%C3%B3zef_Zaremba_(genera%C5%82)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/J%C3%B3zef_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q896660"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski matematyk, profesor UJ"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish mathematician (1863-1942)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Stanis%C5%82aw_Zaremba_(1863%E2%80%931942)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Stanis%C5%82aw_Zaremba_(mathematician)"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1327931"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Russian opera singer"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Elena_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1694314"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "American actor (1908-1986)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/John_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1855546"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Czech weightlifter (1957–2026)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Ota_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Ota_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2717812"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "rosyjski kompozytor i teoretyk muzyki"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Russian composer (1821-1879)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Niko%C5%82aj_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Nikolai_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2848821"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski duchowny katolicki, biskup poznański"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish catholic priest"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Andrzej_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Andrzej_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2927020"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "francuski piłkarz"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "French association football player (1955-2018)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Bruno_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3367642"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "francuski piłkarz"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "French association football player"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Pascal_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4187172"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ukrainian and Russian composer (1861-1915)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Sigismund_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4187173"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ukrainian composer and pianist (1833-1902)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/W%C5%82adys%C5%82aw_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Vladyslav_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6377150"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "American actress"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Kathryn_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6440243"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski polityk"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish politician"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Krzysztof_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Krzysztof_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6786702"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski piłkarz ręczny"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish handball player"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Mateusz_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Mateusz_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9342375"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski matematyk"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish mathematician"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Stanis%C5%82aw_Krystyn_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Stanis%C5%82aw_Krystyn_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11736363"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski architekt"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish architect (1846-1897)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Karol_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Karol_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27733815"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polski matematyk, informatyk"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish mathematician and computer scientist"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Wojciech_Zaremba"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Wojciech_Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q177515"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "urbanista polski, prezydent Szczecina (1910–1993)"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish urban planner, mayor of Szczecin (1910–1993)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Piotr_Zaremba_(urbanista)"
+      }
+    } ]
+  }
+}

@@ -1,0 +1,421 @@
+{
+  "head" : {
+    "vars" : [ "person", "description_pl", "description_en", "plwiki", "enwiki" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2955939"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska malarka żydowskiego pochodzenia"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish painter (1899-1942)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Chana_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Chana_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3183111"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "sopran"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish singer"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Jolanta_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Jolanta_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9155323"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska pisarka (1903-1969)"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish writer (1903-1969)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Anna_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Anna_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9179979"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska polityczka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish politician (1955–2020)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Bronis%C5%82awa_Kowalska_(polityk)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Bronis%C5%82awa_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9253180"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska szachistka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish chess player"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/El%C5%BCbieta_Kowalska_(szachistka)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/El%C5%BCbieta_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9357316"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "uczona polska, chemik, tłumacz literatury pięknej"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish chemist"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Teresa_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Teresa_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17155287"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish handball player"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Agnieszka_Kowalska_(pi%C5%82karka_r%C4%99czna)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Agnieszka_Kocela"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q61988993"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska szachistka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish chess player"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Natalia_Kowalska_(szachistka)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Natalia_Kowalska_(chess_player)"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q293102"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska piosenkarka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish singer"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Kasia_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Kasia_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q456986"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska kierowca wyścigowa"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish racing driver"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Natalia_Kowalska_(kierowca)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Natalia_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q458585"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish steeplechaser"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Katarzyna_Kowalska_(lekkoatletka)"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Katarzyna_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18978"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska zakonnica katolicka, mistyczka, święta (1905–1938)"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "nun and saint from Poland (1905–1938)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Faustyna_Kowalska"
+      },
+      "enwiki" : {
+        "type" : "uri",
+        "value" : "https://en.wikipedia.org/wiki/Faustina_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4225512"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska klaryska kapucynka, błogosławiona Kościoła katolickiego"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Mieczys%C5%82awa_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4225513"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska aktorka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish actress (1941-2026)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Halina_Kowalska_(aktorka)"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9154914"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska poetka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish poet (1932–2008)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Anka_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9168078"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska aktorka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish actress"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Beata_Olga_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9178394"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska historyczka sztuki"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish art historian (1930–2023)"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Bo%C5%BCena_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11692866"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska aktorka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish actor and model"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Danuta_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27119642"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska zapaśniczka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish female sport wrestler"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Monika_Kowalska"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57419854"
+      },
+      "description_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "polska socjolożka"
+      },
+      "description_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Polish sociologist"
+      },
+      "plwiki" : {
+        "type" : "uri",
+        "value" : "https://pl.wikipedia.org/wiki/Beata_Kowalska_(socjolog)"
+      }
+    } ]
+  }
+}

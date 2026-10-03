@@ -8,6 +8,28 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-033 — "how many people hold this exact first name and surname" for the paid tier: from which source, if any?
+
+**Status:** NON-BLOCKING NOW. It blocks that figure in the paid report, nothing else.
+**Owner:** project owner.
+**Raised by:** TASK-073's session, 2026-10-03. Asked about the famous-bearers card, the owner added: "then in premium search also how many people are holding the exact name and surname".
+
+Facts, checked 2026-10-03:
+
+- The PESEL surname lists this project imports count people per surname only (TASK-002, TASK-004).
+- dane.gov.pl publishes PESEL first-name lists separately, by sex and by first or second name (a search for "imiona PESEL" returned, among others, resource 21495 "lista imion męskich w rejestrze PESEL stan na 21.01.2020 - imię pierwsze" and 54111 for 2024, second names). The first five results were all first-name lists. **No published table pairing first name with surname was found**; the search was not exhaustive.
+- Multiplying a first name's share by a surname's count assumes the two are independent. They are not (first names follow sex, age and region, and so do surnames), so the product is a model estimate, not a count. `AGENTS.md` §9 forbids presenting it as one, and ADR-0001 keeps estimates apart from facts.
+
+Options:
+
+1. **Ask the data holder.** A request to the Ministry of Digital Affairs (the PESEL register's controller) for counts of first name and surname pairs, with small cells suppressed as the surname lists already are. A reply may take weeks, and may refuse.
+2. **Show a labelled estimate.** The independence product, stated as an estimate with its assumption and range, on the paid surface only. Needs an ADR that admits a modelled figure, and a method.
+3. **Do not offer it.** Keep the paid tier to what sources state.
+
+The assistant's recommendation, not a decision: option 1 first; option 3 until an answer comes. Option 2 would put a number on the page that no source states.
+
+---
+
 ## D-026 — the product's name and domain
 
 **Status:** NON-BLOCKING NOW. It blocks the sending domain for account mail (a Resend domain must be verified) and any rename of the site.

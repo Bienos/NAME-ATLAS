@@ -27,6 +27,8 @@
 import type {
   ArchivePeriod,
   ArchiveSection,
+  Bearer,
+  BearersSection,
   ChangeEntry,
   DistributionEntry,
   OtherForm,
@@ -336,6 +338,46 @@ export function archiveSentence(
       `not under copyright and in ${records} catalogue ${section.catalogue_records === 1 ? "record" : "records"} ` +
       `in Polona (searched on ${date})`,
   );
+}
+
+/**
+ * The bearers sentence (TASK-073, ADR-0030): how many people Wikidata names
+ * with exactly this surname and an article in a Wikipedia, and when it was
+ * asked. Zero is an answer and is said as one. Null when the section holds no
+ * answer.
+ */
+export function bearersSentence(
+  section: BearersSection,
+  surname: string,
+  lang: Lang,
+): string | null {
+  if (section.state !== "READY" || section.total === null || section.searched_on === null) {
+    return null;
+  }
+  const date = formatDate(section.searched_on, lang);
+  if (section.total === 0) {
+    return terminate(
+      lang === "pl"
+        ? `Wikidane nie wymieniają nikogo o nazwisku ${surname}, kto ma artykuł w Wikipedii (stan z ${date})`
+        : `Wikidata lists nobody with the surname ${surname} who has a Wikipedia article (as of ${date})`,
+    );
+  }
+  const n = formatInteger(section.total, lang);
+  return terminate(
+    lang === "pl"
+      ? `Wikidane wymieniają ${n} ${pluralPl(section.total, "osobę", "osoby", "osób")} o nazwisku ${surname} z artykułem w Wikipedii (stan z ${date})`
+      : `Wikidata lists ${n} ${section.total === 1 ? "person" : "people"} with the surname ${surname} who ${section.total === 1 ? "has" : "have"} a Wikipedia article (as of ${date})`,
+  );
+}
+
+/** A person's years as Wikidata states them: "1863–1942", "ur. 1973", or nothing. */
+export function bearerYears(person: Bearer, lang: Lang): string | null {
+  if (person.born !== null && person.died !== null) {
+    return `${String(person.born)}–${String(person.died)}`;
+  }
+  if (person.born !== null) return `${UI[lang].bearersBorn} ${String(person.born)}`;
+  if (person.died !== null) return `† ${String(person.died)}`;
+  return null;
 }
 
 /** A period of publication as a reader says it: `przed 1800`, `1800–1849`, `od 1940`. */
@@ -852,6 +894,22 @@ export const UI = {
     archiveNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w zbiorach Polony.",
     archiveUnavailable: "Wyników z Polony nie można teraz pokazać.",
     archiveBlocked: "Wyników z Polony nie można pokazać tutaj z powodu licencji źródła.",
+    // TASK-073: known people with the surname, from Wikidata (ADR-0030).
+    chapterBearersTitle: "Kto znany nosi to nazwisko?",
+    chapterBearersLede:
+      "Wikidane, otwarta baza wiedzy powiązana z Wikipedią, wymieniają osoby o tym nazwisku. " +
+      "Pokazujemy te, o których napisano najwięcej artykułów w Wikipediach.",
+    bearersCaveat:
+      "To samo nazwisko nie oznacza pokrewieństwa. Wikidane redagują wolontariusze, więc " +
+      "mogą zawierać błędy.",
+    bearersBorn: "ur.",
+    bearersNoDeath: "bez daty śmierci w Wikidanych",
+    bearersArticle: "Wikipedia",
+    bearersMore: "Pozostałe osoby ({n}) pokażemy w raporcie „Nazwisko i rodzina”.",
+    bearersRemoval: "Jesteś na tej liście i nie chcesz na niej być? Napisz do nas.",
+    bearersNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w Wikidanych.",
+    bearersUnavailable: "Listy znanych osób nie można teraz pokazać.",
+    bearersBlocked: "Listy znanych osób nie można pokazać tutaj z powodu licencji źródła.",
     navLabel: "Na tej stronie",
     navCount: "Liczba osób",
     navRarity: "Rzadkość",
@@ -859,6 +917,7 @@ export const UI = {
     navMeaning: "Znaczenie",
     navChange: "Zmiany w czasie",
     navArchive: "W archiwach",
+    navBearers: "Znane osoby",
     navSources: "Źródła",
     rankCaption: "miejsce na liście nazwisk",
     neighboursHeading: "Sąsiedzi na liście",
@@ -899,6 +958,7 @@ export const UI = {
     deckMeaning: "Znaczenie",
     deckInterpretation: "interpretacja",
     deckPrint: "Dawne druki",
+    deckBearers: "Znane osoby",
     deckPrintPages: "stron dzieł w domenie publicznej",
     deckCatalogue: "W katalogu",
     deckCatalogueHeading: "Rekordy katalogu Polony, w których pada to słowo.",
@@ -927,6 +987,9 @@ export const UI = {
     limitationArchiveWord:
       "Liczby z Polony to wyniki wyszukiwania słowa w każdej odmianie, w katalogu i w tekście " +
       "stron dzieł, które nie są chronione prawem autorskim; nie każdy wynik dotyczy nazwiska.",
+    limitationBearersFamily:
+      "Osoby z Wikidanych mają to samo nazwisko; to nie znaczy, że są ze sobą ani z kimkolwiek " +
+      "spokrewnione. Brak daty śmierci w Wikidanych nie oznacza, że ktoś żyje.",
     limitationRounded: "Wartość „1 na X” jest zaokrąglona; liczba osób jest dokładna.",
     limitationPartition:
       "Wydawca nie podaje, czy podział dotyczy płci osoby, czy rodzaju gramatycznego nazwiska. " +
@@ -1420,6 +1483,23 @@ export const UI = {
     archiveNotSearched: "We have not searched Polona's collections for this surname yet.",
     archiveUnavailable: "Results from Polona cannot be shown right now.",
     archiveBlocked: "Results from Polona cannot be shown here because of the source's licence.",
+    // TASK-073: known people with the surname, from Wikidata (ADR-0030).
+    chapterBearersTitle: "Who well known has this surname?",
+    chapterBearersLede:
+      "Wikidata, the open knowledge base behind Wikipedia, lists people with this surname. " +
+      "We show those the most Wikipedia articles are written about.",
+    bearersCaveat:
+      "Sharing a surname does not mean being related. Wikidata is edited by volunteers and " +
+      "can be wrong.",
+    bearersBorn: "b.",
+    bearersNoDeath: "no date of death in Wikidata",
+    bearersArticle: "Wikipedia",
+    bearersMore: "The other people ({n}) will be in the “Surname and family” report.",
+    bearersRemoval: "Are you on this list and would rather not be? Write to us.",
+    bearersNotSearched: "We have not looked this surname up in Wikidata yet.",
+    bearersUnavailable: "The list of well-known people cannot be shown right now.",
+    bearersBlocked:
+      "The list of well-known people cannot be shown here because of the source's licence.",
     navLabel: "On this page",
     navCount: "Count",
     navRarity: "Rarity",
@@ -1427,6 +1507,7 @@ export const UI = {
     navMeaning: "Meaning",
     navChange: "Change over time",
     navArchive: "In archives",
+    navBearers: "Well-known people",
     navSources: "Sources",
     rankCaption: "rank on the surname list",
     neighboursHeading: "Neighbours on the list",
@@ -1467,6 +1548,7 @@ export const UI = {
     deckMeaning: "Meaning",
     deckInterpretation: "interpretation",
     deckPrint: "Old print",
+    deckBearers: "Well-known people",
     deckPrintPages: "pages of public-domain works",
     deckCatalogue: "In the catalogue",
     deckCatalogueHeading: "Records in Polona's catalogue in which the word appears.",
@@ -1495,6 +1577,9 @@ export const UI = {
     limitationArchiveWord:
       "Polona's figures are search results for the word in any inflected form, in the catalogue " +
       "and in the text of pages of works not under copyright; not every result is the surname.",
+    limitationBearersFamily:
+      "The people from Wikidata share the surname; that does not mean they are related to each " +
+      "other or to anyone. No date of death in Wikidata does not mean a person is living.",
     limitationRounded: "The 1-in-X figure is rounded; the count of people is exact.",
     limitationPartition:
       "The publisher does not state whether the split is by a person's sex or by the grammatical " +
