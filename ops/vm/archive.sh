@@ -59,6 +59,11 @@ case "$TOP_RANK" in '' | *[!0-9]*) die "TOP_RANK must be a positive integer, got
 [ -f "$FINALIZED" ] || die "finalize has not run ($FINALIZED is missing)"
 state=$(systemctl show -p ActiveState --value "$BUILD_UNIT")
 [ "$state" = inactive ] || [ "$state" = failed ] || die "the register build is running (ActiveState=$state)"
+# Unpacking would change the code under Wikidata's load (bearers.sh, TASK-077).
+state=$(systemctl show -p ActiveState --value name-atlas-bearers-load 2>/dev/null || true)
+case "$state" in
+  active | activating | deactivating | reloading) die "name-atlas-bearers-load is running (ActiveState=$state)" ;;
+esac
 state=$(systemctl show -p ActiveState --value "$UNIT" 2>/dev/null || true)
 if [ "$state" = active ] || [ "$state" = activating ]; then
   # Unpacking now would change the code under the running loader.

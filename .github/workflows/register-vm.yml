@@ -17,9 +17,10 @@ name: Register VM
 #   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
+#   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
 #   accounts       ops/vm/accounts.sh (TASK-063): migrate, the role nameatlas_app and its password, PgBouncer's user list, the isolation checks; repeatable
 #
-# provision, status, finalize, editions, extras, shift-finish and archive end by connecting the way the web app does;
+# provision, status, finalize, editions, extras, shift-finish, archive and bearers end by connecting the way the web app does;
 # accounts ends by connecting the way the accounts connection does (nameatlas_app, with its own secret).
 
 on:
@@ -44,6 +45,7 @@ on:
             shift,
             shift-finish,
             archive,
+            bearers,
             accounts,
           ]
 
@@ -81,7 +83,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | accounts) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | accounts) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -227,6 +229,14 @@ jobs:
           scp -q ops/vm/archive.sh vm:name-atlas-ops/archive.sh
           ssh vm 'sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz'
 
+      - name: bearers
+        if: steps.step.outputs.step == 'bearers'
+        run: |
+          # The pushed commit's tree: the loader, and migration 0029 it needs.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/bearers.sh vm:name-atlas-ops/bearers.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/bearers.sh ~/name-atlas-ops/app.tar.gz'
+
       - name: accounts
         if: steps.step.outputs.step == 'accounts'
         env:
@@ -254,7 +264,7 @@ jobs:
           steps.step.outputs.step == 'provision' || steps.step.outputs.step == 'status' ||
           steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions' ||
           steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'shift-finish' ||
-          steps.step.outputs.step == 'archive'
+          steps.step.outputs.step == 'archive' || steps.step.outputs.step == 'bearers'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
@@ -279,6 +289,8 @@ jobs:
                   WHERE claim_type = 'SURNAME_MEANING' AND claim_status = 'ACTIVE'"
             p -c "SELECT 'change claims ' || count(*) FROM claims
                   WHERE claim_type::text = 'SURNAME_DISTRIBUTION_SHIFT' AND claim_status = 'ACTIVE'"
+            p -c "SELECT 'NOTABLE_BEARERS claims ' || count(*) FROM claims
+                  WHERE claim_type::text = 'NOTABLE_BEARERS' AND claim_status = 'ACTIVE'"
           fi
           if p -c 'CREATE TABLE public.web_role_must_not_write (x int)' 2> write.err; then
             echo "::error::the web role could create a table"
