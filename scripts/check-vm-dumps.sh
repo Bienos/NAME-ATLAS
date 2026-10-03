@@ -2,10 +2,11 @@
 # Holds the database VM's scripts to two rules (TASK-063, ADR-0027 §5.2):
 #
 #   1. every script in ops/vm parses (`bash -n`);
-#   2. every `pg_dump` those scripts run excludes the rows of schema `accounts`
-#      (`--exclude-table-data='accounts.*'`): the data-load steps dump the whole
-#      database, and without the flag each would copy readers' addresses and
-#      password hashes into a plain file on the VM, which an account's deletion
+#   2. every `pg_dump` those scripts run excludes the rows of schemas `accounts`
+#      and `family` (`--exclude-table-data='accounts.*'` and `'family.*'`; TASK-066,
+#      ADR-0029): the data-load steps dump the whole database, and without the
+#      flags each would copy readers' addresses, password hashes and the people
+#      of their trees into a plain file on the VM, which an account's deletion
 #      would not reach.
 #
 # `scripts/check-vm-dumps.sh [DIR]` checks DIR instead of ops/vm, which is how
@@ -31,10 +32,12 @@ done
 
 while IFS=: read -r file line text; do
   dumps=$((dumps + 1))
-  if [[ "$text" != *"--exclude-table-data='accounts.*'"* ]]; then
-    echo "check-vm-dumps: $file:$line runs pg_dump without --exclude-table-data='accounts.*'" >&2
-    status=1
-  fi
+  for schema in accounts family; do
+    if [[ "$text" != *"--exclude-table-data='$schema.*'"* ]]; then
+      echo "check-vm-dumps: $file:$line runs pg_dump without --exclude-table-data='$schema.*'" >&2
+      status=1
+    fi
+  done
 done < <(grep -nE '(^|[[:space:]])pg_dump[[:space:]]+--' "${scripts[@]}" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#' || true)
 
 # A check that finds nothing checks nothing: the four data-load scripts take a dump each.
@@ -44,6 +47,6 @@ if [ "$dumps" -lt 4 ] && [ "$dir" = ops/vm ]; then
 fi
 
 if [ "$status" = 0 ]; then
-  echo "check-vm-dumps: ${#scripts[@]} scripts parse, and all $dumps pg_dump invocations exclude the rows of schema accounts"
+  echo "check-vm-dumps: ${#scripts[@]} scripts parse, and all $dumps pg_dump invocations exclude the rows of schemas accounts and family"
 fi
 exit "$status"
