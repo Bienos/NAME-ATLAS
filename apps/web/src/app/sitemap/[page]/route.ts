@@ -1,9 +1,8 @@
 import { db as sharedDb } from "../../../lib/db.js";
 import { SITEMAP_PAGE_SIZE, sitemapEntries } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
-import { indexingEnabled } from "../../../lib/seo.js";
+import { indexingEnabled, siteOrigin } from "../../../lib/seo.js";
 import { sitemapPageXml } from "../../../lib/sitemap-xml.js";
-import { siteOrigin } from "../../../lib/surname-page.js";
 
 /**
  * `/sitemap/{n}.xml` — one page of at most 50,000 URLs (TASK-027, ADR-0010 §3).

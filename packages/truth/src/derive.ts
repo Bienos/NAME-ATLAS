@@ -24,13 +24,13 @@
 import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
-import { NORMALIZATION_VERSION, resolveSurname } from "@name-atlas/resolver";
+import { NORMALIZATION_VERSION } from "@name-atlas/resolver";
 import { findPeselResource, isPeselEdition } from "@name-atlas/sources";
 import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
 import { evaluateAllSurfaces } from "./rights.js";
 import type { EffectiveRights } from "./rights.js";
-import { requiredProfileText } from "./universe.js";
-import type { UniverseSizeCache } from "./universe.js";
+import { loadSourceContext, requiredProfileText, resolveForDerivation } from "./universe.js";
+import type { DerivationSourceContext, UniverseSizeCache } from "./universe.js";
 import {
   CONFIDENCE_ASSESSMENT_METHOD,
   CONFIDENCE_ASSESSMENT_VERSION,
@@ -71,7 +71,6 @@ interface ApplicableSnapshot {
   readonly universe_description: string;
   readonly coverage_notes: string | null;
   readonly comparability_group: string | null;
-  readonly dataset_version: string | null;
   readonly geography_level: string;
   /** The publisher's resource id, for deciding which source record is authoritative. */
   readonly external_record_id: string | null;
@@ -102,7 +101,6 @@ async function loadApplicableSnapshots(
       "sr.universe_description",
       "sr.coverage_notes",
       "sr.comparability_group",
-      "sr.dataset_version",
       "s.geography_level",
     ])
     .select((eb) =>
@@ -114,8 +112,6 @@ async function loadApplicableSnapshots(
     .orderBy("s.distribution_snapshot_id")
     .execute();
 
-  // TASK-045: an earlier edition is imported as its own dated snapshot and is
-  // never derived from; the current resources alone yield claims.
   return rows
     .filter((row) => !isPeselEdition(row.external_record_id))
     .map((row) => ({
@@ -132,7 +128,6 @@ async function loadApplicableSnapshots(
       ),
       coverage_notes: row.coverage_notes,
       comparability_group: row.comparability_group,
-      dataset_version: row.dataset_version,
       geography_level: row.geography_level,
       external_record_id: row.external_record_id,
       content_hash: row.content_hash,
@@ -220,73 +215,6 @@ export class TruthInvariantError extends Error {
   }
 }
 
-interface SourceContext {
-  readonly source_id: string;
-  readonly name: string;
-  readonly publisher: string | null;
-  readonly homepage_or_reference_url: string | null;
-  readonly rights: EffectiveRights;
-  readonly rights_profile_id: string;
-  readonly attribution_text: string | null;
-  readonly attribution_required: boolean;
-  readonly terms_version: string | null;
-  readonly rights_url: string | null;
-}
-
-async function loadSourceContext(
-  db: Kysely<DB> | Transaction<DB>,
-  sourceId: string,
-): Promise<SourceContext> {
-  const row = await db
-    .selectFrom("sources as src")
-    .innerJoin("rights_profiles as rp", "rp.rights_profile_id", "src.default_rights_profile_id")
-    .select([
-      "src.source_id",
-      "src.name",
-      "src.publisher",
-      "src.homepage_or_reference_url",
-      "rp.rights_profile_id",
-      "rp.automated_access",
-      "rp.commercial_use",
-      "rp.redistribution",
-      "rp.metadata_rights",
-      "rp.review_status",
-      "rp.attribution_text",
-      "rp.attribution_required",
-      "rp.terms_version",
-      "rp.rights_url",
-    ])
-    .where("src.source_id", "=", sourceId)
-    .executeTakeFirst();
-
-  if (!row) {
-    // ARCHITECTURE.md §10 invariant 13: no production source without rights.
-    throw new TruthInvariantError(
-      "MISSING_RIGHTS_PROFILE",
-      `source ${sourceId} has no reachable rights profile`,
-    );
-  }
-
-  return {
-    source_id: row.source_id,
-    name: row.name,
-    publisher: row.publisher,
-    homepage_or_reference_url: row.homepage_or_reference_url,
-    rights_profile_id: row.rights_profile_id,
-    rights: {
-      automated_access: row.automated_access,
-      commercial_use: row.commercial_use,
-      redistribution: row.redistribution,
-      metadata_rights: row.metadata_rights,
-      review_status: row.review_status,
-    },
-    attribution_text: row.attribution_text,
-    attribution_required: row.attribution_required,
-    terms_version: row.terms_version,
-    rights_url: row.rights_url,
-  };
-}
-
 export interface DeriveOptions {
   /** Overridable so tests can exercise a restrictive rights posture. */
   readonly rightsOverride?: EffectiveRights;
@@ -316,70 +244,14 @@ export async function deriveCurrentPopulation(
   rawInput: string,
   options: DeriveOptions = {},
 ): Promise<SurnameTruthResult> {
-  const lookup = await resolveSurname(db, rawInput);
-
-  if (lookup.kind === "LOOKUP_FAILED") {
-    return {
-      kind: "NO_RESULT",
-      reason: "LOOKUP_FAILED",
-      resolution_status: "LOOKUP_FAILED",
-      surname: null,
-      message: `resolution lookup failed at ${lookup.stage}`,
-    };
-  }
-
-  const resolution = lookup.resolution;
-  const status = resolution.resolution_status;
-
-  if (resolution.outcome === "INVALID_INPUT") {
-    return {
-      kind: "NO_RESULT",
-      reason: "INVALID_INPUT",
-      resolution_status: status,
-      surname: null,
-      message: `input rejected by validation: ${status}`,
-    };
-  }
-  if (status === "MULTIPLE_EXACT" || status === "REVIEW_REQUIRED") {
-    return {
-      kind: "NO_RESULT",
-      reason: "AMBIGUOUS",
-      resolution_status: status,
-      surname: null,
-      message: "resolution is ambiguous or requires review; no candidate was selected",
-    };
-  }
   // TASK-005 §15 U-5: EXACT only. KNOWN_VARIANT is excluded and recorded,
   // because no NameForm variant links exist in production data yet, so a
-  // permissive path could not be tested against anything real.
-  if (status !== "EXACT" || !resolution.resolved_surname_id) {
-    return {
-      kind: "NO_RESULT",
-      reason: "UNRESOLVED",
-      resolution_status: status,
-      surname: null,
-      message: "input did not resolve exactly to a canonical surname",
-    };
-  }
-
-  const surnameId = resolution.resolved_surname_id;
-  const surnameRow = await db
-    .selectFrom("surnames")
-    .select(["surname_id", "canonical_display", "canonical_key", "primary_script"])
-    .where("surname_id", "=", surnameId)
-    .executeTakeFirst();
-  if (!surnameRow) {
-    throw new TruthInvariantError(
-      "RESOLVED_SURNAME_MISSING",
-      `resolver returned surname ${surnameId} which does not exist`,
-    );
-  }
-  const surname: CanonicalSurnameIdentity = {
-    surname_id: surnameRow.surname_id,
-    canonical_display: surnameRow.canonical_display,
-    canonical_key: surnameRow.canonical_key,
-    primary_script: surnameRow.primary_script,
-  };
+  // permissive path could not be tested against anything real. The rule lives
+  // in resolveForDerivation, shared with every other chain.
+  const resolved = await resolveForDerivation(db, rawInput);
+  if (resolved.kind !== "RESOLVED") return resolved;
+  const { status, surname } = resolved;
+  const surnameId = surname.surname_id;
 
   const snapshots = await loadApplicableSnapshots(db, surnameId);
   if (snapshots.length === 0) {
@@ -427,7 +299,7 @@ async function deriveOne(
   trx: Transaction<DB>,
   surname: CanonicalSurnameIdentity,
   snapshot: ApplicableSnapshot,
-  source: SourceContext,
+  source: DerivationSourceContext,
 ): Promise<CurrentPopulationClaimResult> {
   const count = Number(snapshot.count);
   if (!Number.isInteger(count) || count < 2) {
@@ -637,7 +509,7 @@ async function projectExisting(
   trx: Transaction<DB>,
   claimId: string,
   snapshot: ApplicableSnapshot,
-  source: SourceContext,
+  source: DerivationSourceContext,
   count: number,
 ): Promise<CurrentPopulationClaimResult> {
   const claim = await trx

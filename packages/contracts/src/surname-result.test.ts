@@ -17,6 +17,8 @@ import {
   neighbourListSchema,
   neighboursSectionSchema,
   otherFormSchema,
+  LOCALITIES_LIMIT,
+  localitiesSectionSchema,
 } from "./surname-result.js";
 
 /**
@@ -277,6 +279,7 @@ describe("top-level response", () => {
         change: null,
         neighbours: null,
         other_form: null,
+        localities: null,
       }).success,
     ).toBe(true);
   });
@@ -961,6 +964,7 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
       bearers: null,
       neighbours: null,
       other_form: null,
+      localities: null,
     };
     expect(surnameResultResponseSchema.safeParse({ ...base, change: null }).success).toBe(true);
     expect(
@@ -969,7 +973,7 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
         change: { state: "UNAVAILABLE", entries: [], reason_code: "X", surface: SURFACE },
       }).success,
     ).toBe(false);
-    // Missing altogether is not the same as null: a 1.6 producer fails against 1.10.
+    // Missing altogether is not the same as null: a 1.6 producer fails against 1.11.
     expect(surnameResultResponseSchema.safeParse(base).success).toBe(false);
   });
 
@@ -1097,6 +1101,16 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
     },
     neighbours: { state: "READY", lists: [LIST], reason_code: null, surface: SURFACE },
     other_form: OTHER,
+    localities: {
+      state: "NOT_LOADED",
+      reference_date: null,
+      places: [],
+      total: null,
+      confidence: null,
+      citation: null,
+      reason_code: "TERYT_NOT_LOADED",
+      surface: SURFACE,
+    },
   };
 
   it("carries both on a resolved surname, and refuses an other form that is the surname itself", () => {
@@ -1122,11 +1136,115 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
       bearers: null,
       neighbours: null,
       other_form: null,
+      localities: null,
     };
     const check = (r: unknown) => surnameResultResponseSchema.safeParse(r);
     expect(check(unresolved).success).toBe(true);
     expect(check({ ...unresolved, neighbours: resolved.neighbours }).success).toBe(false);
     expect(check({ ...unresolved, other_form: OTHER }).success).toBe(false);
+  });
+
+  describe("localities with the surname's name (TASK-090, ADR-0025 §2.7; schema 1.11)", () => {
+    // SYNTHETIC ids; the place is the real Jemna of the TERYT excerpt (TASK-039).
+    const id = (n: number) => `01a0b9e3-34f3-7633-a239-2b8596dfc0${String(n).padStart(2, "0")}`;
+    const place = (n: number, name: string, kind: "CITY" | "VILLAGE" | "OTHER") => ({
+      place: { id: id(n), name, kind, teryt_simc: String(855_434 + n).padStart(7, "0") },
+      gmina: "Stoszowice",
+      powiat: "ząbkowicki",
+      voivodeship: "DOLNOŚLĄSKIE",
+    });
+    const CITATION = {
+      ...VALID_CITATION,
+      id: id(90),
+      title: "TERYT",
+      publisher: "GUS",
+      publication_date: "2026-01-01",
+      locator: "TERYT SIMC, wersja urzędowa, STAN_NA 2026-01-01",
+      attribution: null,
+      terms: null,
+      source_page_url: "https://api.stat.gov.pl/Home/TerytApi?lang=en",
+    };
+    const ready = {
+      state: "READY",
+      reference_date: "2026-01-01",
+      places: [place(1, "Jemna", "VILLAGE")],
+      total: 1,
+      confidence: {
+        status: "VERIFIED",
+        methodology_code: "official_name_exact_key@locality_match@1",
+      },
+      citation: CITATION,
+      reason_code: null,
+      surface: SURFACE,
+    };
+    const notLoaded = resolved.localities;
+    const check = (l: unknown) => localitiesSectionSchema.safeParse(l).success;
+
+    it("accepts a READY section with its date, total, confidence and citation, and one with no place", () => {
+      expect(check(ready)).toBe(true);
+      expect(check({ ...ready, places: [], total: 0 })).toBe(true);
+      expect(check(notLoaded)).toBe(true);
+    });
+
+    it("refuses a READY section missing its date, total, confidence or citation, or carrying a reason", () => {
+      expect(check({ ...ready, reference_date: null })).toBe(false);
+      expect(check({ ...ready, total: null })).toBe(false);
+      expect(check({ ...ready, confidence: null })).toBe(false);
+      expect(check({ ...ready, citation: null })).toBe(false);
+      expect(check({ ...ready, reason_code: "X" })).toBe(false);
+    });
+
+    it("refuses a list longer than its total, a place listed twice, or more than the limit", () => {
+      expect(check({ ...ready, total: 0 })).toBe(false);
+      expect(
+        check({
+          ...ready,
+          places: [place(1, "Jemna", "VILLAGE"), place(1, "Jemna", "VILLAGE")],
+          total: 2,
+        }),
+      ).toBe(false);
+      const many = Array.from({ length: LOCALITIES_LIMIT + 1 }, (_, i) =>
+        place(i + 1, "Jemna", "OTHER"),
+      );
+      expect(check({ ...ready, places: many, total: many.length })).toBe(false);
+      expect(check({ ...ready, places: many.slice(0, LOCALITIES_LIMIT), total: many.length })).toBe(
+        true,
+      );
+    });
+
+    it("refuses places, a date or a citation on a section that is not READY, and a bad SIMC id", () => {
+      expect(check({ ...notLoaded, places: ready.places })).toBe(false);
+      expect(check({ ...notLoaded, reference_date: "2026-01-01" })).toBe(false);
+      expect(check({ ...notLoaded, reason_code: null })).toBe(false);
+      const bad = { ...place(1, "Jemna", "VILLAGE") };
+      expect(
+        check({ ...ready, places: [{ ...bad, place: { ...bad.place, teryt_simc: "855434" } }] }),
+      ).toBe(false);
+    });
+
+    it("is present exactly when the surname resolved", () => {
+      const response = (r: unknown) => surnameResultResponseSchema.safeParse(r).success;
+      expect(response({ ...resolved, localities: ready })).toBe(true);
+      expect(response({ ...resolved, localities: null })).toBe(false);
+      const unresolved = {
+        ...resolved,
+        status: "UNRESOLVED" as const,
+        surname: null,
+        population: null,
+        rarity: null,
+        distribution: null,
+        suggestions: NO_SUGGESTIONS,
+        meaning: null,
+        change: null,
+        archive: null,
+        neighbours: null,
+        other_form: null,
+        localities: null,
+        bearers: null,
+      };
+      expect(response(unresolved)).toBe(true);
+      expect(response({ ...unresolved, localities: ready })).toBe(false);
+    });
   });
 });
 

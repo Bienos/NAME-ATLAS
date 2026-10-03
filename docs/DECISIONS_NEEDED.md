@@ -30,6 +30,28 @@ The assistant's recommendation, not a decision: option 1 first; option 3 until a
 
 ---
 
+## D-032 — `pl_teryt`'s redistribution, and the SEO surface for the localities section
+
+**Status:** NON-BLOCKING NOW. It blocks nothing: the surname page is rendered on the free surface, where the stored profile allows the section, and the page's indexability folds the rights of the surname's claims, which the localities lookup is not.
+**Owner:** project owner.
+**Raised by:** the localities task's session (TASK-066 then, TASK-090 now), 2026-10-01.
+
+Facts, as the code and the stored data stand:
+
+- TASK-038 seeds `pl_teryt` with `commercial_use = ALLOWED`, `automated_access = ALLOWED`, every other permission `UNKNOWN`, `review_status = LEGAL_REVIEW_REQUIRED`, no legal review. `evaluateSurface` answers `ALLOWED` for `FREE` and `BLOCKED` for `SEO` (`REDISTRIBUTION_UNRESOLVED`) on that profile. TASK-066's localities section follows it: shown on the free page, `RIGHTS_BLOCKED` when queried on the SEO surface.
+- `apps/web/src/lib/seo-surface.ts` decides a page's indexability by folding the rights profiles behind the surname's **claims**. The localities are a lookup, not a claim, so a page with a matching locality is indexable exactly as before and shows TERYT data whose own SEO surface is blocked.
+- GUS's terms, quoted in `fixtures/teryt/source-manifest.json` (read 2026-09-30): "Rejestr terytorialny TERYT jest jawny", and the TERC, SIMC and ULIC files "udostępniane są bezpłatnie wszystkim użytkownikom", including "pobieranie zbiorów pełnych". No attribution wording and no redistribution wording is on either page.
+
+To decide, one of:
+
+1. Set `pl_teryt`'s `redistribution` to `ALLOWED` on those terms, as a data migration recorded as the owner's judgement (the shape of migration 0008 for PESEL's D-007). The section's SEO surface then opens and the question closes.
+2. Fold the sections that are not claims (today only the localities) into the page's SEO gate. Every page with a matching locality then becomes `noindex` until (1).
+3. Leave it: the free page shows the section, an explicit SEO-surface query is refused, and indexability ignores it.
+
+The assistant's recommendation, not a decision: (1). The terms quoted say the register is public and its full files are free for every user to download; nothing on them restricts redistribution.
+
+---
+
 ## D-031 — RESOLVED (2026-10-01): the proposal stands, subject to legal review
 
 **Resolution:** The project owner: "it's ok". A relative who declines contact stays as a row the owner alone sees, never shown to a member or matched, with the address suppressed per tree (ADR-0029 §2.6.23). The legal review `docs/canonical/19` §11 requires still precedes the invitation feature; its outcome may reduce the row further.
@@ -116,29 +138,38 @@ The chosen design marks a person *ze źródła* when a document (a scan of a rec
 3. Are photographs of people documents? A photograph of a living person is personal data of a third party with no record behind it. The safer first answer is records only: birth, marriage, death, and the like.
 
 Until answered, nothing in the tree takes a file.
-## D-026 — the product's name and domain
 
-**Status:** NON-BLOCKING NOW. It blocks the sending domain for account mail (a Resend domain must be verified) and any rename of the site.
+---
+
+## D-026 — RESOLVED: primary product domain selected
+
+The owner selected `name-atlas.pl` as primary and `nameatlas.pl` as alternate on 2026-10-02 (TASK-067, `docs/DOMAIN_SETUP.md`). The earlier no-domain conclusion is superseded. Mail-domain verification in Resend remains an account go-live prerequisite; the selected domain alone does not verify a sender.
+
+---
+
+## D-025 — the tiers the owner named on 2026-10-01 evening, against ADR-0026's
+
+**Status:** NON-BLOCKING NOW. It blocks any change to the offer page and the checkout task.
 **Owner:** project owner.
-**Raised by:** TASK-062's session, 2026-10-01, at the owner's request ("buy domena or find me better name for this tool", then "a name that works best for [a] global audience as well"). The owner chose to **buy nothing yet**.
+**Raised by:** ADR-0028's session, 2026-10-01.
 
-Facts, checked 2026-10-01 through Vercel's registrar and by fetching the pages:
+ADR-0026 (accepted 2026-10-01, live on `/pl/oferta`) has three tiers: free, "Nazwisko i rodzina" 29,99 zł, "Genealogia z DNA" 499 zł. Later the same day, in a chat outside this repository, the owner described a different set, reached after sign-in from the download or share button:
 
-- **"Name Atlas" has no domain.** `nameatlas.com`, `.app`, `.io`, `.pl` and `.eu` are all registered. `nameatlas.app` serves another live site titled "Name Atlas" ("Find names you didn't know how to search for"), so the English name also collides with a running product.
-- **Vercel cannot register `.pl`** (`tld_not_supported`). The owner's `.pl` domains on the team (`gdziekibel.pl`, `gdziewc.pl`, `meal-prep.pl`) are registered elsewhere (`home.pl` nameservers). A `.pl` name has to be bought there by the owner.
-- **Polish-only names are out** (the owner wants a name that works globally). `atlasnazwisk.pl`, `skadnazwisko.pl`, `ilunas.pl`, `rodowy.pl` and `nazwik.pl` are taken.
-- **Free as `.com` and `.app` on Vercel, 2026-10-01** ($11.25 a year for `.com`; $14.99 the first year for `.app`, renewing at $15; none premium): `namewhere`, `surnamia`, `atlasofsurnames`, `onomatlas`, `namekith`, `surnamelore`. **Free as `.app` only** (the `.com` is taken): `namelore`, `nameprint`, `namemap`, `namepath`, `namefolk`, `namevine`, `rootname`, `surnamely`, `kinname`. **Taken as both:** `namesake`, `onoma`, `kinmap`, `kinatlas`, `namekin`, `nomina`, `nameroots`; `nomen.app` is taken too (its `.com` was not checked).
-- A web search found no existing product under `Surnamia`, `Namewhere`, `Onomatlas`, `Surnamelore` or `Namekith`. **That is not a trademark search**, and handles on Instagram, TikTok and YouTube were not checked.
+- "smaller research", 28,99 zł;
+- "couple", 89,99 zł;
+- "family review", 199 zł;
+- "genealogist research", 800 zł, "coming soon".
 
-The assistant's recommendation, not a decision: **Namewhere** (`namewhere.com`): plain English, spelled as it sounds, and not tied to surnames, so first names and the tree fit under it. The alternative is **Surnamia** (`surnamia.com`): a coined, ownable name, but locked to surnames while first names are next on the owner's list.
+What each holds was drafted in that chat and not yet confirmed by the owner.
 
-To decide:
+To supersede ADR-0026, the owner needs to confirm:
 
-1. a name, or to keep "Name Atlas" and accept it has no domain;
-2. which domains to buy (the `.com` alone is $11.25 a year), and whether to add a `.pl` bought at `home.pl`;
-3. the sending domain for account mail, which Resend must verify (SPF and DKIM).
+1. that this set replaces ADR-0026's tiers, and the offer page follows it;
+2. whether the 800 zł genealogist tier replaces the 499 zł "Genealogia z DNA" tier, and whether DNA stays in it;
+3. where the tree and famous bearers sit: ADR-0026 put both in the 29,99 zł tier;
+4. D-024's question again, for each new price: one payment or recurring, and who takes the 800 zł.
 
-A rename is its own task: it touches the copy, the share cards, the legal text, the mail text and the metadata.
+ADR-0028 (what may be shown) names no price, so it holds under either set.
 
 ---
 
@@ -181,13 +212,17 @@ Neither changes any behaviour today.
 
 ---
 
-## D-022 — RESOLVED (2026-09-29): *Onomastica* is dropped as a meaning source
+## D-022 — RESOLVED (2026-09-30): *Onomastica* is a meaning source, on its printed CC BY-ND 4.0 licence
 
-**Resolution**, decided by the project owner on 2026-09-29: option (c), "Drop Onomastica".
+**Resolution**, decided by the project owner on 2026-09-30, reversing their answer of 2026-09-29: option (b). The owner's words: "bring back onomastica … use that source".
 
-- *Onomastica* is not a source for meaning claims. No ingestion task is written, and none is blocked on this entry.
-- TASK-032's record (`docs/sources/onomastica.md`) and its acquisition record stay as evidence of what was found.
-- D-002 and ADR-0008 are unchanged. Meaning still comes from attributed Path B sources, or it is a stated gap. It needs no ADR: nothing in the code or the model changes.
+- The project relies on the licence each article prints, CC BY-ND 4.0 International, for the OJS copies of vols 64 (2020) onward. This is the project owner's judgement, recorded as such, as D-007 was for PESEL. The contradicting statements (below) are unchanged, and the rights profiles stay `LEGAL_REVIEW_REQUIRED`: no lawyer has reviewed the reliance.
+- Only the OJS copies are used. The journals.pan.pl copies of vol. 64, which print a BY-NC-ND URL, are not.
+- Vols 56–63 stay out: they state no licence, and this decision does not grant one.
+- Only verbatim excerpts are published, each cited to its page, never an adaptation, because of the NoDerivatives term. The open legal question N7 in `docs/sources/onomastica.md` §13 (whether a gloss or root is "Adapted Material") therefore does not arise for what is published.
+- TASK-069 imports the first article. D-002 and ADR-0008 are unchanged.
+
+**The answer of 2026-09-29**, superseded: option (c), "Drop Onomastica".
 
 **Original record, for reference**
 

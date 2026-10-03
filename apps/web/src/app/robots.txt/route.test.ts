@@ -1,12 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { indexingEnabled } from "../../lib/seo.js";
-import { siteOrigin } from "../../lib/surname-page.js";
+import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
 import { GET } from "./route.js";
 
 vi.mock("../../lib/seo.js", () => ({
   indexingEnabled: vi.fn(),
-}));
-vi.mock("../../lib/surname-page.js", () => ({
   siteOrigin: vi.fn(() => "https://name-atlas.pl"),
 }));
 

@@ -31,37 +31,38 @@ export interface SeoGates {
 const CLOSED: SeoGates = { seoSurfaceAllowed: false, privacyPublic: false, profiles: 0 };
 
 export async function seoGatesFor(db: Kysely<DB>, surnameId: string): Promise<SeoGates> {
-  const entity = await db
-    .selectFrom("knowledge_entities")
-    .select(["privacy_class", "lifecycle_status"])
-    .where("entity_id", "=", surnameId)
-    .executeTakeFirst();
+  const [entity, profiles] = await Promise.all([
+    db
+      .selectFrom("knowledge_entities")
+      .select(["privacy_class", "lifecycle_status"])
+      .where("entity_id", "=", surnameId)
+      .executeTakeFirst(),
+    db
+      .selectFrom("claims")
+      .innerJoin("citations", "citations.claim_id", "claims.claim_id")
+      .innerJoin(
+        "rights_profiles",
+        "rights_profiles.rights_profile_id",
+        "citations.rights_profile_id",
+      )
+      .select([
+        "rights_profiles.rights_profile_id as rights_profile_id",
+        "rights_profiles.metadata_rights as metadata_rights",
+        "rights_profiles.transcription_rights as transcription_rights",
+        "rights_profiles.image_rights as image_rights",
+        "rights_profiles.database_rights as database_rights",
+        "rights_profiles.automated_access as automated_access",
+        "rights_profiles.commercial_use as commercial_use",
+        "rights_profiles.redistribution as redistribution",
+        "rights_profiles.review_status as review_status",
+      ])
+      .where("claims.subject_entity_id", "=", surnameId)
+      .where("claims.claim_status", "=", "ACTIVE")
+      .distinct()
+      .execute(),
+  ]);
 
   const privacyPublic = entity?.privacy_class === "PUBLIC" && entity.lifecycle_status === "ACTIVE";
-
-  const profiles = await db
-    .selectFrom("claims")
-    .innerJoin("citations", "citations.claim_id", "claims.claim_id")
-    .innerJoin(
-      "rights_profiles",
-      "rights_profiles.rights_profile_id",
-      "citations.rights_profile_id",
-    )
-    .select([
-      "rights_profiles.rights_profile_id as rights_profile_id",
-      "rights_profiles.metadata_rights as metadata_rights",
-      "rights_profiles.transcription_rights as transcription_rights",
-      "rights_profiles.image_rights as image_rights",
-      "rights_profiles.database_rights as database_rights",
-      "rights_profiles.automated_access as automated_access",
-      "rights_profiles.commercial_use as commercial_use",
-      "rights_profiles.redistribution as redistribution",
-      "rights_profiles.review_status as review_status",
-    ])
-    .where("claims.subject_entity_id", "=", surnameId)
-    .where("claims.claim_status", "=", "ACTIVE")
-    .distinct()
-    .execute();
 
   if (profiles.length === 0) return { ...CLOSED, privacyPublic };
 

@@ -124,6 +124,46 @@ const FULL_INPUT = {
     count: 67_308,
     surface: SURFACE,
   },
+  // SYNTHETIC: two real localities of the TERYT excerpt (TASK-039) stand in for
+  // the section's shape; nothing here asserts that a locality named KOWALSKI exists.
+  localities: {
+    state: "READY",
+    reference_date: "2026-01-01",
+    places: [
+      {
+        place: { id: id(21), name: "Jemna", kind: "VILLAGE", teryt_simc: "0855434" },
+        gmina: "Stoszowice",
+        powiat: "ząbkowicki",
+        voivodeship: "DOLNOŚLĄSKIE",
+      },
+      {
+        place: { id: id(22), name: "Szklary", kind: "VILLAGE", teryt_simc: "0856623" },
+        gmina: "Ząbkowice Śląskie",
+        powiat: "ząbkowicki",
+        voivodeship: "DOLNOŚLĄSKIE",
+      },
+    ],
+    total: 3,
+    confidence: {
+      status: "VERIFIED",
+      methodology_code: "official_name_exact_key@locality_match@1",
+    },
+    citation: {
+      id: "cit-teryt",
+      title: "TERYT",
+      publisher: "GUS",
+      publication_date: "2026-01-01",
+      source_type: "OFFICIAL_DATASET",
+      locator: "TERYT SIMC, wersja urzędowa, STAN_NA 2026-01-01",
+      url: "https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default",
+      attribution: null,
+      terms: null,
+      retrieved_at: "2026-09-30T01:26:29Z",
+      source_page_url: "https://api.stat.gov.pl/Home/TerytApi?lang=en",
+    },
+    reason_code: null,
+    surface: SURFACE,
+  },
   distribution: {
     state: "READY",
     entries: [
@@ -343,6 +383,16 @@ const COUNT_ONLY: SurnameResultResponse = surnameResultResponseSchema.parse({
     surface: SURFACE,
   },
   other_form: null,
+  localities: {
+    state: "NOT_LOADED",
+    reference_date: null,
+    places: [],
+    total: null,
+    confidence: null,
+    citation: null,
+    reason_code: "TERYT_NOT_LOADED",
+    surface: SURFACE,
+  },
   distribution: {
     state: "UNAVAILABLE",
     entries: [],
@@ -423,6 +473,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
       "meaning",
       "print",
       "catalogue",
+      "places",
       "bearers",
       "end",
     ]);
@@ -454,6 +505,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
       bearers: null,
       neighbours: null,
       other_form: null,
+      localities: null,
     });
     expect(deckCards(unresolved, "pl", LINKS)).toEqual([]);
   });
@@ -500,8 +552,38 @@ describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
     const sources = [...html.matchAll(/<p class="dk-source">(.*?)<\/p>/gu)].map((m) =>
       text(m[1] ?? ""),
     );
-    expect(sources).toHaveLength(11);
+    expect(sources).toHaveLength(12);
     for (const source of sources.slice(0, -1)) expect(source).toMatch(/\b(19|20)\d\d\b/u);
+  });
+
+  it("lists the localities the page lists, with the line that a shared name is a coincidence", () => {
+    const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "places");
+    const html = faces(card === undefined ? [] : [card]);
+    const page = text(renderToStaticMarkup(createElement(Result, { response: FULL, lang: "pl" })));
+    for (const name of ["Jemna", "Szklary", "gm. Stoszowice, pow. ząbkowicki, woj. DOLNOŚLĄSKIE"]) {
+      expect(html).toContain(name);
+      expect(page).toContain(name);
+    }
+    expect(text(html)).toContain("i jeszcze 1");
+    expect(page).toContain("i jeszcze 1");
+    // The warning line, on the card itself, so a screenshot keeps it (ADR-0025 §2.7).
+    expect(text(html)).toContain("Zbieżność nazw w rejestrze.");
+    for (const lang of ["pl", "en"] as const) {
+      const body = text(
+        faces(deckCards(FULL, lang, LINKS).filter((c) => c.key === "places")),
+      ).toLowerCase();
+      for (const wrong of ["pochodzi", "comes from", "originat", "mieszka", "lives in"]) {
+        expect(body, `${lang}: ${wrong}`).not.toContain(wrong);
+      }
+    }
+  });
+
+  it("has no localities card for a surname that matches no locality", () => {
+    const none = surnameResultResponseSchema.parse({
+      ...FULL_INPUT,
+      localities: { ...FULL_INPUT.localities, places: [], total: 0 },
+    });
+    expect(deckCards(none, "pl", LINKS).map((c) => c.key)).not.toContain("places");
   });
 
   it("states the coverage warning before the map's figures, as the page does", () => {
@@ -899,6 +981,7 @@ describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () =>
       bearers: null,
       neighbours: null,
       other_form: null,
+      localities: null,
     });
     expect(summaryFacts(unresolved, "pl")).toBeNull();
     expect(shareFacts(unresolved, "summary", "pl")).toBeNull();

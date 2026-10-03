@@ -5,9 +5,10 @@
 #   1. TERC and SIMC, downloaded from GUS through the "Pliki pełne" page's own
 #      postback, each CSV member checked against fixtures/teryt/source-manifest.json;
 #   2. the source catalogue, then the TERYT import;
-#   3. Buryan 1933 (sources/onomastics/buryan-1933.json), then a SURNAME_MEANING
-#      derivation for each of its surnames;
-#   4. the gate: TERYT's counts, one meaning per Buryan surname in the register,
+#   3. every onomastic source file in sources/onomastics/ (Buryan 1933 and, since
+#      TASK-069, Onomastica), then a SURNAME_MEANING derivation for each surname
+#      they list;
+#   4. the gate: TERYT's counts, one meaning per listed surname in the register,
 #      and the PESEL register exactly as finalize left it;
 #   5. read access for the web role, VACUUM ANALYZE, and a pg_dump beside
 #      finalize's.
@@ -33,7 +34,7 @@ STATE=/var/lib/name-atlas
 FINALIZED=$STATE/register-finalized
 BACKUP_DIR=$STATE/backup
 TERYT_MANIFEST=fixtures/teryt/source-manifest.json
-BURYAN=sources/onomastics/buryan-1933.json
+ONOMASTICS_DIR=sources/onomastics
 TERYT_PAGE='https://eteryt.stat.gov.pl/eTeryt/rejestr_teryt/udostepnianie_danych/baza_teryt/uzytkownicy_indywidualni/pobieranie/pliki_pelne.aspx?contrast=default'
 
 log() { echo "[extras] $*"; }
@@ -60,7 +61,11 @@ if [ -d /run/systemd/system ]; then
 fi
 [ -f "$FINALIZED" ] ||
   die "finalize has not run ($FINALIZED is missing). Its gate counts exactly the four PESEL source records, so this runs after it"
-{ [ -f "$APP/$TERYT_MANIFEST" ] && [ -f "$APP/$BURYAN" ]; } || die "$APP has no $TERYT_MANIFEST or $BURYAN; push build first"
+shopt -s nullglob
+onomastic_files=("$APP/$ONOMASTICS_DIR"/*.json "$APP"/datasets/onomastics/*.json)
+shopt -u nullglob
+{ [ -f "$APP/$TERYT_MANIFEST" ] && [ "${#onomastic_files[@]}" -gt 0 ]; } ||
+  die "$APP has no $TERYT_MANIFEST or no $ONOMASTICS_DIR/*.json; push build first"
 command -v python3 >/dev/null || die "python3 is missing (it unpacks the TERYT zips)"
 
 pesel_state() {
@@ -130,23 +135,33 @@ log "2/5 the source catalogue, then TERYT"
 as_build pnpm --silent seed:sources | sed 's/^/[extras]   /'
 as_build pnpm --silent import:teryt --terc "$TERYT_DIR/TERC.csv" --simc "$TERYT_DIR/SIMC.csv" | sed 's/^/[extras]   /'
 
-log "3/5 Buryan 1933, then SURNAME_MEANING for each of its surnames"
-as_build pnpm --silent import-onomastics --file "$APP/$BURYAN" | sed 's/^/[extras]   /'
+log "3/5 ${#onomastic_files[@]} onomastic source file(s), then SURNAME_MEANING for each surname they list"
+for f in "${onomastic_files[@]}"; do
+  as_build pnpm --silent import-onomastics --file "$f" | sed 's/^/[extras]   /'
+done
+# A surname two works discuss gets one claim, so it is derived and counted once.
 mapfile -t surnames < <(as_build node -e \
-  'for (const e of require(process.argv[1]).entries) console.log(e.surname)' "$APP/$BURYAN")
-[ "${#surnames[@]}" -gt 0 ] || die "$BURYAN lists no surnames"
+  'for (const f of process.argv.slice(1)) for (const e of require(f).entries) console.log(e.surname)' \
+  "${onomastic_files[@]}" | sort -u)
+[ "${#surnames[@]}" -gt 0 ] || die "$ONOMASTICS_DIR lists no surnames"
 with_meaning=0 without_meaning=0 not_in_register=0
+# `sort -u` is byte-wise, so "ZAREMBA" and "Zaremba" both survive it while the register holds one
+# surname and one claim. The tool prints the register's own display form first; count each once.
+declare -A counted=()
 for s in "${surnames[@]}"; do
   out=$(as_build pnpm exec tsx packages/truth/bin/surname-meaning.ts "$s")
   first=${out%%$'\n'*}
   echo "[extras]   $first"
+  display=${first%%:*}
+  if [ -n "${counted[$display]:-}" ]; then continue; fi
+  counted[$display]=1
   case "$first" in
     *"interpretation(s))") with_meaning=$((with_meaning + 1)) ;;
     *"NO SOURCED MEANING"*) without_meaning=$((without_meaning + 1)) ;;
     *) not_in_register=$((not_in_register + 1)) ;;
   esac
 done
-log "  ${#surnames[@]} surnames: $with_meaning with a meaning, $without_meaning in the register without one, $not_in_register not resolved"
+log "  ${#counted[@]} distinct surnames ($((${#surnames[@]} - ${#counted[@]})) listed again in another form): $with_meaning with a meaning, $without_meaning in the register without one, $not_in_register not resolved"
 
 log "4/5 the gate"
 fail=0
@@ -160,7 +175,7 @@ check "SIMC ids (localities)" 101865 "$(q "SELECT count(*) FROM entity_external_
 check "TERYT source records (2 files + 4,360 + 101,865 rows)" 106227 "$(q "
   SELECT count(*) FROM source_records sr JOIN sources s ON s.source_id = sr.source_id WHERE s.source_key = 'pl_teryt'")"
 check "REGION places" 16 "$(q "SELECT count(*) FROM places WHERE place_type = 'REGION'")"
-check "Buryan surnames in the register without a meaning" 0 "$without_meaning"
+check "listed surnames in the register without a meaning" 0 "$without_meaning"
 check "ACTIVE SURNAME_MEANING claims" "$with_meaning" \
   "$(q "SELECT count(*) FROM claims WHERE claim_type = 'SURNAME_MEANING' AND claim_status = 'ACTIVE'")"
 check "ACTIVE claims sharing a claim_key" 0 \
@@ -188,4 +203,4 @@ mv "$dump.partial" "$dump"
 log "  $(du -h "$dump" | cut -f1) $dump"
 
 date -u +%Y-%m-%dT%H:%M:%SZ >"$STATE/extras-loaded"
-log "done: TERYT and Buryan 1933 are loaded"
+log "done: TERYT and the onomastic sources are loaded"

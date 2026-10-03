@@ -31,6 +31,9 @@ import type {
   BearersSection,
   ChangeEntry,
   DistributionEntry,
+  LocalitiesSection,
+  LocalityEntry,
+  LocalityKind,
   OtherForm,
   PopulationObservation,
   RarityEntry,
@@ -904,6 +907,20 @@ export const UI = {
     archiveNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w zbiorach Polony.",
     archiveUnavailable: "Wyników z Polony nie można teraz pokazać.",
     archiveBlocked: "Wyników z Polony nie można pokazać tutaj z powodu licencji źródła.",
+    // TASK-090: localities with the same name (ADR-0025 §2.7).
+    chapterPlacesTitle: "Które miejscowości tak się nazywają?",
+    chapterPlacesLede:
+      "Rejestr TERYT, urzędowy wykaz miejscowości, zawiera miejscowości o nazwie takiej samej " +
+      "jak to nazwisko. Pokazujemy je z gminą, powiatem i województwem.",
+    placesNote:
+      "Zbieżność nazw w rejestrze. Nie mówi ona, skąd wzięło się nazwisko, ani że ma ono " +
+      "związek z tymi miejscami.",
+    placesWhole:
+      "Tylko miejscowości samodzielne według SIMC, bez części miejscowości, pod nazwą urzędową " +
+      "z rejestru.",
+    placesCity: "miasto",
+    placesVillage: "wieś",
+    placesOther: "inna miejscowość",
     // TASK-073: known people with the surname, from Wikidata (ADR-0030).
     chapterBearersTitle: "Kto znany nosi to nazwisko?",
     chapterBearersLede:
@@ -928,6 +945,7 @@ export const UI = {
     navMeaning: "Znaczenie",
     navChange: "Zmiany w czasie",
     navArchive: "W archiwach",
+    navPlaces: "Miejscowości",
     navBearers: "Znane osoby",
     navSources: "Źródła",
     rankCaption: "miejsce na liście nazwisk",
@@ -974,6 +992,8 @@ export const UI = {
     deckCatalogue: "W katalogu",
     deckCatalogueHeading: "Rekordy katalogu Polony, w których pada to słowo.",
     deckCatalogueTotal: "rekordów łącznie",
+    deckPlaces: "Miejscowości",
+    deckPlacesHeading: "Miejscowości w rejestrze TERYT o tej samej nazwie.",
     deckEnd: "Podsumowanie",
     deckEndHeading: "w liczbach.",
     deckFullPage: "Zobacz całą stronę",
@@ -1536,6 +1556,20 @@ export const UI = {
     archiveNotSearched: "We have not searched Polona's collections for this surname yet.",
     archiveUnavailable: "Results from Polona cannot be shown right now.",
     archiveBlocked: "Results from Polona cannot be shown here because of the source's licence.",
+    // TASK-090: localities with the same name (ADR-0025 §2.7).
+    chapterPlacesTitle: "Which localities have this name?",
+    chapterPlacesLede:
+      "The TERYT register, Poland's official list of localities, holds localities named the " +
+      "same as this surname. We show them with their gmina, powiat and voivodeship.",
+    placesNote:
+      "A shared name in the register. It does not say where the surname began, or that the " +
+      "surname and these places are connected.",
+    placesWhole:
+      "Whole localities only, as SIMC lists them, without parts of a locality, under the " +
+      "register's official name.",
+    placesCity: "town",
+    placesVillage: "village",
+    placesOther: "other locality",
     // TASK-073: known people with the surname, from Wikidata (ADR-0030).
     chapterBearersTitle: "Who well known has this surname?",
     chapterBearersLede:
@@ -1561,6 +1595,7 @@ export const UI = {
     navMeaning: "Meaning",
     navChange: "Change over time",
     navArchive: "In archives",
+    navPlaces: "Localities",
     navBearers: "Well-known people",
     navSources: "Sources",
     rankCaption: "rank on the surname list",
@@ -1607,6 +1642,8 @@ export const UI = {
     deckCatalogue: "In the catalogue",
     deckCatalogueHeading: "Records in Polona's catalogue in which the word appears.",
     deckCatalogueTotal: "records in all",
+    deckPlaces: "Localities",
+    deckPlacesHeading: "Localities in the TERYT register with the same name.",
     deckEnd: "Summary",
     deckEndHeading: "in numbers.",
     deckFullPage: "See the full page",
@@ -2065,4 +2102,61 @@ export function rightsBlockedText(lang: Lang): string {
   return lang === "pl"
     ? "Licencja źródła nie pozwala pokazać tej wartości na tej stronie."
     : "The source's licence does not permit showing this value on this page.";
+}
+
+/* --- localities with the same name (TASK-090, ADR-0025 §2.7) ------------- */
+
+/** The register's kinds, by TASK-039's classification of SIMC's `RM`. */
+export function localityKindLabel(kind: LocalityKind, lang: Lang): string {
+  const t = UI[lang];
+  return kind === "CITY" ? t.placesCity : kind === "VILLAGE" ? t.placesVillage : t.placesOther;
+}
+
+/** "gm. Stoszowice, pow. ząbkowicki, woj. DOLNOŚLĄSKIE": the register's names, as written. */
+export function localityAdminLine(entry: LocalityEntry, lang: Lang): string {
+  return lang === "pl"
+    ? `gm. ${entry.gmina}, pow. ${entry.powiat}, woj. ${entry.voivodeship}`
+    : `gmina ${entry.gmina}, powiat ${entry.powiat}, ${entry.voivodeship} voivodeship`;
+}
+
+/** "miejscowość" / "miejscowości", "locality" / "localities", for a count. */
+export function localitiesNoun(n: number, lang: Lang): string {
+  if (lang === "pl") return n === 1 ? "miejscowość" : "miejscowości";
+  return n === 1 ? "locality" : "localities";
+}
+
+/**
+ * The chapter's statement: the register, the count and the register's own
+ * date. It names a coincidence of names and nothing more; the warning line
+ * that follows it says so.
+ */
+export function localitiesSentence(
+  section: LocalitiesSection,
+  surname: string,
+  lang: Lang,
+): string | null {
+  if (section.state !== "READY" || section.total === null || section.reference_date === null) {
+    return null;
+  }
+  const date = formatDate(section.reference_date, lang);
+  if (section.total === 0) {
+    return terminate(
+      lang === "pl"
+        ? `Rejestr TERYT nie wymienia miejscowości o nazwie ${surname} (stan na ${date})`
+        : `The TERYT register lists no locality named ${surname} (as of ${date})`,
+    );
+  }
+  const count = formatInteger(section.total, lang);
+  const noun = localitiesNoun(section.total, lang);
+  return terminate(
+    lang === "pl"
+      ? `Rejestr TERYT wymienia ${count} ${noun} o nazwie ${surname} (stan na ${date})`
+      : `The TERYT register lists ${count} ${noun} named ${surname} (as of ${date})`,
+  );
+}
+
+/** "i jeszcze 3" / "and 3 more": what a shortened list leaves out. */
+export function localitiesMore(n: number, lang: Lang): string {
+  const count = formatInteger(n, lang);
+  return lang === "pl" ? `i jeszcze ${count}` : `and ${count} more`;
 }

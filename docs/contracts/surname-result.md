@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12; 1.11 is `localities`, open in #70 and #77), 2026-10-03
-- **Schema version:** `1.10` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-090 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03
+- **Schema version:** `1.12` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -31,7 +31,7 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
 
 ```jsonc
 {
-  "schema_version": "1.10",
+  "schema_version": "1.11",
   "status": "RESOLVED",          // | "UNRESOLVED" | "AMBIGUOUS"
   "surname": {                    // null unless RESOLVED
     "id": "<uuid>",
@@ -249,11 +249,35 @@ A resolved surname also carries its neighbours on each list it is ranked on, and
 }
 ```
 
+A resolved surname also carries the localities in the TERYT register whose official name is the surname (1.11), on TERYT's own rights, with the register's reference date. A lookup, not a claim: a shared name is a coincidence in the register, and no field says, and no surface may say, that the surname began in or is connected with any of these places. `READY` with no place is an answer; `NOT_LOADED` says the database holds no SIMC file.
+
+```jsonc
+"localities": {
+  "state": "READY",              // | "NOT_LOADED" | "RIGHTS_BLOCKED"
+  "reference_date": "2026-01-01", // the register's STAN_NA; null unless READY
+  "places": [                    // whole localities only, at most 20: cities, villages, the rest;
+    {                            // then by voivodeship, powiat, gmina, name
+      "place": { "id": "…", "name": "Jemna", "kind": "VILLAGE", "teryt_simc": "0855434" },
+      "gmina": "Stoszowice",
+      "powiat": "ząbkowicki",
+      "voivodeship": "DOLNOŚLĄSKIE"
+    }
+  ],
+  "total": 1,                    // how many match, listed or not; null unless READY
+  "confidence": { "status": "VERIFIED", "methodology_code": "official_name_exact_key@locality_match@1" },
+  "citation": { "id": "…", "title": "TERYT", "publisher": "GUS", "publication_date": "2026-01-01",
+                "source_type": "OFFICIAL_DATASET", "locator": "TERYT SIMC, wersja urzędowa, STAN_NA 2026-01-01",
+                "source_page_url": "https://api.stat.gov.pl/Home/TerytApi?lang=en", "…": "as above" },
+  "reason_code": null,           // TERYT_NOT_LOADED when NOT_LOADED; non-null exactly when not READY
+  "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
+}
+```
+
 For an input that did not resolve, the fact sections are null and `suggestions` carries the answer:
 
 ```jsonc
 {
-  "schema_version": "1.10",
+  "schema_version": "1.11",
   "status": "UNRESOLVED",
   "surname": null,
   "population": null,
@@ -310,8 +334,12 @@ These are schema constraints, not conventions — a violating payload fails vali
 26. **Neighbours are `READY` exactly when they hold a list.** Added in 1.10. Not `READY` carries no list and a reason; `READY` carries no reason. The section is present exactly when `status` is `RESOLVED`.
 27. **The other form is a form, by one fixed rule, and never the surname itself.** Added in 1.10. `rule_code` is the literal `ADJECTIVAL_SKI_CKI_DZKI`: -ski, -cki and -dzki pair with -ska, -cka and -dzka on the other list, and no other ending is paired. No field states a relation between the people who bear the two forms (ADR-0025 §2.5).
 28. **The other form is present only on a resolved surname.** Added in 1.10. It is null on every other status, and null where the rule does not pair the ending or the paired form has no rank on the other list.
-29. **A bearer shares the surname, nothing more.** Added in 1.12. `people` are those whose own name in Wikidata ends with exactly the surname and who have a Wikipedia article (ADR-0030 §2.1). No field relates them to each other or to the reader, and the page says so beside them. A null `died` means Wikidata states no date of death, not that the person is alive.
-30. **`people` and `more` add up to `total`.** Added in 1.12. How many are listed depends on the surface (ADR-0030 §2.7); the count does not. `NOT_SEARCHED` carries no count, date or person, and a `READY` section with a total of zero is an answer.
+29. **A locality is listed by exact name, and never as the surname's origin.** Added in 1.11. A place is listed when its official name's canonical key is the surname's (`official_name_exact_key`), and only a whole locality is (a part of a locality is not). No field relates the surname to the place beyond the name; `docs/sources/INVENTORY.md` §4 ("a surname appearing in a place is not evidence that it originated there") binds every surface.
+30. **A READY localities section carries its date, total, confidence and citation.** Added in 1.11. `reference_date` is the register's own `STAN_NA`, `total` counts every match whether listed or not and is never below the list's length, and `reason_code` is null exactly when READY. `READY` with no place is an answer: the register lists no locality of that name.
+31. **A locality is listed once, and at most 20 are.** Added in 1.11. The list is in a fixed order (cities, villages, the rest; then voivodeship, powiat, gmina, name), so two reads of one state agree; `total` says what the list leaves out.
+32. **The localities section is present exactly when the surname resolved.** Added in 1.11. On every other status it is null, like the other sections.
+33. **A bearer shares the surname, nothing more.** Added in 1.12. `people` are those whose own name in Wikidata ends with exactly the surname and who have a Wikipedia article (ADR-0030 §2.1). No field relates them to each other or to the reader, and the page says so beside them. A null `died` means Wikidata states no date of death, not that the person is alive.
+34. **`people` and `more` add up to `total`.** Added in 1.12. How many are listed depends on the surface (ADR-0030 §2.7); the count does not. `NOT_SEARCHED` carries no count, date or person, and a `READY` section with a total of zero is an answer.
 
 ## Accepted rendering of a rarity entry
 
@@ -359,6 +387,15 @@ Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between
 - Changes carry their sign, a true minus and one decimal. The table below the sentence has one row per edition with its count and its share of that edition's list ("1 in X"), a row saying *not on the list — not zero* for an absent edition, a row in place of a publisher's duplicate saying it repeats the previous edition, and a note that the 2019 files describe their contents in fewer words and are read as the same list.
 - The chapter is shown only for a `READY` section; `UNAVAILABLE` is not a chapter.
 
+## Accepted rendering of a localities section
+
+Decided with TASK-090 (2026-10-01, ADR-0025 §2.7: localities "under a line saying it is not where the surname comes from"). The statement names the register, the count and the date; the warning line comes before the list; and the list gives each locality's kind and its gmina, powiat and voivodeship as the register writes them:
+
+- EN: `The TERYT register lists {n} {locality|localities} named {surname} (as of {date}).` then *A shared name in the register. It does not say where the surname began, or that the surname and these places are connected.*
+- PL: `Rejestr TERYT wymienia {n} {miejscowość|miejscowości} o nazwie {surname} (stan na {date}).` then *Zbieżność nazw w rejestrze. Nie mówi ona, skąd wzięło się nazwisko, ani że ma ono związek z tymi miejscami.*
+- **Never** "comes from", "originates", "pochodzi", "lives in" or "mieszka": the page's forbidden words hold for this chapter as for the distribution.
+- The chapter and the card are shown only for a `READY` section with at least one place; no place is not a chapter.
+
 ## Recorded deviations
 
 - **`unit` is a two-member enum, and PESEL now emits `PEOPLE`.** `docs/canonical/16` §26 fixes the unit as the single literal `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widened it to `"PEOPLE" | "SURNAME_OCCURRENCES"` while TASK-004 §14 U-4 was open. On 2026-09-20 the project owner decided U-4 on the field's definition — the counted field is *nazwisko aktualne*, of which every living person in PESEL has exactly one, so an occurrence among living persons is one person — and PESEL-derived values emit `"PEOPLE"` since then (ADR-0004, amendment of 2026-09-20). `"SURNAME_OCCURRENCES"` stays in the enum for a source whose counted field is not one-per-person. Not a breaking change: the enum is unchanged, only the emitted value.
@@ -375,7 +412,8 @@ Decided with TASK-051 (2026-09-30, ADR-0020 §2.5). It says what changed between
 
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
 
-**1.10 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.10 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-066, #70 and #77), not on `main` when this was written; whichever lands second carries both.
+**1.10 → 1.11 (2026-10-01, TASK-090, ADR-0025 §2.7).** Adds `localities` (required, nullable, present exactly when `status` is `RESOLVED`). A consumer written against 1.10 is unaffected; a producer must now supply it. It is a lookup in the TERYT register TASK-039 loads, through the indexes migrations 0010 and 0023 made, so no new derivation, claim or migration comes with it; its state and surface come from `pl_teryt`'s stored rights profile, as the archive's do from Polona's.
+**1.11 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.11 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-090, #70 and #77), not on `main` when this was written; whichever lands second carries both.
 
 **1.9 → 1.10 (2026-10-01, TASK-055, ADR-0025).** Adds `neighbours` (required, nullable, present exactly when `status` is `RESOLVED`) and `other_form` (required, nullable, null unless `RESOLVED`). A consumer written against 1.9 is unaffected; a producer must now supply both. Both are read from rank claims that already exist, so no new derivation comes with them; migration 0026 adds an index so that the neighbours of a rare surname, whose place is shared by tens of thousands, are read without a sort.
 

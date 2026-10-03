@@ -7562,6 +7562,43 @@ a.tree-card:hover {
   margin: 0 0 var(--space-2);
 }
 
+/* --- localities with the same name (TASK-090, ADR-0025 §2.7) ------------ */
+
+.places {
+  display: grid;
+  gap: 2px;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.places li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.place-name {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.place-kind {
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: var(--text-secondary);
+}
+
+.place-admin {
+  grid-column: 1 / -1;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
 /* --- the deck of cards (TASK-055, ADR-0025) ----------------------------- */
 
 /* A layer over the complete page, drawn by script only. Each card is one
@@ -8318,12 +8355,44 @@ a.tree-card:hover {
   color: var(--dusk-ink-soft);
 }
 
+/* The localities card (TASK-090): one row per place, the register's names as written. */
+.dk-places {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .dk-bearers {
   display: grid;
   gap: var(--space-3);
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.dk-places li {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid #fffaf314;
+  border-radius: 12px;
+  background: #fffaf30a;
+}
+
+.dk-places b {
+  display: block;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.dk-places span {
+  display: block;
+  margin-top: calc(var(--space-2) / 2);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-soft);
 }
 
 .dk-bearers li {

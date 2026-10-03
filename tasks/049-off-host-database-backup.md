@@ -1,6 +1,6 @@
 # TASK-049 — An off-host copy of the production database, with one restore tested
 
-- **Status:** SPECIFIED 2026-09-30, not started. One of five launch hygiene tasks (046–050).
+- **Status:** TOOLING IMPLEMENTED 2026-10-02 in TASK-070; production upload and PostgreSQL 17 restore drill remain BLOCKED on the R2 credentials and the owner-held age identity. AC-1 is verified; AC-2 and AC-3 are not completed. One of five launch hygiene tasks (046–050).
 - **Requested by:** the project owner, 2026-09-30 (see TASK-046).
 - **Milestone:** none in `PLAN.md`.
 - **Depends on:** TASK-042 (the VM) and its `finalize`; the owner's access to the VM or a working `Register VM` workflow.

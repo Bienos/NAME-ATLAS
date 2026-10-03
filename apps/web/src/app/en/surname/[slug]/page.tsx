@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { permanentRedirect } from "next/navigation";
 import {
   answerSlug,
+  answerSlugForMetadata,
   CanonicalSurnamePage,
   metadataFor,
   parseIntent,
@@ -23,7 +24,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  return metadataFor(await answerSlug(slug, null, "en"), "en", slug);
+  return metadataFor(await answerSlugForMetadata(slug, "en"), "en", slug);
 }
 
 export default async function Page({ params, searchParams }: Props) {

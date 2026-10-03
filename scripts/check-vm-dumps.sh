@@ -7,7 +7,8 @@
 #      ADR-0029): the data-load steps dump the whole database, and without the
 #      flags each would copy readers' addresses, password hashes and the people
 #      of their trees into a plain file on the VM, which an account's deletion
-#      would not reach.
+#      would not reach. The exception is `backup.sh`'s one invocation, which
+#      streams them straight into age with pipefail (TASK-049 / TASK-070).
 #
 # `scripts/check-vm-dumps.sh [DIR]` checks DIR instead of ops/vm, which is how
 # a test breaks a copy on purpose. It finds the dumps by their options, so a
@@ -32,12 +33,22 @@ done
 
 while IFS=: read -r file line text; do
   dumps=$((dumps + 1))
-  for schema in accounts family; do
-    if [[ "$text" != *"--exclude-table-data='$schema.*'"* ]]; then
-      echo "check-vm-dumps: $file:$line runs pg_dump without --exclude-table-data='$schema.*'" >&2
+  if [ "$(basename "$file")" = backup.sh ]; then
+    # Only this exact streaming invocation may include private rows. A file
+    # output, a removed pipe, or a different encryptor fails this guard.
+    next=$(sed -n "$((line + 1))p" "$file")
+    # shellcheck disable=SC2016 # compare literal shell source, not expanded variables
+    if [[ "$text" != *'pg_dump --format=custom --snapshot="$snapshot" -d "$DB" 2>"$tmp/dump.err" |' ]] ||
+       [[ "$next" != *'age -r "$recipient" -o "$tmp/dump.age"'* ]] ||
+       ! grep -q '^set -euo pipefail$' "$file"; then
+      echo "check-vm-dumps: $file:$line must stream directly into age with pipefail" >&2
       status=1
     fi
-  done
+  elif [[ "$text" != *"--exclude-table-data='accounts.*'"* ||
+          "$text" != *"--exclude-table-data='family.*'"* ]]; then
+    echo "check-vm-dumps: $file:$line must exclude accounts and family rows" >&2
+    status=1
+  fi
 done < <(grep -nE '(^|[[:space:]])pg_dump[[:space:]]+--' "${scripts[@]}" | grep -vE '^[^:]+:[0-9]+:[[:space:]]*#' || true)
 
 # A check that finds nothing checks nothing: the four data-load scripts take a dump each.
@@ -47,6 +58,6 @@ if [ "$dumps" -lt 4 ] && [ "$dir" = ops/vm ]; then
 fi
 
 if [ "$status" = 0 ]; then
-  echo "check-vm-dumps: ${#scripts[@]} scripts parse, and all $dumps pg_dump invocations exclude the rows of schemas accounts and family"
+  echo "check-vm-dumps: ${#scripts[@]} scripts parse, and $dumps dumps exclude private rows or stream them directly into age"
 fi
 exit "$status"

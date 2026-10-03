@@ -11,8 +11,9 @@ import type { Kysely } from "kysely";
  * enums it needs already exist (0004). So this migration adds one enum value
  * and one constraint, as 0025 did.
  *
- * Numbered 0029 because 0028 is the family tree's (#67, #76, #77, #79), which
- * is not on `main` yet (`AGENTS.md` §11).
+ * Numbered 0029 because 0028 was the family tree's (#67, #76, #77, #79), which
+ * was not on `main` yet (`AGENTS.md` §11). The family tree merged after this, as
+ * 0030, so that no database is asked to apply a migration older than one it has.
  *
  * The constraint compares `claim_type::text`, not the enum literal: PostgreSQL
  * refuses to use a value added by `ALTER TYPE … ADD VALUE` in the transaction

@@ -99,6 +99,17 @@ export const SECTIONS = [
     title: "chapterArchiveTitle",
     lede: "chapterArchiveLede",
   },
+  // TASK-090: TERYT's localities with the surname's name (ADR-0025 §2.7),
+  // shown only when one matches.
+  {
+    key: "places",
+    field: "localities",
+    anchor: "places",
+    intent: "places",
+    nav: "navPlaces",
+    title: "chapterPlacesTitle",
+    lede: "chapterPlacesLede",
+  },
   // TASK-073: the known people Wikidata names with the surname (ADR-0030).
   {
     key: "bearers",

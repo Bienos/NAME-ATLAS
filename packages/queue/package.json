@@ -15,7 +15,6 @@
     "@name-atlas/db": "workspace:*",
     "@name-atlas/domain": "workspace:*",
     "@name-atlas/logging": "workspace:*",
-    "bullmq": "6.3.8",
     "ioredis": "5.9.0",
     "kysely": "0.29.6",
     "zod": "4.6.5"

@@ -67,6 +67,16 @@ function response(name: string, entries: unknown[]): SurnameResultResponse {
       surface: SURFACE,
     },
     other_form: null,
+    localities: {
+      state: "NOT_LOADED",
+      reference_date: null,
+      places: [],
+      total: null,
+      confidence: null,
+      citation: null,
+      reason_code: "TERYT_NOT_LOADED",
+      surface: SURFACE,
+    },
     change: {
       state: "UNAVAILABLE",
       entries: [],

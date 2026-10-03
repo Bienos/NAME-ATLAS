@@ -1,10 +1,9 @@
 import { db as sharedDb } from "../../lib/db.js";
 import { sitemapCount } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
-import { indexingEnabled } from "../../lib/seo.js";
+import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
 import { BLOG_SITEMAP_PATH, pageCount, sitemapIndexXml } from "../../lib/sitemap-xml.js";
 import { blogPosts } from "../../lib/blog-posts.js";
-import { siteOrigin } from "../../lib/surname-page.js";
 
 /**
  * `/sitemap.xml` — the sitemap index (TASK-027, ADR-0010 §3).

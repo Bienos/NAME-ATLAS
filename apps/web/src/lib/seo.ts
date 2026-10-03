@@ -33,6 +33,19 @@ export function indexingEnabled(env: Record<string, string | undefined> = proces
   return env[SEO_INDEXING_FLAG] === "true";
 }
 
+export const SITE_ORIGIN_ENV = "SITE_ORIGIN";
+
+/**
+ * The public origin for canonical and Open Graph URLs. Never guessed from a request.
+ *
+ * Lives here, not in the page module, so `robots.txt` and the sitemaps can read
+ * it without importing the page and everything the page imports.
+ */
+export function siteOrigin(env: Record<string, string | undefined> = process.env): string | null {
+  const value = env[SITE_ORIGIN_ENV]?.trim();
+  return value ? value.replace(/\/+$/u, "") : null;
+}
+
 /** The families a payload can publish on the surface it was evaluated for. */
 export function publishableFamilies(response: SurnameResultResponse): readonly ValueFamily[] {
   const families: ValueFamily[] = [];

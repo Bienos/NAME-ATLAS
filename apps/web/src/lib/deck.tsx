@@ -15,6 +15,7 @@ import type {
   ChangeEntry,
   CitationDto,
   DistributionEntry,
+  LocalitiesSection,
   NeighbourList,
   OtherForm,
   SurnameResultResponse,
@@ -29,6 +30,10 @@ import {
   formatInteger,
   formatPercent,
   formatPercentChange,
+  localitiesMore,
+  localitiesNoun,
+  localityAdminLine,
+  localityKindLabel,
   otherFormSentence,
   partitionLabel,
   reasonText,
@@ -632,6 +637,55 @@ function catalogue(archive: ArchiveSection, lang: Lang): CardFace | null {
   };
 }
 
+/** How many localities the card names; the total says what it leaves out. */
+const PLACES_ON_CARD = 5;
+
+/** TERYT's localities with the surname's name (TASK-090), the warning line on the card itself. */
+function places(response: SurnameResultResponse, lang: Lang): CardFace | null {
+  const t = UI[lang];
+  const section: LocalitiesSection | null = response.localities;
+  if (section?.state !== "READY" || section.places.length === 0) return null;
+  if (section.total === null || section.reference_date === null || section.citation === null) {
+    return null;
+  }
+  const shown = section.places.slice(0, PLACES_ON_CARD);
+  const more = section.total - shown.length;
+  return {
+    key: "places",
+    title: t.deckPlaces,
+    face: (
+      <Face
+        eyebrow={t.deckPlaces}
+        aside="TERYT"
+        heading={t.deckPlacesHeading}
+        source={
+          <>
+            {section.citation.publisher ?? section.citation.title} ·{" "}
+            <b>{formatDate(section.reference_date, lang)}</b>
+          </>
+        }
+      >
+        <p className="dk-big">
+          {formatInteger(section.total, lang)}
+          <small> {localitiesNoun(section.total, lang)}</small>
+        </p>
+        <ul className="dk-places">
+          {shown.map((entry) => (
+            <li key={entry.place.id}>
+              <b>{entry.place.name}</b>
+              <span>
+                {localityKindLabel(entry.place.kind, lang)} · {localityAdminLine(entry, lang)}
+              </span>
+            </li>
+          ))}
+        </ul>
+        {more > 0 ? <p className="dk-note">{localitiesMore(more, lang)}</p> : null}
+        <p className="dk-note">{t.placesNote}</p>
+      </Face>
+    ),
+  };
+}
+
 function bearers(section: BearersSection, lang: Lang): CardFace | null {
   const t = UI[lang];
   if (section.state !== "READY" || section.total === null || section.total === 0) return null;
@@ -760,9 +814,9 @@ function end(
 /**
  * The cards for a resolved surname, in ADR-0025 §2.3's order: the surname,
  * rarity, neighbours, where, change, the other form, meaning, old print,
- * Polona's catalogue, the known people with the surname (TASK-073), the
- * summary. Each card leads with the surname's main list. Empty for anything
- * that did not resolve.
+ * Polona's catalogue, the localities with the same name (TASK-090), the known
+ * people with the surname (TASK-073) and the summary. Each card leads with the
+ * surname's main list. Empty for anything that did not resolve.
  */
 export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckLinks): DeckCard[] {
   if (given.status !== "RESOLVED" || given.surname === null) return [];
@@ -779,6 +833,7 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
     meaning(response, lang),
     archive === null ? null : print(archive, lang),
     archive === null ? null : catalogue(archive, lang),
+    places(response, lang),
     response.bearers === null ? null : bearers(response.bearers, lang),
     end(response, surname, links, lang),
   ];

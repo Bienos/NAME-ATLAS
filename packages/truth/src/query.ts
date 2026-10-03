@@ -22,6 +22,7 @@
  */
 import type { Kysely } from "kysely";
 import { archiveSectionFor } from "./archive.js";
+import { localitiesSectionFor } from "./localities.js";
 import { bearersSectionFor } from "./bearers.js";
 import { OTHER_FORM_RULE, readOtherForm, readRankNeighbours } from "./neighbours.js";
 import type { DB } from "@name-atlas/db";
@@ -623,6 +624,7 @@ export async function querySurnameResult(
         bearers: null,
         neighbours: null,
         other_form: null,
+        localities: null,
       },
     };
   }
@@ -647,6 +649,7 @@ export async function querySurnameResult(
         bearers: null,
         neighbours: null,
         other_form: null,
+        localities: null,
       },
     };
   }
@@ -667,6 +670,9 @@ export async function querySurnameResult(
     display_name: resolution.resolved_canonical_display ?? resolution.unicode_nfc,
     script: resolution.primary_script,
   };
+  // TERYT's localities with the surname's name, on TERYT's own rights, present
+  // on every resolved surname whether or not the register counts it (TASK-090).
+  const localities = await localitiesSectionFor(db, identity.display_name, surface);
 
   if (claims.length === 0) {
     // Absence. The surname may be below the publisher's suppression
@@ -706,6 +712,7 @@ export async function querySurnameResult(
         bearers: bearersSection,
         neighbours: emptyNeighbours("UNAVAILABLE", reason, noRights),
         other_form: null,
+        localities,
       },
     };
   }
@@ -742,6 +749,7 @@ export async function querySurnameResult(
         bearers: bearersSection,
         neighbours: emptyNeighbours("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         other_form: null,
+        localities,
       },
     };
   }
@@ -843,6 +851,7 @@ export async function querySurnameResult(
       bearers: bearersSection,
       neighbours: extras.neighbours,
       other_form: extras.other_form,
+      localities,
     },
   };
 }

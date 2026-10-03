@@ -1,7 +1,8 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import * as reports from "../../../packages/sources/src/import-result.js";
 import { sql } from "kysely";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
@@ -107,6 +108,39 @@ describe("regional ingestion and the voivodeship Place foundation (TASK-011)", (
       "knowledge_entities",
     ]) {
       await sql`DELETE FROM ${sql.table(table)}`.execute(db());
+    }
+  });
+
+  it("rolls back a database failure and returns DATABASE_ERROR", async () => {
+    await sql`CREATE FUNCTION reject_regional_insert() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN RAISE EXCEPTION 'fixture database refusal' USING ERRCODE = '23514'; END $$`.execute(
+      db(),
+    );
+    await sql`CREATE TRIGGER reject_regional BEFORE INSERT ON source_records
+      FOR EACH ROW EXECUTE FUNCTION reject_regional_insert()`.execute(db());
+    try {
+      const result = await importRegionalMale();
+      expect(result).toMatchObject({ kind: "FAILED", reason: "DATABASE_ERROR" });
+      expect(await countOf("source_records")).toBe(0);
+      expect(await countOf("sources")).toBe(0);
+      expect(await countOf("distribution_values")).toBe(0);
+    } finally {
+      await sql`DROP TRIGGER reject_regional ON source_records`.execute(db());
+      await sql`DROP FUNCTION reject_regional_insert()`.execute(db());
+    }
+  });
+
+  it("rolls back an unexpected reconciliation error without labelling it a database failure", async () => {
+    const error = new TypeError("fixture reconciliation defect");
+    const assertion = vi.spyOn(reports, "assertRegionalReconciles").mockImplementationOnce(() => {
+      throw error;
+    });
+    try {
+      await expect(importRegionalMale()).rejects.toBe(error);
+      expect(await countOf("source_records")).toBe(0);
+      expect(await countOf("distribution_values")).toBe(0);
+    } finally {
+      assertion.mockRestore();
     }
   });
 

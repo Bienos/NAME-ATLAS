@@ -6,7 +6,6 @@ import type {
   SurnameResultResponse,
 } from "@name-atlas/contracts";
 import {
-  assessmentWord,
   formatDate,
   formatInteger,
   formatPercent,
@@ -239,6 +238,3 @@ export function Snapshot({
     </header>
   );
 }
-
-/** Exported for the sources section, so both count the same way. */
-export { assessmentWord };

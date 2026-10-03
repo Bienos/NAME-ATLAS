@@ -13,12 +13,13 @@ name: Register VM
 #   status     ops/vm/status.sh: the build, the database, the services, the machine
 #   finalize   ops/vm/finalize.sh: the gate, durability, grants, ANALYZE, prewarm, dump
 #   editions   ops/vm/editions.sh: every earlier PESEL edition as dated snapshots (TASK-045)
-#   extras     ops/vm/extras.sh (TASK-041): TERYT and Buryan 1933, after finalize
+#   extras     ops/vm/extras.sh (TASK-041, 069): TERYT and the onomastic sources, after finalize
 #   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
+#   backup         ops/vm/backup.sh (TASK-049): encrypted off-host copy, including accounts and family
 #   accounts       ops/vm/accounts.sh (TASK-063): migrate, the role nameatlas_app and its password, PgBouncer's user list, the isolation checks; repeatable
 #
 # provision, status, finalize, editions, extras, shift-finish, archive, bearers and meanings end by connecting the way the web app does;
@@ -49,6 +50,7 @@ on:
             bearers,
             meanings,
             accounts,
+            backup,
           ]
 
 concurrency:
@@ -85,7 +87,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | meanings | accounts) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | meanings | accounts | backup) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -205,7 +207,9 @@ jobs:
       - name: extras
         if: steps.step.outputs.step == 'extras'
         run: |
-          scp -q ops/vm/extras.sh vm:name-atlas-ops/extras.sh
+          scp -q ops/vm/extras.sh datasets/onomastics/onomastica-64-16-walkowiak.json vm:name-atlas-ops/
+          ssh vm 'sudo install -d -o nameatlas -g nameatlas -m 755 /srv/name-atlas/app/datasets/onomastics;
+            sudo install -o nameatlas -g nameatlas -m 644 ~/name-atlas-ops/onomastica-64-16-walkowiak.json /srv/name-atlas/app/datasets/onomastics/onomastica-64-16-walkowiak.json'
           ssh vm 'sudo bash ~/name-atlas-ops/extras.sh'
 
       - name: shift
@@ -268,6 +272,27 @@ jobs:
           scp -q ops/vm/accounts.sh ops/vm/accounts-roles.sql vm:name-atlas-ops/
           # The password goes to the script's stdin, never into a command line.
           ssh vm 'sudo bash ~/name-atlas-ops/accounts.sh ~/name-atlas-ops/app.tar.gz ~/name-atlas-ops/accounts-roles.sql' <<< "$pw"
+
+      - name: backup
+        if: steps.step.outputs.step == 'backup'
+        env:
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+          BACKUP_R2_BUCKET: ${{ secrets.BACKUP_R2_BUCKET }}
+          BACKUP_R2_ENDPOINT: ${{ secrets.BACKUP_R2_ENDPOINT }}
+          BACKUP_R2_ACCESS_KEY_ID: ${{ secrets.BACKUP_R2_ACCESS_KEY_ID }}
+          BACKUP_R2_SECRET_ACCESS_KEY: ${{ secrets.BACKUP_R2_SECRET_ACCESS_KEY }}
+        run: |
+          for key in BACKUP_AGE_RECIPIENT BACKUP_R2_BUCKET BACKUP_R2_ENDPOINT BACKUP_R2_ACCESS_KEY_ID BACKUP_R2_SECRET_ACCESS_KEY; do
+            [ -n "${!key}" ] || { echo "::error::repository secret $key is not set"; exit 1; }
+          done
+          scp -q ops/vm/backup.sh ops/vm/backup-check.ts vm:name-atlas-ops/
+          # The helper reads aggregate counts and the public sample payload; no
+          # migration or dependency installation is performed by this step.
+          ssh vm 'sudo install -o nameatlas -g nameatlas -m 644 ~/name-atlas-ops/backup-check.ts /srv/name-atlas/app/ops/vm/backup-check.ts'
+          # Secrets travel over SSH stdin, never in command arguments or logs.
+          printf '%s\n' "$BACKUP_AGE_RECIPIENT" "$BACKUP_R2_BUCKET" "$BACKUP_R2_ENDPOINT" \
+            "$BACKUP_R2_ACCESS_KEY_ID" "$BACKUP_R2_SECRET_ACCESS_KEY" |
+            ssh vm 'sudo bash ~/name-atlas-ops/backup.sh --stdin'
 
       - name: Connect as the web app does (TLS, SCRAM, PgBouncer, read-only)
         if: >-

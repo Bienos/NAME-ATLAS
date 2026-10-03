@@ -41,21 +41,17 @@ declare const Blob: new (parts: readonly string[], options?: { type?: string }) 
 const COPY = {
   pl: {
     share: "Udostępnij",
-    copy: "Kopiuj link",
     copied: "Skopiowano link.",
     shared: "Udostępniono.",
     cancelled: "Nie udostępniono.",
     denied: "Nie udało się skopiować. Link do skopiowania ręcznie:",
-    linkLabel: "Link do tej strony",
   },
   en: {
     share: "Share",
-    copy: "Copy link",
     copied: "Link copied.",
     shared: "Shared.",
     cancelled: "Not shared.",
     denied: "Could not copy. The link to copy by hand:",
-    linkLabel: "Link to this page",
   },
 } as const;
 

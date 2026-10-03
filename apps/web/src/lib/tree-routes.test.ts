@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { handleTreePost, needsLivingConsent } from "./tree-routes.js";
 import type { TreeRouteDeps } from "./tree-routes.js";
 import { ID, tree, TREE_ID } from "./tree-fixture.js";
+import { treeStatusWords } from "./tree-text.js";
 
 const ORIGIN = "https://atlas.test";
 const SESSION = "S".repeat(43);
@@ -404,6 +405,19 @@ describe("the tree's actions (TASK-076)", () => {
       ),
     ).toBe(`${person}?status=would-cycle`);
     expect(family.setParent).toHaveBeenLastCalledWith(expect.objectContaining({ role: "PARENT" }));
+    // A second mother or father (migration 0030's index) has its own word.
+    family.setParent.mockResolvedValueOnce({ kind: "INVALID", problem: "ROLE_TAKEN" });
+    expect(
+      location(
+        await handleTreePost(
+          "set-parent",
+          post("set-parent", { tree: TREE_ID, child: ID.ewa, parent: ID.cousin, role: "MOTHER" }),
+          deps,
+        ),
+      ),
+    ).toBe(`${person}?status=role-taken`);
+    expect(treeStatusWords("pl", "person", "role-taken")).not.toBeNull();
+    expect(treeStatusWords("en", "person", "role-taken")).not.toBeNull();
 
     expect(
       location(

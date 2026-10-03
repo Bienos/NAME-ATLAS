@@ -26,7 +26,7 @@ export const dynamic = "force-dynamic";
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const answer = await answerSlug(slug, null);
+  const answer = await answerSlug(slug, null, "en");
   const response = answer.kind === "RESULT" ? answer.response : null;
   return renderOgCard(
     ogFacts(response, "en"),

@@ -38,6 +38,7 @@ describe("MIGRATIONS_DIR", () => {
       "0027_accounts_schema.ts", // TASK-061 / ADR-0027 — free accounts, in their own schema
       "0028_family_schema.ts", // TASK-066 / ADR-0029 — the family tree, in its own schema
       "0029_notable_bearers.ts", // TASK-073 / ADR-0030 — the NOTABLE_BEARERS claim type
+      "0030_family_safeguards.ts", // the #76 review — one mother and one father; editors move updated_at
     ]);
   });
 });

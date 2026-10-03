@@ -19,6 +19,7 @@ import {
   deriveCurrentRank,
   deriveRarityContext,
 } from "@name-atlas/truth";
+import type { UniverseSizeCache } from "@name-atlas/truth";
 import type { DeriveSurnameClaimsPayload } from "@name-atlas/queue";
 
 export interface DeriveResult {
@@ -49,9 +50,13 @@ export async function deriveSurnameClaims(
 
   const outcomes: { chain: string; outcome: string }[] = [];
   let claims = 0;
+  // Rank, rarity and distribution each count the same national universe. One
+  // job is one run, so it counts it once (the run-scoped memo universe.ts
+  // documents); the cache is discarded with the job.
+  const universeSizeCache: UniverseSizeCache = new Map();
 
   for (const [chain, derive] of chains) {
-    const result = await derive(db, payload.surname);
+    const result = await derive(db, payload.surname, { universeSizeCache });
     if (result.kind === "NO_RESULT") {
       outcomes.push({ chain, outcome: result.reason });
       log.info("chain_refused", { chain, reason: result.reason });

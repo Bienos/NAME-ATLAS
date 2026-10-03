@@ -69,9 +69,13 @@ jobs:
         run: pnpm check:ids
 
       # The database VM's scripts parse, and none of their dumps copies the rows
-      # of schema accounts (TASK-063).
+      # of schemas accounts or family (TASK-063, 068). The off-host backup
+      # streams private rows into encryption (TASK-049).
       - name: VM scripts and dumps
         run: pnpm check:vm
+
+      - name: Backup failure and retention regressions
+        run: python3 scripts/test-backup.py
 
       - name: Unit tests
         run: pnpm test

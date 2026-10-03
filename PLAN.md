@@ -4,6 +4,22 @@ Coarse milestones only. Detailed work exists only as a task file in `tasks/`, an
 
 Milestone numbering follows `docs/canonical/23` §17. Current state is in `STATUS.md`.
 
+## Implementation status, 2026-10-02
+
+These are coarse milestone states; `STATUS.md` owns deployment and release facts.
+
+| Milestone | Current state |
+|---|---|
+| M0–M2 | Complete. |
+| M3 | Polona connector, archive claims and async runtime implemented; closed-beta release not signed off. |
+| M4 | Coverage reporting exists; DiscoveryIndex and premium eligibility remain unimplemented. |
+| M5 | Not implemented; requires M4's real inventory decision. |
+| M6 | Offer pages and inactive accounts implemented early; checkout and payments remain blocked on product and operating decisions. |
+| M7 | Launch hygiene and backup tooling implemented; production encrypted upload, restore drill and release review remain outstanding. |
+| M8 | Slugs, sitemap and indexing gates implemented early; a qualified SEO cohort remains to be released. |
+
+The private family-tree core is implemented early and remains inactive. Its release still requires working accounts, a restore-tested off-host backup, payment eligibility and privacy/legal approval.
+
 ## M0 — Foundation + source risk removal
 
 Smallest production-shaped platform, plus elimination of the two risks that would invalidate everything downstream: the real PESEL source, and Unicode surname identity.
