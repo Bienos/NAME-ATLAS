@@ -13,7 +13,7 @@ Task: `tasks/073-blog-post-finding-ancestors.md`. Branch `claude/magical-brahmag
   - From 1 January 1868, Catholic civil registration books in the Kingdom of Poland kept in Russian and Polish, and other faiths' in Russian only; some entries in Latin. Source: Piotr Szewczyński, *Archiwa, Biblioteki i Muzea Kościelne* 94 (2010), quoting the Organizing Committee's decree of 10/22 November 1867 (note 8) and noting extracts in Latin.
   - 100 years for birth records and 80 for marriage and death records at the civil registry office, counted from the end of the year, then transfer to the state archive within two years (art. 28). Who receives a copy, including ascendants, descendants and siblings (art. 45). Source: the Act of 28 November 2014, Prawo o aktach stanu cywilnego, as published (Dz.U. 2014 poz. 1741), read from `eli.gov.pl`. Later amendments to these two articles were not checked.
   - Not from a cited source: the practical advice (search name variants, start with dates and numbers in a foreign-language record, compare parents' names), "a grandfather's birth record from the 1930s will usually still be at the registry office" (arithmetic from art. 28), and that copies and commissioned searches may cost money (the post names no fee).
-- `STATUS.md`: the blog line, the Deployed line (#80 live) and "Last rewritten".
+- `STATUS.md`: the blog line, the Deployed line and "Last rewritten". After #82 (the landing preview JPEG) reached `main`, this branch merged `origin/main` @ `561506d`; the merge conflicted only on "Last rewritten", kept as this change's. The Deployed line names #82's production deployment, `dpl_Dz5qhTMoDLQFuFmdP5rTYHUeyjRb` (READY).
 
 ## Verified
 
