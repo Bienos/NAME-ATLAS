@@ -21,6 +21,7 @@ Each kind of truth has exactly one owner. Never duplicate truth across files.
 | Source classification/ownership map | `docs/SOURCE_MAP.md` |
 | Repository areas | `docs/CODEMAP.md` |
 | Open decisions that block work | `docs/DECISIONS_NEEDED.md` |
+| Search and editorial content queue (rules in ADR-0031) | `docs/SEO_CONTENT_PLAN.md` |
 
 ## 2. `docs/canonical/` is read-only
 
