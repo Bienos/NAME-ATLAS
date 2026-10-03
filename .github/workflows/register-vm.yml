@@ -16,7 +16,8 @@ name: Register VM
 #   extras     ops/vm/extras.sh (TASK-041, 069): TERYT and the onomastic sources, after finalize
 #   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
-#   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return
+#   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return;
+#                  the input top_rank sets its rank limit (TASK-087; 2000 when empty)
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   backup         ops/vm/backup.sh (TASK-049): encrypted off-host copy, including accounts and family
@@ -52,6 +53,11 @@ on:
             accounts,
             backup,
           ]
+      top_rank:
+        description: archive only, the rank limit on either register list (empty for 2000)
+        required: false
+        type: string
+        default: ""
 
 concurrency:
   group: register-vm
@@ -229,11 +235,22 @@ jobs:
 
       - name: archive
         if: steps.step.outputs.step == 'archive'
+        env:
+          TOP_RANK: ${{ inputs.top_rank }}
         run: |
+          # Digits only: the value goes into the command line on the VM (TASK-087).
+          top_rank=$(printf '%s' "$TOP_RANK" | tr -d '[:space:]')
+          if [ -z "$top_rank" ]; then
+            top_rank=2000
+          elif ! [[ "$top_rank" =~ ^[1-9][0-9]{0,5}$ ]]; then
+            echo "::error::top_rank must be a whole number from 1 to 999999, got '$TOP_RANK'"
+            exit 1
+          fi
+          echo "::notice::archive rank limit: $top_rank"
           # The pushed commit's tree: the loader, and migration 0025 it needs.
           git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
           scp -q ops/vm/archive.sh vm:name-atlas-ops/archive.sh
-          ssh vm 'sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz'
+          ssh vm "sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz $top_rank"
 
       - name: bearers
         if: steps.step.outputs.step == 'bearers'
