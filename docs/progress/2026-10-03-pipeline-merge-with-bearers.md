@@ -49,3 +49,16 @@ Local PostgreSQL 16 with PostGIS.
 | `pnpm test:integration` | exit 0; 408 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
 | `pnpm db:migrate` on an empty database, then `db:generate-types` | 0028, 0029 and 0030 applied in that order; the generated types unchanged |
+
+## Third merge: `main` after #86 (the blog's redesign), 2026-10-03
+
+`main` took #86 at `29b08d7` as TASK-075, and the open #87 claims TASK-077. The merge:
+
+- **Renumbers the localities task to TASK-079** (`tasks/079-localities-with-the-same-name.md`), free on `main` and in every open pull request. The code comments, contract notes, `STATUS.md`, `docs/CODEMAP.md`, D-032's line and TASK-070 follow.
+- **`STATUS.md`:** only the "Last rewritten" line conflicted.
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build`, `test:backup` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 408 tests |
+| `pnpm test:golden` | exit 0; 364 tests |

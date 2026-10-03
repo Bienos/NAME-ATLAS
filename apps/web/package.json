@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "build": "tsx scripts/check-blog-content.ts && next build --webpack",
     "start": "next start",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run"

@@ -1,7 +1,7 @@
-# TASK-075 — Coverage per surname, and how much of the register could carry a paid report
+# TASK-080 — Coverage per surname, and how much of the register could carry a paid report
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-coverage-assessment.md`); AC-3 on the full register and AC-5 on production are not run.
-- **Number:** 075. Drafted as 071, then 072, then 074; `main` gave 071, 072 and 074 to blog posts (#78, #80, #83) and 073 to well-known bearers (#84) while this was open. 075 is the next number free on `main` on 2026-10-03, 15:30 UTC.
+- **Number:** 080. Drafted as 071, then 072, then 074, then 075; `main` gave 071, 072 and 074 to blog posts (#78, #80, #83), 073 to well-known bearers (#84) and 075 to the blog's redesign (#86) while this was open. 076 is `main`'s tree pages, 077 is claimed by #87, 078 by #81 and 079 by #76's localities, so 080 is the next number free on `main` and in the open pull requests on 2026-10-03.
 - **Requested by:** the project owner, 2026-10-03: "start M4 premium inventory".
 - **Milestone:** M4, first step (`PLAN.md` M4; `docs/canonical/23` §22, COV-001).
 - **Depends on:** built on #77's head (#76 with `main` merged in); #76 merged (the 147 Onomastica meanings and the localities read change what coverage finds).
