@@ -1323,7 +1323,8 @@ export const UI = {
     reportBodySource: "Źródło, jeśli je znasz",
     termsLink: "Regulamin",
     contactHeading: "Kontakt",
-    contactIntro: "Name Atlas prowadzi jedna osoba. Napisz na adres:",
+    contactIntro:
+      "Name Atlas prowadzi jedna osoba. Napisz przez formularz niżej: wiadomość trafi prosto na skrzynkę, a odpowiedź na adres, który podasz.",
     contactTopicsLead: "Napisz, jeśli:",
     contactTopics: [
       "liczba, znaczenie lub źródło na stronie nazwiska jest błędne albo czegoś brakuje (podaj nazwisko i, jeśli możesz, źródło);",
@@ -1334,6 +1335,38 @@ export const UI = {
       "Na każdej stronie nazwiska i na stronie porównania jest link „Zgłoś błąd”, który przygotowuje taką wiadomość z nazwiskiem i adresem strony.",
     contactNoPromise:
       "Czytamy każdą wiadomość, ale nie obiecujemy terminu odpowiedzi. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.",
+    // The contact form (sends through `/api/contact`) and the footer's groups.
+    contactFormLabel: "Formularz kontaktowy",
+    contactName: "Imię",
+    contactEmail: "Twój e-mail",
+    contactTopic: "Temat",
+    contactTopicOptions: [
+      "Błąd w danych",
+      "Dane osobowe lub prawa do źródła",
+      "Bezpieczeństwo",
+      "Współpraca",
+      "Inne",
+    ],
+    contactMessage: "Wiadomość",
+    contactTrap: "Zostaw to pole puste",
+    contactSend: "Wyślij wiadomość",
+    contactSending: "Wysyłanie…",
+    contactSent: "Dziękujemy, wiadomość wysłana. Odpowiemy na podany adres.",
+    contactInvalid: "Podaj poprawny adres e-mail i wpisz wiadomość (do 5000 znaków).",
+    contactFailed:
+      "Nie udało się wysłać wiadomości. Spróbuj za chwilę albo wyślij ją ze swojej poczty.",
+    contactUnavailable:
+      "Wysyłka z formularza nie jest jeszcze włączona. Wyślij wiadomość ze swojej poczty.",
+    contactMailInstead: "Otwórz w programie pocztowym",
+    contactDirect: "Wolisz pisać bezpośrednio?",
+    contactPrivacyNote: "Serwis nie zapisuje wiadomości: trafia ona tylko na skrzynkę Name Atlas.",
+    footerExplore: "Odkrywaj",
+    footerRead: "Czytaj",
+    footerSite: "Serwis",
+    footerFollow: "Obserwuj",
+    footerCtaTitle: "Coś się nie zgadza? Masz pytanie?",
+    footerCtaAction: "Napisz do nas",
+    footerTop: "Na górę",
     footer:
       "Każda liczba pochodzi z rejestru PESEL i jest podana razem z zakresem zbioru, datą i źródłem. Brak danych jest podany jako brak, nigdy jako zero.",
   },
@@ -1890,7 +1923,8 @@ export const UI = {
     reportBodySource: "Source, if you know one",
     termsLink: "Terms",
     contactHeading: "Contact",
-    contactIntro: "Name Atlas is run by one person. Write to:",
+    contactIntro:
+      "Name Atlas is run by one person. Write through the form below: the message goes straight to the inbox, and the reply to the address you give.",
     contactTopicsLead: "Write if:",
     contactTopics: [
       "a figure, meaning or source on a surname page is wrong or missing (name the surname and, if you can, the source);",
@@ -1901,6 +1935,39 @@ export const UI = {
       "Every surname page and the comparison page has a “Report a problem” link that prepares such a message with the surname and the page address.",
     contactNoPromise:
       "Every message is read, but no reply time is promised. A report of an error does not change the page at once: the source is checked first.",
+    // The contact form (sends through `/api/contact`) and the footer's groups.
+    contactFormLabel: "Contact form",
+    contactName: "Name",
+    contactEmail: "Your email",
+    contactTopic: "Topic",
+    contactTopicOptions: [
+      "An error in the data",
+      "Personal data or a source's rights",
+      "Security",
+      "Working together",
+      "Something else",
+    ],
+    contactMessage: "Message",
+    contactTrap: "Leave this field empty",
+    contactSend: "Send message",
+    contactSending: "Sending…",
+    contactSent: "Thank you, your message is sent. The reply will go to the address you gave.",
+    contactInvalid: "Give a valid email address and write a message (up to 5,000 characters).",
+    contactFailed:
+      "The message could not be sent. Try again in a moment, or send it from your own mail.",
+    contactUnavailable:
+      "Sending from the form is not switched on yet. Send the message from your own mail.",
+    contactMailInstead: "Open in your mail program",
+    contactDirect: "Prefer to write directly?",
+    contactPrivacyNote:
+      "The site does not store your message: it only reaches the Name Atlas inbox.",
+    footerExplore: "Explore",
+    footerRead: "Read",
+    footerSite: "The site",
+    footerFollow: "Follow",
+    footerCtaTitle: "Something look wrong? Have a question?",
+    footerCtaAction: "Write to us",
+    footerTop: "Back to top",
     footer:
       "Every number comes from the PESEL register and is shown with its dataset scope, date and source. Missing data is stated as missing, never as zero.",
   },

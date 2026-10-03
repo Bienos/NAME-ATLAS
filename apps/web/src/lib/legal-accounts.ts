@@ -77,7 +77,7 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
     oracleItem:
       "Oracle — serwer bazy danych we Frankfurcie. Otrzymuje zapytanie o nazwisko, ale nie adres IP odwiedzającego; trzyma też dane konta (wyżej).",
     resendItem:
-      "Resend, Inc. (USA) — wysyłanie wiadomości z linkiem do konta. Przekazanie do USA opiera się na certyfikacji Resend w EU-U.S. Data Privacy Framework i na standardowych klauzulach umownych, jak Resend deklaruje.",
+      "Resend, Inc. (USA) — wysyłanie wiadomości z linkiem do konta i dostarczanie wiadomości z formularza kontaktowego na naszą skrzynkę. Przekazanie do USA opiera się na certyfikacji Resend w EU-U.S. Data Privacy Framework i na standardowych klauzulach umownych, jak Resend deklaruje.",
     rightsParagraph:
       "Konto usuniesz sam na jego stronie; z pozostałych praw skorzystasz, pisząc na adres podany wyżej.",
   },
@@ -115,7 +115,7 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
     oracleItem:
       "Oracle — the database server in Frankfurt. It receives the surname query but not the visitor's IP address; it also holds the account data (above).",
     resendItem:
-      "Resend, Inc. (USA) — sending the account's link emails. The transfer to the USA rests on Resend's certification under the EU-U.S. Data Privacy Framework and on standard contractual clauses, as Resend states.",
+      "Resend, Inc. (USA) — sending the account's link emails and delivering the contact form's messages to our mailbox. The transfer to the USA rests on Resend's certification under the EU-U.S. Data Privacy Framework and on standard contractual clauses, as Resend states.",
     rightsParagraph:
       "You delete the account yourself on its page; for your other rights, write to the address above.",
   },
@@ -182,7 +182,9 @@ function privacyWithAccounts(lang: Lang, doc: LegalDocument): LegalDocument {
         if (!items.includes(words.oracleItem)) {
           throw new Error("legal-accounts: the base text has no Oracle item");
         }
-        return [{ ...section, items: [...items, words.resendItem] }];
+        // The base text names Resend for the contact form; the account's item replaces it.
+        const withoutResend = items.filter((item) => !item.startsWith("Resend"));
+        return [{ ...section, items: [...withoutResend, words.resendItem] }];
       }
       case words.rightsHeading:
         return [{ ...section, paragraphs: [...section.paragraphs, words.rightsParagraph] }];
