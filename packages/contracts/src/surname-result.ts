@@ -29,9 +29,9 @@ import { z } from "zod";
  * TASK-054 reached `main` first, as 1.8, while TASK-051 was still open as 1.7,
  * so 1.9 is the first version on `main` that carries both. 1.10 adds
  * `neighbours` and `other_form` (TASK-055, ADR-0025). 1.11 adds `localities`
- * (TASK-066, ADR-0025 §2.7).
+ * (TASK-066, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030).
  */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.11";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.12";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -653,6 +653,96 @@ export const archiveSectionSchema = z
     { message: "a section that is not READY carries no search, count or source" },
   );
 
+/** One person Wikidata names with the surname (TASK-073, ADR-0030). */
+export const bearerSchema = z.object({
+  /** The Wikidata id, `Q…`. */
+  wikidata_id: z.string().regex(/^Q[1-9][0-9]*$/u),
+  /** The name as Wikidata labels the person. */
+  name: z.string().min(1),
+  /** Wikidata's one-line description, in Polish and in English, where it has one. */
+  description_pl: z.string().min(1).max(200).nullable(),
+  description_en: z.string().min(1).max(200).nullable(),
+  /** Years as Wikidata states them. A null `died` is not "living": it may just not be recorded. */
+  born: z.number().int().nullable(),
+  died: z.number().int().nullable(),
+  /** The person's article in the Polish Wikipedia, else the English one. */
+  article_url: z.string().url().nullable(),
+  wikidata_url: z.string().url(),
+});
+
+export const bearersStateSchema = z.enum([
+  "READY",
+  /** Wikidata has not been asked about this surname yet. Never a count of zero. */
+  "NOT_SEARCHED",
+  "RIGHTS_BLOCKED",
+  "UNAVAILABLE",
+]);
+
+/**
+ * Known people with the surname (TASK-073, ADR-0030): a `NOTABLE_BEARERS`
+ * claim. People whose own name, in Wikidata, ends with exactly this surname
+ * and who have an article in at least one Wikipedia: Polish citizens first,
+ * then the most widely written about. Sharing a surname says nothing about family. A READY section
+ * with a total of zero is an answer; NOT_SEARCHED is the absence of one.
+ *
+ * `people` is as long as the surface allows (the free page lists three, the
+ * paid report all the claim keeps); `more` is how many the count holds beyond
+ * them.
+ */
+export const bearersSectionSchema = z
+  .object({
+    state: bearersStateSchema,
+    searched_on: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/u)
+      .nullable(),
+    total: z.number().int().nonnegative().nullable(),
+    with_death_date: z.number().int().nonnegative().nullable(),
+    people: z.array(bearerSchema),
+    more: z.number().int().nonnegative().nullable(),
+    confidence: confidenceSchema.nullable(),
+    citation: citationSchema.nullable(),
+    reason_code: z.string().min(1).nullable(),
+    surface: surfaceEligibilitySchema,
+  })
+  .refine(
+    (b) =>
+      (b.state === "READY") ===
+      (b.searched_on !== null &&
+        b.total !== null &&
+        b.with_death_date !== null &&
+        b.more !== null &&
+        b.confidence !== null &&
+        b.citation !== null),
+    { message: "date, counts, confidence and citation are present exactly when READY" },
+  )
+  .refine((b) => (b.state === "READY") === (b.reason_code === null), {
+    message: "reason_code is null exactly when READY",
+  })
+  .refine((b) => b.state === "READY" || b.people.length === 0, {
+    message: "a section that is not READY names nobody",
+  })
+  .refine(
+    (b) =>
+      b.state === "READY" ||
+      (b.searched_on === null &&
+        b.total === null &&
+        b.with_death_date === null &&
+        b.more === null &&
+        b.confidence === null &&
+        b.citation === null),
+    { message: "a section that is not READY carries no date, count or source" },
+  )
+  .refine(
+    (b) =>
+      b.state !== "READY" ||
+      (b.total !== null &&
+        b.with_death_date !== null &&
+        b.with_death_date <= b.total &&
+        b.people.length + (b.more ?? 0) === b.total),
+    { message: "the people listed and the more beyond them add up to the total" },
+  );
+
 /**
  * `docs/canonical/16` §21, minus `canonical_slug`/`canonical_path`.
  *
@@ -931,6 +1021,11 @@ export const surnameResultResponseSchema = z
     archive: archiveSectionSchema.nullable(),
     /** Added in 1.10 (TASK-055). Present exactly when RESOLVED. */
     neighbours: neighboursSectionSchema.nullable(),
+    /**
+     * Added in 1.12 (TASK-073). Present exactly when RESOLVED, and
+     * `NOT_SEARCHED` rather than absent when Wikidata has not been asked.
+     */
+    bearers: bearersSectionSchema.nullable(),
     /** Added in 1.10 (TASK-055). Null unless RESOLVED, and null where no other form is paired. */
     other_form: otherFormSchema.nullable(),
     /** Added in 1.11 (TASK-066). Present exactly when RESOLVED. */
@@ -962,6 +1057,9 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.neighbours !== null : r.neighbours === null), {
     message: "neighbours section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => (r.status === "RESOLVED" ? r.bearers !== null : r.bearers === null), {
+    message: "bearers section is present exactly when status is RESOLVED",
   })
   .refine((r) => r.status === "RESOLVED" || r.other_form === null, {
     message: "an other form is present only when status is RESOLVED",
@@ -1023,6 +1121,9 @@ export type ArchivePeriod = z.infer<typeof archivePeriodSchema>;
 export type ArchiveExample = z.infer<typeof archiveExampleSchema>;
 export type ArchiveState = z.infer<typeof archiveStateSchema>;
 export type ArchiveSection = z.infer<typeof archiveSectionSchema>;
+export type Bearer = z.infer<typeof bearerSchema>;
+export type BearersState = z.infer<typeof bearersStateSchema>;
+export type BearersSection = z.infer<typeof bearersSectionSchema>;
 export type NeighbourEntry = z.infer<typeof neighbourEntrySchema>;
 export type NeighbourList = z.infer<typeof neighbourListSchema>;
 export type NeighboursSection = z.infer<typeof neighboursSectionSchema>;

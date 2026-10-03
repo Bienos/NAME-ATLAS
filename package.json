@@ -29,6 +29,7 @@
     "truth:derive-shift": "pnpm --filter @name-atlas/truth run derive-shift",
     "truth:list-facts": "pnpm --filter @name-atlas/truth run build-list-facts",
     "truth:archive-load": "pnpm --filter @name-atlas/truth run archive-load",
+    "truth:bearers-load": "pnpm --filter @name-atlas/truth run bearers-load",
     "coverage:report": "pnpm --silent --filter @name-atlas/truth run coverage-report",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",

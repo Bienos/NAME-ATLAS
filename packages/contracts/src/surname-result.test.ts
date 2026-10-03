@@ -13,6 +13,7 @@ import {
   populationValueSchema,
   surnameResultResponseSchema,
   archiveSectionSchema,
+  bearersSectionSchema,
   neighbourListSchema,
   neighboursSectionSchema,
   otherFormSchema,
@@ -274,6 +275,7 @@ describe("top-level response", () => {
         suggestions: NO_SUGGESTIONS,
         meaning: null,
         archive: null,
+        bearers: null,
         change: null,
         neighbours: null,
         other_form: null,
@@ -959,6 +961,7 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
       suggestions: NO_SUGGESTIONS,
       meaning: null,
       archive: null,
+      bearers: null,
       neighbours: null,
       other_form: null,
       localities: null,
@@ -974,8 +977,8 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
     expect(surnameResultResponseSchema.safeParse(base).success).toBe(false);
   });
 
-  it("is schema version 1.11", () => {
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.11");
+  it("is schema version 1.12", () => {
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.12");
   });
 });
 
@@ -1084,6 +1087,18 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
       reason_code: "X",
       surface: SURFACE,
     },
+    bearers: {
+      state: "NOT_SEARCHED",
+      searched_on: null,
+      total: null,
+      with_death_date: null,
+      people: [],
+      more: null,
+      confidence: null,
+      citation: null,
+      reason_code: "X",
+      surface: SURFACE,
+    },
     neighbours: { state: "READY", lists: [LIST], reason_code: null, surface: SURFACE },
     other_form: OTHER,
     localities: {
@@ -1118,6 +1133,7 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
       meaning: null,
       change: null,
       archive: null,
+      bearers: null,
       neighbours: null,
       other_form: null,
       localities: null,
@@ -1224,9 +1240,97 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
         neighbours: null,
         other_form: null,
         localities: null,
+        bearers: null,
       };
       expect(response(unresolved)).toBe(true);
       expect(response({ ...unresolved, localities: ready })).toBe(false);
     });
+  });
+});
+
+/** TASK-073: the known people with the surname, from Wikidata (ADR-0030). */
+describe("bearers section", () => {
+  const SURFACE = {
+    surface: "FREE",
+    decision: "ALLOWED",
+    reason_code: "RIGHTS_PERMIT_FREE_SURFACE",
+  };
+  const PERSON = {
+    wikidata_id: "Q896660",
+    name: "Stanisław Zaremba",
+    description_pl: "polski matematyk, profesor UJ",
+    description_en: null,
+    born: 1863,
+    died: 1942,
+    article_url: "https://pl.wikipedia.org/wiki/Stanis%C5%82aw_Zaremba_(1863%E2%80%931942)",
+    wikidata_url: "https://www.wikidata.org/wiki/Q896660",
+  };
+  const READY = {
+    state: "READY",
+    searched_on: "2026-10-03",
+    total: 59,
+    with_death_date: 37,
+    people: [PERSON],
+    more: 58,
+    confidence: { status: "VERIFIED", methodology_code: "wikidata_query_scope@wikidata_scope@1" },
+    citation: {
+      id: "c1",
+      title: "Wikidata",
+      publisher: null,
+      publication_date: null,
+      source_type: "OTHER",
+      locator: "Zaremba",
+      url: "https://query.wikidata.org/#q",
+      attribution: null,
+      terms: "CC0",
+      retrieved_at: "2026-10-03T12:05:00Z",
+      source_page_url: "https://www.wikidata.org/wiki/Wikidata:Licensing",
+    },
+    reason_code: null,
+    surface: SURFACE,
+  };
+  const NOT_SEARCHED = {
+    state: "NOT_SEARCHED",
+    searched_on: null,
+    total: null,
+    with_death_date: null,
+    people: [],
+    more: null,
+    confidence: null,
+    citation: null,
+    reason_code: "BEARERS_NOT_SEARCHED",
+    surface: SURFACE,
+  };
+
+  it("accepts a ready answer, a zero, and the absence of one", () => {
+    expect(bearersSectionSchema.safeParse(READY).success).toBe(true);
+    expect(
+      bearersSectionSchema.safeParse({
+        ...READY,
+        total: 0,
+        with_death_date: 0,
+        people: [],
+        more: 0,
+      }).success,
+    ).toBe(true);
+    expect(bearersSectionSchema.safeParse(NOT_SEARCHED).success).toBe(true);
+  });
+
+  it("refuses people or counts on a section that holds no answer", () => {
+    expect(bearersSectionSchema.safeParse({ ...NOT_SEARCHED, people: [PERSON] }).success).toBe(
+      false,
+    );
+    expect(bearersSectionSchema.safeParse({ ...NOT_SEARCHED, total: 0 }).success).toBe(false);
+    expect(bearersSectionSchema.safeParse({ ...READY, citation: null }).success).toBe(false);
+  });
+
+  it("refuses people and a remainder that do not add up to the total", () => {
+    expect(bearersSectionSchema.safeParse({ ...READY, more: 57 }).success).toBe(false);
+    expect(bearersSectionSchema.safeParse({ ...READY, with_death_date: 60 }).success).toBe(false);
+  });
+
+  it("refuses an id that is not a Wikidata id", () => {
+    const bad = { ...PERSON, wikidata_id: "2143315" };
+    expect(bearersSectionSchema.safeParse({ ...READY, people: [bad] }).success).toBe(false);
   });
 });

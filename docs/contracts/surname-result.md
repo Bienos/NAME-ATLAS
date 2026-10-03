@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-066 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01
-- **Schema version:** `1.11` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-066 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03
+- **Schema version:** `1.12` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -139,6 +139,24 @@ Errors use the `docs/canonical/16` §78 envelope and carry a `request_id`. No st
     "citation": { "title": "Polona", "publisher": "Biblioteka Narodowa", "attribution": "Polona, Biblioteka Narodowa",
                   "source_page_url": "https://polona.pl/", "…": "as above" },
     "reason_code": null,             // ARCHIVE_NOT_SEARCHED when NOT_SEARCHED; non-null exactly when not READY
+    "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
+  },
+  "bearers": {                  // added in 1.12; present exactly when RESOLVED
+    "state": "READY",                // READY | NOT_SEARCHED | RIGHTS_BLOCKED | UNAVAILABLE
+    "searched_on": "2026-10-03",     // null unless READY
+    "total": 59,                     // people named exactly this surname with a Wikipedia article
+    "with_death_date": 37,           // of those, how many Wikidata gives a date of death
+    "people": [                      // 3 on FREE and SEO, up to 20 on PAID and INTERNAL
+      { "wikidata_id": "Q896660", "name": "Stanisław Zaremba",
+        "description_pl": "polski matematyk, profesor UJ", "description_en": null,   // at most 200 characters
+        "born": 1863, "died": 1942,  // years only; a null died is not "living"
+        "article_url": "https://pl.wikipedia.org/wiki/…", "wikidata_url": "https://www.wikidata.org/wiki/Q896660" }
+    ],
+    "more": 58,                      // total − people listed on this surface
+    "confidence": { "status": "VERIFIED", "methodology_code": "wikidata_query_scope@wikidata_scope@1" },
+    "citation": { "title": "Wikidata", "publisher": null, "terms": "CC0",
+                  "url": "https://query.wikidata.org/#…", "…": "as above" },
+    "reason_code": null,             // BEARERS_NOT_SEARCHED when NOT_SEARCHED; non-null exactly when not READY
     "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
   }
 }
@@ -320,6 +338,8 @@ These are schema constraints, not conventions — a violating payload fails vali
 30. **A READY localities section carries its date, total, confidence and citation.** Added in 1.11. `reference_date` is the register's own `STAN_NA`, `total` counts every match whether listed or not and is never below the list's length, and `reason_code` is null exactly when READY. `READY` with no place is an answer: the register lists no locality of that name.
 31. **A locality is listed once, and at most 20 are.** Added in 1.11. The list is in a fixed order (cities, villages, the rest; then voivodeship, powiat, gmina, name), so two reads of one state agree; `total` says what the list leaves out.
 32. **The localities section is present exactly when the surname resolved.** Added in 1.11. On every other status it is null, like the other sections.
+33. **A bearer shares the surname, nothing more.** Added in 1.12. `people` are those whose own name in Wikidata ends with exactly the surname and who have a Wikipedia article (ADR-0030 §2.1). No field relates them to each other or to the reader, and the page says so beside them. A null `died` means Wikidata states no date of death, not that the person is alive.
+34. **`people` and `more` add up to `total`.** Added in 1.12. How many are listed depends on the surface (ADR-0030 §2.7); the count does not. `NOT_SEARCHED` carries no count, date or person, and a `READY` section with a total of zero is an answer.
 
 ## Accepted rendering of a rarity entry
 
@@ -393,6 +413,7 @@ Decided with TASK-066 (2026-10-01, ADR-0025 §2.7: localities "under a line sayi
 Breaking this contract requires a `schema_version` bump and a stated compatibility window (`docs/contracts/README.md`). Additive fields and new enum members are not breaking.
 
 **1.10 → 1.11 (2026-10-01, TASK-066, ADR-0025 §2.7).** Adds `localities` (required, nullable, present exactly when `status` is `RESOLVED`). A consumer written against 1.10 is unaffected; a producer must now supply it. It is a lookup in the TERYT register TASK-039 loads, through the indexes migrations 0010 and 0023 made, so no new derivation, claim or migration comes with it; its state and surface come from `pl_teryt`'s stored rights profile, as the archive's do from Polona's.
+**1.11 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.11 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-066, #70 and #77), not on `main` when this was written; whichever lands second carries both.
 
 **1.9 → 1.10 (2026-10-01, TASK-055, ADR-0025).** Adds `neighbours` (required, nullable, present exactly when `status` is `RESOLVED`) and `other_form` (required, nullable, null unless `RESOLVED`). A consumer written against 1.9 is unaffected; a producer must now supply both. Both are read from rank claims that already exist, so no new derivation comes with them; migration 0026 adds an index so that the neighbours of a rare surname, whose place is shared by tens of thousands, are read without a sort.
 
@@ -414,4 +435,4 @@ Breaking this contract requires a `schema_version` bump and a stated compatibili
 
 ## Not covered
 
-Autocomplete and prefix search (now their own contract, `surname-prefix.md`), a caller-settable similarity threshold, confirming a suggestion as a resolution, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, a change over time of the regional distribution (2025 to 2026), and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT`, `CURRENT_DISTRIBUTION`, `SURNAME_MEANING` and `SURNAME_DISTRIBUTION_SHIFT`. `LINGUISTIC_ORIGIN`, `GEOGRAPHIC_ORIGIN`, `SURNAME_FORMATION_TYPE` and `ROOT_INTERPRETATION` are separate canonical claim types and are not in this contract. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.
+Autocomplete and prefix search (now their own contract, `surname-prefix.md`), a caller-settable similarity threshold, confirming a suggestion as a resolution, the full profile resource and its remaining chapters, SSE, polling, ETag/conditional GET, rate limiting, entitlements, map geometry and `MapLayerDTO`, powiat or finer geography, a change over time of the regional distribution (2025 to 2026), and every fact other than `CURRENT_POPULATION`, `RARITY_CONTEXT`, `CURRENT_DISTRIBUTION`, `SURNAME_MEANING`, `SURNAME_DISTRIBUTION_SHIFT`, `ARCHIVE_AVAILABILITY` and `NOTABLE_BEARERS`. `LINGUISTIC_ORIGIN`, `GEOGRAPHIC_ORIGIN`, `SURNAME_FORMATION_TYPE` and `ROOT_INTERPRETATION` are separate canonical claim types and are not in this contract. Caching is currently `no-store`; a real policy (`docs/canonical/16` §84, §87) belongs to whichever task first needs it.

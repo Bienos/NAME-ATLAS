@@ -2,7 +2,7 @@ import { Kysely, PostgresDialect } from "kysely";
 import type { createPool } from "@name-atlas/db";
 
 /**
- * The tables of schema `family` (migration 0028), typed by hand, as
+ * The tables of schema `family` (migration 0030), typed by hand, as
  * `@name-atlas/accounts` types `accounts`: `pnpm db:generate-types` reads
  * `public.*` only, and these tables are deliberately outside it (ADR-0029 §2.1).
  */

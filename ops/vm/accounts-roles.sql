@@ -47,7 +47,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE nameatlas IN SCHEMA accounts
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO nameatlas_app;
 
 -- The family tree (TASK-068, ADR-0029 §2.1): the same role, the same grants, a
--- second schema. Its tables carry row-level security policies (migration 0028),
+-- second schema. Its tables carry row-level security policies (migration 0030),
 -- which apply to this role because it does not own the tables.
 CREATE SCHEMA IF NOT EXISTS family AUTHORIZATION nameatlas;
 REVOKE ALL ON SCHEMA family FROM PUBLIC;

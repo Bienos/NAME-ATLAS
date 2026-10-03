@@ -56,6 +56,8 @@ export interface ClaimProps {
 
 function countryWord(code: string, lang: Lang): string {
   if (code === "PL") return lang === "pl" ? "Polska" : "Poland";
+  // A source whose scope is the world, as the catalogue puts it (Wikidata, TASK-073).
+  if (code === "GLOBAL") return lang === "pl" ? "Świat" : "Worldwide";
   return code;
 }
 
