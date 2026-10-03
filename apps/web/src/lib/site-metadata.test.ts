@@ -14,7 +14,7 @@ describe("landing link metadata", () => {
       description: SITE_COPY.pl.description,
       images: [
         {
-          url: "https://name-atlas.pl/share/name-atlas-v2.jpg",
+          url: "https://name-atlas.pl/share/name-atlas-v3.jpg",
           width: 1200,
           height: 630,
           type: "image/jpeg",
@@ -23,7 +23,7 @@ describe("landing link metadata", () => {
     });
     expect(metadata.twitter).toMatchObject({
       card: "summary_large_image",
-      images: ["https://name-atlas.pl/share/name-atlas-v2.jpg"],
+      images: ["https://name-atlas.pl/share/name-atlas-v3.jpg"],
       title: SITE_COPY.pl.title,
       description: SITE_COPY.pl.description,
     });
