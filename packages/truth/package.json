@@ -17,6 +17,7 @@
     "derive-batch": "tsx bin/derive-batch.ts",
     "derive-shift": "tsx bin/derive-shift-batch.ts",
     "coverage-report": "tsx bin/coverage-report.ts",
+    "coverage-assess": "tsx bin/coverage-assess.ts",
     "build-list-facts": "tsx bin/build-list-facts.ts",
     "archive-load": "tsx bin/archive-load.ts"
   },
