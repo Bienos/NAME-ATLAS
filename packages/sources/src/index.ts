@@ -125,3 +125,6 @@ export * from "./teryt/index.js";
 // Wikidata — TASK-073 (ADR-0030): famous bearers of a surname, as a source
 // record per surname. Queried ahead of time, never when a page is viewed.
 export * from "./wikidata/index.js";
+
+// PESEL given names — TASK-078 (ADR-0032): a second name type, kept apart from surnames.
+export * from "./given-names/index.js";
