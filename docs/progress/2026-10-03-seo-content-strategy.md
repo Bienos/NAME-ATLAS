@@ -6,14 +6,15 @@ Branch `claude/great-wozniak-5wwxf8`, on `origin/main` @ `7363889`. The owner su
 
 - `docs/adr/0031-search-and-editorial-content.md`: the strategy's rules (one surname URL per surname, editorial pieces for general questions, original data studies, no separate GEO layer, extend rather than duplicate, the banned list) and nine review amendments. ADR-0028, 0029 and 0030 are held by open pull requests #65, #67 and #81, so this takes 0031.
 - `docs/SEO_CONTENT_PLAN.md`: the query → surface map, the surname-page intents, the thirty-piece queue with a status for each, four briefs, the data studies split into ungated and gated, the flagship index, the roadmap and the hundred-title backlog.
+- After #84 (TASK-073) reached `main`, this branch merged `origin/main` @ `63ed2a0`. The merge conflicted on `STATUS.md` ("Last rewritten", kept as this change's, and "Next", keeping #84's "More cards" line) and on `docs/CODEMAP.md`'s ADR row (keeping #84's 0030 entry and adding 0031).
 - `AGENTS.md` §1 (a row for the plan), `docs/CODEMAP.md` (the ADR and the plan), `STATUS.md` (a "Next" line and "Last rewritten").
 
 ## Review findings, checked against the repository
 
 - Every page is `noindex` while `SEO_INDEXING_ENABLED` is unset (`apps/web/src/lib/seo.ts`; STATUS.md's blog line). The strategy's month 1 "index first qualified surname cohort" is left to the owner and `PLAN.md` M8.
-- Regional suppression per (surname, voivodeship) cell is NOT VERIFIED (`docs/sources/pesel-regional.md` item 9). So "found in only one województwo" and the other concentration studies are gated.
+- Regional suppression is per (surname, voivodeship) cell, minimum 2, verified from the bytes (`docs/sources/pesel-regional.md` item 18). An absent cell is never a confirmed zero (item 19). About 21% of occurrences sit in no voivodeship row, for a reason the publisher does not state. So "found in only one województwo" is not publishable, and the other regional studies are restricted to published rows (ADR-0031 §3.2). The first version of this change cited the earlier item 9 row, which says "not verified". That was corrected before merge, after a re-read of the record's later sections.
 - The national 2026-01-20 files sum to 42,757,839 occurrences against GUS's ~37.3 million residents (`docs/sources/candidate-sources.md`). Studies report occurrences, not people.
-- The strategy's statement that single-occurrence forms are excluded matches `docs/sources/pesel-regional.md` item 9 (`PESEL_MIN_VALID_COUNT = 2`).
+- The strategy's statement that single-occurrence forms are excluded matches `docs/sources/pesel-regional.md` items 9 and 18 (`PESEL_MIN_VALID_COUNT = 2`).
 - The 2019–2026 series has no 2022 women's edition, and `PRAWDA` has no 2020–2022 point (STATUS.md).
 - `PRODUCT.md` §8 non-goal 5 (no coat-of-arms or noble-descent claims) limits pieces 18 and 30 to correcting the myth. Non-goal 14 (no programmatic SEO) agrees with the strategy.
 - The blog is already bilingual (TASK-071), which contradicts month 11's "begin English content".
@@ -22,7 +23,7 @@ Branch `claude/great-wozniak-5wwxf8`, on `origin/main` @ `7363889`. The owner su
 
 ## Verified
 
-- `pnpm check:ids`: exit 0, "every task, ADR, migration and decision number is used once".
+- `pnpm check:ids`, run again after the merge: exit 0, "every task, ADR, migration and decision number is used once".
 - `pnpm format:check`: exit 1, with warnings on nine `.ts` files this change does not touch (`account-paths.ts`, `deck-client.tsx`, `resolution.ts`, `onomastics.ts`, `alto.ts`, `rights.ts`, `registry.ts`, `confidence.ts`, `query.ts`). The same nine fail with this change stashed. `node_modules` was not installed, so the Prettier that ran may not be the pinned one. None of this change's files is flagged.
 - `typecheck`, `lint`, `test` and `build` were not run: the change touches Markdown only.
 

@@ -23,7 +23,7 @@ Blog posts create curiosity. Surname pages answer personal queries. Data studies
 | `czy mapa nazwiska pokazuje pochodzenie rodziny` | editorial |
 | `najrzadsze nazwiska w Polsce` | data study / hub |
 | `nazwiska które zanikają` | original data study |
-| `najbardziej regionalne nazwiska w Polsce` | data study, **gated** (ADR-0031 §3.2) |
+| `najbardziej regionalne nazwiska w Polsce` | data study, under ADR-0031 §3.2's restrictions |
 | `jak sprawdzić pochodzenie nazwiska` | guide → surname search |
 | `jak szukać nazwiska w starych źródłach` | archive guide |
 | `jak znaleźć przodków` | genealogy guide (`jak-szukac-przodkow`, **live**) |
@@ -109,7 +109,7 @@ The strategy's fifth brief (the history pillar) is piece 5 above; see its status
 
 Each is its own task, which first fixes method, denominator and suppression (ADR-0031 §2.3, §3.2–§3.4).
 
-**Not gated** (national lists and the 2019–2026 editions are loaded):
+**Not gated** (national lists and the 2019–2026 editions are loaded; the national lists carry no regional caveat):
 
 - Polish Surname Index 2026 (flagship, §8)
 - The surnames growing fastest; declining fastest; most stable (2019–2026, per list)
@@ -119,9 +119,9 @@ Each is its own task, which first fixes method, denominator and suppression (ADR
 - Morphology: share of published 2026 forms ending in -ski/-ska and other endings; -ski/-owski/-ewski; -wicz/-ewicz/-owicz; -ak/-czyk/-czak; average occurrences per ending; length distribution; compound (double-barrelled) surnames; longest and shortest forms; diacritic patterns; forms present on only one of the men's and women's lists
 - Men's list vs women's list over time
 
-**Gated on the regional suppression grain** (`docs/sources/pesel-regional.md` item 9):
+**Regional, under ADR-0031 §3.2's restrictions** (published rows only; floor of 2 per cell; the unassigned share named; residence, never origin):
 
-- Most geographically concentrated surnames; surnames present in all 16 województwa; surnames in only one
+- Most geographically concentrated surnames; surnames with a published row in all 16 województwa. Not "surnames in only one": an absent cell is never a confirmed zero.
 - Most distinctive or most concentrated surname per region; regional diversity; Mazowieckie vs Małopolskie
 - Regional concentration of endings; regional changes over time
 
@@ -142,7 +142,7 @@ A reusable research page, repeated each year after the PESEL release.
 - **Morphology:** common endings and their distribution.
 - **Change:** 2019 → 2026 growth, decline, stability, rank movers.
 - **Search:** "Where does your surname sit?" → the surname page.
-- **Geography:** national spread vs concentration, **gated** with the regional studies.
+- **Geography:** national spread vs concentration, under the regional restrictions (§6).
 
 ## 9. Conversion paths
 
@@ -161,7 +161,7 @@ A reusable research page, repeated each year after the PESEL release.
 | 2 | History of Polish surnames; formation types (5, 7–9) |
 | 3 | Endings, extending `koncowki-nazwisk` with the morphology study |
 | 4 | Rarity: the Polish Surname Index 2026 launch, pieces 11–13 |
-| 5 | Geography: how to read a surname map (regional studies only if ungated) |
+| 5 | Geography: how to read a surname map; the regional studies under §6's restrictions |
 | 6 | Historical change 2019–2026: the change studies |
 | 7 | Archive research: Polona, variants, earliest attestations (21–24) |
 | 8 | Genealogy bridge (26–28, extending `jak-szukac-przodkow`) |
@@ -180,7 +180,7 @@ The strategy's hundred titles, by group, after the first thirty. Each becomes a 
 - **B. Formation:** odmiejscowe; patronimiczne; odimienne; zawodowe; odapelatywne; przymiotnikowe; rzeczownikowe; how nicknames became surnames; how surnames became hereditary; why one surname arose several times.
 - **C. Endings:** -ski, -owski, -ewski, -cki, -dzki, -wicz, -ewicz, -owicz, -ak, -czyk (each only with evidence of its own, ADR-0031 §2.6).
 - **D. Statistics:** most common 2026; rarest; how many surnames; measuring rarity; what a rank means; why PESEL omits some forms; why sites' figures differ; how often PESEL lists are updated; reading a bearer count; may the two forms be summed.
-- **E. Geography:** reading a map; map vs origin; regional surnames; Mazowsze, Wielkopolska, Silesia, Kashubia, Podlasie, the Kresy; why surnames cluster (regional pieces gated as §6).
+- **E. Geography:** reading a map; map vs origin; regional surnames; Mazowsze, Wielkopolska, Silesia, Kashubia, Podlasie, the Kresy; why surnames cluster (regional pieces under §6's restrictions).
 - **F. History:** when surnames arose; oldest; medieval; 16th century; peasant; burgher; noble; women's forms; old women's forms; spelling change.
 - **G. Genealogy:** starting from a surname; finding ancestors; a family tree; Geneteka; Szukaj w Archiwach; a birth record; a marriage record; a maiden name; the parish; documenting sources (several extend `jak-szukac-przodkow`).
 - **H. Trust and myths:** same surname, same family?; -ski and nobility; nationality; ethnic origin; map and roots; a surname and one village; the coat of arms; ancestors from a surname alone; can AI determine a surname's origin; spotting a false etymology.

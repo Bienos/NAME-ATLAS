@@ -1,0 +1,2063 @@
+{
+  "head" : {
+    "vars" : [ "person", "sitelinks", "born", "died", "polish", "label_pl", "label_mul", "label_en" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q177515"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1910"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1993"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q211274"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q331544"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1300"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1292"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Tomasz II Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Thomas II Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q522270"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1908"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1994"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Peter Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Peter Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q578192"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1731"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1774"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q172107"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Józef Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Józef Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q896660"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "18"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1863"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1942"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q920044"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "7"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1951"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Maciej Zaremba Bielawski"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maciej Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1327931"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1958"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Elena Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1694314"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1908"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1986"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "John Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "John Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1855546"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "22"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1957"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2026"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Ota Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Ota Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ota Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1929920"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1955"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2012"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Michael Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2143315"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1967"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Renata Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Renata Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Renata Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2514498"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1954"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Algimantas Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2717812"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "17"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1821"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1879"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Nikołaj Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Nikolai Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2848821"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1250"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1318"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q577867"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Andrzej Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Andrzej Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2927020"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1955"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2018"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Bruno Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Bruno Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3367642"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1959"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pascal Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7945586"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1928"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2000"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Lidia Rybotycka-Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Lidia Rybotycka-Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8075825"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1895"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1967"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Zygmunt Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zygmunt Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9263100"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1751"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1863"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Franciszek Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Franciszek Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9342375"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1903"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1990"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Stanisław Krystyn Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Stanisław Krystyn Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9373649"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1954"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Wiesław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Wiesław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9388432"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1926"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2009"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Zbigniew Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Zbigniew Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11718066"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1896"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1940"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jan Konstanty Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Jan Konstanty Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jan Konstanty Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11725736"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1947"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jerzy Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Jerzy Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jerzy Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11731683"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Józef Zaremba (XIX wiek)"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Józef Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4187172"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1861"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1915"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Sigismund Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4187173"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1833"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1902"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Władysław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vladyslav Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4540223"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1601"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1648"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q172107"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5418858"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "7"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1899"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1986"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Ewa Szelburg-Zarembina"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ewa Szelburg-Zarembina"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6377150"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1982"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Kathryn Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6440243"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1972"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Krzysztof Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Krzysztof Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6786702"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1984"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Mateusz Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Mateusz Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7156225"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1915"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1979"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Paweł Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Paweł Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7177843"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Peter Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11736363"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1846"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1897"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Karol Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Karol Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11767882"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1966"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11767880"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Marcin Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11769778"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1910"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1939"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Marian Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Marian Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Marian Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11772343"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1966"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Małgorzata Okońska-Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Małgorzata Okońska-Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Małgorzata Okońska-Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11818279"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1963"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12094713"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1883"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1954"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Henryk Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Henryk Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16091680"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1930"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2025"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Eve Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Eve Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Eve Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17371789"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1931"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2015"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Fedir Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17552661"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1724"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1768"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q172107"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Szymon Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Szymon Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18549351"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1908"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1930"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Aurel Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q24688969"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1520"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1649871"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jan Zaremba z Kalinowy"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jan Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q26201801"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1550"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1649871"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Wacław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Wacław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27431231"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1992"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Adrian Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Adrian Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27733815"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "15"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1988"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Wojciech Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Wojciech Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Wojciech Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q29829622"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1913"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Maria Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maria Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30346265"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1881"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1958"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Czesław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Czesław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q97370438"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1940"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2013"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Tadeusz Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Tadeusz Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q98067484"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2001"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Aleksandra Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Aleksandra Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q109833205"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1906"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1983"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jan Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Jan Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jan Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q111745117"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1942"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2022"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Maria Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Maria Lucyna Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Maria Lucyna Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q121693555"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1909"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Stanisław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q46628757"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Dorota Tomaszewska-Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dorota Tomaszewska-Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q48853684"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1922"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1999"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Bronisław Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Bronisław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q57756245"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1936"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jacek Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Jacek Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q58370823"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1958"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Krzysztof Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Krzysztof Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q60613230"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1946"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Elżbieta Witkowska-Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Elżbieta Witkowska-Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q60832792"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1959"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Piotr Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q94693752"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1824"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1895"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Laurenz Zaremba"
+      },
+      "label_en" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Laurenz Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q9258507"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1770"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q172107"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Felicjan Mikołaj Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q85870742"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1902"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1972"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Władysław Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q97371722"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "born" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1874"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1939"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jan Zaremba"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q112574312"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q172107"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Jan Zaremba z Kalinowy"
+      },
+      "label_mul" : {
+        "xml:lang" : "mul",
+        "type" : "literal",
+        "value" : "Jan Zaremba z Kalinowy"
+      }
+    }, {
+      "person" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q121139219"
+      },
+      "sitelinks" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      },
+      "died" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1454"
+      },
+      "polish" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1649871"
+      },
+      "label_pl" : {
+        "xml:lang" : "pl",
+        "type" : "literal",
+        "value" : "Wawrzyniec Zaremba z Kalinowy"
+      }
+    } ]
+  }
+}
