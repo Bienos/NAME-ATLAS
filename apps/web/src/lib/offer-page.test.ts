@@ -124,9 +124,12 @@ describe("the offer page (TASK-057, ADR-0026)", () => {
       expect(footer).toContain(`href="${offerPath(lang)}"`);
       for (const label of ["Blog", "Instagram", "TikTok", "YouTube"])
         expect(footer).toContain(`>${label}</a>`);
-      expect(followLinks(lang).every((l) => l.href === (lang === "en" ? "/?lang=en" : "/"))).toBe(
-        true,
-      );
+      // The blog has its own index since TASK-071; the three social links still lead home.
+      expect(
+        followLinks(lang)
+          .filter((l) => l.label !== "Blog")
+          .every((l) => l.href === (lang === "en" ? "/?lang=en" : "/")),
+      ).toBe(true);
     }
     expect(offerMetadata("en").alternates?.canonical).toBe("/en/offer");
     expect(render("pl")).toContain('href="/en/offer" hrefLang="en"');

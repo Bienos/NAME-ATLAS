@@ -4635,6 +4635,47 @@ body.dusk {
   margin: 0 0 var(--space-2);
 }
 
+/* The blog (TASK-071): the index's entries, a post's date and its own headings. */
+.blog-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blog-list li + li {
+  margin-top: var(--space-7);
+}
+
+.reading h2.blog-entry-title,
+.blog-body h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 1.625rem;
+  line-height: 1.2;
+}
+
+.blog-body h2 {
+  margin-top: var(--space-7);
+}
+
+.blog-body h3 {
+  margin: var(--space-6) 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--dusk-ink);
+}
+
+.blog-date {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-muted);
+}
+
+.blog-back {
+  margin-top: var(--space-8);
+}
+
 /* The footer's blog and social links, after the contact line (TASK-057). */
 .footer-follow {
   display: flex;

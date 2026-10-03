@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { BlogPost } from "./blog.js";
 import {
+  BLOG_SITEMAP_PATH,
+  blogSitemapXml,
   escapeXml,
   pageCount,
   SITEMAP_PAGE_SIZE,
@@ -91,5 +94,41 @@ describe("sitemapPageXml", () => {
   it("skips an entry whose slug yields no route rather than emitting a bare prefix", () => {
     const xml = sitemapPageXml(ORIGIN, "pl", [{ ...entry("nowak"), slug: "" }]);
     expect(xml).not.toContain("<url>");
+  });
+});
+
+describe("the blog's sitemap (TASK-071)", () => {
+  const post = (slug: string, lang: "pl" | "en", date: string): BlogPost => ({
+    title: slug,
+    description: slug,
+    date,
+    slug,
+    lang,
+    body: [{ kind: "p", inlines: [{ kind: "text", text: "x" }] }],
+  });
+
+  it("is named by the index only when asked, and the index is otherwise unchanged (AC-9)", () => {
+    expect(sitemapIndexXml(ORIGIN, 2, [])).toBe(sitemapIndexXml(ORIGIN, 2));
+    const xml = sitemapIndexXml(ORIGIN, 1, [BLOG_SITEMAP_PATH]);
+    expect(xml).toContain(`<loc>${ORIGIN}/sitemap/1.xml</loc>`);
+    expect(xml).toContain(`<loc>${ORIGIN}/sitemap-blog.xml</loc>`);
+    expect(sitemapIndexXml(ORIGIN, 0, [BLOG_SITEMAP_PATH])).toContain(
+      `<loc>${ORIGIN}/sitemap-blog.xml</loc>`,
+    );
+  });
+
+  it("lists each post with its date, and the language pair as alternates (AC-9)", () => {
+    const posts = [
+      post("a", "pl", "2026-10-02"),
+      post("a", "en", "2026-10-02"),
+      post("b", "pl", "2026-10-01"),
+    ];
+    const xml = blogSitemapXml("https://x.test/?a=1&b=2", posts);
+    expect(xml).toContain("<loc>https://x.test/?a=1&amp;b=2/pl/blog/a</loc>");
+    expect(xml).toContain("<lastmod>2026-10-02</lastmod>");
+    expect(xml).toContain('hreflang="en" href="https://x.test/?a=1&amp;b=2/en/blog/a"');
+    const b = xml.slice(xml.indexOf("/pl/blog/b"));
+    expect(b.slice(0, b.indexOf("</url>"))).not.toContain("xhtml:link");
+    expect(xml.match(/<url>/gu)?.length).toBe(3);
   });
 });

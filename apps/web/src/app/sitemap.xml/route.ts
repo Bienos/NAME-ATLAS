@@ -2,7 +2,8 @@ import { db as sharedDb } from "../../lib/db.js";
 import { sitemapCount } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled } from "../../lib/seo.js";
-import { pageCount, sitemapIndexXml } from "../../lib/sitemap-xml.js";
+import { BLOG_SITEMAP_PATH, pageCount, sitemapIndexXml } from "../../lib/sitemap-xml.js";
+import { blogPosts } from "../../lib/blog-posts.js";
 import { siteOrigin } from "../../lib/surname-page.js";
 
 /**
@@ -32,7 +33,12 @@ export async function GET(): Promise<Response> {
   try {
     const db = sharedDb();
     const total = await sitemapCount(db, "pl");
-    return new Response(sitemapIndexXml(origin, pageCount(total)), { status: 200, headers: XML });
+    // The blog's sitemap (TASK-071), only when it has a post to list.
+    const extra = blogPosts().length > 0 ? [BLOG_SITEMAP_PATH] : [];
+    return new Response(sitemapIndexXml(origin, pageCount(total), extra), {
+      status: 200,
+      headers: XML,
+    });
   } catch (cause: unknown) {
     log.error("sitemap_index_failed", { cause });
     // A 500 is right: an empty sitemap would tell a crawler we publish nothing.
