@@ -126,3 +126,13 @@ The onomastics code, `ops/vm/README.md` and the surname-meaning test merged with
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `build` | exit 0 |
 | `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
 | `pnpm test:golden` | exit 0; 364 tests |
+
+## Ninth merge: `main` after #92 (the footer and contact form), 2026-10-03
+
+The web files #92 changed (`globals.css`, `messages.ts`, `request-policy.ts`, `legal-text.ts` and others) merged without conflict. `STATUS.md` conflicted in two lines: "Last rewritten", and the launch-hygiene line, which takes `main`'s contact-form text with this branch's state of TASK-049 (tooling implemented, production upload and restore unverified).
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0 |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |

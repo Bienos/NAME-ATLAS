@@ -40,6 +40,13 @@ export const ACCOUNT_PATH = "/api/account/";
 export const TREE_POLICY: RateLimitPolicy = { limit: 30, windowMs: 60_000 };
 export const TREE_PATH = "/api/tree/";
 
+/**
+ * The contact form: each post can send a mail, so five a minute per client, its
+ * own bucket. A person writing a message sends one.
+ */
+export const CONTACT_POLICY: RateLimitPolicy = { limit: 5, windowMs: 60_000 };
+export const CONTACT_PATH = "/api/contact";
+
 /** The longest window of any policy: what an eviction sweep keeps. */
 export const LONGEST_WINDOW_MS = Math.max(
   PAGE_POLICY.windowMs,
@@ -47,6 +54,7 @@ export const LONGEST_WINDOW_MS = Math.max(
   PREFIX_POLICY.windowMs,
   ACCOUNT_POLICY.windowMs,
   TREE_POLICY.windowMs,
+  CONTACT_POLICY.windowMs,
 );
 
 /** The limit a path is held to. */
@@ -54,5 +62,6 @@ export function policyFor(pathname: string): RateLimitPolicy {
   if (pathname === PREFIX_PATH) return PREFIX_POLICY;
   if (pathname.startsWith(ACCOUNT_PATH)) return ACCOUNT_POLICY;
   if (pathname.startsWith(TREE_PATH)) return TREE_POLICY;
+  if (pathname === CONTACT_PATH) return CONTACT_POLICY;
   return pathname.startsWith("/api/") ? API_POLICY : PAGE_POLICY;
 }
