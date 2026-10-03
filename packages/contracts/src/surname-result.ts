@@ -29,7 +29,7 @@ import { z } from "zod";
  * TASK-054 reached `main` first, as 1.8, while TASK-051 was still open as 1.7,
  * so 1.9 is the first version on `main` that carries both. 1.10 adds
  * `neighbours` and `other_form` (TASK-055, ADR-0025). 1.11 adds `localities`
- * (TASK-086, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030).
+ * (TASK-090, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030).
  */
 export const SURNAME_RESULT_SCHEMA_VERSION = "1.12";
 
@@ -905,7 +905,7 @@ export const localityKindSchema = z.enum(["CITY", "VILLAGE", "OTHER"]);
 
 /**
  * One whole locality in the TERYT register whose official name is the surname
- * (TASK-086, ADR-0025 §2.7), with the gmina, powiat and voivodeship it belongs
+ * (TASK-090, ADR-0025 §2.7), with the gmina, powiat and voivodeship it belongs
  * to on the register's reference date. A part of a locality is never listed.
  */
 export const localityEntrySchema = z.object({
@@ -930,7 +930,7 @@ export const localitiesStateSchema = z.enum([
 ]);
 
 /**
- * The localities whose name is the surname (TASK-086). A lookup in an official
+ * The localities whose name is the surname (TASK-090). A lookup in an official
  * register by the resolver's own canonical key, never a claim about the
  * surname: a shared name is a coincidence in the register, and no field here
  * says, and no surface may say, that the surname began in or is connected
@@ -1028,7 +1028,7 @@ export const surnameResultResponseSchema = z
     bearers: bearersSectionSchema.nullable(),
     /** Added in 1.10 (TASK-055). Null unless RESOLVED, and null where no other form is paired. */
     other_form: otherFormSchema.nullable(),
-    /** Added in 1.11 (TASK-086). Present exactly when RESOLVED. */
+    /** Added in 1.11 (TASK-090). Present exactly when RESOLVED. */
     localities: localitiesSectionSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {

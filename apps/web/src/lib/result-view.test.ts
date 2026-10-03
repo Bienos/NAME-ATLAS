@@ -71,7 +71,7 @@ function rarity(x: number, numerator: number, group: string) {
 }
 
 /** NOWAK: both partitions, and a READY distribution over its 16 voivodeships. */
-/** TERYT's own record for the localities chapter (TASK-086): the real file record's shape. */
+/** TERYT's own record for the localities chapter (TASK-090): the real file record's shape. */
 const TERYT_CITATION = {
   id: "cit-teryt",
   title: "TERYT",
@@ -860,7 +860,7 @@ describe("TASK-023 AC-1, ADR-0012: every figure is a claim; its evidence is at t
   it("renders each observation, rarity entry and distribution entry as a claim, with no panel", () => {
     const markup = render(RESOLVED, "pl");
     // 2 population + 2 rarity + 1 distribution entries in the fixture, and the
-    // localities statement (TASK-086).
+    // localities statement (TASK-090).
     expect(markup.match(/class="claim"/gu)?.length).toBe(6);
     expect(markup).not.toContain('class="evidence"');
     expect(markup).not.toContain("Zobacz dowody");
@@ -881,7 +881,7 @@ describe("TASK-023 AC-1, ADR-0012: every figure is a claim; its evidence is at t
     const markup = render(RESOLVED, "en");
     const from = markup.indexOf('<ul class="sources">');
     const list = markup.slice(from, markup.indexOf("</ul>", from));
-    // PESEL once, and TERYT once for the localities chapter (TASK-086).
+    // PESEL once, and TERYT once for the localities chapter (TASK-090).
     expect(list.match(/<li>/gu)?.length).toBe(2);
     expect(list).toContain(`href="${CITATION.source_page_url}"`);
     expect(list).toContain(">dane.gov.pl</a>");
@@ -1082,7 +1082,7 @@ describe("TASK-023: sources section and anchors", () => {
     // The source list only: the notes below it are a list of their own.
     const from = m.indexOf('<ul class="sources">');
     const sources = m.slice(from, m.indexOf("</ul>", from));
-    // PESEL once for every register figure, and TERYT once for the localities (TASK-086).
+    // PESEL once for every register figure, and TERYT once for the localities (TASK-090).
     expect(sources.match(/<li>/gu)?.length).toBe(2);
   });
 
@@ -1618,7 +1618,7 @@ describe("TASK-051: the change-over-time chapter", () => {
     const markup = render(CHANGE_READY, "en");
     const from = markup.indexOf('<ul class="sources">');
     const sources = markup.slice(from, markup.indexOf("</ul>", from));
-    // PESEL once for every register figure; TERYT once for the localities (TASK-086).
+    // PESEL once for every register figure; TERYT once for the localities (TASK-090).
     expect(sources.match(/<li>/gu)).toHaveLength(2);
     expect(sources.match(/>dane\.gov\.pl<\/a>/gu)).toHaveLength(1);
   });
@@ -1661,10 +1661,10 @@ describe("TASK-051: the change-over-time chapter", () => {
 });
 
 /**
- * TASK-086 AC-3: the localities chapter. The fixture's places are the TERYT
+ * TASK-090 AC-3: the localities chapter. The fixture's places are the TERYT
  * excerpt's real localities under a surname they do not match (SYNTHETIC).
  */
-describe("TASK-086: localities with the same name", () => {
+describe("TASK-090: localities with the same name", () => {
   const withLocalities = (localities: unknown): unknown => ({
     ...(RESOLVED as Record<string, unknown>),
     localities,

@@ -7562,7 +7562,7 @@ a.tree-card:hover {
   margin: 0 0 var(--space-2);
 }
 
-/* --- localities with the same name (TASK-086, ADR-0025 §2.7) ------------ */
+/* --- localities with the same name (TASK-090, ADR-0025 §2.7) ------------ */
 
 .places {
   display: grid;
@@ -8355,7 +8355,7 @@ a.tree-card:hover {
   color: var(--dusk-ink-soft);
 }
 
-/* The localities card (TASK-086): one row per place, the register's names as written. */
+/* The localities card (TASK-090): one row per place, the register's names as written. */
 .dk-places {
   display: grid;
   gap: var(--space-2);

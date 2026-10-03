@@ -6,7 +6,7 @@
 
 ## In scope
 
-Combine #70's localities/contract 1.11 (TASK-066, now TASK-086), #67's private tree core (renumbered TASK-068 here; #67 itself merged first, on 2026-10-03, as TASK-066, so the core is TASK-066 and this branch's copy of the task file was dropped), #65's source-display ADR, #44's 147 Onomastica entries (renumbered TASK-069), and the safe #30 cleanup on current code. Reconcile D-032 with the tree's D-030, preserve the owner-selected domain, and implement TASK-049 tooling. Preserve synced reference files under sources: the additional article lives in `datasets/onomastics/`.
+Combine #70's localities/contract 1.11 (TASK-066, now TASK-090), #67's private tree core (renumbered TASK-068 here; #67 itself merged first, on 2026-10-03, as TASK-066, so the core is TASK-066 and this branch's copy of the task file was dropped), #65's source-display ADR, #44's 147 Onomastica entries (renumbered TASK-069), and the safe #30 cleanup on current code. Reconcile D-032 with the tree's D-030, preserve the owner-selected domain, and implement TASK-049 tooling. Preserve synced reference files under sources: the additional article lives in `datasets/onomastics/`.
 
 Correct the cleanup's actual review issues: keep the truth reads sequential for the two-connection production pool, retain earlier-edition filtering, and return DATABASE_ERROR only for database/driver failures. Check concurrency and graph visibility in the inactive tree service. Keep all user-facing account, payment and privacy release gates.
 
