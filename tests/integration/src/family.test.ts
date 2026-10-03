@@ -10,8 +10,8 @@ import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 
 /**
- * TASK-068: the family tree over a real PostgreSQL, as the role that will run
- * it, with the row-level security policies of migration 0030 applied to it.
+ * TASK-066: the family tree over a real PostgreSQL, as the role that will run
+ * it, with the row-level security policies of migration 0028 applied to it.
  *
  * As in `accounts.test.ts`, the roles come from `ops/vm/accounts-roles.sql`
  * itself. The three accounts below are inserted as the superuser, complete,
@@ -34,7 +34,7 @@ function urlAs(connectionUri: string, user: string, password: string): string {
   return url.toString();
 }
 
-describe("family tree (TASK-068, ADR-0029)", () => {
+describe("family tree (TASK-066, ADR-0029)", () => {
   let database: TestDatabase | undefined;
   let appPool: ReturnType<typeof createPool> | undefined;
   let webPool: ReturnType<typeof createPool> | undefined;
@@ -745,11 +745,12 @@ describe("family tree (TASK-068, ADR-0029)", () => {
     expect((await family.listTrees(MEMBER)).map((t) => t.title)).toEqual(["Linia Wróblów"]);
   });
 
-  it("0030 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
+  it("0028 down refuses while a tree is stored and changes nothing (AC-9)", async () => {
     const migrator = createMigrator(db().db);
-    // `0031` (given names, TASK-076) sits above and holds nothing here.
-    const givenNames = await migrator.migrateDown();
-    expect(givenNames.results?.map((r) => r.migrationName)).toEqual(["0031_given_names"]);
+    // Step past the migrations above 0028 first (TASK-073's 0029, the
+    // safeguards' 0030, the given names' 0031); the refusal under test is 0028's.
+    const above = await migrator.migrateTo("0028_family_schema");
+    expect(above.error).toBeUndefined();
     const { error } = await migrator.migrateDown();
     expect(String(error)).toMatch(/refusing to drop schema family/u);
     const still = await sql<{ n: number }>`SELECT count(*)::int AS n FROM family.trees`.execute(

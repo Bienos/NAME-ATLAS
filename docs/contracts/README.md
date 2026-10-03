@@ -26,4 +26,4 @@ Accepted: `surname-result.md` (TASK-006) and `surname-prefix.md` (suggest-as-you
 
 Accepted with ADR-0015: `list-facts.md` (TASK-040, statistics about one whole published list), merged in #32 on 2026-09-30.
 
-Accepted with ADR-0029: `tree.md` (TASK-068, the family tree), 2026-10-01.
+Accepted with ADR-0029: `tree.md` (TASK-066, the family tree), 2026-10-01.

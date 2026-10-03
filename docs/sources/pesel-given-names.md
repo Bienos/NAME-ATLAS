@@ -1,6 +1,6 @@
 # PESEL given-name lists (dane.gov.pl dataset 1667)
 
-Source record for TASK-076 (ADR-0031). Read on 2026-10-03.
+Source record for TASK-078 (ADR-0031). Read on 2026-10-03.
 
 - **Dataset:** "Lista imion występujących w rejestrze PESEL", Ministerstwo Cyfryzacji, https://dane.gov.pl/pl/dataset/1667,lista-imion-wystepujacych-w-rejestrze-pesel (API: `https://api.dane.gov.pl/1.4/datasets/1667`).
 - **Licence:** "CC0 1.0", as the dataset's metadata states. Update frequency "Rocznie" (yearly).
@@ -9,7 +9,7 @@ Source record for TASK-076 (ADR-0031). Read on 2026-10-03.
   - One file per sex and name position (`imię pierwsze`, `imię drugie`).
   - Snapshots from 2019-07-18 to 2026-01-20.
   - From 2021 the files are XLSX with a portal-generated CSV at `csv_download_url`. The 2020 files are also published as CSV.
-- **Imported (TASK-076):** 1159669 (male, first) and 1159670 (female, first), dated 2026-01-20. Their checksums, sizes, row counts and totals are pinned in `packages/sources/src/given-names/registry.ts`, and the publisher's resource objects are saved verbatim in `acquisition/2026-10-03/metadata/`.
+- **Imported (TASK-078):** 1159669 (male, first) and 1159670 (female, first), dated 2026-01-20. Their checksums, sizes, row counts and totals are pinned in `packages/sources/src/given-names/registry.ts`, and the publisher's resource objects are saved verbatim in `acquisition/2026-10-03/metadata/`.
 - **Shape:**
   - The files are UTF-8 with no byte-order mark and CRLF line ends.
   - The header is `IMIĘ_PIERWSZE,PŁEĆ,LICZBA_WYSTĄPIEŃ`.

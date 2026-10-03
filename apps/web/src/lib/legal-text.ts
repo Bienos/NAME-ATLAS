@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL } from "./contact.js";
 import { accountsVariant } from "./legal-accounts.js";
+import { treeVariant } from "./legal-tree.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -34,6 +35,15 @@ export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
  * are on. The base text keeps `LEGAL_UPDATED`.
  */
 export const ACCOUNTS_LEGAL_UPDATED = "2026-10-01";
+
+/**
+ * The date of the tree variant (TASK-076): the terms gain the clause on living
+ * people and the notice a section on the tree. Shown, and recorded as the
+ * version a reader accepted, only when the tree is on (`family-config.ts`).
+ * It is also the version the consent step checks an account against
+ * (ADR-0029 §2.4.12).
+ */
+export const TREE_LEGAL_UPDATED = "2026-10-03";
 
 export interface LegalSection {
   readonly heading: string;
@@ -320,21 +330,32 @@ const TERMS: Record<Lang, LegalDocument> = {
 /**
  * The document as it stands. `accounts` says whether the site has accounts
  * (`accountsEnabled`): then the notice and the terms say so (`legal-accounts.ts`);
- * otherwise this is the text as it was before accounts, unchanged.
+ * `tree` whether the family tree is on (`familyTreeEnabled`): then they say
+ * that too (`legal-tree.ts`). Otherwise this is the text as it was before
+ * accounts, unchanged.
  */
-export function legalDocument(kind: LegalKind, lang: Lang, accounts = false): LegalDocument {
+export function legalDocument(
+  kind: LegalKind,
+  lang: Lang,
+  accounts = false,
+  tree = false,
+): LegalDocument {
   const base = kind === "privacy" ? PRIVACY[lang] : TERMS[lang];
-  return accounts ? accountsVariant(kind, lang, base) : base;
+  if (!accounts) return base;
+  const withAccounts = accountsVariant(kind, lang, base);
+  return tree ? treeVariant(kind, lang, withAccounts) : withAccounts;
 }
 
 /** The date the document last changed, for the page and for the version recorded. */
 /**
  * The date shown on a document: its own, or the accounts variant's when that
- * is later. Display only; the version a reader accepts is
- * {@link ACCOUNTS_LEGAL_UPDATED} (`accounts-runtime.ts`).
+ * is later, or the tree variant's when the tree is on and that is later.
+ * Display only; the version a reader accepts is {@link ACCOUNTS_LEGAL_UPDATED}
+ * or {@link TREE_LEGAL_UPDATED} (`accounts-runtime.ts`).
  */
-export function legalUpdated(kind: LegalKind, accounts = false): string {
+export function legalUpdated(kind: LegalKind, accounts = false, tree = false): string {
   const own = LEGAL_UPDATED[kind];
+  if (accounts && tree) return TREE_LEGAL_UPDATED > own ? TREE_LEGAL_UPDATED : own;
   return accounts && ACCOUNTS_LEGAL_UPDATED > own ? ACCOUNTS_LEGAL_UPDATED : own;
 }
 

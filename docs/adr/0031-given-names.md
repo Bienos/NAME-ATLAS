@@ -1,6 +1,6 @@
 # ADR-0031 — Given names: a second name type, kept apart from surnames
 
-- **Status:** Proposed 2026-10-03. The first build (TASK-076) is internal: no page, no contract and no claim read it.
+- **Status:** Proposed 2026-10-03. The first build (TASK-078) is internal: no page, no contract and no claim read it.
 - **Deciders:** the project owner asked on 2026-10-03 to "design adding full name report to paid so you can find name meaning", and then to "start the first-name statistics". This ADR records the storage that start needs. The product questions (which tier, free or paid, which meaning sources) are open in the design draft and are not decided here.
 - **Supersedes:** nothing. It adds an entity that `docs/canonical/11` does not have.
 
@@ -42,6 +42,6 @@
 
 ## Consequences
 
-- Migration 0031 adds `GIVEN_NAME` to `entity_type` and `source_granularity`, plus the two tables. It follows `main`'s 0029 (#84) and #76's 0030.
+- Migration 0031 adds `GIVEN_NAME` to `entity_type` and `source_granularity`, plus the two tables. It follows `main`'s 0029 (#84) and #76's 0030 (family safeguards).
 - Second names, earlier editions (2019–2025), the deceased-inclusive list (dataset 1501) and births by year (dataset 219) each fit the same tables as further resources. They are not imported here.
 - A later page that shows a given name reads claims, not this table (ADR-0001, `ARCHITECTURE.md` §6).

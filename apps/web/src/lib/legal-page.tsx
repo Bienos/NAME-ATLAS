@@ -3,6 +3,7 @@ import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SiteShell } from "./site-shell.js";
 import { accountsEnabled } from "./accounts-config.js";
+import { familyTreeEnabled } from "./family-config.js";
 import { legalDocument, legalPath, legalUpdated } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
 
@@ -10,7 +11,9 @@ import type { LegalKind } from "./legal-text.js";
  * `/pl/prywatnosc`, `/en/privacy`, `/pl/regulamin`, `/en/terms` (TASK-046).
  * Static: the text is in `legal-text.ts`; no database, no request data. When
  * accounts are on (`accounts-config.ts`, read at build) it says so
- * (`legal-accounts.ts`), and its date is the accounts variant's.
+ * (`legal-accounts.ts`), and its date is the accounts variant's; when the
+ * family tree is on too (TASK-076), it carries the tree's statements
+ * (`legal-tree.ts`) and that variant's date.
  */
 
 export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
@@ -25,8 +28,9 @@ export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
 
 export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly lang: Lang }) {
   const accounts = accountsEnabled();
-  const doc = legalDocument(kind, lang, accounts);
-  const updated = legalUpdated(kind, accounts);
+  const tree = familyTreeEnabled();
+  const doc = legalDocument(kind, lang, accounts, tree);
+  const updated = legalUpdated(kind, accounts, tree);
   const other: Lang = lang === "pl" ? "en" : "pl";
   return (
     <SiteShell

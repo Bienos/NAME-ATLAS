@@ -9,7 +9,8 @@ import type { AccountLinks, Accounts, Mailer } from "@name-atlas/accounts";
 import { createPool, loadAccountsDbConfig } from "@name-atlas/db";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
-import { ACCOUNTS_LEGAL_UPDATED } from "./legal-text.js";
+import { familyTreeEnabled } from "./family-config.js";
+import { ACCOUNTS_LEGAL_UPDATED, TREE_LEGAL_UPDATED } from "./legal-text.js";
 
 /**
  * The accounts the running site uses (TASK-062, ADR-0027 §2.2): one pool for
@@ -28,10 +29,13 @@ import { ACCOUNTS_LEGAL_UPDATED } from "./legal-text.js";
 
 export interface AccountsRuntime {
   readonly accounts: Accounts;
+  /** The pool of schema `accounts`; the family tree's service shares it (TASK-076), as the same role. */
+  readonly pool: ReturnType<typeof createPool>;
   readonly mailer: Mailer;
   /** Whether the site is served over HTTPS, which decides the cookie's name and `Secure`. */
   readonly secure: boolean;
   readonly cronSecret: string;
+  /** The date of the terms a sign-up accepts: the tree variant's when the tree is on (TASK-076), else the accounts variant's. */
   readonly termsVersion: string;
 }
 
@@ -71,10 +75,11 @@ export function accountsRuntime(env: NodeJS.ProcessEnv = process.env): AccountsR
   });
   cached = {
     accounts,
+    pool,
     mailer: createResendMailer(mail),
     secure: origin.startsWith("https://"),
     cronSecret,
-    termsVersion: ACCOUNTS_LEGAL_UPDATED,
+    termsVersion: familyTreeEnabled(env) ? TREE_LEGAL_UPDATED : ACCOUNTS_LEGAL_UPDATED,
   };
   return cached;
 }

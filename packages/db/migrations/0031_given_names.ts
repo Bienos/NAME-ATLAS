@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * Given names, a second name type kept apart from surnames (ADR-0031, TASK-076).
+ * Given names, a second name type kept apart from surnames (ADR-0031, TASK-078).
  *
  * - `given_names`: one identity per written form under the resolver's
  *   canonical key, as `surnames` has. No column joins it to a surname.
@@ -13,7 +13,7 @@ import type { Kysely } from "kysely";
  *   name has no row.
  *
  * Numbered 0031: `main` gave 0029 to the well-known bearers (#84), and #76's
- * family schema is 0030 (`AGENTS.md` §11). The new enum values
+ * family safeguards are 0030 (`AGENTS.md` §11). The new enum values
  * are compared as text in the constraints below: PostgreSQL refuses to use a
  * value added by `ALTER TYPE … ADD VALUE` in the transaction that added it
  * (see 0025).

@@ -126,5 +126,5 @@ export * from "./teryt/index.js";
 // record per surname. Queried ahead of time, never when a page is viewed.
 export * from "./wikidata/index.js";
 
-// PESEL given names — TASK-076 (ADR-0031): a second name type, kept apart from surnames.
+// PESEL given names — TASK-078 (ADR-0031): a second name type, kept apart from surnames.
 export * from "./given-names/index.js";

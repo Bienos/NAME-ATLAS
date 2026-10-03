@@ -1,9 +1,9 @@
-# TASK-076 — The PESEL given-name lists, imported (first names, 2026-01-20)
+# TASK-078 — The PESEL given-name lists, imported (first names, 2026-01-20)
 
 - **Status:** IMPLEMENTED 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`). Not on production.
 - **Requested by:** the project owner, 2026-10-03: "start the first-name statistics", the first phase of the full-name report design.
 - **Decision:** ADR-0031 (proposed with this task).
-- **Number:** 076. Drafted as 073, then 075; `main` gave 073 and 074 to #84 and #83, and #79 is 075. 076 is the next number free on `main` and in the open pull requests on 2026-10-03, 15:40 UTC. ADR-0031 and migration 0031 follow the same way: `main` took ADR-0030 and migration 0029 (#84), and #76 carries migration 0030.
+- **Number:** 078. Drafted as 073, then 075, then 076; while this was open `main` gave 073 and 074 to #84 and #83, 076 to the tree pages (#67), #79 took 075 and the localities task became 077 in #76. 078 is the next number free on `main` and in the open pull requests on 2026-10-03, 16:00 UTC. ADR-0031 and migration 0031 are unchanged: `main` took ADR-0030 and migration 0029 (#84), and #76 carries migration 0030 (the family safeguards).
 - **Depends on:** #79's branch (migration 0031 must follow `main`'s 0029 and #76's 0030).
 - **Model guidance:** implementation session.
 

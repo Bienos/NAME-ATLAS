@@ -93,6 +93,9 @@ importers:
       '@name-atlas/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@name-atlas/family':
+        specifier: workspace:*
+        version: link:../../packages/family
       '@name-atlas/logging':
         specifier: workspace:*
         version: link:../../packages/logging

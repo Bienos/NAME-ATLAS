@@ -800,6 +800,8 @@ export const UI = {
     navHow: "Jak to działa",
     navOffer: "Oferta",
     navAccount: "Konto",
+    // Only when the family tree is on (TASK-076).
+    navTrees: "Drzewa",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "Więcej: Twoja rodzina i DNA",
     // The footer's blog and social links (TASK-057).
@@ -897,7 +899,7 @@ export const UI = {
     archiveNotSearched: "Tego nazwiska jeszcze nie sprawdziliśmy w zbiorach Polony.",
     archiveUnavailable: "Wyników z Polony nie można teraz pokazać.",
     archiveBlocked: "Wyników z Polony nie można pokazać tutaj z powodu licencji źródła.",
-    // TASK-066: localities with the same name (ADR-0025 §2.7).
+    // TASK-077: localities with the same name (ADR-0025 §2.7).
     chapterPlacesTitle: "Które miejscowości tak się nazywają?",
     chapterPlacesLede:
       "Rejestr TERYT, urzędowy wykaz miejscowości, zawiera miejscowości o nazwie takiej samej " +
@@ -1415,6 +1417,7 @@ export const UI = {
     navHow: "How it works",
     navOffer: "Offer",
     navAccount: "Account",
+    navTrees: "Trees",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "More: your family and DNA",
     // The footer's blog and social links (TASK-057).
@@ -1504,7 +1507,7 @@ export const UI = {
     archiveNotSearched: "We have not searched Polona's collections for this surname yet.",
     archiveUnavailable: "Results from Polona cannot be shown right now.",
     archiveBlocked: "Results from Polona cannot be shown here because of the source's licence.",
-    // TASK-066: localities with the same name (ADR-0025 §2.7).
+    // TASK-077: localities with the same name (ADR-0025 §2.7).
     chapterPlacesTitle: "Which localities have this name?",
     chapterPlacesLede:
       "The TERYT register, Poland's official list of localities, holds localities named the " +
@@ -2018,7 +2021,7 @@ export function rightsBlockedText(lang: Lang): string {
     : "The source's licence does not permit showing this value on this page.";
 }
 
-/* --- localities with the same name (TASK-066, ADR-0025 §2.7) ------------- */
+/* --- localities with the same name (TASK-077, ADR-0025 §2.7) ------------- */
 
 /** The register's kinds, by TASK-039's classification of SIMC's `RM`. */
 export function localityKindLabel(kind: LocalityKind, lang: Lang): string {

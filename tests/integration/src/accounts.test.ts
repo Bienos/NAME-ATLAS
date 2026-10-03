@@ -832,7 +832,7 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       expect(inPublic).toEqual([]);
       // No foreign key crosses the register's boundary in either direction, and
       // the only references into `accounts` come from the other private schema,
-      // `family` (TASK-068, ADR-0029 §2.1), never from `public`.
+      // `family` (TASK-066, ADR-0029 §2.1), never from `public`.
       const crossing = await rows<{ n: string }>(`
         SELECT count(*)::text AS n
         FROM pg_constraint c
@@ -860,8 +860,8 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   describe("the migration (AC-8)", () => {
     it("refuses to go down while a user is stored, and removes the schema when none is", async () => {
       const migrator = createMigrator(db().db);
-      // Step past the migrations above 0027 first (TASK-073's 0029, the family
-      // schema's 0030, the given names' 0031); none holds anything here.
+      // Step past the migrations above 0027 first (0028, the family schema, which
+      // holds no tree here, 0029, 0030 and the given names' 0031).
       await migrator.migrateTo("0027_accounts_schema");
       const refused = await migrator.migrateDown();
       expect(String(refused.error)).toMatch(/refusing to drop schema accounts/u);

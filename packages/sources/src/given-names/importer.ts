@@ -1,5 +1,5 @@
 /**
- * Imports one PESEL given-name list (ADR-0031, TASK-076), with TASK-004's
+ * Imports one PESEL given-name list (ADR-0031, TASK-078), with TASK-004's
  * posture:
  *
  *   rights gate → checksum → decode → parse fail-closed → classify
