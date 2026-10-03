@@ -1,6 +1,6 @@
-# 2026-10-03 — The blog's third post: how to find Polish ancestors (TASK-073)
+# 2026-10-03 — The blog's third post: how to find Polish ancestors (TASK-074)
 
-Task: `tasks/073-blog-post-finding-ancestors.md`. Branch `claude/magical-brahmagupta-il0fm1`, restarted from `origin/main` @ `619d365` after #80 was merged. The owner asked for "the next blog post" without a topic; the session chose a step-by-step guide to searching for ancestors.
+Task: `tasks/074-blog-post-finding-ancestors.md`. Branch `claude/magical-brahmagupta-il0fm1`, restarted from `origin/main` @ `619d365` after #80 was merged. The owner asked for "the next blog post" without a topic; the session chose a step-by-step guide to searching for ancestors.
 
 ## Changed
 

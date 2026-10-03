@@ -1,9 +1,9 @@
-# TASK-073 — The blog's third post: how to find Polish ancestors online
+# TASK-074 — The blog's third post: how to find Polish ancestors online
 
 - **Status:** IMPLEMENTED 2026-10-03 on `claude/magical-brahmagupta-il0fm1`; record: `docs/progress/2026-10-03-blog-post-finding-ancestors.md`.
 - **Requested by:** the project owner, 2026-10-03: "write the next blog post", with no topic named. The session chose a step-by-step guide to searching for ancestors, which the first two posts lead into, and said so.
 - **Decision:** none. Content only, in the format TASK-071 defined.
-- **Depends on:** TASK-071 (#78) and TASK-072 (#80), whose post this one links to. Numbers 066, 068, 069 and 070 are held by open pull requests (#67, #70, #76); this task takes 073.
+- **Depends on:** TASK-071 (#78) and TASK-072 (#80), whose post this one links to. It was written as TASK-073 and renumbered to 074 on 2026-10-03: open pull requests #81 (opened before this task's #83), #84 and #67 also name a TASK-073, and #79 a TASK-072. 074 was free on `main` and in every open pull request.
 - **Model guidance:** implementation session.
 
 ## 1. Goal
