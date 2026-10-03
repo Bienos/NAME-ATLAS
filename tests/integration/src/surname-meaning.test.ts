@@ -138,6 +138,39 @@ describe("SURNAME_MEANING against a real PostgreSQL", () => {
       expect(second.source_record_id).toBe(first.source_record_id);
       expect(await count("source_records", "record_type = 'ARTICLE'")).toBe(1);
     });
+
+    it("replaces an earlier version of the same work, which is then read no more (TASK-081)", async () => {
+      const first = await importOnomasticSource(db(), { bytes: WORK_A, allowSynthetic: true });
+      if (first.kind !== "IMPORTED") throw new Error("expected IMPORTED");
+      expect(first.supersedes_source_record_id).toBeNull();
+
+      // The same work with one entry's gloss changed: a new version, not a second work.
+      const file = JSON.parse(Buffer.from(WORK_A).toString("utf8")) as {
+        entries: { literal_gloss: string }[];
+      };
+      file.entries[0]!.literal_gloss = "synthetic gloss, second version";
+      const second = await importOnomasticSource(db(), {
+        bytes: Buffer.from(JSON.stringify(file)),
+        allowSynthetic: true,
+      });
+      if (second.kind !== "IMPORTED") throw new Error("expected IMPORTED");
+      expect(second.source_id).toBe(first.source_id);
+      expect(second.supersedes_source_record_id).toBe(first.source_record_id);
+      expect(
+        await count("source_records", "record_type = 'ARTICLE' AND record_status = 'ACTIVE'"),
+      ).toBe(1);
+      expect(
+        await count(
+          "source_records",
+          `source_record_id = '${first.source_record_id}' AND record_status = 'UPDATED'`,
+        ),
+      ).toBe(1);
+
+      const result = await deriveSurnameMeaning(db(), "KOWALCZYK");
+      if (result.kind !== "RESULT" || !result.meaning) throw new Error("expected a claim");
+      expect(result.meaning.interpretations).toHaveLength(1);
+      expect(result.meaning.interpretations[0]?.source_record_id).toBe(second.source_record_id);
+    });
   });
 
   describe("AC-1: no admissible work means no claim and a stated gap", () => {

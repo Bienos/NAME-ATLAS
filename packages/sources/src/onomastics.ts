@@ -309,6 +309,8 @@ export type ImportOnomasticOutcome =
       readonly source_id: string;
       readonly source_record_id: string;
       readonly entries: number;
+      /** The earlier version of the same work this one replaces, now `UPDATED`; null for a first import. */
+      readonly supersedes_source_record_id: string | null;
     }
   | {
       readonly kind: "ALREADY_IMPORTED";
@@ -421,6 +423,12 @@ function productionStatusFor(
  * Everything in one transaction, and idempotent on identical bytes: the same
  * file imported twice yields `ALREADY_IMPORTED` rather than a second record.
  *
+ * A new version of a work already imported (the same `source_key` and year,
+ * different bytes) replaces it: the earlier record becomes `UPDATED` and the
+ * new one names it in `supersedes_source_record_id`. Derivation reads `ACTIVE`
+ * records only, so an entry carried in both versions is read once, from the
+ * new one (TASK-081).
+ *
  * Note what this does **not** do: it does not create evidence or claims. That
  * is `deriveSurnameMeaning`'s job, which keeps storage and derivation apart the
  * same way the PESEL importer does (`ARCHITECTURE.md` §10 invariant 10).
@@ -475,13 +483,35 @@ export async function importOnomasticSource(
       };
     }
 
+    const externalRecordId = `${parsed.file.work.source_key}:${parsed.file.work.year}`;
+    const previous = await trx
+      .selectFrom("source_records")
+      .select(["source_record_id"])
+      .where("source_id", "=", sourceId)
+      .where("external_record_id", "=", externalRecordId)
+      .where("record_status", "=", "ACTIVE")
+      .orderBy("created_at", "desc")
+      .execute();
+    if (previous.length > 0) {
+      await trx
+        .updateTable("source_records")
+        .set({ record_status: "UPDATED" })
+        .where(
+          "source_record_id",
+          "in",
+          previous.map((r) => r.source_record_id),
+        )
+        .execute();
+    }
+    const supersedes = previous[0]?.source_record_id ?? null;
+
     const sourceRecordId = uuidv7();
     await trx
       .insertInto("source_records")
       .values({
         source_record_id: sourceRecordId,
         source_id: sourceId,
-        external_record_id: `${parsed.file.work.source_key}:${parsed.file.work.year}`,
+        external_record_id: externalRecordId,
         external_parent_id: null,
         record_type: "ARTICLE",
         source_url: options.sourceUrl ?? parsed.file.work.reference_url,
@@ -494,7 +524,7 @@ export async function importOnomasticSource(
         source_modified_at: null,
         rights_profile_id: null,
         record_status: "ACTIVE",
-        supersedes_source_record_id: null,
+        supersedes_source_record_id: supersedes,
       })
       .execute();
 
@@ -503,6 +533,7 @@ export async function importOnomasticSource(
       source_id: sourceId,
       source_record_id: sourceRecordId,
       entries: parsed.file.entries.length,
+      supersedes_source_record_id: supersedes,
     };
   });
 }

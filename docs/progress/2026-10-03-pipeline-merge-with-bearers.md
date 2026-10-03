@@ -101,3 +101,18 @@ Only `STATUS.md` conflicted: the "Last rewritten" line, and the More-cards line,
 | `bash -n` on every `ops/vm/*.sh` and `scripts/*.sh` | no errors |
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup` | exit 0; `check:vm`: 12 scripts parse, 5 dumps pass |
 | `check-vm-dumps.sh` on a copy of `ops/vm` with `finalize.sh`'s `family` flag removed | exit 1, naming `finalize.sh` |
+
+## Seventh merge: `main` after #89 (TASK-081, Buryan 1933 and the `meanings` VM step), 2026-10-03
+
+The onomastics code, `ops/vm/README.md` and the surname-meaning test merged without conflict. `meanings.sh`'s gate counts Buryan's own versions and shared claim keys, so this branch's Onomastica meanings, a second work, do not trip it. The conflicts:
+
+- **`.github/workflows/register-vm.yml`:** `meanings` (TASK-081) and `backup` both kept, in the header and the step `case`.
+- **`docs/CODEMAP.md`:** this branch's `ops/vm/` row, with `meanings.sh` added from `main`.
+- **`STATUS.md`:** the "Last rewritten" line.
+
+| Command | Result |
+|---|---|
+| `bash -n` on every `ops/vm/*.sh` and `scripts/*.sh`; `register-vm.yml` parsed as YAML | no errors |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup`, `build` | exit 0; `check:vm`: 13 scripts parse, 5 dumps pass |
+| `pnpm test:integration` (local PostgreSQL 16) | exit 0; 409 tests |
+| `pnpm test:golden` | exit 0; 364 tests |
