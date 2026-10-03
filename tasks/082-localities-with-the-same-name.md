@@ -1,4 +1,4 @@
-# TASK-079 — Localities with the same name as the surname, from TERYT, under a line that says it is not where the surname began
+# TASK-082 — Localities with the same name as the surname, from TERYT, under a line that says it is not where the surname began
 
 - **Status:** IMPLEMENTED 2026-10-01 on `claude/hopeful-bohr-05xd4b`; record: `docs/progress/2026-10-01-localities-with-the-same-name.md`.
 - **Requested by:** the project owner, 2026-10-01: on the cards proposal, "show localities with the same name under a warning line" (ADR-0025, deciders), then "go ahead" on the list of data not yet linked to a card.
@@ -17,7 +17,7 @@ A resolved surname's page and deck show the localities in the official TERYT reg
 3. The archive section (TASK-054) is the pattern for a section on its own source: its state and surface come from that source's stored rights profile, it carries its own citation, and the page lists that citation once at the foot (ADR-0012), linked to `sources.homepage_or_reference_url`.
 4. The deck has one card per ready section and none for the rest (ADR-0025 §2.3); a card without an image of its own shares the summary (TASK-056). The page hides the change chapter when it has no claim rather than stating the absence.
 5. `apps/web/src/lib/result-view.test.ts` forbids the words "comes from", "originat", "pochodzi", "mieszka" and "lives in" anywhere on a resolved page, so the warning line must say what it says without them.
-6. TASK-065 is taken by two open pull requests (#67, #69); ADR-0028 and ADR-0029 by #65 and #67; D-025 by #65 and D-027 to D-029 by #67, so D-032 is the next free decision. TASK-079 is free on `main` and in the open pull requests. No migration is needed: the lookup uses the indexes 0010 and 0023 made.
+6. TASK-065 is taken by two open pull requests (#67, #69); ADR-0028 and ADR-0029 by #65 and #67; D-025 by #65 and D-027 to D-029 by #67, so D-032 is the next free decision. TASK-082 is free on `main` and in the open pull requests. No migration is needed: the lookup uses the indexes 0010 and 0023 made.
 
 ## 3. In scope
 

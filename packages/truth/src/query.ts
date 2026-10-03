@@ -671,7 +671,7 @@ export async function querySurnameResult(
     script: resolution.primary_script,
   };
   // TERYT's localities with the surname's name, on TERYT's own rights, present
-  // on every resolved surname whether or not the register counts it (TASK-079).
+  // on every resolved surname whether or not the register counts it (TASK-082).
   const localities = await localitiesSectionFor(db, identity.display_name, surface);
 
   if (claims.length === 0) {
