@@ -8,7 +8,7 @@
 
 ## 1. Goal
 
-`/pl/blog` and `/en/blog` list the posts written in that language, newest first, and `/pl/blog/{slug}` and `/en/blog/{slug}` show one post, all in the site's own shell. A post is a Markdown file in `apps/web/src/content/blog/`. The footer's "Blog" link leads to the blog in the reader's language. **No post ships with this task:** until the owner supplies one, both indexes say there are no posts yet.
+`/pl/blog` and `/en/blog` list the posts written in that language, newest first, and `/pl/blog/{slug}` and `/en/blog/{slug}` show one post, all in the site's own shell. A post is a Markdown file in `apps/web/src/content/blog/`. The footer's "Blog" link leads to the blog in the reader's language. The first post ships with it (§3, added at the owner's request on 2026-10-03); with no post, an index says there are none yet.
 
 ## 2. Facts (checked on `main` @ `3e2e9b3`, 2026-10-03)
 
@@ -31,11 +31,12 @@
 - **The footer.** The "Blog" entry of `followLinks` leads to `blogPath(lang)`. Instagram, TikTok and YouTube stay as they are.
 - **The deployment.** `next.config.ts` lists the content directory in `outputFileTracingIncludes` for the blog routes and the blog sitemap.
 - **Interface text** in `messages.ts` in both languages (`messages.test.ts` holds the keys equal), and a few rules in `globals.css` for the list.
+- **The first post** (added 2026-10-03 at the owner's request: "write the first blog post about genealogy why people look for names and past use common keywords and some sources to prove your points and add faq at the end all meta data etc"): `genealogia.pl.md` and `genealogia.en.md`, one slug for both. Why people research their families, a short history of Polish surnames, where to search, what Name Atlas shows, a FAQ and a list of sources. Every factual claim rests on a source cited in the post and checked on 2026-10-03; the post shows no figure from the register.
 - **Tests, `docs/CODEMAP.md`, `STATUS.md`, `apps/web/src/content/blog/README.md`** (the format, for whoever writes a post), and a progress record.
 
 ## 4. Out of scope
 
-- Any post's text. The owner supplies the first one; tests use fixtures that are not shipped.
+- Any post beyond the first (§3). Tests use fixtures that are not shipped.
 - A header link to the blog (footer only), comments, search, tags, categories, pagination, images inside posts, an RSS or Atom feed, scheduled or draft posts (a post is published when its file is on `main`), an author, an editor or a CMS (WordPress and a headless CMS were considered; either can feed the same pages later, in its own task and ADR).
 - Addresses for Instagram, TikTok and YouTube.
 - Any change to accounts, the offer, the surname page, `robots.txt`, the privacy notice or the terms. The blog adds no cookie, form, script or request for the reader beyond the pages themselves and the analytics the site already has.
@@ -53,6 +54,7 @@
 - **AC-8.** The footer's Blog link is `/pl/blog` in Polish and `/en/blog` in English; the other three follow links are unchanged (unit).
 - **AC-9.** The blog sitemap carries each post's address and its `hreflang` pair, with escaped XML; the index names it only when asked to, and without it the document is the same as before (unit).
 - **AC-10.** `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `test` and `build` exit 0.
+- **AC-12.** The shipped posts parse, and none carries a link the renderer would drop (unit).
 - **AC-11.** In a production build served locally, with one fixture post present: `/pl/blog`, `/en/blog` and the post answer 200 with the right `lang`, canonical and `robots` for the flag off and on; an unknown slug and a wrong-language slug answer 404; `/sitemap-blog.xml` answers as above; the build's trace for the blog routes lists the content file (§6).
 
 ## 6. Verification

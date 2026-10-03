@@ -203,8 +203,13 @@ describe("ordering, pairs and the directory (AC-3)", () => {
     expect(blogPosts(join(tmpdir(), "no-such-blog-directory-071"))).toEqual([]);
   });
 
-  it("ships no post: the content folder holds only its README", () => {
-    expect(blogPosts()).toEqual([]);
+  it("parses every shipped post, and no shipped link is one the renderer would drop", () => {
+    const posts = blogPosts();
+    expect(posts.length).toBeGreaterThan(0);
+    const links = posts.flatMap((p) =>
+      p.body.flatMap((b) => (b.kind === "ul" ? b.items.flat() : b.inlines)),
+    );
+    expect(links.filter((n) => n.kind === "link" && n.href === null)).toEqual([]);
   });
 });
 
