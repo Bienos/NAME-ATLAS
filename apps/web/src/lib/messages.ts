@@ -809,6 +809,14 @@ export const UI = {
     blogEmpty: "Nie ma jeszcze żadnych wpisów.",
     blogListLabel: "Wpisy",
     blogBack: "Wszystkie wpisy",
+    // The blog's redesign (TASK-075). The two headings name the posts' own
+    // sections, which get their own styling.
+    blogMore: "Więcej wpisów",
+    blogFaqHeading: "Najczęstsze pytania",
+    blogSourcesHeading: "Źródła",
+    blogCtaTitle: "Sprawdź swoje nazwisko",
+    blogCtaBody:
+      "Zobacz, ile osób nosi je dziś, jak jest rzadkie i gdzie występuje najczęściej. Za darmo i bez konta.",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1408,6 +1416,14 @@ export const UI = {
     blogEmpty: "There are no posts yet.",
     blogListLabel: "Posts",
     blogBack: "All posts",
+    // The blog's redesign (TASK-075). The two headings name the posts' own
+    // sections, which get their own styling.
+    blogMore: "More posts",
+    blogFaqHeading: "Frequently asked questions",
+    blogSourcesHeading: "Sources",
+    blogCtaTitle: "Look up your surname",
+    blogCtaBody:
+      "See how many people bear it today, how rare it is and where it is most common. Free, no account needed.",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
