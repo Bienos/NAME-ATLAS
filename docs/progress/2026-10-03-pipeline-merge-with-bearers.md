@@ -86,3 +86,18 @@ Only `STATUS.md` conflicted: the "Last rewritten" line, and the More-cards line,
 | Command | Result |
 |---|---|
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test` | exit 0 |
+
+## Sixth merge: `main` after #88 (the `accounts` step and schema `family`), 2026-10-03
+
+#88 made the same change this branch carries for the data-load dumps (both `--exclude-table-data` flags), so after the merge their `pg_dump` lines are this branch's, unchanged. The conflicts:
+
+- **`ops/vm/editions.sh`, `extras.sh`, `finalize.sh`, `shift.sh`:** comments only; `main`'s wording, which names schema `family`.
+- **`ops/vm/accounts.sh`:** `main`'s checks: PUBLIC grants on both private schemas, and the foreign-key check across them.
+- **`scripts/check-vm-dumps.sh`:** this branch's rule, so `backup.sh`'s one invocation may stream the private rows straight into age with pipefail; `main`'s header, with that exception added.
+- **`STATUS.md`:** the "Last rewritten" line.
+
+| Command | Result |
+|---|---|
+| `bash -n` on every `ops/vm/*.sh` and `scripts/*.sh` | no errors |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm`, `test`, `test:backup` | exit 0; `check:vm`: 12 scripts parse, 5 dumps pass |
+| `check-vm-dumps.sh` on a copy of `ops/vm` with `finalize.sh`'s `family` flag removed | exit 1, naming `finalize.sh` |
