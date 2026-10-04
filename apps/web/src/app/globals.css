@@ -9369,6 +9369,12 @@ main.studio h1 {
   align-items: start;
 }
 
+/* A horizontal swipe on the card shows the next one; vertical scrolling stays the page's. */
+.studio-swipe {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .studio-image {
   display: block;
   width: 100%;
