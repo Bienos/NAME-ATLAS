@@ -1,4 +1,3 @@
-import { accountsEnabled } from "./accounts-config.js";
 import { cache } from "react";
 import { db as sharedDb } from "./db.js";
 import type { Metadata } from "next";
@@ -26,7 +25,7 @@ import { SiteShell } from "./site-shell.js";
 import { SUMMARY_ANCHOR } from "./sections.js";
 import { comparePagePath } from "./site-links.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
-import { deckCards, deckFinish, deckSignIn } from "./deck.js";
+import { deckCards, deckFinish } from "./deck.js";
 import { SurnameDeck } from "./deck-client.js";
 
 /**
@@ -414,9 +413,7 @@ export function CanonicalSurnamePage({
                 hintKeys: t.deckHintKeys,
                 hintTouch: t.deckHintTouch,
                 share: t.deckShare,
-                sharing: t.deckSharing,
               }}
-              signIn={deckSignIn(lang, path, accountsEnabled())}
               finish={studio === null ? null : { href: studio, label: t.deckFinish }}
             />
           )}
