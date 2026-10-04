@@ -280,7 +280,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId],
       query: {},
       session: { userId: OWNER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (owner.kind !== "view" || owner.data.kind !== "tree")
       throw new Error("expected the owner's pedigree");
@@ -310,7 +310,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId],
       query: {},
       session: { userId: MEMBER, termsVersion: OLD_TERMS },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (member.kind !== "view" || member.data.kind !== "tree")
       throw new Error("expected the member's pedigree");
@@ -330,7 +330,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "konstelacja"],
       query: { sel: "3" },
       session: { userId: OWNER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (sky.kind !== "view" || sky.data.kind !== "constellation")
       throw new Error("expected the owner's constellation");
@@ -343,7 +343,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "constellation"],
       query: { sel: "3" },
       session: { userId: MEMBER, termsVersion: OLD_TERMS },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (memberSky.kind !== "view" || memberSky.data.kind !== "constellation")
       throw new Error("expected the member's constellation");
@@ -385,7 +385,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "add"],
       query: {},
       session: { userId: MEMBER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     expect(form).toEqual({ kind: "redirect", to: `/en/account/trees/${treeId}` });
     const refused = location(
@@ -404,7 +404,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: undefined,
       query: {},
       session: { userId: MEMBER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (trees.kind !== "view" || trees.data.kind !== "trees") throw new Error("expected the trees");
     expect(trees.data.trees).toMatchObject([{ tree_id: treeId, role: "VIEWER", person_count: 1 }]);
