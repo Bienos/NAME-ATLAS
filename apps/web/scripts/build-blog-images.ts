@@ -384,6 +384,56 @@ function coMozna(): string {
   return scene(94, horizon, "", `${pool}<g>${stones.join("")}</g>${lantern}`);
 }
 
+/**
+ * czy-to-samo-nazwisko-to-rodzina: two lone trees on a plain at dusk, alike in
+ * shape, whose roots spread under the ground apart and never touch.
+ */
+function tenSam(): string {
+  const rnd = random(101);
+  const horizon = 520;
+  const crowns: string[] = [];
+  const roots: string[] = [];
+  const branch = (
+    x: number,
+    y: number,
+    angle: number,
+    len: number,
+    width: number,
+    depth: number,
+  ) => {
+    const x2 = x + Math.cos(angle) * len;
+    const y2 = y - Math.sin(angle) * len;
+    crowns.push(
+      `<line x1="${f(x)}" y1="${f(y)}" x2="${f(x2)}" y2="${f(y2)}" stroke="${C.sunk}" stroke-width="${f(width)}" stroke-linecap="round"/>`,
+    );
+    if (depth === 0) {
+      crowns.push(
+        `<circle cx="${f(x2)}" cy="${f(y2)}" r="${f(2 + rnd() * 2.5)}" fill="${C.amber}" opacity="${f(0.25 + rnd() * 0.35)}"/>`,
+      );
+      return;
+    }
+    const spread = 0.38 + rnd() * 0.2;
+    branch(x2, y2, angle + spread, len * (0.68 + rnd() * 0.1), width * 0.68, depth - 1);
+    branch(x2, y2, angle - spread, len * (0.68 + rnd() * 0.1), width * 0.68, depth - 1);
+  };
+  for (const tx of [470, 1130]) {
+    const s = tx / W;
+    const base = horizon - 92 * s * (1 - s);
+    branch(tx, base + 4, Math.PI / 2, 100, 16, 7);
+    for (let k = 0; k < 7; k += 1) {
+      const dir = k < 3 ? -1 : k > 3 ? 1 : rnd() < 0.5 ? -1 : 1;
+      const reach = 70 + rnd() * 170;
+      const depth = 60 + rnd() * 170;
+      const ex = tx + dir * reach * (0.3 + (Math.abs(k - 3) / 3) * 0.7);
+      const ey = base + depth;
+      roots.push(
+        `<path d="M${tx} ${f(base + 6)} C ${f(tx + dir * 10)} ${f(base + depth * 0.4)} ${f(ex - dir * 30)} ${f(ey - 40)} ${f(ex)} ${f(ey)}" fill="none" stroke="${C.ember}" stroke-width="${f(1.5 + rnd() * 2.5)}" stroke-linecap="round" opacity="${f(0.35 + rnd() * 0.3)}"/>`,
+      );
+    }
+  }
+  return scene(101, horizon, "", `<g>${roots.join("")}</g><g>${crowns.join("")}</g>`);
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
@@ -393,6 +443,7 @@ const IMAGES: Record<string, () => string> = {
   "jak-sprawdzic-pochodzenie-nazwiska": jakSprawdzic,
   "kowalski-czy-kowalska": kowalski,
   "co-mozna-wyczytac-z-nazwiska": coMozna,
+  "czy-to-samo-nazwisko-to-rodzina": tenSam,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));
