@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-04, by TASK-100: the couple report built, dark behind `COUPLE_REPORT_ENABLED` (`docs/progress/2026-10-04-couple-report.md`).
+**Last rewritten:** 2026-10-04: the deck's known-people card links each person to Wikipedia and Wikidata (`docs/progress/2026-10-04-deck-bearer-links.md`).
 
 ## Production
 
