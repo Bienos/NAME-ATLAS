@@ -23,11 +23,13 @@ export const CONTROLLER_PLACE = "Iława";
 /**
  * The date each document was last changed, ISO. The privacy notice changed for
  * the offer's forms (TASK-057), then for the well-known people Wikidata names
- * (TASK-073, ADR-0030), and for the contact form.
+ * (TASK-073, ADR-0030), for the contact form, and for the legal review of
+ * 2026-10-04 (`docs/progress/2026-10-04-legal-review.md`), which also added the
+ * terms' ban on unlawful content.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
-  privacy: "2026-10-03",
-  terms: "2026-09-30",
+  privacy: "2026-10-04",
+  terms: "2026-10-04",
 };
 
 /**
@@ -44,7 +46,7 @@ export const ACCOUNTS_LEGAL_UPDATED = "2026-10-01";
  * It is also the version the consent step checks an account against
  * (ADR-0029 §2.4.12).
  */
-export const TREE_LEGAL_UPDATED = "2026-10-03";
+export const TREE_LEGAL_UPDATED = "2026-10-04";
 
 /**
  * The date of the Google variant of the privacy notice (TASK-084): shown only
@@ -101,7 +103,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Po co i na jakiej podstawie",
         paragraphs: [
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
-          "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz) i treść wiadomości, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę.",
+          "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz), wybrany temat, treść wiadomości i język strony, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę. Link „Zgłoś błąd” przygotowuje wiadomość w Twoim programie pocztowym z adresem strony i nazwiskiem, którego dotyczy; wysyłasz ją sam.",
           "Statystyki odwiedzin (które strony są oglądane, ile razy i skąd) prowadzimy na tej samej podstawie. Zbiera je Vercel Web Analytics: bez plików cookie; odwiedzający są rozróżniani skrótem obliczonym z żądania, kasowanym po 24 godzinach. Dla każdej odsłony zapisuje czas, adres strony, stronę odsyłającą, kraj, region i miasto, system, przeglądarkę i typ urządzenia. Zanim adres trafi do statystyk, nasz kod zastępuje w nim nazwisko oznaczeniem [slug] i usuwa parametry zapytania, więc statystyki nie zawierają wyszukiwanego nazwiska.",
           "Jeśli zapiszesz się na listę oczekujących albo zapytasz o badanie genealogiczne, przetwarzamy Twój adres i to, co napiszesz, żeby odpowiedzieć i dać znać, gdy usługa ruszy. Podstawą jest działanie na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO). Nie wysyłaj nam wyników testu DNA ani informacji o zdrowiu: to dane szczególnie chronione, a do pierwszej odpowiedzi nie są potrzebne.",
           "Zanim przekażemy Twoje dane genealogom, którzy prowadzą badanie, zapytamy Cię o zgodę i powiemy, kim są.",
@@ -129,8 +131,14 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Twoje prawa",
         paragraphs: [
-          "Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia i ograniczenia przetwarzania oraz prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Napisz na adres podany wyżej. Sam adres IP zwykle nie pozwala nam ustalić, kim jesteś; wtedy możemy nie być w stanie wskazać Twoich danych (art. 11 RODO).",
-          "Możesz wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, uodo.gov.pl).",
+          "Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia i ograniczenia przetwarzania, prawo do przenoszenia danych, które podałeś nam na podstawie umowy lub przed jej zawarciem (art. 6 ust. 1 lit. b RODO), oraz prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Napisz na adres podany wyżej. Sam adres IP zwykle nie pozwala nam ustalić, kim jesteś; wtedy możemy nie być w stanie wskazać Twoich danych (art. 11 RODO).",
+          "Możesz wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa, uodo.gov.pl) albo do organu nadzorczego w kraju, w którym mieszkasz.",
+        ],
+      },
+      {
+        heading: "Czy musisz podać dane",
+        paragraphs: [
+          "Żeby czytać serwis, nie musisz podawać żadnych danych. Podanie adresu e-mail jest dobrowolne, ale bez niego nie możemy odpowiedzieć na wiadomość ani zapisać Cię na listę oczekujących.",
         ],
       },
       {
@@ -171,7 +179,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Why, and on what basis",
         paragraphs: [
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
-          "If you email us or write through the contact form, we process your address, your name (if you give it) and your message to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox.",
+          "If you email us or write through the contact form, we process your address, your name (if you give it), the topic you choose, your message and the page's language to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox. The “Report a problem” link prepares an email in your own mail program with the page's address and the surname it concerns; you send it yourself.",
           "Visit statistics (which pages are viewed, how often and from where) rest on the same basis. Vercel Web Analytics collects them: no cookies; visitors are told apart by a hash computed from the request, discarded after 24 hours. For each page view it records the time, the page address, the referring page, the country, region and city, the operating system, the browser and the device type. Before the address reaches the statistics, our code replaces the surname in it with [slug] and removes the query parameters, so the statistics never contain the surname searched for.",
           "If you join the waiting list or ask about genealogy research, we process your address and what you write to reply and to tell you when the service starts. The basis is taking steps at your request before entering into a contract (Article 6(1)(b) GDPR). Do not send us DNA results or health information: they are specially protected data, and a first reply does not need them.",
           "Before we pass your details to the genealogists who carry out the research, we will ask for your consent and tell you who they are.",
@@ -199,8 +207,14 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Your rights",
         paragraphs: [
-          "You have the right to access your data, to have it corrected, erased or its processing restricted, and to object to processing based on legitimate interest. Write to the address above. An IP address alone usually does not tell us who you are; in that case we may be unable to identify your data (Article 11 GDPR).",
+          "You have the right to access your data, to have it corrected, erased or its processing restricted, to data portability for data you gave us under a contract or before entering into one (Article 6(1)(b) GDPR), and to object to processing based on legitimate interest. Write to the address above. An IP address alone usually does not tell us who you are; in that case we may be unable to identify your data (Article 11 GDPR).",
           "You may complain to the Polish supervisory authority, the President of the Personal Data Protection Office (ul. Stawki 2, 00-193 Warsaw, uodo.gov.pl), or to the authority where you live.",
+        ],
+      },
+      {
+        heading: "Whether you must give data",
+        paragraphs: [
+          "You need to give no data to read the site. Giving an email address is up to you, but without one we cannot reply to a message or put you on the waiting list.",
         ],
       },
       {
@@ -246,7 +260,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Dozwolone korzystanie",
         paragraphs: [
-          "Nie wolno zakłócać działania serwisu ani pobierać jego treści automatycznie w sposób niezgodny z plikiem robots.txt lub omijający limity zapytań.",
+          "Nie wolno zakłócać działania serwisu ani pobierać jego treści automatycznie w sposób niezgodny z plikiem robots.txt lub omijający limity zapytań. Nie wolno przesyłać do serwisu treści o charakterze bezprawnym.",
         ],
       },
       {
@@ -306,7 +320,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Acceptable use",
         paragraphs: [
-          "Do not disrupt the site, and do not download its content automatically in a way that disregards robots.txt or works around the request limits.",
+          "Do not disrupt the site, and do not download its content automatically in a way that disregards robots.txt or works around the request limits. Do not send unlawful content to the site.",
         ],
       },
       {

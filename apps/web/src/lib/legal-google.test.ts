@@ -1,10 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  ACCOUNTS_LEGAL_UPDATED,
-  GOOGLE_LEGAL_UPDATED,
-  legalDocument,
-  legalUpdated,
-} from "./legal-text.js";
+import { GOOGLE_LEGAL_UPDATED, legalDocument, legalUpdated } from "./legal-text.js";
 
 const LANGS = ["pl", "en"] as const;
 const HEADING = { pl: "Logowanie przez Google", en: "Signing in with Google" } as const;
@@ -50,7 +45,7 @@ describe("the privacy notice with Google sign-in (TASK-084)", () => {
         legalDocument("terms", lang, true, false, false),
       );
     }
-    expect(legalUpdated("terms", true, false, true)).toBe(ACCOUNTS_LEGAL_UPDATED);
+    expect(legalUpdated("terms", true, false, true)).toBe(legalUpdated("terms", true));
     expect(legalUpdated("privacy", true, false, true)).toBe(GOOGLE_LEGAL_UPDATED);
     expect(legalUpdated("privacy", false, false, true)).toBe(legalUpdated("privacy"));
   });

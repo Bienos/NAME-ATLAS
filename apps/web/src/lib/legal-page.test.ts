@@ -19,12 +19,33 @@ describe("legal pages (TASK-046)", () => {
         const doc = legalDocument(kind, lang);
         expect(html).toContain(`<main lang="${htmlLang(lang)}"`);
         expect(html).toContain(`<h2>${doc.title}</h2>`);
-        expect(html).toContain(
-          `<time dateTime="${kind === "privacy" ? "2026-10-03" : "2026-09-30"}">`,
-        );
+        expect(html).toContain(`<time dateTime="2026-10-04">`);
         for (const s of doc.sections) expect(html).toContain(`<h3>${s.heading}</h3>`);
       }
     }
+  });
+
+  it("state the base text's facts and required elements in both languages (legal review 2026-10-04)", () => {
+    const privacy = {
+      pl: JSON.stringify(legalDocument("privacy", "pl")),
+      en: JSON.stringify(legalDocument("privacy", "en")),
+    };
+    const terms = {
+      pl: JSON.stringify(legalDocument("terms", "pl")),
+      en: JSON.stringify(legalDocument("terms", "en")),
+    };
+    expect(privacy.pl).toContain("wybrany temat");
+    expect(privacy.en).toContain("the topic you choose");
+    expect(privacy.pl).toContain("Zgłoś błąd");
+    expect(privacy.en).toContain("Report a problem");
+    expect(privacy.pl).toContain("prawo do przenoszenia danych");
+    expect(privacy.en).toContain("data portability");
+    expect(privacy.pl).toContain("organu nadzorczego w kraju, w którym mieszkasz");
+    expect(privacy.en).toContain("the authority where you live");
+    expect(privacy.pl).toContain("Czy musisz podać dane");
+    expect(privacy.en).toContain("Whether you must give data");
+    expect(terms.pl).toContain("treści o charakterze bezprawnym");
+    expect(terms.en).toContain("unlawful content");
   });
 
   it("name the controller and the contact in both documents and languages", () => {

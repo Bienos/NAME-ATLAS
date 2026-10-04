@@ -48,3 +48,43 @@ Found in passing, outside this task's scope (code, not text):
 
 1. Account deletion fails for a user who has claimed a card in someone else's tree. `family.persons.claimed_by_user_id … ON DELETE SET NULL` leaves `claimed_at` set, which violates CHECK `persons_claim_pair` (`0033…:43,47`; `packages/accounts/src/service.ts:795`). Reproduced on a scratch PostgreSQL 16 with a two-table model: "new row … violates check constraint".
 2. `analytics-path.ts:32-42` does not redact the person id on the claimed-card route `/pl/konto/drzewa/karta/{personId}` (`tree-paths.ts:147-164`).
+
+## Phase 2 — what changed
+
+The project owner approved the table on 2026-10-04. Only the legal modules, their tests and one date assertion in `offer-page.test.ts` changed in code.
+
+- `apps/web/src/lib/legal-text.ts` (base): F-01, F-02, G-01 (portability), G-02 (a new section, "Czy musisz podać dane" / "Whether you must give data"), G-03, G-04 (unlawful content in "Dozwolone korzystanie" / "Acceptable use").
+- `apps/web/src/lib/legal-accounts.ts`: F-03, F-04, F-05, F-06, F-07 (the account id in the logs), F-08 (reset mail), and G-02 for accounts (address and password required, no password with Google). The module now also expects the base's "Czy musisz podać dane" heading and throws without it.
+- `apps/web/src/lib/legal-tree.ts`: F-08 (invitations), F-09–F-16. The tree variant now also replaces the Oracle and Resend items, and throws when either is missing. The "members" sentences are gone (F-12).
+- `legal-google.ts`: unchanged.
+- Decisions: D-035–D-041 added to `docs/DECISIONS_NEEDED.md` (J-01–J-08); P-01 points to D-024 and ADR-0023 §2.5.
+
+### Dates
+
+| Constant | Before | After | Why |
+|---|---|---|---|
+| `LEGAL_UPDATED.privacy` | 2026-10-03 | 2026-10-04 | base notice changed (F-01, F-02, G-01–G-03) |
+| `LEGAL_UPDATED.terms` | 2026-09-30 | 2026-10-04 | base terms changed (G-04) |
+| `TREE_LEGAL_UPDATED` | 2026-10-03 | **2026-10-04, bumped** | the tree clause changed (F-11, F-12). Accounts that accepted an earlier version are asked again at the consent step before their next living person. No account exists in production (accounts are off), so nobody is asked today. |
+| `ACCOUNTS_LEGAL_UPDATED` | 2026-10-01 | **2026-10-01, not bumped** | The accounts variant's own terms text did not change. It cannot share the tree's date: the consent check compares versions as text (`tree-routes.ts:128`), so an account opened with the tree off would then skip the tree clause. The owner chose this option on 2026-10-04. Consequence: with accounts on and the tree **off**, the terms page shows 2026-10-04 while a new account records 2026-10-01. With the tree on (production's `FAMILY_TREE_ENABLED=1`), the shown and recorded dates are both 2026-10-04. Recorded in D-041. |
+| `GOOGLE_LEGAL_UPDATED` | 2026-10-04 | unchanged | the Google section did not change |
+
+Shown dates, from `legalUpdated()`: privacy 2026-10-04 and terms 2026-10-04 in every variant.
+
+## Verification (run on 2026-10-04, real results)
+
+- `pnpm --filter web test`: 77 files, 823 tests passed. The first run failed one test, `offer-page.test.ts` "is matched by the privacy notice…", which pinned `LEGAL_UPDATED.terms` to 2026-09-30; after updating that assertion, all passed. The legal tests now also assert the new statements (cookie name and 400 days, the one-day deletion of failed sign-ins, the 7-day links, portability, the required-data section, the unlawful-content clause, the tree's death place, parent roles, 14 days, 18 years, JSON, and that the member sentences are gone, with the Oracle and Resend items single and naming the tree, with and without Google).
+- `pnpm --filter web typecheck` (`tsc -p tsconfig.json --noEmit`): exit 0.
+- `pnpm lint`: passes. The first run flagged an unused import in `legal-google.test.ts`, which was removed.
+- `pnpm check:ids`: "every task, ADR, migration and decision number is used once".
+- `pnpm exec prettier --check` on the changed files: clean.
+- `pnpm --filter web build` with the flags off: exit 0, all four pages static (○). `next start` on :3301; Playwright with the pre-installed Chromium at 390 × 844 opened `/pl/prywatnosc`, `/en/privacy`, `/pl/regulamin`, `/en/terms`. Each returned 200 with `<time datetime="2026-10-04">` ("4 października 2026 r." / "4 October 2026") and the base headings, including the new section. `scrollWidth` was 390 = `clientWidth` (no horizontal scroll).
+- The same build with accounts, tree and Google on (placeholder local values for the seven variables plus `FAMILY_TREE_ENABLED=1`; no database or mail was contacted): exit 0, and the four pages again 200 with date 2026-10-04 and no horizontal scroll at 390 px. The privacy page carries the account, tree and Google sections; the terms carry "Konto" and "Drzewo i osoby żyjące". The PL page's HTML contains `__Host-na_session`, "dane konta i drzew", "zaproszeń do potwierdzenia karty", "Google Ireland Limited" and "najpóźniej w ciągu doby".
+
+## Not verified
+
+- The accounts + Google combination with the tree off was checked by unit tests only, not in the browser.
+- Vendor statements (Vercel's log and analytics retention, the Resend and Vercel DPF/SCC claims) were not re-read; they are unchanged from the earlier text.
+- Production was not deployed or checked; this change's deployment is recorded on its merged PR.
+- No lawyer has reviewed any of this. D-031 and `docs/canonical/19` §11 remain open.
+- The two code bugs above (claimant account deletion; the claimed-card route in analytics) are not fixed here. Queueing them as separate tasks failed (the tool timed out); they need their own tasks.
