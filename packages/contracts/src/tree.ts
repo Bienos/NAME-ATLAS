@@ -11,6 +11,9 @@
  * `hidden_living_count` saying how many. Notes travel to the owner and
  * editors only; a viewer receives `null`.
  *
+ * 1.1 (TASK-094): a person carries `claimed`, `claimed_by_me`, `hidden_fields`
+ * and `contact_declined`, the trace of an invitation answered (ADR-0029 §2.6).
+ *
  * `places` is filled by the route from the register (the read-only pool, by
  * TERYT code, with no user id in that query) so the map can place a birth;
  * the family package does not read the register and answers `place_codes`
@@ -18,7 +21,10 @@
  */
 import { z } from "zod";
 
-export const TREE_SCHEMA_VERSION = "1.0";
+export const TREE_SCHEMA_VERSION = "1.1";
+
+/** What a claimant may keep from everyone else (TASK-094, ADR-0029 §2.6.22). */
+export const hiddenFieldSchema = z.enum(["birth_year", "birth_place", "birth_surname"]);
 
 export const livingStatusSchema = z.enum(["UNKNOWN", "LIVING", "DECEASED"]);
 export const parentRoleSchema = z.enum(["MOTHER", "FATHER", "PARENT"]);
@@ -51,12 +57,22 @@ export const treePersonSchema = z
     /** Null for a viewer. */
     notes: z.string().min(1).max(2000).nullable(),
     updated_at: z.string().datetime(),
+    /** Someone answered "to ja" to an invitation for this row (1.1, TASK-094). */
+    claimed: z.boolean(),
+    claimed_by_me: z.boolean(),
+    /** The fields the claimant hides; blank in this object for everyone but them. */
+    hidden_fields: z.array(hiddenFieldSchema),
+    /** The person declined contact: the owner alone receives the row (D-031). */
+    contact_declined: z.boolean(),
   })
   .refine((p) => p.treated_as_living === (p.living_status !== "DECEASED"), {
     message: "treated_as_living must follow living_status",
   })
   .refine((p) => p.death.year === null || p.living_status === "DECEASED", {
     message: "a death year means DECEASED",
+  })
+  .refine((p) => p.claimed || (!p.claimed_by_me && p.hidden_fields.length === 0), {
+    message: "only a claimed row is claimed by the caller or hides a field",
   });
 
 export const treeParentageSchema = z.object({

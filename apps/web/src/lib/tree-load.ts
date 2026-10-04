@@ -1,13 +1,25 @@
-import type { Family, TreePersonRead, TreeRead, TreeSummary } from "@name-atlas/family";
+import type {
+  CardRead,
+  CardSummary,
+  Family,
+  InvitationRead,
+  TreePersonRead,
+  TreeRead,
+  TreeSummary,
+} from "@name-atlas/family";
+import { hashToken } from "@name-atlas/accounts";
 import { accountPath } from "./account-paths.js";
 import type { Lang } from "./messages.js";
 import {
   draftFrom,
   draftOf,
+  draftOfCard,
   EMPTY_DRAFT,
   hasDraft,
+  INVITATION_TOKEN,
   isId,
   isSlotRole,
+  isToken,
   treePath,
   treeTarget,
 } from "./tree-paths.js";
@@ -17,6 +29,11 @@ import { nextQuestion, parentsOf, pedigree, unplaced } from "./tree-pedigree.js"
 import type { Question, Slot } from "./tree-pedigree.js";
 import type { PlaceMatch, PlaceRegion } from "./tree-places.js";
 import { treeStatusWords } from "./tree-text.js";
+
+/** The token as the invitations table keys it: its SHA-256, hex (`accounts`' `hashToken`). */
+function hashHex(token: string): string {
+  return hashToken(token).toString("hex");
+}
 
 /**
  * What each tree page shows, decided and loaded here (TASK-076), away from
@@ -36,7 +53,10 @@ export interface TreeSession {
 }
 
 export interface TreeLoadDeps {
-  readonly family: Pick<Family, "listTrees" | "getTree">;
+  readonly family: Pick<
+    Family,
+    "listTrees" | "getTree" | "invitationOf" | "openInvitation" | "listCards" | "getCard"
+  >;
   /** The TERYT lookup, or null where the register is not configured. */
   readonly places: ((typed: string) => Promise<readonly PlaceMatch[]>) | null;
   /** The register's localities behind a tree's place codes, for the Mapa (TASK-092); null where the register is not configured. */
@@ -72,6 +92,8 @@ export type TreePageData =
       /** The first tree, read for its question; null with no tree. */
       readonly firstTree: TreeRead | null;
       readonly question: Question | null;
+      /** The rows the reader has claimed in other people's trees (TASK-094). */
+      readonly cards: readonly CardSummary[];
     }
   | {
       readonly kind: "consent";
@@ -142,6 +164,33 @@ export type TreePageData =
       /** The other people of the tree, for linking an existing one as a parent. */
       readonly others: readonly TreePersonRead[];
       readonly form: PersonFormData;
+      /** The latest invitation of this person, for the owner, and whether it still waits for an answer; null for anyone else or with none (TASK-094). */
+      readonly invitation: (InvitationRead & { readonly pending: boolean }) | null;
+    }
+  | {
+      /** An invitation's page (TASK-094): the reader's own row, or why there is none to show. */
+      readonly kind: "invitation";
+      readonly lang: Lang;
+      readonly status: string | null;
+      readonly token: string | null;
+      readonly state:
+        | { readonly kind: "open"; readonly card: CardRead }
+        | { readonly kind: "expired" }
+        | { readonly kind: "answered" }
+        | { readonly kind: "missing" };
+    }
+  | {
+      readonly kind: "cards";
+      readonly lang: Lang;
+      readonly status: string | null;
+      readonly cards: readonly CardSummary[];
+    }
+  | {
+      readonly kind: "card";
+      readonly lang: Lang;
+      readonly status: string | null;
+      readonly card: CardRead;
+      readonly form: PersonFormData;
     };
 
 export type TreeDecision =
@@ -192,14 +241,65 @@ export async function loadTreePage(input: {
   if (!input.enabled) return { kind: "not-found" };
   const target: TreeTarget | null = treeTarget(lang, input.segments);
   if (target === null) return { kind: "not-found" };
-  // Back to the tree's own page after signing in (TASK-084).
+  // Back to the tree's own page after signing in (TASK-084), or to the invitation with its token (TASK-094).
   if (session === null) {
-    return {
-      kind: "redirect",
-      to: accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) }),
-    };
+    const token = first(query, INVITATION_TOKEN);
+    const next =
+      target.page === "invitation" && isToken(token)
+        ? treePath(lang, { page: "invitation" }, { [INVITATION_TOKEN]: token })
+        : treePath(lang, { page: "trees" });
+    return { kind: "redirect", to: accountPath(lang, "sign-in", { next }) };
   }
   const { userId } = session;
+
+  if (target.page === "invitation") {
+    const token = first(query, INVITATION_TOKEN);
+    const status = statusOf(lang, "invitation", query);
+    if (!isToken(token)) {
+      return {
+        kind: "view",
+        data: { kind: "invitation", lang, status, token: null, state: { kind: "missing" } },
+      };
+    }
+    const opened = await deps.family.openInvitation({ userId, tokenHash: hashHex(token) });
+    const state =
+      opened.kind === "OK"
+        ? ({ kind: "open", card: opened.card } as const)
+        : opened.kind === "EXPIRED"
+          ? ({ kind: "expired" } as const)
+          : opened.kind === "ANSWERED"
+            ? ({ kind: "answered" } as const)
+            : ({ kind: "missing" } as const);
+    return { kind: "view", data: { kind: "invitation", lang, status, token, state } };
+  }
+
+  if (target.page === "cards") {
+    return {
+      kind: "view",
+      data: {
+        kind: "cards",
+        lang,
+        status: statusOf(lang, "cards", query),
+        cards: await deps.family.listCards(userId),
+      },
+    };
+  }
+
+  if (target.page === "card") {
+    const found = await deps.family.getCard({ userId, personId: target.personId });
+    if (found.kind !== "OK")
+      return { kind: "redirect", to: treePath(lang, { page: "cards" }, { status: "not-found" }) };
+    return {
+      kind: "view",
+      data: {
+        kind: "card",
+        lang,
+        status: statusOf(lang, "card", query),
+        card: found.card,
+        form: await formOf(query, draftOfCard(found.card), deps),
+      },
+    };
+  }
 
   if (target.page === "trees") {
     const trees = await deps.family.listTrees(userId);
@@ -216,6 +316,7 @@ export async function loadTreePage(input: {
         trees,
         firstTree,
         question: firstTree === null ? null : nextQuestion(firstTree),
+        cards: await deps.family.listCards(userId),
       },
     };
   }
@@ -363,6 +464,22 @@ export async function loadTreePage(input: {
       parents: parentsOf(tree, person.id),
       others: tree.persons.filter((p) => p.id !== person.id),
       form: await formOf(query, draftOf(person), deps),
+      invitation:
+        tree.tree.role === "OWNER" ? await invitationState(deps, userId, person.id) : null,
     },
+  };
+}
+
+/** The person's latest invitation with its state decided here, so the page renders without a clock. */
+async function invitationState(
+  deps: TreeLoadDeps,
+  userId: string,
+  personId: string,
+): Promise<(InvitationRead & { readonly pending: boolean }) | null> {
+  const read = await deps.family.invitationOf({ userId, personId });
+  if (read === null) return null;
+  return {
+    ...read,
+    pending: read.answered_at === null && Date.parse(read.expires_at) > Date.now(),
   };
 }

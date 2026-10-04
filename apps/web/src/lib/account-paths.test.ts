@@ -5,6 +5,7 @@ import {
   accountPath,
   actionPath,
   isAccountAction,
+  isTreeNext,
   safeNext,
   stepFromSlug,
 } from "./account-paths.js";
@@ -172,6 +173,32 @@ describe("the share studio as a return address (TASK-093, AC-6)", () => {
       "/pl/nazwisko/%2e%2e/udostepnij",
       "/pl/nazwisko/a%2fb/udostepnij",
       "//evil.test/pl/nazwisko/kowalski/udostepnij",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
+  });
+});
+
+describe("an invitation to a tree as a return address (TASK-094, AC-6)", () => {
+  const token = "A".repeat(43);
+
+  it("takes the invitation page with its token, in both languages, and knows it leads to the tree", () => {
+    for (const page of [
+      `/pl/konto/drzewa/zaproszenie?t=${token}`,
+      `/en/account/trees/invitation?t=${token}`,
+    ]) {
+      expect(safeNext(page), page).toBe(page);
+      expect(isTreeNext(page), page).toBe(true);
+    }
+  });
+
+  it("refuses the page without a well-formed token, or with anything else in it", () => {
+    for (const value of [
+      "/pl/konto/drzewa/zaproszenie",
+      "/pl/konto/drzewa/zaproszenie?t=short",
+      `/pl/konto/drzewa/zaproszenie?t=${token}&x=1`,
+      `/en/account/trees/invitation?t=${token}/`,
+      `/pl/konto/drzewa/karty?t=${token}`,
     ]) {
       expect(safeNext(value), value).toBeNull();
     }

@@ -1,6 +1,6 @@
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
-import type { Accounts } from "@name-atlas/accounts";
+import type { Accounts, Mailer } from "@name-atlas/accounts";
 import { accountsRuntime } from "./accounts-runtime.js";
 import { familyTreeEnabled } from "./family-config.js";
 import { TREE_LEGAL_UPDATED } from "./legal-text.js";
@@ -22,6 +22,10 @@ export interface FamilyRuntime {
   readonly secure: boolean;
   /** The terms version an account must carry to hold a living person (ADR-0029 §2.4.12). */
   readonly livingTermsVersion: string;
+  /** The accounts mailer, for invitations (TASK-094); null with Google sign-in alone. */
+  readonly mailer: Mailer | null;
+  /** `SITE_ORIGIN`, without a trailing slash. */
+  readonly origin: string;
 }
 
 let cached: FamilyRuntime | null | undefined;
@@ -36,6 +40,8 @@ export function familyRuntime(env: NodeJS.ProcessEnv = process.env): FamilyRunti
     accounts: accounts.accounts,
     secure: accounts.secure,
     livingTermsVersion: TREE_LEGAL_UPDATED,
+    mailer: accounts.mailer,
+    origin: accounts.origin,
   };
   return cached;
 }

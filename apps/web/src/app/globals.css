@@ -9455,3 +9455,44 @@ main.studio h1 {
     margin: 0 auto;
   }
 }
+
+/* Invitations and claims (TASK-094): the owner's invitation on a person's
+   page, a claimed row's hidden marks, the invited person's three answers,
+   the claimant's hide boxes. */
+.tree-hidden-mark {
+  font-style: italic;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-cards-link {
+  margin: var(--space-3) 0 0;
+}
+
+.tree-answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.tree-answers .offer-send {
+  flex: 1 1 12rem;
+}
+
+.tree-explain {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding-left: 1.25rem;
+  color: var(--dusk-ink-soft);
+  font-size: 0.9375rem;
+}
+
+.tree-card-facts ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.tree-form .tree-hide small {
+  display: block;
+  color: var(--dusk-ink-muted);
+}

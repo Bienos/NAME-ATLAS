@@ -2,7 +2,7 @@ import { Kysely, PostgresDialect } from "kysely";
 import type { createPool } from "@name-atlas/db";
 
 /**
- * The tables of schema `family` (migration 0030), typed by hand, as
+ * The tables of schema `family` (migrations 0028, 0030, 0033), typed by hand, as
  * `@name-atlas/accounts` types `accounts`: `pnpm db:generate-types` reads
  * `public.*` only, and these tables are deliberately outside it (ADR-0029 §2.1).
  */
@@ -22,7 +22,14 @@ export type AuditKind =
   | "MEMBER_ADDED"
   | "MEMBER_REMOVED"
   | "SEES_LIVING_CHANGED"
-  | "EXPORTED";
+  | "EXPORTED"
+  | "INVITATION_SENT"
+  | "PERSON_CLAIMED"
+  | "CLAIM_RELEASED"
+  | "CONTACT_DECLINED";
+export type InvitationAnswer = "ME" | "NOT_ME" | "NO_CONTACT";
+/** What a claimant may keep from everyone else (TASK-094, ADR-0029 §2.6.22). */
+export type HiddenField = "birth_year" | "birth_place" | "birth_surname";
 
 export interface TreesTable {
   tree_id: string;
@@ -53,6 +60,34 @@ export interface PersonsTable {
   created_by: string | null;
   created_at: Date;
   updated_at: Date;
+  /** The account that answered "to ja" to an invitation (TASK-094); one per row, one row per tree per account. */
+  claimed_by_user_id: string | null;
+  claimed_at: Date | null;
+  /** The row of a person who answered "nie chcę kontaktu": the owner's alone (D-031). */
+  contact_declined: boolean;
+  hidden_fields: HiddenField[];
+}
+
+export interface InvitationsTable {
+  invitation_id: string;
+  tree_id: string;
+  person_id: string;
+  /** The SHA-256 of the token, hex; the token itself is in the mail and nowhere else. */
+  token_hash: string;
+  /** The SHA-256 of the normalised address, hex; the address itself is not stored (§2.6.20). */
+  address_hash: string;
+  sent_by: string | null;
+  sent_at: Date;
+  expires_at: Date;
+  answered_at: Date | null;
+  answer: InvitationAnswer | null;
+  answered_by: string | null;
+}
+
+export interface SuppressionsTable {
+  tree_id: string;
+  address_hash: string;
+  created_at: Date;
 }
 
 export interface ParentageTable {
@@ -86,6 +121,8 @@ export interface FamilyDB {
   parentage: ParentageTable;
   members: MembersTable;
   audit_events: AuditEventsTable;
+  invitations: InvitationsTable;
+  suppressions: SuppressionsTable;
 }
 
 /**

@@ -1,4 +1,4 @@
-import type { LivingStatus, ParentRole } from "./schema.js";
+import type { HiddenField, LivingStatus, ParentRole, PersonsTable } from "./schema.js";
 
 /**
  * The tree's rules that need no database (ADR-0029 §2.2): what a person row
@@ -191,4 +191,65 @@ export function wouldCycle(
 /** How many parents a child already has. */
 export function parentCount(edges: readonly ParentEdge[], childId: string): number {
   return edges.filter((edge) => edge.child_id === childId).length;
+}
+
+// --- Invitations and claims (TASK-094, ADR-0029 §2.6) ---------------------
+
+/** An invitation lives this long; there is no reminder (§2.6.20). */
+export const INVITATION_DAYS = 14;
+/** How many invitations one tree may send in `INVITATION_WINDOW_DAYS` (§2.6.20: "ten a month"). */
+export const INVITATIONS_PER_WINDOW = 10;
+export const INVITATION_WINDOW_DAYS = 30;
+/** Nobody whose birth year makes them younger than this is invited (§2.6.20). */
+export const INVITATION_MIN_AGE = 18;
+
+export const HIDDEN_FIELDS: readonly HiddenField[] = ["birth_year", "birth_place", "birth_surname"];
+
+export function isHiddenField(value: unknown): value is HiddenField {
+  return (HIDDEN_FIELDS as readonly unknown[]).includes(value);
+}
+
+export type InviteProblem =
+  /** A person who has died is not invited; the invitation is for the living (§2.6). */
+  | "NOT_LIVING"
+  | "MINOR"
+  /** The row is already somebody's. */
+  | "CLAIMED"
+  /** The person answered "nie chcę kontaktu" (§2.6.23). */
+  | "DECLINED"
+  /** The address is on the tree's suppression list. */
+  | "SUPPRESSED"
+  /** An invitation for this person is still open. */
+  | "PENDING"
+  | "LIMIT";
+
+/**
+ * Why a person may not be invited, from the row alone, or null when they may.
+ * The address's and the tree's problems (`SUPPRESSED`, `PENDING`, `LIMIT`)
+ * need the database and are the service's.
+ */
+export function inviteProblem(
+  person: Pick<
+    PersonsTable,
+    "living_status" | "birth_year" | "claimed_by_user_id" | "contact_declined"
+  >,
+  now: Date,
+): Extract<InviteProblem, "NOT_LIVING" | "MINOR" | "CLAIMED" | "DECLINED"> | null {
+  if (!treatedAsLiving(person.living_status)) return "NOT_LIVING";
+  if (person.birth_year !== null && now.getUTCFullYear() - person.birth_year < INVITATION_MIN_AGE) {
+    return "MINOR";
+  }
+  if (person.claimed_by_user_id !== null) return "CLAIMED";
+  if (person.contact_declined) return "DECLINED";
+  return null;
+}
+
+/** The hidden fields as typed, each known and each once. */
+export function checkHiddenFields(values: readonly unknown[]): readonly HiddenField[] | null {
+  const seen = new Set<HiddenField>();
+  for (const value of values) {
+    if (!isHiddenField(value)) return null;
+    seen.add(value);
+  }
+  return HIDDEN_FIELDS.filter((f) => seen.has(f));
 }

@@ -14,6 +14,10 @@ const person = {
   source_note: null,
   notes: null,
   updated_at: "2026-10-01T12:00:00.000Z",
+  claimed: false,
+  claimed_by_me: false,
+  hidden_fields: [],
+  contact_declined: false,
 };
 
 describe("tree contract", () => {
@@ -50,6 +54,23 @@ describe("tree contract", () => {
     expect(treePersonSchema.safeParse({ ...unknown, treated_as_living: false }).success).toBe(
       false,
     );
+  });
+
+  it("carries a claim and its hidden fields, known ones only, on a claimed row (1.1, TASK-094)", () => {
+    const claimed = {
+      ...person,
+      claimed: true,
+      claimed_by_me: true,
+      hidden_fields: ["birth_year"],
+    };
+    expect(treePersonSchema.safeParse(claimed).success).toBe(true);
+    expect(treePersonSchema.safeParse({ ...claimed, hidden_fields: ["surname"] }).success).toBe(
+      false,
+    );
+    expect(treePersonSchema.safeParse({ ...person, hidden_fields: ["birth_year"] }).success).toBe(
+      false,
+    );
+    expect(treePersonSchema.safeParse({ ...person, claimed_by_me: true }).success).toBe(false);
   });
 
   it("knows one provenance and a seven-digit place code", () => {

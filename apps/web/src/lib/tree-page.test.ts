@@ -26,7 +26,8 @@ afterEach(() => vi.unstubAllEnvs());
 function render(data: TreePageData): string {
   return renderToStaticMarkup(createElement(TreePageView, { data }))
     .replaceAll("&amp;", "&")
-    .replaceAll("&#x27;", "'");
+    .replaceAll("&#x27;", "'")
+    .replaceAll("&quot;", '"');
 }
 
 const SUMMARY = {
@@ -67,6 +68,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
         trees: [SUMMARY],
         firstTree: t,
         question: nextQuestion(t),
+        cards: [],
       });
       const words = TREE_TEXT[lang];
       expect(html).toContain(`href="${treePath(lang, { page: "tree", treeId: TREE_ID })}"`);
@@ -88,6 +90,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
       trees: [],
       firstTree: null,
       question: null,
+      cards: [],
     });
     expect(none).toContain(TREE_TEXT.pl.dashboard.none);
   });
@@ -227,6 +230,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
         },
         search: { kind: "none" },
       },
+      invitation: null,
     });
     expect(html).toContain("<h2>Halina Zielińska</h2>");
     expect(html).toContain('action="/api/tree/update-person"');
@@ -253,6 +257,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
       parents: { known: [], hidden: 1 },
       others: [],
       form: { draft: EMPTY_DRAFT, search: { kind: "none" } },
+      invitation: null,
     });
     expect(root).toContain(TREE_TEXT.en.person.isRoot);
     expect(root).toContain(TREE_TEXT.en.person.hiddenParents(1));
@@ -531,5 +536,202 @@ describe("the Mapa view (TASK-092)", () => {
     expect(viewer).toContain(TREE_TEXT.pl.map.offMap(1));
     expect(treeMetadata("pl", "map").title).toBe("Mapa — Name Atlas");
     expect(treeMetadata("en", "map").title).toBe("Map — Name Atlas");
+  });
+});
+
+describe("invitations and claims (TASK-094, AC-6)", () => {
+  const CARD = {
+    person: {
+      id: ID.marta,
+      given_names: "Marta",
+      surname: "Zielińska",
+      birth_surname: null,
+      birth: { year: 1991, approx: false, place_code: null, place_text: "Szczebrzeszyn" },
+      hidden_fields: [] as const,
+      claimed_at: null,
+    },
+    parents: [{ given_names: "Ewa", surname: "Zielińska", role: "MOTHER" as const }],
+  };
+  const TOKEN = "T".repeat(43);
+  const INVITATION = {
+    invitation_id: "0199a1b2-0000-7000-8000-00000000cc01",
+    sent_at: "2026-10-04T10:00:00.000Z",
+    expires_at: "2026-10-18T10:00:00.000Z",
+    answered_at: null,
+    answer: null,
+    pending: true,
+  };
+
+  function personData(
+    lang: "pl" | "en",
+    person = PEOPLE.marta,
+    invitation: Extract<TreePageData, { kind: "person" }>["invitation"] = null,
+    role: "OWNER" | "EDITOR" = "OWNER",
+  ): Extract<TreePageData, { kind: "person" }> {
+    const t = tree();
+    return {
+      kind: "person",
+      lang,
+      status: null,
+      tree: { ...t, tree: { ...t.tree, role } },
+      person,
+      parents: { known: [], hidden: 0 },
+      others: [PEOPLE.ewa],
+      form: { draft: EMPTY_DRAFT, search: { kind: "none" } },
+      invitation,
+    };
+  }
+
+  it("the owner's page of a living person carries the invitation form, then the invitation's state", () => {
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const html = render(personData(lang));
+      expect(html).toContain('action="/api/tree/invite"');
+      expect(html).toContain('name="email"');
+      expect(html).toContain('name="consent"');
+      expect(html).toContain(t.invite.lede);
+      const pending = render(personData(lang, PEOPLE.marta, INVITATION));
+      expect(pending).not.toContain('action="/api/tree/invite"');
+      expect(pending).toContain(t.invite.pending("4", "18").slice(0, 10));
+      const answered = render(
+        personData(lang, PEOPLE.marta, {
+          ...INVITATION,
+          answered_at: "2026-10-05T10:00:00.000Z",
+          answer: "NOT_ME",
+          pending: false,
+        }),
+      );
+      expect(answered).toContain('action="/api/tree/invite"');
+      expect(answered).toContain(lang === "pl" ? "nie zaprosisz" : "cannot invite");
+    }
+    // Not for an editor, nor for a deceased person.
+    expect(render(personData("pl", PEOPLE.marta, null, "EDITOR"))).not.toContain(
+      'action="/api/tree/invite"',
+    );
+    expect(render(personData("pl", PEOPLE.jozef))).not.toContain('action="/api/tree/invite"');
+  });
+
+  it("a claimed row is read-only with its hidden fields marked; a declined row says so (AC-3, AC-4)", () => {
+    const claimed = {
+      ...PEOPLE.marta,
+      claimed: true,
+      hidden_fields: ["birth_year", "birth_place"] as const,
+      birth: { year: null, approx: false, place_code: null, place_text: null },
+      birth_surname: "Wróbel",
+    };
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const html = render(personData(lang, claimed));
+      expect(html).not.toContain('action="/api/tree/update-person"');
+      expect(html).not.toContain('action="/api/tree/invite"');
+      expect(html).toContain(t.invite.claimedNote);
+      expect(html.split(t.invite.hiddenMark)).toHaveLength(3);
+      expect(html).toContain("Wróbel");
+      expect(html).toContain('action="/api/tree/set-parent"');
+      expect(html).toContain('action="/api/tree/delete-person"');
+    }
+    const mine = render(personData("pl", { ...claimed, claimed_by_me: true }));
+    expect(mine).toContain('action="/api/tree/update-person"');
+    const declined = render(personData("en", { ...PEOPLE.marta, contact_declined: true }));
+    expect(declined).toContain(TREE_TEXT.en.invite.declinedNote);
+    expect(declined).not.toContain('action="/api/tree/invite"');
+  });
+
+  it("the invitation page shows the row, the parents and the three answers with the token, and the same in both languages", () => {
+    const shapes: string[] = [];
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const html = render({
+        kind: "invitation",
+        lang,
+        status: null,
+        token: TOKEN,
+        state: { kind: "open", card: CARD },
+      });
+      expect(html).toContain("Marta");
+      expect(html).toContain("Szczebrzeszyn");
+      expect(html).toContain(`${t.person.roles.MOTHER}: Ewa Zielińska`);
+      expect(html).toContain('action="/api/tree/answer-invitation"');
+      expect(html).toContain(`name="t" value="${TOKEN}"`);
+      for (const value of ["me", "not-me", "no-contact"])
+        expect(html).toContain(`value="${value}"`);
+      for (const line of t.invitation.explain) expect(html).toContain(line);
+      expect(html).not.toContain("Rodzina Zielińskich");
+      // The page's own tag structure: the words and the addresses differ by language, and the shell's nav has its own order.
+      const main = html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+      shapes.push(main.replace(/>[^<]*</gu, "><").replace(/<([a-z0-9]+)[^>]*>/gu, "<$1>"));
+      const other = lang === "pl" ? "en" : "pl";
+      expect(html).toContain(`href="${treePath(other, { page: "invitation" }, { t: TOKEN })}"`);
+    }
+    expect(shapes[0]).toBe(shapes[1]);
+    for (const [state, word] of [
+      ["expired", "expired"],
+      ["answered", "answered"],
+      ["missing", "not-found"],
+    ] as const) {
+      const html = render({
+        kind: "invitation",
+        lang: "pl",
+        status: null,
+        token: TOKEN,
+        state: { kind: state },
+      });
+      expect(html).toContain(TREE_TEXT.pl.status.invitation[word]?.text ?? "?");
+      expect(html).not.toContain('action="/api/tree/answer-invitation"');
+    }
+  });
+
+  it("the cards and one card: the list, the form with the hide boxes, the parents, the way to leave (AC-3, AC-5)", () => {
+    const summary = {
+      person_id: ID.marta,
+      given_names: "Marta",
+      surname: "Zielińska",
+      claimed_at: "2026-10-04T10:00:00.000Z",
+    };
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const list = render({ kind: "cards", lang, status: "left", cards: [summary] });
+      expect(list).toContain(`href="${treePath(lang, { page: "card", personId: ID.marta })}"`);
+      expect(list).toContain(t.status.cards["left"]?.text ?? "?");
+      const none = render({ kind: "cards", lang, status: null, cards: [] });
+      expect(none).toContain(t.cards.none);
+      const card = render({
+        kind: "card",
+        lang,
+        status: "claimed",
+        card: { ...CARD, person: { ...CARD.person, hidden_fields: ["birth_place"] } },
+        form: {
+          draft: { ...EMPTY_DRAFT, given: "Marta", surname: "Zielińska", birthYear: "1991" },
+          search: { kind: "none" },
+        },
+      });
+      expect(card).toContain('action="/api/tree/update-card"');
+      expect(card).toContain('name="hide" checked="" value="birth_place"');
+      expect(card).toContain('name="hide" value="birth_year"');
+      expect(card).not.toContain('checked="" value="birth_year"');
+      expect(card).not.toContain(`name="living"`);
+      expect(card).not.toContain(`name="death"`);
+      expect(card).toContain('action="/api/tree/leave-tree"');
+      expect(card).toContain(t.card.leaveConfirm);
+      expect(card).toContain(t.status.card["claimed"]?.text ?? "?");
+      expect(card).toContain(`${t.person.roles.MOTHER}: Ewa Zielińska`);
+    }
+    const dashboard = render({
+      kind: "trees",
+      lang: "pl",
+      status: null,
+      trees: [],
+      firstTree: null,
+      question: null,
+      cards: [summary],
+    });
+    expect(dashboard).toContain(`href="${treePath("pl", { page: "cards" })}"`);
+    expect(dashboard).toContain(TREE_TEXT.pl.cards.dashboardLink(1));
+  });
+
+  it("names the three new pages in their metadata", () => {
+    for (const page of ["invitation", "cards", "card"] as const) {
+      expect(treeMetadata("pl", page).title).toBe(`${TREE_TEXT.pl.headings[page]} — Name Atlas`);
+    }
   });
 });

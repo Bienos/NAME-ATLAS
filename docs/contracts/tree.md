@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Accepted by:** TASK-066 (`tasks/065-family-tree-core.md`) with ADR-0029, 2026-10-01
-- **Schema version:** `1.0` · **API version:** `v1`
+- **Schema version:** `1.1` (1.0 by TASK-066; 1.1 by TASK-094, invitations and claims) · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/tree.ts`
 - **Produced by:** `@name-atlas/family`'s `getTree` and `exportTree` (everything but `places`), and the route that resolves `place_codes` into `places` from the register.
 
@@ -28,7 +28,7 @@ Both need a signed-in session (ADR-0027). The route is not built by TASK-066; th
 
 ```jsonc
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "tree": {
     "id": "<uuid>",
     "title": "Rodzina Zielińskich",
@@ -49,7 +49,11 @@ Both need a signed-in session (ADR-0027). The route is not built by TASK-066; th
     "provenance": "ENTERED",             // the first release's only value (ADR-0029 §2.2.6)
     "source_note": "akt małżeństwa, parafia Szczebrzeszyn" | null,
     "notes": "…" | null,                 // null for a VIEWER
-    "updated_at": "<ISO 8601>"
+    "updated_at": "<ISO 8601>",
+    "claimed": false,                    // 1.1: someone answered "to ja" to an invitation for this row
+    "claimed_by_me": false,              // 1.1: the caller is that someone
+    "hidden_fields": ["birth_year" | "birth_place" | "birth_surname"],  // 1.1: what the claimant hides; blank here for everyone but them
+    "contact_declined": false            // 1.1: the person declined contact; the owner alone receives such a row
   }],
   "parentage": [{ "child_id": "<uuid>", "parent_id": "<uuid>", "role": "MOTHER" | "FATHER" | "PARENT" }],
   "members": [{ "user_id": "<uuid>", "role": "EDITOR" | "VIEWER", "sees_living": false }] | null,  // null unless OWNER
@@ -68,7 +72,14 @@ Both need a signed-in session (ADR-0027). The route is not built by TASK-066; th
 
 ## Versioning
 
-`1.0`. A field added for invitations and claims (ADR-0029 §2.6) is a minor bump; removing or renaming one is a major bump with a stated window.
+`1.1`. TASK-094 added the four claim fields (the minor bump 1.0 announced); removing or renaming a field is a major bump with a stated window.
+
+## Invitations and claims (TASK-094, ADR-0029 §2.6)
+
+- A claimed row's `birth_surname`, `birth.year` (with `approx`), and `birth.place_code` with `birth.place_text` are `null` for everyone but the claimant when the claimant lists that field in `hidden_fields`; the list itself travels to everyone, so the owner sees that a field is hidden and not what it holds.
+- The owner and the editors cannot update a claimed row (`CLAIMED` from `updatePerson`); `parentage` is still theirs.
+- A row with `contact_declined` is never in a member's `persons`; the owner receives it with the flag.
+- The invited person, and later the claimant, is not a member: they do not receive this object at all, only their own row with the parents' names (`CardRead` in `@name-atlas/family`), and the tree's title is not part of it.
 
 ## Parentage edit safeguards (TASK-070)
 
