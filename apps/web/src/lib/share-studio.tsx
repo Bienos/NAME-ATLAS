@@ -9,7 +9,7 @@ import { studioCards } from "./deck.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ShareButton } from "./share-button.js";
-import { shareCardPath, sharePreviewPath, studioPath } from "./share-facts.js";
+import { shareCardPath, sharePreviewPath, studioPath, surnamePdfPath } from "./share-facts.js";
 import type { ShareCardKey } from "./share-facts.js";
 import { SiteShell } from "./site-shell.js";
 import { comparePagePath, offerPath } from "./site-links.js";
@@ -194,6 +194,9 @@ export function ShareStudio({
                   signIn: t.studioSignInPrompt,
                 }}
               />
+              <a className="studio-pdf" href={surnamePdfPath(path)} download>
+                {t.studioPdf}
+              </a>
               <p className="studio-hint">{t.studioInstagram}</p>
             </>
           ) : null}
