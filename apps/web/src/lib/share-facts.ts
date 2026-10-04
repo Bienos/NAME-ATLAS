@@ -591,6 +591,11 @@ export function sharePreviewPath(pagePath: string, card: ShareCardKey, lang: Lan
   return `${shareCardPath(pagePath, card, lang)}/${lang === "en" ? "preview" : "podglad"}`;
 }
 
+/** Every card of the surname in one PDF (TASK-104): `/pl/nazwisko/{slug}/pdf`. */
+export function surnamePdfPath(pagePath: string): string {
+  return `${pagePath}/pdf`;
+}
+
 /** The share studio (TASK-093, ADR-0034): `/pl/nazwisko/{slug}/udostepnij?card={card}`. */
 export function studioPath(pagePath: string, lang: Lang, card: ShareCardKey | null = null): string {
   const path = `${pagePath}/${lang === "en" ? "share" : "udostepnij"}`;
