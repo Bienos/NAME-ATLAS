@@ -1038,6 +1038,8 @@ export const UI = {
     studioUnavailable: "Pobieranie jest chwilowo niedostępne. Spróbuj za chwilę.",
     studioBack: "Wróć do kart",
     studioMore: "Co dalej",
+    // The page link's share, beside the card's own "Udostępnij".
+    studioShareLink: "Udostępnij link",
     scaleLabel: "Skala rzadkości",
     scaleCommon: "częstsze",
     scaleRare: "rzadsze",
@@ -1723,6 +1725,8 @@ export const UI = {
     studioUnavailable: "Downloads are unavailable for a moment. Try again shortly.",
     studioBack: "Back to the cards",
     studioMore: "What next",
+    // The page link's share, beside the card's own "Share".
+    studioShareLink: "Share the link",
     scaleLabel: "Rarity scale",
     scaleCommon: "more common",
     scaleRare: "rarer",

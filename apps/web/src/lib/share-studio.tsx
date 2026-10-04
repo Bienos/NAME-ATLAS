@@ -192,7 +192,12 @@ export function ShareStudio({
             <h2>{t.studioMore}</h2>
             <div className="studio-more">
               {shareUrl === null ? null : (
-                <ShareButton url={shareUrl} title={`${surname} — ${t.title}`} lang={lang} />
+                <ShareButton
+                  url={shareUrl}
+                  title={`${surname} — ${t.title}`}
+                  lang={lang}
+                  label={t.studioShareLink}
+                />
               )}
               <a href={`${path}?view=cards`}>{t.studioBack}</a>
               <a
