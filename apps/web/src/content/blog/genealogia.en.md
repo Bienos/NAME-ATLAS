@@ -29,7 +29,7 @@ Kaleta identifies eight ways Polish surnames were formed. Among them are surname
 - from a variant of a first name, like Klesz from Klement,
 - from a name taken from another language, like Steynbrecher.
 
-Surnames ending in -ski were formed from place names, usually the place where the family held land. Over time they became a sign of belonging to the nobility, and they were so desirable that people with other surnames tried to adopt them. So the -ski ending on its own does not prove noble ancestry.
+Surnames ending in -ski were formed from place names, usually the place where the family held land. Over time they became a sign of belonging to the nobility, and they were so desirable that people with other surnames tried to adopt them. So the -ski ending on its own does not prove noble ancestry. We tell the longer history of Polish surnames, from the Middle Ages to the PESEL register, in our [post on where Polish surnames came from](/en/blog/skad-wziely-sie-nazwiska-w-polsce).
 
 ## Where to find Polish ancestors
 
