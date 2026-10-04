@@ -12,6 +12,7 @@ import {
   createPasswordHasher,
   hashToken,
 } from "@name-atlas/accounts";
+import { treeResponseSchema } from "@name-atlas/contracts";
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 import {
@@ -23,6 +24,7 @@ import {
 } from "@name-atlas/sources";
 import { loadTreePage } from "../../../apps/web/src/lib/tree-load.js";
 import { placeRegions, searchPlaces } from "../../../apps/web/src/lib/tree-places.js";
+import { handleTreeExport } from "../../../apps/web/src/lib/tree-export.js";
 import { handleTreePost } from "../../../apps/web/src/lib/tree-routes.js";
 import type { TreeRouteDeps } from "../../../apps/web/src/lib/tree-routes.js";
 
@@ -410,6 +412,45 @@ describe("the tree pages over a real database (TASK-076)", () => {
     });
     if (trees.kind !== "view" || trees.data.kind !== "trees") throw new Error("expected the trees");
     expect(trees.data.trees).toMatchObject([{ tree_id: treeId, role: "VIEWER", person_count: 1 }]);
+  });
+
+  it("TASK-098 AC-2, AC-3: the export answers the contract's object as a file, records EXPORTED once, and gives a member their own view", async () => {
+    const log = { correlationId: "req-export", info: () => undefined, warn: () => undefined };
+    const exportDeps = { family, accounts: deps.accounts, secure: true, log };
+    const request = (token: string) =>
+      new Request(`${ORIGIN}/api/v1/trees/${treeId}/export?lang=pl`, {
+        headers: { cookie: `__Host-na_session=${token}` },
+      });
+    const before = await sql<{ n: number }>`
+      SELECT count(*)::int AS n FROM family.audit_events WHERE tree_id = ${treeId} AND kind = 'EXPORTED'
+    `.execute(db().db);
+    const owner = await handleTreeExport(treeId, request(OWNER_TOKEN), exportDeps);
+    expect(owner.status).toBe(200);
+    expect(owner.headers.get("content-disposition")).toBe(
+      `attachment; filename="drzewo-${treeId.slice(0, 8)}.json"`,
+    );
+    const body = treeResponseSchema.parse(await owner.json());
+    expect(body.schema_version).toBe("1.1");
+    expect(body.tree.role).toBe("OWNER");
+    expect(body.persons.map((p) => p.given_names).sort()).toEqual([
+      "Franciszek",
+      "Józef",
+      "Marianna",
+    ]);
+    expect(body.places).toEqual([]);
+    const after = await sql<{ n: number }>`
+      SELECT count(*)::int AS n FROM family.audit_events WHERE tree_id = ${treeId} AND kind = 'EXPORTED'
+    `.execute(db().db);
+    expect((after.rows[0]?.n ?? 0) - (before.rows[0]?.n ?? 0)).toBe(1);
+
+    const member = await handleTreeExport(treeId, request(MEMBER_TOKEN), exportDeps);
+    expect(member.status).toBe(200);
+    const theirs = treeResponseSchema.parse(await member.json());
+    expect(theirs.tree.role).toBe("VIEWER");
+    expect(theirs.persons.map((p) => p.given_names)).toEqual(["Józef"]);
+    expect(theirs.hidden_living_count).toBe(2);
+    expect(theirs.members).toBeNull();
+    expect((await handleTreeExport(treeId, request("X".repeat(43)), exportDeps)).status).toBe(401);
   });
 
   it("the birthplace lookup finds TERYT localities by a typed prefix, as the read-only role, with their district and voivodeship", async () => {
