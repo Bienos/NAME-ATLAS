@@ -188,6 +188,12 @@ export function ShareStudio({
                     cancel: t.studioVideoCancel,
                     failed: t.studioVideoFailed,
                     signIn: t.studioSignInPrompt,
+                    length: t.studioVideoLength,
+                    short: t.studioVideoShort,
+                    full: t.studioVideoFull,
+                    motion: t.studioVideoMotion,
+                    up: t.studioVideoUp,
+                    side: t.studioVideoSide,
                   }}
                 />
                 <p className="studio-hint">{t.studioInstagram}</p>
