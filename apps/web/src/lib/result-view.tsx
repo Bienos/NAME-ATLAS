@@ -904,11 +904,11 @@ export function BearerItem({ person, lang }: { person: Bearer; lang: Lang }) {
       {description === null ? null : <span className="bearer-what">{description}</span>}
       <span className="bearer-links">
         {person.article_url === null ? null : (
-          <a href={person.article_url} rel="noopener noreferrer">
+          <a href={person.article_url} target="_blank" rel="noopener noreferrer">
             {t.bearersArticle}
           </a>
         )}
-        <a href={person.wikidata_url} rel="noopener noreferrer">
+        <a href={person.wikidata_url} target="_blank" rel="noopener noreferrer">
           Wikidata
         </a>
       </span>

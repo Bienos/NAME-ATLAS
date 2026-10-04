@@ -1174,6 +1174,7 @@ describe("TASK-073: the known people's card", () => {
     expect(html).toContain('href="https://pl.wikipedia.org/wiki/Daniel_Kowalski"');
     expect(html.match(/href="https:\/\/[a-z]+\.wikipedia\.org/gu)).toHaveLength(1);
     expect(html).toContain('href="https://www.wikidata.org/wiki/Q17558303"');
+    expect(html.match(/target="_blank"/gu)).toHaveLength(4);
   });
 
   it("is left out when Wikidata names nobody, or has not been asked", () => {

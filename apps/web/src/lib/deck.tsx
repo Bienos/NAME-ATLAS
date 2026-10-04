@@ -719,13 +719,13 @@ function bearers(section: BearersSection, lang: Lang): CardFace | null {
                 <small className="dk-bearer-links">
                   {person.article_url === null ? null : (
                     <>
-                      <a href={person.article_url} rel="noopener noreferrer">
+                      <a href={person.article_url} target="_blank" rel="noopener noreferrer">
                         {t.bearersArticle}
                       </a>
                       {" · "}
                     </>
                   )}
-                  <a href={person.wikidata_url} rel="noopener noreferrer">
+                  <a href={person.wikidata_url} target="_blank" rel="noopener noreferrer">
                     Wikidata
                   </a>
                 </small>
