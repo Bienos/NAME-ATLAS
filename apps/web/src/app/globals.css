@@ -1421,6 +1421,35 @@ p {
   margin-bottom: var(--space-2);
 }
 
+/* --- the couple report: each surname's own chapters, side by side (TASK-100) */
+
+.couple-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-3) var(--space-6);
+}
+
+.couple-side {
+  min-width: 0;
+}
+
+.couple-side h4 {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.couple-counts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.couple-links a + a {
+  margin-left: var(--space-4);
+}
+
 /* --- the surname profile: the result page's editorial layout ------------- */
 
 /*

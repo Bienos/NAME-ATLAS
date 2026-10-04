@@ -33,18 +33,20 @@ export function comparisonPath(a: string, b: string, lang: Lang): string {
  * the one slug rule (`slugFor`, `docs/canonical/21` §21–§24), and the route
  * redirects, so the comparison keeps one address and what was typed never
  * reaches a link or a log. A slug that names no surname is refused later, as
- * before, by the lookup. Pure: no database.
+ * before, by the lookup. Pure: no database. The couple report (TASK-100) reads
+ * the same query and redirects to its own address (`pathFor`).
  */
 export function comparisonRequest(
   params: Record<string, string | string[] | undefined>,
   lang: Lang,
+  pathFor: (a: string, b: string, lang: Lang) => string = comparisonPath,
 ): ComparisonRequest {
   const qa = one(params["qa"]);
   const qb = one(params["qb"]);
   if (qa !== "" || qb !== "") {
     const a = slugFor(qa);
     const b = slugFor(qb);
-    if (a !== null && b !== null) return { kind: "REDIRECT", to: comparisonPath(a, b, lang) };
+    if (a !== null && b !== null) return { kind: "REDIRECT", to: pathFor(a, b, lang) };
     return { kind: "PICK", first: qa, second: qb, error: true };
   }
   const a = one(params["a"]);

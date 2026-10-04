@@ -24,7 +24,8 @@ export const COMPARISON_METADATA: Metadata = {
   robots: { index: false, follow: false },
 };
 
-async function loadSide(db: Kysely<DB>, slug: string, lang: Lang): Promise<ComparisonSide> {
+/** One side: its slug resolved and its surname result validated. Also the couple report's (TASK-100). */
+export async function loadSide(db: Kysely<DB>, slug: string, lang: Lang): Promise<ComparisonSide> {
   const resolved = await resolveSlug(db, slug);
   if (resolved.kind !== "RESOLVED") return { slug, display: null, response: null, path: null };
   // The stored address, never recomputed from the display form (`currentPathFor`).
