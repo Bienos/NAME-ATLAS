@@ -83,3 +83,75 @@ export async function searchPlaces(
     region: region.get(r.place_id) ?? null,
   }));
 }
+
+/** A locality of the register with the district and the voivodeship above it (TASK-092). */
+export interface PlaceRegion {
+  /** The seven-digit SIMC code. */
+  readonly code: string;
+  readonly name: string;
+  readonly district: string | null;
+  /** The voivodeship, with its two-digit TERC code as `voivodeship-geometry.ts` keys the map; null when the chain does not reach one. */
+  readonly region: { readonly code: string; readonly name: string } | null;
+}
+
+const TERC_PROVIDER = "TERYT";
+
+/**
+ * The localities behind a tree's `place_codes`, each with its district and
+ * voivodeship, for the Mapa view (TASK-092). A code the register does not
+ * know is left out; the register knows nothing about who asked.
+ */
+export async function placeRegions(
+  db: Kysely<DB>,
+  codes: readonly string[],
+): Promise<readonly PlaceRegion[]> {
+  const wanted = [...new Set(codes.filter((code) => /^[0-9]{7}$/u.test(code)))];
+  if (wanted.length === 0) return [];
+  const rows = await sql<{
+    code: string;
+    name: string;
+    place_type: string | null;
+    above: string | null;
+    terc: string | null;
+  }>`
+    WITH RECURSIVE loc AS (
+      SELECT p.place_id, x.external_id AS code, p.current_display_name AS name
+        FROM places p
+        JOIN entity_external_ids x ON x.entity_id = p.place_id
+       WHERE x.provider_key = ${SIMC_PROVIDER} AND x.external_id = ANY(${wanted}::text[])
+         AND p.entity_status = 'ACTIVE'
+    ), up AS (
+      SELECT m.child_place_id AS start, m.parent_place_id AS place_id, 1 AS depth
+        FROM administrative_memberships m
+       WHERE m.child_place_id IN (SELECT place_id FROM loc) AND m.membership_type = 'ADMINISTRATIVE'
+      UNION ALL
+      SELECT up.start, m.parent_place_id, up.depth + 1
+        FROM up JOIN administrative_memberships m ON m.child_place_id = up.place_id
+       WHERE up.depth < 4 AND m.membership_type = 'ADMINISTRATIVE'
+    )
+    SELECT loc.code, loc.name, a.place_type::text AS place_type, a.current_display_name AS above, rx.external_id AS terc
+      FROM loc
+      LEFT JOIN up ON up.start = loc.place_id
+      LEFT JOIN places a ON a.place_id = up.place_id AND a.place_type IN ('COUNTY_DISTRICT', 'REGION')
+      LEFT JOIN entity_external_ids rx ON rx.entity_id = a.place_id AND rx.provider_key = ${TERC_PROVIDER}
+     ORDER BY loc.code
+  `.execute(db);
+  const byCode = new Map<
+    string,
+    { name: string; district: string | null; region: PlaceRegion["region"] }
+  >();
+  for (const row of rows.rows) {
+    const entry = byCode.get(row.code) ?? { name: row.name, district: null, region: null };
+    if (row.place_type === "COUNTY_DISTRICT" && row.above !== null) entry.district = row.above;
+    if (
+      row.place_type === "REGION" &&
+      row.above !== null &&
+      row.terc !== null &&
+      /^[0-9]{2}$/u.test(row.terc)
+    ) {
+      entry.region = { code: row.terc, name: row.above };
+    }
+    byCode.set(row.code, entry);
+  }
+  return [...byCode.entries()].map(([code, entry]) => ({ code, ...entry }));
+}

@@ -152,7 +152,7 @@ export interface TreeText {
   readonly constellation: {
     readonly lede: string;
     readonly viewsLabel: string;
-    readonly views: Readonly<Record<"tree" | "constellation", string>>;
+    readonly views: Readonly<Record<"tree" | "constellation" | "map", string>>;
     readonly skyLabel: string;
     readonly arcLabel: (generation: number) => string;
     /** The word a star carries for its kind, in a label such as "Józef Zieliński, ze źródła". */
@@ -179,6 +179,21 @@ export interface TreeText {
       readonly sourceChip: string;
       readonly livingNote: string;
       readonly edit: string;
+    };
+  };
+  /** The Mapa view (TASK-092): the map by voivodeship, the rail, the card. */
+  readonly map: {
+    readonly lede: string;
+    readonly mapLabel: string;
+    readonly railLabel: string;
+    readonly note: string;
+    readonly offMap: (n: number) => string;
+    readonly offMapItem: string;
+    readonly noPlace: string;
+    readonly regionLabel: (name: string, n: number) => string;
+    readonly card: {
+      readonly heading: string;
+      readonly birth: string;
     };
   };
   readonly form: {
@@ -389,6 +404,7 @@ const PL: TreeText = {
     consent: "Ta osoba żyje?",
     tree: "Rodowód",
     constellation: "Konstelacja",
+    map: "Mapa",
     add: "Dodaj osobę",
     person: "Osoba",
   },
@@ -449,7 +465,7 @@ const PL: TreeText = {
   constellation: {
     lede: "Te same cztery pokolenia jako gwiazdozbiór: Ty na dole, przodkowie coraz wyżej. Wybierz gwiazdę, żeby zobaczyć osobę.",
     viewsLabel: "Widok drzewa",
-    views: { tree: "Rodowód", constellation: "Konstelacja" },
+    views: { tree: "Rodowód", constellation: "Konstelacja", map: "Mapa" },
     skyLabel: "Drzewo jako gwiazdozbiór",
     arcLabel: (generation) => `Pokolenie ${["I", "II", "III", "IV"][generation] ?? generation + 1}`,
     kind: {
@@ -487,6 +503,23 @@ const PL: TreeText = {
       livingNote:
         "Widzisz tę osobę tylko Ty. Nie bierze udziału w dopasowaniach z innymi drzewami.",
       edit: "Edytuj",
+    },
+  },
+  map: {
+    lede: "Miejsca urodzenia osób z drzewa na mapie Polski, według województw z rejestru TERYT. Wybierz osobę, żeby zobaczyć jej województwo.",
+    mapLabel: "Drzewo na mapie",
+    railLabel: "Osoby wg pokoleń",
+    note: "Punkt to województwo, w którym urodziła się osoba z drzewa. Linia łączy dziecko z rodzicem, gdy urodzili się w różnych województwach.",
+    offMap: (n) =>
+      n === 1
+        ? "1 osoba nie jest na mapie: brak miejscowości z rejestru TERYT."
+        : `${n} osób nie ma miejsca na mapie: brak miejscowości z rejestru TERYT.`,
+    offMapItem: "poza mapą",
+    noPlace: "bez miejsca urodzenia",
+    regionLabel: (name, n) => `${name}: ${n === 1 ? "1 osoba" : `${n} osób`}`,
+    card: {
+      heading: "Wybrana osoba",
+      birth: "Urodzenie",
     },
   },
   form: {
@@ -581,6 +614,7 @@ const PL: TreeText = {
     },
     add: personProblems(PL_PROBLEMS),
     constellation: {},
+    map: {},
     person: {
       saved: ok("Zapisano."),
       linked: ok("Rodzic połączony."),
@@ -701,6 +735,7 @@ const EN: TreeText = {
     consent: "Is this person living?",
     tree: "Pedigree",
     constellation: "Constellation",
+    map: "Map",
     add: "Add a person",
     person: "Person",
   },
@@ -761,7 +796,7 @@ const EN: TreeText = {
   constellation: {
     lede: "The same four generations as a constellation: you at the bottom, the ancestors higher up. Pick a star to see the person.",
     viewsLabel: "View of the tree",
-    views: { tree: "Pedigree", constellation: "Constellation" },
+    views: { tree: "Pedigree", constellation: "Constellation", map: "Map" },
     skyLabel: "The tree as a constellation",
     arcLabel: (generation) =>
       `Generation ${["I", "II", "III", "IV"][generation] ?? generation + 1}`,
@@ -800,6 +835,23 @@ const EN: TreeText = {
       sourceChip: "From a source",
       livingNote: "Only you see this person. They take no part in matching with other trees.",
       edit: "Edit",
+    },
+  },
+  map: {
+    lede: "The birthplaces of the people in the tree on the map of Poland, by voivodeship from the TERYT register. Pick a person to see their voivodeship.",
+    mapLabel: "The tree on the map",
+    railLabel: "People by generation",
+    note: "A mark is the voivodeship a person in the tree was born in. A line joins a child to a parent when they were born in different voivodeships.",
+    offMap: (n) =>
+      n === 1
+        ? "1 person is not on the map: no locality from the TERYT register."
+        : `${n} people are not on the map: no locality from the TERYT register.`,
+    offMapItem: "off the map",
+    noPlace: "no birthplace",
+    regionLabel: (name, n) => `${name}: ${n === 1 ? "1 person" : `${n} people`}`,
+    card: {
+      heading: "Picked person",
+      birth: "Birth",
     },
   },
   form: {
@@ -897,6 +949,7 @@ const EN: TreeText = {
     },
     add: personProblems(EN_PROBLEMS),
     constellation: {},
+    map: {},
     person: {
       saved: ok("Saved."),
       linked: ok("Parent linked."),

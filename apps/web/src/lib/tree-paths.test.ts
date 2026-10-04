@@ -198,3 +198,14 @@ describe("the Konstelacja's address (TASK-091, AC-1)", () => {
     expect(treeTarget("pl", ["konstelacja"])).toBeNull();
   });
 });
+
+describe("the Mapa's address (TASK-092, AC-1)", () => {
+  it("is the tree's address with the view's slug, in both languages", () => {
+    expect(treePath("pl", { page: "map", treeId: TREE })).toBe(`/pl/konto/drzewa/${TREE}/mapa`);
+    expect(treePath("en", { page: "map", treeId: TREE })).toBe(`/en/account/trees/${TREE}/map`);
+    expect(treeTarget("pl", [TREE, "mapa"])).toEqual({ page: "map", treeId: TREE });
+    expect(treeTarget("en", [TREE, "map"])).toEqual({ page: "map", treeId: TREE });
+    expect(treeTarget("pl", [TREE, "map"])).toBeNull();
+    expect(treeTarget("pl", [TREE, "mapa", "x"])).toBeNull();
+  });
+});

@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { treeMetadata, TreePageView } from "./tree-page.js";
 import type { TreePageData } from "./tree-load.js";
+import type { PlaceRegion } from "./tree-places.js";
 import { pedigree, nextQuestion, unplaced } from "./tree-pedigree.js";
 import { EMPTY_DRAFT, treeLandingPath, treePath } from "./tree-paths.js";
 import { TREE_TEXT } from "./tree-text.js";
@@ -416,5 +417,119 @@ describe("the Konstelacja view (TASK-091)", () => {
     expect(rodowod).toContain(
       `href="${treePath("pl", { page: "constellation", treeId: TREE_ID })}"`,
     );
+  });
+});
+
+function mapData(
+  lang: "pl" | "en",
+  t = tree(),
+  picked = 1,
+  places: PlaceRegion[] = [],
+): Extract<TreePageData, { kind: "map" }> {
+  const slots = pedigree(t);
+  return {
+    kind: "map",
+    lang,
+    status: null,
+    tree: t,
+    slots,
+    picked,
+    places,
+    unplacedCount: unplaced(t, slots).length,
+  };
+}
+
+describe("the Mapa view (TASK-092)", () => {
+  const withPlaces = () => {
+    const t = tree();
+    return tree({
+      persons: t.persons.map((p) =>
+        p.id === ID.marta || p.id === ID.ewa
+          ? { ...p, birth: { ...p.birth, place_code: "0960432", place_text: "Szczebrzeszyn" } }
+          : p,
+      ),
+    });
+  };
+  const PLACES = [
+    {
+      code: "0960432",
+      name: "Szczebrzeszyn",
+      district: "zamojski",
+      region: { code: "06", name: "LUBELSKIE" },
+    },
+  ];
+
+  it("draws the 16 voivodeships, lights the ones with people, lists the rail as links ?sel=n and the picked card, in both languages (AC-4, AC-5)", () => {
+    const shapes: string[] = [];
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const html = render(mapData(lang, withPlaces(), 1, PLACES));
+      expect(html).toContain(t.map.lede);
+      expect(html).toContain(
+        `href="${treePath(lang, { page: "map", treeId: TREE_ID })}" aria-current="page"`,
+      );
+      expect(html).toContain(
+        `href="${treePath(lang, { page: "constellation", treeId: TREE_ID })}"`,
+      );
+      expect(html.match(/class="tree-map-region /gu)?.length).toBe(16);
+      expect(html.match(/tree-map-region-b3/gu)?.length).toBe(1);
+      expect(html).toContain("tree-map-region-picked");
+      expect(html).toContain(`aria-label="${t.map.regionLabel("LUBELSKIE", 2)}"`);
+      expect(html).toContain("LUBELSKIE ×2</text>");
+      expect(html.match(/href="\?sel=/gu)?.length).toBe(7);
+      expect(html.match(/tree-rail-item" aria-current="true"/gu)?.length).toBe(1);
+      expect(html).toContain(
+        `${t.map.card.heading}</p><h3>${PEOPLE.marta.given_names} ${PEOPLE.marta.surname}</h3>`,
+      );
+      expect(html).toContain(`${t.map.card.birth}: Szczebrzeszyn · zamojski · LUBELSKIE`);
+      expect(html).toContain(t.map.offMap(5));
+      expect(html).toContain(t.map.offMapItem);
+      expect(html).toContain(t.map.note);
+      expect(html).not.toContain("<script");
+      const view = html.slice(
+        html.indexOf('<div class="tree-map-view">'),
+        html.indexOf("</aside>"),
+      );
+      shapes.push(view.replace(/>[^<]*</gu, "><").replace(/"[^"]*"/gu, '""'));
+    }
+    expect(shapes[0]).toBe(shapes[1]);
+  });
+
+  it("joins Marta to Ewa across voivodeships only when their voivodeships differ, and shows a viewer no way to edit", () => {
+    const same = render(mapData("pl", withPlaces(), 3, PLACES));
+    expect(same).not.toContain("tree-map-arc");
+    const t = withPlaces();
+    const apart = tree({
+      persons: t.persons.map((p) =>
+        p.id === ID.ewa
+          ? { ...p, birth: { ...p.birth, place_code: "0918123", place_text: "Warszawa" } }
+          : p,
+      ),
+    });
+    const html = render(
+      mapData("pl", apart, 3, [
+        ...PLACES,
+        {
+          code: "0918123",
+          name: "Warszawa",
+          district: "Warszawa",
+          region: { code: "14", name: "MAZOWIECKIE" },
+        },
+      ]),
+    );
+    expect(html.match(/class="tree-map-arc"/gu)?.length).toBe(1);
+    expect(html).toContain("MAZOWIECKIE</text>");
+    expect(html).toContain(
+      `href="${treePath("pl", { page: "person", treeId: TREE_ID, personId: ID.ewa })}"`,
+    );
+    const member = treeForMember();
+    const viewer = render(
+      mapData("pl", { ...member, tree: { ...member.tree, root_person_id: ID.jozef } }, 1, []),
+    );
+    expect(viewer).toContain(TREE_TEXT.pl.pedigree.viewer);
+    expect(viewer).not.toContain("/osoba/");
+    expect(viewer).toContain(TREE_TEXT.pl.map.offMap(1));
+    expect(treeMetadata("pl", "map").title).toBe("Mapa — Name Atlas");
+    expect(treeMetadata("en", "map").title).toBe("Map — Name Atlas");
   });
 });

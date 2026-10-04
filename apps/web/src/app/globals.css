@@ -5534,6 +5534,186 @@ a.tree-card:hover {
   border-radius: 10px;
 }
 
+/* The Mapa view (TASK-092): the voivodeships lit by the people born in them,
+   the arcs between a child's and a parent's, the rail by generation and the
+   picked person's card. */
+.site > main.tree-map {
+  max-width: 76rem;
+}
+
+.tree-map-view {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  margin: 0 0 var(--space-6);
+}
+
+@media (min-width: 64rem) {
+  .tree-map-view {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    align-items: start;
+  }
+}
+
+.tree-map-sky {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.tree-map-canvas {
+  padding: var(--space-4);
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 100%, var(--dusk-sky-ember) 0%, transparent 70%),
+    linear-gradient(180deg, var(--dusk-surface-sunk) 0%, var(--dusk-sky-wine) 100%);
+  border: 1px solid var(--dusk-line);
+  border-radius: 12px;
+}
+
+.tree-map-canvas svg {
+  display: block;
+  width: 100%;
+  max-width: 40rem;
+  height: auto;
+  margin: 0 auto;
+}
+
+.tree-map-region {
+  fill: var(--dusk-map-no-data);
+  stroke: var(--dusk-line);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.tree-map-region-b2 {
+  fill: var(--dusk-map-2);
+}
+
+.tree-map-region-b3 {
+  fill: var(--dusk-map-3);
+}
+
+.tree-map-region-b4 {
+  fill: var(--dusk-map-4);
+}
+
+.tree-map-region-picked {
+  stroke: var(--dusk-amber);
+  stroke-width: 2.5;
+}
+
+.tree-map-arc {
+  fill: none;
+  stroke: var(--dusk-amber);
+  stroke-opacity: 0.75;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.tree-map-mark circle {
+  fill: var(--dusk-ink-soft);
+  stroke: var(--dusk-surface-sunk);
+  stroke-width: 1.5;
+}
+
+.tree-map-mark-source circle {
+  fill: var(--dusk-amber);
+}
+
+.tree-map-mark-living circle {
+  fill: var(--dusk-surface-sunk);
+  stroke: var(--dusk-ink);
+}
+
+.tree-map-mark-picked circle {
+  stroke: var(--dusk-amber);
+  stroke-width: 2.5;
+}
+
+.tree-map-label {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 500;
+  fill: var(--dusk-ink);
+  paint-order: stroke;
+  stroke: var(--dusk-surface-sunk);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.tree-rail {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.tree-rail > div > .tree-eyebrow {
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.tree-rail ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tree-rail-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  color: var(--dusk-ink);
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.tree-rail-item:hover {
+  border-color: var(--dusk-line-control);
+}
+
+.tree-rail-item:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+.tree-rail-item[aria-current="true"] {
+  background: var(--dusk-surface-sunk);
+  border-color: var(--dusk-amber);
+}
+
+.tree-rail-item .tree-swatch {
+  flex: none;
+  margin: 0;
+}
+
+.tree-rail-item b {
+  display: block;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.tree-rail-item span span {
+  display: block;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.tree-rail-off b {
+  color: var(--dusk-ink-muted);
+}
+
+.tree-map-card {
+  margin-top: var(--space-3);
+}
+
 /* The tree's landing page (TASK-076, the "Horyzont" direction): a dusk hero
    whose sample pedigree recedes to the horizon, then the reading. Full width;
    the reading shell's measure is applied inside each section. */

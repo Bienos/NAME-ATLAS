@@ -22,7 +22,7 @@ import {
   terytFileInput,
 } from "@name-atlas/sources";
 import { loadTreePage } from "../../../apps/web/src/lib/tree-load.js";
-import { searchPlaces } from "../../../apps/web/src/lib/tree-places.js";
+import { placeRegions, searchPlaces } from "../../../apps/web/src/lib/tree-places.js";
 import { handleTreePost } from "../../../apps/web/src/lib/tree-routes.js";
 import type { TreeRouteDeps } from "../../../apps/web/src/lib/tree-routes.js";
 
@@ -280,7 +280,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId],
       query: {},
       session: { userId: OWNER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (owner.kind !== "view" || owner.data.kind !== "tree")
       throw new Error("expected the owner's pedigree");
@@ -310,7 +310,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId],
       query: {},
       session: { userId: MEMBER, termsVersion: OLD_TERMS },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (member.kind !== "view" || member.data.kind !== "tree")
       throw new Error("expected the member's pedigree");
@@ -330,7 +330,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "konstelacja"],
       query: { sel: "3" },
       session: { userId: OWNER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (sky.kind !== "view" || sky.data.kind !== "constellation")
       throw new Error("expected the owner's constellation");
@@ -343,7 +343,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "constellation"],
       query: { sel: "3" },
       session: { userId: MEMBER, termsVersion: OLD_TERMS },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (memberSky.kind !== "view" || memberSky.data.kind !== "constellation")
       throw new Error("expected the member's constellation");
@@ -355,6 +355,29 @@ describe("the tree pages over a real database (TASK-076)", () => {
     expect(memberSky.data.picked).toBe(3);
     expect(memberSky.data.tree.hidden_living_count).toBe(2);
 
+    // The Mapa (TASK-092, AC-2): the register's locality behind a place code, with its district and voivodeship.
+    const regions = await placeRegions(webPool === undefined ? db().db : createDb(webPool), [
+      "0856623",
+      "0918123",
+      "0000000",
+      "nope",
+    ]);
+    expect(regions).toEqual([
+      {
+        code: "0856623",
+        name: "Szklary",
+        district: "ząbkowicki",
+        region: { code: "02", name: "DOLNOŚLĄSKIE" },
+      },
+      {
+        code: "0918123",
+        name: "Warszawa",
+        district: "Warszawa",
+        region: { code: "14", name: "MAZOWIECKIE" },
+      },
+    ]);
+    expect(await placeRegions(db().db, [])).toEqual([]);
+
     // The member's forms are not pages, and the member's routes are refused by the policies.
     const form = await loadTreePage({
       enabled: true,
@@ -362,7 +385,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: [treeId, "add"],
       query: {},
       session: { userId: MEMBER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     expect(form).toEqual({ kind: "redirect", to: `/en/account/trees/${treeId}` });
     const refused = location(
@@ -381,7 +404,7 @@ describe("the tree pages over a real database (TASK-076)", () => {
       segments: undefined,
       query: {},
       session: { userId: MEMBER, termsVersion: CLAUSE },
-      deps: { family, places: null },
+      deps: { family, places: null, regions: null },
     });
     if (trees.kind !== "view" || trees.data.kind !== "trees") throw new Error("expected the trees");
     expect(trees.data.trees).toMatchObject([{ tree_id: treeId, role: "VIEWER", person_count: 1 }]);

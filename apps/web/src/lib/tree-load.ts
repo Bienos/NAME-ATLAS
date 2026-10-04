@@ -15,7 +15,7 @@ import type { PersonDraft, SlotRole, TreeTarget } from "./tree-paths.js";
 import { pickSlot } from "./tree-constellation.js";
 import { nextQuestion, parentsOf, pedigree, unplaced } from "./tree-pedigree.js";
 import type { Question, Slot } from "./tree-pedigree.js";
-import type { PlaceMatch } from "./tree-places.js";
+import type { PlaceMatch, PlaceRegion } from "./tree-places.js";
 import { treeStatusWords } from "./tree-text.js";
 
 /**
@@ -39,6 +39,8 @@ export interface TreeLoadDeps {
   readonly family: Pick<Family, "listTrees" | "getTree">;
   /** The TERYT lookup, or null where the register is not configured. */
   readonly places: ((typed: string) => Promise<readonly PlaceMatch[]>) | null;
+  /** The register's localities behind a tree's place codes, for the Mapa (TASK-092); null where the register is not configured. */
+  readonly regions: ((codes: readonly string[]) => Promise<readonly PlaceRegion[]>) | null;
 }
 
 export type Query = Readonly<Record<string, string | readonly string[] | undefined>>;
@@ -105,6 +107,17 @@ export type TreePageData =
       readonly tree: TreeRead;
       readonly slots: readonly Slot[];
       readonly picked: number;
+      readonly unplacedCount: number;
+    }
+  | {
+      /** The Mapa view (TASK-092): the slots, the picked one, and the register's localities behind the tree's place codes. */
+      readonly kind: "map";
+      readonly lang: Lang;
+      readonly status: string | null;
+      readonly tree: TreeRead;
+      readonly slots: readonly Slot[];
+      readonly picked: number;
+      readonly places: readonly PlaceRegion[];
       readonly unplacedCount: number;
     }
   | {
@@ -281,6 +294,31 @@ export async function loadTreePage(input: {
         tree,
         slots,
         picked: pickSlot(slots, first(query, "sel")),
+        unplacedCount: unplaced(tree, slots).length,
+      },
+    };
+  }
+
+  if (target.page === "map") {
+    const slots = pedigree(tree);
+    let places: readonly PlaceRegion[] = [];
+    if (deps.regions !== null && tree.place_codes.length > 0) {
+      try {
+        places = await deps.regions(tree.place_codes);
+      } catch {
+        places = [];
+      }
+    }
+    return {
+      kind: "view",
+      data: {
+        kind: "map",
+        lang,
+        status: null,
+        tree,
+        slots,
+        picked: pickSlot(slots, first(query, "sel")),
+        places,
         unplacedCount: unplaced(tree, slots).length,
       },
     };
