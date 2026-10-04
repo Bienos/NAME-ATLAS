@@ -2,7 +2,7 @@ import { answerSlug, requestOrigin } from "./surname-page.js";
 import { pageSlug } from "./slug.js";
 import { isShareCard, shareFacts } from "./share-facts.js";
 import type { ShareCardKey, ShareFacts } from "./share-facts.js";
-import { renderShareCard } from "./share-card.js";
+import { isCardLayer, renderShareCard } from "./share-card.js";
 import type { GateVerdict } from "./download-gate.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -38,15 +38,24 @@ export async function shareCardResponse(
   lang: Lang,
   hostHeader: string | null,
   gate: GateVerdict = "off",
+  layer: string | null = null,
 ): Promise<Response> {
   if (!isShareCard(card)) return new Response("Not found", { status: 404 });
+  // The video's layers (TASK-108): an unknown one is no image, so nothing caches it.
+  if (layer !== null && !isCardLayer(layer)) return new Response("Not found", { status: 404 });
   const refused = gateRefusal(gate);
   if (refused !== null) return refused;
   const found = await factsFor(rawSlug, card, lang, "");
   if (found instanceof Response) return found;
   const origin = requestOrigin(hostHeader);
   const host = origin === null ? null : new URL(origin).host;
-  return renderShareCard(found, host, gate === "open" ? PRIVATE : CACHE);
+  return renderShareCard(
+    found,
+    host,
+    gate === "open" ? PRIVATE : CACHE,
+    null,
+    layer === null || !isCardLayer(layer) ? null : { layer, hook: UI[lang].videoHook },
+  );
 }
 
 /**

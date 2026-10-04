@@ -15,5 +15,12 @@ export async function GET(
 ): Promise<Response> {
   const { slug, card } = await params;
   const gate = await downloadGate(accountsRuntime(), request.headers.get("cookie"));
-  return shareCardResponse(slug, card, "en", request.headers.get("host"), gate);
+  return shareCardResponse(
+    slug,
+    card,
+    "en",
+    request.headers.get("host"),
+    gate,
+    new URL(request.url).searchParams.get("layer"),
+  );
 }
