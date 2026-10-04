@@ -20,7 +20,7 @@ describe("legal pages (TASK-046)", () => {
         expect(html).toContain(`<main lang="${htmlLang(lang)}"`);
         expect(html).toContain(`<h2>${doc.title}</h2>`);
         expect(html).toContain(
-          `<time dateTime="${kind === "privacy" ? "2026-10-03" : "2026-09-30"}">`,
+          `<time dateTime="${kind === "privacy" ? "2026-10-04" : "2026-09-30"}">`,
         );
         for (const s of doc.sections) expect(html).toContain(`<h3>${s.heading}</h3>`);
       }
