@@ -8,6 +8,7 @@ import {
   safeNext,
   stepFromSlug,
 } from "./account-paths.js";
+import { SHARE_CARDS, studioPath } from "./share-facts.js";
 
 const LANGS = ["pl", "en"] as const;
 
@@ -134,5 +135,45 @@ describe("where a sign-in may return to (TASK-064, AC-5)", () => {
       `/pl/nazwisko/${"a".repeat(200)}`,
     ];
     for (const value of refused) expect(safeNext(value), String(value)).toBeNull();
+  });
+});
+
+describe("the share studio as a return address (TASK-093, AC-6)", () => {
+  it("takes the studio in its own language, with or without one of its cards", () => {
+    for (const card of SHARE_CARDS) {
+      for (const page of [
+        `/pl/nazwisko/kowalski/udostepnij?card=${card}`,
+        `/en/surname/o'neil/share?card=${card}`,
+        `/pl/nazwisko/%C5%82uczak/udostepnij?card=${card}`,
+        studioPath("/pl/nazwisko/kowalski", "pl", card),
+        studioPath("/en/surname/nowak-k3m9qp", "en", card),
+      ]) {
+        expect(safeNext(page), page).toBe(page);
+      }
+    }
+    expect(safeNext("/pl/nazwisko/kowalski/udostepnij")).toBe("/pl/nazwisko/kowalski/udostepnij");
+    expect(safeNext("/en/surname/kowalski/share")).toBe("/en/surname/kowalski/share");
+  });
+
+  it("refuses a studio address with anything else in it", () => {
+    for (const value of [
+      "/pl/nazwisko/kowalski/share",
+      "/en/surname/kowalski/udostepnij",
+      "/pl/nazwisko/kowalski/udostepnij?card=horoscope",
+      "/pl/nazwisko/kowalski/udostepnij?card=",
+      "/pl/nazwisko/kowalski/udostepnij?card=summary&card=rarity",
+      "/pl/nazwisko/kowalski/udostepnij?card=summary&next=/x",
+      "/pl/nazwisko/kowalski/udostepnij?view=cards",
+      "/pl/nazwisko/kowalski/udostepnij?card=summary#x",
+      "/pl/nazwisko/kowalski/udostepnij/",
+      "/pl/nazwisko/kowalski/udostepnij?",
+      "/pl/nazwisko/kowalski?view=cards/udostepnij",
+      "/pl/nazwisko/../udostepnij",
+      "/pl/nazwisko/%2e%2e/udostepnij",
+      "/pl/nazwisko/a%2fb/udostepnij",
+      "//evil.test/pl/nazwisko/kowalski/udostepnij",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
   });
 });

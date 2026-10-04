@@ -12,7 +12,8 @@ vi.mock("./share-facts.js", async (importOriginal) => ({
 }));
 vi.mock("./share-card.js", () => ({ renderShareCard }));
 
-const { shareCardResponse } = await import("./share-route.js");
+const { shareCardResponse, sharePreviewResponse } = await import("./share-route.js");
+const { UI } = await import("./messages.js");
 
 const PUBLIC_CACHE = "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
 
@@ -94,5 +95,36 @@ describe("the share-card route with accounts on (TASK-064, AC-2, AC-3, AC-4)", (
     expect(moved.headers.get("location")).toBe("/en/surname/nowak/card/summary");
     shareFacts.mockReturnValueOnce(null);
     expect((await shareCardResponse("x", "rarity", "pl", null, "open")).status).toBe(404);
+  });
+});
+
+describe("the card's preview (TASK-093, AC-2)", () => {
+  it("draws the card half size with the mark in the page's language, public whatever the gate", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      renderShareCard.mockClear();
+      const response = await sharePreviewResponse("kowalski", "summary", lang, "atlas.test");
+      expect(response.status).toBe(200);
+      expect(response.headers.get("cache-control")).toBe(PUBLIC_CACHE);
+      const [, host, , mark] = renderShareCard.mock.calls[0] as unknown[];
+      expect(host).toBe("atlas.test");
+      expect(mark).toBe(UI[lang].studioPreviewMark);
+    }
+  });
+
+  it("answers 404, 308 and 503 as the image does, the move keeping the preview", async () => {
+    expect((await sharePreviewResponse("kowalski", "horoscope", "pl", null)).status).toBe(404);
+    answerSlug.mockResolvedValueOnce({ kind: "NOT_FOUND" });
+    expect((await sharePreviewResponse("x", "summary", "pl", null)).status).toBe(404);
+    answerSlug.mockResolvedValueOnce({ kind: "UNAVAILABLE" });
+    expect((await sharePreviewResponse("x", "summary", "pl", null)).status).toBe(503);
+    answerSlug.mockResolvedValueOnce({ kind: "MOVED", current_slug: "nowak" });
+    const pl = await sharePreviewResponse("x", "rarity", "pl", null);
+    expect(pl.status).toBe(308);
+    expect(pl.headers.get("location")).toBe("/pl/nazwisko/nowak/karta/rarity/podglad");
+    answerSlug.mockResolvedValueOnce({ kind: "MOVED", current_slug: "nowak" });
+    const en = await sharePreviewResponse("x", "rarity", "en", null);
+    expect(en.headers.get("location")).toBe("/en/surname/nowak/card/rarity/preview");
+    shareFacts.mockReturnValueOnce(null);
+    expect((await sharePreviewResponse("x", "rarity", "pl", null)).status).toBe(404);
   });
 });

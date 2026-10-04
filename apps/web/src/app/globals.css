@@ -8942,6 +8942,21 @@ a.tree-card:hover {
   color: var(--dusk-ink-muted);
 }
 
+/* The deck's way out (TASK-093): the end card's one primary link and the last card's "next". */
+.dk-actions a.dk-finish {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-weight: 600;
+}
+
+a.deck-nav.deck-finish {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  text-decoration: none;
+}
+
 /* Old print: a card on paper. */
 .dk-card.dk-paper {
   border-color: #00000026;
@@ -9105,5 +9120,158 @@ a.tree-card:hover {
 
   .dk-card {
     padding: var(--space-4) var(--space-5) var(--space-3) var(--space-4);
+  }
+}
+
+/* The share studio (TASK-093, ADR-0034): the card, its buttons, then where next. */
+main.studio {
+  max-width: 64rem;
+  padding: var(--space-7) var(--space-5) var(--space-9);
+  color: var(--dusk-ink);
+}
+
+.studio-eyebrow {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dusk-amber);
+}
+
+main.studio h1 {
+  margin: var(--space-2) 0 var(--space-5);
+}
+
+.studio-cards ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.studio-cards a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--dusk-line);
+  border-radius: 999px;
+  color: var(--dusk-ink);
+  font-size: 0.875rem;
+  text-decoration: none;
+}
+
+.studio-cards a[aria-current="page"] {
+  border-color: var(--dusk-amber);
+  color: var(--dusk-amber);
+}
+
+.studio-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+}
+
+.studio-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--dusk-line);
+  border-radius: 20px;
+}
+
+.studio-panel {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.studio-panel h2 {
+  margin: var(--space-5) 0 0;
+  font-size: 1.125rem;
+}
+
+.studio-actions,
+.studio-gate,
+.studio-more {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.studio-actions button,
+.studio-gate a,
+.studio-more a,
+.studio-more .share button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 1px solid var(--dusk-line);
+  border-radius: 999px;
+  background: #fffaf30a;
+  color: var(--dusk-ink);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.studio-more a {
+  justify-content: space-between;
+  border-radius: 12px;
+}
+
+.studio-actions .studio-primary,
+.studio-gate .studio-primary {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-weight: 600;
+}
+
+.studio-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.studio-gate p,
+.studio-status,
+.studio-hint {
+  margin: 0;
+  color: var(--dusk-ink-soft);
+}
+
+.studio-status,
+.studio-hint {
+  font-size: 0.875rem;
+}
+
+.studio-status:empty {
+  display: none;
+}
+
+.studio-more .share {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.studio-more .share-url {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .studio-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio-image {
+    max-width: 20rem;
+    margin: 0 auto;
   }
 }
