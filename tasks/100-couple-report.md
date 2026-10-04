@@ -1,6 +1,6 @@
 # TASK-100 — The couple report: two surnames' facts side by side, dark behind a flag
 
-- **Status:** SPECIFIED 2026-10-04. Not implemented.
+- **Status:** IMPLEMENTED 2026-10-04, dark (`docs/progress/2026-10-04-couple-report.md`).
 - **Requested by:** the project owner, 2026-10-04: asked about "a name and couple compatibility", offered three framings, they chose **"A"** (facts side by side, no score) and approved "an ADR plus a task".
 - **Decision:** ADR-0035 (proposed here). It answers D-025 §1.
 - **Depends on:** TASK-025 (the comparison), the surname result contract (`docs/contracts/surname-result.md`, through 1.12), all on `main` @ `d655a45`.
