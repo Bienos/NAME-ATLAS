@@ -1023,9 +1023,9 @@ export const UI = {
     studioPreviewMark: "Podgląd · Name Atlas",
     studioShare: "Udostępnij",
     studioDownload: "Pobierz",
-    studioCopy: "Kopiuj obraz",
+    studioGallery: "Zapisz w galerii",
+    studioGalleryHint: "Wybierz „Zapisz obraz”.",
     studioWorking: "Przygotowuję…",
-    studioCopied: "Skopiowano obraz.",
     studioFailed: "Nie udało się. Spróbuj jeszcze raz.",
     studioInstagram:
       "Na Instagramie: udostępnij z telefonu albo pobierz i wyślij obraz na telefon.",
@@ -1712,9 +1712,9 @@ export const UI = {
     studioPreviewMark: "Preview · Name Atlas",
     studioShare: "Share",
     studioDownload: "Download",
-    studioCopy: "Copy image",
+    studioGallery: "Save to Photos",
+    studioGalleryHint: "Choose “Save Image”.",
     studioWorking: "Preparing…",
-    studioCopied: "Image copied.",
     studioFailed: "That did not work. Try again.",
     studioInstagram:
       "For Instagram: share from your phone, or download and send the image to your phone.",
