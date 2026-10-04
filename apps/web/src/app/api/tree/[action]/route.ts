@@ -22,6 +22,8 @@ export async function POST(
     accounts: runtime.accounts,
     secure: runtime.secure,
     livingTermsVersion: runtime.livingTermsVersion,
+    mailer: runtime.mailer,
+    origin: runtime.origin,
     log: createLogger({ service: "web", base: { route: "/api/tree" } }),
   });
 }

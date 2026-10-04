@@ -169,6 +169,8 @@ describe("the tree pages over a real database (TASK-076)", () => {
       accounts,
       secure: true,
       livingTermsVersion: CLAUSE,
+      mailer: null,
+      origin: ORIGIN,
       log: { info: () => undefined, warn: () => undefined },
     };
   });

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import type { TreePersonRead, TreeRead } from "@name-atlas/family";
+import { HIDDEN_FIELDS } from "@name-atlas/family";
+import type { CardRead, TreePersonRead, TreeRead } from "@name-atlas/family";
 import { accountsRuntime } from "./accounts-runtime.js";
 import { db } from "./db.js";
 import { familyTreeEnabled } from "./family-config.js";
@@ -16,7 +17,15 @@ import { TreeMapView } from "./tree-map-view.js";
 import { TreeConstellation } from "./tree-stars.js";
 import { loadTreePage } from "./tree-load.js";
 import type { PersonFormData, Query, TreePageData, TreeSession } from "./tree-load.js";
-import { DRAFT_FIELDS, draftQuery, treeActionPath, treePath, treeTarget } from "./tree-paths.js";
+import {
+  DRAFT_FIELDS,
+  draftQuery,
+  HIDE_FIELD,
+  INVITATION_TOKEN,
+  treeActionPath,
+  treePath,
+  treeTarget,
+} from "./tree-paths.js";
 import type {
   PersonDraft,
   SlotRole,
@@ -36,6 +45,11 @@ import { statusChip, TREE_TEXT, treeStatusWords, yearsLine } from "./tree-text.j
  * (ADR-0021) after the chosen mockups: the dashboard, the consent step, the
  * Rodowód with its cards and dashed empty places, one question per screen,
  * and a person's form.
+ *
+ * Invitations and claims (TASK-094): a person's page carries the owner's
+ * invitation and shows a claimed row read-only with its hidden fields marked;
+ * the invitation page shows the invited person their own row and the three
+ * answers; a claimant's cards and one card with its form are their own pages.
  *
  * `tree-load.ts` decides and reads; this file only renders what it returns.
  * The pages are `noindex` and `no-store`, and the one lookup outside the tree
@@ -154,28 +168,31 @@ function Check({
   name,
   label,
   checked,
+  value = "1",
 }: {
   readonly name: string;
   readonly label: string;
   readonly checked: boolean;
+  /** The box's value; several boxes of one name carry their own (the hide boxes, TASK-094). */
+  readonly value?: string;
 }) {
   return (
     <label className="account-check">
-      <input type="checkbox" name={name} value="1" defaultChecked={checked} />
+      <input type="checkbox" name={name} value={value} defaultChecked={checked} />
       <span>{label}</span>
     </label>
   );
 }
 
 /** The fields of one person, as the one-question flow and the person's form share them. */
-function PersonFields({
+/** The birthplace: the typed name, the TERYT lookup as a GET of the page, the matches as radios. */
+function PlaceFields({
   lang,
   form,
   pagePath,
 }: {
   readonly lang: Lang;
   readonly form: PersonFormData;
-  /** The page itself, which the TERYT lookup is a GET of. */
   readonly pagePath: string;
 }) {
   const t = TREE_TEXT[lang].form;
@@ -183,30 +200,6 @@ function PersonFields({
   const chosen = form.search.kind === "found" ? form.search.matches : [];
   return (
     <>
-      <Text name={DRAFT_FIELDS.given} label={t.given} value={d.given} maxLength={120} required />
-      <Text
-        name={DRAFT_FIELDS.surname}
-        label={t.surname}
-        value={d.surname}
-        maxLength={120}
-        required
-      />
-      <Text
-        name={DRAFT_FIELDS.birthSurname}
-        label={t.birthSurname}
-        value={d.birthSurname}
-        maxLength={120}
-      />
-      <div className="tree-year">
-        <Text
-          name={DRAFT_FIELDS.birthYear}
-          label={t.birthYear}
-          value={d.birthYear}
-          maxLength={4}
-          mono
-        />
-        <Check name={DRAFT_FIELDS.birthApprox} label={t.approx} checked={d.birthApprox} />
-      </div>
       <div className="tree-place">
         <Text
           name={DRAFT_FIELDS.placeText}
@@ -265,6 +258,49 @@ function PersonFields({
           </label>
         </fieldset>
       )}
+    </>
+  );
+}
+
+function PersonFields({
+  lang,
+  form,
+  pagePath,
+}: {
+  readonly lang: Lang;
+  readonly form: PersonFormData;
+  /** The page itself, which the TERYT lookup is a GET of. */
+  readonly pagePath: string;
+}) {
+  const t = TREE_TEXT[lang].form;
+  const d = form.draft;
+  return (
+    <>
+      <Text name={DRAFT_FIELDS.given} label={t.given} value={d.given} maxLength={120} required />
+      <Text
+        name={DRAFT_FIELDS.surname}
+        label={t.surname}
+        value={d.surname}
+        maxLength={120}
+        required
+      />
+      <Text
+        name={DRAFT_FIELDS.birthSurname}
+        label={t.birthSurname}
+        value={d.birthSurname}
+        maxLength={120}
+      />
+      <div className="tree-year">
+        <Text
+          name={DRAFT_FIELDS.birthYear}
+          label={t.birthYear}
+          value={d.birthYear}
+          maxLength={4}
+          mono
+        />
+        <Check name={DRAFT_FIELDS.birthApprox} label={t.approx} checked={d.birthApprox} />
+      </div>
+      <PlaceFields lang={lang} form={form} pagePath={pagePath} />
       <fieldset className="tree-living">
         <legend>{t.livingHeading}</legend>
         {(["LIVING", "DECEASED", "UNKNOWN"] as const).map((status) => (
@@ -416,6 +452,13 @@ function TreesView({ data }: { data: Extract<TreePageData, { kind: "trees" }> })
             </li>
           ))}
         </ul>
+        {data.cards.length > 0 ? (
+          <p className="tree-cards-link">
+            <a href={treePath(lang, { page: "cards" })}>
+              {t.cards.dashboardLink(data.cards.length)}
+            </a>
+          </p>
+        ) : null}
         <h3>{t.dashboard.newTree}</h3>
         <Form action="create-tree" lang={lang} label={t.dashboard.newTree}>
           <Text
@@ -785,13 +828,22 @@ function PersonView({ data }: { data: Extract<TreePageData, { kind: "person" }> 
           {yearsLine(person, lang)} <Chip person={person} lang={lang} />
         </p>
         <Status lang={lang} page="person" word={data.status} />
-        <p>{t.person.lede}</p>
-        <Form action="update-person" lang={lang} label={t.form.save}>
-          <input type="hidden" name="tree" value={treeId} />
-          <input type="hidden" name="person" value={person.id} />
-          <PersonFields lang={lang} form={data.form} pagePath={pagePath} />
-          <Send>{t.form.save}</Send>
-        </Form>
+        {person.contact_declined ? (
+          <p className="tree-panel-note">{t.invite.declinedNote}</p>
+        ) : null}
+        {person.claimed && !person.claimed_by_me ? (
+          <ClaimedRow lang={lang} person={person} />
+        ) : (
+          <>
+            <p>{t.person.lede}</p>
+            <Form action="update-person" lang={lang} label={t.form.save}>
+              <input type="hidden" name="tree" value={treeId} />
+              <input type="hidden" name="person" value={person.id} />
+              <PersonFields lang={lang} form={data.form} pagePath={pagePath} />
+              <Send>{t.form.save}</Send>
+            </Form>
+          </>
+        )}
       </section>
       <section>
         <h3>{t.person.parents}</h3>
@@ -876,6 +928,12 @@ function PersonView({ data }: { data: Extract<TreePageData, { kind: "person" }> 
           )}
         </section>
       ) : null}
+      {tree.tree.role === "OWNER" &&
+      person.treated_as_living &&
+      !person.claimed &&
+      !person.contact_declined ? (
+        <InviteSection lang={lang} treeId={treeId} person={person} invitation={data.invitation} />
+      ) : null}
       <section>
         <h3>{t.person.deleteHeading}</h3>
         <Form action="delete-person" lang={lang} label={t.person.deleteHeading}>
@@ -883,6 +941,315 @@ function PersonView({ data }: { data: Extract<TreePageData, { kind: "person" }> 
           <input type="hidden" name="person" value={person.id} />
           <Check name="confirm" label={t.person.deleteConfirm} checked={false} />
           <Send ghost>{t.person.deleteSubmit}</Send>
+        </Form>
+      </section>
+    </>
+  );
+}
+
+/** A row someone has claimed, as the owner and the members see it: read-only, a hidden field marked (TASK-094, §2.6.22). */
+function ClaimedRow({ lang, person }: { readonly lang: Lang; readonly person: TreePersonRead }) {
+  const t = TREE_TEXT[lang];
+  const hidden = (field: (typeof HIDDEN_FIELDS)[number]): boolean =>
+    person.hidden_fields.includes(field);
+  const mark = <em className="tree-hidden-mark">{t.invite.hiddenMark}</em>;
+  const about = lang === "pl" ? "ok. " : "c. ";
+  return (
+    <div className="tree-panel tree-claimed">
+      <p className="tree-panel-note">{t.invite.claimedNote}</p>
+      <dl>
+        <dt>{t.form.birthYear}</dt>
+        <dd>
+          {hidden("birth_year")
+            ? mark
+            : person.birth.year === null
+              ? "—"
+              : `${person.birth.approx ? about : ""}${person.birth.year}`}
+        </dd>
+        <dt>{t.form.place}</dt>
+        <dd>{hidden("birth_place") ? mark : (person.birth.place_text ?? "—")}</dd>
+        <dt>{t.form.birthSurname}</dt>
+        <dd>{hidden("birth_surname") ? mark : (person.birth_surname ?? "—")}</dd>
+      </dl>
+    </div>
+  );
+}
+
+/** The owner's invitation of a living person: the form, or the state of the last one (TASK-094, §2.6.20). */
+function InviteSection({
+  lang,
+  treeId,
+  person,
+  invitation,
+}: {
+  readonly lang: Lang;
+  readonly treeId: string;
+  readonly person: TreePersonRead;
+  readonly invitation: Extract<TreePageData, { kind: "person" }>["invitation"];
+}) {
+  const t = TREE_TEXT[lang];
+  const day = (iso: string): string => formatDate(iso.slice(0, 10), lang);
+  const pending = invitation !== null && invitation.pending;
+  let state: string | null = null;
+  if (invitation !== null) {
+    if (invitation.answered_at !== null && invitation.answer !== null) {
+      state = t.invite.answered[invitation.answer](day(invitation.answered_at));
+    } else if (pending) {
+      state = t.invite.pending(day(invitation.sent_at), day(invitation.expires_at));
+    } else {
+      state = t.invite.expired(day(invitation.sent_at));
+    }
+  }
+  return (
+    <section className="tree-invite">
+      <h3>{t.invite.heading}</h3>
+      {state === null ? null : <p className="tree-panel-note">{state}</p>}
+      {pending ? null : (
+        <>
+          <p>{t.invite.lede}</p>
+          <Form action="invite" lang={lang} label={t.invite.heading}>
+            <input type="hidden" name="tree" value={treeId} />
+            <input type="hidden" name="person" value={person.id} />
+            <label>
+              <span>{t.invite.email}</span>
+              <input type="email" name="email" maxLength={254} required autoComplete="off" />
+            </label>
+            <Check name="consent" label={t.invite.consent} checked={false} />
+            <Send>{t.invite.send}</Send>
+          </Form>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** The invited person's or the claimant's own row with the parents' names (TASK-094, §2.6.21). */
+function CardFacts({
+  lang,
+  card,
+  parentsHeading,
+  noParents,
+}: {
+  readonly lang: Lang;
+  readonly card: CardRead;
+  readonly parentsHeading: string;
+  readonly noParents: string;
+}) {
+  const t = TREE_TEXT[lang];
+  const p = card.person;
+  const about = lang === "pl" ? "ok. " : "c. ";
+  return (
+    <div className="tree-panel tree-card-facts">
+      <dl>
+        <dt>{t.form.given}</dt>
+        <dd>{p.given_names}</dd>
+        <dt>{t.form.surname}</dt>
+        <dd>{p.surname}</dd>
+        {p.birth_surname === null ? null : (
+          <>
+            <dt>{t.form.birthSurname}</dt>
+            <dd>{p.birth_surname}</dd>
+          </>
+        )}
+        <dt>{t.form.birthYear}</dt>
+        <dd>{p.birth.year === null ? "—" : `${p.birth.approx ? about : ""}${p.birth.year}`}</dd>
+        <dt>{t.form.place}</dt>
+        <dd>{p.birth.place_text ?? "—"}</dd>
+      </dl>
+      <h3>{parentsHeading}</h3>
+      {card.parents.length === 0 ? (
+        <p>{noParents}</p>
+      ) : (
+        <ul>
+          {card.parents.map((parent, i) => (
+            <li key={i}>
+              {t.person.roles[parent.role]}: {parent.given_names} {parent.surname}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function InvitationView({ data }: { data: Extract<TreePageData, { kind: "invitation" }> }) {
+  const { lang } = data;
+  const t = TREE_TEXT[lang];
+  const word =
+    data.status ??
+    (data.state.kind === "expired"
+      ? "expired"
+      : data.state.kind === "answered"
+        ? "answered"
+        : data.state.kind === "missing"
+          ? "not-found"
+          : null);
+  return (
+    <section>
+      <h2>{t.headings.invitation}</h2>
+      {data.state.kind === "open" ? <p className="page-lede">{t.invitation.lede}</p> : null}
+      <Status lang={lang} page="invitation" word={word} />
+      {data.state.kind === "open" && data.token !== null ? (
+        <>
+          <h3>{t.invitation.yourRow}</h3>
+          <CardFacts
+            lang={lang}
+            card={data.state.card}
+            parentsHeading={t.invitation.parents}
+            noParents={t.invitation.noParents}
+          />
+          <h3>{t.invitation.question}</h3>
+          <Form action="answer-invitation" lang={lang} label={t.invitation.question}>
+            <input type="hidden" name={INVITATION_TOKEN} value={data.token} />
+            <div className="tree-answers">
+              <button type="submit" className="offer-send" name="answer" value="me">
+                {t.invitation.me}
+              </button>
+              <button
+                type="submit"
+                className="offer-send account-danger"
+                name="answer"
+                value="not-me"
+              >
+                {t.invitation.notMe}
+              </button>
+              <button
+                type="submit"
+                className="offer-send account-danger"
+                name="answer"
+                value="no-contact"
+              >
+                {t.invitation.noContact}
+              </button>
+            </div>
+          </Form>
+          <ul className="tree-explain">
+            {t.invitation.explain.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      <p>
+        <a href={treePath(lang, { page: "trees" })}>{t.headings.trees}</a>
+      </p>
+    </section>
+  );
+}
+
+function CardsView({ data }: { data: Extract<TreePageData, { kind: "cards" }> }) {
+  const { lang } = data;
+  const t = TREE_TEXT[lang];
+  return (
+    <section>
+      <p className="tree-eyebrow">
+        <a href={treePath(lang, { page: "trees" })}>{t.headings.trees}</a>
+      </p>
+      <h2>{t.headings.cards}</h2>
+      <p className="page-lede">{t.cards.lede}</p>
+      <Status lang={lang} page="cards" word={data.status} />
+      {data.cards.length === 0 ? <p>{t.cards.none}</p> : null}
+      <ul className="tree-list">
+        {data.cards.map((card) => (
+          <li key={card.person_id}>
+            <a href={treePath(lang, { page: "card", personId: card.person_id })}>
+              <span className="tree-card-name">
+                {card.given_names} {card.surname}
+              </span>
+              <span className="tree-card-years">
+                {t.cards.claimed}{" "}
+                <time dateTime={card.claimed_at.slice(0, 10)}>
+                  {formatDate(card.claimed_at.slice(0, 10), lang)}
+                </time>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/** The claimant's own form: the shared fields, the birthplace lookup, the hide boxes (TASK-094, §2.6.22). */
+function CardView({ data }: { data: Extract<TreePageData, { kind: "card" }> }) {
+  const { lang, card } = data;
+  const t = TREE_TEXT[lang];
+  const f = t.form;
+  const d = data.form.draft;
+  const pagePath = treePath(lang, { page: "card", personId: card.person.id });
+  return (
+    <>
+      <section>
+        <p className="tree-eyebrow">
+          <a href={treePath(lang, { page: "cards" })}>{t.headings.cards}</a>
+        </p>
+        <h2>{t.headings.card}</h2>
+        <p className="page-lede">{t.card.lede}</p>
+        <Status lang={lang} page="card" word={data.status} />
+        <Form action="update-card" lang={lang} label={t.card.save}>
+          <input type="hidden" name="person" value={card.person.id} />
+          <Text
+            name={DRAFT_FIELDS.given}
+            label={f.given}
+            value={d.given}
+            maxLength={120}
+            required
+          />
+          <Text
+            name={DRAFT_FIELDS.surname}
+            label={f.surname}
+            value={d.surname}
+            maxLength={120}
+            required
+          />
+          <Text
+            name={DRAFT_FIELDS.birthSurname}
+            label={f.birthSurname}
+            value={d.birthSurname}
+            maxLength={120}
+          />
+          <div className="tree-year">
+            <Text
+              name={DRAFT_FIELDS.birthYear}
+              label={f.birthYear}
+              value={d.birthYear}
+              maxLength={4}
+              mono
+            />
+            <Check name={DRAFT_FIELDS.birthApprox} label={f.approx} checked={d.birthApprox} />
+          </div>
+          <PlaceFields lang={lang} form={data.form} pagePath={pagePath} />
+          <fieldset className="tree-hide">
+            <legend>{t.card.hideHeading}</legend>
+            {HIDDEN_FIELDS.map((field) => (
+              <Check
+                key={field}
+                name={HIDE_FIELD}
+                value={field}
+                label={t.card.hide[field]}
+                checked={card.person.hidden_fields.includes(field)}
+              />
+            ))}
+            <small>{t.card.hideHint}</small>
+          </fieldset>
+          <Send>{t.card.save}</Send>
+        </Form>
+      </section>
+      <section>
+        <CardFacts
+          lang={lang}
+          card={card}
+          parentsHeading={t.card.parents}
+          noParents={t.card.noParents}
+        />
+      </section>
+      <section>
+        <h3>{t.card.leaveHeading}</h3>
+        <p>{t.card.leaveLede}</p>
+        <Form action="leave-tree" lang={lang} label={t.card.leaveHeading}>
+          <input type="hidden" name="person" value={card.person.id} />
+          <Check name="confirm" label={t.card.leaveConfirm} checked={false} />
+          <Send ghost>{t.card.leaveSubmit}</Send>
         </Form>
       </section>
     </>
@@ -966,11 +1333,19 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
               ? { page: "map", treeId: data.tree.tree.id }
               : data.kind === "add"
                 ? { page: "add", treeId: data.tree.tree.id }
-                : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
+                : data.kind === "invitation"
+                  ? { page: "invitation" }
+                  : data.kind === "cards"
+                    ? { page: "cards" }
+                    : data.kind === "card"
+                      ? { page: "card", personId: data.card.person.id }
+                      : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
+  const otherQuery: Readonly<Record<string, string>> =
+    data.kind === "invitation" && data.token !== null ? { [INVITATION_TOKEN]: data.token } : {};
   return (
     <SiteShell
       lang={lang}
-      otherPath={treePath(other, otherTarget)}
+      otherPath={treePath(other, otherTarget, otherQuery)}
       world={{ mode: "quiet" }}
       mainClassName={`reading account tree tree-${data.kind}`}
       current="trees"
@@ -982,6 +1357,9 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
       {data.kind === "add" ? <AddView data={data} /> : null}
       {data.kind === "person" ? <PersonView data={data} /> : null}
       {data.kind === "consent" ? <ConsentView data={data} /> : null}
+      {data.kind === "invitation" ? <InvitationView data={data} /> : null}
+      {data.kind === "cards" ? <CardsView data={data} /> : null}
+      {data.kind === "card" ? <CardView data={data} /> : null}
     </SiteShell>
   );
 }

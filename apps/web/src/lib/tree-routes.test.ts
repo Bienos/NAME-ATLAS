@@ -1,4 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
+import type { OutgoingMail } from "@name-atlas/accounts";
+import { hashToken } from "@name-atlas/accounts";
 import { handleTreePost, needsLivingConsent } from "./tree-routes.js";
 import type { TreeRouteDeps } from "./tree-routes.js";
 import { ID, tree, TREE_ID } from "./tree-fixture.js";
@@ -9,6 +11,8 @@ const SESSION = "S".repeat(43);
 const USER = "0199a1b2-0000-7000-8000-00000000aa11";
 const NEW_PERSON = "0199a1b2-0000-7000-8000-00000000bb99";
 const CLAUSE = "2026-10-03";
+const INVITATION = "0199a1b2-0000-7000-8000-00000000cc01";
+const FAILING_ADDRESS = "bounce@example.test";
 
 /** Unique, so a leak into a redirect or a log is found by `includes`. */
 const GIVEN = "Halinka-secret";
@@ -16,6 +20,7 @@ const SURNAME = "Zielonka-secret";
 
 interface Fakes {
   readonly deps: TreeRouteDeps;
+  readonly sent: OutgoingMail[];
   readonly family: { [K in keyof TreeRouteDeps["family"]]: ReturnType<typeof vi.fn> };
   readonly accounts: {
     sessionFromToken: ReturnType<typeof vi.fn>;
@@ -35,6 +40,15 @@ function fakes(termsVersion = CLAUSE): Fakes {
     setParent: vi.fn(() => Promise.resolve({ kind: "OK" })),
     removeParent: vi.fn(() => Promise.resolve({ kind: "OK" })),
     setRoot: vi.fn(() => Promise.resolve({ kind: "OK" })),
+    invite: vi.fn(() =>
+      Promise.resolve({ kind: "OK", invitationId: INVITATION, expiresAt: new Date() }),
+    ),
+    withdrawInvitation: vi.fn(() => Promise.resolve({ kind: "OK" })),
+    answerInvitation: vi.fn(() =>
+      Promise.resolve({ kind: "OK", treeId: TREE_ID, personId: ID.marta }),
+    ),
+    updateCard: vi.fn(() => Promise.resolve({ kind: "OK" })),
+    leaveTree: vi.fn(() => Promise.resolve({ kind: "OK" })),
   };
   const accounts = {
     sessionFromToken: vi.fn((token: unknown) =>
@@ -45,17 +59,26 @@ function fakes(termsVersion = CLAUSE): Fakes {
     acceptTerms: vi.fn(() => Promise.resolve()),
   };
   const logged: { event: string; fields: unknown }[] = [];
+  const sent: OutgoingMail[] = [];
   const deps: TreeRouteDeps = {
     family: family as unknown as TreeRouteDeps["family"],
     accounts: accounts as unknown as TreeRouteDeps["accounts"],
     secure: true,
     livingTermsVersion: CLAUSE,
+    mailer: {
+      send: (mail) => {
+        if (mail.to === FAILING_ADDRESS) return Promise.reject(new Error("MailError"));
+        sent.push(mail);
+        return Promise.resolve();
+      },
+    },
+    origin: ORIGIN,
     log: {
       info: (event, fields) => logged.push({ event, fields }),
       warn: (event, fields) => logged.push({ event, fields }),
     },
   };
-  return { deps, family, accounts, logged };
+  return { deps, family, accounts, logged, sent };
 }
 
 function post(
@@ -575,5 +598,237 @@ describe("the living-people clause (TASK-076, AC-4; ADR-0029 §2.4.12)", () => {
     );
     expect(JSON.stringify(logged)).not.toContain(GIVEN);
     expect(JSON.stringify(logged)).not.toContain(SURNAME);
+  });
+});
+
+describe("invitations and claims (TASK-094)", () => {
+  const TOKEN_SHAPE = /^[A-Za-z0-9_-]{43}$/u;
+  const person = `/pl/konto/drzewa/${TREE_ID}/osoba/${ID.marta}`;
+
+  it("invite: makes a token, hands the service its hash and the address's hash, mails the token and names the owner (AC-1)", async () => {
+    const { deps, family, sent, logged } = fakes();
+    const to = location(
+      await handleTreePost(
+        "invite",
+        post("invite", {
+          tree: TREE_ID,
+          person: ID.marta,
+          email: " Relative@Example.test ",
+          consent: "on",
+        }),
+        deps,
+      ),
+    );
+    expect(to).toBe(`${person}?status=invited`);
+    expect(family.invite).toHaveBeenCalledTimes(1);
+    const call = family.invite.mock.calls[0]?.[0] as {
+      userId: string;
+      treeId: string;
+      personId: string;
+      tokenHash: string;
+      addressHash: string;
+    };
+    expect(call).toMatchObject({ userId: USER, treeId: TREE_ID, personId: ID.marta });
+    expect(call.tokenHash).toMatch(/^[0-9a-f]{64}$/u);
+    expect(call.addressHash).toMatch(/^[0-9a-f]{64}$/u);
+    expect(sent).toHaveLength(1);
+    const mail = sent[0]!;
+    expect(mail.to).toBe("Relative@Example.test");
+    expect(mail.text).toContain("x@example.test");
+    const link = /https:\/\/atlas\.test\/pl\/konto\/drzewa\/zaproszenie\?t=([A-Za-z0-9_-]+)/u.exec(
+      mail.text,
+    );
+    expect(link?.[1]).toMatch(TOKEN_SHAPE);
+    expect(hashToken(link?.[1] ?? "").toString("hex")).toBe(call.tokenHash);
+    expect(mail.text).not.toContain("Marta");
+    expect(JSON.stringify(logged)).not.toContain("Relative");
+    expect(JSON.stringify(logged)).not.toContain(link?.[1] ?? "none");
+  });
+
+  it("invite: the consent box, the address, the service's reasons, and a mail that cannot be sent takes the row back", async () => {
+    const { deps, family } = fakes();
+    const back = async (fields: Record<string, string>): Promise<string> =>
+      location(
+        await handleTreePost(
+          "invite",
+          post("invite", { tree: TREE_ID, person: ID.marta, ...fields }),
+          deps,
+        ),
+      );
+    expect(await back({ email: "r@example.test" })).toBe(`${person}?status=invite-consent`);
+    expect(await back({ email: "nope", consent: "on" })).toBe(`${person}?status=invite-email`);
+    expect(family.invite).not.toHaveBeenCalled();
+    for (const problem of [
+      "NOT_LIVING",
+      "MINOR",
+      "CLAIMED",
+      "DECLINED",
+      "SUPPRESSED",
+      "PENDING",
+      "LIMIT",
+    ]) {
+      family.invite.mockResolvedValueOnce({ kind: "INVALID", problem });
+      expect(await back({ email: "r@example.test", consent: "on" })).toBe(
+        `${person}?status=${problem.toLowerCase().replace("_", "-")}`,
+      );
+    }
+    family.invite.mockResolvedValueOnce({ kind: "FORBIDDEN" });
+    expect(await back({ email: "r@example.test", consent: "on" })).toBe(
+      `${person}?status=forbidden`,
+    );
+    expect(await back({ email: FAILING_ADDRESS, consent: "on" })).toBe(
+      `${person}?status=invite-mail`,
+    );
+    expect(family.withdrawInvitation).toHaveBeenCalledWith({
+      userId: USER,
+      invitationId: INVITATION,
+    });
+    const { deps: unmailed, family: none } = fakes();
+    (unmailed as { mailer: unknown }).mailer = null;
+    expect(
+      location(
+        await handleTreePost(
+          "invite",
+          post("invite", {
+            tree: TREE_ID,
+            person: ID.marta,
+            email: "r@example.test",
+            consent: "on",
+          }),
+          unmailed,
+        ),
+      ),
+    ).toBe(`${person}?status=invite-mail`);
+    expect(none.invite).not.toHaveBeenCalled();
+  });
+
+  it("answer-invitation: spends the token with one of three answers and goes to the card or the cards (AC-3, AC-4)", async () => {
+    const { deps, family } = fakes();
+    const token = "T".repeat(43);
+    const answer = async (fields: Record<string, string>): Promise<string> =>
+      location(await handleTreePost("answer-invitation", post("answer-invitation", fields), deps));
+    expect(await answer({ t: token, answer: "me" })).toBe(
+      `/pl/konto/drzewa/karta/${ID.marta}?status=claimed`,
+    );
+    expect(family.answerInvitation).toHaveBeenCalledWith({
+      userId: USER,
+      tokenHash: hashToken(token).toString("hex"),
+      answer: "ME",
+    });
+    expect(await answer({ t: token, answer: "not-me" })).toBe(
+      "/pl/konto/drzewa/karty?status=not-me",
+    );
+    expect(await answer({ t: token, answer: "no-contact" })).toBe(
+      "/pl/konto/drzewa/karty?status=no-contact",
+    );
+    expect(await answer({ t: token, answer: "maybe" })).toBe(
+      `/pl/konto/drzewa/zaproszenie?t=${token}&status=answer`,
+    );
+    expect(await answer({ t: "short", answer: "me" })).toBe(
+      "/pl/konto/drzewa/zaproszenie?status=not-found",
+    );
+    for (const [kind, status] of [
+      ["EXPIRED", "expired"],
+      ["ANSWERED", "answered"],
+      ["NOT_FOUND", "not-found"],
+    ] as const) {
+      family.answerInvitation.mockResolvedValueOnce({ kind });
+      expect(await answer({ t: token, answer: "me" })).toBe(
+        `/pl/konto/drzewa/zaproszenie?t=${token}&status=${status}`,
+      );
+    }
+    family.answerInvitation.mockResolvedValueOnce({ kind: "INVALID", problem: "ALREADY_IN_TREE" });
+    expect(await answer({ t: token, answer: "me" })).toBe(
+      `/pl/konto/drzewa/zaproszenie?t=${token}&status=already-in-tree`,
+    );
+  });
+
+  it("update-card and leave-tree are the claimant's, with the hide boxes and the confirmation (AC-3, AC-5)", async () => {
+    const { deps, family } = fakes();
+    const card = `/pl/konto/drzewa/karta/${ID.marta}`;
+    const body = new URLSearchParams({
+      lang: "pl",
+      person: ID.marta,
+      given: "Marta",
+      surname: "Zielińska",
+      birth: "1991",
+    });
+    body.append("hide", "birth_year");
+    body.append("hide", "birth_place");
+    const request = new Request(`${ORIGIN}/api/tree/update-card`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+        origin: ORIGIN,
+        cookie: `__Host-na_session=${SESSION}`,
+      },
+      body: body.toString(),
+    });
+    expect(location(await handleTreePost("update-card", request, deps))).toBe(
+      `${card}?status=saved`,
+    );
+    expect(family.updateCard).toHaveBeenCalledWith({
+      userId: USER,
+      personId: ID.marta,
+      card: expect.objectContaining({
+        givenNames: "Marta",
+        birthYear: 1991,
+        hiddenFields: ["birth_year", "birth_place"],
+      }),
+    });
+    family.updateCard.mockResolvedValueOnce({ kind: "INVALID", problems: ["HIDDEN_FIELDS"] });
+    expect(
+      location(
+        await handleTreePost(
+          "update-card",
+          post("update-card", { person: ID.marta, given: "M", surname: "Z" }),
+          deps,
+        ),
+      ),
+    ).toBe(`${card}?given=M&surname=Z&status=hidden-fields`);
+    family.updateCard.mockResolvedValueOnce({ kind: "NOT_FOUND" });
+    expect(
+      location(
+        await handleTreePost(
+          "update-card",
+          post("update-card", { person: ID.marta, given: "M", surname: "Z" }),
+          deps,
+        ),
+      ),
+    ).toBe("/pl/konto/drzewa/karty?status=not-found");
+    expect(
+      location(await handleTreePost("leave-tree", post("leave-tree", { person: ID.marta }), deps)),
+    ).toBe(`${card}?status=confirm`);
+    expect(family.leaveTree).not.toHaveBeenCalled();
+    expect(
+      location(
+        await handleTreePost(
+          "leave-tree",
+          post("leave-tree", { person: ID.marta, confirm: "on" }),
+          deps,
+        ),
+      ),
+    ).toBe("/pl/konto/drzewa/karty?status=left");
+    expect(family.leaveTree).toHaveBeenCalledWith({ userId: USER, personId: ID.marta });
+  });
+
+  it("update-person on a row someone else has claimed goes back to the form with the word for it", async () => {
+    const { deps, family } = fakes();
+    family.updatePerson.mockResolvedValueOnce({ kind: "CLAIMED" });
+    const to = location(
+      await handleTreePost(
+        "update-person",
+        post("update-person", {
+          tree: TREE_ID,
+          person: ID.ewa,
+          given: "Ewa",
+          surname: "Zielińska",
+        }),
+        deps,
+      ),
+    );
+    expect(to).toBe(
+      `${`/pl/konto/drzewa/${TREE_ID}/osoba/${ID.ewa}`}?given=Ewa&surname=Zieli%C5%84ska&status=claimed-row`,
+    );
   });
 });

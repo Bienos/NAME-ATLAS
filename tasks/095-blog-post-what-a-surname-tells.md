@@ -1,9 +1,9 @@
-# TASK-094 — The blog's seventh post: what a surname can and cannot tell
+# TASK-095 — The blog's seventh post: what a surname can and cannot tell
 
 - **Status:** IMPLEMENTED 2026-10-04 on `claude/blog-piece-2`; record: `docs/progress/2026-10-04-blog-post-what-a-surname-tells.md`.
 - **Requested by:** the project owner, 2026-10-04: "go continue" with the next editorial piece. ADR-0031 §4 takes the topic from `docs/SEO_CONTENT_PLAN.md` §4 in order; piece 1 is live (TASK-086), so this is piece 2, "Co naprawdę można wyczytać z nazwiska — a czego nie?", with brief §5.2. It is not marked as an extension of an existing post (ADR-0031 §2.5).
 - **Decision:** none new. Inside ADR-0031 (§2.2: sources, a FAQ, the surname search at the end; §3.2: a missing voivodeship is not zero; §3.5: -ski is not nobility, and a surname does not establish ethnicity or nationality; §3.8: IJP PAN cited and linked, nothing copied into the product) and TASK-071/075's format.
-- **Depends on:** TASK-071, 075 and 086 (the blog, the image script, the previous post), on `main` at `d655a45` (#100). 094 is the next number free on `main` and in open pull requests (none open on 2026-10-04); 088 and 089 stay skipped, as `docs/progress/2026-10-03-share-studio-spec.md` records.
+- **Depends on:** TASK-071, 075 and 086 (the blog, the image script, the previous post), on `main` at `d655a45` (#100). Written as TASK-094 and renumbered to 095 on 2026-10-04, when #103 took 094 on `main`; 095 is free on `main` and in open pull requests; 088 and 089 stay skipped, as `docs/progress/2026-10-03-share-studio-spec.md` records.
 - **Model guidance:** implementation session.
 
 ## 1. Goal

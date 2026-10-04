@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
-import type { TreePersonRead } from "@name-atlas/family";
+import type { CardRead, TreePersonRead } from "@name-atlas/family";
 import {
+  cardFromDraft,
   draftFrom,
   draftOf,
+  draftOfCard,
   draftQuery,
   EMPTY_DRAFT,
   hasDraft,
+  invitationAnswer,
   isId,
+  isToken,
   isTreeAction,
   parseYear,
   personFromDraft,
@@ -172,6 +176,10 @@ describe("the one-question flow's draft (TASK-076, AC-6)", () => {
       source_note: "akt małżeństwa",
       notes: "ślub 1960",
       updated_at: "2026-10-03T10:00:00.000Z",
+      claimed: false,
+      claimed_by_me: false,
+      hidden_fields: [],
+      contact_declined: false,
     };
     expect(draftOf(read)).toEqual(full);
   });
@@ -207,5 +215,82 @@ describe("the Mapa's address (TASK-092, AC-1)", () => {
     expect(treeTarget("en", [TREE, "map"])).toEqual({ page: "map", treeId: TREE });
     expect(treeTarget("pl", [TREE, "map"])).toBeNull();
     expect(treeTarget("pl", [TREE, "mapa", "x"])).toBeNull();
+  });
+});
+
+describe("invitations and cards (TASK-094, AC-6)", () => {
+  const token = "A".repeat(43);
+
+  it("has an invitation page with its token in the query, the cards, and one card, in both languages", () => {
+    expect(treePath("pl", { page: "invitation" }, { t: token })).toBe(
+      `/pl/konto/drzewa/zaproszenie?t=${token}`,
+    );
+    expect(treePath("en", { page: "invitation" }, { t: token })).toBe(
+      `/en/account/trees/invitation?t=${token}`,
+    );
+    expect(treePath("pl", { page: "cards" })).toBe("/pl/konto/drzewa/karty");
+    expect(treePath("en", { page: "card", personId: PERSON })).toBe(
+      `/en/account/trees/card/${PERSON}`,
+    );
+    expect(treeTarget("pl", ["zaproszenie"])).toEqual({ page: "invitation" });
+    expect(treeTarget("en", ["invitation"])).toEqual({ page: "invitation" });
+    expect(treeTarget("pl", ["karty"])).toEqual({ page: "cards" });
+    expect(treeTarget("pl", ["karta", PERSON.toUpperCase()])).toEqual({
+      page: "card",
+      personId: PERSON,
+    });
+    expect(treeTarget("pl", ["invitation"])).toBeNull();
+    expect(treeTarget("pl", ["karta"])).toBeNull();
+    expect(treeTarget("pl", ["karta", "nope"])).toBeNull();
+    expect(treeTarget("en", ["cards", "x"])).toBeNull();
+  });
+
+  it("knows a token's shape, the three answers and the four actions", () => {
+    expect(isToken(token)).toBe(true);
+    expect(isToken(`${token}=`)).toBe(false);
+    expect(isToken(42)).toBe(false);
+    expect(invitationAnswer("me")).toBe("ME");
+    expect(invitationAnswer("not-me")).toBe("NOT_ME");
+    expect(invitationAnswer("no-contact")).toBe("NO_CONTACT");
+    expect(invitationAnswer("ME")).toBeNull();
+    expect(invitationAnswer("toString")).toBeNull();
+    for (const action of ["invite", "answer-invitation", "update-card", "leave-tree"]) {
+      expect(isTreeAction(action), action).toBe(true);
+    }
+  });
+
+  it("shows a card as the form that will correct it, and reads the form back with what is hidden", () => {
+    const card: CardRead = {
+      person: {
+        id: PERSON,
+        given_names: "Marta",
+        surname: "Zielińska",
+        birth_surname: null,
+        birth: { year: 1991, approx: false, place_code: "0920077", place_text: "Szczebrzeszyn" },
+        hidden_fields: ["birth_place"],
+        claimed_at: "2026-10-04T10:00:00.000Z",
+      },
+      parents: [{ given_names: "Ewa", surname: "Zielińska", role: "MOTHER" }],
+    };
+    const draft = draftOfCard(card);
+    expect(draft).toEqual({
+      ...EMPTY_DRAFT,
+      given: "Marta",
+      surname: "Zielińska",
+      birthYear: "1991",
+      placeCode: "0920077",
+      placeText: "Szczebrzeszyn",
+      living: "LIVING",
+    });
+    expect(cardFromDraft(draft, ["birth_place", "nope"])).toEqual({
+      givenNames: "Marta",
+      surname: "Zielińska",
+      birthSurname: "",
+      birthYear: 1991,
+      birthYearApprox: false,
+      birthPlaceCode: "0920077",
+      birthPlaceText: "Szczebrzeszyn",
+      hiddenFields: ["birth_place", "nope"],
+    });
   });
 });

@@ -1,4 +1,9 @@
-import type { LivingStatus, TreePersonRead } from "@name-atlas/family";
+import type {
+  HiddenField,
+  InvitationAnswer,
+  LivingStatus,
+  TreePersonRead,
+} from "@name-atlas/family";
 import type { Lang } from "./messages.js";
 import type { StarKind } from "./tree-constellation.js";
 import type { SlotRole, TreePage } from "./tree-paths.js";
@@ -255,6 +260,53 @@ export interface TreeText {
     readonly submit: string;
     readonly cancel: string;
   };
+  /** The owner's invitation of a living person, on the person's page (TASK-094, ADR-0029 §2.6.20). */
+  readonly invite: {
+    readonly heading: string;
+    readonly lede: string;
+    readonly email: string;
+    readonly consent: string;
+    readonly send: string;
+    readonly pending: (sent: string, until: string) => string;
+    readonly answered: Readonly<Record<InvitationAnswer, (when: string) => string>>;
+    readonly expired: (sent: string) => string;
+    readonly claimedNote: string;
+    readonly hiddenMark: string;
+    readonly declinedNote: string;
+  };
+  /** The invited person's page: their own row and the three answers (§2.6.21). */
+  readonly invitation: {
+    readonly lede: string;
+    readonly yourRow: string;
+    readonly parents: string;
+    readonly noParents: string;
+    readonly question: string;
+    readonly me: string;
+    readonly notMe: string;
+    readonly noContact: string;
+    readonly explain: readonly string[];
+    readonly missing: string;
+  };
+  readonly cards: {
+    readonly lede: string;
+    readonly none: string;
+    readonly claimed: string;
+    readonly dashboardLink: (n: number) => string;
+  };
+  /** The claimant's own card: the form, what to hide, the way to leave (§2.6.22). */
+  readonly card: {
+    readonly lede: string;
+    readonly parents: string;
+    readonly noParents: string;
+    readonly hideHeading: string;
+    readonly hide: Readonly<Record<HiddenField, string>>;
+    readonly hideHint: string;
+    readonly save: string;
+    readonly leaveHeading: string;
+    readonly leaveLede: string;
+    readonly leaveConfirm: string;
+    readonly leaveSubmit: string;
+  };
   readonly status: Readonly<Record<TreePage, StatusMap>>;
 }
 
@@ -407,6 +459,9 @@ const PL: TreeText = {
     map: "Mapa",
     add: "Dodaj osobę",
     person: "Osoba",
+    invitation: "Zaproszenie",
+    cards: "Twoje karty",
+    card: "Twoja karta",
   },
   dashboard: {
     lede: "Prywatne, dopóki kogoś nie zaprosisz. Osoby żyjące widzisz tylko Ty.",
@@ -573,6 +628,69 @@ const PL: TreeText = {
     deleteConfirm: "Rozumiem. Ta osoba zniknie z drzewa razem ze swoimi powiązaniami.",
     deleteSubmit: "Usuń osobę",
   },
+  invite: {
+    heading: "Zaproś tę osobę",
+    lede: "Jedna wiadomość, na prośbę właściciela drzewa. Wymienia Ciebie, nie tę osobę: bez imienia, daty i miejsca. Bez przypomnień.",
+    email: "Adres e-mail tej osoby",
+    consent: "Ta osoba wie, że podaję jej adres, i zgadza się na to.",
+    send: "Wyślij zaproszenie",
+    pending: (sent, until) =>
+      `Zaproszenie wysłane ${sent}, ważne do ${until}. Nie dowiesz się, czy zostało otwarte.`,
+    answered: {
+      ME: (when) => `Ta osoba potwierdziła kartę ${when}.`,
+      NOT_ME: (when) => `Odpowiedź z ${when}: to nie ta osoba. Tego adresu nie zaprosisz ponownie.`,
+      NO_CONTACT: (when) =>
+        `Odpowiedź z ${when}: nie chce kontaktu. Tego adresu nie zaprosisz ponownie.`,
+    },
+    expired: (sent) => `Zaproszenie z ${sent} wygasło bez odpowiedzi. Możesz wysłać nowe.`,
+    claimedNote:
+      "Ta osoba potwierdziła, że to ona. Od teraz sama poprawia swoje dane; Ty zmieniasz tylko powiązania. Pole oznaczone jako ukryte widzi tylko ona.",
+    hiddenMark: "ukryte przez tę osobę",
+    declinedNote:
+      "Ta osoba nie chce kontaktu. Widzisz ją tylko Ty; nie pokazujemy jej nikomu, kogo zaprosisz, i nigdy nie dopasujemy jej do innego drzewa.",
+  },
+  invitation: {
+    lede: "Ktoś wpisał Cię do swojego prywatnego drzewa rodzinnego. To wszystko, co o Tobie zapisał. Nic więcej z drzewa nie zobaczysz, dopóki nie zdecydujesz.",
+    yourRow: "Twój wpis",
+    parents: "Rodzice, jak ich zapisano",
+    noParents: "Rodziców nie wpisano.",
+    question: "Czy to Ty?",
+    me: "To ja",
+    notMe: "To nie ja",
+    noContact: "Nie chcę kontaktu",
+    explain: [
+      "„To ja”: karta staje się Twoja. Sam poprawiasz swoje dane, możesz ukryć rok i miejsce urodzenia oraz nazwisko rodowe i w każdej chwili możesz odejść z drzewa.",
+      "„To nie ja”: właściciel dowie się, że to nie Ty, i nie zaprosi tego adresu ponownie.",
+      "„Nie chcę kontaktu”: jak wyżej, a Twój wpis widzi od teraz tylko właściciel; nikt inny i żadne dopasowanie.",
+      "Właściciel dowie się tylko, co odpowiedziałeś. Nie dowie się, czy otworzyłeś wiadomość.",
+    ],
+    missing: "Ten link nie prowadzi do zaproszenia. Sprawdź, czy skopiowałeś go w całości.",
+  },
+  cards: {
+    lede: "Karty, które potwierdziłeś w cudzych drzewach. Każdą poprawiasz sam i z każdej możesz odejść.",
+    none: "Nie potwierdziłeś jeszcze żadnej karty. Karta pojawi się tu, gdy ktoś Cię zaprosi i odpowiesz „to ja”.",
+    claimed: "potwierdzono",
+    dashboardLink: (n) =>
+      n === 1 ? "Twoja karta w cudzym drzewie" : `Twoje karty w cudzych drzewach (${n})`,
+  },
+  card: {
+    lede: "To Twój wpis w cudzym drzewie. Popraw, co chcesz; zaznacz, czego właściciel i zaproszeni mają nie widzieć.",
+    parents: "Rodzice, jak ich zapisał właściciel",
+    noParents: "Rodziców nie wpisano.",
+    hideHeading: "Ukryj przed innymi",
+    hide: {
+      birth_year: "Rok urodzenia",
+      birth_place: "Miejsce urodzenia",
+      birth_surname: "Nazwisko rodowe",
+    },
+    hideHint: "Ukryte pole zostaje w Twojej karcie. Inni widzą tylko, że jest ukryte.",
+    save: "Zapisz",
+    leaveHeading: "Odejdź z drzewa",
+    leaveLede:
+      "Twoja karta wraca do notatki właściciela, bez tego, co ukryłeś. Ten adres nie dostanie już zaproszenia do tego drzewa.",
+    leaveConfirm: "Rozumiem. Chcę odejść z tego drzewa.",
+    leaveSubmit: "Odejdź",
+  },
   consent: {
     lede: "Jeśli tak, wpisujesz ją do prywatnej części drzewa. Zanim ją zapiszemy:",
     points: [
@@ -626,6 +744,65 @@ const PL: TreeText = {
       "would-cycle": problem("Nikt nie może być własnym przodkiem."),
       "not-found": problem("Nie ma takiej osoby w tym drzewie."),
       forbidden: problem("Nie możesz tego zmienić w tym drzewie."),
+      "claimed-row": problem(
+        "Ta osoba potwierdziła swoją kartę i sama poprawia swoje dane. Możesz zmieniać tylko powiązania.",
+      ),
+      invited: ok("Zaproszenie wysłane. Dowiesz się, co ta osoba odpowie."),
+      "invite-email": problem("Wpisz poprawny adres e-mail."),
+      "invite-consent": problem(
+        "Potwierdź, że ta osoba wie o przekazaniu adresu i zgadza się na to.",
+      ),
+      "invite-mail": problem(
+        "Nie udało się wysłać wiadomości. Zaproszenie nie zostało zapisane. Spróbuj za chwilę.",
+      ),
+      "not-living": problem("Zaprosić można tylko osobę żyjącą."),
+      minor: problem("Osoby, która według roku urodzenia ma mniej niż 18 lat, nie zapraszamy."),
+      claimed: problem("Ta osoba już potwierdziła swoją kartę."),
+      declined: problem("Ta osoba nie chce kontaktu. Nie zaprosisz jej ponownie."),
+      suppressed: problem(
+        "Ten adres odpowiedział już, że to nie ta osoba albo że nie chce kontaktu. Nie zaprosisz go ponownie.",
+      ),
+      pending: problem(
+        "Zaproszenie dla tej osoby jest jeszcze ważne. Poczekaj, aż odpowie albo wygaśnie.",
+      ),
+      limit: problem(
+        "Z jednego drzewa można wysłać dziesięć zaproszeń na 30 dni. Ten limit jest wyczerpany.",
+      ),
+      ...personProblems(PL_PROBLEMS),
+    },
+    invitation: {
+      answer: problem("Wybierz jedną z trzech odpowiedzi."),
+      expired: problem("To zaproszenie wygasło. Osoba, która je wysłała, może wysłać nowe."),
+      answered: problem("Na to zaproszenie już odpowiedziano."),
+      "not-found": problem(
+        "Ten link nie prowadzi do zaproszenia. Sprawdź, czy skopiowałeś go w całości.",
+      ),
+      "already-claimed": problem("Tę kartę potwierdził już ktoś inny."),
+      "already-in-tree": problem(
+        "Masz już potwierdzoną kartę w tym drzewie. Jedno konto to jedna osoba.",
+      ),
+      error: problem(PL_PROBLEMS.error),
+    },
+    cards: {
+      "not-me": ok(
+        "Dziękujemy. Właściciel drzewa dowie się, że to nie Ty, i nie zaprosi tego adresu ponownie.",
+      ),
+      "no-contact": ok(
+        "Dziękujemy. Właściciel drzewa dowie się, że nie chcesz kontaktu. Twój wpis widzi od teraz tylko on.",
+      ),
+      left: ok("Odszedłeś z drzewa. Twoja karta wróciła do notatki właściciela."),
+      "not-found": problem("Nie ma takiej karty albo nie jest Twoja."),
+      error: problem(PL_PROBLEMS.error),
+    },
+    card: {
+      claimed: ok("To Twoja karta. Od teraz tylko Ty ją poprawiasz."),
+      saved: ok("Zapisano."),
+      confirm: problem("Zaznacz potwierdzenie, żeby odejść z drzewa."),
+      "hidden-fields": problem(
+        "Można ukryć tylko rok urodzenia, miejsce urodzenia i nazwisko rodowe.",
+      ),
+      "not-found": problem("Nie ma takiej karty albo nie jest Twoja."),
+      forbidden: problem("Nie możesz tego zmienić."),
       ...personProblems(PL_PROBLEMS),
     },
   },
@@ -738,6 +915,9 @@ const EN: TreeText = {
     map: "Map",
     add: "Add a person",
     person: "Person",
+    invitation: "Invitation",
+    cards: "Your cards",
+    card: "Your card",
   },
   dashboard: {
     lede: "Private until you invite someone. Living people are seen by you alone.",
@@ -906,6 +1086,71 @@ const EN: TreeText = {
     deleteConfirm: "I understand. This person leaves the tree with their links.",
     deleteSubmit: "Delete the person",
   },
+  invite: {
+    heading: "Invite this person",
+    lede: "One message, at your request. It names you, not them: no name, date or place. No reminders.",
+    email: "This person's email address",
+    consent: "This person knows I am passing on their address and agrees to it.",
+    send: "Send the invitation",
+    pending: (sent, until) =>
+      `Invitation sent ${sent}, valid until ${until}. You will not learn whether it was opened.`,
+    answered: {
+      ME: (when) => `This person confirmed their card ${when}.`,
+      NOT_ME: (when) =>
+        `Answer from ${when}: not this person. You cannot invite that address again.`,
+      NO_CONTACT: (when) =>
+        `Answer from ${when}: no contact wanted. You cannot invite that address again.`,
+    },
+    expired: (sent) =>
+      `The invitation of ${sent} expired without an answer. You can send a new one.`,
+    claimedNote:
+      "This person confirmed it is them. From now on they correct their own data; you change only the relationships. A field marked as hidden is seen by them alone.",
+    hiddenMark: "hidden by this person",
+    declinedNote:
+      "This person wants no contact. You alone see them; we show them to nobody you invite, and never match them with another tree.",
+  },
+  invitation: {
+    lede: "Someone entered you in their private family tree. This is everything they wrote about you. You see nothing else of the tree until you decide.",
+    yourRow: "Your entry",
+    parents: "Parents, as written",
+    noParents: "No parents were entered.",
+    question: "Is this you?",
+    me: "It is me",
+    notMe: "It is not me",
+    noContact: "I want no contact",
+    explain: [
+      '"It is me": the card becomes yours. You correct your own data, you may hide the year and place of birth and the birth surname, and you can leave the tree at any time.',
+      '"It is not me": the owner learns it is not you and cannot invite this address again.',
+      '"I want no contact": as above, and from now on the owner alone sees your entry; nobody else, and no matching.',
+      "The owner learns only what you answered. They do not learn whether you opened the message.",
+    ],
+    missing: "This link does not lead to an invitation. Check that you copied all of it.",
+  },
+  cards: {
+    lede: "The cards you confirmed in other people's trees. You correct each yourself and can leave any of them.",
+    none: 'You have not confirmed a card yet. One appears here when someone invites you and you answer "it is me".',
+    claimed: "confirmed",
+    dashboardLink: (n) =>
+      n === 1 ? "Your card in someone else's tree" : `Your cards in other people's trees (${n})`,
+  },
+  card: {
+    lede: "This is your entry in someone else's tree. Correct what you like; tick what the owner and the invited should not see.",
+    parents: "Parents, as the owner wrote them",
+    noParents: "No parents were entered.",
+    hideHeading: "Hide from others",
+    hide: {
+      birth_year: "Year of birth",
+      birth_place: "Place of birth",
+      birth_surname: "Birth surname",
+    },
+    hideHint: "A hidden field stays in your card. Others see only that it is hidden.",
+    save: "Save",
+    leaveHeading: "Leave the tree",
+    leaveLede:
+      "Your card returns to the owner's note, without what you hid. This address will get no further invitation to this tree.",
+    leaveConfirm: "I understand. I want to leave this tree.",
+    leaveSubmit: "Leave",
+  },
   consent: {
     lede: "If so, you are entering them into the private part of the tree. Before we save them:",
     points: [
@@ -961,6 +1206,63 @@ const EN: TreeText = {
       "would-cycle": problem("Nobody can be their own ancestor."),
       "not-found": problem("There is no such person in this tree."),
       forbidden: problem("You cannot change that in this tree."),
+      "claimed-row": problem(
+        "This person confirmed their card and corrects their own data. You can change only the relationships.",
+      ),
+      invited: ok("Invitation sent. You will learn what this person answers."),
+      "invite-email": problem("Enter a valid email address."),
+      "invite-consent": problem(
+        "Confirm that this person knows about passing on the address and agrees to it.",
+      ),
+      "invite-mail": problem(
+        "The message could not be sent. The invitation was not saved. Try again in a moment.",
+      ),
+      "not-living": problem("Only a living person can be invited."),
+      minor: problem("We do not invite a person who is under 18 by their year of birth."),
+      claimed: problem("This person has already confirmed their card."),
+      declined: problem("This person wants no contact. You cannot invite them again."),
+      suppressed: problem(
+        "This address has already answered that it is not this person, or that they want no contact. You cannot invite it again.",
+      ),
+      pending: problem(
+        "The invitation for this person is still valid. Wait for the answer or for it to expire.",
+      ),
+      limit: problem("One tree can send ten invitations per 30 days. That limit is used up."),
+      ...personProblems(EN_PROBLEMS),
+    },
+    invitation: {
+      answer: problem("Choose one of the three answers."),
+      expired: problem("This invitation has expired. The person who sent it can send a new one."),
+      answered: problem("This invitation has already been answered."),
+      "not-found": problem(
+        "This link does not lead to an invitation. Check that you copied all of it.",
+      ),
+      "already-claimed": problem("Someone else has already confirmed this card."),
+      "already-in-tree": problem(
+        "You already have a confirmed card in this tree. One account is one person.",
+      ),
+      error: problem(EN_PROBLEMS.error),
+    },
+    cards: {
+      "not-me": ok(
+        "Thank you. The tree's owner will learn it is not you and cannot invite this address again.",
+      ),
+      "no-contact": ok(
+        "Thank you. The tree's owner will learn you want no contact. From now on they alone see your entry.",
+      ),
+      left: ok("You left the tree. Your card returned to the owner's note."),
+      "not-found": problem("There is no such card, or it is not yours."),
+      error: problem(EN_PROBLEMS.error),
+    },
+    card: {
+      claimed: ok("This is your card. From now on you alone correct it."),
+      saved: ok("Saved."),
+      confirm: problem("Tick the confirmation to leave the tree."),
+      "hidden-fields": problem(
+        "Only the year of birth, the place of birth and the birth surname can be hidden.",
+      ),
+      "not-found": problem("There is no such card, or it is not yours."),
+      forbidden: problem("You cannot change that."),
       ...personProblems(EN_PROBLEMS),
     },
   },

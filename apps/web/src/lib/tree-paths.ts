@@ -1,4 +1,11 @@
-import type { LivingStatus, PersonInput, TreePersonRead } from "@name-atlas/family";
+import type {
+  CardInput,
+  CardRead,
+  InvitationAnswer,
+  LivingStatus,
+  PersonInput,
+  TreePersonRead,
+} from "@name-atlas/family";
 import type { Lang } from "./messages.js";
 
 /**
@@ -14,14 +21,26 @@ import type { Lang } from "./messages.js";
  * - `zgoda` / `consent` — the one-time step before the first living person;
  * - `{tree}` — the pedigree (Rodowód);
  * - `{tree}/dodaj` / `{tree}/add` — one question, one person;
- * - `{tree}/osoba/{person}` / `{tree}/person/{person}` — a person's form.
+ * - `{tree}/osoba/{person}` / `{tree}/person/{person}` — a person's form;
+ * - `zaproszenie?t=…` / `invitation?t=…` — an invited person's own row and the three answers (TASK-094);
+ * - `karty` / `cards` — the rows the reader has claimed, and `karta/{person}` / `card/{person}` one of them.
  *
  * An id is a UUID or the segment is not an address (404). Nothing in a path or
  * a query is ever a name: the draft carries what the reader is typing, which
  * is theirs, and a status word says what happened.
  */
 
-export type TreePage = "trees" | "consent" | "tree" | "constellation" | "map" | "add" | "person";
+export type TreePage =
+  | "trees"
+  | "consent"
+  | "tree"
+  | "constellation"
+  | "map"
+  | "add"
+  | "person"
+  | "invitation"
+  | "cards"
+  | "card";
 
 export type TreeTarget =
   | { readonly page: "trees" }
@@ -32,12 +51,24 @@ export type TreeTarget =
   /** The Mapa view of a tree (TASK-092). */
   | { readonly page: "map"; readonly treeId: string }
   | { readonly page: "add"; readonly treeId: string }
-  | { readonly page: "person"; readonly treeId: string; readonly personId: string };
+  | { readonly page: "person"; readonly treeId: string; readonly personId: string }
+  /** An invitation's page (TASK-094); the token travels in the query, `t`. */
+  | { readonly page: "invitation" }
+  | { readonly page: "cards" }
+  | { readonly page: "card"; readonly personId: string };
 
 const BASE: Readonly<Record<Lang, string>> = { pl: "/pl/konto/drzewa", en: "/en/account/trees" };
 
 const SLUG: Readonly<
-  Record<Lang, Readonly<Record<"consent" | "add" | "person" | "constellation" | "map", string>>>
+  Record<
+    Lang,
+    Readonly<
+      Record<
+        "consent" | "add" | "person" | "constellation" | "map" | "invitation" | "cards" | "card",
+        string
+      >
+    >
+  >
 > = {
   pl: {
     consent: "zgoda",
@@ -45,6 +76,9 @@ const SLUG: Readonly<
     person: "osoba",
     constellation: "konstelacja",
     map: "mapa",
+    invitation: "zaproszenie",
+    cards: "karty",
+    card: "karta",
   },
   en: {
     consent: "consent",
@@ -52,8 +86,20 @@ const SLUG: Readonly<
     person: "person",
     constellation: "constellation",
     map: "map",
+    invitation: "invitation",
+    cards: "cards",
+    card: "card",
   },
 };
+
+/** The query name of an invitation's token, on the page and in the mail's link. */
+export const INVITATION_TOKEN = "t";
+const TOKEN_SHAPE = /^[A-Za-z0-9_-]{43}$/u;
+
+/** A token as the route makes them: 32 random bytes as base64url. Anything else is not one. */
+export function isToken(value: unknown): value is string {
+  return typeof value === "string" && TOKEN_SHAPE.test(value);
+}
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
@@ -106,6 +152,15 @@ export function treePath(
     case "person":
       path = `${base}/${target.treeId}/${slug.person}/${target.personId}`;
       break;
+    case "invitation":
+      path = `${base}/${slug.invitation}`;
+      break;
+    case "cards":
+      path = `${base}/${slug.cards}`;
+      break;
+    case "card":
+      path = `${base}/${slug.card}/${target.personId}`;
+      break;
   }
   const search = new URLSearchParams(query).toString();
   return search === "" ? path : `${path}?${search}`;
@@ -118,6 +173,11 @@ export function treeTarget(lang: Lang, segments: readonly string[] | undefined):
   if (parts.length === 0) return { page: "trees" };
   const [first, second, third] = parts;
   if (parts.length === 1 && first === slug.consent) return { page: "consent" };
+  if (parts.length === 1 && first === slug.invitation) return { page: "invitation" };
+  if (parts.length === 1 && first === slug.cards) return { page: "cards" };
+  if (parts.length === 2 && first === slug.card && isId(second)) {
+    return { page: "card", personId: second.toLowerCase() };
+  }
   if (!isId(first)) return null;
   const treeId = first.toLowerCase();
   if (parts.length === 1) return { page: "tree", treeId };
@@ -139,7 +199,11 @@ export type TreeAction =
   | "remove-parent"
   | "set-root"
   | "accept-living-terms"
-  | "delete-tree";
+  | "delete-tree"
+  | "invite"
+  | "answer-invitation"
+  | "update-card"
+  | "leave-tree";
 
 export const TREE_ACTIONS: readonly TreeAction[] = [
   "create-tree",
@@ -151,7 +215,27 @@ export const TREE_ACTIONS: readonly TreeAction[] = [
   "set-root",
   "accept-living-terms",
   "delete-tree",
+  "invite",
+  "answer-invitation",
+  "update-card",
+  "leave-tree",
 ];
+
+/** The three answers as the form sends them (TASK-094, ADR-0029 §2.6.21). */
+export const INVITATION_ANSWERS = {
+  me: "ME",
+  "not-me": "NOT_ME",
+  "no-contact": "NO_CONTACT",
+} as const;
+
+export function invitationAnswer(value: unknown): InvitationAnswer | null {
+  return typeof value === "string" && Object.hasOwn(INVITATION_ANSWERS, value)
+    ? INVITATION_ANSWERS[value as keyof typeof INVITATION_ANSWERS]
+    : null;
+}
+
+/** The claimant's form (TASK-094): the draft's fields it shares, and the boxes that hide one. */
+export const HIDE_FIELD = "hide";
 
 export const TREE_API_PREFIX = "/api/tree/";
 
@@ -317,5 +401,35 @@ export function draftOf(person: TreePersonRead): PersonDraft {
     living: person.living_status,
     sourceNote: person.source_note ?? "",
     notes: person.notes ?? "",
+  };
+}
+
+/** The claimant's own row as the card form shows it (TASK-094): the draft's shared fields, the rest empty. */
+export function draftOfCard(card: CardRead): PersonDraft {
+  const p = card.person;
+  return {
+    ...EMPTY_DRAFT,
+    given: p.given_names,
+    surname: p.surname,
+    birthSurname: p.birth_surname ?? "",
+    birthYear: p.birth.year === null ? "" : String(p.birth.year),
+    birthApprox: p.birth.approx,
+    placeCode: p.birth.place_code ?? "",
+    placeText: p.birth.place_text ?? "",
+    living: "LIVING",
+  };
+}
+
+/** The draft as the service's card input, with what the reader ticked to hide. `updateCard` checks both. */
+export function cardFromDraft(draft: PersonDraft, hidden: readonly string[]): CardInput {
+  return {
+    givenNames: draft.given,
+    surname: draft.surname,
+    birthSurname: draft.birthSurname,
+    birthYear: parseYear(draft.birthYear),
+    birthYearApprox: draft.birthApprox,
+    birthPlaceCode: draft.placeCode,
+    birthPlaceText: draft.placeText,
+    hiddenFields: hidden,
   };
 }

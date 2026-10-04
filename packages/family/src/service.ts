@@ -1,11 +1,23 @@
 import { randomUUID } from "node:crypto";
 import { sql } from "kysely";
 import type { Kysely, Transaction } from "kysely";
-import { checkPerson, parentCount, treatedAsLiving, wouldCycle } from "./rules.js";
-import type { PersonInput, PersonProblem } from "./rules.js";
+import {
+  checkHiddenFields,
+  checkPerson,
+  INVITATION_DAYS,
+  INVITATION_WINDOW_DAYS,
+  INVITATIONS_PER_WINDOW,
+  inviteProblem,
+  parentCount,
+  treatedAsLiving,
+  wouldCycle,
+} from "./rules.js";
+import type { InviteProblem, PersonInput, PersonProblem } from "./rules.js";
 import type {
   AuditKind,
   FamilyDB,
+  HiddenField,
+  InvitationAnswer,
   LivingStatus,
   MemberRole,
   ParentRole,
@@ -27,6 +39,12 @@ import type {
  * What it will not do: read the register (it has no grant there; a birthplace
  * is a code the route resolves), send anything, or log a name. Audit rows
  * carry ids and kinds only.
+ *
+ * Invitations and claims (TASK-094, ADR-0029 §2.6): the owner sends one
+ * invitation per living person, the route mails it, and the invited person,
+ * signed in with any account, opens it with the token (carried in the
+ * transaction as `app.invitation`, which the policies read) and answers.
+ * The token and the address reach this service only as their SHA-256, hex.
  */
 
 export interface FamilyDeps {
@@ -67,6 +85,59 @@ export interface TreePersonRead {
   readonly source_note: string | null;
   readonly notes: string | null;
   readonly updated_at: string;
+  /** Someone answered "to ja" to an invitation for this row (TASK-094). */
+  readonly claimed: boolean;
+  readonly claimed_by_me: boolean;
+  /** What the claimant keeps from everyone else; for them the fields are blank here. */
+  readonly hidden_fields: readonly HiddenField[];
+  /** The person answered "nie chcę kontaktu": the owner alone reads the row (D-031). */
+  readonly contact_declined: boolean;
+}
+
+/** What an invited person, or a claimant, sees: their own row and the parents' names (§2.6.21). */
+export interface CardRead {
+  readonly person: {
+    readonly id: string;
+    readonly given_names: string;
+    readonly surname: string;
+    readonly birth_surname: string | null;
+    readonly birth: LifeEventRead;
+    readonly hidden_fields: readonly HiddenField[];
+    readonly claimed_at: string | null;
+  };
+  readonly parents: readonly {
+    readonly given_names: string;
+    readonly surname: string;
+    readonly role: ParentRole;
+  }[];
+}
+
+export interface CardSummary {
+  readonly person_id: string;
+  readonly given_names: string;
+  readonly surname: string;
+  readonly claimed_at: string;
+}
+
+/** The claimant's own fields (§2.6.22); the status stays `LIVING`, and death, source and notes are the owner's. */
+export interface CardInput {
+  readonly givenNames: string;
+  readonly surname: string;
+  readonly birthSurname?: string | null;
+  readonly birthYear?: number | null;
+  readonly birthYearApprox?: boolean;
+  readonly birthPlaceCode?: string | null;
+  readonly birthPlaceText?: string | null;
+  readonly hiddenFields: readonly unknown[];
+}
+
+/** An invitation as its owner sees it: when, until when, and the answer. */
+export interface InvitationRead {
+  readonly invitation_id: string;
+  readonly sent_at: string;
+  readonly expires_at: string;
+  readonly answered_at: string | null;
+  readonly answer: InvitationAnswer | null;
 }
 
 export interface LifeEventRead {
@@ -94,6 +165,31 @@ export type TreeResult = { readonly kind: "OK"; readonly tree: TreeRead } | NotF
 export type PersonWriteResult =
   | { readonly kind: "OK"; readonly personId: string }
   | { readonly kind: "INVALID"; readonly problems: readonly PersonProblem[] }
+  /** Someone else has claimed the row: its fields are theirs now (§2.6.22). */
+  | { readonly kind: "CLAIMED" }
+  | NotFound
+  | Forbidden;
+export type InviteResult =
+  | { readonly kind: "OK"; readonly invitationId: string; readonly expiresAt: Date }
+  | { readonly kind: "INVALID"; readonly problem: InviteProblem }
+  | NotFound
+  | Forbidden;
+export type OpenInvitationResult =
+  | { readonly kind: "OK"; readonly card: CardRead }
+  | { readonly kind: "EXPIRED" }
+  | { readonly kind: "ANSWERED" }
+  | NotFound;
+export type AnswerProblem = "ALREADY_CLAIMED" | "ALREADY_IN_TREE";
+export type AnswerResult =
+  | { readonly kind: "OK"; readonly treeId: string; readonly personId: string }
+  | { readonly kind: "EXPIRED" }
+  | { readonly kind: "ANSWERED" }
+  | { readonly kind: "INVALID"; readonly problem: AnswerProblem }
+  | NotFound;
+export type CardResult = { readonly kind: "OK"; readonly card: CardRead } | NotFound;
+export type CardWriteResult =
+  | { readonly kind: "OK" }
+  | { readonly kind: "INVALID"; readonly problems: readonly (PersonProblem | "HIDDEN_FIELDS")[] }
   | NotFound
   | Forbidden;
 export type ParentProblem =
@@ -158,11 +254,21 @@ export function createFamily(deps: FamilyDeps) {
   const now = deps.now ?? (() => new Date());
   const newId = deps.newId ?? randomUUID;
 
-  /** One transaction as one user: the policies see `app.user_id` for its length. */
-  async function as<T>(userId: string, work: (trx: Trx) => Promise<T>): Promise<T | Forbidden> {
+  /**
+   * One transaction as one user: the policies see `app.user_id` for its
+   * length, and `app.invitation` (a token's hash) when the caller holds one.
+   */
+  async function as<T>(
+    userId: string,
+    work: (trx: Trx) => Promise<T>,
+    invitation: string | null = null,
+  ): Promise<T | Forbidden> {
     try {
       return await db.transaction().execute(async (trx) => {
         await sql`SELECT set_config('app.user_id', ${userId}, true)`.execute(trx);
+        if (invitation !== null) {
+          await sql`SELECT set_config('app.invitation', ${invitation}, true)`.execute(trx);
+        }
         return work(trx);
       });
     } catch (error) {
@@ -254,7 +360,7 @@ export function createFamily(deps: FamilyDeps) {
             .orderBy("accepted_at")
             .execute()
         : null;
-    const hidden = await sql<{
+    const hiddenLiving = await sql<{
       n: number;
     }>`SELECT family.hidden_living_count(${treeId}) AS n`.execute(trx);
     const codes = new Set<string>();
@@ -263,6 +369,10 @@ export function createFamily(deps: FamilyDeps) {
       if (p.death_place_code !== null) codes.add(p.death_place_code);
     }
     const seesNotes = role !== "VIEWER";
+    const hidden = (p: PersonsTable, field: HiddenField): boolean =>
+      p.claimed_by_user_id !== null &&
+      p.claimed_by_user_id !== userId &&
+      p.hidden_fields.includes(field);
     return {
       tree: {
         id: tree.tree_id,
@@ -276,8 +386,13 @@ export function createFamily(deps: FamilyDeps) {
         id: p.person_id,
         given_names: p.given_names,
         surname: p.surname,
-        birth_surname: p.birth_surname,
-        birth: event(p, "birth"),
+        birth_surname: hidden(p, "birth_surname") ? null : p.birth_surname,
+        birth: {
+          year: hidden(p, "birth_year") ? null : p.birth_year,
+          approx: hidden(p, "birth_year") ? false : p.birth_year_approx,
+          place_code: hidden(p, "birth_place") ? null : p.birth_place_code,
+          place_text: hidden(p, "birth_place") ? null : p.birth_place_text,
+        },
         death: event(p, "death"),
         living_status: p.living_status,
         treated_as_living: treatedAsLiving(p.living_status),
@@ -285,11 +400,48 @@ export function createFamily(deps: FamilyDeps) {
         source_note: p.source_note,
         notes: seesNotes ? p.notes : null,
         updated_at: p.updated_at.toISOString(),
+        claimed: p.claimed_by_user_id !== null,
+        claimed_by_me: p.claimed_by_user_id === userId,
+        hidden_fields: p.hidden_fields,
+        contact_declined: p.contact_declined,
       })),
       parentage,
       members,
-      hidden_living_count: hidden.rows[0]?.n ?? 0,
+      hidden_living_count: hiddenLiving.rows[0]?.n ?? 0,
       place_codes: [...codes].sort(),
+    };
+  }
+
+  /** The caller's own row with the parents' names: what the policies let an invited person or a claimant read. */
+  async function card(trx: Trx, personId: string): Promise<CardRead | null> {
+    const p = await trx
+      .selectFrom("persons")
+      .selectAll()
+      .where("person_id", "=", personId)
+      .executeTakeFirst();
+    if (p === undefined) return null;
+    const parents = await trx
+      .selectFrom("parentage")
+      .innerJoin("persons as parent", "parent.person_id", "parentage.parent_id")
+      .select(["parent.given_names", "parent.surname", "parentage.role"])
+      .where("parentage.child_id", "=", personId)
+      .orderBy("parentage.created_at")
+      .execute();
+    return {
+      person: {
+        id: p.person_id,
+        given_names: p.given_names,
+        surname: p.surname,
+        birth_surname: p.birth_surname,
+        birth: event(p, "birth"),
+        hidden_fields: p.hidden_fields,
+        claimed_at: p.claimed_at === null ? null : p.claimed_at.toISOString(),
+      },
+      parents: parents.map((r) => ({
+        given_names: r.given_names,
+        surname: r.surname,
+        role: r.role,
+      })),
     };
   }
 
@@ -423,6 +575,10 @@ export function createFamily(deps: FamilyDeps) {
             created_by: input.userId,
             created_at: at,
             updated_at: at,
+            claimed_by_user_id: null,
+            claimed_at: null,
+            contact_declined: false,
+            hidden_fields: [],
           })
           .execute();
         await audit(trx, input.treeId, input.userId, "PERSON_CREATED", personId);
@@ -441,10 +597,13 @@ export function createFamily(deps: FamilyDeps) {
       return as(input.userId, async (trx) => {
         const before = await trx
           .selectFrom("persons")
-          .select(["tree_id", "living_status"])
+          .select(["tree_id", "living_status", "claimed_by_user_id"])
           .where("person_id", "=", input.personId)
           .executeTakeFirst();
         if (before === undefined) return { kind: "NOT_FOUND" as const };
+        if (before.claimed_by_user_id !== null && before.claimed_by_user_id !== input.userId) {
+          return { kind: "CLAIMED" as const };
+        }
         const updated = await trx
           .updateTable("persons")
           .set({ ...checked.fields, updated_at: now() })
@@ -718,6 +877,313 @@ export function createFamily(deps: FamilyDeps) {
         if (updated.numUpdatedRows === 0n) return { kind: "NOT_FOUND" as const };
         await audit(trx, input.treeId, input.userId, "SEES_LIVING_CHANGED");
         return { kind: "OK" as const };
+      });
+    },
+
+    // --- Invitations and claims (TASK-094, ADR-0029 §2.6) -------------------
+
+    /**
+     * Records one invitation for a person and hands back its id and expiry;
+     * the route sends the mail, whose token is known here only as its hash.
+     * Owner only; the rules of §2.6.20, each named.
+     */
+    async invite(input: {
+      readonly userId: string;
+      readonly treeId: string;
+      readonly personId: string;
+      /** The SHA-256 of the token, hex. */
+      readonly tokenHash: string;
+      /** The SHA-256 of the normalised address, hex. */
+      readonly addressHash: string;
+    }): Promise<InviteResult> {
+      return as(input.userId, async (trx) => {
+        const role = await roleIn(trx, input.treeId, input.userId);
+        if (role === null) return { kind: "NOT_FOUND" as const };
+        if (role !== "OWNER") throw new ForbiddenError();
+        await lockTree(trx, input.treeId);
+        const person = await trx
+          .selectFrom("persons")
+          .select([
+            "tree_id",
+            "living_status",
+            "birth_year",
+            "claimed_by_user_id",
+            "contact_declined",
+          ])
+          .where("person_id", "=", input.personId)
+          .executeTakeFirst();
+        if (person === undefined || person.tree_id !== input.treeId)
+          return { kind: "NOT_FOUND" as const };
+        const at = now();
+        const problem = inviteProblem(person, at);
+        if (problem !== null) return { kind: "INVALID" as const, problem };
+        const suppressed = await trx
+          .selectFrom("suppressions")
+          .select("address_hash")
+          .where("tree_id", "=", input.treeId)
+          .where("address_hash", "=", input.addressHash)
+          .executeTakeFirst();
+        if (suppressed !== undefined)
+          return { kind: "INVALID" as const, problem: "SUPPRESSED" as const };
+        const pending = await trx
+          .selectFrom("invitations")
+          .select("invitation_id")
+          .where("person_id", "=", input.personId)
+          .where("answered_at", "is", null)
+          .where("expires_at", ">", at)
+          .executeTakeFirst();
+        if (pending !== undefined) return { kind: "INVALID" as const, problem: "PENDING" as const };
+        const since = new Date(at.getTime() - INVITATION_WINDOW_DAYS * 86_400_000);
+        const sent = await trx
+          .selectFrom("invitations")
+          .select(sql<number>`count(*)::int`.as("n"))
+          .where("tree_id", "=", input.treeId)
+          .where("sent_at", ">", since)
+          .executeTakeFirst();
+        if ((sent?.n ?? 0) >= INVITATIONS_PER_WINDOW)
+          return { kind: "INVALID" as const, problem: "LIMIT" as const };
+        // An expired, unanswered invitation gives way to the new one.
+        await trx
+          .deleteFrom("invitations")
+          .where("person_id", "=", input.personId)
+          .where("answered_at", "is", null)
+          .execute();
+        const invitationId = newId();
+        const expiresAt = new Date(at.getTime() + INVITATION_DAYS * 86_400_000);
+        await trx
+          .insertInto("invitations")
+          .values({
+            invitation_id: invitationId,
+            tree_id: input.treeId,
+            person_id: input.personId,
+            token_hash: input.tokenHash,
+            address_hash: input.addressHash,
+            sent_by: input.userId,
+            sent_at: at,
+            expires_at: expiresAt,
+            answered_at: null,
+            answer: null,
+            answered_by: null,
+          })
+          .execute();
+        await audit(trx, input.treeId, input.userId, "INVITATION_SENT", input.personId);
+        return { kind: "OK" as const, invitationId, expiresAt };
+      });
+    },
+
+    /** Takes back an unanswered invitation whose mail could not be sent. Owner only. */
+    async withdrawInvitation(input: {
+      readonly userId: string;
+      readonly invitationId: string;
+    }): Promise<PlainResult> {
+      return as(input.userId, async (trx) => {
+        const deleted = await trx
+          .deleteFrom("invitations")
+          .where("invitation_id", "=", input.invitationId)
+          .where("answered_at", "is", null)
+          .executeTakeFirst();
+        return deleted.numDeletedRows === 0n
+          ? { kind: "NOT_FOUND" as const }
+          : { kind: "OK" as const };
+      });
+    },
+
+    /** The latest invitation for a person, as its owner sees it, or null. */
+    async invitationOf(input: {
+      readonly userId: string;
+      readonly personId: string;
+    }): Promise<InvitationRead | null> {
+      const result = await as(input.userId, async (trx) => {
+        const row = await trx
+          .selectFrom("invitations")
+          .select(["invitation_id", "sent_at", "expires_at", "answered_at", "answer"])
+          .where("person_id", "=", input.personId)
+          .orderBy("sent_at", "desc")
+          .executeTakeFirst();
+        if (row === undefined) return null;
+        return {
+          invitation_id: row.invitation_id,
+          sent_at: row.sent_at.toISOString(),
+          expires_at: row.expires_at.toISOString(),
+          answered_at: row.answered_at === null ? null : row.answered_at.toISOString(),
+          answer: row.answer,
+        };
+      });
+      return isForbidden(result) ? null : result;
+    },
+
+    /**
+     * What the holder of a token sees after signing in: their own row and the
+     * parents' names, and nothing else of the tree (§2.6.21). The policies do
+     * the hiding; this only reads.
+     */
+    async openInvitation(input: {
+      readonly userId: string;
+      readonly tokenHash: string;
+    }): Promise<OpenInvitationResult> {
+      const result = await as(
+        input.userId,
+        async (trx) => {
+          const inv = await trx
+            .selectFrom("invitations")
+            .select(["person_id", "expires_at", "answered_at"])
+            .where("token_hash", "=", input.tokenHash)
+            .executeTakeFirst();
+          if (inv === undefined) return { kind: "NOT_FOUND" as const };
+          if (inv.answered_at !== null) return { kind: "ANSWERED" as const };
+          if (inv.expires_at <= now()) return { kind: "EXPIRED" as const };
+          const found = await card(trx, inv.person_id);
+          return found === null
+            ? { kind: "NOT_FOUND" as const }
+            : { kind: "OK" as const, card: found };
+        },
+        input.tokenHash,
+      );
+      return isForbidden(result) ? { kind: "NOT_FOUND" } : result;
+    },
+
+    /** Spends the token with one of the three answers (§2.6.22–23), through `family.answer_invitation`. */
+    async answerInvitation(input: {
+      readonly userId: string;
+      readonly tokenHash: string;
+      readonly answer: InvitationAnswer;
+    }): Promise<AnswerResult> {
+      const result = await as(
+        input.userId,
+        async (trx) => {
+          const rows = await sql<{
+            outcome: string;
+            tree_id: string | null;
+            person_id: string | null;
+          }>`SELECT outcome, tree_id, person_id FROM family.answer_invitation(${input.tokenHash}, ${input.answer}::family.invitation_answer, ${now()}::timestamptz)`.execute(
+            trx,
+          );
+          const row = rows.rows[0];
+          if (row === undefined) return { kind: "NOT_FOUND" as const };
+          switch (row.outcome) {
+            case "OK":
+              return {
+                kind: "OK" as const,
+                treeId: row.tree_id ?? "",
+                personId: row.person_id ?? "",
+              };
+            case "EXPIRED":
+              return { kind: "EXPIRED" as const };
+            case "ANSWERED":
+              return { kind: "ANSWERED" as const };
+            case "ALREADY_CLAIMED":
+              return { kind: "INVALID" as const, problem: "ALREADY_CLAIMED" as const };
+            case "ALREADY_IN_TREE":
+              return { kind: "INVALID" as const, problem: "ALREADY_IN_TREE" as const };
+            default:
+              return { kind: "NOT_FOUND" as const };
+          }
+        },
+        input.tokenHash,
+      );
+      return isForbidden(result) ? { kind: "NOT_FOUND" } : result;
+    },
+
+    /** The rows the caller has claimed, in any tree. */
+    async listCards(userId: string): Promise<readonly CardSummary[]> {
+      const result = await as(userId, async (trx) => {
+        const rows = await trx
+          .selectFrom("persons")
+          .select(["person_id", "given_names", "surname", "claimed_at"])
+          .where("claimed_by_user_id", "=", userId)
+          .orderBy("claimed_at", "desc")
+          .execute();
+        return rows.map((r) => ({
+          person_id: r.person_id,
+          given_names: r.given_names,
+          surname: r.surname,
+          claimed_at: (r.claimed_at ?? new Date(0)).toISOString(),
+        }));
+      });
+      return isForbidden(result) ? [] : result;
+    },
+
+    /** One claimed row with the parents' names, for its claimant. */
+    async getCard(input: {
+      readonly userId: string;
+      readonly personId: string;
+    }): Promise<CardResult> {
+      const result = await as(input.userId, async (trx) => {
+        const mine = await trx
+          .selectFrom("persons")
+          .select("claimed_by_user_id")
+          .where("person_id", "=", input.personId)
+          .executeTakeFirst();
+        if (mine === undefined || mine.claimed_by_user_id !== input.userId)
+          return { kind: "NOT_FOUND" as const };
+        const found = await card(trx, input.personId);
+        return found === null
+          ? { kind: "NOT_FOUND" as const }
+          : { kind: "OK" as const, card: found };
+      });
+      return isForbidden(result) ? { kind: "NOT_FOUND" } : result;
+    },
+
+    /** The claimant corrects their own fields and chooses what to hide (§2.6.22). */
+    async updateCard(input: {
+      readonly userId: string;
+      readonly personId: string;
+      readonly card: CardInput;
+    }): Promise<CardWriteResult> {
+      const checked = checkPerson({
+        givenNames: input.card.givenNames,
+        surname: input.card.surname,
+        birthSurname: input.card.birthSurname,
+        birthYear: input.card.birthYear,
+        birthYearApprox: input.card.birthYearApprox,
+        birthPlaceCode: input.card.birthPlaceCode,
+        birthPlaceText: input.card.birthPlaceText,
+        livingStatus: "LIVING",
+      });
+      if (!checked.ok) return { kind: "INVALID", problems: checked.problems };
+      const hiddenFields = checkHiddenFields(input.card.hiddenFields);
+      if (hiddenFields === null) return { kind: "INVALID", problems: ["HIDDEN_FIELDS"] };
+      return as(input.userId, async (trx) => {
+        const before = await trx
+          .selectFrom("persons")
+          .select(["tree_id", "claimed_by_user_id"])
+          .where("person_id", "=", input.personId)
+          .executeTakeFirst();
+        if (before === undefined || before.claimed_by_user_id !== input.userId)
+          return { kind: "NOT_FOUND" as const };
+        const updated = await trx
+          .updateTable("persons")
+          .set({
+            given_names: checked.fields.given_names,
+            surname: checked.fields.surname,
+            birth_surname: checked.fields.birth_surname,
+            birth_year: checked.fields.birth_year,
+            birth_year_approx: checked.fields.birth_year_approx,
+            birth_place_code: checked.fields.birth_place_code,
+            birth_place_text: checked.fields.birth_place_text,
+            hidden_fields: [...hiddenFields],
+            updated_at: now(),
+          })
+          .where("person_id", "=", input.personId)
+          .executeTakeFirst();
+        if (updated.numUpdatedRows === 0n) throw new ForbiddenError();
+        await audit(trx, before.tree_id, input.userId, "PERSON_UPDATED", input.personId);
+        return { kind: "OK" as const };
+      });
+    },
+
+    /** The claimant leaves: the claim goes, the row returns to the owner's note, the address is suppressed (§2.6.22). */
+    async leaveTree(input: {
+      readonly userId: string;
+      readonly personId: string;
+    }): Promise<PlainResult> {
+      return as(input.userId, async (trx) => {
+        const rows = await sql<{
+          released: boolean;
+        }>`SELECT family.release_claim(${input.personId}::uuid, ${now()}::timestamptz) AS released`.execute(
+          trx,
+        );
+        return rows.rows[0]?.released ? { kind: "OK" as const } : { kind: "NOT_FOUND" as const };
       });
     },
   };

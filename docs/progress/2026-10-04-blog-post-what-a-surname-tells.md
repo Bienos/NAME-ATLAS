@@ -1,6 +1,6 @@
-# 2026-10-04 — The blog's seventh post: what a surname can and cannot tell (TASK-094)
+# 2026-10-04 — The blog's seventh post: what a surname can and cannot tell (TASK-095)
 
-Task: `tasks/094-blog-post-what-a-surname-tells.md`. Branch `claude/blog-piece-2`, on `origin/main` @ `d655a45` (#100); `git merge-base --is-ancestor origin/main HEAD` passed before the first edit. The owner said "go continue" with the next editorial piece. ADR-0031 §4 takes the topic from `docs/SEO_CONTENT_PLAN.md` §4 in order: piece 1 is live (TASK-086), so this is piece 2, brief §5.2, marked queued and not an extension. No pull request was open on 2026-10-04 (`gh api repos/Bienos/NAME-ATLAS/pulls?state=open` returned none), and `pnpm check:ids` passed with 094.
+Task: `tasks/095-blog-post-what-a-surname-tells.md`. Branch `claude/blog-piece-2`, on `origin/main` @ `d655a45` (#100); `git merge-base --is-ancestor origin/main HEAD` passed before the first edit. The owner said "go continue" with the next editorial piece. ADR-0031 §4 takes the topic from `docs/SEO_CONTENT_PLAN.md` §4 in order: piece 1 is live (TASK-086), so this is piece 2, brief §5.2, marked queued and not an extension. No pull request was open on 2026-10-04 (`gh api repos/Bienos/NAME-ATLAS/pulls?state=open` returned none), and `pnpm check:ids` passed with 094.
 
 ## Changed
 
