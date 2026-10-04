@@ -67,8 +67,27 @@ export interface IdentitiesTable {
   last_used_at: Date;
 }
 
+/** What a reader bought (migration 0035, TASK-111): one row per paid test-mode Checkout Session. */
+export interface PurchasesTable {
+  purchase_id: string;
+  /** Null once the account is deleted; the record of the sale stays. */
+  user_id: string | null;
+  tier: PurchaseTier;
+  checkout_session_id: string;
+  /** In grosze, VAT included. */
+  amount_total: number;
+  currency: "pln";
+  /** Always false: the table refuses a live purchase (ADR-0023 §2.5). */
+  livemode: boolean;
+  paid_at: Date;
+}
+
+/** The sellable tiers of ADR-0037; the 800 zł tier is not sold yet. */
+export type PurchaseTier = "smaller" | "couple" | "family";
+
 export interface AccountsDB {
   identities: IdentitiesTable;
+  purchases: PurchasesTable;
   users: UsersTable;
   sessions: SessionsTable;
   email_tokens: EmailTokensTable;

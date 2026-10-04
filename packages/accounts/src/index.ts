@@ -29,7 +29,9 @@ export {
 } from "./google.js";
 export type { GoogleConfig, GoogleIdentity, GoogleProblem } from "./google.js";
 export { createAccountsDb } from "./schema.js";
-export type { AccountsDB } from "./schema.js";
+export type { AccountsDB, PurchaseTier } from "./schema.js";
+export { createPurchases } from "./purchases.js";
+export type { PaidCheckout, Purchases, PurchaseView } from "./purchases.js";
 export {
   createAccounts,
   FAILURES_KEEP_HOURS,

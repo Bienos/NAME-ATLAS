@@ -52,7 +52,9 @@ export const CONTENT_SECURITY_POLICY: string = [
   "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  // The buy form's 303 leads to Stripe's hosted checkout (TASK-111), and a
+  // browser holds a form's redirect to `form-action` too.
+  "form-action 'self' https://checkout.stripe.com",
   "frame-ancestors 'none'",
 ].join("; ");
 
