@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   canCopyImage,
   canShareFiles,
   copyCardImage,
   saveCardImage,
   shareCardImage,
+  shareOrSaveFile,
 } from "./share-actions.js";
+import { VideoRefused, canMakeVideo, makeCardVideo } from "./share-video.js";
 import type { ShareOutcome } from "./share-actions.js";
 
 /**
@@ -96,6 +98,98 @@ export function StudioActions({
         {outcome === "copied" ? labels.copied : null}
         {outcome === "failed" ? labels.failed : null}
         {outcome === "sign-in" && signInHref !== null ? (
+          <a href={signInHref}>{labels.signIn}</a>
+        ) : null}
+      </p>
+    </div>
+  );
+}
+
+export interface VideoLabels {
+  readonly make: string;
+  /** With `{n}` for the percentage done. */
+  readonly working: string;
+  readonly cancel: string;
+  readonly failed: string;
+  readonly signIn: string;
+}
+
+/**
+ * "Pobierz wideo" (TASK-097): a short MP4 of the surname's cards, made in the
+ * browser. Shown only where the browser can encode it; until that is known,
+ * and on the server, there is no button.
+ */
+export function StudioVideo({
+  images,
+  surname,
+  fileName,
+  labels,
+  signInHref,
+}: {
+  /** The cards' full image addresses, summary first. */
+  images: readonly string[];
+  surname: string;
+  fileName: string;
+  labels: VideoLabels;
+  signInHref: string | null;
+}) {
+  const [able, setAble] = useState(false);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [failure, setFailure] = useState<"failed" | "sign-in" | null>(null);
+  const cancelled = useRef(false);
+
+  useEffect(() => {
+    let live = true;
+    void canMakeVideo().then((yes) => {
+      if (live) setAble(yes);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  if (!able || images.length === 0) return null;
+
+  async function make(): Promise<void> {
+    cancelled.current = false;
+    setFailure(null);
+    setProgress(0);
+    try {
+      const video = await makeCardVideo(images, setProgress, () => cancelled.current);
+      await shareOrSaveFile(video, fileName, surname);
+    } catch (cause) {
+      const reason = cause instanceof VideoRefused ? cause.reason : "failed";
+      if (reason !== "cancelled") setFailure(reason);
+    } finally {
+      setProgress(null);
+    }
+  }
+
+  return (
+    <div className="studio-video">
+      {progress === null ? (
+        <button type="button" onClick={() => void make()}>
+          {labels.make}
+        </button>
+      ) : (
+        <>
+          <button type="button" disabled>
+            {labels.working.replace("{n}", String(Math.round(progress * 100)))}
+          </button>
+          <button
+            type="button"
+            className="studio-cancel"
+            onClick={() => {
+              cancelled.current = true;
+            }}
+          >
+            {labels.cancel}
+          </button>
+        </>
+      )}
+      <p className="studio-status" role="status">
+        {failure === "failed" ? labels.failed : null}
+        {failure === "sign-in" && signInHref !== null ? (
           <a href={signInHref}>{labels.signIn}</a>
         ) : null}
       </p>

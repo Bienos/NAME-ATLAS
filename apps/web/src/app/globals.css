@@ -9375,6 +9375,7 @@ main.studio h1 {
 }
 
 .studio-actions,
+.studio-video,
 .studio-gate,
 .studio-more {
   display: grid;
@@ -9383,6 +9384,7 @@ main.studio h1 {
 }
 
 .studio-actions button,
+.studio-video button,
 .studio-gate a,
 .studio-more a,
 .studio-more .share button {
@@ -9414,7 +9416,8 @@ main.studio h1 {
   font-weight: 600;
 }
 
-.studio-actions button:disabled {
+.studio-actions button:disabled,
+.studio-video button:disabled {
   opacity: 0.6;
   cursor: default;
 }

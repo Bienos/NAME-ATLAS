@@ -18,7 +18,7 @@ name: Register VM
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return;
 #                  the input top_rank sets its rank limit (TASK-087; 2000 when empty);
-#                  restart_archive stops a running load and starts it again on this commit (TASK-097)
+#                  restart_archive stops a running load and starts it again on this commit (TASK-099)
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   backup         ops/vm/backup.sh (TASK-049): encrypted off-host copy, including accounts and family

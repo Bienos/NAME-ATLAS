@@ -1,6 +1,6 @@
-# 2026-10-04 — TASK-097: Polona's requests at least 250 ms apart, and a restart for a running archive load
+# 2026-10-04 — TASK-099: Polona's requests at least 250 ms apart, and a restart for a running archive load
 
-**Task:** `tasks/097-polona-faster.md`. **Decision:** ADR-0036, amending ADR-0024 §2.2's interval. **Numbers:** TASK-097 and ADR-0036, the next free on `main` (task 094, ADR-0034) and in the open pull requests (TASK-095 in #102 and #104, TASK-096 in #106, ADR-0035 in #104). **Requested by:** the project owner, "Go faster", then "4× (0.25 s gap)", for the Polona pass over the top 10,000 started at 15:47 UTC (`archive` run 37214248808), which ran at about 8 s a surname: 1,154 of 10,575 at 18:21 UTC.
+**Task:** `tasks/099-polona-faster.md`. **Decision:** ADR-0036, amending ADR-0024 §2.2's interval. **Numbers:** TASK-099 and ADR-0036, the next free on `main` (task 097, ADR-0034) and in the open pull requests (TASK-095 in #104, TASK-096 in #106, TASK-098 in #107, ADR-0035 in #104); first numbered 097, which #109 took on `main` first. **Requested by:** the project owner, "Go faster", then "4× (0.25 s gap)", for the Polona pass over the top 10,000 started at 15:47 UTC (`archive` run 37214248808), which ran at about 8 s a surname: 1,154 of 10,575 at 18:21 UTC.
 
 ## What changed
 

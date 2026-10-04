@@ -4,7 +4,7 @@
 - **Date:** 2026-10-04
 - **Deciders:** the project owner. Told that the pass over the top 10,000 surnames would take about 23 hours at one request a second, they asked to "go faster". Offered 2× (500 ms), 4× (250 ms) or keeping one second until Polona is asked, they chose **"4× (0.25 s gap)"**, having been told that a higher rate makes a block by Polona more likely.
 - **Amends:** ADR-0024 §2.2, only its interval ("at least one second apart"). Everything else in §2.2 stands: one request at a time, a user agent that names Name Atlas and its contact page, a timeout, a back-off on errors, a fixed set of searches per surname, never walking the collection.
-- **Implemented by:** TASK-097.
+- **Implemented by:** TASK-099.
 
 ## 1. Context
 

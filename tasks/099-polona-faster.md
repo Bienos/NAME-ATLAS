@@ -1,9 +1,9 @@
-# TASK-097 — Polona four times faster, and a restart for a running archive load
+# TASK-099 — Polona four times faster, and a restart for a running archive load
 
 - **Status:** IMPLEMENTED 2026-10-04 on `claude/polona-faster`; record: `docs/progress/2026-10-04-polona-faster.md`.
 - **Requested by:** the project owner, 2026-10-04: "Go faster", then "4× (0.25 s gap)" for the Polona pass over the top 10,000 surnames running since 15:47 UTC.
 - **Decision:** ADR-0036 (amends ADR-0024 §2.2's interval).
-- **Number:** 097, the next free on `main` (up to 094) and in the open pull requests (095 in #102 and #104, 096 in #106; ADR-0035 in #104).
+- **Number:** 099, the next free on `main` (up to 097, the share video, #109) and in the open pull requests (095 in #104, 096 in #106, 098 in #107; ADR-0035 in #104). First numbered 097, which #109 took on `main` first.
 
 ## 1. Goal
 

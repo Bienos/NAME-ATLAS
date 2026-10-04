@@ -21,7 +21,7 @@
 # searches only the surnames whose last search is older than 90 days.
 #
 # A running load is left alone unless the third argument is `restart`
-# (TASK-097): then it is stopped and started again on the pushed commit, and
+# (TASK-099): then it is stopped and started again on the pushed commit, and
 # the restart continues where it stopped.
 #
 # Runs after finalize.sh (its marker is required). Runs as root:
@@ -78,7 +78,7 @@ if [ "$state" = active ] || [ "$state" = activating ]; then
     log "already running ($state); nothing unpacked or started. status.sh shows its progress."
     exit 0
   fi
-  log "already running ($state); stopping it to restart on the pushed commit (TASK-097)"
+  log "already running ($state); stopping it to restart on the pushed commit (TASK-099)"
   systemctl stop "$UNIT"
   state=$(systemctl show -p ActiveState --value "$UNIT")
   [ "$state" = inactive ] || [ "$state" = failed ] || die "$UNIT did not stop (ActiveState=$state)"
