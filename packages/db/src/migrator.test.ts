@@ -40,6 +40,7 @@ describe("MIGRATIONS_DIR", () => {
       "0029_notable_bearers.ts", // TASK-073 / ADR-0030 — the NOTABLE_BEARERS claim type
       "0030_family_safeguards.ts", // the #76 review — one mother and one father; editors move updated_at
       "0031_given_names.ts", // TASK-078 / ADR-0032 — given names, apart from surnames
+      "0032_accounts_google_identities.ts", // TASK-084 / ADR-0033 — Google sign-in
     ]);
   });
 });

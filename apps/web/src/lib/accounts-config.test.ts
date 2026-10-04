@@ -1,7 +1,15 @@
-import { loadMailConfig } from "@name-atlas/accounts";
+import { loadGoogleConfig, loadMailConfig } from "@name-atlas/accounts";
 import { loadAccountsDbConfig } from "@name-atlas/db";
 import { describe, expect, it } from "vitest";
-import { ACCOUNTS_ENV, accountsEnabled, missingAccountsEnv } from "./accounts-config.js";
+import {
+  ACCOUNTS_BASE_ENV,
+  ACCOUNTS_ENV,
+  accountsEnabled,
+  GOOGLE_ENV,
+  googleEnabled,
+  mailEnabled,
+  missingAccountsEnv,
+} from "./accounts-config.js";
 
 /** A made-up environment as the library readers take it (Next's typing demands `NODE_ENV` of a real one). */
 const env = (values: Record<string, string | undefined>) => values as unknown as NodeJS.ProcessEnv;
@@ -51,5 +59,43 @@ describe("accountsEnabled (TASK-062, AC-1)", () => {
     const noKey = { ...ALL, RESEND_API_KEY: " " };
     expect(loadMailConfig(env(noKey))).toBeNull();
     expect(accountsEnabled(noKey)).toBe(false);
+  });
+});
+
+describe("the ways in (TASK-084, ADR-0033)", () => {
+  const BASE = {
+    ACCOUNTS_DATABASE_URL: ALL.ACCOUNTS_DATABASE_URL,
+    SITE_ORIGIN: ALL.SITE_ORIGIN,
+    CRON_SECRET: ALL.CRON_SECRET,
+  };
+  const GOOGLE = { GOOGLE_CLIENT_ID: "id.apps.googleusercontent.com", GOOGLE_CLIENT_SECRET: "s" };
+
+  it("turns accounts on with Google alone, without the mail", () => {
+    expect(accountsEnabled({ ...BASE, ...GOOGLE })).toBe(true);
+    expect(googleEnabled({ ...BASE, ...GOOGLE })).toBe(true);
+    expect(mailEnabled({ ...BASE, ...GOOGLE })).toBe(false);
+    expect(missingAccountsEnv({ ...BASE, ...GOOGLE })).toEqual([]);
+  });
+
+  it("offers each way only when it is complete", () => {
+    expect(googleEnabled({ ...ALL, GOOGLE_CLIENT_ID: "x" })).toBe(false);
+    expect(mailEnabled(ALL)).toBe(true);
+    expect(googleEnabled({ ...ALL, ...GOOGLE })).toBe(true);
+    expect(mailEnabled({ ...ALL, ...GOOGLE })).toBe(true);
+  });
+
+  it("needs the base whatever the way in", () => {
+    for (const name of ACCOUNTS_BASE_ENV) {
+      const without: Record<string, string | undefined> = { ...BASE, ...GOOGLE };
+      delete without[name];
+      expect(accountsEnabled(without), name).toBe(false);
+      expect(missingAccountsEnv(without), name).toEqual([name]);
+    }
+  });
+
+  it("agrees with the library's Google reader", () => {
+    expect(loadGoogleConfig(env({ ...BASE, ...GOOGLE }))).not.toBeNull();
+    expect(loadGoogleConfig(env({ ...BASE, GOOGLE_CLIENT_ID: "x" }))).toBeNull();
+    expect(GOOGLE_ENV).toEqual(["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"]);
   });
 });

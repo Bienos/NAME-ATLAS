@@ -10,7 +10,8 @@ import type { Lang } from "./messages.js";
  * `/en/account/[[...step]]`, so a step is a slug and an unknown slug is a 404.
  */
 
-export type AccountStep = "account" | "sign-in" | "sign-up" | "reset" | "confirm" | "new-password";
+export type AccountStep =
+  "account" | "sign-in" | "sign-up" | "reset" | "confirm" | "new-password" | "welcome";
 
 export const ACCOUNT_STEPS: readonly AccountStep[] = [
   "account",
@@ -19,6 +20,7 @@ export const ACCOUNT_STEPS: readonly AccountStep[] = [
   "reset",
   "confirm",
   "new-password",
+  "welcome",
 ];
 
 const BASE: Readonly<Record<Lang, string>> = { pl: "/pl/konto", en: "/en/account" };
@@ -31,6 +33,7 @@ const SLUG: Readonly<Record<Lang, Readonly<Record<AccountStep, string>>>> = {
     reset: "reset",
     confirm: "potwierdz",
     "new-password": "nowe-haslo",
+    welcome: "witaj",
   },
   en: {
     account: "",
@@ -39,6 +42,7 @@ const SLUG: Readonly<Record<Lang, Readonly<Record<AccountStep, string>>>> = {
     reset: "reset",
     confirm: "confirm",
     "new-password": "new-password",
+    welcome: "welcome",
   },
 };
 
@@ -69,11 +73,19 @@ export function stepFromSlug(
 }
 
 export type AccountAction =
-  "sign-up" | "complete" | "sign-in" | "sign-out" | "reset-request" | "reset" | "delete";
+  | "sign-up"
+  | "complete"
+  | "google-complete"
+  | "sign-in"
+  | "sign-out"
+  | "reset-request"
+  | "reset"
+  | "delete";
 
 export const ACCOUNT_ACTIONS: readonly AccountAction[] = [
   "sign-up",
   "complete",
+  "google-complete",
   "sign-in",
   "sign-out",
   "reset-request",
@@ -92,9 +104,29 @@ export function actionPath(action: AccountAction): string {
   return `${ACCOUNT_API_PREFIX}${action}`;
 }
 
+/** Google sign-in's two GET routes (TASK-084): the start, and Google's return address. */
+export const GOOGLE_START_PATH = "/api/account/google";
+export const GOOGLE_CALLBACK_PATH = "/api/account/google/callback";
+
+/** The address that starts a Google sign-in, carrying the language and where to go after. */
+export function googleStartPath(lang: Lang, next: string | null): string {
+  const query = new URLSearchParams({ lang });
+  if (next !== null) query.set("next", next);
+  return `${GOOGLE_START_PATH}?${query.toString()}`;
+}
+
+/** The family tree's own page (TASK-076), the other place a sign-in may return to (TASK-084). */
+const TREE_HOMES: ReadonlySet<string> = new Set(["/pl/konto/drzewa", "/en/account/trees"]);
+
+/** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
+export function isTreeNext(next: string | null): boolean {
+  return next !== null && TREE_HOMES.has(next);
+}
+
 /**
  * Where a sign-in may send the reader on (TASK-064): the surname page they came
- * from, which the deck's prompt names, and nothing else. It is checked again
+ * from, which the deck's prompt names, or the family tree's page (TASK-084),
+ * and nothing else. It is checked again
  * by the sign-in action, because a form field can say anything, and a redirect
  * to an address a stranger chose is how a sign-in page is turned into a trap.
  *
@@ -111,6 +143,7 @@ const NEXT_PATTERN =
 
 export function safeNext(value: unknown): string | null {
   if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
+  if (TREE_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;
   const segment = match[1] ?? "";

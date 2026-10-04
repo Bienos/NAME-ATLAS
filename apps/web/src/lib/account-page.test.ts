@@ -15,6 +15,7 @@ const LANGS = ["pl", "en"] as const;
 const TOKEN = "k".repeat(43);
 const SESSION: SessionView = {
   email: "reader@example.test",
+  hasPassword: true,
   termsVersion: "2026-10-01",
   termsAcceptedOn: "2026-10-02",
 };
@@ -32,7 +33,15 @@ function decide(
 function data(
   overrides: Partial<AccountPageData> & Pick<AccountPageData, "step">,
 ): AccountPageData {
-  return { lang: "pl", status: null, token: null, session: null, next: null, ...overrides };
+  return {
+    lang: "pl",
+    status: null,
+    token: null,
+    session: null,
+    next: null,
+    ways: { mail: true, google: false },
+    ...overrides,
+  };
 }
 
 function render(d: AccountPageData): string {
@@ -232,12 +241,12 @@ describe("the six pages as markup (AC-5, AC-6, AC-8)", () => {
 });
 
 describe("the pages' metadata (AC-10)", () => {
-  it("keeps every step out of search, and the two token steps from sending a Referer to another site", () => {
+  it("keeps every step out of search, and the three token steps from sending a Referer to another site", () => {
     for (const lang of LANGS) {
       for (const step of ACCOUNT_STEPS) {
         const meta = accountMetadata(lang, step);
         expect(meta.robots, `${lang} ${step}`).toEqual({ index: false, follow: false });
-        const token = step === "confirm" || step === "new-password";
+        const token = step === "confirm" || step === "new-password" || step === "welcome";
         expect(meta.referrer, `${lang} ${step}`).toBe(token ? "same-origin" : undefined);
       }
     }
@@ -343,5 +352,97 @@ describe("the sign-in's way back to a surname (TASK-064, AC-7)", () => {
       to: "/pl/konto",
     });
     expect(decide("pl", ["zaloguj"], {}, SESSION)).toEqual({ kind: "redirect", to: "/pl/konto" });
+  });
+});
+
+describe("Google sign-in on the pages (TASK-084, ADR-0033)", () => {
+  const BOTH = { mail: true, google: true } as const;
+  const GOOGLE_ONLY = { mail: false, google: true } as const;
+
+  it("puts Continue with Google above the email form on sign-in and sign-up, carrying the page to return to", () => {
+    const html = render(data({ step: "sign-in", ways: BOTH, next: "/pl/konto/drzewa" }));
+    expect(html).toContain('href="/api/account/google?lang=pl&next=%2Fpl%2Fkonto%2Fdrzewa"');
+    expect(html).toContain(ACCOUNT_TEXT.pl.google.button);
+    expect(html).toContain(ACCOUNT_TEXT.pl.google.or);
+    expect(html).toContain(ACCOUNT_TEXT.pl.google.forTree);
+    expect(html.indexOf("/api/account/google")).toBeLessThan(
+      html.indexOf('action="/api/account/sign-in"'),
+    );
+    const signUp = render(data({ step: "sign-up", lang: "en", ways: BOTH }));
+    expect(signUp).toContain('href="/api/account/google?lang=en"');
+    expect(signUp).toContain('action="/api/account/sign-up"');
+  });
+
+  it("offers no Google button when Google is not configured", () => {
+    expect(render(data({ step: "sign-in" }))).not.toContain("/api/account/google");
+  });
+
+  it("with Google only, offers no email form and no mail steps", () => {
+    const html = render(data({ step: "sign-in", ways: GOOGLE_ONLY }));
+    expect(html).toContain("/api/account/google");
+    expect(html).not.toContain('action="/api/account/sign-in"');
+    expect(html).not.toContain(ACCOUNT_TEXT.pl.google.or);
+    for (const step of ["reset", "confirm", "new-password"] as const) {
+      const segments = accountPath("pl", step).split("/").slice(3);
+      expect(
+        decideAccountPage({
+          enabled: true,
+          lang: "pl",
+          segments,
+          query: {},
+          session: null,
+          ways: GOOGLE_ONLY,
+        }),
+        step,
+      ).toEqual({ kind: "not-found" });
+    }
+  });
+
+  it("has no terms step without Google", () => {
+    expect(decide("pl", ["witaj"], { token: TOKEN })).toEqual({ kind: "not-found" });
+  });
+
+  it("the terms step posts its token, the page to return to and the box, and asks for no password", () => {
+    const decided = decideAccountPage({
+      enabled: true,
+      lang: "en",
+      segments: ["welcome"],
+      query: { token: TOKEN, next: "/en/account/trees" },
+      session: null,
+      ways: BOTH,
+    });
+    expect(decided.kind).toBe("view");
+    if (decided.kind !== "view") return;
+    expect(decided.data.next).toBe("/en/account/trees");
+    const html = render(decided.data);
+    expect(html).toContain('action="/api/account/google-complete"');
+    expect(html).toContain(`name="token" value="${TOKEN}"`);
+    expect(html).toContain('name="next" value="/en/account/trees"');
+    expect(html).toContain('name="terms"');
+    expect(html).not.toContain('type="password"');
+  });
+
+  it("the terms step without a token says it has lapsed and shows no form", () => {
+    const decided = decideAccountPage({
+      enabled: true,
+      lang: "pl",
+      segments: ["witaj"],
+      query: {},
+      session: null,
+      ways: BOTH,
+    });
+    if (decided.kind !== "view") throw new Error("expected a view");
+    expect(decided.data.status).toBe("expired");
+    expect(render(decided.data)).not.toContain("google-complete");
+  });
+
+  it("an account without a password is deleted with a confirmation box, and is offered a password", () => {
+    const html = render(
+      data({ step: "account", ways: BOTH, session: { ...SESSION, hasPassword: false } }),
+    );
+    expect(html).toContain(ACCOUNT_TEXT.pl.account.viaGoogle);
+    expect(html).toContain(`href="${accountPath("pl", "reset")}"`);
+    expect(html).toContain('name="confirm"');
+    expect(html).not.toContain('type="password"');
   });
 });

@@ -92,6 +92,21 @@ Accounts are off until all of this is done, and nothing on the site changes befo
    `ACCOUNTS_DATABASE_URL` is the one that names the accounts role: never put these credentials in `DATABASE_URL`, whose read-only role has no grant on schema `accounts`.
 4. Under Settings → Cron Jobs, `/api/cron/accounts-purge` is listed (it deletes sign-ups that were never confirmed after 7 days, which the privacy notice promises). It is read from `apps/web/vercel.json` only if `apps/web` is the project's root directory.
 
+### Google sign-in (TASK-084, ADR-0033)
+
+Google is a second way in, and it can be the only one: with `ACCOUNTS_DATABASE_URL`, `SITE_ORIGIN` and `CRON_SECRET` set, accounts are on if **either** the two Resend variables **or** the two Google variables are set. With Google alone, the email forms are not shown.
+
+1. Migration 0032 must be on the VM: run the `accounts` step of the `Register VM` workflow again after this change merges (it applies pending migrations and is repeatable).
+2. In the Google Cloud console (console.cloud.google.com), create a project, then **Google Auth Platform → Branding**: the app name "Name Atlas", a support email, the logo, the home page `https://name-atlas.pl`, the privacy page `https://name-atlas.pl/pl/prywatnosc`, the terms page `https://name-atlas.pl/pl/regulamin`, and `name-atlas.pl` as an authorised domain (verified in Google Search Console).
+3. **Audience:** External; publish the app (it asks for `openid` and `email` only, which need no Google review).
+4. **Clients → Create client → Web application.** Authorised redirect URI, exactly: `https://name-atlas.pl/api/account/google/callback` (it is `SITE_ORIGIN` + `/api/account/google/callback`; add `http://localhost:3000/api/account/google/callback` for a local run).
+5. In Vercel (Production), two more variables, then a redeploy:
+
+   ```
+   GOOGLE_CLIENT_ID=<the client ID, ending .apps.googleusercontent.com>
+   GOOGLE_CLIENT_SECRET=<the client secret>
+   ```
+
 ## Going back
 
 Vercel keeps the previous production deployment with the old `DATABASE_URL` in it. An Instant Rollback to it returns production to Supabase at once, as long as no other production deployment has been made since, and as long as the Supabase project has not been paused for inactivity (free projects pause after a week).

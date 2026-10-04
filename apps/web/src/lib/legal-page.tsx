@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SiteShell } from "./site-shell.js";
-import { accountsEnabled } from "./accounts-config.js";
+import { accountsEnabled, googleEnabled } from "./accounts-config.js";
 import { familyTreeEnabled } from "./family-config.js";
 import { legalDocument, legalPath, legalUpdated } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
@@ -29,8 +29,9 @@ export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
 export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly lang: Lang }) {
   const accounts = accountsEnabled();
   const tree = familyTreeEnabled();
-  const doc = legalDocument(kind, lang, accounts, tree);
-  const updated = legalUpdated(kind, accounts, tree);
+  const google = googleEnabled();
+  const doc = legalDocument(kind, lang, accounts, tree, google);
+  const updated = legalUpdated(kind, accounts, tree, google);
   const other: Lang = lang === "pl" ? "en" : "pl";
   return (
     <SiteShell

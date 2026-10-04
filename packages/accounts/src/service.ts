@@ -6,6 +6,7 @@ import type { Language, OutgoingMail } from "./mail-text.js";
 import type { PasswordHasher } from "./password.js";
 import type { AccountsDB, EmailTokenPurpose } from "./schema.js";
 import { emailKey, hashToken, isTokenShape, newToken } from "./tokens.js";
+import type { GoogleIdentity } from "./google.js";
 import { checkEmail, checkPassword } from "./validation.js";
 import type { PasswordProblem } from "./validation.js";
 
@@ -48,6 +49,8 @@ export const FAILURES_WINDOW_MINUTES = 15;
 export const FAILURES_KEEP_HOURS = 1;
 /** A pending account whose link was never followed is deleted after this long. */
 export const PENDING_KEEP_DAYS = 7;
+/** How long a first Google sign-in may wait on the terms step (ADR-0033 §2.4). */
+export const GOOGLE_TERMS_HOURS = 1;
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -98,9 +101,25 @@ export type SignInResult =
   | { readonly kind: "REJECTED" }
   | { readonly kind: "THROTTLED" };
 
+export type GoogleSignInResult =
+  | {
+      readonly kind: "SIGNED_IN";
+      readonly userId: string;
+      readonly sessionToken: string;
+      readonly expiresAt: Date;
+    }
+  /** A first sign-in: the terms step must be taken with this token before there is a session. */
+  | { readonly kind: "NEEDS_TERMS"; readonly token: string }
+  /** Google has not verified the address, or it is not one this site accepts. */
+  | { readonly kind: "UNVERIFIED" }
+  /** The address's account is already linked to a different Google account. */
+  | { readonly kind: "OTHER_GOOGLE" };
+
 export interface Session {
   readonly userId: string;
   readonly email: string;
+  /** False for an account made through Google whose owner has not set a password. */
+  readonly hasPassword: boolean;
   readonly language: Language;
   readonly termsVersion: string;
   readonly termsAcceptedAt: Date;
@@ -115,6 +134,7 @@ export type ResetResult =
 
 export type DeleteResult =
   | { readonly kind: "DELETED" }
+  /** The password was wrong or, for an account without one, the deletion was not confirmed. */
   | { readonly kind: "WRONG_PASSWORD" }
   | { readonly kind: "NOT_FOUND" };
 
@@ -403,6 +423,198 @@ export function createAccounts(deps: AccountsDeps) {
     },
 
     /**
+     * Signs in with an identity Google vouched for (ADR-0033 §2.4), already
+     * checked by `exchangeGoogleCode`. In order:
+     *
+     * 1. A Google account linked before signs its user in, or, if that user
+     *    never took the terms step, sends them back to it.
+     * 2. Otherwise Google must have verified the address. An account with that
+     *    address is linked to this Google account: Google's verification proves
+     *    control of the mailbox, which is the same proof the sign-up link asks
+     *    for. A complete account is signed in; a pending one goes to the terms
+     *    step. One already linked to a different Google account is refused.
+     * 3. A new address becomes a pending account, linked, and goes to the terms
+     *    step. Nobody is signed in before they accept the terms themselves.
+     */
+    async signInWithGoogle(input: {
+      readonly identity: GoogleIdentity;
+      readonly language: Language;
+    }): Promise<GoogleSignInResult> {
+      const { identity } = input;
+      const language: Language = input.language === "en" ? "en" : "pl";
+      const at = now();
+
+      const outcome = await db.transaction().execute(async (trx) => {
+        const linked = await trx
+          .selectFrom("identities as i")
+          .innerJoin("users as u", "u.user_id", "i.user_id")
+          .select(["i.identity_id", "u.user_id", "u.email_verified_at"])
+          .where("i.provider", "=", "GOOGLE")
+          .where("i.subject", "=", identity.subject)
+          .executeTakeFirst();
+        if (linked !== undefined) {
+          await trx
+            .updateTable("identities")
+            .set({ last_used_at: at })
+            .where("identity_id", "=", linked.identity_id)
+            .execute();
+          return {
+            kind: "LINKED",
+            userId: linked.user_id,
+            complete: linked.email_verified_at !== null,
+          } as const;
+        }
+
+        const email = checkEmail(identity.email);
+        if (!identity.emailVerified || !email.ok) return { kind: "UNVERIFIED" } as const;
+
+        const existing = await trx
+          .selectFrom("users")
+          .select(["user_id", "email_verified_at"])
+          .where("email_normalised", "=", email.normalised)
+          .forUpdate()
+          .executeTakeFirst();
+        let userId: string;
+        let complete: boolean;
+        if (existing !== undefined) {
+          const other = await trx
+            .selectFrom("identities")
+            .select("identity_id")
+            .where("user_id", "=", existing.user_id)
+            .where("provider", "=", "GOOGLE")
+            .executeTakeFirst();
+          if (other !== undefined) return { kind: "OTHER_GOOGLE" } as const;
+          userId = existing.user_id;
+          complete = existing.email_verified_at !== null;
+        } else {
+          userId = newId();
+          complete = false;
+          await trx
+            .insertInto("users")
+            .values({
+              user_id: userId,
+              email: email.email,
+              email_normalised: email.normalised,
+              language,
+              password_hash: null,
+              email_verified_at: null,
+              terms_version: null,
+              terms_accepted_at: null,
+              created_at: at,
+              updated_at: at,
+              last_sign_in_at: null,
+            })
+            .execute();
+        }
+        await trx
+          .insertInto("identities")
+          .values({
+            identity_id: newId(),
+            user_id: userId,
+            provider: "GOOGLE",
+            subject: identity.subject,
+            created_at: at,
+            last_used_at: at,
+          })
+          .execute();
+        return { kind: "LINKED", userId, complete } as const;
+      });
+
+      if (outcome.kind === "UNVERIFIED" || outcome.kind === "OTHER_GOOGLE") {
+        return { kind: outcome.kind };
+      }
+      if (!outcome.complete) {
+        const token = await issueToken(
+          outcome.userId,
+          "GOOGLE_TERMS",
+          at,
+          GOOGLE_TERMS_HOURS * HOUR,
+        );
+        return { kind: "NEEDS_TERMS", token };
+      }
+      const session = await startSession(outcome.userId, at);
+      await db
+        .updateTable("users")
+        .set({ last_sign_in_at: at })
+        .where("user_id", "=", outcome.userId)
+        .execute();
+      return {
+        kind: "SIGNED_IN",
+        userId: outcome.userId,
+        sessionToken: session.token,
+        expiresAt: session.expiresAt,
+      };
+    },
+
+    /**
+     * The terms step of a first Google sign-in: with the token
+     * `signInWithGoogle` returned and the terms accepted, the pending account is
+     * completed (address verified by Google, no password) and signed in. A
+     * refusal of the terms does not spend the token.
+     */
+    async completeGoogleSignUp(input: {
+      readonly token: unknown;
+      readonly termsVersion: string;
+      readonly termsAccepted: boolean;
+    }): Promise<CompleteResult> {
+      if (!isTokenShape(input.token)) return { kind: "INVALID_OR_EXPIRED" };
+      const at = now();
+      const found = await db
+        .selectFrom("email_tokens as t")
+        .innerJoin("users as u", "u.user_id", "t.user_id")
+        .select(["t.token_id", "u.user_id"])
+        .where("t.token_hash", "=", hashToken(input.token))
+        .where("t.purpose", "=", "GOOGLE_TERMS")
+        .where("t.used_at", "is", null)
+        .where("t.expires_at", ">", at)
+        .where("u.email_verified_at", "is", null)
+        .executeTakeFirst();
+      if (found === undefined) return { kind: "INVALID_OR_EXPIRED" };
+      if (!input.termsAccepted) return { kind: "INVALID", problem: "TERMS" };
+
+      const completed = await db.transaction().execute(async (trx) => {
+        const row = await trx
+          .selectFrom("email_tokens")
+          .select(["token_id", "user_id"])
+          .where("token_id", "=", found.token_id)
+          .where("used_at", "is", null)
+          .forUpdate()
+          .executeTakeFirst();
+        if (row === undefined) return false;
+        await trx
+          .updateTable("users")
+          .set({
+            email_verified_at: at,
+            terms_version: input.termsVersion,
+            terms_accepted_at: at,
+            last_sign_in_at: at,
+            updated_at: at,
+          })
+          .where("user_id", "=", row.user_id)
+          .where("email_verified_at", "is", null)
+          .execute();
+        // Every unspent token of the user is spent: this one, and a sign-up
+        // link mailed earlier, which would otherwise let its finder set a password.
+        await trx
+          .updateTable("email_tokens")
+          .set({ used_at: at })
+          .where("user_id", "=", row.user_id)
+          .where("used_at", "is", null)
+          .execute();
+        return true;
+      });
+      if (!completed) return { kind: "INVALID_OR_EXPIRED" };
+
+      const session = await startSession(found.user_id, at);
+      return {
+        kind: "SIGNED_IN",
+        userId: found.user_id,
+        sessionToken: session.token,
+        expiresAt: session.expiresAt,
+      };
+    },
+
+    /**
      * Records that a signed-in reader accepted a newer version of the terms
      * (ADR-0027 §2.9; TASK-076's consent step before the first living person
      * in a tree). A pending account cannot accept anything.
@@ -433,6 +645,7 @@ export function createAccounts(deps: AccountsDeps) {
           "u.user_id",
           "u.email",
           "u.language",
+          "u.password_hash",
           "u.terms_version",
           "u.terms_accepted_at",
         ])
@@ -457,6 +670,7 @@ export function createAccounts(deps: AccountsDeps) {
       return {
         userId: row.user_id,
         email: row.email,
+        hasPassword: row.password_hash !== null,
         language: row.language,
         termsVersion: row.terms_version,
         termsAcceptedAt: row.terms_accepted_at,
@@ -556,18 +770,26 @@ export function createAccounts(deps: AccountsDeps) {
       });
     },
 
-    /** Deletes the account and, by cascade, its sessions and tokens, once the password is confirmed. */
+    /**
+     * Deletes the account and, by cascade, its sessions, tokens and Google
+     * link, once the password is confirmed. An account made through Google that
+     * has no password is confirmed by `confirmed` instead: its signed-in
+     * session is the proof there is (ADR-0033 §2.6).
+     */
     async deleteAccount(input: {
       readonly userId: string;
       readonly password: string;
+      readonly confirmed?: boolean;
     }): Promise<DeleteResult> {
       const user = await db
         .selectFrom("users")
-        .select(["user_id", "password_hash"])
+        .select(["user_id", "password_hash", "email_verified_at"])
         .where("user_id", "=", input.userId)
         .executeTakeFirst();
-      if (user === undefined || user.password_hash === null) return { kind: "NOT_FOUND" };
-      if (!(await hasher.verify(user.password_hash, input.password))) {
+      if (user === undefined || user.email_verified_at === null) return { kind: "NOT_FOUND" };
+      if (user.password_hash === null) {
+        if (input.confirmed !== true) return { kind: "WRONG_PASSWORD" };
+      } else if (!(await hasher.verify(user.password_hash, input.password))) {
         return { kind: "WRONG_PASSWORD" };
       }
       await db.deleteFrom("users").where("user_id", "=", user.user_id).execute();

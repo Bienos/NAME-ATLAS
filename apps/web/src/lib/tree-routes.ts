@@ -372,7 +372,9 @@ export async function handleTreePost(
   try {
     const token = cookieValue(request.headers.get("cookie"), sessionCookieName(deps.secure));
     const session = token === null ? null : await deps.accounts.sessionFromToken(token);
-    if (session === null) return see(accountPath(lang, "sign-in"));
+    if (session === null) {
+      return see(accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) }));
+    }
     return await run(
       action,
       form,

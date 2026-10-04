@@ -135,7 +135,7 @@ describe("the tree's routes refuse what the account's refuse (TASK-076, AC-2)", 
           deps,
         ),
       ),
-    ).toBe("/pl/konto/zaloguj");
+    ).toBe("/pl/konto/zaloguj?next=%2Fpl%2Fkonto%2Fdrzewa");
     expect(
       location(
         await handleTreePost(
@@ -144,7 +144,7 @@ describe("the tree's routes refuse what the account's refuse (TASK-076, AC-2)", 
           deps,
         ),
       ),
-    ).toBe("/pl/konto/zaloguj");
+    ).toBe("/pl/konto/zaloguj?next=%2Fpl%2Fkonto%2Fdrzewa");
     expect(family.createTree).not.toHaveBeenCalled();
     location(
       await handleTreePost(

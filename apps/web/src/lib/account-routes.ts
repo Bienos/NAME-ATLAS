@@ -44,6 +44,7 @@ export interface AccountRouteDeps {
     Accounts,
     | "signUp"
     | "completeSignUp"
+    | "completeGoogleSignUp"
     | "signIn"
     | "sessionFromToken"
     | "signOut"
@@ -51,7 +52,8 @@ export interface AccountRouteDeps {
     | "resetPassword"
     | "deleteAccount"
   >;
-  readonly mailer: Mailer;
+  /** Null when only Google sign-in is configured (ADR-0033): then nothing here mails, and the mail forms 404. */
+  readonly mailer: Mailer | null;
   /** Runs a task once the response has been sent (`after` from `next/server`). */
   readonly after: (task: () => Promise<void>) => void;
   readonly secure: boolean;
@@ -138,10 +140,11 @@ export function problemStatus(problem: string): string {
 }
 
 function sendAfter(deps: AccountRouteDeps, mail: OutgoingMail | null): void {
-  if (mail === null) return;
+  const { mailer } = deps;
+  if (mail === null || mailer === null) return;
   deps.after(async () => {
     try {
-      await deps.mailer.send(mail);
+      await mailer.send(mail);
     } catch (error) {
       // The status and nothing else: not the address, not the provider's body.
       deps.log.warn("account_mail_failed", {
@@ -197,6 +200,27 @@ async function run(
       }
       deps.log.info("account_created", { userId: result.userId });
       return see(accountPath(lang, "account", { status: "welcome" }), [
+        sessionCookie(result.sessionToken, secure),
+      ]);
+    }
+
+    case "google-complete": {
+      // The terms step of a first Google sign-in (TASK-084, ADR-0033 §2.4).
+      const token = field(form, "token");
+      const next = safeNext(field(form, "next"));
+      const result = await accounts.completeGoogleSignUp({
+        token,
+        termsVersion: deps.termsVersion,
+        termsAccepted: field(form, "terms") !== "",
+      });
+      if (result.kind === "INVALID_OR_EXPIRED") {
+        return back("sign-in", lang, "google-expired", undefined, next);
+      }
+      if (result.kind === "INVALID") {
+        return back("welcome", lang, problemStatus(result.problem), token, next);
+      }
+      deps.log.info("account_created", { userId: result.userId, via: "google" });
+      return see(next ?? accountPath(lang, "account", { status: "welcome" }), [
         sessionCookie(result.sessionToken, secure),
       ]);
     }
@@ -261,8 +285,11 @@ async function run(
       const result = await accounts.deleteAccount({
         userId: session.userId,
         password: field(form, "password"),
+        confirmed: field(form, "confirm") !== "",
       });
-      if (result.kind === "WRONG_PASSWORD") return back("account", lang, "wrong-password");
+      if (result.kind === "WRONG_PASSWORD") {
+        return back("account", lang, session.hasPassword ? "wrong-password" : "unconfirmed");
+      }
       deps.log.info("account_deleted", { userId: session.userId });
       return see(accountPath(lang, "sign-in", { status: "deleted" }), [
         clearedSessionCookie(secure),
@@ -286,6 +313,10 @@ export async function handleAccountPost(
   if (!isSameSiteRequest(request)) {
     return new Response("Forbidden", { status: 403, headers: NO_STORE });
   }
+  // Without mail (Google only, ADR-0033) the two forms that only send mail do not exist.
+  if (deps.mailer === null && (action === "sign-up" || action === "reset-request")) {
+    return new Response("Not found", { status: 404, headers: NO_STORE });
+  }
   const form = await readForm(request);
   if (form === null) return new Response("Bad request", { status: 400, headers: NO_STORE });
 
@@ -301,6 +332,7 @@ export async function handleAccountPost(
     const page: Record<AccountAction, AccountStep> = {
       "sign-up": "sign-up",
       complete: "confirm",
+      "google-complete": "welcome",
       "sign-in": "sign-in",
       "sign-out": "sign-in",
       "reset-request": "reset",

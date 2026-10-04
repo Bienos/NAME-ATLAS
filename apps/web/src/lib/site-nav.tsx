@@ -17,13 +17,15 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
     ["compare", comparePagePath(lang), t.navCompare],
     ["how", howPath(lang), t.navHow],
     ["offer", offerPath(lang), t.navOffer],
-    // Only when accounts exist (TASK-062): read at render, so a static page bakes it at build.
+    // The tree's landing page, only when the family tree is on (TASK-076): the
+    // pages themselves need a session, the landing says why.
+    ...(familyTreeEnabled() ? ([["trees", treeLandingPath(lang), t.navTrees]] as const) : []),
+    // Last, drawn as a button (TASK-084), only when accounts exist (TASK-062):
+    // read at render, so a static page bakes it at build. It leads to the
+    // account, which sends a reader who is not signed in to sign-in.
     ...(accountsEnabled()
       ? ([["account", accountPath(lang, "account"), t.navAccount]] as const)
       : []),
-    // And the tree's landing page beside it, only when the family tree is on
-    // (TASK-076): the pages themselves need a session, the landing says why.
-    ...(familyTreeEnabled() ? ([["trees", treeLandingPath(lang), t.navTrees]] as const) : []),
   ];
   return (
     <>

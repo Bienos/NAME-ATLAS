@@ -8,6 +8,14 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-034 — RESOLVED (2026-10-04): the family tree is free with an account
+
+**Resolution:** The project owner, 2026-10-04: "tree free with sign up". Any complete account may build a tree at no cost; it is no longer in the 29,99 zł tier. This supersedes D-029 ("paid; the tree stays dark until checkout exists"). The offer page moves the tree to the free tier (TASK-084). The paid tier keeps connecting trees, extra research, the report and the well-known bearers.
+
+**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built.
+
+---
+
 ## D-033 — "how many people hold this exact first name and surname" for the paid tier: from which source, if any?
 
 **Status:** NON-BLOCKING NOW. It blocks that figure in the paid report, nothing else.
@@ -87,7 +95,7 @@ Whichever is chosen, the product stores the provider's reference, the verified n
 
 ---
 
-## D-029 — RESOLVED (2026-10-01): paid; the tree stays dark until checkout exists
+## D-029 — RESOLVED (2026-10-01): paid; the tree stays dark until checkout exists (superseded by D-034, 2026-10-04: free)
 
 **Resolution:** The project owner: "make it paid". The tree is built and tested (TASK-066 onward) and shown to nobody until the 29,99 zł tier can be sold (ADR-0023 §2.5, D-024). Recorded in ADR-0029 §2.5.19.
 

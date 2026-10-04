@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL } from "./contact.js";
 import { accountsVariant } from "./legal-accounts.js";
+import { googleVariant } from "./legal-google.js";
 import { treeVariant } from "./legal-tree.js";
 import type { Lang } from "./messages.js";
 
@@ -44,6 +45,13 @@ export const ACCOUNTS_LEGAL_UPDATED = "2026-10-01";
  * (ADR-0029 §2.4.12).
  */
 export const TREE_LEGAL_UPDATED = "2026-10-03";
+
+/**
+ * The date of the Google variant of the privacy notice (TASK-084): shown only
+ * when Google sign-in is configured. Display only: the terms are unchanged, so
+ * the version a reader accepts stays the accounts' or the tree's.
+ */
+export const GOOGLE_LEGAL_UPDATED = "2026-10-04";
 
 export interface LegalSection {
   readonly heading: string;
@@ -341,11 +349,13 @@ export function legalDocument(
   lang: Lang,
   accounts = false,
   tree = false,
+  google = false,
 ): LegalDocument {
   const base = kind === "privacy" ? PRIVACY[lang] : TERMS[lang];
   if (!accounts) return base;
   const withAccounts = accountsVariant(kind, lang, base);
-  return tree ? treeVariant(kind, lang, withAccounts) : withAccounts;
+  const withGoogle = google ? googleVariant(kind, lang, withAccounts) : withAccounts;
+  return tree ? treeVariant(kind, lang, withGoogle) : withGoogle;
 }
 
 /** The date the document last changed, for the page and for the version recorded. */
@@ -355,10 +365,19 @@ export function legalDocument(
  * Display only; the version a reader accepts is {@link ACCOUNTS_LEGAL_UPDATED}
  * or {@link TREE_LEGAL_UPDATED} (`accounts-runtime.ts`).
  */
-export function legalUpdated(kind: LegalKind, accounts = false, tree = false): string {
+export function legalUpdated(
+  kind: LegalKind,
+  accounts = false,
+  tree = false,
+  google = false,
+): string {
   const own = LEGAL_UPDATED[kind];
-  if (accounts && tree) return TREE_LEGAL_UPDATED > own ? TREE_LEGAL_UPDATED : own;
-  return accounts && ACCOUNTS_LEGAL_UPDATED > own ? ACCOUNTS_LEGAL_UPDATED : own;
+  const dates = [own];
+  if (accounts) dates.push(ACCOUNTS_LEGAL_UPDATED);
+  if (accounts && tree) dates.push(TREE_LEGAL_UPDATED);
+  // The Google variant changes the notice only (`legal-google.ts`).
+  if (accounts && google && kind === "privacy") dates.push(GOOGLE_LEGAL_UPDATED);
+  return dates.reduce((latest, date) => (date > latest ? date : latest));
 }
 
 export function legalPath(kind: LegalKind, lang: Lang): string {

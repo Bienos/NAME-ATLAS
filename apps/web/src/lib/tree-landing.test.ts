@@ -93,8 +93,9 @@ describe("the tree's landing page (TASK-076)", () => {
     for (const lang of LANGS) {
       const html = render(lang);
       expect(html.split(`href="${treePath(lang, { page: "trees" })}"`)).toHaveLength(3);
-      expect(html.split(`href="${accountPath(lang, "sign-up")}"`)).toHaveLength(3);
-      expect(html).toContain(`href="${accountPath(lang, "sign-in")}"`);
+      // Both lead to sign-in, which offers Google and sign-up, and returns to the tree (TASK-084).
+      const signIn = accountPath(lang, "sign-in", { next: treePath(lang, { page: "trees" }) });
+      expect(html.split(`href="${signIn}"`)).toHaveLength(5);
       expect(html).toContain(`href="${offerPath(lang)}"`);
       const other = lang === "pl" ? "en" : "pl";
       expect(html).toContain(`href="${treeLandingPath(other)}" hrefLang="${other}"`);

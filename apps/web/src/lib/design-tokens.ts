@@ -143,3 +143,14 @@ export const TYPE_FAMILIES = {
   ui: "Instrument Sans",
   data: "IBM Plex Mono",
 } as const;
+
+/**
+ * Google's mark on the "Continue with Google" button (TASK-084), in the four
+ * colours Google's sign-in branding guidelines fix. Not the site's palette.
+ */
+export const GOOGLE_MARK = {
+  red: "#EA4335",
+  blue: "#4285F4",
+  yellow: "#FBBC05",
+  green: "#34A853",
+} as const;
