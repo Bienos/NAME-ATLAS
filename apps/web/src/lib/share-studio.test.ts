@@ -84,6 +84,8 @@ describe("the share studio (TASK-093)", () => {
     expect(html).not.toContain("card=meaning");
     expect(html).toContain('href="/pl/nazwisko/kowalski?view=cards"');
     expect(html).toContain('href="/pl/oferta"');
+    // The page link's share is named apart from the card's own (TASK-093 follow-up).
+    expect(html).toContain(`>${UI.pl.studioShareLink}</button>`);
     expect(html).toContain('href="/pl/porownaj?qa=KOWALSKI"');
     // The language switch leads to the studio in the other language.
     expect(html).toContain('href="/en/surname/kowalski/share?card=rarity"');
