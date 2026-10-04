@@ -144,7 +144,18 @@ function browserDeps(): ShareDeps {
   };
 }
 
-export function ShareButton({ url, title, lang }: { url: string; title: string; lang: Lang }) {
+export function ShareButton({
+  url,
+  title,
+  lang,
+  label,
+}: {
+  url: string;
+  title: string;
+  lang: Lang;
+  /** A label in place of "Udostępnij", where a page has another share button beside it. */
+  label?: string;
+}) {
   const t = COPY[lang];
   const [status, setStatus] = useState<Status>("IDLE");
 
@@ -177,7 +188,7 @@ export function ShareButton({ url, title, lang }: { url: string; title: string; 
           void performShare(browserDeps(), { title, url }).then(setStatus);
         }}
       >
-        {t.share}
+        {label ?? t.share}
       </button>
       {/* Always present: the link a reader can copy by hand, with or without script. */}
       {/* No `aria-label`: it would replace the link's text, and the text is the
