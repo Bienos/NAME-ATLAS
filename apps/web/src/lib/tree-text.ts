@@ -22,6 +22,8 @@ import type { SlotRole, TreePage } from "./tree-paths.js";
 export interface StatusWords {
   readonly text: string;
   readonly tone: "ok" | "problem";
+  /** A link to the offer page after the text, with these words (TASK-111). */
+  readonly offer?: string;
 }
 
 type StatusMap = Readonly<Record<string, StatusWords>>;
@@ -727,6 +729,11 @@ const PL: TreeText = {
     tree: {
       added: ok("Osoba jest w drzewie."),
       "person-deleted": ok("Osoba usunięta z drzewa."),
+      "person-limit": {
+        text: "Darmowe drzewo mieści 5 osób i to drzewo jest pełne. Więcej osób odblokuje każdy płatny pakiet; pakiety będą dostępne wkrótce. Nic nie zostało zapisane.",
+        tone: "problem",
+        offer: "Zobacz ofertę",
+      },
       "not-found": problem("Nie ma takiej osoby w tym drzewie."),
       confirm: problem("Zaznacz potwierdzenie, żeby usunąć drzewo."),
       root: ok("Rodowód zaczyna się teraz od tej osoby."),
@@ -1192,6 +1199,11 @@ const EN: TreeText = {
     tree: {
       added: ok("The person is in the tree."),
       "person-deleted": ok("Person removed from the tree."),
+      "person-limit": {
+        text: "A free tree holds 5 people, and this one is full. Any paid tier unlocks more; the tiers are coming soon. Nothing was saved.",
+        tone: "problem",
+        offer: "See the offer",
+      },
       "not-found": problem("There is no such person in this tree."),
       confirm: problem("Tick the confirmation to delete the tree."),
       root: ok("The pedigree now starts from this person."),

@@ -102,7 +102,12 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
       `.execute(db().db);
     }
     appPool = createPool({ databaseUrl: urlAs(db().connectionUri, "nameatlas_app", APP_PASSWORD) });
-    family = createFamily({ db: createFamilyDb(appPool) });
+    // These fixtures hold more people than a free tree (TASK-111); the cap
+    // has its own tests in `family.test.ts`, so here the owner has a paid tier.
+    family = createFamily({
+      db: createFamilyDb(appPool),
+      hasPaidTier: () => Promise.resolve(true),
+    });
 
     const created = await family.createTree({ userId: OWNER, title: "Rodzina Zielińskich" });
     if (created.kind !== "CREATED") throw new Error("fixture tree failed");
@@ -535,6 +540,8 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
         .kind,
     ).toBe("OK");
     const migrator = createMigrator(db().db);
+    // Later migrations first (0034, TASK-111), so that the next step down is 0033's.
+    expect((await migrator.migrateTo("0033_family_invitations")).error).toBeUndefined();
     const { error } = await migrator.migrateDown();
     expect(String(error)).toMatch(/refusing to drop the claims/u);
     const still = await sql<{ n: number }>`

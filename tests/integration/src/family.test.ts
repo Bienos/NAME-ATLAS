@@ -397,6 +397,114 @@ describe("family tree (TASK-066, ADR-0029)", () => {
     }
   });
 
+  it("caps a free tree at 5 people, counting rows an editor cannot see, and any paid tier lifts it (TASK-111)", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Free cap fixture" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    const treeId = created.treeId;
+    try {
+      // Four living people, whom an editor without `sees_living` does not see.
+      for (const givenNames of ["A", "B", "C", "D"]) {
+        const added = await family.addPerson({
+          userId: OWNER,
+          treeId,
+          person: { givenNames, surname: "Fixture", livingStatus: "LIVING" },
+        });
+        expect(added.kind).toBe("OK");
+      }
+      await family.addMember({ userId: OWNER, treeId, memberUserId: MEMBER, role: "EDITOR" });
+      // The editor sees no one, yet the fifth is the last a free tree takes.
+      const fifth = await family.addPerson({
+        userId: MEMBER,
+        treeId,
+        person: { givenNames: "E", surname: "Fixture", deathYear: 1900 },
+      });
+      expect(fifth.kind).toBe("OK");
+      const sixth = { givenNames: "F", surname: "Fixture", deathYear: 1900 };
+      expect(await family.addPerson({ userId: MEMBER, treeId, person: sixth })).toEqual({
+        kind: "PERSON_LIMIT",
+        limit: 5,
+      });
+      expect(await family.addPerson({ userId: OWNER, treeId, person: sixth })).toEqual({
+        kind: "PERSON_LIMIT",
+        limit: 5,
+      });
+      const count = await sql<{ n: number }>`
+        SELECT count(*)::int AS n FROM family.persons WHERE tree_id = ${treeId}
+      `.execute(db().db);
+      expect(count.rows[0]?.n).toBe(5);
+
+      // The owner's paid tier lifts the cap, for the editor too; asked of the owner's account.
+      const asked: string[] = [];
+      const paid = createFamily({
+        db: createFamilyDb(app()),
+        hasPaidTier: (userId) => {
+          asked.push(userId);
+          return Promise.resolve(userId === OWNER);
+        },
+      });
+      expect((await paid.addPerson({ userId: MEMBER, treeId, person: sixth })).kind).toBe("OK");
+      expect(asked).toEqual([OWNER]);
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId });
+    }
+  });
+
+  it("lets only one of two concurrent adds take a free tree's last place (TASK-111)", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Free cap race" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    const treeId = created.treeId;
+    try {
+      for (const givenNames of ["A", "B", "C", "D"]) {
+        const added = await family.addPerson({
+          userId: OWNER,
+          treeId,
+          person: { givenNames, surname: "Fixture" },
+        });
+        expect(added.kind).toBe("OK");
+      }
+      const results = await Promise.all(
+        ["E", "F", "G"].map((givenNames) =>
+          family.addPerson({ userId: OWNER, treeId, person: { givenNames, surname: "Fixture" } }),
+        ),
+      );
+      expect(results.filter((r) => r.kind === "OK")).toHaveLength(1);
+      expect(results.filter((r) => r.kind === "PERSON_LIMIT")).toHaveLength(2);
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId });
+    }
+  });
+
+  it("answers a tree_person_count of 0 to a caller who may not write the tree (TASK-111)", async () => {
+    const created = await family.createTree({ userId: OWNER, title: "Count fixture" });
+    if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+    try {
+      await family.addPerson({
+        userId: OWNER,
+        treeId: created.treeId,
+        person: { givenNames: "A", surname: "Fixture" },
+      });
+      const countAs = async (userId: string): Promise<number | undefined> => {
+        const client = await app().connect();
+        try {
+          await client.query("BEGIN");
+          await client.query("SELECT set_config('app.user_id', $1, true)", [userId]);
+          const result = await client.query<{ n: number }>(
+            "SELECT family.tree_person_count($1::uuid) AS n",
+            [created.treeId],
+          );
+          await client.query("ROLLBACK");
+          return result.rows[0]?.n;
+        } finally {
+          client.release();
+        }
+      };
+      expect(await countAs(OWNER)).toBe(1);
+      expect(await countAs(STRANGER)).toBe(0);
+    } finally {
+      await family.deleteTree({ userId: OWNER, treeId: created.treeId });
+    }
+  });
+
   it("creates a tree and its people, and a death year makes a person DECEASED (AC-1)", async () => {
     const created = await ok(
       await family.createTree({ userId: OWNER, title: " Rodzina Zielińskich " }),

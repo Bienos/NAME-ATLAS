@@ -137,6 +137,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     // ask for the next step down.
     const migrator = createMigrator(db);
     for (const expected of [
+      "0034_family_person_count",
       "0033_family_invitations",
       "0032_accounts_google_identities",
       "0031_given_names",

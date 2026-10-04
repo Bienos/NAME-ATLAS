@@ -16,6 +16,21 @@ export const YEAR_MAX = 2100;
 /** A child has at most this many parents. */
 export const PARENTS_MAX = 2;
 
+/**
+ * A tree whose owner has no paid tier holds at most this many people; adding
+ * one more needs a paid tier, any of the four (ADR-0037 §2.1, D-025, TASK-111).
+ */
+export const FREE_TREE_PERSONS_MAX = 5;
+
+/**
+ * Whether an account has a paid tier. No checkout exists (ADR-0023 §2.5), so
+ * nothing records one and every account answers false. Checkout replaces this
+ * through `FamilyDeps.hasPaidTier`.
+ */
+export async function noPaidTier(_userId: string): Promise<boolean> {
+  return false;
+}
+
 /** The canonical rule: an unknown status is protected as living (`docs/canonical/19` §10). */
 export function treatedAsLiving(status: LivingStatus): boolean {
   return status !== "DECEASED";

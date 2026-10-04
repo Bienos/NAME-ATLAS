@@ -353,6 +353,28 @@ describe("the tree's actions (TASK-076)", () => {
     ).toBe("/pl/konto/drzewa?status=forbidden");
   });
 
+  it("add-person: a free tree that is full goes to the tree with the word that points to the offer (TASK-111)", async () => {
+    const { deps, family } = fakes();
+    family.addPerson.mockResolvedValueOnce({ kind: "PERSON_LIMIT", limit: 5 });
+    expect(
+      location(
+        await handleTreePost(
+          "add-person",
+          post("add-person", { tree: TREE_ID, child: ID.ewa, role: "MOTHER", ...PERSON_FIELDS }),
+          deps,
+        ),
+      ),
+    ).toBe(`/pl/konto/drzewa/${TREE_ID}?status=person-limit`);
+    // Nothing was added, so nothing is linked.
+    expect(family.setParent).not.toHaveBeenCalled();
+    for (const lang of ["pl", "en"] as const) {
+      const words = treeStatusWords(lang, "tree", "person-limit");
+      expect(words?.tone).toBe("problem");
+      expect(words?.text).toContain("5");
+      expect(words?.offer).toBeTruthy();
+    }
+  });
+
   it("update-person, delete-person with its confirmation, set-parent, remove-parent, set-root, delete-tree", async () => {
     const { deps, family } = fakes();
     const person = `/pl/konto/drzewa/${TREE_ID}/osoba/${ID.ewa}`;

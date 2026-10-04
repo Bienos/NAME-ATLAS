@@ -146,6 +146,17 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
     expect(render(treeData("en", withHidden))).toContain(TREE_TEXT.en.pedigree.hidden);
   });
 
+  it("says a full free tree is full and links to the offer, with no way to buy (TASK-111)", () => {
+    const offer = { pl: "/pl/oferta", en: "/en/offer" } as const;
+    for (const lang of LANGS) {
+      const html = render(treeData(lang, tree(), "person-limit"));
+      const words = TREE_TEXT[lang].status.tree["person-limit"];
+      expect(html).toContain(words?.text);
+      expect(html).toContain(`<a href="${offer[lang]}">${words?.offer}</a>`);
+      expect(html).not.toMatch(/kup|zapłać|buy|checkout|pay now/iu);
+    }
+  });
+
   it("one question per screen: the role choice, then the form with the fields of the design (AC-6)", () => {
     const t = tree();
     const choice = render({
