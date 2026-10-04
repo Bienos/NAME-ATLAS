@@ -8,7 +8,7 @@
     - **B**, A plus one stated overlap figure for where the two names live;
     - **C**, a playful compatibility percentage, advised against.
   - They answered **"A"**.
-  - Asked in the same message to "confirm 'couple' replaces the current tiers (D-025)" and to approve "an ADR plus a task", they answered **"ok, ok"**.
+  - Asked in the same message to "confirm 'couple' replaces the current tiers (D-025)" and to approve "an ADR plus a task", they answered **"ok, ok"**. Asked again whether that meant the whole tier set or only the couple tier, they answered **"a, whole set"**.
 - **Amends:** ADR-0026 §2.1, by D-025 §1 (below). It does not yet replace ADR-0026's tier list on the offer page: D-025 §2–§4 are still open.
 - **Relates to:** D-025 (the owner's tier set of 2026-10-01, which names "couple" at 89,99 zł), D-033 (no count of an exact first name and surname), ADR-0001 (confidence and rights apart), ADR-0023 §2.5 (no real payments before the legal and tax gates), TASK-025 (the two-surname comparison).
 - **Implemented by:** TASK-100.

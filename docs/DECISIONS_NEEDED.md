@@ -161,7 +161,7 @@ The owner selected `name-atlas.pl` as primary and `nameatlas.pl` as alternate on
 **Owner:** project owner.
 **Raised by:** ADR-0028's session, 2026-10-01.
 
-**2026-10-04, ADR-0035's session:** asked to "confirm 'couple' replaces the current tiers (D-025)", the owner answered "ok". §1 is taken as answered by that. They also chose framing "A" for the couple tier: the two surnames' facts side by side, with no score (ADR-0035, TASK-100). What the other new tiers hold is still not confirmed, and §2–§4 are open.
+**2026-10-04, ADR-0035's session:** asked to "confirm 'couple' replaces the current tiers (D-025)", the owner answered "ok". Asked to be sure whether that meant the whole set or only the couple tier, they answered "a, whole set". §1 is answered: the set replaces ADR-0026's tiers, and the offer page will follow it. They also chose framing "A" for the couple tier: the two surnames' facts side by side, with no score (ADR-0035, TASK-100). What the other new tiers hold is still not confirmed, and §2–§4 are open.
 
 ADR-0026 (accepted 2026-10-01, live on `/pl/oferta`) has three tiers: free, "Nazwisko i rodzina" 29,99 zł, "Genealogia z DNA" 499 zł. Later the same day, in a chat outside this repository, the owner described a different set, reached after sign-in from the download or share button:
 
