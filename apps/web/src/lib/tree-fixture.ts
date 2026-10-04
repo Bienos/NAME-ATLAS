@@ -29,6 +29,10 @@ export function person(
     source_note: null,
     notes: null,
     updated_at: "2026-10-03T10:00:00.000Z",
+    claimed: false,
+    claimed_by_me: false,
+    hidden_fields: [],
+    contact_declined: false,
   };
 }
 

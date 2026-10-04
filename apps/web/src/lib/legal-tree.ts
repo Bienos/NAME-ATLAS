@@ -11,7 +11,7 @@ import type { Lang } from "./messages.js";
  * The clause is what the one-time consent step points at: an account whose
  * recorded terms version predates `TREE_LEGAL_UPDATED` is asked to accept
  * again before its first living person is saved. Every statement rests on the
- * code (migration 0028's policies, `@name-atlas/family`) or on a decision
+ * code (migrations 0028 and 0033's policies, `@name-atlas/family`) or on a decision
  * (D-028: a tree lives as long as its account; D-031: the declined-contact
  * rule, which awaits legal review before anything here goes live).
  */
@@ -43,6 +43,7 @@ const WORDS: Record<Lang, TreeWords> = {
         "Dane o Tobie przetwarzamy, żeby prowadzić konto i drzewo, o które prosisz (art. 6 ust. 1 lit. b RODO). Dane innych osób wpisujesz Ty i odpowiadasz za to, że masz do tego prawo; my przechowujemy je na Twoje zlecenie w ramach tej samej umowy.",
         "Drzewo jest prywatne. Widzisz je Ty, a osoby, które do niego zaprosisz, widzą osoby zmarłe; osoby żyjące i te bez roku zgonu widzą tylko wtedy, gdy im to włączysz. Nikt inny nie ma do niego dostępu. Osoby żyjące nie są porównywane z innymi drzewami.",
         "Drzewo przechowujemy tak długo, jak istnieje konto. Usuwasz je sam, w całości lub osobę po osobie; usunięcie konta usuwa je od razu. W każdej chwili możesz je pobrać.",
+        "Osobę żyjącą możesz zaprosić, żeby sama potwierdziła swoją kartę. Adres e-mail, który wpiszesz, służy do wysłania jednej wiadomości i nie jest zapisywany przy osobie; przechowujemy jedynie jego skrót w ramach tego drzewa, żeby nie zaprosić tego adresu ponownie, gdy osoba odpowie, że to nie ona albo że nie chce kontaktu. Osoba, która potwierdzi kartę, sama poprawia swoje dane i może ukryć przed Tobą rok i miejsce urodzenia oraz nazwisko rodowe.",
       ],
     },
   },
@@ -65,6 +66,7 @@ const WORDS: Record<Lang, TreeWords> = {
         "We process data about you to run the account and the tree you ask for (art. 6(1)(b) GDPR). Data about other people is entered by you, and you are responsible for having the right to enter it; we keep it on your behalf under the same contract.",
         "The tree is private. You see it, and the people you invite see the deceased; they see living people, and people without a year of death, only when you turn that on for them. Nobody else has access. Living people are not compared with other trees.",
         "We keep the tree as long as the account exists. You delete it yourself, as a whole or person by person; deleting the account deletes it at once. You can download it at any time.",
+        "You can invite a living person to confirm their own card. The email address you enter is used to send one message and is not stored with the person; we keep only its hash within that tree, so that the address is not invited again once the person answers that it is not them or that they want no contact. A person who confirms their card corrects their own data and may hide the year and place of birth and the birth surname from you.",
       ],
     },
   },

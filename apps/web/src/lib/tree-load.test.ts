@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { loadTreePage } from "./tree-load.js";
 import type { TreeLoadDeps } from "./tree-load.js";
+import type { CardRead } from "@name-atlas/family";
+import { hashToken } from "@name-atlas/accounts";
 import { ID, PEOPLE, tree, treeForMember, TREE_ID } from "./tree-fixture.js";
 
 const SESSION = { userId: "0199a1b2-0000-7000-8000-00000000aa11", termsVersion: "2026-10-03" };
@@ -13,13 +15,38 @@ const SUMMARY = {
 };
 
 type Mocked = TreeLoadDeps & {
-  family: { listTrees: ReturnType<typeof vi.fn>; getTree: ReturnType<typeof vi.fn> };
+  family: {
+    listTrees: ReturnType<typeof vi.fn>;
+    getTree: ReturnType<typeof vi.fn>;
+    invitationOf: ReturnType<typeof vi.fn>;
+    openInvitation: ReturnType<typeof vi.fn>;
+    listCards: ReturnType<typeof vi.fn>;
+    getCard: ReturnType<typeof vi.fn>;
+  };
 };
+
+const CARD: CardRead = {
+  person: {
+    id: ID.marta,
+    given_names: "Marta",
+    surname: "Zielińska",
+    birth_surname: null,
+    birth: { year: 1991, approx: false, place_code: null, place_text: "Szczebrzeszyn" },
+    hidden_fields: [],
+    claimed_at: null,
+  },
+  parents: [{ given_names: "Ewa", surname: "Zielińska", role: "MOTHER" }],
+};
+const TOKEN = "T".repeat(43);
 
 function deps(read = tree(), places: TreeLoadDeps["places"] = null): Mocked {
   const family = {
     listTrees: vi.fn(() => Promise.resolve([SUMMARY])),
     getTree: vi.fn(() => Promise.resolve({ kind: "OK", tree: read })),
+    invitationOf: vi.fn(() => Promise.resolve(null)),
+    openInvitation: vi.fn(() => Promise.resolve({ kind: "OK", card: CARD })),
+    listCards: vi.fn(() => Promise.resolve([])),
+    getCard: vi.fn(() => Promise.resolve({ kind: "OK", card: CARD })),
   };
   return { family, places } as unknown as Mocked;
 }
@@ -245,5 +272,97 @@ describe("the Mapa's decision (TASK-092)", () => {
     if (fell.kind !== "view" || fell.data.kind !== "map") throw new Error("expected the map");
     expect(fell.data.places).toEqual([]);
     expect(regions).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("invitations and cards (TASK-094, AC-6)", () => {
+  it("sends a signed-out reader to sign in and back to the invitation with its token", async () => {
+    expect(await load(["zaproszenie"], { t: TOKEN }, deps(), null)).toEqual({
+      kind: "redirect",
+      to: `/pl/konto/zaloguj?next=${encodeURIComponent(`/pl/konto/drzewa/zaproszenie?t=${TOKEN}`)}`,
+    });
+    expect(await load(["zaproszenie"], { t: "short" }, deps(), null)).toEqual({
+      kind: "redirect",
+      to: "/pl/konto/zaloguj?next=%2Fpl%2Fkonto%2Fdrzewa",
+    });
+  });
+
+  it("opens the invitation by the token's hash, and names why not otherwise, without a tree read", async () => {
+    const d = deps();
+    const open = await load(["zaproszenie"], { t: TOKEN }, d);
+    expect(open).toMatchObject({
+      kind: "view",
+      data: { kind: "invitation", token: TOKEN, state: { kind: "open", card: CARD } },
+    });
+    expect(d.family.openInvitation).toHaveBeenCalledWith({
+      userId: SESSION.userId,
+      tokenHash: hashToken(TOKEN).toString("hex"),
+    });
+    expect(d.family.getTree).not.toHaveBeenCalled();
+    for (const [kind, state] of [
+      ["EXPIRED", "expired"],
+      ["ANSWERED", "answered"],
+      ["NOT_FOUND", "missing"],
+    ] as const) {
+      d.family.openInvitation.mockResolvedValueOnce({ kind });
+      expect(await load(["zaproszenie"], { t: TOKEN, status: "answer" }, d)).toMatchObject({
+        data: { kind: "invitation", status: "answer", state: { kind: state } },
+      });
+    }
+    expect(await load(["zaproszenie"], {}, d)).toMatchObject({
+      data: { kind: "invitation", token: null, state: { kind: "missing" } },
+    });
+  });
+
+  it("lists the cards, on their page and on the dashboard, and shows one as its form", async () => {
+    const d = deps();
+    const summary = {
+      person_id: ID.marta,
+      given_names: "Marta",
+      surname: "Zielińska",
+      claimed_at: "2026-10-04T10:00:00.000Z",
+    };
+    d.family.listCards.mockResolvedValue([summary]);
+    expect(await load(["karty"], { status: "left" }, d)).toMatchObject({
+      data: { kind: "cards", status: "left", cards: [summary] },
+    });
+    expect(await load(undefined, {}, d)).toMatchObject({
+      data: { kind: "trees", cards: [summary] },
+    });
+    const card = await load(["karta", ID.marta], { status: "claimed" }, d);
+    expect(card).toMatchObject({
+      data: {
+        kind: "card",
+        status: "claimed",
+        card: CARD,
+        form: { draft: { given: "Marta", placeText: "Szczebrzeszyn", living: "LIVING" } },
+      },
+    });
+    expect(d.family.getCard).toHaveBeenCalledWith({ userId: SESSION.userId, personId: ID.marta });
+    d.family.getCard.mockResolvedValueOnce({ kind: "NOT_FOUND" });
+    expect(await load(["karta", ID.marta], {}, d)).toEqual({
+      kind: "redirect",
+      to: "/pl/konto/drzewa/karty?status=not-found",
+    });
+  });
+
+  it("reads the person's latest invitation for the owner and not for a member", async () => {
+    const d = deps();
+    const invitation = {
+      invitation_id: "0199a1b2-0000-7000-8000-00000000cc01",
+      sent_at: "2026-10-04T10:00:00.000Z",
+      expires_at: "2026-10-18T10:00:00.000Z",
+      answered_at: null,
+      answer: null,
+    };
+    d.family.invitationOf.mockResolvedValue(invitation);
+    expect(await load([TREE_ID, "osoba", ID.marta], {}, d)).toMatchObject({
+      data: { kind: "person", invitation },
+    });
+    const member = deps({ ...tree(), tree: { ...tree().tree, role: "EDITOR" } });
+    expect(await load([TREE_ID, "osoba", ID.marta], {}, member)).toMatchObject({
+      data: { kind: "person", invitation: null },
+    });
+    expect(member.family.invitationOf).not.toHaveBeenCalled();
   });
 });

@@ -2,6 +2,8 @@ export { createFamilyDb } from "./schema.js";
 export type {
   AuditKind,
   FamilyDB,
+  HiddenField,
+  InvitationAnswer,
   LivingStatus,
   MemberRole,
   ParentRole,
@@ -9,7 +11,15 @@ export type {
   TreesTable,
 } from "./schema.js";
 export {
+  checkHiddenFields,
   checkPerson,
+  HIDDEN_FIELDS,
+  INVITATION_DAYS,
+  INVITATION_MIN_AGE,
+  INVITATION_WINDOW_DAYS,
+  INVITATIONS_PER_WINDOW,
+  inviteProblem,
+  isHiddenField,
   NAME_MAX,
   NOTES_MAX,
   PARENTS_MAX,
@@ -20,13 +30,29 @@ export {
   YEAR_MAX,
   YEAR_MIN,
 } from "./rules.js";
-export type { PersonCheck, PersonFields, PersonInput, PersonProblem } from "./rules.js";
+export type {
+  InviteProblem,
+  PersonCheck,
+  PersonFields,
+  PersonInput,
+  PersonProblem,
+} from "./rules.js";
 export { createFamily } from "./service.js";
 export type {
+  AnswerProblem,
+  AnswerResult,
+  CardInput,
+  CardRead,
+  CardResult,
+  CardSummary,
+  CardWriteResult,
   CreateTreeResult,
   Family,
+  InvitationRead,
+  InviteResult,
   MemberProblem,
   MemberResult,
+  OpenInvitationResult,
   ParentProblem,
   ParentResult,
   PersonWriteResult,

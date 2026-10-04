@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { checkPerson, parentCount, treatedAsLiving, wouldCycle } from "./rules.js";
+import {
+  checkHiddenFields,
+  checkPerson,
+  inviteProblem,
+  parentCount,
+  treatedAsLiving,
+  wouldCycle,
+} from "./rules.js";
 
 describe("treatedAsLiving", () => {
   it("protects UNKNOWN as living and frees only DECEASED", () => {
@@ -88,5 +95,35 @@ describe("wouldCycle and parentCount", () => {
   it("counts a child's parents", () => {
     expect(parentCount(edges, "marta")).toBe(1);
     expect(parentCount(edges, "franciszek")).toBe(0);
+  });
+});
+
+describe("invitations (TASK-094, ADR-0029 §2.6.20)", () => {
+  const now = new Date("2026-10-04T12:00:00Z");
+  const row = {
+    living_status: "LIVING" as const,
+    birth_year: 1990,
+    claimed_by_user_id: null,
+    contact_declined: false,
+  };
+
+  it("invites a living or unknown adult, and names why not otherwise", () => {
+    expect(inviteProblem(row, now)).toBeNull();
+    expect(inviteProblem({ ...row, living_status: "UNKNOWN", birth_year: null }, now)).toBeNull();
+    expect(inviteProblem({ ...row, living_status: "DECEASED" }, now)).toBe("NOT_LIVING");
+    expect(inviteProblem({ ...row, birth_year: 2009 }, now)).toBe("MINOR");
+    expect(inviteProblem({ ...row, birth_year: 2008 }, now)).toBeNull();
+    expect(inviteProblem({ ...row, claimed_by_user_id: "someone" }, now)).toBe("CLAIMED");
+    expect(inviteProblem({ ...row, contact_declined: true }, now)).toBe("DECLINED");
+  });
+
+  it("knows the three fields a claimant may hide, in one order, each once", () => {
+    expect(checkHiddenFields([])).toEqual([]);
+    expect(checkHiddenFields(["birth_place", "birth_year", "birth_place"])).toEqual([
+      "birth_year",
+      "birth_place",
+    ]);
+    expect(checkHiddenFields(["surname"])).toBeNull();
+    expect(checkHiddenFields([1])).toBeNull();
   });
 });

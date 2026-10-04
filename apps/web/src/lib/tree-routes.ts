@@ -1,4 +1,5 @@
-import type { Accounts } from "@name-atlas/accounts";
+import { checkEmail, emailKey, hashToken, newToken } from "@name-atlas/accounts";
+import type { Accounts, Mailer } from "@name-atlas/accounts";
 import { checkPerson, treatedAsLiving } from "@name-atlas/family";
 import type { Family, ParentRole, PersonInput } from "@name-atlas/family";
 import { accountPath } from "./account-paths.js";
@@ -7,15 +8,21 @@ import type { AccountLog } from "./account-routes.js";
 import type { Lang } from "./messages.js";
 import { cookieValue, sessionCookieName } from "./session-cookie.js";
 import {
+  cardFromDraft,
   draftFrom,
   draftQuery,
+  HIDE_FIELD,
+  INVITATION_TOKEN,
+  invitationAnswer,
   isId,
   isSlotRole,
+  isToken,
   isTreeAction,
   personFromDraft,
   treePath,
 } from "./tree-paths.js";
 import type { PersonDraft, SlotRole, TreeAction, TreeTarget } from "./tree-paths.js";
+import { invitationMail } from "./tree-mail.js";
 import { problemWord } from "./tree-text.js";
 
 /**
@@ -40,6 +47,11 @@ import { problemWord } from "./tree-text.js";
  *   or later; otherwise the answer is the consent page with the draft, and
  *   the POST that accepts (`accept-living-terms`) records the version and
  *   then saves the person (AC-4; ADR-0029 §2.4.12).
+ * - **Invitations and claims (TASK-094, ADR-0029 §2.6).** `invite` makes the
+ *   token here, hands the service its hash and the address's hash, and mails
+ *   the token; the address itself goes into the mail and nowhere else, and a
+ *   mail that cannot be sent takes its invitation back. `answer-invitation`
+ *   spends the token; `update-card` and `leave-tree` are the claimant's.
  */
 
 export interface TreeRouteDeps {
@@ -54,10 +66,19 @@ export interface TreeRouteDeps {
     | "setParent"
     | "removeParent"
     | "setRoot"
+    | "invite"
+    | "withdrawInvitation"
+    | "answerInvitation"
+    | "updateCard"
+    | "leaveTree"
   >;
   readonly accounts: Pick<Accounts, "sessionFromToken" | "acceptTerms">;
   readonly secure: boolean;
   readonly livingTermsVersion: string;
+  /** Sends the invitation; null where no mail is configured, and then no invitation is made. */
+  readonly mailer: Mailer | null;
+  /** `SITE_ORIGIN`, for the link in the mail. */
+  readonly origin: string;
   readonly log: AccountLog;
 }
 
@@ -110,6 +131,8 @@ export function needsLivingConsent(
 interface Session {
   readonly userId: string;
   readonly termsVersion: string;
+  /** The account's address: what the invitation names as the inviter (§2.6.20). */
+  readonly email: string;
 }
 
 /** Where a person is being added or changed: a new person under a tree, or an existing one. */
@@ -184,6 +207,7 @@ async function savePerson(
     }
     if (result.kind === "NOT_FOUND") return treesPage(lang, "not-found");
     if (result.kind === "FORBIDDEN") return backToForm(lang, subject, draft, "forbidden");
+    if (result.kind === "CLAIMED") return backToForm(lang, subject, draft, "claimed-row");
     return see(
       treePath(
         lang,
@@ -199,6 +223,8 @@ async function savePerson(
   }
   if (result.kind === "NOT_FOUND") return treesPage(lang, "not-found");
   if (result.kind === "FORBIDDEN") return treesPage(lang, "forbidden");
+  // A new row is nobody's claim yet; the variant exists for `updatePerson`.
+  if (result.kind === "CLAIMED") return treesPage(lang, "forbidden");
 
   let status = "added";
   if (subject.childId !== null && subject.role !== null) {
@@ -348,6 +374,110 @@ async function run(
       if (result.kind === "FORBIDDEN") return see(treePath(lang, page, { status: "forbidden" }));
       return see(treePath(lang, page, { status: "root" }));
     }
+
+    case "invite": {
+      const treeId = field(form, "tree");
+      const personId = field(form, "person");
+      if (!isId(treeId) || !isId(personId)) return treesPage(lang, "not-found");
+      const page: TreeTarget = { page: "person", treeId, personId };
+      const back = (status: string): Response => see(treePath(lang, page, { status }));
+      if (field(form, "consent") === "") return back("invite-consent");
+      const email = checkEmail(field(form, "email"));
+      if (!email.ok) return back("invite-email");
+      if (deps.mailer === null) return back("invite-mail");
+      const token = newToken();
+      const result = await family.invite({
+        userId,
+        treeId,
+        personId,
+        tokenHash: hashToken(token).toString("hex"),
+        addressHash: emailKey(email.normalised).toString("hex"),
+      });
+      if (result.kind === "INVALID") return back(problemWord(result.problem));
+      if (result.kind === "NOT_FOUND") return back("not-found");
+      if (result.kind === "FORBIDDEN") return back("forbidden");
+      const link = `${deps.origin}${treePath(lang, { page: "invitation" }, { [INVITATION_TOKEN]: token })}`;
+      try {
+        await deps.mailer.send(invitationMail(email.email, lang, link, session.email));
+      } catch (error) {
+        deps.log.warn("tree_invitation_mail_failed", {
+          error: error instanceof Error ? error.name : "unknown",
+        });
+        await family.withdrawInvitation({ userId, invitationId: result.invitationId });
+        return back("invite-mail");
+      }
+      deps.log.info("tree_invited", { userId, treeId });
+      return back("invited");
+    }
+
+    case "answer-invitation": {
+      const token = field(form, INVITATION_TOKEN);
+      if (!isToken(token))
+        return see(treePath(lang, { page: "invitation" }, { status: "not-found" }));
+      const back = (status: string): Response =>
+        see(treePath(lang, { page: "invitation" }, { [INVITATION_TOKEN]: token, status }));
+      const answer = invitationAnswer(field(form, "answer"));
+      if (answer === null) return back("answer");
+      const result = await family.answerInvitation({
+        userId,
+        tokenHash: hashToken(token).toString("hex"),
+        answer,
+      });
+      if (result.kind === "EXPIRED") return back("expired");
+      if (result.kind === "ANSWERED") return back("answered");
+      if (result.kind === "NOT_FOUND") return back("not-found");
+      if (result.kind === "INVALID") return back(problemWord(result.problem));
+      deps.log.info("tree_invitation_answered", { userId, treeId: result.treeId, answer });
+      if (answer === "ME") {
+        return see(
+          treePath(lang, { page: "card", personId: result.personId }, { status: "claimed" }),
+        );
+      }
+      return see(
+        treePath(
+          lang,
+          { page: "cards" },
+          { status: answer === "NOT_ME" ? "not-me" : "no-contact" },
+        ),
+      );
+    }
+
+    case "update-card": {
+      const personId = field(form, "person");
+      if (!isId(personId)) return see(treePath(lang, { page: "cards" }, { status: "not-found" }));
+      const page: TreeTarget = { page: "card", personId };
+      const draft = draftFrom((name) => fieldOrNull(form, name));
+      const hidden = form.getAll(HIDE_FIELD).filter((v): v is string => typeof v === "string");
+      const result = await family.updateCard({
+        userId,
+        personId,
+        card: cardFromDraft(draft, hidden),
+      });
+      if (result.kind === "INVALID")
+        return see(
+          treePath(lang, page, {
+            ...draftQuery(draft),
+            status: problemWord(result.problems[0] ?? "ERROR"),
+          }),
+        );
+      if (result.kind === "NOT_FOUND")
+        return see(treePath(lang, { page: "cards" }, { status: "not-found" }));
+      if (result.kind === "FORBIDDEN") return see(treePath(lang, page, { status: "forbidden" }));
+      return see(treePath(lang, page, { status: "saved" }));
+    }
+
+    case "leave-tree": {
+      const personId = field(form, "person");
+      if (!isId(personId)) return see(treePath(lang, { page: "cards" }, { status: "not-found" }));
+      if (field(form, "confirm") === "") {
+        return see(treePath(lang, { page: "card", personId }, { status: "confirm" }));
+      }
+      const result = await family.leaveTree({ userId, personId });
+      if (result.kind !== "OK")
+        return see(treePath(lang, { page: "cards" }, { status: "not-found" }));
+      deps.log.info("tree_left", { userId });
+      return see(treePath(lang, { page: "cards" }, { status: "left" }));
+    }
   }
 }
 
@@ -378,7 +508,7 @@ export async function handleTreePost(
     return await run(
       action,
       form,
-      { userId: session.userId, termsVersion: session.termsVersion },
+      { userId: session.userId, termsVersion: session.termsVersion, email: session.email },
       deps,
     );
   } catch (error) {
