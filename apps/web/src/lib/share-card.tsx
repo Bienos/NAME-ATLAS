@@ -650,7 +650,7 @@ export async function renderShareCard(
 }
 
 /**
- * The video's layers (TASK-105): the same card split so the clip can bring its
+ * The video's layers (TASK-108): the same card split so the clip can bring its
  * figures in. `base` is the card with its figures and visual hidden, `reveal`
  * only those, on a transparent ground, in the same places. `intro` is the
  * clip's opening plate without the surname, `intro-name` the surname alone.
@@ -853,7 +853,7 @@ function ground(paper: boolean) {
 }
 
 /**
- * The clip's opening plate (TASK-105): the wordmark, the surname large and a
+ * The clip's opening plate (TASK-108): the wordmark, the surname large and a
  * question the next card answers. It states no fact. `intro` is the plate
  * without the surname, `intro-name` the surname alone, so the clip can draw it in.
  */

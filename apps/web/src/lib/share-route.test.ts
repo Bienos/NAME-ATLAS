@@ -132,7 +132,7 @@ describe("the card's preview (TASK-093, AC-2)", () => {
   });
 });
 
-describe("the video's layers (TASK-105)", () => {
+describe("the video's layers (TASK-108)", () => {
   it("draws a known layer with the opening's question, behind the same gate", async () => {
     const response = await shareCardResponse(
       "kowalski",

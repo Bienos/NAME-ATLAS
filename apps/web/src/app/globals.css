@@ -9369,6 +9369,12 @@ main.studio h1 {
   align-items: start;
 }
 
+/* A horizontal swipe on the card shows the next one; vertical scrolling stays the page's. */
+.studio-swipe {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .studio-image {
   display: block;
   width: 100%;
@@ -9398,6 +9404,7 @@ main.studio h1 {
 
 .studio-actions button,
 .studio-video button,
+.studio-pdf,
 .studio-gate a,
 .studio-more a,
 .studio-more .share button {
@@ -9430,7 +9437,7 @@ main.studio h1 {
 }
 
 .studio-actions button:disabled,
-/* The video's choices (TASK-105): two options a row, as pills. */
+/* The video's choices (TASK-108): two options a row, as pills. */
 .studio-choice {
   display: flex;
   flex-wrap: wrap;

@@ -218,7 +218,7 @@ export function LandingHow({ lang }: { lang: Lang }) {
 }
 
 /**
- * The offer in one strip (TASK-065): the three tiers as the offer page words
+ * The offer in one strip (TASK-065): the tiers as the offer page words
  * them — `offerDocument` is the one owner of their names, prices and status —
  * then the page itself and its waiting list. Nothing here can be bought.
  */
@@ -241,7 +241,7 @@ export function LandingOffer({ lang }: { lang: Lang }) {
       </ul>
       <p className="landing-more">
         <a href={offerPath(lang)}>{t.offerAll}</a>
-        <a href={`${offerPath(lang)}#tier-family`}>{t.offerWaitlist}</a>
+        <a href={`${offerPath(lang)}#tier-smaller`}>{t.offerWaitlist}</a>
       </p>
     </section>
   );

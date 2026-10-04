@@ -7,12 +7,12 @@ import {
   videoSchedule,
 } from "./share-video.js";
 
-/** TASK-097 AC-2 and TASK-105 AC-1: the clip's timeline, and whether the browser may make it. */
+/** TASK-097 AC-2 and TASK-108 AC-1: the clip's timeline, and whether the browser may make it. */
 
 const FULL = { length: "full", motion: "up" } as const;
 const SHORT = { length: "short", motion: "side" } as const;
 
-describe("the clip's timeline (TASK-105 AC-1)", () => {
+describe("the clip's timeline (TASK-108 AC-1)", () => {
   it("opens on the surname, then the cards in order, and the full clip closes on the summary", () => {
     expect(videoSchedule(3, FULL).segments).toEqual([
       { kind: "intro" },

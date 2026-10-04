@@ -181,7 +181,7 @@ export function StudioVideo({
     }
   }
 
-  /** One choice as a row of two options (TASK-105). */
+  /** One choice as a row of two options (TASK-108). */
   const choice = <T extends string>(
     name: string,
     legend: string,

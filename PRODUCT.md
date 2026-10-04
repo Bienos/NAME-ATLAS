@@ -90,15 +90,13 @@ Rules:
 - Premium is offered **only** when coverage and the DiscoveryIndex show real inventory exists for that surname.
 - The report is an immutable, versioned artifact with claim references and citations.
 - The surname report never implies anything about the buyer's specific family. Only what the reader enters into their own tree, or asks a genealogist to research, is about their family.
-- Three tiers, in PLN (ADR-0026, which supersedes ADR-0023's two products):
-  - **Free.** The cards, a share card for each answer, the full page and the comparison. Later, a free account to keep and share cards.
-  - **Nazwisko i rodzina**, 29.99 zł:
-    - the report above;
-    - famous bearers ("shares the surname — not your relative");
-    - a family tree the reader builds and may connect to other readers' trees;
-    - more inputs and extra research from the sources the site holds.
-  - **Genealogia z DNA**, 499 zł. Research into the reader's family by professional genealogists, with DNA analysis, through a partner. Enquiries go to the owner by email.
-- Both paid tiers show "Wkrótce" until they exist and can lawfully be sold. Whether each is one payment or recurring is open (D-024).
+- Five tiers, in PLN, each a one-time payment (ADR-0037, which supersedes ADR-0026's three):
+  - **Free, with an account.** The cards, a share card for each answer, the full page and the comparison; famous bearers ("shares the surname — not your relative"); a family tree of up to 5 people; connecting trees, with matches up to second cousins.
+  - **"smaller research"**, 28,99 zł: the tree unlock (a tree of more than 5 people, and matches beyond second cousins). Anything else is not yet confirmed.
+  - **"couple"**, 89,99 zł: the couple report (ADR-0035), and the tree unlock.
+  - **"family review"**, 199 zł: the tree unlock. Anything else is not yet confirmed.
+  - **"genealogist research"**, 800 zł: research into the reader's family by a partner genealogist, with DNA analysis, paid to Name Atlas; and the tree unlock. Enquiries go to the owner by email.
+- Every paid tier shows "Wkrótce" until it exists and can lawfully be sold.
 
 ## 7. Trust and evidence rules
 
@@ -121,7 +119,7 @@ Not in the free surname product, and not on its critical path. ADR-0026 lifts 1�
 - connecting trees matches only people who have died;
 - DNA analysis is a partner genealogist's service; Name Atlas does not ingest DNA data.
 
-Whether 11 is lifted for the 29.99 zł tier is D-024.
+Non-goal 11 holds for every tier: each is a one-time payment (ADR-0037, D-024).
 
 1. Automatic ancestor identification or confirmed family relationships.
 2. Family tree construction, FamilyBranch, person-level record matching.

@@ -16,13 +16,15 @@ import type { Lang } from "./messages.js";
  */
 
 /** Cached at the edge for an hour: the facts change only when data is loaded. */
-const CACHE = { "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400" };
+export const CACHE = {
+  "Cache-Control": "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+};
 
 /**
  * With accounts on, an image goes to one reader (TASK-064): a shared cache that
  * kept it would hand it to a reader with no session, so nothing keeps it.
  */
-const PRIVATE = { "Cache-Control": "private, no-store" };
+export const PRIVATE = { "Cache-Control": "private, no-store" };
 
 /**
  * The gate (TASK-064, `download-gate.ts`) comes after the card is known and
@@ -39,8 +41,28 @@ export async function shareCardResponse(
   layer: string | null = null,
 ): Promise<Response> {
   if (!isShareCard(card)) return new Response("Not found", { status: 404 });
-  // The video's layers (TASK-105): an unknown one is no image, so nothing caches it.
+  // The video's layers (TASK-108): an unknown one is no image, so nothing caches it.
   if (layer !== null && !isCardLayer(layer)) return new Response("Not found", { status: 404 });
+  const refused = gateRefusal(gate);
+  if (refused !== null) return refused;
+  const found = await factsFor(rawSlug, card, lang, "");
+  if (found instanceof Response) return found;
+  const origin = requestOrigin(hostHeader);
+  const host = origin === null ? null : new URL(origin).host;
+  return renderShareCard(
+    found,
+    host,
+    gate === "open" ? PRIVATE : CACHE,
+    null,
+    layer === null || !isCardLayer(layer) ? null : { layer, hook: UI[lang].videoHook },
+  );
+}
+
+/**
+ * What the gate answers instead of a file (TASK-064): 401 without a session,
+ * 503 when the accounts database cannot say, nothing when the file may go.
+ */
+export function gateRefusal(gate: GateVerdict): Response | null {
   if (gate === "sign-in") {
     return new Response("Sign in to save the image", {
       status: 401,
@@ -53,17 +75,7 @@ export async function shareCardResponse(
       headers: { "Cache-Control": "no-store", "Retry-After": "60" },
     });
   }
-  const found = await factsFor(rawSlug, card, lang, "");
-  if (found instanceof Response) return found;
-  const origin = requestOrigin(hostHeader);
-  const host = origin === null ? null : new URL(origin).host;
-  return renderShareCard(
-    found,
-    host,
-    gate === "open" ? PRIVATE : CACHE,
-    null,
-    layer === null || !isCardLayer(layer) ? null : { layer, hook: UI[lang].videoHook },
-  );
+  return null;
 }
 
 /**

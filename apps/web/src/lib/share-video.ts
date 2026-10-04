@@ -1,5 +1,5 @@
 /**
- * The share video (TASK-097, TASK-105, ADR-0034 §2.6): a short vertical MP4
+ * The share video (TASK-097, TASK-108, ADR-0034 §2.6): a short vertical MP4
  * made in the browser from the surname's own share-card images, with no audio.
  * The server draws the images (each card in two layers, and an opening plate);
  * the clip is put together in the browser and nothing is stored. The muxer (`mediabunny`) is
@@ -48,7 +48,7 @@ declare function fetch(
   input: string,
 ): Promise<{ readonly ok: boolean; readonly status: number; blob(): Promise<BlobLike> }>;
 
-/** The clip's shape (TASK-097 §3, TASK-105): 1080 × 1920 at 30 fps, no audio. */
+/** The clip's shape (TASK-097 §3, TASK-108): 1080 × 1920 at 30 fps, no audio. */
 export const VIDEO = {
   width: 1080,
   height: 1920,
@@ -79,7 +79,7 @@ export const VIDEO = {
   bitrate: 6_000_000,
 } as const;
 
-/** The reader's choices (TASK-105): how long, and which way the cards move. */
+/** The reader's choices (TASK-108): how long, and which way the cards move. */
 export type VideoLength = "short" | "full";
 export type VideoMotion = "up" | "side";
 export interface VideoOptions {
@@ -121,7 +121,7 @@ function ease(x: number): number {
 }
 
 /**
- * The clip's timeline for `count` cards (TASK-105 AC-1). The opening plate,
+ * The clip's timeline for `count` cards (TASK-108 AC-1). The opening plate,
  * then each card pushed in and held while its figures rise in; a full clip
  * pushes the summary in again to close. A card's figures are never drawn part
  * way through a number: the whole figure moves in, faded. Pure, so it is
@@ -174,7 +174,7 @@ export function videoSchedule(count: number, options: VideoOptions = DEFAULT_VID
   };
 }
 
-/** Each card's two layers, and the opening's (TASK-105): the addresses the clip reads. */
+/** Each card's two layers, and the opening's (TASK-108): the addresses the clip reads. */
 export function layerUrls(cardUrls: readonly string[], count: number) {
   const layer = (url: string, name: string) =>
     `${url}${url.includes("?") ? "&" : "?"}layer=${name}`;
@@ -301,7 +301,7 @@ async function bitmap(url: string): Promise<ImageLike> {
 }
 
 /**
- * Makes the clip from the cards' image addresses (TASK-097 §3, TASK-105),
+ * Makes the clip from the cards' image addresses (TASK-097 §3, TASK-108),
  * reporting progress from 0 to 1, and returns it as `video/mp4`. Each card is
  * read in its two layers and the opening from the summary's. `isCancelled` is
  * checked between frames.
