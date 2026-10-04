@@ -10,7 +10,7 @@ import type { GateVerdict } from "./download-gate.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The surname's PDF (TASK-104): `/pl/nazwisko/{slug}/pdf` and
+ * The surname's PDF (TASK-107): `/pl/nazwisko/{slug}/pdf` and
  * `/en/surname/{slug}/pdf`. Every card the studio offers, summary first, one
  * per page, each the same validated image as its share card with its source
  * and date. Nothing is drawn that the cards do not already show. The download

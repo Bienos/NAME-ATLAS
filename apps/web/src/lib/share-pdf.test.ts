@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { PDF_PAGE, cardsPdf, pdfFileName, surnamePdfResponse } from "./share-pdf.js";
 import { surnamePdfPath } from "./share-facts.js";
 
-/** TASK-104: every card of the surname in one PDF, behind the card's download gate. */
+/** TASK-107: every card of the surname in one PDF, behind the card's download gate. */
 
 /** A 1 × 1 PNG, enough for pdf-lib to embed. */
 const PNG = Uint8Array.from(
@@ -13,7 +13,7 @@ const PNG = Uint8Array.from(
   ),
 );
 
-describe("the surname's PDF (TASK-104)", () => {
+describe("the surname's PDF (TASK-107)", () => {
   it("puts each card on its own 9:16 page, in order, with a title and language", async () => {
     const bytes = await cardsPdf([PNG, PNG, PNG], { title: "KOWALSKI — Name Atlas", lang: "pl" });
     const doc = await PDFDocument.load(bytes);

@@ -1,8 +1,9 @@
-# TASK-104 — The surname's PDF: every card in one file, for a reader who may download
+# TASK-107 — The surname's PDF: every card in one file, for a reader who may download
 
 - **Status:** IMPLEMENTED 2026-10-04 on `claude/surname-pdf`; record: `docs/progress/2026-10-04-surname-pdf.md`.
 - **Requested by:** the project owner, 2026-10-04: "pełen pdf do ściągnięcia powinien być też". Asked who may take it, they chose "Zalogowani za darmo": the same gate as the card's image.
 - **Decision:** no new ADR. The PDF is the studio's card images put together (ADR-0034); it adds no claim, fact or data path, and uses TASK-064's gate.
+- **Numbering:** first opened as TASK-104; #119 took 104 first, and #122 and #123 took 105 and 106, so this is TASK-107.
 - **Depends on:** TASK-056 (the card images), TASK-064 (the gate), TASK-093 (the studio).
 
 ## 1. Goal

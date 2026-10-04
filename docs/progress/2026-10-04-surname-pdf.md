@@ -1,4 +1,4 @@
-# 2026-10-04 — TASK-104: the surname's PDF
+# 2026-10-04 — TASK-107: the surname's PDF
 
 ## Changed
 
@@ -9,7 +9,7 @@
 - `share-studio.tsx`, `messages.ts`, `globals.css`: the studio's "Pobierz PDF ze wszystkimi kartami" / "Download a PDF of every card", beside the video, only where the card may be downloaded.
 - Tests: `share-pdf.test.ts` (new, 3), `share-studio.test.ts` (the link with `off`/`open`, not with `sign-in`).
 - `apps/web/package.json`, `pnpm-lock.yaml`: `pdf-lib` 1.17.1 (MIT, pure JavaScript; its dependencies are `@pdf-lib/standard-fonts`, `@pdf-lib/upng`, `pako`, `tslib`). Justification: no installed package writes a PDF.
-- `tasks/104-surname-pdf.md`, `docs/CODEMAP.md`, `STATUS.md`.
+- `tasks/107-surname-pdf.md`, `docs/CODEMAP.md`, `STATUS.md`.
 
 ## Verification
 

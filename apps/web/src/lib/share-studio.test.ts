@@ -41,7 +41,7 @@ describe("the share studio (TASK-093)", () => {
       expect(html, gate).not.toContain("/podglad");
       expect(html, gate).toContain(UI.pl.studioDownload);
       expect(html, gate).toContain(UI.pl.studioInstagram);
-      // TASK-104: every card in one PDF, beside the card's own buttons.
+      // TASK-107: every card in one PDF, beside the card's own buttons.
       expect(html, gate).toContain('href="/pl/nazwisko/kowalski/pdf"');
       expect(html, gate).not.toContain(UI.pl.studioSignInPrompt);
     }

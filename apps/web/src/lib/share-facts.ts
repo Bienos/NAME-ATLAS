@@ -591,7 +591,7 @@ export function sharePreviewPath(pagePath: string, card: ShareCardKey, lang: Lan
   return `${shareCardPath(pagePath, card, lang)}/${lang === "en" ? "preview" : "podglad"}`;
 }
 
-/** Every card of the surname in one PDF (TASK-104): `/pl/nazwisko/{slug}/pdf`. */
+/** Every card of the surname in one PDF (TASK-107): `/pl/nazwisko/{slug}/pdf`. */
 export function surnamePdfPath(pagePath: string): string {
   return `${pagePath}/pdf`;
 }
