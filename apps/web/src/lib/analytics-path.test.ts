@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyticsUrl, redactSurnamePath } from "./analytics-path.js";
+import { analyticsUrl, redactSurnamePath, redactTreePath } from "./analytics-path.js";
 import { beforeSend } from "./site-analytics.js";
 
 const HOST = "https://name-atlas-two.vercel.app";
@@ -86,5 +86,16 @@ describe("TASK-076 AC-7: the analytics never sees a tree's or a person's id", ()
     expect(analyticsUrl("/pl/konto/drzewa/zgoda?tree=x&given=Halina")).toBe(
       "/pl/konto/drzewa/zgoda",
     );
+  });
+});
+
+describe("the Konstelacja's address in the statistics (TASK-091, AC-1)", () => {
+  it("keeps the view's slug and replaces the tree's id", () => {
+    expect(
+      redactTreePath("/pl/konto/drzewa/0199a1b2-0000-7000-8000-00000000aa01/konstelacja"),
+    ).toBe("/pl/konto/drzewa/[tree]/konstelacja");
+    expect(
+      redactTreePath("/en/account/trees/0199a1b2-0000-7000-8000-00000000aa01/constellation"),
+    ).toBe("/en/account/trees/[tree]/constellation");
   });
 });

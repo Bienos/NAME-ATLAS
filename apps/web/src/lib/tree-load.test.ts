@@ -181,3 +181,35 @@ describe("the tree pages' decisions (TASK-076)", () => {
     });
   });
 });
+
+describe("the Konstelacja's decision (TASK-091)", () => {
+  it("draws the same slots as the pedigree, picks the slot the address names or the root, and counts the unplaced", async () => {
+    const root = await load([TREE_ID, "konstelacja"]);
+    if (root.kind !== "view" || root.data.kind !== "constellation")
+      throw new Error("expected the constellation");
+    expect(root.data.slots.map((slot) => slot.n)).toEqual(
+      (await load([TREE_ID])).kind === "view" ? root.data.slots.map((slot) => slot.n) : [],
+    );
+    expect(root.data.picked).toBe(1);
+    expect(root.data.unplacedCount).toBe(1);
+    expect(root.data.status).toBeNull();
+
+    const picked = await load([TREE_ID, "konstelacja"], { sel: "10" });
+    if (picked.kind !== "view" || picked.data.kind !== "constellation")
+      throw new Error("expected the constellation");
+    expect(picked.data.picked).toBe(10);
+    const stray = await load([TREE_ID, "konstelacja"], { sel: "77" });
+    if (stray.kind !== "view" || stray.data.kind !== "constellation")
+      throw new Error("expected the constellation");
+    expect(stray.data.picked).toBe(1);
+  });
+
+  it("is a view for a member too, with the hidden count the tree carries", async () => {
+    const member = await load([TREE_ID, "konstelacja"], {}, deps(treeForMember()));
+    if (member.kind !== "view" || member.data.kind !== "constellation")
+      throw new Error("expected the constellation");
+    expect(member.data.tree.hidden_living_count).toBeGreaterThan(0);
+    expect(member.data.tree.tree.role).toBe("VIEWER");
+    expect(await load([TREE_ID, "nope"])).toEqual({ kind: "not-found" });
+  });
+});

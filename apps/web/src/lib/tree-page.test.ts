@@ -311,3 +311,110 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
     expect(html).toContain(`class="nav-trees" href="${treeLandingPath("pl")}" aria-current="page"`);
   });
 });
+
+function constellationData(
+  lang: "pl" | "en",
+  t = tree(),
+  picked = 1,
+): Extract<TreePageData, { kind: "constellation" }> {
+  const slots = pedigree(t);
+  return {
+    kind: "constellation",
+    lang,
+    status: null,
+    tree: t,
+    slots,
+    picked,
+    unplacedCount: unplaced(t, slots).length,
+  };
+}
+
+describe("the Konstelacja view (TASK-091)", () => {
+  it("draws every slot as a star that is a link to ?sel=n, the switch, the legend and the root's panel, in both languages (AC-4, AC-6)", () => {
+    const shapes: string[] = [];
+    for (const lang of LANGS) {
+      const t = TREE_TEXT[lang];
+      const html = render(constellationData(lang));
+      const slots = pedigree(tree());
+      expect(html).toContain(`lang="${htmlLang(lang)}"`);
+      expect(html).toContain(t.constellation.lede);
+      expect(html).toContain(`aria-label="${t.constellation.viewsLabel}"`);
+      expect(html).toContain(
+        `href="${treePath(lang, { page: "constellation", treeId: TREE_ID })}" aria-current="page"`,
+      );
+      expect(html).toContain(`href="${treePath(lang, { page: "tree", treeId: TREE_ID })}"`);
+      for (const slot of slots) expect(html).toContain(`href="?sel=${slot.n}"`);
+      expect(html.match(/href="\?sel=/gu)?.length).toBe(slots.length);
+      expect(html).toContain(`href="?sel=1" class="tree-star tree-star-living"`);
+      expect(html.match(/tree-star-[a-z]+" aria-label="[^"]*" aria-current="true"/gu)?.length).toBe(
+        1,
+      );
+      expect(html).toContain(`${PEOPLE.marta.given_names} ${PEOPLE.marta.surname}</h3>`);
+      expect(html).toContain(t.constellation.panel.livingNote);
+      expect(html).toContain(
+        `href="${treePath(lang, { page: "person", treeId: TREE_ID, personId: ID.marta })}"`,
+      );
+      expect(html).toContain(t.constellation.note);
+      for (const word of Object.values(t.constellation.legend)) expect(html).toContain(word);
+      expect(html).toContain(t.constellation.outside(1));
+      expect(html).toContain(t.constellation.arcLabel(3));
+      expect(html).not.toContain("<script");
+      const stars = html.slice(html.indexOf('<div class="tree-stars">'), html.indexOf("</aside>"));
+      shapes.push(stars.replace(/>[^<]*</gu, "><").replace(/"[^"]*"/gu, '""'));
+    }
+    expect(shapes[0]).toBe(shapes[1]);
+  });
+
+  it("shows an empty place's panel with the way to add that parent, and nothing to add for a viewer (AC-5)", () => {
+    const html = render(constellationData("pl", tree(), 7));
+    expect(html).toContain(
+      `href="?sel=7" class="tree-star tree-star-empty" aria-label="puste miejsce" aria-current="true"`,
+    );
+    expect(html).toContain("Brak danych.</h3>");
+    expect(html).toContain(
+      `href="${treePath("pl", { page: "add", treeId: TREE_ID }, { child: ID.ewa, role: "MOTHER" })}">Dodaj matkę</a>`,
+    );
+    // A member whose tree starts from a deceased person: stars, but nothing to add or edit.
+    const member = treeForMember();
+    const viewer = render(
+      constellationData("pl", { ...member, tree: { ...member.tree, root_person_id: ID.jozef } }, 2),
+    );
+    expect(viewer).toContain(TREE_TEXT.pl.pedigree.viewer);
+    expect(viewer).toContain(TREE_TEXT.pl.pedigree.hiddenCount(member.hidden_living_count));
+    expect(viewer).not.toContain("/dodaj");
+    expect(viewer).not.toContain("/osoba/");
+    expect(viewer).toContain("tree-star-entered");
+    expect(viewer).toContain(`>${TREE_TEXT.pl.constellation.noneName}</text>`);
+    expect(viewer).not.toContain(`>${TREE_TEXT.pl.constellation.emptyName}</text>`);
+    // A member whose root is a person they may not see has no stars, and no way to start.
+    const blind = render(constellationData("pl", member, 1));
+    expect(blind).not.toContain("?sel=");
+    expect(blind).toContain(TREE_TEXT.pl.question.startLede);
+    expect(blind).not.toContain(TREE_TEXT.pl.pedigree.addFirst);
+    // A parent the caller may not see is a hidden star with its own panel.
+    const withHidden = tree({
+      parentage: [
+        ...tree().parentage,
+        { child_id: ID.jozef, parent_id: ID.hidden, role: "FATHER" },
+      ],
+      hidden_living_count: 1,
+    });
+    const hidden = render(constellationData("pl", withHidden, 8));
+    expect(hidden).toContain(`href="?sel=8" class="tree-star tree-star-hidden"`);
+    expect(hidden).toContain(`${TREE_TEXT.pl.constellation.panel.hiddenHeading}</h3>`);
+    expect(hidden).toContain(TREE_TEXT.pl.constellation.panel.hiddenText);
+    expect(hidden).toContain(`>${TREE_TEXT.pl.constellation.hiddenName}</text>`);
+  });
+
+  it("names the page in the metadata and switches to the pedigree from the Rodowód too (AC-6)", () => {
+    expect(treeMetadata("pl", "constellation").title).toBe("Konstelacja — Name Atlas");
+    expect(treeMetadata("en", "constellation").title).toBe("Constellation — Name Atlas");
+    const rodowod = render(treeData("pl"));
+    expect(rodowod).toContain(
+      `href="${treePath("pl", { page: "tree", treeId: TREE_ID })}" aria-current="page"`,
+    );
+    expect(rodowod).toContain(
+      `href="${treePath("pl", { page: "constellation", treeId: TREE_ID })}"`,
+    );
+  });
+});

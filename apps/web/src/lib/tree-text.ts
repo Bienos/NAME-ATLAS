@@ -1,5 +1,6 @@
 import type { LivingStatus, TreePersonRead } from "@name-atlas/family";
 import type { Lang } from "./messages.js";
+import type { StarKind } from "./tree-constellation.js";
 import type { SlotRole, TreePage } from "./tree-paths.js";
 
 /**
@@ -146,6 +147,39 @@ export interface TreeText {
     readonly deleteConfirm: string;
     readonly deleteSubmit: string;
     readonly back: string;
+  };
+  /** The Konstelacja view (TASK-091): the sky, the stars' words, the legend, the panel. */
+  readonly constellation: {
+    readonly lede: string;
+    readonly viewsLabel: string;
+    readonly views: Readonly<Record<"tree" | "constellation", string>>;
+    readonly skyLabel: string;
+    readonly arcLabel: (generation: number) => string;
+    /** The word a star carries for its kind, in a label such as "Józef Zieliński, ze źródła". */
+    readonly kind: Readonly<Record<StarKind, string>>;
+    /** The short name under an empty or a hidden star. */
+    readonly emptyName: string;
+    readonly noneName: string;
+    readonly hiddenName: string;
+    readonly emptySub: string;
+    readonly legend: Readonly<Record<Exclude<StarKind, "hidden">, string>>;
+    readonly note: string;
+    readonly outside: (n: number) => string;
+    readonly outsideLink: string;
+    readonly panel: {
+      readonly heading: string;
+      readonly emptyHeading: string;
+      readonly emptyText: string;
+      readonly hiddenHeading: string;
+      readonly hiddenText: string;
+      readonly birth: string;
+      readonly birthSurname: string;
+      readonly death: string;
+      readonly source: string;
+      readonly sourceChip: string;
+      readonly livingNote: string;
+      readonly edit: string;
+    };
   };
   readonly form: {
     readonly roleHeading: (role: SlotRole) => string;
@@ -354,6 +388,7 @@ const PL: TreeText = {
     trees: "Twoje drzewa",
     consent: "Ta osoba żyje?",
     tree: "Rodowód",
+    constellation: "Konstelacja",
     add: "Dodaj osobę",
     person: "Osoba",
   },
@@ -410,6 +445,49 @@ const PL: TreeText = {
     deleteConfirm: "Rozumiem. Usuń to drzewo na stałe.",
     deleteSubmit: "Usuń drzewo",
     back: "Wszystkie drzewa",
+  },
+  constellation: {
+    lede: "Te same cztery pokolenia jako gwiazdozbiór: Ty na dole, przodkowie coraz wyżej. Wybierz gwiazdę, żeby zobaczyć osobę.",
+    viewsLabel: "Widok drzewa",
+    views: { tree: "Rodowód", constellation: "Konstelacja" },
+    skyLabel: "Drzewo jako gwiazdozbiór",
+    arcLabel: (generation) => `Pokolenie ${["I", "II", "III", "IV"][generation] ?? generation + 1}`,
+    kind: {
+      source: "ze źródła",
+      entered: "wpisane przez Ciebie",
+      living: "żyje, prywatne",
+      hidden: "osoba ukryta",
+      empty: "puste miejsce",
+    },
+    emptyName: "Dodaj",
+    noneName: "Brak",
+    hiddenName: "Ukryta",
+    emptySub: "brak danych",
+    legend: {
+      source: "Ze źródła",
+      entered: "Wpisane przez Ciebie",
+      living: "Żyje, prywatne",
+      empty: "Brak danych",
+    },
+    note: "Światło oznacza źródło, nie pewność. Puste miejsca zostają puste.",
+    outside: (n) => (n === 1 ? "1 osoba poza rodowodem." : `${n} osób poza rodowodem.`),
+    outsideLink: "Zobacz w rodowodzie",
+    panel: {
+      heading: "Osoba",
+      emptyHeading: "Brak danych.",
+      emptyText:
+        "Nie wpisano tej osoby. Puste miejsce zostaje puste, dopóki nie dodasz osoby ze swojej wiedzy albo z dokumentu.",
+      hiddenHeading: "Osoba ukryta.",
+      hiddenText: "Właściciel drzewa nie udostępnił tej osoby.",
+      birth: "Urodzenie",
+      birthSurname: "Nazwisko rodowe",
+      death: "Zgon",
+      source: "Skąd to wiesz",
+      sourceChip: "Ze źródła",
+      livingNote:
+        "Widzisz tę osobę tylko Ty. Nie bierze udziału w dopasowaniach z innymi drzewami.",
+      edit: "Edytuj",
+    },
   },
   form: {
     roleHeading: (role) => (role === "MOTHER" ? "Matka" : "Ojciec"),
@@ -502,6 +580,7 @@ const PL: TreeText = {
       error: problem(PL_PROBLEMS.error),
     },
     add: personProblems(PL_PROBLEMS),
+    constellation: {},
     person: {
       saved: ok("Zapisano."),
       linked: ok("Rodzic połączony."),
@@ -621,6 +700,7 @@ const EN: TreeText = {
     trees: "Your trees",
     consent: "Is this person living?",
     tree: "Pedigree",
+    constellation: "Constellation",
     add: "Add a person",
     person: "Person",
   },
@@ -677,6 +757,50 @@ const EN: TreeText = {
     deleteConfirm: "I understand. Delete this tree for good.",
     deleteSubmit: "Delete the tree",
     back: "All trees",
+  },
+  constellation: {
+    lede: "The same four generations as a constellation: you at the bottom, the ancestors higher up. Pick a star to see the person.",
+    viewsLabel: "View of the tree",
+    views: { tree: "Pedigree", constellation: "Constellation" },
+    skyLabel: "The tree as a constellation",
+    arcLabel: (generation) =>
+      `Generation ${["I", "II", "III", "IV"][generation] ?? generation + 1}`,
+    kind: {
+      source: "from a source",
+      entered: "entered by you",
+      living: "living, private",
+      hidden: "hidden person",
+      empty: "empty place",
+    },
+    emptyName: "Add",
+    noneName: "None",
+    hiddenName: "Hidden",
+    emptySub: "no data",
+    legend: {
+      source: "From a source",
+      entered: "Entered by you",
+      living: "Living, private",
+      empty: "No data",
+    },
+    note: "Light means a source, not certainty. Empty places stay empty.",
+    outside: (n) =>
+      n === 1 ? "1 person outside the pedigree." : `${n} people outside the pedigree.`,
+    outsideLink: "See them in the pedigree",
+    panel: {
+      heading: "Person",
+      emptyHeading: "No data.",
+      emptyText:
+        "Nobody has been entered here. An empty place stays empty until you add a person from what you know or from a document.",
+      hiddenHeading: "Hidden person.",
+      hiddenText: "The tree's owner has not shared this person.",
+      birth: "Birth",
+      birthSurname: "Birth surname",
+      death: "Death",
+      source: "How you know",
+      sourceChip: "From a source",
+      livingNote: "Only you see this person. They take no part in matching with other trees.",
+      edit: "Edit",
+    },
   },
   form: {
     roleHeading: (role) => (role === "MOTHER" ? "Mother" : "Father"),
@@ -772,6 +896,7 @@ const EN: TreeText = {
       error: problem(EN_PROBLEMS.error),
     },
     add: personProblems(EN_PROBLEMS),
+    constellation: {},
     person: {
       saved: ok("Saved."),
       linked: ok("Parent linked."),
