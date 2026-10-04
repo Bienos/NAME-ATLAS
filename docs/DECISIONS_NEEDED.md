@@ -157,7 +157,7 @@ The owner selected `name-atlas.pl` as primary and `nameatlas.pl` as alternate on
 
 ## D-025 — the tiers the owner named on 2026-10-01 evening, against ADR-0026's
 
-**Status:** ANSWERED 2026-10-04 (below). An ADR superseding ADR-0026 is the next step; until it is accepted the offer page and checkout stay as they are.
+**Status:** ANSWERED 2026-10-04 (below). ADR-0037 (proposed 2026-10-04, TASK-104) records the set and supersedes ADR-0026's tiers; the offer page follows it on that branch. This entry is deleted when ADR-0037 is accepted. Still open, and not blocking: what else the 28,99 zł and 199 zł tiers hold.
 **Owner:** project owner.
 **Raised by:** ADR-0028's session, 2026-10-01.
 
@@ -216,7 +216,7 @@ ADR-0028 (what may be shown) names no price, so it holds under either set.
 
 ## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
 
-**Status:** ANSWERED 2026-10-04 for the owner's new tier set (D-025): every tier is one payment for now, and the 800 zł tier that replaces the 499 zł one is paid to Name Atlas.
+**Status:** ANSWERED 2026-10-04 for the owner's new tier set (D-025): every tier is one payment for now, and the 800 zł tier that replaces the 499 zł one is paid to Name Atlas. Recorded in ADR-0037 §2.1 and §2.4.
 **Owner:** project owner.
 **Raised by:** TASK-057 (ADR-0026 §4), 2026-10-01.
 
