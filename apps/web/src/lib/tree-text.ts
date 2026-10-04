@@ -147,6 +147,9 @@ export interface TreeText {
     readonly entered: string;
     readonly added: (name: string) => string;
     readonly viewer: string;
+    /** The download (TASK-098): the link's words and the line under it. */
+    readonly exportLink: string;
+    readonly exportHint: string;
     readonly deleteHeading: string;
     readonly deleteLede: string;
     readonly deleteConfirm: string;
@@ -510,6 +513,9 @@ const PL: TreeText = {
     entered: "Wpisane przez Ciebie",
     added: (name) => `${name} jest w drzewie.`,
     viewer: "Oglądasz to drzewo. Zmienia je jego właściciel.",
+    exportLink: "Pobierz drzewo (JSON)",
+    exportHint:
+      "Plik z tym, co widzisz: osoby, powiązania, miejsca jako kody TERYT. Każde pobranie jest zapisywane w historii drzewa.",
     deleteHeading: "Usuń drzewo",
     deleteLede:
       "Drzewo, wszystkie osoby, powiązania i zapisy zmian znikają od razu i nie da się tego cofnąć.",
@@ -966,6 +972,9 @@ const EN: TreeText = {
     entered: "Entered by you",
     added: (name) => `${name} is in the tree.`,
     viewer: "You are viewing this tree. Its owner changes it.",
+    exportLink: "Download the tree (JSON)",
+    exportHint:
+      "A file of what you see: the people, the links, the places as TERYT codes. Every download is recorded in the tree's history.",
     deleteHeading: "Delete the tree",
     deleteLede:
       "The tree, everyone in it, the links and the record of changes go at once, and this cannot be undone.",

@@ -13,7 +13,7 @@ GET /api/v1/trees/{tree_id}
 GET /api/v1/trees/{tree_id}/export
 ```
 
-Both need a signed-in session (ADR-0027). The route is not built by TASK-066; the shape is fixed so the pages and the package agree.
+Both need a signed-in session (ADR-0027). The export is built by TASK-098 (`apps/web/src/lib/tree-export.ts`): the object below as a file (`content-disposition: attachment`, a name from the id, never the title; `private, no-store`), recorded as `EXPORTED`, with `places` empty while the register holds no coordinates for a locality (TASK-092). The plain read is not built; the pages read through the service.
 
 ## Status codes
 

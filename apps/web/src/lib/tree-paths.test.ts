@@ -16,6 +16,7 @@ import {
   personFromDraft,
   TREE_ACTIONS,
   treeActionPath,
+  treeExportPath,
   treePath,
   treeTarget,
 } from "./tree-paths.js";
@@ -66,6 +67,11 @@ describe("the tree's addresses (TASK-076)", () => {
     expect(treeTarget("pl", [TREE, "osoba", "x"])).toBeNull();
     expect(treeTarget("pl", [TREE, "osoba", PERSON, "more"])).toBeNull();
     expect(treeTarget("pl", [TREE.toUpperCase()])).toEqual({ page: "tree", treeId: TREE });
+  });
+
+  it("names the tree's export with the language that names the file (TASK-098)", () => {
+    expect(treeExportPath("pl", TREE)).toBe(`/api/v1/trees/${TREE}/export?lang=pl`);
+    expect(treeExportPath("en", TREE)).toBe(`/api/v1/trees/${TREE}/export?lang=en`);
   });
 
   it("knows an id and an action", () => {

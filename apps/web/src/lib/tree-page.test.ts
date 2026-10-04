@@ -5,7 +5,7 @@ import { treeMetadata, TreePageView } from "./tree-page.js";
 import type { TreePageData } from "./tree-load.js";
 import type { PlaceRegion } from "./tree-places.js";
 import { pedigree, nextQuestion, unplaced } from "./tree-pedigree.js";
-import { EMPTY_DRAFT, treeLandingPath, treePath } from "./tree-paths.js";
+import { EMPTY_DRAFT, treeExportPath, treeLandingPath, treePath } from "./tree-paths.js";
 import { TREE_TEXT } from "./tree-text.js";
 import { htmlLang } from "./messages.js";
 import { ID, PEOPLE, tree, treeForMember, TREE_ID } from "./tree-fixture.js";
@@ -113,6 +113,12 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
     expect(html).toContain("Piotr Wróbel");
     expect(html).toContain('action="/api/tree/delete-tree"');
     expect(html).not.toContain(TREE_TEXT.pl.pedigree.hidden);
+    // The export link (TASK-098, AC-4), for the owner here and for a viewer below.
+    expect(html).toContain(`href="${treeExportPath("pl", TREE_ID)}" download`);
+    expect(html).toContain(TREE_TEXT.pl.pedigree.exportLink);
+    const en = render(treeData("en"));
+    expect(en).toContain(`href="${treeExportPath("en", TREE_ID)}" download`);
+    expect(en).toContain(TREE_TEXT.en.pedigree.exportLink);
   });
 
   it("the pedigree for a member who may not see the living: the deceased, the count, no forms", () => {
@@ -120,6 +126,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
       const html = render(treeData(lang, treeForMember()));
       expect(html).toContain(TREE_TEXT[lang].pedigree.hiddenCount(4));
       expect(html).toContain(TREE_TEXT[lang].pedigree.viewer);
+      expect(html).toContain(`href="${treeExportPath(lang, TREE_ID)}" download`);
       expect(html).not.toContain("Marta");
       expect(html).toContain("Antoni Kaczmarek");
       expect(html).not.toContain("/api/tree/");

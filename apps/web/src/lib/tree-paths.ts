@@ -239,6 +239,12 @@ export const HIDE_FIELD = "hide";
 
 export const TREE_API_PREFIX = "/api/tree/";
 
+/** The tree as a JSON download (TASK-098): `GET /api/v1/trees/{id}/export`, the language naming the file. */
+export const TREE_EXPORT_PREFIX = "/api/v1/trees/";
+export function treeExportPath(lang: Lang, treeId: string): string {
+  return `${TREE_EXPORT_PREFIX}${treeId}/export?lang=${lang}`;
+}
+
 export function isTreeAction(value: string): value is TreeAction {
   return (TREE_ACTIONS as readonly string[]).includes(value);
 }
