@@ -34,6 +34,7 @@ DB=name_atlas
 BUILD_USER=nameatlas
 WEB_ROLE=nameatlas_web
 APP_ROLE=nameatlas_app
+STAGING_ROLE=nameatlas_staging_web
 OPS_HOME=/srv/name-atlas
 APP=$OPS_HOME/app
 POOLER_PORT=6432
@@ -115,16 +116,17 @@ fi
 
 log "4/5 PgBouncer's user list"
 # One line for each role that has a SCRAM secret, the web role first: the same
-# text provision.sh writes, so a later provision finds nothing to change.
+# text provision.sh writes, so a later provision finds nothing to change. The
+# staging role (ADR-0039) keeps its line once staging.sh has made it.
 # PgBouncer logs in to PostgreSQL with the client's own secret, so each must be
 # byte-identical to pg_authid's.
 umask 077
 : >"$PGB/userlist.txt.new"
-for role in "$WEB_ROLE" "$APP_ROLE"; do
+for role in "$WEB_ROLE" "$APP_ROLE" "$STAGING_ROLE"; do
   secret=$(runuser -u postgres -- psql -X -tAc "SELECT rolpassword FROM pg_authid WHERE rolname = '$role'")
   if [[ "$secret" == SCRAM-SHA-256\$* ]]; then
     printf '"%s" "%s"\n' "$role" "$secret" >>"$PGB/userlist.txt.new"
-  else
+  elif [ "$role" != "$STAGING_ROLE" ]; then
     rm -f "$PGB/userlist.txt.new"
     die "$role has no SCRAM secret"
   fi

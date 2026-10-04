@@ -22,11 +22,12 @@ GitHub runner ──SSH──▶ :22  ──▶ sudo ops/vm/*.sh ──socket, p
 | `bearers.sh` | TASK-077, after `finalize`, on `archive.sh`'s pattern: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate` (migration 0029, the `NOTABLE_BEARERS` claim type, and 0028's empty `family` schema while it is pending; `accounts` grants that schema to `nameatlas_app`), checks the web role can read every table, starts the `name-atlas-bearers-load` unit (`pnpm truth:bearers-load --top-rank 2000`, TASK-073) and returns. The load asks the Wikidata Query Service one or two questions per surname, at least a second apart; it resumes after a restart and writes `/var/lib/name-atlas/bearers/loaded` only when a pass completes. It refuses while the archive load or the change-over-time batch runs, and `archive.sh` refuses while it runs. |
 | `meanings.sh` | TASK-081, after `finalize` and `extras`: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate`, imports the current `sources/onomastics/buryan-1933.json` (a new version replaces the one `extras` imported, which becomes `UPDATED`), derives every surname of the file in one process, and gates: every listed surname the register holds has a meaning, one `ACTIVE` claim per claim key, one `ACTIVE` version of the work. Repeatable. It refuses while the register build, the archive load, the bearers load or the change-over-time batch runs. |
 | `accounts.sh` | TASK-063, after `provision` and `build`: unpacks the pushed commit, runs `pnpm install` and `pnpm db:migrate` (migration `0027` makes schema `accounts`; any earlier one still pending, `0026`'s index at the time of writing, comes with it), runs `accounts-roles.sql`, sets the role `nameatlas_app`'s password (from stdin, only if it does not already work), writes PgBouncer's user list for the web role and that role and reloads it only if the file changed, then checks, by the catalog and by connecting as the role through the pooler, that it writes `accounts` and nothing else. Repeatable: a second run changes nothing. |
+| `staging.sh` | ADR-0039: the staging database `name_atlas_staging` beside production on the same cluster. `refresh` (the `staging` step) makes the read-only role `nameatlas_staging_web` and its password (stdin), drops the old copy, streams `pg_dump` of production into `pg_restore` without the rows of `accounts` and `family` (no file is written), then does what `migrate` does. `migrate` (the `staging-migrate` step) unpacks the pushed commit into `/srv/name-atlas/staging-app` (production's tree is left alone), runs `pnpm db:migrate` on the copy, grants, adds the copy's line to `pgbouncer.ini` and the role to the user list (reload, not restart), and checks that the role reads the copy only, that no other role may connect to it, and that its `accounts` and `family` tables hold no rows. |
 | `accounts-roles.sql` | The role `nameatlas_app` and its grants on schema `accounts`, idempotent; `accounts.sh` runs it from the copy the workflow stages. |
 | `request` | The step the workflow runs when a push changes this file. |
 | `ssh_host_ed25519_key.pub` | The VM's SSH host key, pinned after the first `check`. |
 
-`.github/workflows/register-vm.yml` runs one step over SSH. It starts by `workflow_dispatch` (the workflow is on the default branch, `main`), or on a push that changes `request` to a branch named in its `on.push` trigger: `claude/eager-brown-s2u6qh` and `claude/awesome-darwin-af7l50`.
+`.github/workflows/register-vm.yml` runs one step over SSH. It starts by `workflow_dispatch` (the workflow is on the default branch, `main`; the `staging` and `staging-migrate` steps are listed there once ADR-0039's change is merged), or on a push that changes `request` to a branch named in its `on.push` trigger: `claude/eager-brown-s2u6qh` and `claude/awesome-darwin-af7l50`.
 
 ## Setting it up: the project owner's part
 
@@ -106,6 +107,28 @@ Google is a second way in, and it can be the only one: with `ACCOUNTS_DATABASE_U
    GOOGLE_CLIENT_ID=<the client ID, ending .apps.googleusercontent.com>
    GOOGLE_CLIENT_SECRET=<the client secret>
    ```
+
+## Staging: the owner's part (ADR-0039)
+
+`staging.name-atlas.pl` shows `main`; `name-atlas.pl` shows the branch `production`, which only the **Release** workflow moves. The staging site reads its own copy of the database, never production's.
+
+1. **GitHub secret** `VM_DB_STAGING_WEB_PASSWORD`: 40 random letters and digits, **different** from the other two. Keep a copy in a password manager for step 3.
+2. **`Register VM` → `staging`**, from `main` (Actions → Register VM → Run workflow → step `staging`). It copies production into `name_atlas_staging` and ends by connecting as the staging site will. The copy reads the whole production database at a lower priority; the site may be slower until it finishes. Its duration on the real database has not been measured: the job's limit is 3 hours, and a run cut short is repaired by running it again.
+3. **Vercel**, Settings → Environment Variables → Add: key `DATABASE_URL`, environment **Preview** only, branch **`main`**:
+
+   ```
+   postgresql://nameatlas_staging_web:<VM_DB_STAGING_WEB_PASSWORD>@<VM_HOST>:6432/name_atlas_staging?uselibpqcompat=true&sslmode=require
+   ```
+
+   Copy nothing else from Production: accounts, mail, Google sign-in and payments stay off on staging, and `SITE_ORIGIN` and `SEO_INDEXING_ENABLED` stay unset.
+4. The domain and the production branch: `docs/DOMAIN_SETUP.md` → "Staging and releases".
+
+### Running it
+
+- `staging`: a fresh copy of production, migrated to the commit the workflow runs from. Run it when staging's data should catch up with production's (after `archive`, `bearers` or `meanings` load new claims), or to start again after a migration was dropped or renumbered. `staging-migrate` then fails with Kysely's "previously executed migration ... is missing", and `staging` repairs it.
+- `staging-migrate`: after a merge that adds a migration, so staging's database matches staging's code. It changes nothing in production.
+- Production's migrations still come from the steps that apply them (`accounts`, `archive`, `bearers`, `meanings`; each runs `pnpm db:migrate`). The Release workflow refuses to release a commit whose migrations production has not applied.
+- `provision` and `accounts` keep the staging line in `pgbouncer.ini` and the staging role in the user list, so running either later leaves staging working.
 
 ## Going back
 
