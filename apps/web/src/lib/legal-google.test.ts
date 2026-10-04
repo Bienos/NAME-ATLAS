@@ -10,7 +10,8 @@ describe("the privacy notice with Google sign-in (TASK-084)", () => {
       // The base text already names Google as the mailbox's provider; the variant's own words are absent.
       const text = JSON.stringify(legalDocument("privacy", lang, true, false, false));
       expect(text, lang).not.toContain(HEADING[lang]);
-      expect(text, lang).not.toContain("Google Ireland");
+      // Google Analytics names Google Ireland too (TASK-109); sign-in's own item is absent.
+      expect(text, lang).not.toContain("Google Ireland Limited (Ir");
     }
   });
 

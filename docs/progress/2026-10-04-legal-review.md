@@ -88,3 +88,12 @@ Shown dates, from `legalUpdated()`: privacy 2026-10-04 and terms 2026-10-04 in e
 - Production was not deployed or checked; this change's deployment is recorded on its merged PR.
 - No lawyer has reviewed any of this. D-031 and `docs/canonical/19` §11 remain open.
 - The two code bugs above (claimant account deletion; the claimed-card route in analytics) are not fixed here. Queueing them as separate tasks failed (the tool timed out); they need their own tasks.
+
+## After the review: Google Analytics (#126) merged into this branch
+
+TASK-109 (#126, ADR-0038) reached `main` after the review was done. It adds Google Analytics behind a consent banner and its own text in `legal-text.ts` and `legal-accounts.ts`. This branch merged it on 2026-10-04 and kept both sets of changes; `LEGAL_UPDATED.terms` stays at this review's 2026-10-04. Two of the review's statements no longer hold:
+
+- the "no finding" line said there was no `localStorage` and only two cookies. Since #126, the consent choice is kept in `localStorage` (`google-analytics.ts:19`), and after consent Google sets `_ga` and `_ga_<id>`. #126's own text covers these; this review did not re-check that text.
+- G-01 said no processing relied on consent. Google Analytics now relies on consent (art. 6(1)(a)), and #126's text states the right to withdraw it.
+
+After the merge: `pnpm --filter web test` 78 files and 830 tests passed; `typecheck`, `pnpm lint`, `pnpm check:ids` and Prettier pass. The browser check was not repeated after the merge.
