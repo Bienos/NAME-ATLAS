@@ -29,7 +29,7 @@ Kaleta wyróżnia osiem sposobów tworzenia polskich nazwisk. Wśród nich są n
 - od odmiany imienia, jak Klesz od imienia Klement,
 - przejęte z innego języka, jak Steynbrecher.
 
-Nazwiska na -ski powstawały od nazw miejscowości, zwykle tych, w których ród miał majątek. Z czasem stały się znakiem przynależności do szlachty i były tak pożądane, że ludzie o innych nazwiskach starali się je przyjąć. Dlatego sama końcówka -ski nie dowodzi szlacheckiego pochodzenia.
+Nazwiska na -ski powstawały od nazw miejscowości, zwykle tych, w których ród miał majątek. Z czasem stały się znakiem przynależności do szlachty i były tak pożądane, że ludzie o innych nazwiskach starali się je przyjąć. Dlatego sama końcówka -ski nie dowodzi szlacheckiego pochodzenia. Dłuższą historię polskich nazwisk, od średniowiecza do rejestru PESEL, opisujemy we [wpisie o tym, skąd wzięły się nazwiska w Polsce](/pl/blog/skad-wziely-sie-nazwiska-w-polsce).
 
 ## Gdzie szukać przodków
 

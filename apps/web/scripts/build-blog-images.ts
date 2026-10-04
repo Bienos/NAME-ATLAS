@@ -470,6 +470,42 @@ function mapaNazwiska(): string {
   );
 }
 
+/**
+ * skad-wziely-sie-nazwiska-w-polsce: the ground under a dusk sky cut into
+ * curved layers, like strata, each holding a row of lights; the top layer is
+ * the brightest and fullest, the deepest the faintest and sparsest.
+ */
+function skadNazwiska(): string {
+  const rnd = random(104);
+  const horizon = 400;
+  const layers = 6;
+  const bands: string[] = [];
+  const lights: string[] = [];
+  for (let k = 0; k < layers; k += 1) {
+    const y = horizon + 50 + k * 64;
+    const bow = 30 - k * 4;
+    const depth = k / (layers - 1);
+    bands.push(
+      `<path d="M0 ${f(y)} Q ${W / 2} ${f(y - bow)} ${W} ${f(y)}" fill="none" stroke="${C.ember}" stroke-opacity="${f(0.42 - depth * 0.3)}" stroke-width="1.5"/>`,
+    );
+    const count = Math.round(34 - depth * 26);
+    for (let i = 0; i < count; i += 1) {
+      const x = 30 + rnd() * (W - 60);
+      const t = x / W;
+      const cy = y - bow * 4 * t * (1 - t) - 14 - rnd() * 22;
+      lights.push(
+        `<circle cx="${f(x)}" cy="${f(cy)}" r="${f(3.2 - depth * 2)}" fill="${C.amber}" opacity="${f((0.85 - depth * 0.65) * (0.6 + rnd() * 0.4))}"/>`,
+      );
+    }
+  }
+  return scene(
+    104,
+    horizon,
+    "",
+    `<g>${bands.join("")}</g><g filter="url(#glow)">${lights.join("")}</g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
@@ -481,6 +517,7 @@ const IMAGES: Record<string, () => string> = {
   "co-mozna-wyczytac-z-nazwiska": coMozna,
   "czy-to-samo-nazwisko-to-rodzina": tenSam,
   "mapa-nazwiska-a-mapa-rodziny": mapaNazwiska,
+  "skad-wziely-sie-nazwiska-w-polsce": skadNazwiska,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));
