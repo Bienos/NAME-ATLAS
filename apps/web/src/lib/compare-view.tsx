@@ -33,6 +33,15 @@ import { comparisonPath } from "./compare-request.js";
  * `docs/canonical/21` §2.1 and the directive's §53 both rule out.
  */
 
+/** The picker's address and words, for a page other than the comparison. */
+export interface PickerCopy {
+  readonly action: string;
+  readonly otherPath: string;
+  readonly heading: string;
+  readonly intro: string;
+  readonly submit: string;
+}
+
 export interface ComparisonSide {
   readonly slug: string;
   readonly display: string | null;
@@ -306,30 +315,34 @@ export function ComparisonView({
  * plain fields, typed as the surnames are written, and a `GET` to this same
  * route, which turns them into addresses (`compare-request.ts`). The
  * disclaimer stands above the fields, as it stands above every comparison.
+ * The couple report (TASK-100) uses it with its own address and words.
  */
 export function ComparePicker({
   lang,
   first,
   second,
   error,
+  copy = null,
 }: {
   lang: Lang;
   first: string;
   second: string;
   error: boolean;
+  /** Another page's address and words in place of the comparison's. */
+  copy?: PickerCopy | null;
 }) {
   const t = UI[lang];
-  const action = lang === "pl" ? "/pl/porownaj" : "/en/compare";
+  const action = copy?.action ?? (lang === "pl" ? "/pl/porownaj" : "/en/compare");
   return (
     <SiteShell
       lang={lang}
-      otherPath={lang === "pl" ? "/en/compare" : "/pl/porownaj"}
+      otherPath={copy?.otherPath ?? (lang === "pl" ? "/en/compare" : "/pl/porownaj")}
       world={{ mode: "quiet" }}
-      current="compare"
+      current={copy === null ? "compare" : null}
       mainClassName="compare compare-pick"
     >
-      <h1 className="page-title">{t.compareHeading}</h1>
-      <p className="page-lede">{t.compareIntro}</p>
+      <h1 className="page-title">{copy?.heading ?? t.compareHeading}</h1>
+      <p className="page-lede">{copy?.intro ?? t.compareIntro}</p>
       <p className="warning">{t.compareDisclaimer}</p>
       <form className="compare-form" action={action} method="get">
         <label htmlFor="qa">{t.compareFirstLabel}</label>
@@ -358,7 +371,7 @@ export function ComparePicker({
             {t.compareNeedsTwo}
           </p>
         ) : null}
-        <button type="submit">{t.compareAction}</button>
+        <button type="submit">{copy?.submit ?? t.compareAction}</button>
       </form>
     </SiteShell>
   );
