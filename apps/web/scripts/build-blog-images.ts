@@ -434,6 +434,42 @@ function tenSam(): string {
   return scene(101, horizon, "", `<g>${roots.join("")}</g><g>${crowns.join("")}</g>`);
 }
 
+/**
+ * mapa-nazwiska-a-mapa-rodziny: scattered lights on a dark plain at dusk, and
+ * from one of them a faint dotted path winding back to the horizon and fading.
+ */
+function mapaNazwiska(): string {
+  const rnd = random(102);
+  const horizon = 420;
+  const lights: string[] = [];
+  for (let k = 0; k < 46; k += 1) {
+    const y = horizon + 24 + rnd() * (H - horizon - 60);
+    const near = (y - horizon) / (H - horizon);
+    lights.push(
+      `<circle cx="${f(rnd() * W)}" cy="${f(y)}" r="${f(1.2 + near * 3.2)}" fill="${C.amber}" opacity="${f(0.25 + rnd() * 0.45)}"/>`,
+    );
+  }
+  const start = { x: W * 0.62, y: 742 };
+  const end = { x: W * 0.36, y: horizon - 14 };
+  const dots: string[] = [];
+  const steps = 64;
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps;
+    const x = start.x + (end.x - start.x) * t + Math.sin(t * Math.PI * 3.2) * 150 * (1 - t);
+    const y = start.y + (end.y - start.y) * (1 - (1 - t) * (1 - t));
+    dots.push(
+      `<circle cx="${f(x)}" cy="${f(y)}" r="${f(3.4 - t * 2.4)}" fill="${C.inkSoft}" opacity="${f(0.7 * (1 - t) + 0.04)}"/>`,
+    );
+  }
+  const home = `<circle cx="${f(start.x)}" cy="${f(start.y)}" r="9" fill="${C.sun}"/>`;
+  return scene(
+    102,
+    horizon,
+    "",
+    `<g>${lights.join("")}</g><g>${dots.join("")}</g><g filter="url(#glow)">${home}</g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
@@ -444,6 +480,7 @@ const IMAGES: Record<string, () => string> = {
   "kowalski-czy-kowalska": kowalski,
   "co-mozna-wyczytac-z-nazwiska": coMozna,
   "czy-to-samo-nazwisko-to-rodzina": tenSam,
+  "mapa-nazwiska-a-mapa-rodziny": mapaNazwiska,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));
