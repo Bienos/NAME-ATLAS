@@ -1,6 +1,6 @@
-# 2026-10-04 — `koncowki-nazwisk`: what the -ski ending means (TASK-109)
+# 2026-10-04 — `koncowki-nazwisk`: what the -ski ending means (TASK-110)
 
-Task: `tasks/109-blog-extend-ski.md`. Branch `claude/blog-piece-6`, on `origin/main` @ `366550a` (#123); `git merge-base --is-ancestor origin/main HEAD` passed before the first edit. The owner said "ok" to plan piece 6, marked "extend `koncowki-nazwisk`". Under ADR-0031 §2.5 the existing post's -ski section was extended; no new URL or image.
+Task: `tasks/110-blog-extend-ski.md`. Branch `claude/blog-piece-6`, on `origin/main` @ `366550a` (#123); `git merge-base --is-ancestor origin/main HEAD` passed before the first edit. The owner said "ok" to plan piece 6, marked "extend `koncowki-nazwisk`". Under ADR-0031 §2.5 the existing post's -ski section was extended; no new URL or image.
 
 **Number.** Open pull requests on 2026-10-04 (`gh api repos/Bienos/NAME-ATLAS/pulls?state=open`) use task numbers up to 108 (#125); `tasks/` on `main` ends at 105. 109 is free.
 
@@ -13,7 +13,7 @@ Task: `tasks/109-blog-extend-ski.md`. Branch `claude/blog-piece-6`, on `origin/m
   - Three sources added: Wolnicz-Pawłowska (1999), IJP PAN's dictionary and its "O słowniku", Kowalik (*Onomastica* 2017).
   - The rest of the post is unchanged. `date` stays 2026-10-03: the blog format (`apps/web/src/content/blog/README.md`) allows no `updated` key, and none was added. Title and description are unchanged.
   - **No register figure.** The numbers are years and centuries, and page numbers. Wolnicz-Pawłowska's percentages for the 100 most common surnames (from a 1990 PESEL list, after Skowronek) and Culture.pl's share of -ski among the top 1,000 were read and deliberately not used; the -ski statistic belongs to the data study.
-- **Records:** this file, `tasks/109-blog-extend-ski.md`, `docs/SEO_CONTENT_PLAN.md` §4 piece 6 (done as an extension, TASK-109), and in `STATUS.md` the blog line (`koncowki-nazwisk`'s -ski section extended; `skad-wziely-sie-nazwiska-w-polsce` marked live since #123), the "Search and editorial content" line (next: piece 7, "Nazwiska odmiejscowe: kiedy nazwisko naprawdę pochodzi od miejsca?", queued) and "Last rewritten". `docs/CODEMAP.md` is unchanged: no structure changed.
+- **Records:** this file, `tasks/110-blog-extend-ski.md`, `docs/SEO_CONTENT_PLAN.md` §4 piece 6 (done as an extension, TASK-110), and in `STATUS.md` the blog line (`koncowki-nazwisk`'s -ski section extended; `skad-wziely-sie-nazwiska-w-polsce` marked live since #123), the "Search and editorial content" line (next: piece 7, "Nazwiska odmiejscowe: kiedy nazwisko naprawdę pochodzi od miejsca?", queued) and "Last rewritten". `docs/CODEMAP.md` is unchanged: no structure changed.
 
 ## New claims and where they were read (2026-10-04)
 

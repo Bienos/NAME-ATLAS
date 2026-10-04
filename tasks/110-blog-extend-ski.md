@@ -1,4 +1,4 @@
-# TASK-109 — Extend `koncowki-nazwisk`: what the -ski ending means
+# TASK-110 — Extend `koncowki-nazwisk`: what the -ski ending means
 
 - **Status:** IMPLEMENTED 2026-10-04 on `claude/blog-piece-6`; record: `docs/progress/2026-10-04-blog-extend-ski.md`.
 - **Requested by:** the project owner, 2026-10-04: "ok" to plan piece 6 in `docs/SEO_CONTENT_PLAN.md` §4, "Co oznacza końcówka -ski w polskim nazwisku?", marked "extend `koncowki-nazwisk`; the original -ski statistic belongs to data study §7".
@@ -6,7 +6,7 @@
 - **Also inside:** ADR-0031 §2.2 (sources, a FAQ, the surname search at the end, no register figure), §3.5 (-ski is explained only as not establishing nobility or a coat of arms) and TASK-071/075's format.
 - **Date:** the post format has no `updated` key (the blog `README.md` allows only `title`, `description`, `date`, `slug`, `lang`, `image`, `imageAlt`), so the post keeps `date: 2026-10-03`. Title and description are unchanged: both already name -ski first.
 - **Depends on:** TASK-105, on `main` at `366550a` (#123).
-- **Number:** 109 is the next number free on `main` and in open pull requests on 2026-10-04 (the highest in use is TASK-108, #125).
+- **Number:** written as TASK-109 and renumbered to 110 on 2026-10-04, when #126 took 109 on `main`; 110 is free on `main` and in open pull requests.
 - **Model guidance:** implementation session.
 
 ## 1. Goal
