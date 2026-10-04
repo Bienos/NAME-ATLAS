@@ -41,7 +41,7 @@ describe("security headers (TASK-048)", () => {
   it("keeps the policy strict: no wildcard, no eval, no inline scripts", () => {
     const d = directives(CONTENT_SECURITY_POLICY);
     expect(d.get("default-src")).toBe("'self'");
-    expect(d.get("script-src")).toBe("'self'");
+    expect(d.get("script-src")).toBe("'self' https://www.googletagmanager.com");
     expect(d.get("object-src")).toBe("'none'");
     expect(d.get("base-uri")).toBe("'self'");
     expect(d.get("frame-ancestors")).toBe("'none'");

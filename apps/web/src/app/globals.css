@@ -9513,3 +9513,57 @@ main.studio h1 {
   display: block;
   color: var(--dusk-ink-muted);
 }
+
+/*
+ * The Google Analytics consent banner (TASK-109): fixed to the bottom, the two
+ * choices side by side and equal, so refusing is as easy as accepting.
+ */
+.consent-banner {
+  position: fixed;
+  inset: auto var(--space-4, 1rem) var(--space-4, 1rem) var(--space-4, 1rem);
+  z-index: 50;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+}
+
+.consent-banner p {
+  margin: 0 0 var(--space-3, 0.75rem);
+}
+
+.consent-banner a {
+  color: var(--accent);
+}
+
+.consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+}
+
+.consent-actions button,
+.consent-settings {
+  flex: 1 1 10rem;
+  min-height: 44px;
+  padding: 0 var(--space-4, 1rem);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consent-actions button:hover,
+.consent-settings:hover {
+  background: var(--hover-light);
+}

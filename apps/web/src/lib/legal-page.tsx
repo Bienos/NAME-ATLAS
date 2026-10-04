@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { SiteShell } from "./site-shell.js";
+import { ConsentSettingsButton } from "./consent-banner.js";
+import { CONSENT_COPY } from "./google-analytics.js";
 import { accountsEnabled, googleEnabled } from "./accounts-config.js";
 import { familyTreeEnabled } from "./family-config.js";
 import { legalDocument, legalPath, legalUpdated } from "./legal-text.js";
@@ -59,6 +61,11 @@ export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly l
           )}
         </section>
       ))}
+      {kind === "privacy" && (
+        <p>
+          <ConsentSettingsButton label={CONSENT_COPY[lang].change} />
+        </p>
+      )}
     </SiteShell>
   );
 }

@@ -36,7 +36,10 @@ describe("the legal texts with the tree (TASK-076, AC-1)", () => {
       expect(pl.sections.map((s) => s.paragraphs.length)).toEqual(
         en.sections.map((s) => s.paragraphs.length),
       );
-      expect(legalUpdated(kind, true, true)).toBe(TREE_LEGAL_UPDATED);
+      // The tree's date, unless the document itself changed later (TASK-109).
+      expect(legalUpdated(kind, true, true)).toBe(
+        [TREE_LEGAL_UPDATED, legalUpdated(kind, true)].sort().at(-1),
+      );
     }
     const terms = legalDocument("terms", "pl", true, true);
     const clause = terms.sections.find((s) => s.heading === treeTermsHeading("pl"));
