@@ -39,6 +39,8 @@ export const ACCOUNT_PATH = "/api/account/";
  */
 export const TREE_POLICY: RateLimitPolicy = { limit: 30, windowMs: 60_000 };
 export const TREE_PATH = "/api/tree/";
+/** The tree's export (TASK-098): a download a reader clicks, held to the same bucket. */
+export const TREE_API_PATH = "/api/v1/trees/";
 
 /**
  * The contact form: each post can send a mail, so five a minute per client, its
@@ -61,7 +63,7 @@ export const LONGEST_WINDOW_MS = Math.max(
 export function policyFor(pathname: string): RateLimitPolicy {
   if (pathname === PREFIX_PATH) return PREFIX_POLICY;
   if (pathname.startsWith(ACCOUNT_PATH)) return ACCOUNT_POLICY;
-  if (pathname.startsWith(TREE_PATH)) return TREE_POLICY;
+  if (pathname.startsWith(TREE_PATH) || pathname.startsWith(TREE_API_PATH)) return TREE_POLICY;
   if (pathname === CONTACT_PATH) return CONTACT_POLICY;
   return pathname.startsWith("/api/") ? API_POLICY : PAGE_POLICY;
 }
