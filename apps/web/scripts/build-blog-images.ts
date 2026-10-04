@@ -313,6 +313,43 @@ function jakSprawdzic(): string {
 }
 
 /**
+ * kowalski-czy-kowalska: one thread rising from the horizon that splits into
+ * two mirrored branches, each ending in a lit point.
+ */
+function kowalski(): string {
+  const rnd = random(76);
+  const horizon = 690;
+  const cx = W / 2;
+  const fork = 430;
+  const lines: string[] = [];
+  const stem = `<path d="M${cx} ${horizon - 10} C ${cx - 14} ${horizon - 120} ${cx + 14} ${fork + 110} ${cx} ${fork}" fill="none" stroke="${C.amber}" stroke-width="5" stroke-linecap="round"/>`;
+  for (const side of [-1, 1]) {
+    const tipX = cx + side * 360;
+    const tipY = 190;
+    lines.push(
+      `<path d="M${cx} ${fork} C ${cx + side * 40} ${fork - 120} ${tipX - side * 60} ${tipY + 120} ${tipX} ${tipY}" fill="none" stroke="${C.amber}" stroke-width="4" stroke-linecap="round"/>`,
+    );
+    for (let k = 0; k < 5; k += 1) {
+      const spread = 30 + k * 26;
+      lines.push(
+        `<path d="M${cx} ${fork} C ${cx + side * (40 + spread)} ${fork - 100} ${tipX - side * (60 - spread)} ${tipY + 140 + k * 18} ${tipX + side * (rnd() * 20)} ${tipY + 30 + k * 26}" fill="none" stroke="${C.amber}" stroke-width="1.5" stroke-linecap="round" opacity="${f(0.18 + rnd() * 0.12)}"/>`,
+      );
+    }
+  }
+  const tips = [-1, 1]
+    .map(
+      (side) =>
+        `<circle cx="${cx + side * 360}" cy="190" r="13" fill="${side < 0 ? C.amber : C.sun}"/>`,
+    )
+    .join("");
+  return scene(
+    76,
+    horizon,
+    `<g>${stem}${lines.join("")}</g><g filter="url(#glow)">${tips}<circle cx="${cx}" cy="${fork}" r="6" fill="${C.sun}"/></g>`,
+  );
+}
+
+/**
  * co-mozna-wyczytac-z-nazwiska: a small lantern on the ground at dusk, its pool
  * of light showing the stones near it clearly while those beyond fade into the
  * dark.
@@ -354,6 +391,7 @@ const IMAGES: Record<string, () => string> = {
   "historia-genealogii": historia,
   "imie-i-nazwisko-ciekawostki": ciekawostki,
   "jak-sprawdzic-pochodzenie-nazwiska": jakSprawdzic,
+  "kowalski-czy-kowalska": kowalski,
   "co-mozna-wyczytac-z-nazwiska": coMozna,
 };
 
