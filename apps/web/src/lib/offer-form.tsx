@@ -10,11 +10,11 @@ import {
   offerDocument,
   waitlistMailto,
 } from "./offer-text.js";
-import type { DnaAnswer, EnquiryAnswers } from "./offer-text.js";
+import type { DnaAnswer, EnquiryAnswers, WaitlistTier } from "./offer-text.js";
 
 /**
- * The offer page's two forms (TASK-057): the 29.99 zł waiting list and the
- * 499 zł enquiry. Each prepares an email to the owner and nothing else. The
+ * The offer page's two forms (TASK-057, TASK-104): a paid tier's waiting list
+ * and the 800 zł enquiry. Each prepares an email to the owner and nothing else. The
  * link's address is rebuilt as the reader types, and the reader's own mail
  * program sends it. The web app writes nothing (ADR-0017 §2.3, ADR-0026 §2.3).
  *
@@ -38,12 +38,14 @@ function valueOf(event: { readonly target: unknown }): string {
 }
 
 export function OfferForm({
-  kind,
+  tier,
   lang,
 }: {
-  readonly kind: "waitlist" | "enquiry";
+  /** The genealogist's tier takes an enquiry; every other paid tier a waiting list. */
+  readonly tier: WaitlistTier | "genealogy";
   readonly lang: Lang;
 }) {
+  const kind = tier === "genealogy" ? "enquiry" : "waitlist";
   const doc = offerDocument(lang);
   const id = useId();
   const [surname, setSurname] = useState("");
@@ -54,7 +56,8 @@ export function OfferForm({
     () => false,
   );
 
-  const href = kind === "waitlist" ? waitlistMailto(surname, lang) : enquiryMailto(answers, lang);
+  const href =
+    tier === "genealogy" ? enquiryMailto(answers, lang) : waitlistMailto(tier, surname, lang);
   const words = kind === "waitlist" ? doc.waitlist : doc.enquiry;
 
   if (!client) {
