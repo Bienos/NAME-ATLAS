@@ -173,7 +173,8 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
   it("is matched by the privacy notice: the forms, the DNA request and a new date (AC-4)", () => {
     // 2026-10-01 for the offer's forms; later changes move it on (TASK-073: 2026-10-03).
     expect(LEGAL_UPDATED.privacy >= "2026-10-01").toBe(true);
-    expect(LEGAL_UPDATED.terms).toBe("2026-09-30");
+    // The offer did not change the terms; the legal review of 2026-10-04 did.
+    expect(LEGAL_UPDATED.terms).toBe("2026-10-04");
     const pl = JSON.stringify(legalDocument("privacy", "pl"));
     expect(pl).toContain("Formularze na stronie oferty niczego nie wysyłają do serwisu");
     expect(pl).toContain("Nie wysyłaj nam wyników testu DNA");
