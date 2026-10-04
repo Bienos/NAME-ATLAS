@@ -180,7 +180,7 @@ function fixtureFor(url: string, body: string): string {
 }
 
 describe("the fetcher", () => {
-  it("sends one request at a time, at least a second apart, naming Name Atlas", async () => {
+  it("sends one request at a time, at least POLONA_MIN_INTERVAL_MS apart, naming Name Atlas", async () => {
     const { deps, calls } = fakeDeps((url, body) => ({
       ok: true,
       status: 200,

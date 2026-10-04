@@ -17,7 +17,8 @@ name: Register VM
 #   shift          ops/vm/shift.sh start (TASK-051): migrate, then start the change-over-time batch and return
 #   shift-finish   ops/vm/shift.sh finish: the gate, grants, ANALYZE, dump, once the batch has completed
 #   archive        ops/vm/archive.sh (TASK-054): migrate, then start Polona's archive load and return;
-#                  the input top_rank sets its rank limit (TASK-087; 2000 when empty)
+#                  the input top_rank sets its rank limit (TASK-087; 2000 when empty);
+#                  restart_archive stops a running load and starts it again on this commit (TASK-097)
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   backup         ops/vm/backup.sh (TASK-049): encrypted off-host copy, including accounts and family
@@ -58,6 +59,11 @@ on:
         required: false
         type: string
         default: ""
+      restart_archive:
+        description: archive only, stop a running archive load and start it again on this commit
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: register-vm
@@ -237,6 +243,7 @@ jobs:
         if: steps.step.outputs.step == 'archive'
         env:
           TOP_RANK: ${{ inputs.top_rank }}
+          RESTART_ARCHIVE: ${{ inputs.restart_archive }}
         run: |
           # Digits only: the value goes into the command line on the VM (TASK-087).
           top_rank=$(printf '%s' "$TOP_RANK" | tr -d '[:space:]')
@@ -247,10 +254,15 @@ jobs:
             exit 1
           fi
           echo "::notice::archive rank limit: $top_rank"
+          restart=""
+          if [ "$RESTART_ARCHIVE" = true ]; then
+            restart=restart
+            echo "::notice::a running archive load is restarted on this commit"
+          fi
           # The pushed commit's tree: the loader, and migration 0025 it needs.
           git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
           scp -q ops/vm/archive.sh vm:name-atlas-ops/archive.sh
-          ssh vm "sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz $top_rank"
+          ssh vm "sudo bash ~/name-atlas-ops/archive.sh ~/name-atlas-ops/app.tar.gz $top_rank $restart"
 
       - name: bearers
         if: steps.step.outputs.step == 'bearers'

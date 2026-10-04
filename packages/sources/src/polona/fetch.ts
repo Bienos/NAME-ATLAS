@@ -3,7 +3,7 @@ import { polonaInventoryRequests, summarisePolonaInventory } from "./inventory.j
 import type { PolonaInventory } from "./inventory.js";
 
 /**
- * The Polona connector's network half (TASK-054, ADR-0024 §2.2).
+ * The Polona connector's network half (TASK-054, ADR-0024 §2.2; its interval is ADR-0036's).
  *
  * Polite by construction: one request at a time, at least
  * {@link POLONA_MIN_INTERVAL_MS} between the start of one and the next, a
@@ -12,7 +12,7 @@ import type { PolonaInventory } from "./inventory.js";
  * the loop is tested without a network.
  */
 
-export const POLONA_MIN_INTERVAL_MS = 1000;
+export const POLONA_MIN_INTERVAL_MS = 250;
 export const POLONA_TIMEOUT_MS = 30_000;
 export const POLONA_ATTEMPTS = 3;
 export const POLONA_USER_AGENT =

@@ -3,6 +3,7 @@
 - **Status:** Accepted 2026-10-01, by the project owner's decision in the session that wrote it.
 - **Date:** 2026-10-01
 - **Deciders:** the project owner. Asked what "it's signed off" covered, they chose "Polona access". Asked how far the connector may go, they chose "Everything allowed": also download page text (OCR) and scans to find every mention.
+- **Amended by:** ADR-0036 (2026-10-04): §2.2's interval is now 250 ms; the rest of §2.2 stands.
 - **Resolves:** D-021 items 1 and 4 (`docs/DECISIONS_NEEDED.md`). Items 2 and 3 were resolved by ADR-0014.
 - **Relates to:** ADR-0007 (rights per asset), ADR-0014 (Polona metadata and attribution), `docs/sources/polona.md` (TASK-031), `docs/canonical/11` §11 (`ARCHIVE_AVAILABILITY`), `docs/canonical/23` M3.
 
