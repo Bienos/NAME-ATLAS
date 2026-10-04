@@ -7,7 +7,7 @@ import type { Lang } from "./messages.js";
  * They are shown only when accounts are on (`accounts-config.ts`), so the notice
  * never describes a cookie, a stored address or a mail provider the site does
  * not have. The base text in `legal-text.ts` is left as it is; this module
- * changes it in four places for the notice and adds one section to the terms,
+ * changes it in five places for the notice and adds one section to the terms,
  * and it **throws** when a heading it expects is not there, so a renamed
  * section fails the build instead of publishing a notice that no longer
  * matches.
@@ -35,11 +35,13 @@ interface PrivacyWords {
   readonly dataHeading: string;
   readonly processorsHeading: string;
   readonly rightsHeading: string;
+  readonly requiredHeading: string;
   readonly noAccountsParagraph: string;
   readonly sections: readonly LegalSection[];
   readonly oracleItem: string;
   readonly resendItem: string;
   readonly rightsParagraph: string;
+  readonly requiredParagraph: string;
 }
 
 const PRIVACY: Record<Lang, PrivacyWords> = {
@@ -48,8 +50,9 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
     dataHeading: "Jakie dane przetwarzamy",
     processorsHeading: "Komu powierzamy dane",
     rightsHeading: "Twoje prawa",
+    requiredHeading: "Czy musisz podać dane",
     noAccountsParagraph:
-      "Name Atlas nie ma reklam. Konto jest dobrowolne: żeby czytać serwis, nie trzeba go zakładać. Statystyki odwiedzin zbiera Vercel Web Analytics bez plików cookie i bez nazwiska w adresie (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez konta serwis nie zapisuje w przeglądarce plików cookie ani podobnych danych; po zalogowaniu zapisuje jeden plik cookie, który utrzymuje Cię zalogowanym (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+      "Name Atlas nie ma reklam. Konto jest dobrowolne: żeby czytać serwis, nie trzeba go zakładać. Statystyki odwiedzin zbiera Vercel Web Analytics bez plików cookie i bez nazwiska w adresie (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez konta i bez Twojej zgody na Google Analytics serwis nie zapisuje w przeglądarce plików cookie (zapamiętuje tylko Twój wybór w tej sprawie); po zalogowaniu zapisuje jeden plik cookie, który utrzymuje Cię zalogowanym (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
     sections: [
       {
         heading: "Konto: jakie dane",
@@ -57,10 +60,10 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
           "Konto zakładasz, podając adres e-mail. Wysyłamy na niego link ważny 24 godziny; dopiero po jego otwarciu ustawiasz hasło i akceptujesz regulamin, więc nikt nie założy konta na cudzy adres. Przechowujemy w bazie danych:",
         ],
         items: [
-          "adres e-mail, wybrany język, czas założenia konta i ostatniego logowania;",
+          "adres e-mail, wybrany język, czas założenia konta, potwierdzenia adresu, ostatniej zmiany konta i ostatniego logowania;",
           "wersję regulaminu, którą zaakceptowałeś, i czas akceptacji;",
           "hasło: nie przechowujemy go, tylko jego skrót (scrypt), z którego nie da się go odtworzyć;",
-          "skróty (SHA-256) jednorazowych linków z wiadomości i identyfikatora sesji, nie same linki i identyfikatory;",
+          "skróty (SHA-256) jednorazowych linków z wiadomości i identyfikatora sesji, nie same linki i identyfikatory; przy linku: do czego służy (potwierdzenie adresu, nowe hasło, akceptacja regulaminu), kiedy powstał, kiedy wygasa i kiedy go użyto; przy sesji: kiedy powstała, kiedy ostatnio jej użyto i kiedy wygasa;",
           "po nieudanym logowaniu: skrót adresu i czas próby, żeby ograniczyć zgadywanie hasła.",
         ],
       },
@@ -68,26 +71,30 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
         heading: "Konto: po co, jak długo, komu",
         paragraphs: [
           "Dane konta służą do prowadzenia konta, o które prosisz. Podstawą jest wykonanie umowy na Twoje żądanie (art. 6 ust. 1 lit. b RODO). Skróty nieudanych logowań chronią konto przed zgadywaniem hasła, na podstawie naszego prawnie uzasadnionego interesu (lit. f).",
-          "Po zalogowaniu serwis zapisuje w przeglądarce jeden plik cookie z identyfikatorem sesji (HttpOnly, Secure, SameSite=Lax). Jest niezbędny do działania konta i służy tylko do tego. Znika po wylogowaniu. Sesja na serwerze trwa 30 dni; korzystanie z niej w drugiej połowie tego czasu odnawia ją na kolejne 30, a zmiana hasła kończy wszystkie sesje.",
-          "Adres, który nie dokończył zakładania konta, kasujemy w ciągu 8 dni od podania (usuwanie działa raz dziennie). Konto trwa, dopóki go nie usuniesz. Na stronie konta usuwasz je sam, podając hasło: konto, sesje i linki znikają z bazy od razu. Skróty nieudanych logowań kasujemy po godzinie.",
-          "Wiadomości z linkiem wysyła w naszym imieniu Resend, Inc. (USA), który dostaje Twój adres i treść wiadomości. Nie przekazujemy mu nic poza tym.",
+          "Po zalogowaniu serwis zapisuje w przeglądarce jeden plik cookie z identyfikatorem sesji, __Host-na_session (HttpOnly, Secure, SameSite=Lax). Jest niezbędny do działania konta i służy tylko do tego. Przeglądarka może go trzymać do 400 dni, ale działa tylko, dopóki trwa sesja na serwerze; po wylogowaniu znika. Sesja na serwerze trwa 30 dni; korzystanie z niej w drugiej połowie tego czasu odnawia ją na kolejne 30, a ustawienie nowego hasła kończy wszystkie sesje.",
+          "Adres, który nie dokończył zakładania konta, kasujemy w ciągu 8 dni od podania (usuwanie działa raz dziennie). Konto trwa, dopóki go nie usuniesz. Na stronie konta usuwasz je sam, podając hasło: konto, sesje i linki znikają z bazy od razu. Wygasłe sesje kasujemy raz dziennie, a linki z wiadomości 7 dni po wygaśnięciu. Skróty nieudanych logowań po godzinie przestają się liczyć i kasujemy je najpóźniej w ciągu doby; udane logowanie kasuje je od razu.",
+          "Wiadomości z linkiem do założenia konta i do ustawienia nowego hasła wysyła w naszym imieniu Resend, Inc. (USA), który dostaje Twój adres i treść wiadomości. Nie przekazujemy mu nic poza tym.",
+          "Dzienniki serwisu zapisują identyfikator konta (przy założeniu i usunięciu konta), nigdy adres e-mail ani treść. Przechowuje je Vercel, jak dziennik żądań (wyżej).",
         ],
       },
     ],
     oracleItem:
       "Oracle — serwer bazy danych we Frankfurcie. Otrzymuje zapytanie o nazwisko, ale nie adres IP odwiedzającego; trzyma też dane konta (wyżej).",
     resendItem:
-      "Resend, Inc. (USA) — wysyłanie wiadomości z linkiem do konta i dostarczanie wiadomości z formularza kontaktowego na naszą skrzynkę. Przekazanie do USA opiera się na certyfikacji Resend w EU-U.S. Data Privacy Framework i na standardowych klauzulach umownych, jak Resend deklaruje.",
+      "Resend, Inc. (USA) — wysyłanie wiadomości z linkiem do założenia konta i do ustawienia nowego hasła oraz dostarczanie wiadomości z formularza kontaktowego na naszą skrzynkę. Przekazanie do USA opiera się na certyfikacji Resend w EU-U.S. Data Privacy Framework i na standardowych klauzulach umownych, jak Resend deklaruje.",
     rightsParagraph:
       "Konto usuniesz sam na jego stronie; z pozostałych praw skorzystasz, pisząc na adres podany wyżej.",
+    requiredParagraph:
+      "Konto jest dobrowolne. Żeby je założyć, musisz podać adres e-mail i ustawić hasło (przy logowaniu przez Google hasło nie jest potrzebne); bez nich konto nie może działać.",
   },
   en: {
     whatWeDoNot: "What we do not do",
     dataHeading: "What data we process",
     processorsHeading: "Who processes data for us",
     rightsHeading: "Your rights",
+    requiredHeading: "Whether you must give data",
     noAccountsParagraph:
-      "Name Atlas has no advertising. An account is optional: you do not need one to read the site. Visit statistics are collected by Vercel Web Analytics without cookies and without the surname in the address (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without an account the site stores no cookies or similar data in your browser; once you sign in it stores one cookie that keeps you signed in (below). We do not profile anyone and make no automated decisions.",
+      "Name Atlas has no advertising. An account is optional: you do not need one to read the site. Visit statistics are collected by Vercel Web Analytics without cookies and without the surname in the address (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without an account and without your consent to Google Analytics the site stores no cookies in your browser (it only remembers that choice); once you sign in it stores one cookie that keeps you signed in (below). We do not profile anyone and make no automated decisions.",
     sections: [
       {
         heading: "The account: what data",
@@ -95,10 +102,10 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
           "You create an account by giving an email address. We send a link to it, valid for 24 hours; only after you open it do you set the password and accept the terms, so nobody can open an account on someone else's address. We keep in the database:",
         ],
         items: [
-          "the email address, the language chosen, and the times the account was created and last signed in;",
+          "the email address, the language chosen, and the times the account was created, its address confirmed, last changed and last signed in;",
           "the version of the terms you accepted, and when;",
           "the password: we do not keep it, only a hash of it (scrypt) from which it cannot be recovered;",
-          "hashes (SHA-256) of the one-time links in the emails and of the session identifier, not the links or identifiers themselves;",
+          "hashes (SHA-256) of the one-time links in the emails and of the session identifier, not the links or identifiers themselves; for a link: what it is for (confirming the address, a new password, accepting the terms), when it was made, when it expires and when it was used; for a session: when it began, when it was last used and when it expires;",
           "after a failed sign-in: a hash of the address and the time of the attempt, to limit password guessing.",
         ],
       },
@@ -106,18 +113,21 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
         heading: "The account: why, how long, who",
         paragraphs: [
           "The account data is used to run the account you ask for. The basis is performing a contract at your request (art. 6(1)(b) GDPR). The hashes of failed sign-ins protect the account from password guessing, on the basis of our legitimate interest (point (f)).",
-          "Once you sign in, the site stores one cookie in your browser holding a session identifier (HttpOnly, Secure, SameSite=Lax). It is necessary for the account to work and is used for nothing else. It goes when you sign out. The session on the server lasts 30 days; using it in the second half of that time renews it for another 30, and changing the password ends every session.",
-          "An address that did not finish opening an account is deleted within 8 days of being given (the deletion runs once a day). The account lasts until you delete it. You delete it yourself on the account page, with your password: the account, its sessions and links leave the database at once. The hashes of failed sign-ins are deleted after an hour.",
-          "The emails with the link are sent on our behalf by Resend, Inc. (USA), which receives your address and the text of the message. We give it nothing else.",
+          "Once you sign in, the site stores one cookie in your browser holding a session identifier, __Host-na_session (HttpOnly, Secure, SameSite=Lax). It is necessary for the account to work and is used for nothing else. The browser may keep it for up to 400 days, but it works only while the session on the server lasts; it goes when you sign out. The session on the server lasts 30 days; using it in the second half of that time renews it for another 30, and setting a new password ends every session.",
+          "An address that did not finish opening an account is deleted within 8 days of being given (the deletion runs once a day). The account lasts until you delete it. You delete it yourself on the account page, with your password: the account, its sessions and links leave the database at once. Expired sessions are deleted once a day, and the links in the emails 7 days after they expire. The hashes of failed sign-ins stop counting after an hour and are deleted within a day at the latest; a successful sign-in deletes them at once.",
+          "The emails with the links to open the account and to set a new password are sent on our behalf by Resend, Inc. (USA), which receives your address and the text of the message. We give it nothing else.",
+          "The site's logs record the account's identifier (when an account is created and deleted), never the email address or any content. Vercel keeps them, like the request log (above).",
         ],
       },
     ],
     oracleItem:
       "Oracle — the database server in Frankfurt. It receives the surname query but not the visitor's IP address; it also holds the account data (above).",
     resendItem:
-      "Resend, Inc. (USA) — sending the account's link emails and delivering the contact form's messages to our mailbox. The transfer to the USA rests on Resend's certification under the EU-U.S. Data Privacy Framework and on standard contractual clauses, as Resend states.",
+      "Resend, Inc. (USA) — sending the emails with the links to open the account and to set a new password, and delivering the contact form's messages to our mailbox. The transfer to the USA rests on Resend's certification under the EU-U.S. Data Privacy Framework and on standard contractual clauses, as Resend states.",
     rightsParagraph:
       "You delete the account yourself on its page; for your other rights, write to the address above.",
+    requiredParagraph:
+      "An account is optional. To open one you must give an email address and set a password (signing in with Google needs no password); without them the account cannot work.",
   },
 };
 
@@ -166,6 +176,7 @@ function privacyWithAccounts(lang: Lang, doc: LegalDocument): LegalDocument {
     words.dataHeading,
     words.processorsHeading,
     words.rightsHeading,
+    words.requiredHeading,
   ]) {
     mustFind(doc.sections, heading);
   }
@@ -188,6 +199,8 @@ function privacyWithAccounts(lang: Lang, doc: LegalDocument): LegalDocument {
       }
       case words.rightsHeading:
         return [{ ...section, paragraphs: [...section.paragraphs, words.rightsParagraph] }];
+      case words.requiredHeading:
+        return [{ ...section, paragraphs: [...section.paragraphs, words.requiredParagraph] }];
       default:
         return [section];
     }

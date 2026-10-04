@@ -591,10 +591,11 @@ export async function renderShareCard(
   host: string | null,
   headers: Record<string, string> = {},
   preview: string | null = null,
+  layer: { readonly layer: CardLayer; readonly hook: string } | null = null,
 ): Promise<ImageResponse> {
   const brandFonts = await loadFonts();
   const fonts = brandFonts.length > 0 ? { fonts: brandFonts } : {};
-  const face = cardFace(facts, host);
+  const face = cardFace(facts, host, layer?.layer ?? null, layer?.hook ?? null);
   if (preview === null) return new ImageResponse(face, { ...SHARE_SIZE, headers, ...fonts });
   const scale = PREVIEW_SIZE.width / SHARE_SIZE.width;
   return new ImageResponse(
@@ -648,7 +649,29 @@ export async function renderShareCard(
   );
 }
 
-function cardFace(facts: ShareFacts, host: string | null): ReactElement {
+/**
+ * The video's layers (TASK-108): the same card split so the clip can bring its
+ * figures in. `base` is the card with its figures and visual hidden, `reveal`
+ * only those, on a transparent ground, in the same places. `intro` is the
+ * clip's opening plate without the surname, `intro-name` the surname alone.
+ * Hiding uses opacity, so every layer keeps the full card's layout.
+ */
+export const CARD_LAYERS = ["base", "reveal", "intro", "intro-name"] as const;
+export type CardLayer = (typeof CARD_LAYERS)[number];
+
+export function isCardLayer(value: string): value is CardLayer {
+  return (CARD_LAYERS as readonly string[]).includes(value);
+}
+
+const shown = (visible: boolean) => (visible ? {} : { opacity: 0 });
+
+function cardFace(
+  facts: ShareFacts,
+  host: string | null,
+  layer: CardLayer | null = null,
+  hook: string | null = null,
+): ReactElement {
+  if (layer === "intro" || layer === "intro-name") return introFace(facts, host, layer, hook);
   const paper = facts.paper;
   const ink = paper ? PAPER.ink : DUSK.ink;
   const soft = paper ? PAPER.soft : DUSK.soft;
@@ -666,15 +689,13 @@ function cardFace(facts: ShareFacts, host: string | null): ReactElement {
         padding: `96px ${String(PAD_X)}px 80px`,
         color: ink,
         fontFamily: TYPE_FAMILIES.ui,
-        backgroundColor: paper ? PAPER.ground : DUSK.ground,
-        backgroundImage: paper
-          ? `linear-gradient(170deg, ${PAPER.ground} 0%, ${PAPER.deep} 100%)`
-          : `radial-gradient(90% 38% at 50% 104%, ${TOKENS["dusk-sky-ember"]} 0%, ${TOKENS["dusk-sky-wine"]} 34%, rgba(31,7,31,0) 80%), linear-gradient(180deg, ${TOKENS["dusk-surface-sunk"]} 0%, ${DUSK.ground} 55%, ${DUSK.raised} 100%)`,
+        ...(layer === "reveal" ? {} : ground(paper)),
       }}
     >
       {/* The wordmark and what the card answers. */}
       <div
         style={{
+          ...shown(layer !== "reveal"),
           display: "flex",
           justifyContent: "space-between",
           fontFamily: TYPE_FAMILIES.data,
@@ -689,6 +710,7 @@ function cardFace(facts: ShareFacts, host: string | null): ReactElement {
 
       <div
         style={{
+          ...shown(layer !== "reveal"),
           marginTop: 64,
           fontFamily: TYPE_FAMILIES.display,
           fontSize: nameSize(facts.surname),
@@ -710,28 +732,50 @@ function cardFace(facts: ShareFacts, host: string | null): ReactElement {
           paddingTop: facts.visual?.kind === "recap" ? 28 : 40,
         }}
       >
-        {/* A coverage warning comes before any figure (TASK-012 §3). */}
+        {/* A coverage warning comes before any figure (TASK-012 §3), and is never held back. */}
         {facts.warning === null ? null : (
-          <div style={{ fontSize: 36, lineHeight: 1.3, color: DUSK.warning }}>{facts.warning}</div>
+          <div
+            style={{
+              ...shown(layer !== "reveal"),
+              fontSize: 36,
+              lineHeight: 1.3,
+              color: DUSK.warning,
+            }}
+          >
+            {facts.warning}
+          </div>
         )}
-        {facts.visual?.kind === "map" ? <Visual visual={facts.visual} paper={paper} /> : null}
-        {facts.figure === null ? null : (
-          <Figure
-            text={facts.figure}
-            size={figureSize(facts.figure)}
-            color={paper ? PAPER.ink : DUSK.light}
-          />
-        )}
-        {facts.figureNote === null ? null : (
-          <div style={{ fontSize: 44, lineHeight: 1.25, color: soft }}>{facts.figureNote}</div>
-        )}
-        {facts.visual === null || facts.visual.kind === "map" ? null : (
-          <Visual visual={facts.visual} paper={paper} />
+        {/* What the video brings in: the figure, its note and the visual. */}
+        {facts.visual === null && facts.figure === null && facts.figureNote === null ? null : (
+          <div
+            style={{
+              ...shown(layer !== "base"),
+              display: "flex",
+              flexDirection: "column",
+              gap: 30,
+            }}
+          >
+            {facts.visual?.kind === "map" ? <Visual visual={facts.visual} paper={paper} /> : null}
+            {facts.figure === null ? null : (
+              <Figure
+                text={facts.figure}
+                size={figureSize(facts.figure)}
+                color={paper ? PAPER.ink : DUSK.light}
+              />
+            )}
+            {facts.figureNote === null ? null : (
+              <div style={{ fontSize: 44, lineHeight: 1.25, color: soft }}>{facts.figureNote}</div>
+            )}
+            {facts.visual === null || facts.visual.kind === "map" ? null : (
+              <Visual visual={facts.visual} paper={paper} />
+            )}
+          </div>
         )}
       </div>
 
       <div
         style={{
+          ...shown(layer !== "reveal"),
           marginTop: facts.visual?.kind === "recap" ? 28 : 40,
           fontSize: facts.visual?.kind === "recap" ? 34 : 44,
           lineHeight: 1.34,
@@ -744,6 +788,7 @@ function cardFace(facts: ShareFacts, host: string | null): ReactElement {
       {/* Source and date, then the way back. */}
       <div
         style={{
+          ...shown(layer !== "reveal"),
           display: "flex",
           flexDirection: "column",
           marginTop: 44,
@@ -793,6 +838,96 @@ function cardFace(facts: ShareFacts, host: string | null): ReactElement {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The card's ground: dusk with its ember, or paper. */
+function ground(paper: boolean) {
+  return {
+    backgroundColor: paper ? PAPER.ground : DUSK.ground,
+    backgroundImage: paper
+      ? `linear-gradient(170deg, ${PAPER.ground} 0%, ${PAPER.deep} 100%)`
+      : `radial-gradient(90% 38% at 50% 104%, ${TOKENS["dusk-sky-ember"]} 0%, ${TOKENS["dusk-sky-wine"]} 34%, rgba(31,7,31,0) 80%), linear-gradient(180deg, ${TOKENS["dusk-surface-sunk"]} 0%, ${DUSK.ground} 55%, ${DUSK.raised} 100%)`,
+  };
+}
+
+/**
+ * The clip's opening plate (TASK-108): the wordmark, the surname large and a
+ * question the next card answers. It states no fact. `intro` is the plate
+ * without the surname, `intro-name` the surname alone, so the clip can draw it in.
+ */
+function introFace(
+  facts: ShareFacts,
+  host: string | null,
+  layer: "intro" | "intro-name",
+  hook: string | null,
+): ReactElement {
+  const plate = layer === "intro";
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        padding: `96px ${String(PAD_X)}px 80px`,
+        color: DUSK.ink,
+        fontFamily: TYPE_FAMILIES.ui,
+        ...(plate ? ground(false) : {}),
+      }}
+    >
+      <div
+        style={{
+          ...shown(plate),
+          fontFamily: TYPE_FAMILIES.data,
+          fontSize: 32,
+          letterSpacing: 6,
+          textTransform: "uppercase",
+          color: DUSK.light,
+        }}
+      >
+        Name Atlas
+      </div>
+      <div
+        style={{
+          ...shown(!plate),
+          marginTop: 48,
+          fontFamily: TYPE_FAMILIES.display,
+          fontSize: Math.round(nameSize(facts.surname) * 1.25),
+          lineHeight: 0.98,
+          letterSpacing: -2,
+          maxWidth: MEASURE,
+        }}
+      >
+        {facts.surname}
+      </div>
+      <div
+        style={{
+          ...shown(plate),
+          marginTop: 56,
+          fontSize: 52,
+          lineHeight: 1.25,
+          color: DUSK.soft,
+          maxWidth: MEASURE,
+        }}
+      >
+        {hook ?? ""}
+      </div>
+      {host === null ? null : (
+        <div
+          style={{
+            ...shown(plate),
+            marginTop: 72,
+            fontFamily: TYPE_FAMILIES.data,
+            fontSize: 26,
+            color: DUSK.muted,
+          }}
+        >
+          {host}
+        </div>
+      )}
     </div>
   );
 }

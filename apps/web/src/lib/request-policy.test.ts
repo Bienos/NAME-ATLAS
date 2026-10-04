@@ -6,6 +6,7 @@ import {
   PAGE_POLICY,
   PREFIX_POLICY,
   policyFor,
+  TREE_POLICY,
 } from "./request-policy.js";
 
 describe("what each request is held to (TASK-029, TASK-062 AC-11)", () => {
@@ -17,6 +18,14 @@ describe("what each request is held to (TASK-029, TASK-062 AC-11)", () => {
     expect(policyFor("/api/account/google/callback")).toBe(ACCOUNT_POLICY);
     expect(ACCOUNT_POLICY.limit).toBe(10);
     expect(ACCOUNT_POLICY.limit).toBeLessThan(API_POLICY.limit);
+  });
+
+  it("holds the tree's forms and its export to one bucket (TASK-076, TASK-098)", () => {
+    expect(policyFor("/api/tree/add-person")).toBe(TREE_POLICY);
+    expect(policyFor("/api/v1/trees/0199a1b2-0000-7000-8000-00000000aa01/export")).toBe(
+      TREE_POLICY,
+    );
+    expect(policyFor("/api/v1/trees")).toBe(API_POLICY);
   });
 
   it("keeps the others as they were", () => {

@@ -8,11 +8,88 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-041 — the terms: how they change for account holders, how the contract starts and ends, and our closing of an account
+
+**Status:** NON-BLOCKING NOW (no account exists in production); needed before accounts go on. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (`docs/progress/2026-10-04-legal-review.md`, J-07).
+
+Facts: the terms say "Zmiany regulaminu publikujemy na tej stronie z nową datą." The code asks an account holder to accept a newer version only at the tree's consent step (`apps/web/src/lib/tree-routes.ts:121-128`; `packages/accounts/src/service.ts:622-633`). The terms version is a date compared as text, so the tree clause's version must be later than the version accepted without the tree. When the base terms and the tree clause change on the same day, as they did on 2026-10-04, an account opened with the tree off records `ACCOUNTS_LEGAL_UPDATED` (2026-10-01) while the page shows 2026-10-04. The account terms say we may close an abusive account and "napiszemy o tym na adres konta", with no notice period. The terms do not say when the contract is formed or ends for a reader without an account.
+
+Options: (a) email account holders a set number of days before a change takes effect, with the right to delete the account before then; (b) ask for re-acceptance at the next sign-in for every change; (c) keep publishing only (today's text). Separately: track the tree clause's acceptance apart from the terms version, so that the two dates cannot collide (a code task).
+**Recommendation (not a decision):** (a) with 14 days' notice for changes that are not purely in the user's favour, plus the separate tree-clause record; state formation and ending for readers without an account (by use; ends when they stop); give a notice and a way to object before closing an account, except for abuse in progress.
+
+---
+
+## D-040 — the terms: how a complaint (reklamacja) is made and how fast it is answered
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-06).
+
+Facts: the terms say only that complaints go to the contact address (`apps/web/src/lib/legal-text.ts`, "Zgłoszenia i reklamacje"). UŚUDE art. 8 ust. 3 pkt 4 requires the terms to set the complaint procedure. Ustawa o prawach konsumenta art. 7a deems a consumer's complaint accepted if not answered within 14 days (to be confirmed by the lawyer for a free service).
+
+Options: (a) 14 days, with what a complaint should contain (the address, the page, what is wrong) and that the answer comes by email; (b) a shorter deadline; (c) leave as is.
+**Recommendation (not a decision):** (a).
+
+---
+
+## D-039 — the tree invitation keeps an unsalted hash of the invitee's address
+
+**Status:** NON-BLOCKING NOW; decide before the tree goes live. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (J-05).
+
+Facts: an invitation stores `address_hash` = `sha256("accounts:email:" + normalised address)` (`apps/web/src/lib/tree-routes.ts:394`; `packages/accounts/src/tokens.ts:32-33`), the same key as `accounts.sign_in_failures`. It is not salted per tree, so it can be matched across trees and against a known address. It is kept on every invitation and on the tree's suppression list for as long as the tree (`packages/db/migrations/0033_family_invitations.ts:68-102`). The notice now says "skrót"; it does not claim the hash cannot be linked.
+
+Options: (a) keep it, and say in the notice that it is a hash of the address; (b) a keyed hash (HMAC with a server secret), still global, so the suppression works; (c) a per-tree salt, so that it cannot be linked across trees.
+**Recommendation (not a decision):** (b) or (c), as a code task with a migration. (c) matches the per-tree suppression list the notice describes most closely.
+
+---
+
+## D-038 — processors and their roles: Gmail, Google sign-in, Oracle, and the DPAs
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-04).
+
+Facts: the notice names "Google — skrzynka pocztowa" (the contact address is a consumer Gmail address, `apps/web/src/lib/contact.ts:8`), "Google Ireland Limited … osobny administrator" for sign-in (`legal-google.ts`, already marked as awaiting legal review), and "Oracle — serwer bazy danych we Frankfurcie" with no legal entity. The repo does not record whether the Vercel, Resend or Oracle data processing terms were accepted, or which Oracle entity holds the contract.
+
+Options: (a) confirm each entity and DPA and name them in the notice; (b) move the mailbox to a business mailbox with a DPA (Google Workspace or another provider).
+**Recommendation (not a decision):** (a) now; (b) before taking payments.
+
+---
+
+## D-037 — Vercel Web Analytics and terminal storage consent (PT art. 399)
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** the legal review of 2026-10-04 (J-03).
+
+Facts: the script sets no cookie and stores nothing in the browser (no `localStorage`, `sessionStorage`, `document.cookie` or `indexedDB` anywhere in `apps/web/src`). It runs in the browser and sends each page view to `/_vercel/insights` (`apps/web/src/lib/site-analytics.tsx:13-19`). The notice relies on art. 6(1)(f) GDPR and asks no consent.
+
+Options: (a) counsel confirms that no consent is needed; (b) a consent banner before the script loads; (c) server-side counting only.
+**Recommendation (not a decision):** ask counsel; until then keep (a)'s text, which states the facts.
+
+---
+
+## D-036 — the legal basis for relatives entered in a tree, and how they are informed (GDPR art. 6, 14)
+
+**Status:** BLOCKS the tree's release, together with D-031's legal review. **Owner:** project owner, legal counsel. **Raised by:** the legal review of 2026-10-04 (J-02).
+
+Facts: the notice says data about other people is kept "na Twoje zlecenie w ramach tej samej umowy" (art. 6(1)(b)). A contract with the account holder is not a basis for processing a relative's data. Only an invited, adult, living person receives anything (one invitation email, `apps/web/src/lib/tree-mail.ts`); others are never told.
+
+Options: (a) art. 6(1)(f) for the controller's storage, with the account holder's household activity as the source, and art. 14(5)(b) (disproportionate effort) for not informing each person; (b) treat Name Atlas as the account holder's processor (art. 28) for that data; (c) keep the current text.
+**Recommendation (not a decision):** (a), stated in the notice once counsel agrees.
+
+---
+
+## D-035 — retention periods the code does not set
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-01, J-08).
+
+Facts: the notice says emails and contact messages are kept "tak długo, jak to potrzebne do załatwienia sprawy", and the waiting list "do startu usługi albo do Twojej prośby o wypisanie". They live in the Gmail mailbox and in Resend's sending logs, and no period is set for either. Well-known bearers stay until the next data refresh after an objection, with no period otherwise. Backups (TASK-049) will hold the accounts and family schemas, and their retention is not yet stated in the notice.
+
+Options: (a) a fixed period per category, for example messages 12 months after the matter is closed, the waiting list until launch plus 3 months; (b) keep the "as long as needed" wording.
+**Recommendation (not a decision):** (a), with the backup retention added to the notice when TASK-049's upload runs in production.
+
+---
+
 ## D-034 — RESOLVED (2026-10-04): the family tree is free with an account
 
 **Resolution:** The project owner, 2026-10-04: "tree free with sign up". Any complete account may build a tree at no cost; it is no longer in the 29,99 zł tier. This supersedes D-029 ("paid; the tree stays dark until checkout exists"). The offer page moves the tree to the free tier (TASK-084). The paid tier keeps connecting trees, extra research, the report and the well-known bearers.
 
-**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built.
+**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
 
 ---
 
@@ -157,9 +234,42 @@ The owner selected `name-atlas.pl` as primary and `nameatlas.pl` as alternate on
 
 ## D-025 — the tiers the owner named on 2026-10-01 evening, against ADR-0026's
 
-**Status:** NON-BLOCKING NOW. It blocks any change to the offer page and the checkout task.
+**Status:** ANSWERED 2026-10-04 (below). ADR-0037 (proposed 2026-10-04, TASK-104) records the set and supersedes ADR-0026's tiers; the offer page follows it on that branch. This entry is deleted when ADR-0037 is accepted. Still open, and not blocking: what else the 28,99 zł and 199 zł tiers hold.
 **Owner:** project owner.
 **Raised by:** ADR-0028's session, 2026-10-01.
+
+**2026-10-04, ADR-0035's session:** asked to "confirm 'couple' replaces the current tiers (D-025)", the owner answered "ok". Asked to be sure whether that meant the whole set or only the couple tier, they answered "a, whole set". §1 is answered: the set replaces ADR-0026's tiers, and the offer page will follow it. They also chose framing "A" for the couple tier: the two surnames' facts side by side, with no score (ADR-0035, TASK-100). What the other new tiers hold is still not confirmed, and §2–§4 were open then.
+
+**2026-10-04, later the same session:** asked whether the 800 zł tier keeps DNA, the owner answered "dna yes in 800 tier". §2 is answered: the 800 zł "genealogist research" tier replaces the 499 zł "Genealogia z DNA" tier, with DNA analysis in it, and stays "coming soon". ADR-0026 §2.4's rules for it carry over: the partner is not named, and the page asks readers not to send DNA results or health data by email. §3 is half answered by D-034: the tree is free with an account. Still open: which tier holds famous bearers (and connecting trees), and §4.
+
+**2026-10-04, later the same session:** asked which tier holds famous bearers and connecting trees, the owner answered: "famous berers free connecting tress free but then to unlock more than 2nd cousins or add more ppl oyu have to have paid tier". §3 is answered:
+
+- famous bearers are free;
+- connecting trees is free;
+- a paid tier is needed to see matches beyond second cousins, and to add more people than the free limit.
+
+Not yet said: which paid tier unlocks those (any, or a named one), and how many people the free tree holds. §4 is still open.
+
+**2026-10-04, later the same session:** asked whether each price is paid once or monthly, the owner answered "once as not sure how to make a subscription from it yet". §4 is half answered: every tier is a one-time payment for now. Still open in §4 (and D-024): whether the reader pays the 800 zł to Name Atlas or to the partner.
+
+**2026-10-04, later the same session (answered through a multiple-choice prompt):**
+
+- Free tree: "Free, small cap": building and connecting trees are free, up to a cap on people, with matches shown up to second cousins.
+- The cap: "5 people": a free tree holds 5 people; a sixth needs a paid tier.
+- Which tier unlocks more people and matches beyond second cousins: "Any paid tier", the 28,99 zł tier included.
+- Who takes the 800 zł: "Name Atlas": the reader pays on the site, and Name Atlas pays the partner.
+
+**D-025 is answered in full.** The tiers, with what has been confirmed:
+
+| Tier | Price | Confirmed |
+|---|---|---|
+| Free (account) | 0 | the cards, the comparison, famous bearers, a family tree of up to 5 people, connecting trees with matches up to second cousins |
+| "smaller research" | 28,99 zł | unlocks the tree beyond 5 people and matches beyond second cousins |
+| "couple" | 89,99 zł | the couple report (ADR-0035), and the tree unlock |
+| "family review" | 199 zł | the tree unlock |
+| "genealogist research" | 800 zł | research by a partner genealogist with DNA analysis, paid to Name Atlas, "coming soon"; the tree unlock |
+
+All prices are one-time payments for now. What else the 28,99 and 199 zł tiers hold, beyond the tree unlock, was drafted in the owner's 2026-10-01 chat and is not confirmed. An ADR superseding ADR-0026 should fix this table before the offer page or checkout changes. The 800 zł payee answers D-024's second question for the new tier, and makes Name Atlas the seller of the partner's service, which the consumer terms and invoicing (ADR-0023 §2.5) must cover.
 
 ADR-0026 (accepted 2026-10-01, live on `/pl/oferta`) has three tiers: free, "Nazwisko i rodzina" 29,99 zł, "Genealogia z DNA" 499 zł. Later the same day, in a chat outside this repository, the owner described a different set, reached after sign-in from the download or share button:
 
@@ -183,7 +293,7 @@ ADR-0028 (what may be shown) names no price, so it holds under either set.
 
 ## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
 
-**Status:** NON-BLOCKING NOW. It blocks the checkout task, not the offer page.
+**Status:** ANSWERED 2026-10-04 for the owner's new tier set (D-025): every tier is one payment for now, and the 800 zł tier that replaces the 499 zł one is paid to Name Atlas. Recorded in ADR-0037 §2.1 and §2.4.
 **Owner:** project owner.
 **Raised by:** TASK-057 (ADR-0026 §4), 2026-10-01.
 

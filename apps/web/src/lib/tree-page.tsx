@@ -23,6 +23,7 @@ import {
   HIDE_FIELD,
   INVITATION_TOKEN,
   treeActionPath,
+  treeExportPath,
   treePath,
   treeTarget,
 } from "./tree-paths.js";
@@ -712,6 +713,14 @@ function TreeView({ data }: { data: Extract<TreePageData, { kind: "tree" }> }) {
             <a href={treePath(lang, { page: "add", treeId })}>{t.pedigree.addPerson}</a>
           </p>
         ) : null}
+      </section>
+      <section className="tree-export">
+        <p className="account-links">
+          <a href={treeExportPath(lang, treeId)} download>
+            {t.pedigree.exportLink}
+          </a>
+        </p>
+        <p className="tree-panel-note">{t.pedigree.exportHint}</p>
       </section>
       {tree.tree.role === "OWNER" ? (
         <section>

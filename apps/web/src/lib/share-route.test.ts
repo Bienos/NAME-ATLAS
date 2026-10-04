@@ -10,7 +10,10 @@ vi.mock("./share-facts.js", async (importOriginal) => ({
   ...(await importOriginal<typeof ShareFacts>()),
   shareFacts,
 }));
-vi.mock("./share-card.js", () => ({ renderShareCard }));
+vi.mock("./share-card.js", () => ({
+  renderShareCard,
+  isCardLayer: (value: string) => ["base", "reveal", "intro", "intro-name"].includes(value),
+}));
 
 const { shareCardResponse, sharePreviewResponse } = await import("./share-route.js");
 const { UI } = await import("./messages.js");
@@ -126,5 +129,43 @@ describe("the card's preview (TASK-093, AC-2)", () => {
     expect(en.headers.get("location")).toBe("/en/surname/nowak/card/rarity/preview");
     shareFacts.mockReturnValueOnce(null);
     expect((await sharePreviewResponse("x", "rarity", "pl", null)).status).toBe(404);
+  });
+});
+
+describe("the video's layers (TASK-108)", () => {
+  it("draws a known layer with the opening's question, behind the same gate", async () => {
+    const response = await shareCardResponse(
+      "kowalski",
+      "summary",
+      "pl",
+      "atlas.test",
+      "off",
+      "reveal",
+    );
+    expect(response.status).toBe(200);
+    expect(renderShareCard.mock.calls[0]?.[4]).toEqual({
+      layer: "reveal",
+      hook: UI.pl.videoHook,
+    });
+    const refused = await shareCardResponse(
+      "kowalski",
+      "summary",
+      "pl",
+      "atlas.test",
+      "sign-in",
+      "base",
+    );
+    expect(refused.status).toBe(401);
+  });
+
+  it("answers 404 for an unknown layer and reads nothing", async () => {
+    const response = await shareCardResponse("kowalski", "summary", "pl", "atlas.test", "off", "x");
+    expect(response.status).toBe(404);
+    expect(answerSlug).not.toHaveBeenCalled();
+  });
+
+  it("draws the plain card without a layer", async () => {
+    await shareCardResponse("kowalski", "summary", "pl", "atlas.test");
+    expect(renderShareCard.mock.calls[0]?.[4]).toBeNull();
   });
 });

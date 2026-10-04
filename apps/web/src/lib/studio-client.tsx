@@ -2,29 +2,33 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
-  canCopyImage,
   canShareFiles,
-  copyCardImage,
   saveCardImage,
+  savesThroughSheet,
   shareCardImage,
   shareOrSaveFile,
 } from "./share-actions.js";
-import { VideoRefused, canMakeVideo, makeCardVideo } from "./share-video.js";
+import { DEFAULT_VIDEO, VideoRefused, canMakeVideo, makeCardVideo } from "./share-video.js";
+import type { VideoLength, VideoMotion } from "./share-video.js";
 import type { ShareOutcome } from "./share-actions.js";
 
 /**
  * The share studio's buttons (TASK-093): share the card's image through the
- * system sheet, save it, or copy it. Each button appears only where the
- * browser can do what it says; "Pobierz" always can. What happened is said in
- * one status line.
+ * system sheet, or save it. On iPhone and iPad saving goes through that sheet
+ * too, whose "Zapisz obraz" puts the image in Photos: a download would land in
+ * Files, and no web page can write to the gallery directly. Elsewhere it is a
+ * download. What
+ * happened is said in one status line.
  */
 
 export interface StudioLabels {
   readonly share: string;
   readonly download: string;
-  readonly copy: string;
+  /** "Pobierz" on iPhone and iPad: the image to the gallery. */
+  readonly gallery: string;
+  /** Said once the sheet opened from the gallery button has been used. */
+  readonly galleryHint: string;
   readonly working: string;
-  readonly copied: string;
   readonly failed: string;
   readonly signIn: string;
 }
@@ -32,16 +36,17 @@ export interface StudioLabels {
 /** What the browser can do, read once on the client; nothing before hydration. */
 interface Abilities {
   readonly share: boolean;
-  readonly copy: boolean;
+  /** Saving goes through the share sheet, to the gallery (`savesThroughSheet`). */
+  readonly gallery: boolean;
 }
-const NONE: Abilities = { share: false, copy: false };
+const NONE: Abilities = { share: false, gallery: false };
 let abilities: Abilities | null = null;
 const readAbilities = (): Abilities =>
-  (abilities ??= { share: canShareFiles(), copy: canCopyImage() });
+  (abilities ??= { share: canShareFiles(), gallery: savesThroughSheet() });
 /** Nothing outside changes what the browser can do, so there is nothing to subscribe to. */
 const subscribeNever = () => () => undefined;
 
-type Action = "share" | "download" | "copy";
+type Action = "share" | "download";
 
 export function StudioActions({
   image,
@@ -61,17 +66,18 @@ export function StudioActions({
   const can = useSyncExternalStore(subscribeNever, readAbilities, () => NONE);
   const [busy, setBusy] = useState<Action | null>(null);
   const [outcome, setOutcome] = useState<ShareOutcome | null>(null);
+  const [toGallery, setToGallery] = useState(false);
 
   async function run(action: Action): Promise<void> {
+    // On iPhone and iPad the download goes through the share sheet, for its "Zapisz obraz".
+    const viaSheet = action === "share" || can.gallery;
     setBusy(action);
     setOutcome(null);
+    setToGallery(action === "download" && viaSheet);
     try {
-      const result =
-        action === "share"
-          ? await shareCardImage(image, surname, card)
-          : action === "copy"
-            ? await copyCardImage(image)
-            : await saveCardImage(image, surname, card);
+      const result = viaSheet
+        ? await shareCardImage(image, surname, card)
+        : await saveCardImage(image, surname, card);
       setOutcome(result);
     } finally {
       setBusy(null);
@@ -92,10 +98,9 @@ export function StudioActions({
   return (
     <div className="studio-actions">
       {can.share ? button("share", labels.share, true) : null}
-      {button("download", labels.download, !can.share)}
-      {can.copy ? button("copy", labels.copy, false) : null}
+      {button("download", can.gallery ? labels.gallery : labels.download, !can.share)}
       <p className="studio-status" role="status">
-        {outcome === "copied" ? labels.copied : null}
+        {toGallery && busy === "download" ? labels.galleryHint : null}
         {outcome === "failed" ? labels.failed : null}
         {outcome === "sign-in" && signInHref !== null ? (
           <a href={signInHref}>{labels.signIn}</a>
@@ -112,6 +117,12 @@ export interface VideoLabels {
   readonly cancel: string;
   readonly failed: string;
   readonly signIn: string;
+  readonly length: string;
+  readonly short: string;
+  readonly full: string;
+  readonly motion: string;
+  readonly up: string;
+  readonly side: string;
 }
 
 /**
@@ -136,6 +147,8 @@ export function StudioVideo({
   const [able, setAble] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<"failed" | "sign-in" | null>(null);
+  const [length, setLength] = useState<VideoLength>(DEFAULT_VIDEO.length);
+  const [motion, setMotion] = useState<VideoMotion>(DEFAULT_VIDEO.motion);
   const cancelled = useRef(false);
 
   useEffect(() => {
@@ -155,7 +168,10 @@ export function StudioVideo({
     setFailure(null);
     setProgress(0);
     try {
-      const video = await makeCardVideo(images, setProgress, () => cancelled.current);
+      const video = await makeCardVideo(images, setProgress, () => cancelled.current, {
+        length,
+        motion,
+      });
       await shareOrSaveFile(video, fileName, surname);
     } catch (cause) {
       const reason = cause instanceof VideoRefused ? cause.reason : "failed";
@@ -165,8 +181,41 @@ export function StudioVideo({
     }
   }
 
+  /** One choice as a row of two options (TASK-108). */
+  const choice = <T extends string>(
+    name: string,
+    legend: string,
+    value: T,
+    set: (next: T) => void,
+    options: readonly (readonly [T, string])[],
+  ) => (
+    <fieldset className="studio-choice" disabled={progress !== null}>
+      <legend>{legend}</legend>
+      {options.map(([option, label]) => (
+        <label key={option}>
+          <input
+            type="radio"
+            name={name}
+            value={option}
+            checked={value === option}
+            onChange={() => set(option)}
+          />
+          <span>{label}</span>
+        </label>
+      ))}
+    </fieldset>
+  );
+
   return (
     <div className="studio-video">
+      {choice("video-length", labels.length, length, setLength, [
+        ["full", labels.full],
+        ["short", labels.short],
+      ])}
+      {choice("video-motion", labels.motion, motion, setMotion, [
+        ["up", labels.up],
+        ["side", labels.side],
+      ])}
       {progress === null ? (
         <button type="button" onClick={() => void make()}>
           {labels.make}

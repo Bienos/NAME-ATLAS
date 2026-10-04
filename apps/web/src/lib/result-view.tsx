@@ -104,6 +104,7 @@ function Chapter({
   lang,
   wide = false,
   empty = false,
+  anchor = null,
   children,
 }: {
   /** Which chapter: its anchor, question and reading note come from the registry. */
@@ -115,13 +116,15 @@ function Chapter({
   wide?: boolean;
   /** No figures to read: the absence is stated, compactly, and there is nothing to explain. */
   empty?: boolean;
+  /** An id in place of the registry's, where a page shows the chapter twice (TASK-100). */
+  anchor?: string | null;
   children: ReactNode;
 }) {
   const t = UI[lang];
-  const { anchor, title, lede } = sectionOf(chapter);
+  const { anchor: registered, title, lede } = sectionOf(chapter);
   const className = empty ? "chapter chapter-empty" : wide ? "chapter chapter-wide" : "chapter";
   return (
-    <section id={anchor} className={className}>
+    <section id={anchor ?? registered} className={className}>
       <div className="chapter-rail">
         <p className="chapter-number">{String(number).padStart(2, "0")}</p>
         <h3>{t[title]}</h3>
@@ -156,17 +159,21 @@ function Population({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: PopulationSection;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   const t = UI[lang];
   const several = section.observations.length > 1;
   return (
     <Chapter
+      anchor={anchor}
       chapter="count"
       number={number}
       next={next}
@@ -436,15 +443,19 @@ function Distribution({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: NonNullable<SurnameResultResponse["distribution"]>;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   return (
     <Chapter
+      anchor={anchor}
       chapter="map"
       number={number}
       next={next}
@@ -549,16 +560,20 @@ function Change({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: ChangeSection;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   const t = UI[lang];
   return (
     <Chapter
+      anchor={anchor}
       chapter="change"
       number={number}
       next={next}
@@ -624,11 +639,14 @@ function Meaning({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: MeaningSection;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   const t = UI[lang];
   if (section.state !== "AVAILABLE") {
@@ -639,14 +657,14 @@ function Meaning({
           ? t.meaningBlocked
           : t.meaningUnavailable;
     return (
-      <Chapter chapter="meaning" number={number} next={next} lang={lang}>
+      <Chapter anchor={anchor} chapter="meaning" number={number} next={next} lang={lang}>
         <p className="absent">{body}</p>
       </Chapter>
     );
   }
   const conflicting = section.confidence === "CONFLICTING";
   return (
-    <Chapter chapter="meaning" number={number} next={next} lang={lang}>
+    <Chapter anchor={anchor} chapter="meaning" number={number} next={next} lang={lang}>
       {/* Before the readings, not after: a reader must know these are
           interpretations before they read one as a fact. */}
       <p className="caveat">{t.meaningInterpretationNote}</p>
@@ -813,12 +831,15 @@ function Bearers({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: BearersSection;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   const t = UI[lang];
   const statement = bearersSentence(section, surname, lang);
@@ -830,13 +851,13 @@ function Bearers({
           ? t.bearersBlocked
           : t.bearersUnavailable;
     return (
-      <Chapter chapter="bearers" number={number} next={next} lang={lang} empty>
+      <Chapter anchor={anchor} chapter="bearers" number={number} next={next} lang={lang} empty>
         <p className="absent">{body}</p>
       </Chapter>
     );
   }
   return (
-    <Chapter chapter="bearers" number={number} next={next} lang={lang}>
+    <Chapter anchor={anchor} chapter="bearers" number={number} next={next} lang={lang}>
       <Claim
         statement={statement}
         evidence={bearersEvidence(section, lang)}
@@ -883,11 +904,11 @@ export function BearerItem({ person, lang }: { person: Bearer; lang: Lang }) {
       {description === null ? null : <span className="bearer-what">{description}</span>}
       <span className="bearer-links">
         {person.article_url === null ? null : (
-          <a href={person.article_url} rel="noopener noreferrer">
+          <a href={person.article_url} target="_blank" rel="noopener noreferrer">
             {t.bearersArticle}
           </a>
         )}
-        <a href={person.wikidata_url} rel="noopener noreferrer">
+        <a href={person.wikidata_url} target="_blank" rel="noopener noreferrer">
           Wikidata
         </a>
       </span>
@@ -921,19 +942,22 @@ function Localities({
   number,
   next,
   lang,
+  anchor = null,
 }: {
   section: LocalitiesSection;
   surname: string;
   number: number;
   next: Step | null;
   lang: Lang;
+  /** The chapter's id, where a page shows it twice (TASK-100). */
+  anchor?: string | null;
 }) {
   const t = UI[lang];
   const statement = localitiesSentence(section, surname, lang);
   if (statement === null) return null;
   const more = (section.total ?? 0) - section.places.length;
   return (
-    <Chapter chapter="places" number={number} next={next} lang={lang}>
+    <Chapter anchor={anchor} chapter="places" number={number} next={next} lang={lang}>
       <Claim
         statement={statement}
         evidence={localitiesEvidence(section, lang)}
@@ -1375,3 +1399,6 @@ export function Result({
 }
 
 export { assessmentWord };
+
+/** The surname page's own chapters, for the couple report's two sides (TASK-100). */
+export { Bearers, Change, Distribution, Localities, Meaning, Population };

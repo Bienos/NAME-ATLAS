@@ -1014,9 +1014,6 @@ export const UI = {
     deckFullPage: "Zobacz całą stronę",
     deckCompareForms: "Porównaj obie formy",
     deckShare: "Udostępnij kartę",
-    deckSharing: "Przygotowuję…",
-    deckSignInToSave: "Obraz zapiszesz po zalogowaniu.",
-    deckSignIn: "Zaloguj się lub załóż konto",
     // The share studio (TASK-093, ADR-0034).
     deckFinish: "Twoja karta jest gotowa",
     studioTitle: "Udostępnij kartę",
@@ -1026,9 +1023,9 @@ export const UI = {
     studioPreviewMark: "Podgląd · Name Atlas",
     studioShare: "Udostępnij",
     studioDownload: "Pobierz",
-    studioCopy: "Kopiuj obraz",
+    studioGallery: "Zapisz w galerii",
+    studioGalleryHint: "Wybierz „Zapisz obraz”.",
     studioWorking: "Przygotowuję…",
-    studioCopied: "Skopiowano obraz.",
     studioFailed: "Nie udało się. Spróbuj jeszcze raz.",
     studioInstagram:
       "Na Instagramie: udostępnij z telefonu albo pobierz i wyślij obraz na telefon.",
@@ -1045,6 +1042,14 @@ export const UI = {
     studioVideoWorking: "Tworzę wideo… {n}%",
     studioVideoCancel: "Anuluj",
     studioVideoFailed: "Nie udało się utworzyć wideo.",
+    studioPdf: "Pobierz PDF ze wszystkimi kartami",
+    videoHook: "Ile osób nosi to nazwisko?",
+    studioVideoLength: "Długość",
+    studioVideoShort: "Krótkie (ok. 7 s)",
+    studioVideoFull: "Pełne (wszystkie karty)",
+    studioVideoMotion: "Przejścia",
+    studioVideoUp: "Z dołu",
+    studioVideoSide: "Z boku",
     scaleLabel: "Skala rzadkości",
     scaleCommon: "częstsze",
     scaleRare: "rzadsze",
@@ -1089,6 +1094,26 @@ export const UI = {
     compareAction: "Porównaj",
     compareNeedsTwo: "Wpisz oba nazwiska, tak jak się je pisze.",
     compareFromHere: "Porównaj z innym nazwiskiem",
+    // The couple report (TASK-100, ADR-0035): two surnames' facts side by side,
+    // no score. `couple-view.test.ts` holds these to §3.4's wording rules.
+    coupleHeading: "Wasze nazwiska razem",
+    coupleIntro:
+      "Wpiszcie oba nazwiska. Zestawimy obok siebie to, co rejestr i źródła mówią o każdym " +
+      "z nich osobno.",
+    coupleAction: "Pokaż",
+    coupleNote:
+      "Każde nazwisko opisujemy osobno, z jego własnych danych. Nie liczymy niczego z dwóch " +
+      "nazwisk razem.",
+    coupleNamesHeading: "Nazwiska, które możecie nosić",
+    coupleNamesNote:
+      "Każde nazwisko sprawdzamy osobno w rejestrze PESEL. Liczby z list mężczyzn i kobiet " +
+      "nie są sumowane.",
+    coupleNotListed: "Nie ma go na liście PESEL",
+    coupleWhereHeading: "Gdzie mieszka każde nazwisko",
+    coupleCommonHeading: "Jak częste jest każde nazwisko i jak się zmienia",
+    coupleMeaningHeading: "Co znaczy każde nazwisko",
+    coupleBearersHeading: "Znane osoby i miejscowości o tych nazwiskach",
+    coupleCompareLink: "Porównanie tych dwóch nazwisk",
     // The page for an address that does not exist (TASK-052).
     notFoundHeading: "Nie ma takiej strony",
     notFoundBody:
@@ -1706,9 +1731,6 @@ export const UI = {
     deckFullPage: "See the full page",
     deckCompareForms: "Compare both forms",
     deckShare: "Share this card",
-    deckSharing: "Preparing…",
-    deckSignInToSave: "Sign in to save the image.",
-    deckSignIn: "Sign in or create an account",
     // The share studio (TASK-093, ADR-0034).
     deckFinish: "Your card is ready",
     studioTitle: "Share your card",
@@ -1718,9 +1740,9 @@ export const UI = {
     studioPreviewMark: "Preview · Name Atlas",
     studioShare: "Share",
     studioDownload: "Download",
-    studioCopy: "Copy image",
+    studioGallery: "Save to Photos",
+    studioGalleryHint: "Choose “Save Image”.",
     studioWorking: "Preparing…",
-    studioCopied: "Image copied.",
     studioFailed: "That did not work. Try again.",
     studioInstagram:
       "For Instagram: share from your phone, or download and send the image to your phone.",
@@ -1737,6 +1759,14 @@ export const UI = {
     studioVideoWorking: "Making the video… {n}%",
     studioVideoCancel: "Cancel",
     studioVideoFailed: "The video could not be made.",
+    studioPdf: "Download a PDF of every card",
+    videoHook: "How many people carry this surname?",
+    studioVideoLength: "Length",
+    studioVideoShort: "Short (about 7 s)",
+    studioVideoFull: "Full (every card)",
+    studioVideoMotion: "Transitions",
+    studioVideoUp: "From below",
+    studioVideoSide: "From the side",
     scaleLabel: "Rarity scale",
     scaleCommon: "more common",
     scaleRare: "rarer",
@@ -1779,6 +1809,24 @@ export const UI = {
     compareAction: "Compare",
     compareNeedsTwo: "Type both surnames, as they are written.",
     compareFromHere: "Compare with another surname",
+    coupleHeading: "Your names together",
+    coupleIntro:
+      "Type both surnames. We set side by side what the register and the sources say about " +
+      "each one on its own.",
+    coupleAction: "Show",
+    coupleNote:
+      "Each surname is described on its own, from its own data. Nothing is computed from the " +
+      "two surnames together.",
+    coupleNamesHeading: "The names you could carry",
+    coupleNamesNote:
+      "Each name is looked up on its own in the PESEL register. Figures from the men's and " +
+      "women's lists are not added up.",
+    coupleNotListed: "Not on the PESEL list",
+    coupleWhereHeading: "Where each name lives",
+    coupleCommonHeading: "How common each name is, and its change",
+    coupleMeaningHeading: "What each name means",
+    coupleBearersHeading: "Famous bearers and places of the same name",
+    coupleCompareLink: "The comparison of these two surnames",
     notFoundHeading: "There is no such page",
     notFoundBody:
       "The address may have changed or have a typo in it. Type the surname you are looking for.",

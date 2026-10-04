@@ -165,7 +165,7 @@ describe("the landing's second screen and offer", () => {
     for (const lang of ["pl", "en"] as const) {
       const html = renderToStaticMarkup(createElement(LandingOffer, { lang }));
       const doc = offerDocument(lang);
-      expect(doc.tiers).toHaveLength(3);
+      expect(doc.tiers).toHaveLength(5);
       for (const tier of doc.tiers) {
         expect(html).toContain(`<h3>${tier.name}</h3>`);
         expect(html).toContain(`<p class="strip-price">${tier.price}</p>`);
@@ -173,10 +173,10 @@ describe("the landing's second screen and offer", () => {
       expect(html).toContain(`<p class="strip-status">${doc.now}</p>`);
       expect(html).toContain(`<p class="strip-status">${doc.soon}</p>`);
       expect(html.match(/class="is-now"/gu)).toHaveLength(1);
-      expect(html.match(/class="is-soon"/gu)).toHaveLength(2);
+      expect(html.match(/class="is-soon"/gu)).toHaveLength(4);
       const offer = lang === "pl" ? "/pl/oferta" : "/en/offer";
       expect(html).toContain(`href="${offer}"`);
-      expect(html).toContain(`href="${offer}#tier-family"`);
+      expect(html).toContain(`href="${offer}#tier-smaller"`);
       expect(html).toContain(doc.lede);
       // Nothing to buy here: no form, no button.
       expect(html).not.toContain("<form");

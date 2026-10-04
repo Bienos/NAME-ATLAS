@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { clientKey, evictExpired, rateLimit } from "./lib/rate-limit.js";
 import type { RateLimitStore } from "./lib/rate-limit.js";
 import { LONGEST_WINDOW_MS, policyFor } from "./lib/request-policy.js";
+import { COUPLE_CACHE_CONTROL, isCouplePath } from "./lib/couple-config.js";
 
 /**
  * Request rate limiting (TASK-029).
@@ -61,6 +62,8 @@ export function middleware(request: NextRequest): NextResponse {
   const response = NextResponse.next();
   response.headers.set("x-ratelimit-limit", String(decision.limit));
   response.headers.set("x-ratelimit-remaining", String(decision.remaining));
+  // The couple report is one reader's page: never kept by a browser or a cache (TASK-100).
+  if (isCouplePath(pathname)) response.headers.set("cache-control", COUPLE_CACHE_CONTROL);
   return response;
 }
 

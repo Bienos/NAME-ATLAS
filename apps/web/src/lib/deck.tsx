@@ -40,15 +40,13 @@ import {
   UI,
 } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { accountPath } from "./account-paths.js";
-import type { DeckSignIn } from "./deck-client.js";
 import { RarityScale } from "./rarity-scale.js";
 import { VoivodeshipMap } from "./voivodeship-map.js";
 import { mapInputs } from "./voivodeship-map-input.js";
 import { ShareButton } from "./share-button.js";
 import { comparePagePath, offerPath } from "./site-links.js";
 import { inDeckOrder, oneInOf, rankOf } from "./deck-order.js";
-import { SHARE_CARDS, shareCardFor, shareCardPath, shareFacts, studioPath } from "./share-facts.js";
+import { SHARE_CARDS, shareCardFor, shareFacts, studioPath } from "./share-facts.js";
 import type { ShareCardKey } from "./share-facts.js";
 
 export interface DeckCard {
@@ -59,7 +57,7 @@ export interface DeckCard {
   /** A card printed on paper rather than the dusk. */
   readonly paper?: boolean;
   readonly face: ReactNode;
-  /** The address of this card's share image (TASK-056); null when there is none to share. */
+  /** The share studio for this card's image (TASK-056, TASK-093); null when there is none to share. */
   readonly share: string | null;
 }
 
@@ -718,6 +716,19 @@ function bearers(section: BearersSection, lang: Lang): CardFace | null {
                 <b>{person.name}</b>
                 {years === null ? null : <span>{years}</span>}
                 {what === null ? null : <small>{what}</small>}
+                <small className="dk-bearer-links">
+                  {person.article_url === null ? null : (
+                    <>
+                      <a href={person.article_url} target="_blank" rel="noopener noreferrer">
+                        {t.bearersArticle}
+                      </a>
+                      {" · "}
+                    </>
+                  )}
+                  <a href={person.wikidata_url} target="_blank" rel="noopener noreferrer">
+                    Wikidata
+                  </a>
+                </small>
               </li>
             );
           })}
@@ -855,33 +866,18 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
     response.bearers === null ? null : bearers(response.bearers, lang),
     end(response, surname, links, deckFinish(given, lang, links.path), lang),
   ];
-  // Each card shares its own image, or the summary where it has none (TASK-056).
+  // Each card shares its own image, or the summary where it has none (TASK-056),
+  // through the share studio, which holds the download gate (TASK-093 follow-up).
   const shareOf = (key: string): string | null => {
     const own = shareCardFor(key);
-    if (shareFacts(given, own, lang) !== null) return shareCardPath(links.path, own, lang);
+    if (shareFacts(given, own, lang) !== null) return studioPath(links.path, lang, own);
     return shareFacts(given, "summary", lang) === null
       ? null
-      : shareCardPath(links.path, "summary", lang);
+      : studioPath(links.path, lang, "summary");
   };
   return cards
     .filter((card): card is CardFace => card !== null)
     .map((card) => ({ ...card, share: shareOf(card.key) }));
-}
-
-/**
- * What the deck says to a reader whose image request the route turns away for
- * want of a session (TASK-064): given only when accounts are on, which is when
- * the route can say so. The link leads to the sign-in page and back to this
- * surname's deck, which is open when they return.
- */
-export function deckSignIn(lang: Lang, pagePath: string, accountsOn: boolean): DeckSignIn | null {
-  if (!accountsOn) return null;
-  const t = UI[lang];
-  return {
-    text: t.deckSignInToSave,
-    link: t.deckSignIn,
-    href: accountPath(lang, "sign-in", { next: `${pagePath}?view=cards` }),
-  };
 }
 
 /**

@@ -6,7 +6,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import { safeNext } from "./account-paths.js";
-import { deckCards, deckFinish, deckSignIn, studioCards } from "./deck.js";
+import { deckCards, deckFinish, studioCards } from "./deck.js";
 import type { DeckCard } from "./deck.js";
 import { DECK_PARAM, deckRequested, searchTarget } from "./deck-target.js";
 import { Result } from "./result-view.js";
@@ -287,7 +287,7 @@ const FULL_INPUT = {
         description_en: null,
         born: 1975,
         died: null,
-        article_url: null,
+        article_url: "https://pl.wikipedia.org/wiki/Daniel_Kowalski",
         wikidata_url: "https://www.wikidata.org/wiki/Q558544",
       },
       {
@@ -831,12 +831,17 @@ describe("TASK-056: the deck links each card to its image", () => {
     );
   });
 
-  it("gives every deck card a share address, and the count-only deck the summary", () => {
+  it("gives every deck card a share address in the studio, and the count-only deck the summary", () => {
     expect(deckCards(FULL, "pl", LINKS).every((card) => card.share !== null)).toBe(true);
     expect(deckCards(COUNT_ONLY, "pl", LINKS).map((card) => card.share)).toEqual([
-      "/pl/nazwisko/kowalski/karta/summary",
-      "/pl/nazwisko/kowalski/karta/summary",
+      "/pl/nazwisko/kowalski/udostepnij?card=summary",
+      "/pl/nazwisko/kowalski/udostepnij?card=summary",
     ]);
+    // Each card's own image where it has one (TASK-093 follow-up: through the studio).
+    const rarity = deckCards(FULL, "pl", LINKS).find((card) => card.key === "rarity");
+    expect(rarity?.share).toBe("/pl/nazwisko/kowalski/udostepnij?card=rarity");
+    const catalogue = deckCards(FULL, "pl", LINKS).find((card) => card.key === "catalogue");
+    expect(catalogue?.share).toBe("/pl/nazwisko/kowalski/udostepnij?card=print");
   });
 
   it("names the downloaded file in ASCII, which every browser keeps", () => {
@@ -1094,7 +1099,6 @@ describe("TASK-055: the deck is drawn by script only", () => {
           hintKeys: "h",
           hintTouch: "t",
           share: "s",
-          sharing: "…",
         },
       }),
     );
@@ -1137,29 +1141,17 @@ describe("TASK-055 AC-4: the search opens the deck; the canonical URL does not c
   });
 });
 
-describe("TASK-064 AC-8: what the deck says to a reader the image route turned away", () => {
-  it("says nothing when accounts are off", () => {
-    expect(deckSignIn("pl", "/pl/nazwisko/kowalski", false)).toBeNull();
-    expect(deckSignIn("en", "/en/surname/kowalski", false)).toBeNull();
+describe("TASK-093 follow-up: the deck's share button leads to the studio", () => {
+  it("is a link to the card's studio, not a fetch of the image", () => {
+    const client = source("deck-client.tsx");
+    expect(client).toMatch(/<a className="deck-share" href=\{current\.share\}>/u);
+    expect(client).not.toContain("shareOrSave");
+    expect(client).not.toContain("deck-gate");
   });
 
-  it("leads to the sign-in page in the page's language and back to this deck", () => {
-    const pl = deckSignIn("pl", "/pl/nazwisko/kowalski", true);
-    expect(pl?.href).toBe("/pl/konto/zaloguj?next=%2Fpl%2Fnazwisko%2Fkowalski%3Fview%3Dcards");
-    expect(pl?.text).toBe("Obraz zapiszesz po zalogowaniu.");
-    const en = deckSignIn("en", "/en/surname/nowak", true);
-    expect(en?.href).toBe("/en/account/sign-in?next=%2Fen%2Fsurname%2Fnowak%3Fview%3Dcards");
-    expect(en?.text).toBe("Sign in to save the image.");
-    expect(pl?.link).not.toBe("");
-    expect(en?.link).not.toBe("");
-  });
-
-  it("builds an address the sign-in will follow, for what the page's own path builder makes", () => {
-    for (const slug of ["kowalski", "łuczak", "o'neil", "smith-jones-k3m9qp"]) {
-      const page = `/pl/nazwisko/${encodeURIComponent(slug)}`;
-      const href = deckSignIn("pl", page, true)?.href ?? "";
-      const next = new URL(href, "https://atlas.test").searchParams.get("next");
-      expect(safeNext(next), slug).toBe(`${page}?view=cards`);
+  it("gives every share address a studio address the sign-in will return to", () => {
+    for (const card of deckCards(FULL, "pl", LINKS)) {
+      if (card.share !== null) expect(safeNext(card.share), card.key).toBe(card.share);
     }
   });
 });
@@ -1174,6 +1166,15 @@ describe("TASK-073: the known people's card", () => {
     expect(face).toContain("1910–2022");
     expect(face).toContain("Wikidata · 325");
     expect(face).toContain(UI.pl.bearersCaveat);
+  });
+
+  it("links each person to Wikipedia when there is an article, and always to Wikidata", () => {
+    const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
+    const html = faces(card === undefined ? [] : [card]);
+    expect(html).toContain('href="https://pl.wikipedia.org/wiki/Daniel_Kowalski"');
+    expect(html.match(/href="https:\/\/[a-z]+\.wikipedia\.org/gu)).toHaveLength(1);
+    expect(html).toContain('href="https://www.wikidata.org/wiki/Q17558303"');
+    expect(html.match(/target="_blank"/gu)).toHaveLength(4);
   });
 
   it("is left out when Wikidata names nobody, or has not been asked", () => {
@@ -1193,6 +1194,6 @@ describe("TASK-073: the known people's card", () => {
 
   it("shares the summary, having no image of its own", () => {
     const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
-    expect(card?.share).toMatch(/\/karta\/summary$/u);
+    expect(card?.share).toMatch(/\/udostepnij\?card=summary$/u);
   });
 });

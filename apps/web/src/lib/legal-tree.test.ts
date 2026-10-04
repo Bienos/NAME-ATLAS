@@ -36,25 +36,60 @@ describe("the legal texts with the tree (TASK-076, AC-1)", () => {
       expect(pl.sections.map((s) => s.paragraphs.length)).toEqual(
         en.sections.map((s) => s.paragraphs.length),
       );
-      expect(legalUpdated(kind, true, true)).toBe(TREE_LEGAL_UPDATED);
+      // The tree's date, unless the document itself changed later (TASK-109).
+      expect(legalUpdated(kind, true, true)).toBe(
+        [TREE_LEGAL_UPDATED, legalUpdated(kind, true)].sort().at(-1),
+      );
     }
     const terms = legalDocument("terms", "pl", true, true);
     const clause = terms.sections.find((s) => s.heading === treeTermsHeading("pl"));
     expect(clause).toBeDefined();
-    expect(clause?.paragraphs.join(" ")).toContain("Osobę bez roku zgonu traktujemy jako żyjącą");
+    expect(clause?.paragraphs.join(" ")).toContain(
+      "Osobę, której nie oznaczysz jako zmarłej, traktujemy jako żyjącą",
+    );
+    expect(clause?.paragraphs.join(" ")).not.toContain("zaprosisz do drzewa");
     expect(clause?.paragraphs.join(" ")).toContain("masz prawo wpisać jej dane");
     const notice = legalDocument("privacy", "en", true, true);
     expect(notice.sections.map((s) => s.heading)).toContain("The family tree");
   });
 
-  it("says what the code does: private, the living hidden from members until opened, kept as long as the account", () => {
+  it("says what the code does: private, no members, the invitation's facts, kept as long as the account", () => {
     const notice = legalDocument("privacy", "pl", true, true).sections.find(
       (s) => s.heading === "Drzewo rodzinne",
     );
     const text = notice?.paragraphs.join(" ") ?? "";
     expect(text).toContain("prywatne");
-    expect(text).toContain("tylko wtedy, gdy im to włączysz");
+    // No route lets an owner add a member (legal review 2026-10-04, F-12).
+    expect(text).not.toContain("tylko wtedy, gdy im to włączysz");
     expect(text).toContain("tak długo, jak istnieje konto");
+    expect(text).toContain("miejsce zgonu");
+    expect(text).toContain("matka, ojciec, rodzic");
+    expect(text).toContain("14 dni");
+    expect(text).toContain("18 lat");
+    expect(text).toContain("plik JSON");
+    expect(text).toContain("trwają tyle co drzewo");
+    const en = legalDocument("privacy", "en", true, true).sections.find(
+      (s) => s.heading === "The family tree",
+    );
+    expect(en?.paragraphs.join(" ")).toContain("14 days");
+    expect(en?.paragraphs.join(" ")).toContain("a JSON file");
+  });
+
+  it("names the tree in the database and mail items, with and without Google", () => {
+    for (const google of [false, true]) {
+      for (const [lang, oracle, resend] of [
+        ["pl", "dane konta i drzew", "zaproszeń do potwierdzenia karty"],
+        ["en", "account and tree data", "invitations to confirm a card"],
+      ] as const) {
+        const items = legalDocument("privacy", lang, true, true, google).sections.flatMap(
+          (s) => s.items ?? [],
+        );
+        expect(items.filter((i) => i.startsWith("Oracle"))).toHaveLength(1);
+        expect(items.find((i) => i.startsWith("Oracle"))).toContain(oracle);
+        expect(items.filter((i) => i.startsWith("Resend"))).toHaveLength(1);
+        expect(items.find((i) => i.startsWith("Resend"))).toContain(resend);
+      }
+    }
   });
 
   it("refuses to be applied to a text without the account's sections", () => {

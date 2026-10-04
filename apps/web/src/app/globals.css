@@ -1421,6 +1421,35 @@ p {
   margin-bottom: var(--space-2);
 }
 
+/* --- the couple report: each surname's own chapters, side by side (TASK-100) */
+
+.couple-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-3) var(--space-6);
+}
+
+.couple-side {
+  min-width: 0;
+}
+
+.couple-side h4 {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.couple-counts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.couple-links a + a {
+  margin-left: var(--space-4);
+}
+
 /* --- the surname profile: the result page's editorial layout ------------- */
 
 /*
@@ -8360,16 +8389,12 @@ a.tree-card:hover {
   font-size: 0.875rem;
   font-weight: 600;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .deck-share:hover:not(:disabled) {
   background: var(--dusk-amber-hover);
-}
-
-.deck-share:disabled {
-  opacity: 0.7;
-  cursor: progress;
 }
 
 .deck-full:hover {
@@ -8378,24 +8403,6 @@ a.tree-card:hover {
 }
 
 /* The image route turned the reader away for want of a session (TASK-064). */
-.deck-gate {
-  padding: 0 var(--space-4);
-  color: var(--dusk-ink);
-  font-size: 0.875rem;
-  text-align: center;
-  text-wrap: balance;
-}
-
-.deck-gate:not(:empty) {
-  padding-block: var(--space-2);
-}
-
-.deck-gate a {
-  color: var(--dusk-amber);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
 
 .deck-stage {
   display: grid;
@@ -9044,6 +9051,12 @@ a.tree-card:hover {
   color: var(--dusk-ink-soft);
 }
 
+.dk-bearers .dk-bearer-links a {
+  color: var(--dusk-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .dk-recap {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -9356,6 +9369,12 @@ main.studio h1 {
   align-items: start;
 }
 
+/* A horizontal swipe on the card shows the next one; vertical scrolling stays the page's. */
+.studio-swipe {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .studio-image {
   display: block;
   width: 100%;
@@ -9385,6 +9404,7 @@ main.studio h1 {
 
 .studio-actions button,
 .studio-video button,
+.studio-pdf,
 .studio-gate a,
 .studio-more a,
 .studio-more .share button {
@@ -9417,6 +9437,54 @@ main.studio h1 {
 }
 
 .studio-actions button:disabled,
+/* The video's choices (TASK-108): two options a row, as pills. */
+.studio-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.studio-choice legend {
+  width: 100%;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+}
+
+.studio-choice label {
+  position: relative;
+  display: inline-flex;
+}
+
+.studio-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.studio-choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--dusk-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.studio-choice input:checked + span {
+  border-color: var(--dusk-amber);
+  color: var(--dusk-amber);
+}
+
+.studio-choice input:focus-visible + span {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
 .studio-video button:disabled {
   opacity: 0.6;
   cursor: default;
@@ -9498,4 +9566,58 @@ main.studio h1 {
 .tree-form .tree-hide small {
   display: block;
   color: var(--dusk-ink-muted);
+}
+
+/*
+ * The Google Analytics consent banner (TASK-109): fixed to the bottom, the two
+ * choices side by side and equal, so refusing is as easy as accepting.
+ */
+.consent-banner {
+  position: fixed;
+  inset: auto var(--space-4, 1rem) var(--space-4, 1rem) var(--space-4, 1rem);
+  z-index: 50;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  border: 1px solid var(--border-default);
+  border-radius: 12px;
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font-family: var(--font-ui), system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+}
+
+.consent-banner p {
+  margin: 0 0 var(--space-3, 0.75rem);
+}
+
+.consent-banner a {
+  color: var(--accent);
+}
+
+.consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+}
+
+.consent-actions button,
+.consent-settings {
+  flex: 1 1 10rem;
+  min-height: 44px;
+  padding: 0 var(--space-4, 1rem);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.consent-actions button:hover,
+.consent-settings:hover {
+  background: var(--hover-light);
 }
