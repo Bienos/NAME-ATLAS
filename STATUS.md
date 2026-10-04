@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-04, by the D-025 answers: the owner's tier set in full (`docs/progress/2026-10-04-tier-answers.md`).
+**Last rewritten:** 2026-10-04: the known people's Wikipedia and Wikidata links open in a new tab (`docs/progress/2026-10-04-bearer-links-new-tab.md`).
 
 ## Production
 
