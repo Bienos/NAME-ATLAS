@@ -5,9 +5,10 @@
  *   pnpm fetch:pesel [--dir data]
  *   pnpm fetch:pesel --series [--dir data]
  *
- * `--series` fetches instead every edition of the two national series
- * (ADR-0019, TASK-044): the male and the female list from 2020-01-22 to
- * 2026-01-20, which the list-facts generator reads. A refused resource
+ * `--series` fetches instead every edition of the two national lists that a
+ * trend reads (`PESEL_TREND_EDITIONS`, ADR-0019 as amended by TASK-106): the
+ * male and the female list from 2019-06-30 to 2026-01-20, which the
+ * list-facts generator reads. A refused resource
  * (`PESEL_REFUSED_RESOURCES`) is not an edition and is never fetched.
  *
  * For each resource in the registry: if `<dir>/<name>.csv` already exists and
@@ -27,7 +28,7 @@ import { localFileName, verifyResourceBytes } from "../src/acquire.js";
 import {
   PESEL_EDITIONS,
   PESEL_NATIONAL_RESOURCES_2026,
-  PESEL_NATIONAL_SERIES,
+  PESEL_TREND_EDITIONS,
   PESEL_REGIONAL_RESOURCES_2026,
 } from "../src/registry.js";
 import type { PeselResourceDescriptor } from "../src/registry.js";
@@ -99,11 +100,11 @@ async function main(): Promise<void> {
   const dir = dirArg(argv);
   // --editions: every registered edition that is not current (TASK-045),
   // for the VM's editions step; --series: the two national series, for the
-  // list-facts generator; neither: the four current resources, for the build.
+  // list-facts generator (2019 included, TASK-106); neither: the four current resources, for the build.
   const resources = argv.includes("--editions")
     ? [...PESEL_EDITIONS]
     : argv.includes("--series")
-      ? [...PESEL_NATIONAL_SERIES.national_male, ...PESEL_NATIONAL_SERIES.national_female]
+      ? [...PESEL_TREND_EDITIONS.national_male, ...PESEL_TREND_EDITIONS.national_female]
       : [...PESEL_NATIONAL_RESOURCES_2026, ...PESEL_REGIONAL_RESOURCES_2026];
   await mkdir(dir, { recursive: true });
   let ok = true;
