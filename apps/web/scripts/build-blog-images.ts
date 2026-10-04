@@ -349,6 +349,41 @@ function kowalski(): string {
   );
 }
 
+/**
+ * co-mozna-wyczytac-z-nazwiska: a small lantern on the ground at dusk, its pool
+ * of light showing the stones near it clearly while those beyond fade into the
+ * dark.
+ */
+function coMozna(): string {
+  const rnd = random(94);
+  const horizon = 380;
+  const cx = W * 0.5;
+  const cy = 640;
+  const rx = 470;
+  const ry = 150;
+  const stones: string[] = [];
+  for (let k = 0; k < 140; k += 1) {
+    const x = rnd() * W;
+    const y = horizon + 30 + rnd() * (H - horizon - 30);
+    const d = Math.hypot((x - cx) / rx, (y - cy) / ry);
+    const lit = Math.max(0, 1 - d);
+    const size = 5 + rnd() * 12 * (0.6 + (y - horizon) / (H - horizon));
+    stones.push(
+      `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(size)}" ry="${f(size * 0.42)}" fill="${lit > 0 ? C.amber : C.inkMuted}" opacity="${f(lit > 0 ? 0.2 + lit * 0.6 : 0.04 + rnd() * 0.06)}"/>`,
+    );
+  }
+  const pool = `<defs><radialGradient id="pool" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="${C.amber}" stop-opacity="0.42"/>
+    <stop offset="0.45" stop-color="${C.ember}" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="${C.ember}" stop-opacity="0"/>
+  </radialGradient></defs>
+<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#pool)"/>`;
+  const lantern = `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 64}" stroke="${C.mapDim}" stroke-width="4" stroke-linecap="round"/>
+<g filter="url(#glow)"><rect x="${cx - 13}" y="${cy - 100}" width="26" height="36" rx="6" fill="${C.sun}" opacity="0.95"/></g>
+<path d="M${cx - 17} ${cy - 100} L ${cx} ${cy - 116} L ${cx + 17} ${cy - 100} Z" fill="${C.mapDim}"/>`;
+  return scene(94, horizon, "", `${pool}<g>${stones.join("")}</g>${lantern}`);
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
@@ -357,6 +392,7 @@ const IMAGES: Record<string, () => string> = {
   "imie-i-nazwisko-ciekawostki": ciekawostki,
   "jak-sprawdzic-pochodzenie-nazwiska": jakSprawdzic,
   "kowalski-czy-kowalska": kowalski,
+  "co-mozna-wyczytac-z-nazwiska": coMozna,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));

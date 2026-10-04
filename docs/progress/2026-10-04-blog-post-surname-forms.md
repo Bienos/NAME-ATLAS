@@ -27,9 +27,11 @@ Task: `tasks/096-blog-post-surname-forms.md`. Branch `claude/great-wozniak-5wwxf
     - The framing sentences.
     - The -owa (wife) and -ówna (daughter) meanings are restated from `koncowki-nazwisk`, which carries their sources, and the post links to it.
 - `STATUS.md`:
-  - the blog line: seven posts, `imie-i-nazwisko-ciekawostki` now live since #94, and this post added;
+  - the blog line: `imie-i-nazwisko-ciekawostki` now live since #94, and this post added. After #102 (TASK-095, the seventh post) reached `main`, the merge rebuilt the line from `main`'s version, so it reads eight posts;
   - the Deployed line, read through Vercel's deployment API on 2026-10-04: `dpl_J91izGxxncCBFKqtw1rWajtFyQrQ`, `main` @ `f4fcb8f` (#103), READY;
   - "Last rewritten".
+
+- **Merge with `main` @ `1adde16` (#102, #105, #109).** `STATUS.md`, `apps/web/scripts/build-blog-images.ts` and `apps/web/public/images/blog/README.md` conflicted. Both sides were kept in the script and the README: #102's `coMozna` (seed 94) and this change's `kowalski` (seed 76). `STATUS.md` keeps this change's "Last rewritten" and Deployed lines, and `main`'s blog line with this post added.
 
 ## Verified
 

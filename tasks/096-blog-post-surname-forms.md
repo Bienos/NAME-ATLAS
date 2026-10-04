@@ -39,7 +39,7 @@ It ends with a FAQ and its sources.
 - **AC-3.** In a production build served locally:
   - `/pl/blog/kowalski-czy-kowalska` and `/en/blog/kowalski-czy-kowalska` answer 200, with their title, canonical address and the `pl`/`en` pair.
   - Their image answers 200, and their link to `koncowki-nazwisk` answers 200.
-  - Both indexes list seven posts.
+  - Both indexes list seven posts (eight after #102's post reached `main`).
 - **AC-4.** A run of the script reproduces the six existing images byte for byte.
 
 ## 5. Verification

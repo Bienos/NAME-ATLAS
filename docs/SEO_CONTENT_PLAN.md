@@ -52,7 +52,7 @@ The first thirty pieces, in the strategy's order. Its proposed score is kept for
 | # | Piece | Score | Status |
 |---|---|---|---|
 | 1 | Jak sprawdzić pochodzenie nazwiska? 7 źródeł, którym naprawdę można zaufać | 97 | live: `jak-sprawdzic-pochodzenie-nazwiska` (TASK-086) |
-| 2 | Co naprawdę można wyczytać z nazwiska — a czego nie? | 96 | queued (brief §5.2) |
+| 2 | Co naprawdę można wyczytać z nazwiska — a czego nie? | 96 | live: `co-mozna-wyczytac-z-nazwiska` (TASK-095) |
 | 3 | Czy osoby z tym samym nazwiskiem są rodziną? | 96 | queued (brief §5.3) |
 | 4 | Mapa nazwiska nie jest mapą Twojej rodziny. Jak ją poprawnie czytać? | 96 | queued (brief §5.4) |
 | 5 | Skąd wzięły się nazwiska w Polsce? Od średniowiecza do PESEL | 95 | extend: `genealogia` has a short history section; decide at task time whether the pillar replaces it or links from it |
