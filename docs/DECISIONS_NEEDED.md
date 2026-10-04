@@ -12,7 +12,7 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 **Resolution:** The project owner, 2026-10-04: "tree free with sign up". Any complete account may build a tree at no cost; it is no longer in the 29,99 zł tier. This supersedes D-029 ("paid; the tree stays dark until checkout exists"). The offer page moves the tree to the free tier (TASK-084). The paid tier keeps connecting trees, extra research, the report and the well-known bearers.
 
-**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built.
+**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
 
 ---
 
@@ -157,11 +157,42 @@ The owner selected `name-atlas.pl` as primary and `nameatlas.pl` as alternate on
 
 ## D-025 — the tiers the owner named on 2026-10-01 evening, against ADR-0026's
 
-**Status:** NON-BLOCKING NOW. §1 answered 2026-10-04 (below); §2–§4 still block any change to the offer page and the checkout task.
+**Status:** ANSWERED 2026-10-04 (below). An ADR superseding ADR-0026 is the next step; until it is accepted the offer page and checkout stay as they are.
 **Owner:** project owner.
 **Raised by:** ADR-0028's session, 2026-10-01.
 
-**2026-10-04, ADR-0035's session:** asked to "confirm 'couple' replaces the current tiers (D-025)", the owner answered "ok". Asked to be sure whether that meant the whole set or only the couple tier, they answered "a, whole set". §1 is answered: the set replaces ADR-0026's tiers, and the offer page will follow it. They also chose framing "A" for the couple tier: the two surnames' facts side by side, with no score (ADR-0035, TASK-100). What the other new tiers hold is still not confirmed, and §2–§4 are open.
+**2026-10-04, ADR-0035's session:** asked to "confirm 'couple' replaces the current tiers (D-025)", the owner answered "ok". Asked to be sure whether that meant the whole set or only the couple tier, they answered "a, whole set". §1 is answered: the set replaces ADR-0026's tiers, and the offer page will follow it. They also chose framing "A" for the couple tier: the two surnames' facts side by side, with no score (ADR-0035, TASK-100). What the other new tiers hold is still not confirmed, and §2–§4 were open then.
+
+**2026-10-04, later the same session:** asked whether the 800 zł tier keeps DNA, the owner answered "dna yes in 800 tier". §2 is answered: the 800 zł "genealogist research" tier replaces the 499 zł "Genealogia z DNA" tier, with DNA analysis in it, and stays "coming soon". ADR-0026 §2.4's rules for it carry over: the partner is not named, and the page asks readers not to send DNA results or health data by email. §3 is half answered by D-034: the tree is free with an account. Still open: which tier holds famous bearers (and connecting trees), and §4.
+
+**2026-10-04, later the same session:** asked which tier holds famous bearers and connecting trees, the owner answered: "famous berers free connecting tress free but then to unlock more than 2nd cousins or add more ppl oyu have to have paid tier". §3 is answered:
+
+- famous bearers are free;
+- connecting trees is free;
+- a paid tier is needed to see matches beyond second cousins, and to add more people than the free limit.
+
+Not yet said: which paid tier unlocks those (any, or a named one), and how many people the free tree holds. §4 is still open.
+
+**2026-10-04, later the same session:** asked whether each price is paid once or monthly, the owner answered "once as not sure how to make a subscription from it yet". §4 is half answered: every tier is a one-time payment for now. Still open in §4 (and D-024): whether the reader pays the 800 zł to Name Atlas or to the partner.
+
+**2026-10-04, later the same session (answered through a multiple-choice prompt):**
+
+- Free tree: "Free, small cap": building and connecting trees are free, up to a cap on people, with matches shown up to second cousins.
+- The cap: "5 people": a free tree holds 5 people; a sixth needs a paid tier.
+- Which tier unlocks more people and matches beyond second cousins: "Any paid tier", the 28,99 zł tier included.
+- Who takes the 800 zł: "Name Atlas": the reader pays on the site, and Name Atlas pays the partner.
+
+**D-025 is answered in full.** The tiers, with what has been confirmed:
+
+| Tier | Price | Confirmed |
+|---|---|---|
+| Free (account) | 0 | the cards, the comparison, famous bearers, a family tree of up to 5 people, connecting trees with matches up to second cousins |
+| "smaller research" | 28,99 zł | unlocks the tree beyond 5 people and matches beyond second cousins |
+| "couple" | 89,99 zł | the couple report (ADR-0035), and the tree unlock |
+| "family review" | 199 zł | the tree unlock |
+| "genealogist research" | 800 zł | research by a partner genealogist with DNA analysis, paid to Name Atlas, "coming soon"; the tree unlock |
+
+All prices are one-time payments for now. What else the 28,99 and 199 zł tiers hold, beyond the tree unlock, was drafted in the owner's 2026-10-01 chat and is not confirmed. An ADR superseding ADR-0026 should fix this table before the offer page or checkout changes. The 800 zł payee answers D-024's second question for the new tier, and makes Name Atlas the seller of the partner's service, which the consumer terms and invoicing (ADR-0023 §2.5) must cover.
 
 ADR-0026 (accepted 2026-10-01, live on `/pl/oferta`) has three tiers: free, "Nazwisko i rodzina" 29,99 zł, "Genealogia z DNA" 499 zł. Later the same day, in a chat outside this repository, the owner described a different set, reached after sign-in from the download or share button:
 
@@ -185,7 +216,7 @@ ADR-0028 (what may be shown) names no price, so it holds under either set.
 
 ## D-024 — the paid tiers: one payment or recurring, and who takes the 499 zł?
 
-**Status:** NON-BLOCKING NOW. It blocks the checkout task, not the offer page.
+**Status:** ANSWERED 2026-10-04 for the owner's new tier set (D-025): every tier is one payment for now, and the 800 zł tier that replaces the 499 zł one is paid to Name Atlas.
 **Owner:** project owner.
 **Raised by:** TASK-057 (ADR-0026 §4), 2026-10-01.
 
