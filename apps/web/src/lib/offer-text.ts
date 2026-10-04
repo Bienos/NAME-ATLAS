@@ -2,15 +2,17 @@ import { CONTACT_EMAIL } from "./contact.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The offer page's words (TASK-057, ADR-0026), and the two emails its forms
- * prepare. Pure: the server page and the form's client island both read it.
+ * The offer page's words (TASK-057, TASK-104, ADR-0037), and the two emails
+ * its forms prepare. Pure: the server page and the form's client island both
+ * read it.
  *
- * What the page may say is what ADR-0026 decided: the free tier as it is
- * today, and the two paid tiers as coming, with their prices and no way to buy.
- * The genealogy partner is described by its service and never named.
+ * What the page may say is what ADR-0037 records: the free tier as it is
+ * today, and the four paid tiers as coming, with their prices, what the owner
+ * has confirmed they hold, and no way to buy. The genealogy partner is
+ * described by its service and never named (ADR-0026 §2.4).
  */
 
-export type TierKey = "free" | "family" | "genealogy";
+export type TierKey = "free" | "smaller" | "couple" | "family" | "genealogy";
 
 export interface Tier {
   readonly key: TierKey;
@@ -79,9 +81,14 @@ export interface OfferDocument {
   };
 }
 
+/** What every paid tier unlocks in the tree (D-025: "any paid tier"). Not built yet. */
+const TREE_UNLOCK_PL =
+  "Drzewo rodziny większe niż 5 osób i dopasowania dalsze niż kuzyni drugiego stopnia.";
+const TREE_UNLOCK_EN = "A family tree of more than 5 people, and matches beyond second cousins.";
+
 const PL: OfferDocument = {
   title: "Oferta",
-  lede: "Odpowiedzi o nazwisku są za darmo, a wkrótce także drzewo, które zbudujesz sam. Potem łączenie drzew i badania zawodowych genealogów z DNA.",
+  lede: "Odpowiedzi o nazwisku są za darmo, a wkrótce, z darmowym kontem, także drzewo rodziny do 5 osób. Płatne pakiety, każdy za jednorazową opłatą, poszerzą drzewo; najwyższy to badanie zawodowego genealoga z DNA.",
   now: "Teraz",
   soon: "Wkrótce",
   freeCta: "Sprawdź nazwisko",
@@ -96,27 +103,43 @@ const PL: OfferDocument = {
         "Karty z odpowiedziami zaraz po wpisaniu nazwiska: ile osób je nosi, jak jest rzadkie, w których województwach jest najczęstsze, jak zmieniało się od 2019 roku, co może znaczyć i gdzie pojawia się w dawnych drukach.",
         "Karta do udostępnienia z każdej odpowiedzi.",
         "Pełna strona ze źródłami i porównanie dwóch nazwisk.",
+        "Znane osoby o tym nazwisku: tylko publiczne fakty i link do Wikipedii. To samo nazwisko, nie Twój krewny.",
       ],
-      // The tree is free with an account (D-034, 2026-10-04), no longer part of the 29,99 zł tier.
-      note: "Wkrótce darmowe konto, także przez Google: zachowasz karty i zbudujesz drzewo rodziny: rodzice, dziadkowie, miejsca, daty, nazwiska panieńskie.",
+      // The tree is free with an account, up to 5 people (D-034, D-025, ADR-0037 §2.1).
+      note: "Wkrótce darmowe konto, także przez Google: zachowasz karty i zbudujesz drzewo rodziny do 5 osób: rodzice, dziadkowie, miejsca, daty, nazwiska panieńskie. Połączysz je z drzewami innych osób przez wspólnych przodków, którzy już nie żyją, z dopasowaniami do kuzynów drugiego stopnia.",
+    },
+    // ADR-0037 §2.2: only what the owner confirmed. What else 28,99 zł and 199 zł hold is not decided.
+    {
+      key: "smaller",
+      name: "Małe poszukiwania",
+      price: "28,99 zł",
+      soon: true,
+      lede: "Więcej miejsca w drzewie rodziny.",
+      items: [TREE_UNLOCK_PL],
+    },
+    {
+      key: "couple",
+      name: "Para",
+      price: "89,99 zł",
+      soon: true,
+      lede: "Dwa nazwiska obok siebie.",
+      items: [
+        "Raport „Wasze nazwiska razem”: nazwiska, które może nosić para, i fakty o obu nazwiskach obok siebie: ile osób je nosi, gdzie, jak się zmieniało i co może znaczyć. Bez żadnej oceny pary.",
+        TREE_UNLOCK_PL,
+      ],
     },
     {
       key: "family",
-      name: "Nazwisko i rodzina",
-      price: "29,99 zł",
+      name: "Przegląd rodziny",
+      price: "199 zł",
       soon: true,
-      lede: "Od nazwiska do Twojej rodziny.",
-      items: [
-        "Pełny raport nazwiska: dawne formy, wzmianki w archiwach i drukach, zmiany w czasie i wszystkie źródła.",
-        "Znane osoby o tym nazwisku: tylko publiczne fakty i link do Wikipedii. To samo nazwisko, nie Twój krewny.",
-        "Łączenie drzew z innymi osobami przez wspólnych przodków, którzy już nie żyją.",
-        "Dodatkowe poszukiwania w źródłach serwisu dla miejsc i dat z Twojego drzewa.",
-      ],
+      lede: "Drzewo całej rodziny.",
+      items: [TREE_UNLOCK_PL],
     },
     {
       key: "genealogy",
-      name: "Genealogia z DNA",
-      price: "499 zł",
+      name: "Badanie genealogiczne",
+      price: "800 zł",
       soon: true,
       lede: "Zawodowi genealodzy szukają Twoich przodków w archiwach.",
       items: [
@@ -124,6 +147,7 @@ const PL: OfferDocument = {
         "Drzewo rodziny z kopiami dokumentów, pokolenie po pokoleniu, tak daleko, jak sięgają źródła.",
         "DNA: pomoc w wyborze testu (autosomalny: krewni z obu stron; Y-DNA: linia ojca; mtDNA: linia matki) i analiza testu, który już masz.",
         "Pisemny raport ze źródłami.",
+        TREE_UNLOCK_PL,
       ],
     },
   ],
@@ -139,8 +163,8 @@ const PL: OfferDocument = {
     surname: "Nazwisko, które Cię interesuje (nieobowiązkowo)",
     submit: "Zapisz się e-mailem",
     fallback: "Napisz, by zapisać się na listę",
-    subject: "Lista oczekujących: Nazwisko i rodzina (29,99 zł)",
-    body: "Proszę o wiadomość, gdy pakiet „Nazwisko i rodzina” będzie dostępny.",
+    subject: "Lista oczekujących",
+    body: "Proszę o wiadomość, gdy ten pakiet będzie dostępny.",
   },
   enquiry: {
     heading: "Zapytaj o badanie",
@@ -162,14 +186,14 @@ const PL: OfferDocument = {
     },
     submit: "Wyślij zapytanie e-mailem",
     fallback: "Napisz, by zapytać o badanie",
-    subject: "Zapytanie: Genealogia z DNA (499 zł)",
+    subject: "Zapytanie: Badanie genealogiczne (800 zł)",
     body: "Chcę zapytać o badanie genealogiczne z DNA.",
   },
 };
 
 const EN: OfferDocument = {
   title: "Offer",
-  lede: "The answers about a surname are free, and soon so is a tree you build yourself. Then connecting trees, and research by professional genealogists with DNA.",
+  lede: "The answers about a surname are free, and soon, with a free account, so is a family tree of up to 5 people. The paid tiers, each a one-time payment, widen the tree; the highest is research by a professional genealogist with DNA.",
   now: "Now",
   soon: "Coming soon",
   freeCta: "Look up a surname",
@@ -184,26 +208,41 @@ const EN: OfferDocument = {
         "Cards with answers as soon as you type a surname: how many people bear it, how rare it is, the provinces where it is most common, how it has changed since 2019, what it may mean and where it appears in old print.",
         "A card to share for each answer.",
         "The full page with its sources, and a comparison of two surnames.",
+        "Famous people with the surname: public facts only, with a link to Wikipedia. The same surname, not your relative.",
       ],
-      note: "Coming soon, a free account, with Google too: keep your cards and build your family tree: parents, grandparents, places, dates, maiden names.",
+      note: "Coming soon, a free account, with Google too: keep your cards and build a family tree of up to 5 people: parents, grandparents, places, dates, maiden names. Connect it to other people's trees through shared ancestors who have died, with matches up to second cousins.",
+    },
+    {
+      key: "smaller",
+      name: "Smaller research",
+      price: "PLN 28.99",
+      soon: true,
+      lede: "More room in your family tree.",
+      items: [TREE_UNLOCK_EN],
+    },
+    {
+      key: "couple",
+      name: "Couple",
+      price: "PLN 89.99",
+      soon: true,
+      lede: "Two surnames side by side.",
+      items: [
+        "The “Your names together” report: the names a couple could carry, and both surnames' facts side by side: how many people bear each, where, how it has changed and what it may mean. No score about the couple.",
+        TREE_UNLOCK_EN,
+      ],
     },
     {
       key: "family",
-      name: "Surname and family",
-      price: "PLN 29.99",
+      name: "Family review",
+      price: "PLN 199",
       soon: true,
-      lede: "From the surname to your family.",
-      items: [
-        "The full surname report: old forms, mentions in archives and print, change over time and every source.",
-        "Famous people with the surname: public facts only, with a link to Wikipedia. The same surname, not your relative.",
-        "Connecting trees with other people through shared ancestors who have died.",
-        "Extra searches in the site's sources for the places and dates in your tree.",
-      ],
+      lede: "A tree for the whole family.",
+      items: [TREE_UNLOCK_EN],
     },
     {
       key: "genealogy",
-      name: "Genealogy with DNA",
-      price: "PLN 499",
+      name: "Genealogist research",
+      price: "PLN 800",
       soon: true,
       lede: "Professional genealogists search the archives for your ancestors.",
       items: [
@@ -211,6 +250,7 @@ const EN: OfferDocument = {
         "A family tree with copies of the documents, generation by generation, as far back as the sources go.",
         "DNA: help choosing a test (autosomal: relatives on both sides; Y-DNA: the father's line; mtDNA: the mother's line) and analysis of a test you have already taken.",
         "A written report with its sources.",
+        TREE_UNLOCK_EN,
       ],
     },
   ],
@@ -226,8 +266,8 @@ const EN: OfferDocument = {
     surname: "A surname you are interested in (optional)",
     submit: "Join by email",
     fallback: "Write to join the waiting list",
-    subject: "Waiting list: Surname and family (PLN 29.99)",
-    body: "Please let me know when “Surname and family” is available.",
+    subject: "Waiting list",
+    body: "Please let me know when this tier is available.",
   },
   enquiry: {
     heading: "Ask about research",
@@ -249,7 +289,7 @@ const EN: OfferDocument = {
     },
     submit: "Send the enquiry by email",
     fallback: "Write to ask about research",
-    subject: "Enquiry: Genealogy with DNA (PLN 499)",
+    subject: "Enquiry: Genealogist research (PLN 800)",
     body: "I would like to ask about genealogy research with DNA.",
   },
 };
@@ -271,14 +311,20 @@ function answer(value: string): string {
   return value.trim().slice(0, ANSWER_MAX);
 }
 
-/** The 29.99 zł waiting list: the tier in the subject, the surname if given. */
-export function waitlistMailto(surname: string, lang: Lang): string {
-  const w = offerDocument(lang).waitlist;
+/** The tiers a reader joins a waiting list for: every paid tier but the genealogist's, which takes an enquiry. */
+export type WaitlistTier = Exclude<TierKey, "free" | "genealogy">;
+
+/** A paid tier's waiting list: the tier and its price in the subject, the surname if given. */
+export function waitlistMailto(tier: WaitlistTier, surname: string, lang: Lang): string {
+  const doc = offerDocument(lang);
+  const w = doc.waitlist;
+  const t = doc.tiers.find((x) => x.key === tier);
   const label = w.surname.replace(/ \(.*\)$/u, "");
-  return mailtoHref(w.subject, [w.body, "", `${label}: ${answer(surname)}`]);
+  const subject = t === undefined ? w.subject : `${w.subject}: ${t.name} (${t.price})`;
+  return mailtoHref(subject, [w.body, "", `${label}: ${answer(surname)}`]);
 }
 
-/** The 499 zł enquiry: each question with what the reader typed after it. */
+/** The 800 zł enquiry: each question with what the reader typed after it. */
 export function enquiryMailto(answers: EnquiryAnswers, lang: Lang): string {
   const e = offerDocument(lang).enquiry;
   return mailtoHref(e.subject, [

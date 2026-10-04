@@ -7,8 +7,8 @@ import { SiteShell } from "./site-shell.js";
 import { homePath, offerPath } from "./site-links.js";
 
 /**
- * `/pl/oferta` and `/en/offer` (TASK-057, ADR-0026): the free tier as it is,
- * and the two paid tiers as coming, each with a way to ask. Static: no
+ * `/pl/oferta` and `/en/offer` (TASK-057, TASK-104, ADR-0037): the free tier
+ * as it is, and the four paid tiers as coming, each with a way to ask. Static: no
  * database, no request data, and no way to buy anything.
  */
 
@@ -24,8 +24,8 @@ export function offerMetadata(lang: Lang): Metadata {
 
 function TierCard({ tier, lang }: { readonly tier: Tier; readonly lang: Lang }) {
   const doc = offerDocument(lang);
-  const words =
-    tier.key === "family" ? doc.waitlist : tier.key === "genealogy" ? doc.enquiry : null;
+  const key = tier.key;
+  const words = key === "genealogy" ? doc.enquiry : doc.waitlist;
   return (
     <article className={`offer-tier offer-${tier.key}`} aria-labelledby={`tier-${tier.key}`}>
       <p className="offer-status">{tier.soon ? doc.soon : doc.now}</p>
@@ -38,7 +38,7 @@ function TierCard({ tier, lang }: { readonly tier: Tier; readonly lang: Lang }) 
         ))}
       </ul>
       {tier.note === undefined ? null : <p className="offer-note">{tier.note}</p>}
-      {words === null ? (
+      {key === "free" ? (
         <p>
           <a className="offer-send" href={homePath(lang)}>
             {doc.freeCta} <span aria-hidden="true">→</span>
@@ -48,7 +48,7 @@ function TierCard({ tier, lang }: { readonly tier: Tier; readonly lang: Lang }) 
         <div className="offer-ask">
           <h3>{words.heading}</h3>
           <p>{words.intro}</p>
-          <OfferForm kind={tier.key === "family" ? "waitlist" : "enquiry"} lang={lang} />
+          <OfferForm tier={key} lang={lang} />
         </div>
       )}
     </article>

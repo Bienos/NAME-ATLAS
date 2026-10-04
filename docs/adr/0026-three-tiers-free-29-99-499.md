@@ -1,6 +1,6 @@
 # ADR-0026 — Three tiers: free, 29.99 zł and 499 zł genealogy with DNA
 
-- **Status:** Accepted 2026-10-01, by the project owner's decision in the session that wrote it.
+- **Status:** Accepted 2026-10-01, by the project owner's decision in the session that wrote it. §2.1 and §4's open questions superseded by ADR-0037 (proposed 2026-10-04); §2.2–§2.6 still hold.
 - **Date:** 2026-10-01
 - **Deciders:** the project owner.
   - On the tiers: after the cards, readers "click login to share it with friends and access the next tier". That tier is 29.99 zł and holds "the famous people and also … the genealogy, … a little bit of it", "extra research", "more inputs" and "a tree that people can connect to". The next is 499 zł, "coming soon", genealogy through a partner, with "the contact form … coming to me".
