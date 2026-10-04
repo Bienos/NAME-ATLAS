@@ -21,7 +21,7 @@ import type { Lang } from "./messages.js";
  * is theirs, and a status word says what happened.
  */
 
-export type TreePage = "trees" | "consent" | "tree" | "constellation" | "add" | "person";
+export type TreePage = "trees" | "consent" | "tree" | "constellation" | "map" | "add" | "person";
 
 export type TreeTarget =
   | { readonly page: "trees" }
@@ -29,16 +29,30 @@ export type TreeTarget =
   | { readonly page: "tree"; readonly treeId: string }
   /** The Konstelacja view of a tree (TASK-091). */
   | { readonly page: "constellation"; readonly treeId: string }
+  /** The Mapa view of a tree (TASK-092). */
+  | { readonly page: "map"; readonly treeId: string }
   | { readonly page: "add"; readonly treeId: string }
   | { readonly page: "person"; readonly treeId: string; readonly personId: string };
 
 const BASE: Readonly<Record<Lang, string>> = { pl: "/pl/konto/drzewa", en: "/en/account/trees" };
 
 const SLUG: Readonly<
-  Record<Lang, Readonly<Record<"consent" | "add" | "person" | "constellation", string>>>
+  Record<Lang, Readonly<Record<"consent" | "add" | "person" | "constellation" | "map", string>>>
 > = {
-  pl: { consent: "zgoda", add: "dodaj", person: "osoba", constellation: "konstelacja" },
-  en: { consent: "consent", add: "add", person: "person", constellation: "constellation" },
+  pl: {
+    consent: "zgoda",
+    add: "dodaj",
+    person: "osoba",
+    constellation: "konstelacja",
+    map: "mapa",
+  },
+  en: {
+    consent: "consent",
+    add: "add",
+    person: "person",
+    constellation: "constellation",
+    map: "map",
+  },
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
@@ -83,6 +97,9 @@ export function treePath(
     case "constellation":
       path = `${base}/${target.treeId}/${slug.constellation}`;
       break;
+    case "map":
+      path = `${base}/${target.treeId}/${slug.map}`;
+      break;
     case "add":
       path = `${base}/${target.treeId}/${slug.add}`;
       break;
@@ -106,6 +123,7 @@ export function treeTarget(lang: Lang, segments: readonly string[] | undefined):
   if (parts.length === 1) return { page: "tree", treeId };
   if (parts.length === 2 && second === slug.add) return { page: "add", treeId };
   if (parts.length === 2 && second === slug.constellation) return { page: "constellation", treeId };
+  if (parts.length === 2 && second === slug.map) return { page: "map", treeId };
   if (parts.length === 3 && second === slug.person && isId(third)) {
     return { page: "person", treeId, personId: third.toLowerCase() };
   }

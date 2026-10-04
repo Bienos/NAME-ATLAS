@@ -12,6 +12,7 @@ import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
+import { TreeMapView } from "./tree-map-view.js";
 import { TreeConstellation } from "./tree-stars.js";
 import { loadTreePage } from "./tree-load.js";
 import type { PersonFormData, Query, TreePageData, TreeSession } from "./tree-load.js";
@@ -25,7 +26,7 @@ import type {
 } from "./tree-paths.js";
 import { fullName, GENERATIONS } from "./tree-pedigree.js";
 import type { Question, Slot } from "./tree-pedigree.js";
-import { searchPlaces } from "./tree-places.js";
+import { placeRegions, searchPlaces } from "./tree-places.js";
 import { statusChip, TREE_TEXT, treeStatusWords, yearsLine } from "./tree-text.js";
 
 /**
@@ -446,7 +447,7 @@ function TreesView({ data }: { data: Extract<TreePageData, { kind: "trees" }> })
   );
 }
 
-/** Rodowód · Konstelacja (TASK-091): the two views of one tree, the page's own marked. */
+/** Rodowód · Konstelacja · Mapa (TASK-091, TASK-092): the views of one tree, the page's own marked. */
 function ViewSwitch({
   lang,
   treeId,
@@ -454,24 +455,66 @@ function ViewSwitch({
 }: {
   lang: Lang;
   treeId: string;
-  current: "tree" | "constellation";
+  current: "tree" | "constellation" | "map";
 }) {
   const t = TREE_TEXT[lang].constellation;
+  const views = ["tree", "constellation", "map"] as const;
   return (
     <nav className="tree-seg" aria-label={t.viewsLabel}>
-      <a
-        href={treePath(lang, { page: "tree", treeId })}
-        aria-current={current === "tree" ? "page" : undefined}
-      >
-        {t.views.tree}
-      </a>
-      <a
-        href={treePath(lang, { page: "constellation", treeId })}
-        aria-current={current === "constellation" ? "page" : undefined}
-      >
-        {t.views.constellation}
-      </a>
+      {views.map((view) => (
+        <a
+          key={view}
+          href={treePath(lang, { page: view, treeId })}
+          aria-current={current === view ? "page" : undefined}
+        >
+          {t.views[view]}
+        </a>
+      ))}
     </nav>
+  );
+}
+
+function MapView({ data }: { data: Extract<TreePageData, { kind: "map" }> }) {
+  const { lang, tree } = data;
+  const t = TREE_TEXT[lang];
+  const treeId = tree.tree.id;
+  const canEdit = tree.tree.role !== "VIEWER";
+  return (
+    <section className="tree-wide">
+      <p className="tree-eyebrow">
+        <a href={treePath(lang, { page: "trees" })}>{t.pedigree.back}</a>
+      </p>
+      <h2>{tree.tree.title}</h2>
+      <p className="page-lede">{t.map.lede}</p>
+      <ViewSwitch lang={lang} treeId={treeId} current="map" />
+      {canEdit ? null : <p className="account-status">{t.pedigree.viewer}</p>}
+      {tree.hidden_living_count > 0 ? (
+        <p className="account-status">{t.pedigree.hiddenCount(tree.hidden_living_count)}</p>
+      ) : null}
+      {data.slots.length === 0 ? (
+        <p className="account-links">
+          {t.question.startLede}{" "}
+          {canEdit ? (
+            <a href={treePath(lang, { page: "add", treeId })}>{t.pedigree.addFirst}</a>
+          ) : null}
+        </p>
+      ) : (
+        <TreeMapView
+          lang={lang}
+          treeId={treeId}
+          canEdit={canEdit}
+          slots={data.slots}
+          places={data.places}
+          picked={data.picked}
+        />
+      )}
+      {data.unplacedCount > 0 ? (
+        <p className="account-status">
+          {t.constellation.outside(data.unplacedCount)}{" "}
+          <a href={treePath(lang, { page: "tree", treeId })}>{t.constellation.outsideLink}</a>
+        </p>
+      ) : null}
+    </section>
   );
 }
 
@@ -919,9 +962,11 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
           ? { page: "tree", treeId: data.tree.tree.id }
           : data.kind === "constellation"
             ? { page: "constellation", treeId: data.tree.tree.id }
-            : data.kind === "add"
-              ? { page: "add", treeId: data.tree.tree.id }
-              : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
+            : data.kind === "map"
+              ? { page: "map", treeId: data.tree.tree.id }
+              : data.kind === "add"
+                ? { page: "add", treeId: data.tree.tree.id }
+                : { page: "person", treeId: data.tree.tree.id, personId: data.person.id };
   return (
     <SiteShell
       lang={lang}
@@ -933,6 +978,7 @@ export function TreePageView({ data }: { readonly data: TreePageData }) {
       {data.kind === "trees" ? <TreesView data={data} /> : null}
       {data.kind === "tree" ? <TreeView data={data} /> : null}
       {data.kind === "constellation" ? <ConstellationView data={data} /> : null}
+      {data.kind === "map" ? <MapView data={data} /> : null}
       {data.kind === "add" ? <AddView data={data} /> : null}
       {data.kind === "person" ? <PersonView data={data} /> : null}
       {data.kind === "consent" ? <ConsentView data={data} /> : null}
@@ -978,6 +1024,7 @@ export async function TreePage({
     deps: {
       family: runtime.family,
       places: (typed) => searchPlaces(db(), typed),
+      regions: (codes) => placeRegions(db(), codes),
     },
   });
   if (decision.kind === "not-found") notFound();

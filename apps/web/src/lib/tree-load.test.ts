@@ -213,3 +213,37 @@ describe("the Konstelacja's decision (TASK-091)", () => {
     expect(await load([TREE_ID, "nope"])).toEqual({ kind: "not-found" });
   });
 });
+
+describe("the Mapa's decision (TASK-092)", () => {
+  it("reads the register's localities behind the tree's place codes, or none without the register", async () => {
+    const regions = vi.fn(() =>
+      Promise.resolve([
+        {
+          code: "0960432",
+          name: "Szczebrzeszyn",
+          district: "zamojski",
+          region: { code: "06", name: "LUBELSKIE" },
+        },
+      ]),
+    );
+    const d = { ...deps(tree({ place_codes: ["0960432"] })), regions } as unknown as Mocked;
+    const view = await load([TREE_ID, "mapa"], { sel: "2" }, d);
+    if (view.kind !== "view" || view.data.kind !== "map") throw new Error("expected the map");
+    expect(regions).toHaveBeenCalledWith(["0960432"]);
+    expect(view.data.places.map((p) => p.region?.code)).toEqual(["06"]);
+    expect(view.data.picked).toBe(2);
+    expect(view.data.slots.length).toBeGreaterThan(0);
+
+    const none = await load([TREE_ID, "mapa"], {}, deps(tree({ place_codes: ["0960432"] })));
+    if (none.kind !== "view" || none.data.kind !== "map") throw new Error("expected the map");
+    expect(none.data.places).toEqual([]);
+    const failing = {
+      ...deps(tree({ place_codes: ["0960432"] })),
+      regions: vi.fn(() => Promise.reject(new Error("down"))),
+    } as unknown as Mocked;
+    const fell = await load([TREE_ID, "mapa"], {}, failing);
+    if (fell.kind !== "view" || fell.data.kind !== "map") throw new Error("expected the map");
+    expect(fell.data.places).toEqual([]);
+    expect(regions).toHaveBeenCalledTimes(1);
+  });
+});

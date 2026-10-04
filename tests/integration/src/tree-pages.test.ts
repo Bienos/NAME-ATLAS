@@ -22,7 +22,7 @@ import {
   terytFileInput,
 } from "@name-atlas/sources";
 import { loadTreePage } from "../../../apps/web/src/lib/tree-load.js";
-import { searchPlaces } from "../../../apps/web/src/lib/tree-places.js";
+import { placeRegions, searchPlaces } from "../../../apps/web/src/lib/tree-places.js";
 import { handleTreePost } from "../../../apps/web/src/lib/tree-routes.js";
 import type { TreeRouteDeps } from "../../../apps/web/src/lib/tree-routes.js";
 
@@ -354,6 +354,29 @@ describe("the tree pages over a real database (TASK-076)", () => {
     ]);
     expect(memberSky.data.picked).toBe(3);
     expect(memberSky.data.tree.hidden_living_count).toBe(2);
+
+    // The Mapa (TASK-092, AC-2): the register's locality behind a place code, with its district and voivodeship.
+    const regions = await placeRegions(webPool === undefined ? db().db : createDb(webPool), [
+      "0856623",
+      "0918123",
+      "0000000",
+      "nope",
+    ]);
+    expect(regions).toEqual([
+      {
+        code: "0856623",
+        name: "Szklary",
+        district: "ząbkowicki",
+        region: { code: "02", name: "DOLNOŚLĄSKIE" },
+      },
+      {
+        code: "0918123",
+        name: "Warszawa",
+        district: "Warszawa",
+        region: { code: "14", name: "MAZOWIECKIE" },
+      },
+    ]);
+    expect(await placeRegions(db().db, [])).toEqual([]);
 
     // The member's forms are not pages, and the member's routes are refused by the policies.
     const form = await loadTreePage({
