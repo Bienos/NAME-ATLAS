@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { shareOrSave } from "./share-actions.js";
 
 export { fileStem } from "./share-actions.js";
 
@@ -72,16 +71,8 @@ export interface DeckFace {
   readonly title: string;
   readonly paper?: boolean;
   readonly face: ReactNode;
-  /** The card's share image (TASK-056), or null. */
+  /** The share studio for this card's image (TASK-056, TASK-093), or null. */
   readonly share: string | null;
-}
-
-/** What the deck says to a reader the image route turned away for want of a session (TASK-064). */
-export interface DeckSignIn {
-  readonly text: string;
-  readonly link: string;
-  /** The sign-in page, carrying the surname page to return to. */
-  readonly href: string;
 }
 
 /** The way out of the deck from its last card (TASK-093, ADR-0034 §2.1). */
@@ -101,7 +92,6 @@ export interface DeckLabels {
   readonly hintKeys: string;
   readonly hintTouch: string;
   readonly share: string;
-  readonly sharing: string;
 }
 
 /** `<html data-deck>` while the deck is open: the page behind stops scrolling (`globals.css`). */
@@ -131,7 +121,6 @@ export function SurnameDeck({
   initiallyOpen,
   labels,
   lang,
-  signIn = null,
   finish = null,
 }: {
   cards: readonly DeckFace[];
@@ -141,8 +130,6 @@ export function SurnameDeck({
   /** The search that brought the reader here asked for the deck (`?view=cards`). */
   initiallyOpen: boolean;
   labels: DeckLabels;
-  /** Given only when accounts are on, which is when the image route can answer 401. */
-  signIn?: DeckSignIn | null;
   /**
    * Where "next" leads from the last card (TASK-093): the share studio. The
    * deck ends there, by navigation. Null keeps "next" disabled on the last card.
@@ -157,22 +144,6 @@ export function SurnameDeck({
   const cardEls = useRef<(HTMLElement | null)[]>([]);
   const drag = useRef<{ x: number; dx: number; moved: boolean; el: ElementLike } | null>(null);
   const suppressClick = useRef(false);
-  const [sharing, setSharing] = useState(false);
-  /** The card whose image the route refused with 401: the prompt shows beside that card only. */
-  const [signInFor, setSignInFor] = useState<number | null>(null);
-
-  /**
-   * Shares the card in view as an image: the system share sheet where the
-   * browser can share files (most phones), a download everywhere else.
-   */
-  async function shareCard(url: string, key: string): Promise<void> {
-    setSharing(true);
-    try {
-      if ((await shareOrSave(url, surname, key)) === "sign-in") setSignInFor(at);
-    } finally {
-      setSharing(false);
-    }
-  }
   /** Whether the deck has been open: focus returns to the button only after a close. */
   const wasOpen = useRef(false);
   const last = cards.length - 1;
@@ -340,26 +311,15 @@ export function SurnameDeck({
           ))}
         </ol>
         {current?.share == null ? null : (
-          <button
-            type="button"
-            className="deck-share"
-            onClick={() => void shareCard(current.share as string, current.key)}
-            disabled={sharing}
-          >
-            <span aria-hidden="true">↗</span> {sharing ? labels.sharing : labels.share}
-          </button>
+          // To the share studio for this card (TASK-093 follow-up): the one way
+          // to the image, where the download gate and its sign-in live.
+          <a className="deck-share" href={current.share}>
+            <span aria-hidden="true">↗</span> {labels.share}
+          </a>
         )}
         <button type="button" className="deck-full" onClick={close}>
           {labels.close} <span aria-hidden="true">↓</span>
         </button>
-      </div>
-      {/* Always in the page, so a screen reader announces the text when it appears. */}
-      <div className="deck-gate" role="status">
-        {signIn !== null && signInFor === at ? (
-          <>
-            {signIn.text} <a href={signIn.href}>{signIn.link}</a>
-          </>
-        ) : null}
       </div>
       <div className="deck-stage">
         <nav className="deck-toc" aria-label={labels.cards}>

@@ -8389,16 +8389,12 @@ a.tree-card:hover {
   font-size: 0.875rem;
   font-weight: 600;
   white-space: nowrap;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .deck-share:hover:not(:disabled) {
   background: var(--dusk-amber-hover);
-}
-
-.deck-share:disabled {
-  opacity: 0.7;
-  cursor: progress;
 }
 
 .deck-full:hover {
@@ -8407,24 +8403,6 @@ a.tree-card:hover {
 }
 
 /* The image route turned the reader away for want of a session (TASK-064). */
-.deck-gate {
-  padding: 0 var(--space-4);
-  color: var(--dusk-ink);
-  font-size: 0.875rem;
-  text-align: center;
-  text-wrap: balance;
-}
-
-.deck-gate:not(:empty) {
-  padding-block: var(--space-2);
-}
-
-.deck-gate a {
-  color: var(--dusk-amber);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
 
 .deck-stage {
   display: grid;
