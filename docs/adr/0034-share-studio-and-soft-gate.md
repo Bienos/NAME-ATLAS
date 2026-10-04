@@ -1,6 +1,6 @@
 # ADR-0034 — the deck ends in a share studio, behind a soft sign-in gate
 
-- **Status:** Proposed, 2026-10-03. It is accepted when the project owner merges the pull request that carries it.
+- **Status:** Accepted 2026-10-04: the project owner merged #96, which carried it.
 - **Date:** 2026-10-03
 - **Deciders:** the project owner.
   - On the deck's last card: "it should be like the end button … leading to the next page and … it should essentially leave the cards", then a section "to create … a short video to share on Instagram … and then the card as well with information on it about the surname", reached by signing in, after which readers "access the download dashboard where you can create the video … copy, download the card … share on Instagram".
@@ -35,4 +35,4 @@
 - One new page per language, one new public image route per language (the preview), and one more accepted return address.
 - The deck's in-card sign-in line (TASK-064) stays for the top-bar button; the studio becomes the main path to the image.
 - Conversion depends on accounts going live (ADR-0027 §5). Until then the studio only replaces the last card's actions.
-- `next` is still not carried through sign-up and its mail (TASK-064 §4): a new reader who signs up returns to the studio by pressing its button again in the tab they left. Whether to carry it, and to say so in the privacy notice, is the owner's call.
+- `next` is still not carried through sign-up and its mail (TASK-064 §4): a new reader who signs up returns to the studio by pressing its button again in the tab they left. Whether to carry it, and to say so in the privacy notice, is the owner's call. (TASK-093: Google sign-in, ADR-0033, which came after this ADR, checks `next` with the same `safeNext`, so a reader who signs in or signs up with Google returns to the studio.)

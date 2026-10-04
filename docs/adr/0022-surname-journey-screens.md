@@ -4,6 +4,7 @@
 - **Date:** 2026-10-01
 - **Deciders:** the project owner asked for the flow of the redesign proposal of 30 September and 1 October (2026-10-01).
 - **Relates to:** ADR-0021 (the dusk direction), ADR-0012 (evidence at the foot), TASK-023 (the claim unit and the snapshot), TASK-034 (the section registry).
+- **Amended by:** ADR-0034 (TASK-093), 2026-10-04, in §2.4: the journey ends on the share studio, which the deck's last card leads to.
 - **Code:** `apps/web/src/app/page.tsx`, `apps/web/src/lib/dusk-zoom.tsx`, `next-step.tsx`, `result-view.tsx`, `snapshot.tsx`, `surname-page.tsx`, `dusk-world.tsx`, `landing-sections.tsx`, `sections.ts`, `apps/web/src/app/globals.css`.
 
 ## 1. Context

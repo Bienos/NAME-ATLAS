@@ -131,22 +131,30 @@ export function isTreeNext(next: string | null): boolean {
  * to an address a stranger chose is how a sign-in page is turned into a trap.
  *
  * Only a surname's page of this site is accepted, `/pl/nazwisko/{slug}` or
- * `/en/surname/{slug}`, with `?view=cards` if the deck was open. The slug is
+ * `/en/surname/{slug}`, with `?view=cards` if the deck was open, or its share
+ * studio (TASK-093), `/pl/nazwisko/{slug}/udostepnij` or `/en/surname/{slug}/share`,
+ * with `?card={card}` naming one of the studio's cards. The slug is
  * one path segment as `canonicalSlug` writes it (letters percent-encoded, the
  * apostrophe and hyphen kept); an encoded slash, backslash, dot or control
  * character is not a slug, and neither is a segment of dots (`..` would leave
  * the page).
  */
 const NEXT_MAX_LENGTH = 200;
-const NEXT_PATTERN =
-  /^\/(?:pl\/nazwisko|en\/surname)\/((?:[A-Za-z0-9_~'-]|%[0-9A-Fa-f]{2})+)(?:\?view=cards)?$/u;
+const NEXT_SLUG = "((?:[A-Za-z0-9_~'-]|%[0-9A-Fa-f]{2})+)";
+/** The share studio's cards (TASK-093), as `SHARE_CARDS` in `share-facts.ts` lists them. */
+const STUDIO_CARD = "(?:rarity|neighbours|where|change|other|meaning|print|summary)";
+const NEXT_PATTERN = new RegExp(
+  `^/(?:pl/nazwisko/${NEXT_SLUG}(?:\\?view=cards|/udostepnij(?:\\?card=${STUDIO_CARD})?)?` +
+    `|en/surname/${NEXT_SLUG}(?:\\?view=cards|/share(?:\\?card=${STUDIO_CARD})?)?)$`,
+  "u",
+);
 
 export function safeNext(value: unknown): string | null {
   if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
   if (TREE_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;
-  const segment = match[1] ?? "";
+  const segment = match[1] ?? match[2] ?? "";
   let decoded: string;
   try {
     decoded = decodeURIComponent(segment);

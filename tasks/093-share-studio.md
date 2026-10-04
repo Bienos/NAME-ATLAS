@@ -1,6 +1,6 @@
 # TASK-093 — The share studio: the deck's last card leads to a page with the card's preview, a soft sign-in gate, and download, copy and share
 
-- **Status:** SPECIFIED 2026-10-03, not started.
+- **Status:** IMPLEMENTED 2026-10-04 on `claude/tender-curie-ybiyaj`; record: `docs/progress/2026-10-04-share-studio.md`.
 - **Requested by:** the project owner, 2026-10-03: the deck's end should "leave the cards" for a page where a signed-in reader can "copy, download the card … share on Instagram", and later make a video. Asked to choose, they said "soft gate, no music in v1, write task A". This is task A; the video is a later task.
 - **Decision:** ADR-0034 (proposed here). It amends ADR-0022 §2.4, ADR-0025 and ADR-0027 §5.4.
 - **Depends on:** TASK-056 (the share cards), TASK-062 and TASK-064 (accounts and the gate), all on `main` @ `08516bd`.

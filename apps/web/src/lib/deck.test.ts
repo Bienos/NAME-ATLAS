@@ -1,10 +1,12 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { createElement, Fragment } from "react";
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import { safeNext } from "./account-paths.js";
-import { deckCards, deckSignIn } from "./deck.js";
+import { deckCards, deckFinish, deckSignIn, studioCards } from "./deck.js";
 import type { DeckCard } from "./deck.js";
 import { DECK_PARAM, deckRequested, searchTarget } from "./deck-target.js";
 import { Result } from "./result-view.js";
@@ -22,6 +24,11 @@ import type { ShareFacts } from "./share-facts.js";
 import { shareCardResponse } from "./share-route.js";
 import { Recap } from "./share-card.js";
 import { UI } from "./messages.js";
+import { comparePagePath } from "./site-links.js";
+
+/** A module's source, for what only a browser could otherwise show. */
+const source = (file: string): string =>
+  readFileSync(fileURLToPath(new URL(file, import.meta.url)), "utf8");
 
 /**
  * TASK-055 AC-3 and AC-4, against rendered markup: the deck has a card for each
@@ -1023,17 +1030,48 @@ describe("TASK-060 AC-1 + TASK-059: the story card's chip draws a change's sign 
   });
 });
 
-describe("TASK-057 AC-3: the deck's last card leads to the offer", () => {
-  it("links the summary to the offer page in the page's language", () => {
-    for (const [lang, href] of [
-      ["pl", "/pl/oferta"],
-      ["en", "/en/offer"],
+describe("TASK-093 AC-1: the deck's last card leads out of the deck, to the share studio", () => {
+  it("has one primary link to the studio's summary, then only the full page and another surname", () => {
+    for (const [lang, path, studio] of [
+      ["pl", "/pl/nazwisko/kowalski", "/pl/nazwisko/kowalski/udostepnij?card=summary"],
+      ["en", "/en/surname/kowalski", "/en/surname/kowalski/share?card=summary"],
     ] as const) {
-      const cards = deckCards(FULL, lang, LINKS);
+      const cards = deckCards(FULL, lang, { path, shareUrl: `https://atlas.test${path}` });
       const end = cards[cards.length - 1];
       expect(end?.key).toBe("end");
-      expect(faces(end === undefined ? [] : [end])).toContain(`href="${href}"`);
+      const html = faces(end === undefined ? [] : [end]);
+      expect(html).toContain(`class="dk-finish" href="${studio}"`);
+      expect(html).toContain(UI[lang].deckFinish);
+      expect(html).toContain(`href="${path}"`);
+      expect(html).toContain('href="#surname"');
+      // Moved to the studio (TASK-093 §3.1): the page's link, the comparison and the offer.
+      expect(html).not.toContain(lang === "pl" ? "/pl/oferta" : "/en/offer");
+      expect(html).not.toContain(comparePagePath(lang));
+      expect(html).not.toContain('class="share"');
+      expect(deckFinish(FULL, lang, path)).toBe(studio);
     }
+  });
+
+  it("offers the studio only the cards the surname has, the summary first", () => {
+    const all = studioCards(FULL, "pl");
+    expect(all[0]).toBe("summary");
+    expect(new Set(all).size).toBe(all.length);
+    for (const card of all) expect(shareFacts(FULL, card, "pl")).not.toBeNull();
+    for (const card of SHARE_CARDS.filter((c) => !all.includes(c))) {
+      expect(shareFacts(FULL, card, "pl")).toBeNull();
+    }
+    const few = studioCards(COUNT_ONLY, "pl");
+    expect(few.length).toBeLessThan(all.length);
+    for (const card of few) expect(shareFacts(COUNT_ONLY, card, "pl")).not.toBeNull();
+  });
+
+  it("makes the deck's next control on the last card a link to the studio", () => {
+    expect(source("deck-client.tsx")).toMatch(
+      /at === last && finish !== null \? \(\s*<a className="deck-nav deck-finish" href=\{finish\.href\}/u,
+    );
+    expect(source("deck-client.tsx")).toMatch(
+      /if \(at === last && finish !== null\) location\?\.assign\(finish\.href\);/u,
+    );
   });
 });
 

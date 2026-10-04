@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { shareOrSave } from "./share-actions.js";
+
+export { fileStem } from "./share-actions.js";
 
 /**
  * The deck of cards over the surname page (TASK-055, ADR-0025): the client
@@ -37,19 +40,9 @@ interface KeyLike {
   readonly metaKey: boolean;
   preventDefault(): void;
 }
-interface AnchorLike {
-  href: string;
-  download: string;
-  click(): void;
-  remove(): void;
-}
 declare const document:
   | {
-      readonly body: ElementLike & {
-        readonly children: ArrayLike<ElementLike>;
-        appendChild(node: AnchorLike): void;
-      };
-      createElement(tag: "a"): AnchorLike;
+      readonly body: ElementLike & { readonly children: ArrayLike<ElementLike> };
       readonly documentElement: {
         setAttribute(name: string, value: string): void;
         removeAttribute(name: string): void;
@@ -64,14 +57,7 @@ declare const window:
   | undefined;
 declare const history:
   { replaceState(data: unknown, unused: string, url: string): void } | undefined;
-declare const location: { readonly href: string } | undefined;
-/** Web Share with files (TASK-056); absent or partial in many browsers, so every member is optional. */
-declare const navigator:
-  | {
-      readonly canShare?: (data: { files: readonly unknown[] }) => boolean;
-      readonly share?: (data: { files?: readonly unknown[]; title?: string }) => Promise<void>;
-    }
-  | undefined;
+declare const location: { readonly href: string; assign(url: string): void } | undefined;
 
 interface PointerLike {
   readonly pointerId: number;
@@ -96,6 +82,12 @@ export interface DeckSignIn {
   readonly link: string;
   /** The sign-in page, carrying the surname page to return to. */
   readonly href: string;
+}
+
+/** The way out of the deck from its last card (TASK-093, ADR-0034 §2.1). */
+export interface DeckFinish {
+  readonly href: string;
+  readonly label: string;
 }
 
 export interface DeckLabels {
@@ -130,23 +122,6 @@ function addressWith(open: boolean): string | null {
 
 const two = (n: number) => String(n).padStart(2, "0");
 
-/**
- * A file name browsers keep: Chromium drops a download name with letters such as
- * "ą" and saves "download" instead (checked 2026-10-01), so the surname is
- * folded to ASCII, ł included, which Unicode does not decompose.
- */
-export function fileStem(surname: string): string {
-  return (
-    surname
-      .toLocaleLowerCase("pl")
-      .replace(/ł/gu, "l")
-      .normalize("NFD")
-      .replace(/\p{M}/gu, "")
-      .replace(/[^a-z0-9]+/gu, "-")
-      .replace(/^-+|-+$/gu, "") || "name-atlas"
-  );
-}
-
 /** Nothing outside changes whether this is the client, so there is nothing to subscribe to. */
 const subscribeNever = () => () => undefined;
 
@@ -157,6 +132,7 @@ export function SurnameDeck({
   labels,
   lang,
   signIn = null,
+  finish = null,
 }: {
   cards: readonly DeckFace[];
   surname: string;
@@ -167,6 +143,11 @@ export function SurnameDeck({
   labels: DeckLabels;
   /** Given only when accounts are on, which is when the image route can answer 401. */
   signIn?: DeckSignIn | null;
+  /**
+   * Where "next" leads from the last card (TASK-093): the share studio. The
+   * deck ends there, by navigation. Null keeps "next" disabled on the last card.
+   */
+  finish?: DeckFinish | null;
 }) {
   const [open, setOpen] = useState(initiallyOpen);
   const [at, setAt] = useState(0);
@@ -187,32 +168,7 @@ export function SurnameDeck({
   async function shareCard(url: string, key: string): Promise<void> {
     setSharing(true);
     try {
-      const response = await fetch(url);
-      if (response.status === 401) {
-        setSignInFor(at);
-        return;
-      }
-      if (!response.ok) return;
-      const blob = await response.blob();
-      const name = `${fileStem(surname)}-${url.split("/").pop() ?? key}.png`;
-      const file = new File([blob], name, { type: "image/png" });
-      if (navigator?.share !== undefined && navigator.canShare?.({ files: [file] }) === true) {
-        try {
-          await navigator.share({ files: [file], title: surname });
-        } catch {
-          // Cancelled by the reader: nothing to do.
-        }
-        return;
-      }
-      if (document === undefined) return;
-      const link = document.createElement("a");
-      const objectUrl = URL.createObjectURL(blob);
-      link.href = objectUrl;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 10_000);
+      if ((await shareOrSave(url, surname, key)) === "sign-in") setSignInFor(at);
     } finally {
       setSharing(false);
     }
@@ -271,8 +227,10 @@ export function SurnameDeck({
     if (!open || window === undefined) return;
     const onKey = (event: KeyLike) => {
       if (event.altKey || event.ctrlKey || event.metaKey) return;
-      if (event.key === "ArrowRight" || event.key === "PageDown") go(at + 1);
-      else if (event.key === "ArrowLeft" || event.key === "PageUp") go(at - 1);
+      if (event.key === "ArrowRight" || event.key === "PageDown") {
+        if (at === last && finish !== null) location?.assign(finish.href);
+        else go(at + 1);
+      } else if (event.key === "ArrowLeft" || event.key === "PageUp") go(at - 1);
       else if (event.key === "Home") go(0);
       else if (event.key === "End") go(last);
       else if (event.key === "Escape") close();
@@ -281,7 +239,7 @@ export function SurnameDeck({
     };
     window.addEventListener("keydown", onKey);
     return () => window?.removeEventListener("keydown", onKey);
-  }, [open, at, last, go, close]);
+  }, [open, at, last, go, close, finish]);
 
   function onPointerDown(event: PointerLike) {
     const target = event.target as ElementLike | null;
@@ -478,15 +436,21 @@ export function SurnameDeck({
           >
             ←
           </button>
-          <button
-            type="button"
-            className="deck-nav"
-            aria-label={labels.next}
-            disabled={at === last}
-            onClick={() => go(at + 1)}
-          >
-            →
-          </button>
+          {at === last && finish !== null ? (
+            <a className="deck-nav deck-finish" href={finish.href} aria-label={finish.label}>
+              →
+            </a>
+          ) : (
+            <button
+              type="button"
+              className="deck-nav"
+              aria-label={labels.next}
+              disabled={at === last}
+              onClick={() => go(at + 1)}
+            >
+              →
+            </button>
+          )}
         </div>
       </div>
       <p className="deck-foot">

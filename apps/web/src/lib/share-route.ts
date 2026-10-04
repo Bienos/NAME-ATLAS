@@ -1,8 +1,10 @@
 import { answerSlug, requestOrigin } from "./surname-page.js";
 import { pageSlug } from "./slug.js";
 import { isShareCard, shareFacts } from "./share-facts.js";
+import type { ShareCardKey, ShareFacts } from "./share-facts.js";
 import { renderShareCard } from "./share-card.js";
 import type { GateVerdict } from "./download-gate.js";
+import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -48,6 +50,38 @@ export async function shareCardResponse(
       headers: { "Cache-Control": "no-store", "Retry-After": "60" },
     });
   }
+  const found = await factsFor(rawSlug, card, lang, "");
+  if (found instanceof Response) return found;
+  const origin = requestOrigin(hostHeader);
+  const host = origin === null ? null : new URL(origin).host;
+  return renderShareCard(found, host, gate === "open" ? PRIVATE : CACHE);
+}
+
+/**
+ * The card's preview (TASK-093, ADR-0034 §2.2): half size and marked, public
+ * and cached whatever the gate, with the same 404, 308 and 503 as the image.
+ */
+export async function sharePreviewResponse(
+  rawSlug: string,
+  card: string,
+  lang: Lang,
+  hostHeader: string | null,
+): Promise<Response> {
+  if (!isShareCard(card)) return new Response("Not found", { status: 404 });
+  const found = await factsFor(rawSlug, card, lang, lang === "en" ? "/preview" : "/podglad");
+  if (found instanceof Response) return found;
+  const origin = requestOrigin(hostHeader);
+  const host = origin === null ? null : new URL(origin).host;
+  return renderShareCard(found, host, CACHE, UI[lang].studioPreviewMark);
+}
+
+/** The card's facts from the register, or the response that says why there are none. */
+async function factsFor(
+  rawSlug: string,
+  card: ShareCardKey,
+  lang: Lang,
+  suffix: string,
+): Promise<ShareFacts | Response> {
   const answer = await answerSlug(pageSlug(rawSlug), null, lang);
   // A database that cannot answer is not a missing card: try again later.
   if (answer.kind === "UNAVAILABLE") {
@@ -60,14 +94,11 @@ export async function shareCardResponse(
     return new Response(null, {
       status: 308,
       headers: {
-        Location: `${base}/${encodeURIComponent(answer.current_slug)}/${segment}/${card}`,
+        Location: `${base}/${encodeURIComponent(answer.current_slug)}/${segment}/${card}${suffix}`,
       },
     });
   }
   if (answer.kind !== "RESULT") return new Response("Not found", { status: 404 });
   const facts = shareFacts(answer.response, card, lang);
-  if (facts === null) return new Response("Not found", { status: 404 });
-  const origin = requestOrigin(hostHeader);
-  const host = origin === null ? null : new URL(origin).host;
-  return renderShareCard(facts, host, gate === "open" ? PRIVATE : CACHE);
+  return facts ?? new Response("Not found", { status: 404 });
 }

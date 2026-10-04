@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { ImageResponse } from "next/og";
 import type { ShareFacts, ShareVisual, SummaryFacts } from "./share-facts.js";
 import { TOKENS, TYPE_FAMILIES } from "./design-tokens.js";
@@ -577,12 +577,78 @@ export function Recap({ summary }: { summary: SummaryFacts }): ReactNode {
   );
 }
 
+/** The preview's size (TASK-093): half the story card, with no larger variant. */
+export const PREVIEW_SIZE = { width: 540, height: 960 } as const;
+
+/**
+ * Draws the card. With `preview` (TASK-093, ADR-0034 §2.2) it is drawn at
+ * half size with that label in a band across its lower third, so the page can
+ * show it to a reader the download gate turns away: smaller, marked, and never
+ * the full image.
+ */
 export async function renderShareCard(
   facts: ShareFacts,
   host: string | null,
   headers: Record<string, string> = {},
+  preview: string | null = null,
 ): Promise<ImageResponse> {
   const brandFonts = await loadFonts();
+  const fonts = brandFonts.length > 0 ? { fonts: brandFonts } : {};
+  const face = cardFace(facts, host);
+  if (preview === null) return new ImageResponse(face, { ...SHARE_SIZE, headers, ...fonts });
+  const scale = PREVIEW_SIZE.width / SHARE_SIZE.width;
+  return new ImageResponse(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: SHARE_SIZE.width,
+          height: SHARE_SIZE.height,
+          display: "flex",
+          transform: `scale(${String(scale)})`,
+          transformOrigin: "top left",
+        }}
+      >
+        {face}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: Math.round(PREVIEW_SIZE.height * 0.62),
+          height: 84,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "rgba(20, 6, 22, 0.82)",
+          borderTop: `2px solid ${DUSK.light}`,
+          borderBottom: `2px solid ${DUSK.light}`,
+          color: DUSK.light,
+          fontFamily: TYPE_FAMILIES.data,
+          fontSize: 26,
+          letterSpacing: 4,
+          textTransform: "uppercase",
+        }}
+      >
+        {preview}
+      </div>
+    </div>,
+    { ...PREVIEW_SIZE, headers, ...fonts },
+  );
+}
+
+function cardFace(facts: ShareFacts, host: string | null): ReactElement {
   const paper = facts.paper;
   const ink = paper ? PAPER.ink : DUSK.ink;
   const soft = paper ? PAPER.soft : DUSK.soft;
@@ -590,7 +656,7 @@ export async function renderShareCard(
   const light = paper ? PAPER.light : DUSK.light;
   const line = paper ? PAPER.line : DUSK.line;
 
-  return new ImageResponse(
+  return (
     <div
       style={{
         width: "100%",
@@ -727,7 +793,6 @@ export async function renderShareCard(
           )}
         </div>
       </div>
-    </div>,
-    { ...SHARE_SIZE, headers, ...(brandFonts.length > 0 ? { fonts: brandFonts } : {}) },
+    </div>
   );
 }

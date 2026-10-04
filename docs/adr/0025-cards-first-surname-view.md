@@ -4,6 +4,7 @@
 - **Date:** 2026-10-01
 - **Deciders:** the project owner, 2026-10-01: "default are cards that you swipe with info about your surname", with "a button that shows you full normal website", "for desktop and mobile", and "it must open when someone types surname". Asked about the cards proposal, they chose: link the other grammatical form ("yes, with that label"), show localities with the same name under a warning line, and keep publication languages off the page.
 - **Relates to:** ADR-0022 (the journey as screens; §3 rejected a scripted pager), ADR-0021 (the dusk direction), ADR-0012 (evidence at the foot), TASK-053, TASK-054.
+- **Amended by:** ADR-0034 (TASK-093), 2026-10-04: the deck's last card leads out of the deck to the share studio, and its "next" control on the last card is a link there.
 - **Prototype:** the artifact "Name Atlas Deck", built on real data for NOWAK, KOWALSKI and ZAREMBA.
 
 ## 1. Context

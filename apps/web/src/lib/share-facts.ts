@@ -585,3 +585,14 @@ export function shareCardFor(deckKey: string): ShareCardKey {
 export function shareCardPath(pagePath: string, card: ShareCardKey, lang: Lang): string {
   return `${pagePath}/${lang === "en" ? "card" : "karta"}/${card}`;
 }
+
+/** The card's marked preview (TASK-093): `/pl/nazwisko/{slug}/karta/{card}/podglad`. */
+export function sharePreviewPath(pagePath: string, card: ShareCardKey, lang: Lang): string {
+  return `${shareCardPath(pagePath, card, lang)}/${lang === "en" ? "preview" : "podglad"}`;
+}
+
+/** The share studio (TASK-093, ADR-0034): `/pl/nazwisko/{slug}/udostepnij?card={card}`. */
+export function studioPath(pagePath: string, lang: Lang, card: ShareCardKey | null = null): string {
+  const path = `${pagePath}/${lang === "en" ? "share" : "udostepnij"}`;
+  return card === null ? path : `${path}?card=${card}`;
+}

@@ -48,7 +48,8 @@ import { mapInputs } from "./voivodeship-map-input.js";
 import { ShareButton } from "./share-button.js";
 import { comparePagePath, offerPath } from "./site-links.js";
 import { inDeckOrder, oneInOf, rankOf } from "./deck-order.js";
-import { shareCardFor, shareCardPath, shareFacts } from "./share-facts.js";
+import { SHARE_CARDS, shareCardFor, shareCardPath, shareFacts, studioPath } from "./share-facts.js";
+import type { ShareCardKey } from "./share-facts.js";
 
 export interface DeckCard {
   /** Stable across renders: what the card answers. */
@@ -731,6 +732,7 @@ function end(
   response: SurnameResultResponse,
   surname: string,
   links: DeckLinks,
+  studio: string | null,
   lang: Lang,
 ): CardFace {
   const t = UI[lang];
@@ -789,23 +791,39 @@ function end(
             ))}
           </dl>
         ) : null}
-        <div className="dk-actions">
-          {links.shareUrl === null ? null : (
-            <ShareButton url={links.shareUrl} title={`${surname} — ${t.title}`} lang={lang} />
-          )}
-          <a href={links.path} data-deck-close="">
-            {t.deckFullPage} <span aria-hidden="true">↓</span>
-          </a>
-          <a href={compare}>
-            {t.compareFromHere} <span aria-hidden="true">→</span>
-          </a>
-          <a href="#surname" data-deck-close="">
-            {t.searchAnother} <span aria-hidden="true">→</span>
-          </a>
-          <a href={offerPath(lang)}>
-            {t.deckOffer} <span aria-hidden="true">→</span>
-          </a>
-        </div>
+        {studio === null ? (
+          <div className="dk-actions">
+            {links.shareUrl === null ? null : (
+              <ShareButton url={links.shareUrl} title={`${surname} — ${t.title}`} lang={lang} />
+            )}
+            <a href={links.path} data-deck-close="">
+              {t.deckFullPage} <span aria-hidden="true">↓</span>
+            </a>
+            <a href={compare}>
+              {t.compareFromHere} <span aria-hidden="true">→</span>
+            </a>
+            <a href="#surname" data-deck-close="">
+              {t.searchAnother} <span aria-hidden="true">→</span>
+            </a>
+            <a href={offerPath(lang)}>
+              {t.deckOffer} <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        ) : (
+          // The deck ends here (TASK-093, ADR-0034 §2.1): one way on, to the
+          // share studio; the rest of the old card's ways moved there.
+          <div className="dk-actions">
+            <a className="dk-finish" href={studio}>
+              {t.deckFinish} <span aria-hidden="true">→</span>
+            </a>
+            <a href={links.path} data-deck-close="">
+              {t.deckFullPage} <span aria-hidden="true">↓</span>
+            </a>
+            <a href="#surname" data-deck-close="">
+              {t.searchAnother} <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        )}
       </Face>
     ),
   };
@@ -835,7 +853,7 @@ export function deckCards(given: SurnameResultResponse, lang: Lang, links: DeckL
     archive === null ? null : catalogue(archive, lang),
     places(response, lang),
     response.bearers === null ? null : bearers(response.bearers, lang),
-    end(response, surname, links, lang),
+    end(response, surname, links, deckFinish(given, lang, links.path), lang),
   ];
   // Each card shares its own image, or the summary where it has none (TASK-056).
   const shareOf = (key: string): string | null => {
@@ -864,4 +882,24 @@ export function deckSignIn(lang: Lang, pagePath: string, accountsOn: boolean): D
     link: t.deckSignIn,
     href: accountPath(lang, "sign-in", { next: `${pagePath}?view=cards` }),
   };
+}
+
+/**
+ * The cards the share studio offers for a surname (TASK-093): those with an
+ * image, the summary first. Empty when there is none, and then the deck keeps
+ * its old ending.
+ */
+export function studioCards(given: SurnameResultResponse, lang: Lang): ShareCardKey[] {
+  const ordered: ShareCardKey[] = ["summary", ...SHARE_CARDS.filter((card) => card !== "summary")];
+  return ordered.filter((card) => shareFacts(given, card, lang) !== null);
+}
+
+/** Where the deck's end leads (TASK-093, ADR-0034 §2.1), or null when the studio has no card. */
+export function deckFinish(
+  given: SurnameResultResponse,
+  lang: Lang,
+  pagePath: string,
+): string | null {
+  const first = studioCards(given, lang)[0];
+  return first === undefined ? null : studioPath(pagePath, lang, first);
 }

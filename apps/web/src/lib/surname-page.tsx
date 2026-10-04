@@ -26,7 +26,7 @@ import { SiteShell } from "./site-shell.js";
 import { SUMMARY_ANCHOR } from "./sections.js";
 import { comparePagePath } from "./site-links.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
-import { deckCards, deckSignIn } from "./deck.js";
+import { deckCards, deckFinish, deckSignIn } from "./deck.js";
 import { SurnameDeck } from "./deck-client.js";
 
 /**
@@ -329,6 +329,8 @@ export function CanonicalSurnamePage({
   const world = answer.kind === "RESULT" ? worldInput(answer.response) : EMPTY_WORLD;
   // The deck over the page (TASK-055): the same response, one answer per card.
   const deck = answer.kind === "RESULT" ? deckCards(answer.response, lang, { path, shareUrl }) : [];
+  // Where the deck's last card leads (TASK-093): the share studio, when it has a card.
+  const studio = answer.kind === "RESULT" ? deckFinish(answer.response, lang, path) : null;
 
   return (
     <SiteShell
@@ -415,6 +417,7 @@ export function CanonicalSurnamePage({
                 sharing: t.deckSharing,
               }}
               signIn={deckSignIn(lang, path, accountsEnabled())}
+              finish={studio === null ? null : { href: studio, label: t.deckFinish }}
             />
           )}
         </>
