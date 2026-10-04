@@ -33,6 +33,6 @@
 ## 4. Consequences
 
 - One new page per language, one new public image route per language (the preview), and one more accepted return address.
-- The deck's in-card sign-in line (TASK-064) stays for the top-bar button; the studio becomes the main path to the image.
+- The deck's in-card sign-in line (TASK-064) stayed for the top-bar button at first. **Amended 2026-10-04** (`docs/progress/2026-10-04-deck-share-to-studio.md`): the top-bar button is a link to the studio for the card in view and the in-card line is gone, so the studio is the one path to the image.
 - Conversion depends on accounts going live (ADR-0027 §5). Until then the studio only replaces the last card's actions.
 - `next` is still not carried through sign-up and its mail (TASK-064 §4): a new reader who signs up returns to the studio by pressing its button again in the tab they left. Whether to carry it, and to say so in the privacy notice, is the owner's call. (TASK-093: Google sign-in, ADR-0033, which came after this ADR, checks `next` with the same `safeNext`, so a reader who signs in or signs up with Google returns to the studio.)

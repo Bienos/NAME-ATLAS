@@ -1014,9 +1014,6 @@ export const UI = {
     deckFullPage: "Zobacz całą stronę",
     deckCompareForms: "Porównaj obie formy",
     deckShare: "Udostępnij kartę",
-    deckSharing: "Przygotowuję…",
-    deckSignInToSave: "Obraz zapiszesz po zalogowaniu.",
-    deckSignIn: "Zaloguj się lub załóż konto",
     // The share studio (TASK-093, ADR-0034).
     deckFinish: "Twoja karta jest gotowa",
     studioTitle: "Udostępnij kartę",
@@ -1706,9 +1703,6 @@ export const UI = {
     deckFullPage: "See the full page",
     deckCompareForms: "Compare both forms",
     deckShare: "Share this card",
-    deckSharing: "Preparing…",
-    deckSignInToSave: "Sign in to save the image.",
-    deckSignIn: "Sign in or create an account",
     // The share studio (TASK-093, ADR-0034).
     deckFinish: "Your card is ready",
     studioTitle: "Share your card",
