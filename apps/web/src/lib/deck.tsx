@@ -716,6 +716,19 @@ function bearers(section: BearersSection, lang: Lang): CardFace | null {
                 <b>{person.name}</b>
                 {years === null ? null : <span>{years}</span>}
                 {what === null ? null : <small>{what}</small>}
+                <small className="dk-bearer-links">
+                  {person.article_url === null ? null : (
+                    <>
+                      <a href={person.article_url} rel="noopener noreferrer">
+                        {t.bearersArticle}
+                      </a>
+                      {" · "}
+                    </>
+                  )}
+                  <a href={person.wikidata_url} rel="noopener noreferrer">
+                    Wikidata
+                  </a>
+                </small>
               </li>
             );
           })}

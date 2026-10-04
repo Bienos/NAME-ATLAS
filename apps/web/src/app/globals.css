@@ -9051,6 +9051,12 @@ a.tree-card:hover {
   color: var(--dusk-ink-soft);
 }
 
+.dk-bearers .dk-bearer-links a {
+  color: var(--dusk-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .dk-recap {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
