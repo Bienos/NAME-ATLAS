@@ -23,7 +23,10 @@
  * - `img-src 'self'`: every image is the site's own (icons, share cards); no
  *   page uses a `data:` or `blob:` image;
  * - `connect-src 'self'`: the only client requests are `/api/v1/surname-prefix`
- *   and `/api/v1/events`.
+ *   and `/api/v1/events`;
+ * - Google Analytics, only after the visitor's consent (TASK-109): its script
+ *   from `www.googletagmanager.com`, and its hits to `*.google-analytics.com`
+ *   and `*.analytics.google.com` (requests and, as a fallback, image pings).
  *
  * `script-src 'self'` has no `'unsafe-inline'`, so the reports will name the
  * inline scripts the App Router injects; deciding how to allow those (nonces or
@@ -42,11 +45,11 @@ export interface SecurityHeader {
 
 export const CONTENT_SECURITY_POLICY: string = [
   "default-src 'self'",
-  "script-src 'self'",
+  "script-src 'self' https://www.googletagmanager.com",
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self'",
+  "img-src 'self' https://*.google-analytics.com https://www.googletagmanager.com",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
