@@ -12,11 +12,11 @@ A follow-up to TASK-093. The project owner, with a screenshot of the studio on a
 
 ## Verification
 
-- `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm check:ids`, `pnpm test`, `pnpm build`: exit 0. `apps/web`: 817 tests in 77 files passed (after rebasing onto `main` @ `493e3cf`). The existing `share-studio.test.ts` passes without change.
+- `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm check:ids`, `pnpm test`, `pnpm build`: exit 0. `apps/web`: 821 tests in 78 files passed (after merging `main` with #113). The existing `share-studio.test.ts` passes without change.
 - **Headless Chromium (Playwright's chromium-1194), phone viewport 390 × 844:** `StudioViewer` bundled with esbuild into a scratch page (`next/image` replaced by a plain `<img>`, three cards with placeholder images). From `?card=summary`: the "where" chip showed "where" with `?card=where` and its own panel; ← showed "rarity"; a leftward drag of 200 px showed "where"; → on the last card stayed. A marker set on `window` after the first load was still there at the end, so no page was loaded.
 
 ## Not verified
 
 - The real studio page against a database with several cards (the local PostgreSQL was not running), and a real phone's touch swipe (only a mouse drag was run).
 - The header's language switch still points at the card the page was loaded with, not the one shown after switching.
-- Open PR #113 also changes `share-studio.tsx` and `studio-client.tsx`; whichever merges second must resolve the overlap.
+- #113 (save to the gallery) merged first; its labels (`gallery`, `galleryHint`) are carried into each card's panel here.

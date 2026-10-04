@@ -128,9 +128,9 @@ export function ShareStudio({
           labels={{
             share: t.studioShare,
             download: t.studioDownload,
-            copy: t.studioCopy,
+            gallery: t.studioGallery,
+            galleryHint: t.studioGalleryHint,
             working: t.studioWorking,
-            copied: t.studioCopied,
             failed: t.studioFailed,
             signIn: t.studioSignInPrompt,
           }}

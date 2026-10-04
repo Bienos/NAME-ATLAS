@@ -1,7 +1,6 @@
 /**
  * Getting a card's image out of the browser (TASK-056, moved here by TASK-093):
- * fetch it, then share it through the system sheet, save it as a file or copy
- * it. The deck's top-bar button and the share studio both use this module, so
+ * fetch it, then share it through the system sheet or save it as a file. The deck's top-bar button and the share studio both use this module, so
  * the two behave alike.
  */
 
@@ -29,11 +28,10 @@ declare const navigator:
   | {
       readonly canShare?: (data: { files: readonly unknown[] }) => boolean;
       readonly share?: (data: { files?: readonly unknown[]; title?: string }) => Promise<void>;
-      readonly clipboard?: { readonly write?: (items: readonly unknown[]) => Promise<void> };
+      readonly userAgent?: string;
+      readonly maxTouchPoints?: number;
     }
   | undefined;
-declare const ClipboardItem:
-  (new (items: Record<string, BlobLike | Promise<BlobLike>>) => unknown) | undefined;
 declare const File: new (
   parts: readonly BlobLike[],
   name: string,
@@ -49,7 +47,7 @@ declare function fetch(
 declare function setTimeout(callback: () => void, ms: number): unknown;
 
 /** What happened, for the caller to say. A cancelled share sheet is not a failure. */
-export type ShareOutcome = "shared" | "saved" | "copied" | "cancelled" | "sign-in" | "failed";
+export type ShareOutcome = "shared" | "saved" | "cancelled" | "sign-in" | "failed";
 
 /**
  * A file name browsers keep: Chromium drops a download name with letters such as
@@ -83,10 +81,19 @@ export function canShareFiles(): boolean {
   }
 }
 
-/** Whether this browser can put an image on the clipboard. */
-export function canCopyImage(): boolean {
-  // `typeof`: a browser without the class has no such global at all.
-  return typeof ClipboardItem !== "undefined" && navigator?.clipboard?.write !== undefined;
+/**
+ * Whether a saved image should go through the share sheet to reach the photo
+ * gallery: on iPhone and iPad a download lands in Files, and only the sheet's
+ * "Zapisz obraz" puts it in Photos. iPadOS reports itself as a Mac, so a Mac
+ * with a touch screen counts. Android's downloads already show in its gallery.
+ */
+export function savesThroughSheet(): boolean {
+  if (!canShareFiles()) return false;
+  const agent = navigator?.userAgent ?? "";
+  return (
+    /iPhone|iPad|iPod/u.test(agent) ||
+    (/Macintosh/u.test(agent) && (navigator?.maxTouchPoints ?? 0) > 1)
+  );
 }
 
 /** The image, or why there is none: a 401 is the download gate (TASK-064). */
@@ -181,30 +188,4 @@ export async function saveCardImage(
   const blob = await fetchImage(url);
   if (typeof blob === "string") return blob;
   return save(blob, cardFileName(surname, url, key));
-}
-
-/**
- * The studio's "Kopiuj obraz". The item is built from a promise, which Safari
- * requires: it allows a clipboard write only while the click is still being
- * handled, so the write has to start before the image arrives.
- */
-export async function copyCardImage(url: string): Promise<ShareOutcome> {
-  if (!canCopyImage() || ClipboardItem === undefined || navigator?.clipboard?.write === undefined) {
-    return "failed";
-  }
-  const Item = ClipboardItem;
-  let refused: "sign-in" | "failed" | null = null;
-  const image = fetchImage(url).then((blob) => {
-    if (typeof blob === "string") {
-      refused = blob;
-      throw new Error(blob);
-    }
-    return blob;
-  });
-  try {
-    await navigator.clipboard.write([new Item({ "image/png": image })]);
-    return "copied";
-  } catch {
-    return refused ?? "failed";
-  }
 }
