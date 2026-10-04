@@ -15,7 +15,8 @@ import type { ShareCardKey } from "./share-facts.js";
 import { SiteShell } from "./site-shell.js";
 import { comparePagePath, offerPath } from "./site-links.js";
 import { pageSlug } from "./slug.js";
-import { StudioActions } from "./studio-client.js";
+import { StudioActions, StudioVideo } from "./studio-client.js";
+import { fileStem } from "./share-actions.js";
 import { answerSlugForMetadata, canonicalPathFor, siteOrigin } from "./surname-page.js";
 
 /**
@@ -173,6 +174,19 @@ export function ShareStudio({
                     working: t.studioWorking,
                     copied: t.studioCopied,
                     failed: t.studioFailed,
+                    signIn: t.studioSignInPrompt,
+                  }}
+                />
+                <StudioVideo
+                  images={offered.map((c) => shareCardPath(path, c, lang))}
+                  surname={surname}
+                  fileName={`${fileStem(surname)}-${lang === "en" ? "video" : "wideo"}.mp4`}
+                  signInHref={gate === "open" ? signIn : null}
+                  labels={{
+                    make: t.studioVideo,
+                    working: t.studioVideoWorking,
+                    cancel: t.studioVideoCancel,
+                    failed: t.studioVideoFailed,
                     signIn: t.studioSignInPrompt,
                   }}
                 />

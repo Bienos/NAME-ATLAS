@@ -114,8 +114,13 @@ function save(blob: BlobLike, name: string): ShareOutcome {
   return "saved";
 }
 
-async function shareBlob(blob: BlobLike, name: string, title: string): Promise<ShareOutcome> {
-  const file = new File([blob], name, { type: "image/png" });
+async function shareBlob(
+  blob: BlobLike,
+  name: string,
+  title: string,
+  type = "image/png",
+): Promise<ShareOutcome> {
+  const file = new File([blob], name, { type });
   if (navigator?.share === undefined || navigator.canShare?.({ files: [file] }) !== true) {
     return "failed";
   }
@@ -125,6 +130,19 @@ async function shareBlob(blob: BlobLike, name: string, title: string): Promise<S
   } catch {
     return "cancelled";
   }
+}
+
+/**
+ * A file already made in the browser (the share video, TASK-097): the share
+ * sheet where it takes the file, a download everywhere else.
+ */
+export async function shareOrSaveFile(
+  blob: BlobLike,
+  name: string,
+  title: string,
+): Promise<ShareOutcome> {
+  const shared = await shareBlob(blob, name, title, blob.type);
+  return shared === "failed" ? save(blob, name) : shared;
 }
 
 /**

@@ -1040,6 +1040,11 @@ export const UI = {
     studioMore: "Co dalej",
     // The page link's share, beside the card's own "Udostępnij".
     studioShareLink: "Udostępnij link",
+    // The share video (TASK-097).
+    studioVideo: "Pobierz wideo",
+    studioVideoWorking: "Tworzę wideo… {n}%",
+    studioVideoCancel: "Anuluj",
+    studioVideoFailed: "Nie udało się utworzyć wideo.",
     scaleLabel: "Skala rzadkości",
     scaleCommon: "częstsze",
     scaleRare: "rzadsze",
@@ -1727,6 +1732,11 @@ export const UI = {
     studioMore: "What next",
     // The page link's share, beside the card's own "Share".
     studioShareLink: "Share the link",
+    // The share video (TASK-097).
+    studioVideo: "Download video",
+    studioVideoWorking: "Making the video… {n}%",
+    studioVideoCancel: "Cancel",
+    studioVideoFailed: "The video could not be made.",
     scaleLabel: "Rarity scale",
     scaleCommon: "more common",
     scaleRare: "rarer",
