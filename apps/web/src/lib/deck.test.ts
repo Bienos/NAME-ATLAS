@@ -287,7 +287,7 @@ const FULL_INPUT = {
         description_en: null,
         born: 1975,
         died: null,
-        article_url: null,
+        article_url: "https://pl.wikipedia.org/wiki/Daniel_Kowalski",
         wikidata_url: "https://www.wikidata.org/wiki/Q558544",
       },
       {
@@ -1166,6 +1166,14 @@ describe("TASK-073: the known people's card", () => {
     expect(face).toContain("1910–2022");
     expect(face).toContain("Wikidata · 325");
     expect(face).toContain(UI.pl.bearersCaveat);
+  });
+
+  it("links each person to Wikipedia when there is an article, and always to Wikidata", () => {
+    const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
+    const html = faces(card === undefined ? [] : [card]);
+    expect(html).toContain('href="https://pl.wikipedia.org/wiki/Daniel_Kowalski"');
+    expect(html.match(/href="https:\/\/[a-z]+\.wikipedia\.org/gu)).toHaveLength(1);
+    expect(html).toContain('href="https://www.wikidata.org/wiki/Q17558303"');
   });
 
   it("is left out when Wikidata names nobody, or has not been asked", () => {
