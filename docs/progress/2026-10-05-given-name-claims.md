@@ -36,6 +36,10 @@ CI's `verify` job cannot run on GitHub because of the account's billing block (s
 | `pnpm build` | exit 0 |
 | `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
 
+After the renumbering, `main` @ `5facb03` (#146, web files only) was merged in. On the merged tree:
+- `pnpm typecheck`, `lint`, `format:check`, `check:ids` and `test` returned exit 0, with 2,283 tests.
+- `given-name-claims.test.ts` and `current-rank.test.ts` passed 24 tests.
+
 **The full official files**, out of band, in a separate database `gn_full`:
 
 1. Both files were downloaded from dane.gov.pl, and their checksums match the registry:
