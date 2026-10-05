@@ -23,9 +23,9 @@ export const PARENTS_MAX = 2;
 export const FREE_TREE_PERSONS_MAX = 5;
 
 /**
- * Whether an account has a paid tier. No checkout exists (ADR-0023 §2.5), so
- * nothing records one and every account answers false. Checkout replaces this
- * through `FamilyDeps.hasPaidTier`.
+ * Whether an account has a paid tier: the default answer, false for every
+ * account. The web replaces it through `FamilyDeps.hasPaidTier` with the
+ * recorded purchases (TASK-114).
  */
 export async function noPaidTier(_userId: string): Promise<boolean> {
   return false;
