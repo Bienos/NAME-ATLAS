@@ -9,6 +9,7 @@ import type { TestDatabase } from "@name-atlas/testing";
 import {
   createAccounts,
   createAccountsDb,
+  createPurchases,
   GOOGLE_TERMS_HOURS,
   createPasswordHasher,
   emailKey,
@@ -1005,6 +1006,70 @@ describe("accounts (TASK-061, ADR-0027)", () => {
     });
   });
 
+  describe("purchases (TASK-111)", () => {
+    const paid = (userId: string, session: string) => ({
+      userId,
+      tier: "smaller" as const,
+      checkoutSessionId: session,
+      amountTotal: 2899,
+      currency: "pln" as const,
+      livemode: false,
+    });
+
+    it("records a paid session once, as the app role, and lists it for its reader", async () => {
+      const purchases = createPurchases({ db: createAccountsDb(app()), now: () => clock });
+      const userId = await account("buyer@example.com");
+      expect(await purchases.record(paid(userId, "cs_test_once"))).toBe(true);
+      // Stripe sends `completed` and may send it again: one row.
+      expect(await purchases.record(paid(userId, "cs_test_once"))).toBe(false);
+      expect(await purchases.listForUser(userId)).toEqual([
+        { tier: "smaller", amountTotal: 2899, paidAt: clock },
+      ]);
+    });
+
+    it("refuses a live purchase, an unknown tier and another currency", async () => {
+      const userId = await account("refused.buyer@example.com");
+      const purchases = createPurchases({ db: createAccountsDb(app()) });
+      await expect(
+        purchases.record({ ...paid(userId, "cs_live_x"), livemode: true }),
+      ).rejects.toMatchObject({ code: "23514" });
+      await expect(
+        purchases.record({ ...paid(userId, "cs_test_tier"), tier: "genealogy" as never }),
+      ).rejects.toMatchObject({ code: "23514" });
+      await expect(
+        purchases.record({ ...paid(userId, "cs_test_eur"), currency: "eur" as never }),
+      ).rejects.toMatchObject({ code: "23514" });
+      expect(await purchases.listForUser(userId)).toEqual([]);
+    });
+
+    it("keeps the record of a sale when the account is deleted, before or after the webhook", async () => {
+      const purchases = createPurchases({ db: createAccountsDb(app()) });
+      const before = await account("gone.before@example.com");
+      const after = await account("gone.after@example.com");
+      await purchases.record(paid(after, "cs_test_after"));
+
+      expect(await accounts.deleteAccount({ userId: after, password: GOOD })).toEqual({
+        kind: "DELETED",
+      });
+      expect(await accounts.deleteAccount({ userId: before, password: GOOD })).toEqual({
+        kind: "DELETED",
+      });
+      // The webhook for an account already deleted still records the sale, with no user.
+      expect(await purchases.record(paid(before, "cs_test_before"))).toBe(true);
+
+      expect(
+        await rows<{ checkout_session_id: string; user_id: string | null }>(
+          `SELECT checkout_session_id, user_id FROM accounts.purchases
+            WHERE checkout_session_id IN ('cs_test_after', 'cs_test_before')
+            ORDER BY checkout_session_id`,
+        ),
+      ).toEqual([
+        { checkout_session_id: "cs_test_after", user_id: null },
+        { checkout_session_id: "cs_test_before", user_id: null },
+      ]);
+    });
+  });
+
   describe("the two roles (AC-7)", () => {
     it("lets the accounts role work in its schema and nowhere else", async () => {
       const [timeout] = (await app().query("SHOW statement_timeout")).rows as {
@@ -1033,7 +1098,7 @@ describe("accounts (TASK-061, ADR-0027)", () => {
         return webPool;
       };
       expect((await web().query("SELECT count(*)::int AS n FROM surnames")).rows[0]).toBeDefined();
-      for (const table of ["users", "sessions", "email_tokens", "sign_in_failures"]) {
+      for (const table of ["users", "sessions", "email_tokens", "sign_in_failures", "purchases"]) {
         await expect(
           web().query(`SELECT 1 FROM accounts.${table} LIMIT 1`),
           table,
@@ -1079,6 +1144,21 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
+    it("0036 refuses to go down while a purchase is stored (TASK-111)", async () => {
+      const migrator = createMigrator(db().db);
+      const refused = await migrator.migrateTo("0034_family_release_claims_on_account_deletion");
+      expect(String(refused.error)).toMatch(/refusing to undo 0036/u);
+      expect(await rows("SELECT 1 FROM accounts.purchases LIMIT 1")).toHaveLength(1);
+
+      // Emptied (here only; nothing deletes a purchase), it goes down and up again.
+      await db().pool.query("DELETE FROM accounts.purchases");
+      const down = await migrator.migrateTo("0034_family_release_claims_on_account_deletion");
+      expect(down.error).toBeUndefined();
+      expect(await rows("SELECT 1 FROM pg_tables WHERE tablename = 'purchases'")).toHaveLength(0);
+      const up = await migrator.migrateToLatest();
+      expect(up.error).toBeUndefined();
+      await sql.raw(ROLES_SQL).execute(db().db);
+    });
     it("0032 refuses to go down while a Google identity is stored", async () => {
       const migrator = createMigrator(db().db);
       await migrator.migrateTo("0032_accounts_google_identities");
