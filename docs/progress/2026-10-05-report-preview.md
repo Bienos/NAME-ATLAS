@@ -22,7 +22,19 @@ M5's second step (`tasks/120-report-preview.md`). The owner asked to "build next
 
 ## Verification (commands run, results as returned)
 
-Local CI run in progress; results follow in the next commit.
+CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `01fc50e`, against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | exit 0 |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0, 6 tests |
+| `pnpm test` | exit 0; 2,283 tests (web 897, of which 13 new; truth 395) |
+| `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0; types unchanged (no migration) |
+| `pnpm test:integration` | exit 0; 37 files, 463 tests (1 new) |
+| `pnpm test:golden` | exit 0; 4 files, 364 tests |
+| `pnpm build` | exit 0; the routes list `ƒ /pl/raport/[id]` and `ƒ /en/report/[id]` |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0; 10 Playwright tests passed |
 
 **The page against `next start`**, on the seeded end-to-end database:
 - `pnpm report:build -- --surname NOWAK` stored version 1 (`01a10bcb-…`): INSUFFICIENT_MEANINGFUL_CONTENT, reasons NO_PREMIUM_INVENTORY and COVERAGE_BELOW_STANDARD.
