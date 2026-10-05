@@ -20,6 +20,8 @@
     "test": "pnpm -r --if-present run test",
     "test:integration": "pnpm --filter @name-atlas/integration-tests run test:integration",
     "test:golden": "pnpm --filter @name-atlas/golden-tests run test:golden",
+    "test:e2e": "pnpm --filter @name-atlas/e2e-tests test:e2e",
+    "e2e:seed": "bash tests/e2e/seed.sh",
     "db:migrate": "pnpm --filter @name-atlas/db run migrate",
     "db:generate-types": "pnpm --filter @name-atlas/db run generate-types",
     "fetch:pesel": "tsx packages/sources/bin/fetch-pesel.ts",

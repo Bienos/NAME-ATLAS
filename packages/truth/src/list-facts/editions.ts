@@ -1,8 +1,10 @@
 /**
- * `list_editions@1` — the editions of one list's series (ADR-0019 §2.1–2.3,
+ * `list_editions@2` — the editions of one list's series (ADR-0019 §2.1–2.3,
  * TASK-044 §1): each edition's lineage, its surnames, its people and its
  * smallest count, in date order, and the dates of the series that have no
- * edition, each with the reason.
+ * edition, each with the reason. Since `@2` (TASK-106, ADR-0019 §2.2 as
+ * amended) the first edition may be the list's 2019-06-30 edition, which is in
+ * no series (`series: null`) and says that its description differs.
  *
  * Figures of one edition at a time. Nothing here adds two editions, and
  * nothing here can be given the other list: one series is one list.
@@ -14,9 +16,13 @@
 import { LIST_EDITIONS_METHOD_VERSION } from "../version.js";
 import { ListFactsInputError } from "./histogram.js";
 
-/** One edition of the series. */
+/** `UNIVERSE_DESCRIPTION_DIFFERS`: the 2019 files describe their universe in fewer words. */
+export type EditionNoteCode = "UNIVERSE_DESCRIPTION_DIFFERS";
+
+/** One edition of the series, or the 2019 edition before it (`series: null`). */
 export interface EditionFigures {
-  readonly series: string;
+  readonly series: string | null;
+  readonly universe_note_code: EditionNoteCode | null;
   readonly resource_id: string;
   readonly data_date: string;
   readonly sha256: string;
@@ -56,7 +62,8 @@ export interface ListEditions {
 /** One edition's figures from its lineage and its counts (any order). */
 export function editionFigures(
   lineage: {
-    readonly series: string;
+    readonly series: string | null;
+    readonly universe_note_code: EditionNoteCode | null;
     readonly resource_id: string;
     readonly data_date: string;
     readonly sha256: string;
@@ -80,6 +87,7 @@ export function editionFigures(
   }
   return {
     series: lineage.series,
+    universe_note_code: lineage.universe_note_code,
     resource_id: lineage.resource_id,
     data_date: lineage.data_date,
     sha256: lineage.sha256,
@@ -92,7 +100,8 @@ export function editionFigures(
 
 /**
  * The series' editions and gaps. Refuses (throws) unless the editions are at
- * least two, all of `series`, in strictly ascending date order and with no
+ * least two, all of `series` (the first may instead be in none, with
+ * `UNIVERSE_DESCRIPTION_DIFFERS`), in strictly ascending date order and with no
  * two sharing a SHA-256; and unless each refused resource is of `series`,
  * falls on a date with no edition and repeats, byte for byte, the edition it
  * names as the original.
@@ -106,9 +115,15 @@ export function listEditions(
     throw new ListFactsInputError("a series needs a first and a last edition to compare");
   }
   for (const [i, item] of items.entries()) {
-    if (item.series !== series) {
+    const outside = item.series === null && i === 0;
+    if (
+      outside
+        ? item.universe_note_code !== "UNIVERSE_DESCRIPTION_DIFFERS"
+        : item.series !== series || item.universe_note_code !== null
+    ) {
       throw new ListFactsInputError(
-        `edition ${item.resource_id} is of series ${item.series}, not ${series}`,
+        `edition ${item.resource_id} is of series ${item.series ?? "none"}, not ${series}; only ` +
+          "the first edition may be in none, and must then say that its description differs",
       );
     }
     const previous = items[i - 1];

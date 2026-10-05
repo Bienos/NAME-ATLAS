@@ -28,8 +28,13 @@ import { z } from "zod";
  * series (`editions`) and what changed between its first and last edition
  * (`change`): list-scope figures compared over time within one series, never
  * across the two lists, and never a cause.
+ *
+ * `list_facts@4` (TASK-106, ADR-0019 §2.2 as amended) lets the first edition
+ * be the list's 2019-06-30 edition, as a surname's change over time already
+ * reads it (ADR-0020 §2.2): it is in no series, so its `series` is null and
+ * its `universe_note_code` says that its description differs.
  */
-export const LIST_FACTS_SCHEMA_VERSION = "list_facts@3" as const;
+export const LIST_FACTS_SCHEMA_VERSION = "list_facts@4" as const;
 
 const fraction = z.number().min(0).max(1);
 const positiveInt = z.number().int().positive();
@@ -544,6 +549,12 @@ export const listNamedTopSchema = z.object({
   }),
 });
 
+/**
+ * `UNIVERSE_DESCRIPTION_DIFFERS`: the 2019-06-30 files describe their universe in
+ * fewer words than the series; the owner ruled them the same universe (ADR-0020 §2.2).
+ */
+export const LIST_EDITION_NOTE_CODES = ["UNIVERSE_DESCRIPTION_DIFFERS"] as const;
+
 /** ADR-0019 §2.2: why a resource the publisher lists in a series is not one of its editions. */
 export const LIST_EDITION_GAP_REASONS = ["PUBLISHER_DUPLICATE"] as const;
 
@@ -555,8 +566,13 @@ const resourceId = z.string().regex(/^\d+$/u);
  * sum across editions or lists.
  */
 export const listEditionSchema = z.object({
-  /** The series the edition belongs to (the registry's `series`). */
-  series: z.string().min(1),
+  /**
+   * The series the edition belongs to (the registry's `series`), or null for the
+   * 2019-06-30 edition that precedes it, which is in no series (`list_facts@4`).
+   */
+  series: z.string().min(1).nullable(),
+  /** Null, or why a reader must be told this edition is described differently. */
+  universe_note_code: z.enum(LIST_EDITION_NOTE_CODES).nullable(),
   /** dane.gov.pl resource id. */
   resource_id: resourceId,
   /** The register's reference date the publisher states for the edition. */
@@ -583,7 +599,10 @@ export const listEditionGapSchema = z.object({
   duplicate_of: resourceId,
 });
 
-/** `list_editions@1`: the editions of the list's one series, in date order, and its gaps. */
+/**
+ * `list_editions@2`: the editions of the list's one series, in date order, and its
+ * gaps; since `list_facts@4` the first may be the list's 2019 edition, in no series.
+ */
 export const listEditionsSchema = z
   .object({
     method_version: z.string().min(1),
@@ -603,9 +622,19 @@ export const listEditionsSchema = z
         message: "edition gaps must be in ascending order of data_date, with no date twice",
       }),
   })
-  .refine((e) => e.items.every((item) => item.series === e.series), {
-    message: "every edition of a list must belong to the list's one series",
-  })
+  .refine(
+    (e) =>
+      e.items.every((item, i) =>
+        item.series === null
+          ? i === 0 && item.universe_note_code === "UNIVERSE_DESCRIPTION_DIFFERS"
+          : item.series === e.series && item.universe_note_code === null,
+      ),
+    {
+      message:
+        "every edition of a list must belong to the list's one series, but the first, which " +
+        "may be in none and must then say that its description differs",
+    },
+  )
   .refine((e) => e.items.every((item) => item.row_count === item.surnames), {
     message: "an edition's surnames must be its rows",
   })

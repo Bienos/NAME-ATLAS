@@ -256,7 +256,7 @@ describe("buildListFactsArtefact", () => {
   it("records the pipeline version, apart from the schema version", () => {
     const artefact = buildListFactsArtefact({ male, female });
     expect(artefact.pipeline_version).toBe(LIST_FACTS_METHOD_VERSION);
-    expect(artefact.pipeline_version).toBe("list_facts_pipeline@3");
+    expect(artefact.pipeline_version).toBe("list_facts_pipeline@4");
     expect(artefact.pipeline_version).not.toBe(artefact.schema_version);
   });
 
@@ -423,6 +423,55 @@ describe("computeListFacts over a series (ADR-0019)", () => {
     ).toBe("SERIES_MISMATCHED");
     expect(refusal(() => computeListFacts({ editions: [e2026], refused: [] })).reason).toBe(
       "SERIES_MISMATCHED",
+    );
+  });
+
+  it("reads the list's 2019 edition first, with its own header, in no series (TASK-106)", () => {
+    const rows = [["NOWAK", 49], ["KOWALSKA", 30], ["STARA", 2], ...fill] as const;
+    const text = "nazwisko,liczba\r\n" + rows.map(([n, c]) => `${n},${c}\r\n`).join("");
+    const bytes = new TextEncoder().encode(text);
+    const e2019: ListInput = {
+      bytes,
+      descriptor: {
+        ...e2020.descriptor,
+        resource_id: "18989",
+        data_date: "2019-06-30",
+        official_sha256: sha256Hex(bytes),
+        official_byte_size: bytes.byteLength,
+        official_row_count: rows.length,
+        series: null,
+        header: "nazwisko,liczba",
+        universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
+      },
+    };
+    const facts = computeListFacts({ ...series, editions: [e2019, e2020, e2021, e2026] });
+    expect(facts.editions.items[0]).toMatchObject({
+      series: null,
+      universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
+      resource_id: "18989",
+      people: 1181,
+    });
+    expect(facts.editions.items.slice(1).every((e) => e.universe_note_code === null)).toBe(true);
+    expect(facts.change.first_data_date).toBe("2019-06-30");
+
+    // Not first, or without the registry's note, it is no edition of the list.
+    expect(
+      refusal(() => computeListFacts({ editions: [e2020, e2019, e2026], refused: [] })).reason,
+    ).toBe("SERIES_MISMATCHED");
+    const unnoted: ListInput = {
+      ...e2019,
+      descriptor: { ...e2019.descriptor, universe_note_code: undefined },
+    };
+    expect(
+      refusal(() => computeListFacts({ editions: [unnoted, e2020, e2026], refused: [] })).reason,
+    ).toBe("SERIES_MISMATCHED");
+    // Its header is the registry's word for it: the later header does not parse as it.
+    const relabelled: ListInput = {
+      ...e2020,
+      descriptor: { ...e2020.descriptor, header: "nazwisko,liczba" },
+    };
+    expect(() => computeListFacts({ editions: [relabelled, e2026], refused: [] })).toThrow(
+      /unexpected header|expected header/u,
     );
   });
 

@@ -25,6 +25,7 @@ const OWNER = "0199a1b2-0000-7000-8000-00000000ab01";
 const MEMBER = "0199a1b2-0000-7000-8000-00000000ab02";
 const RELATIVE = "0199a1b2-0000-7000-8000-00000000ab03";
 const OTHER = "0199a1b2-0000-7000-8000-00000000ab04";
+const LEAVER = "0199a1b2-0000-7000-8000-00000000ab05";
 
 function hex(text: string): string {
   return createHash("sha256").update(text, "utf8").digest("hex");
@@ -92,6 +93,7 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
       [MEMBER, "member@example.test"],
       [RELATIVE, "relative@example.test"],
       [OTHER, "other@example.test"],
+      [LEAVER, "leaver@example.test"],
     ]) {
       await sql`
         INSERT INTO accounts.users
@@ -522,6 +524,70 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
     expect(now.rows[0]?.n).toBe(1);
   });
 
+  it("ADR-0029 §2.6.22: deleting a claimant's account leaves the tree as leaving does, and the deletion succeeds", async () => {
+    const kasiaToken = randomUUID();
+    const added = await family.addPerson({
+      userId: OWNER,
+      treeId,
+      person: {
+        givenNames: "Kasia",
+        surname: "Zielińska",
+        birthYear: 1990,
+        livingStatus: "LIVING",
+      },
+    });
+    if (added.kind !== "OK") throw new Error("fixture person failed");
+    // Make room in the window for one more invitation.
+    await sql`
+      UPDATE family.invitations SET sent_at = now() - interval '40 days' WHERE tree_id = ${treeId}
+    `.execute(db().db);
+    expect((await invite(added.personId, "kasia@example.test", hex(kasiaToken))).kind).toBe("OK");
+    expect(
+      (await family.answerInvitation({ userId: LEAVER, tokenHash: hex(kasiaToken), answer: "ME" }))
+        .kind,
+    ).toBe("OK");
+    expect(
+      await family.updateCard({
+        userId: LEAVER,
+        personId: added.personId,
+        card: {
+          givenNames: "Kasia",
+          surname: "Zielińska",
+          birthYear: 1990,
+          hiddenFields: ["birth_year"],
+        },
+      }),
+    ).toMatchObject({ kind: "OK" });
+
+    // `deleteAccount`'s statement (packages/accounts/src/service.ts), as the app role.
+    await sql`DELETE FROM accounts.users WHERE user_id = ${LEAVER}`.execute(createFamilyDb(app()));
+
+    const row = await sql<{
+      claimed_by_user_id: string | null;
+      claimed_at: Date | null;
+      hidden_fields: string[];
+    }>`
+      SELECT claimed_by_user_id, claimed_at, hidden_fields FROM family.persons WHERE person_id = ${added.personId}
+    `.execute(db().db);
+    expect(row.rows).toEqual([{ claimed_by_user_id: null, claimed_at: null, hidden_fields: [] }]);
+    const after = await family.getTree({ userId: OWNER, treeId });
+    if (after.kind !== "OK") throw new Error("the owner reads the tree");
+    expect(after.tree.persons.find((p) => p.id === added.personId)).toMatchObject({
+      claimed: false,
+      hidden_fields: [],
+      birth: { year: 1990 },
+    });
+    expect(await invite(added.personId, "kasia@example.test")).toEqual({
+      kind: "INVALID",
+      problem: "SUPPRESSED",
+    });
+    const released = await sql<{ user_id: string | null }>`
+      SELECT user_id FROM family.audit_events
+      WHERE person_id = ${added.personId} AND kind = 'CLAIM_RELEASED'
+    `.execute(db().db);
+    expect(released.rows).toEqual([{ user_id: null }]);
+  });
+
   it("0033 down refuses while a claim is stored, and the policies read nothing of a declined row for a member", async () => {
     const claimToken = randomUUID();
     const added = await family.addPerson({
@@ -540,9 +606,8 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
         .kind,
     ).toBe("OK");
     const migrator = createMigrator(db().db);
-    // Later migrations first (0034, TASK-111), so that the next step down is 0033's.
-    expect((await migrator.migrateTo("0033_family_invitations")).error).toBeUndefined();
-    const { error } = await migrator.migrateDown();
+    // Down to the migration before 0033: later ones roll back first, then 0033 refuses.
+    const { error } = await migrator.migrateTo("0032_accounts_google_identities");
     expect(String(error)).toMatch(/refusing to drop the claims/u);
     const still = await sql<{ n: number }>`
       SELECT count(*)::int AS n FROM family.persons WHERE claimed_by_user_id IS NOT NULL

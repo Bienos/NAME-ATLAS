@@ -42,3 +42,7 @@ data/
 # text argues for committing it; that is a tool's output, not a project decision.
 apps/*/AGENTS.md
 apps/*/CLAUDE.md
+
+# Playwright output (TASK-103)
+tests/e2e/test-results/
+tests/e2e/playwright-report/

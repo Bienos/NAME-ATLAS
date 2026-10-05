@@ -8,7 +8,8 @@ import {
   shareCardImage,
   shareOrSaveFile,
 } from "./share-actions.js";
-import { VideoRefused, canMakeVideo, makeCardVideo } from "./share-video.js";
+import { DEFAULT_VIDEO, VideoRefused, canMakeVideo, makeCardVideo } from "./share-video.js";
+import type { VideoLength, VideoMotion } from "./share-video.js";
 import type { ShareOutcome } from "./share-actions.js";
 
 /**
@@ -116,6 +117,12 @@ export interface VideoLabels {
   readonly cancel: string;
   readonly failed: string;
   readonly signIn: string;
+  readonly length: string;
+  readonly short: string;
+  readonly full: string;
+  readonly motion: string;
+  readonly up: string;
+  readonly side: string;
 }
 
 /**
@@ -140,6 +147,8 @@ export function StudioVideo({
   const [able, setAble] = useState(false);
   const [progress, setProgress] = useState<number | null>(null);
   const [failure, setFailure] = useState<"failed" | "sign-in" | null>(null);
+  const [length, setLength] = useState<VideoLength>(DEFAULT_VIDEO.length);
+  const [motion, setMotion] = useState<VideoMotion>(DEFAULT_VIDEO.motion);
   const cancelled = useRef(false);
 
   useEffect(() => {
@@ -159,7 +168,10 @@ export function StudioVideo({
     setFailure(null);
     setProgress(0);
     try {
-      const video = await makeCardVideo(images, setProgress, () => cancelled.current);
+      const video = await makeCardVideo(images, setProgress, () => cancelled.current, {
+        length,
+        motion,
+      });
       await shareOrSaveFile(video, fileName, surname);
     } catch (cause) {
       const reason = cause instanceof VideoRefused ? cause.reason : "failed";
@@ -169,8 +181,41 @@ export function StudioVideo({
     }
   }
 
+  /** One choice as a row of two options (TASK-108). */
+  const choice = <T extends string>(
+    name: string,
+    legend: string,
+    value: T,
+    set: (next: T) => void,
+    options: readonly (readonly [T, string])[],
+  ) => (
+    <fieldset className="studio-choice" disabled={progress !== null}>
+      <legend>{legend}</legend>
+      {options.map(([option, label]) => (
+        <label key={option}>
+          <input
+            type="radio"
+            name={name}
+            value={option}
+            checked={value === option}
+            onChange={() => set(option)}
+          />
+          <span>{label}</span>
+        </label>
+      ))}
+    </fieldset>
+  );
+
   return (
     <div className="studio-video">
+      {choice("video-length", labels.length, length, setLength, [
+        ["full", labels.full],
+        ["short", labels.short],
+      ])}
+      {choice("video-motion", labels.motion, motion, setMotion, [
+        ["up", labels.up],
+        ["side", labels.side],
+      ])}
       {progress === null ? (
         <button type="button" onClick={() => void make()}>
           {labels.make}

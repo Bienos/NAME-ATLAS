@@ -119,12 +119,36 @@ describe("the notice and the terms with accounts (AC-2)", () => {
     }
   });
 
-  it("carry the accounts date, which is also the version of the terms a reader accepts", () => {
-    // The notice changed again after the accounts variant (TASK-073): it shows the later date.
+  it("show the later of their own date and the accounts variant's", () => {
+    // Both documents changed again after the accounts variant (TASK-073; the legal
+    // review of 2026-10-04): they show the later date. The version a reader accepts
+    // with the tree off stays ACCOUNTS_LEGAL_UPDATED, so that the tree's consent
+    // step still compares as later (`legal-tree.test.ts`; D-041).
     expect(legalUpdated("privacy", true)).toBe(LEGAL_UPDATED.privacy);
     expect(LEGAL_UPDATED.privacy > ACCOUNTS_LEGAL_UPDATED).toBe(true);
-    expect(legalUpdated("terms", true)).toBe(ACCOUNTS_LEGAL_UPDATED);
+    expect(legalUpdated("terms", true)).toBe(LEGAL_UPDATED.terms);
+    expect(LEGAL_UPDATED.terms > ACCOUNTS_LEGAL_UPDATED).toBe(true);
     expect(ACCOUNTS_LEGAL_UPDATED).toMatch(/^\d{4}-\d{2}-\d{2}$/u);
+  });
+
+  it("say what the code does: the cookie's name and lifetime, when hashes and sessions go, and what an account needs", () => {
+    const pl = text("privacy", "pl", true);
+    const en = text("privacy", "en", true);
+    for (const privacy of [pl, en]) {
+      expect(privacy).toContain("__Host-na_session");
+      expect(privacy).toContain("400");
+    }
+    expect(pl).toContain("najpóźniej w ciągu doby");
+    expect(en).toContain("within a day at the latest");
+    expect(pl).not.toContain("kasujemy po godzinie");
+    expect(pl).toContain("7 dni po wygaśnięciu");
+    expect(en).toContain("7 days after they expire");
+    expect(pl).toContain("ustawienia nowego hasła");
+    expect(en).toContain("set a new password");
+    expect(pl).toContain("musisz podać adres e-mail i ustawić hasło");
+    expect(en).toContain("you must give an email address and set a password");
+    expect(pl).toContain("identyfikator konta");
+    expect(en).toContain("the account's identifier");
   });
 
   it("fail loudly, rather than publish a notice that no longer matches, when a section it changes is gone", () => {

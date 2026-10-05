@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import Image from "next/image";
 import { notFound, permanentRedirect } from "next/navigation";
 import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
@@ -10,12 +9,13 @@ import { studioCards } from "./deck.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ShareButton } from "./share-button.js";
-import { shareCardPath, sharePreviewPath, studioPath } from "./share-facts.js";
+import { shareCardPath, sharePreviewPath, studioPath, surnamePdfPath } from "./share-facts.js";
 import type { ShareCardKey } from "./share-facts.js";
 import { SiteShell } from "./site-shell.js";
 import { comparePagePath, offerPath } from "./site-links.js";
 import { pageSlug } from "./slug.js";
 import { StudioActions, StudioVideo } from "./studio-client.js";
+import { StudioViewer } from "./studio-viewer.js";
 import { fileStem } from "./share-actions.js";
 import { answerSlugForMetadata, canonicalPathFor, siteOrigin } from "./surname-page.js";
 
@@ -115,6 +115,41 @@ export function ShareStudio({
   const here = studioPath(path, lang, card);
   const signIn = accountPath(lang, "sign-in", { next: here });
   const full = gate === "off" || gate === "open";
+  /** The top of the panel for one card: its buttons, or the way to sign in that returns to it. */
+  const studioLead = (c: ShareCardKey) => {
+    const signInHere = accountPath(lang, "sign-in", { next: studioPath(path, lang, c) });
+    if (full) {
+      return (
+        <StudioActions
+          image={shareCardPath(path, c, lang)}
+          surname={surname}
+          card={c}
+          signInHref={gate === "open" ? signInHere : null}
+          labels={{
+            share: t.studioShare,
+            download: t.studioDownload,
+            gallery: t.studioGallery,
+            galleryHint: t.studioGalleryHint,
+            working: t.studioWorking,
+            failed: t.studioFailed,
+            signIn: t.studioSignInPrompt,
+          }}
+        />
+      );
+    }
+    if (gate === "sign-in") {
+      return (
+        <div className="studio-gate">
+          <p>{t.studioSignInPrompt}</p>
+          <a className="studio-primary" href={signInHere}>
+            {t.studioSignIn}
+          </a>
+          <a href={accountPath(lang, "sign-up")}>{t.studioSignUp}</a>
+        </div>
+      );
+    }
+    return <p className="studio-gate">{t.studioUnavailable}</p>;
+  };
   return (
     <SiteShell
       lang={lang}
@@ -132,98 +167,63 @@ export function ShareStudio({
       <section aria-labelledby="studio-heading">
         <p className="studio-eyebrow">{surname}</p>
         <h1 id="studio-heading">{t.studioHeading}</h1>
-        {offered.length > 1 ? (
-          <nav className="studio-cards" aria-label={t.studioCards}>
-            <ul>
-              {offered.map((c) => (
-                <li key={c}>
-                  <a
-                    href={studioPath(path, lang, c)}
-                    aria-current={c === card ? "page" : undefined}
-                  >
-                    {t[CARD_TITLE[c]]}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ) : null}
-        <div className="studio-stage">
-          {/* A generated PNG at its final size, served as is. */}
-          <Image
-            className="studio-image"
-            src={full ? shareCardPath(path, card, lang) : sharePreviewPath(path, card, lang)}
-            alt={`${t.studioImageAlt}: ${surname}, ${t[CARD_TITLE[card]]}`}
-            width={540}
-            height={960}
-            unoptimized
-            priority
-          />
-          <div className="studio-panel">
-            {full ? (
-              <>
-                <StudioActions
-                  image={shareCardPath(path, card, lang)}
-                  surname={surname}
-                  card={card}
-                  signInHref={gate === "open" ? signIn : null}
-                  labels={{
-                    share: t.studioShare,
-                    download: t.studioDownload,
-                    gallery: t.studioGallery,
-                    galleryHint: t.studioGalleryHint,
-                    working: t.studioWorking,
-                    failed: t.studioFailed,
-                    signIn: t.studioSignInPrompt,
-                  }}
-                />
-                <StudioVideo
-                  images={offered.map((c) => shareCardPath(path, c, lang))}
-                  surname={surname}
-                  fileName={`${fileStem(surname)}-${lang === "en" ? "video" : "wideo"}.mp4`}
-                  signInHref={gate === "open" ? signIn : null}
-                  labels={{
-                    make: t.studioVideo,
-                    working: t.studioVideoWorking,
-                    cancel: t.studioVideoCancel,
-                    failed: t.studioVideoFailed,
-                    signIn: t.studioSignInPrompt,
-                  }}
-                />
-                <p className="studio-hint">{t.studioInstagram}</p>
-              </>
-            ) : gate === "sign-in" ? (
-              <div className="studio-gate">
-                <p>{t.studioSignInPrompt}</p>
-                <a className="studio-primary" href={signIn}>
-                  {t.studioSignIn}
-                </a>
-                <a href={accountPath(lang, "sign-up")}>{t.studioSignUp}</a>
-              </div>
-            ) : (
-              <p className="studio-gate">{t.studioUnavailable}</p>
-            )}
-            <h2>{t.studioMore}</h2>
-            <div className="studio-more">
-              {shareUrl === null ? null : (
-                <ShareButton
-                  url={shareUrl}
-                  title={`${surname} — ${t.title}`}
-                  lang={lang}
-                  label={t.studioShareLink}
-                />
-              )}
-              <a href={`${path}?view=cards`}>{t.studioBack}</a>
-              <a
-                href={`${comparePagePath(lang)}?${new URLSearchParams({ qa: surname }).toString()}`}
-              >
-                {t.compareFromHere}
+        <StudioViewer
+          cards={offered.map((c) => ({
+            key: c,
+            title: t[CARD_TITLE[c]],
+            href: studioPath(path, lang, c),
+            src: full ? shareCardPath(path, c, lang) : sharePreviewPath(path, c, lang),
+            alt: `${t.studioImageAlt}: ${surname}, ${t[CARD_TITLE[c]]}`,
+          }))}
+          initial={card}
+          navLabel={t.studioCards}
+          lead={Object.fromEntries(offered.map((c) => [c, studioLead(c)] as const))}
+        >
+          {full ? (
+            <>
+              <StudioVideo
+                images={offered.map((c) => shareCardPath(path, c, lang))}
+                surname={surname}
+                fileName={`${fileStem(surname)}-${lang === "en" ? "video" : "wideo"}.mp4`}
+                signInHref={gate === "open" ? signIn : null}
+                labels={{
+                  make: t.studioVideo,
+                  working: t.studioVideoWorking,
+                  cancel: t.studioVideoCancel,
+                  failed: t.studioVideoFailed,
+                  signIn: t.studioSignInPrompt,
+                  length: t.studioVideoLength,
+                  short: t.studioVideoShort,
+                  full: t.studioVideoFull,
+                  motion: t.studioVideoMotion,
+                  up: t.studioVideoUp,
+                  side: t.studioVideoSide,
+                }}
+              />
+              <a className="studio-pdf" href={surnamePdfPath(path)} download>
+                {t.studioPdf}
               </a>
-              <a href="#surname">{t.searchAnother}</a>
-              <a href={offerPath(lang)}>{t.deckOffer}</a>
-            </div>
+              <p className="studio-hint">{t.studioInstagram}</p>
+            </>
+          ) : null}
+          <h2>{t.studioMore}</h2>
+          <div className="studio-more">
+            {shareUrl === null ? null : (
+              <ShareButton
+                url={shareUrl}
+                title={`${surname} — ${t.title}`}
+                lang={lang}
+                label={t.studioShareLink}
+              />
+            )}
+            <a href={`${path}?view=cards`}>{t.studioBack}</a>
+            <a href={`${comparePagePath(lang)}?${new URLSearchParams({ qa: surname }).toString()}`}>
+              {t.compareFromHere}
+            </a>
+            <a href="#surname">{t.searchAnother}</a>
+            <a href={offerPath(lang)}>{t.deckOffer}</a>
           </div>
-        </div>
+        </StudioViewer>
       </section>
     </SiteShell>
   );

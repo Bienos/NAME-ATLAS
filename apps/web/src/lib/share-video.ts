@@ -1,7 +1,8 @@
 /**
- * The share video (TASK-097, ADR-0034 §2.6): a short vertical MP4 made in the
- * browser from the surname's own share-card images, with no audio. Nothing is
- * rendered on the server and nothing is stored. The muxer (`mediabunny`) is
+ * The share video (TASK-097, TASK-108, ADR-0034 §2.6): a short vertical MP4
+ * made in the browser from the surname's own share-card images, with no audio.
+ * The server draws the images (each card in two layers, and an opening plate);
+ * the clip is put together in the browser and nothing is stored. The muxer (`mediabunny`) is
  * loaded only when a reader asks for a video.
  */
 
@@ -21,6 +22,11 @@ interface ImageLike {
 }
 interface Context2D {
   globalAlpha: number;
+  save(): void;
+  restore(): void;
+  beginPath(): void;
+  rect(x: number, y: number, w: number, h: number): void;
+  clip(): void;
   fillStyle: string;
   fillRect(x: number, y: number, w: number, h: number): void;
   drawImage(image: ImageLike, x: number, y: number, w: number, h: number): void;
@@ -42,72 +48,145 @@ declare function fetch(
   input: string,
 ): Promise<{ readonly ok: boolean; readonly status: number; blob(): Promise<BlobLike> }>;
 
-/** The clip's shape (TASK-097 §3): 1080 × 1920 at 30 fps, no audio. */
+/** The clip's shape (TASK-097 §3, TASK-108): 1080 × 1920 at 30 fps, no audio. */
 export const VIDEO = {
   width: 1080,
   height: 1920,
   fps: 30,
-  /** The shortest a card is held, in seconds. */
-  minHold: 1.5,
-  /** One slide between two cards. */
-  transition: 0.4,
-  /** The summary held again at the end. */
+  /** The opening plate: the surname drawn in, then the question. */
+  intro: 1.8,
+  /** When the surname starts to draw in, and how long it takes. */
+  wipeStart: 0.2,
+  wipe: 0.9,
+  /** How long a card is held: a short clip moves faster. */
+  hold: { short: 1.4, full: 1.8 },
+  /** How many cards each length takes. */
+  cards: { short: 3, full: 7 },
+  /** After a card lands, its figures and visual rise in. */
+  revealStart: 0.12,
+  reveal: 0.6,
+  /** How far the figures rise, in pixels. */
+  rise: 56,
+  /** One push between two plates. */
+  transition: 0.45,
+  /** The full clip ends on the summary again. */
   closing: 1.5,
-  /** The shortest clip: one card is held longer rather than make a three-second video. */
-  minDuration: 8,
+  /** The shortest clip: cards are held longer rather than make a three-second video. */
+  minDuration: 7,
   maxCards: 7,
   /** The H.264 configuration checked before the button is shown: High profile, level 4.0. */
   codec: "avc1.640028",
   bitrate: 6_000_000,
 } as const;
 
-/** What to draw at one moment: a card, and the next sliding in over it by `mix` (0 to 1). */
+/** The reader's choices (TASK-108): how long, and which way the cards move. */
+export type VideoLength = "short" | "full";
+export type VideoMotion = "up" | "side";
+export interface VideoOptions {
+  readonly length: VideoLength;
+  readonly motion: VideoMotion;
+}
+export const DEFAULT_VIDEO: VideoOptions = { length: "full", motion: "up" };
+
+/** One plate of the clip: the opening, or a card (the closing summary is a card again). */
+export type Segment =
+  | { readonly kind: "intro" }
+  | { readonly kind: "card"; readonly card: number; readonly closing: boolean };
+
+/**
+ * What to draw at one moment: a plate, and the next pushing in over it by
+ * `mix` (0 to 1). `reveal` is how far the plate's figures have come in (0 to
+ * 1) and `wipe` how much of the surname the opening shows.
+ */
 export interface Frame {
-  readonly card: number;
-  readonly next: number | null;
+  readonly segment: Segment;
+  readonly next: Segment | null;
   readonly mix: number;
+  readonly reveal: number;
+  readonly wipe: number;
 }
 
 export interface Schedule {
+  readonly segments: readonly Segment[];
   /** How long each card is held, in seconds. */
   readonly hold: number;
   readonly duration: number;
   frameAt(time: number): Frame;
 }
 
-/** Ease in and out, so a slide starts and ends still. */
+/** Ease in and out, so a movement starts and ends still. */
 function ease(x: number): number {
-  return x < 0.5 ? 2 * x * x : 1 - (-2 * x + 2) ** 2 / 2;
+  const t = Math.max(0, Math.min(1, x));
+  return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 }
 
 /**
- * The clip's timeline for `count` cards (TASK-097 AC-1). Each card is held,
- * then the next slides in; after the last, the first card (the summary) slides
- * in again and is held to close. With one card there is nothing to slide: it is
- * held for the whole clip. Pure, so it is tested without a browser.
+ * The clip's timeline for `count` cards (TASK-108 AC-1). The opening plate,
+ * then each card pushed in and held while its figures rise in; a full clip
+ * pushes the summary in again to close. A card's figures are never drawn part
+ * way through a number: the whole figure moves in, faded. Pure, so it is
+ * tested without a browser.
  */
-export function videoSchedule(count: number): Schedule {
-  const n = Math.max(1, Math.min(VIDEO.maxCards, Math.floor(count)));
-  const { transition: tr, closing } = VIDEO;
-  // Slides between the cards, plus one back to the summary when there is more than one card.
-  const slides = n > 1 ? n : 0;
-  const fixed = slides * tr + closing;
-  const hold = Math.max(VIDEO.minHold, (VIDEO.minDuration - fixed) / n);
-  const duration = n * hold + fixed;
-  const step = hold + tr;
+export function videoSchedule(count: number, options: VideoOptions = DEFAULT_VIDEO): Schedule {
+  const n = Math.max(1, Math.min(VIDEO.cards[options.length], Math.floor(count)));
+  const closing = options.length === "full" && n > 1;
+  const segments: Segment[] = [{ kind: "intro" }];
+  for (let i = 0; i < n; i++) segments.push({ kind: "card", card: i, closing: false });
+  if (closing) segments.push({ kind: "card", card: 0, closing: true });
+  const tr = VIDEO.transition;
+  const fixed = VIDEO.intro + (segments.length - 1) * tr + (closing ? VIDEO.closing : 0);
+  const hold = Math.max(VIDEO.hold[options.length], (VIDEO.minDuration - fixed) / n);
+  const holds = segments.map((s) =>
+    s.kind === "intro" ? VIDEO.intro : s.closing ? VIDEO.closing : hold,
+  );
+  const duration = fixed + n * hold;
+
+  const revealAt = (segment: Segment, since: number) =>
+    segment.kind === "intro"
+      ? 1
+      : segment.closing
+        ? 1
+        : ease((since - VIDEO.revealStart) / VIDEO.reveal);
+  const wipeAt = (segment: Segment, since: number) =>
+    segment.kind === "intro" ? ease((since - VIDEO.wipeStart) / VIDEO.wipe) : 1;
+
   return {
+    segments,
     hold,
     duration,
     frameAt(time) {
-      const t = Math.max(0, Math.min(duration, time));
-      if (n === 1) return { card: 0, next: null, mix: 0 };
-      const i = Math.floor(t / step);
-      if (i >= n) return { card: 0, next: null, mix: 0 };
-      const into = t - i * step;
-      if (into < hold) return { card: i, next: null, mix: 0 };
-      const next = i + 1 < n ? i + 1 : 0;
-      return { card: i, next, mix: ease((into - hold) / tr) };
+      let t = Math.max(0, Math.min(duration, time));
+      for (let i = 0; i < segments.length; i++) {
+        const segment = segments[i] as Segment;
+        const held = holds[i] as number;
+        const next = segments[i + 1] ?? null;
+        const span = held + (next === null ? 0 : tr);
+        if (t < span || next === null) {
+          const state = { reveal: revealAt(segment, t), wipe: wipeAt(segment, t) };
+          if (t < held || next === null) return { segment, next: null, mix: 0, ...state };
+          return { segment, next, mix: ease((t - held) / tr), ...state };
+        }
+        t -= span;
+      }
+      // Unreachable: the last segment returns above.
+      return { segment: segments[0] as Segment, next: null, mix: 0, reveal: 1, wipe: 1 };
     },
+  };
+}
+
+/** Each card's two layers, and the opening's (TASK-108): the addresses the clip reads. */
+export function layerUrls(cardUrls: readonly string[], count: number) {
+  const layer = (url: string, name: string) =>
+    `${url}${url.includes("?") ? "&" : "?"}layer=${name}`;
+  const first = cardUrls[0];
+  return {
+    intro:
+      first === undefined
+        ? null
+        : { plate: layer(first, "intro"), name: layer(first, "intro-name") },
+    cards: cardUrls
+      .slice(0, count)
+      .map((url) => ({ base: layer(url, "base"), reveal: layer(url, "reveal") })),
   };
 }
 
@@ -159,40 +238,101 @@ function canvas(): CanvasLike {
   return element;
 }
 
-function draw(ctx: Context2D, images: readonly ImageLike[], frame: Frame): void {
+interface Plates {
+  readonly intro: { readonly plate: ImageLike; readonly name: ImageLike };
+  readonly cards: readonly { readonly base: ImageLike; readonly reveal: ImageLike }[];
+}
+
+/** One plate at an offset, with its figures and the opening's surname as far in as the frame says. */
+function drawSegment(
+  ctx: Context2D,
+  plates: Plates,
+  segment: Segment,
+  x: number,
+  y: number,
+  reveal: number,
+  wipe: number,
+): void {
+  const { width: w, height: h } = VIDEO;
+  if (segment.kind === "intro") {
+    ctx.drawImage(plates.intro.plate, x, y, w, h);
+    // The surname is drawn in from the left, as if written.
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(x, y, Math.round(w * wipe), h);
+    ctx.clip();
+    ctx.drawImage(plates.intro.name, x, y, w, h);
+    ctx.restore();
+    return;
+  }
+  const card = plates.cards[segment.card];
+  if (card === undefined) return;
+  ctx.drawImage(card.base, x, y, w, h);
+  if (reveal <= 0) return;
+  // The whole figure rises in, faded: never a number part way through.
+  ctx.globalAlpha = reveal;
+  ctx.drawImage(card.reveal, x, y + Math.round((1 - reveal) * VIDEO.rise), w, h);
+  ctx.globalAlpha = 1;
+}
+
+function draw(ctx: Context2D, plates: Plates, frame: Frame, motion: VideoMotion): void {
   const { width: w, height: h } = VIDEO;
   ctx.globalAlpha = 1;
   ctx.fillStyle = TOKENS["dusk-surface"];
   ctx.fillRect(0, 0, w, h);
-  const current = images[frame.card];
-  const next = frame.next === null ? undefined : images[frame.next];
-  // A push, as in Stories: the next card rises from below and pushes this one up.
-  // Never a cross-fade, which shows two cards' text over each other.
-  const shift = next === undefined ? 0 : Math.round(frame.mix * h);
-  if (current !== undefined) ctx.drawImage(current, 0, -shift, w, h);
-  if (next !== undefined) ctx.drawImage(next, 0, h - shift, w, h);
+  // A push, as in Stories: the next plate pushes this one out, from below or
+  // from the side. Never a cross-fade, which shows two cards' text over each other.
+  const span = motion === "up" ? h : w;
+  const shift = frame.next === null ? 0 : Math.round(frame.mix * span);
+  const [dx, dy] = motion === "up" ? [0, 1] : [1, 0];
+  drawSegment(ctx, plates, frame.segment, -shift * dx, -shift * dy, frame.reveal, frame.wipe);
+  if (frame.next !== null) {
+    // The incoming card arrives with its figures still out, unless it is the closing summary.
+    const incoming = frame.next.kind === "card" && frame.next.closing ? 1 : 0;
+    drawSegment(ctx, plates, frame.next, (span - shift) * dx, (span - shift) * dy, incoming, 0);
+  }
+}
+
+async function bitmap(url: string): Promise<ImageLike> {
+  const response = await fetch(url);
+  if (response.status === 401) throw new VideoRefused("sign-in");
+  if (!response.ok) throw new VideoRefused("failed");
+  return createImageBitmap(await response.blob());
 }
 
 /**
- * Makes the clip from the cards' image addresses (TASK-097 §3), reporting
- * progress from 0 to 1, and returns it as `video/mp4`. `isCancelled` is
+ * Makes the clip from the cards' image addresses (TASK-097 §3, TASK-108),
+ * reporting progress from 0 to 1, and returns it as `video/mp4`. Each card is
+ * read in its two layers and the opening from the summary's. `isCancelled` is
  * checked between frames.
  */
 export async function makeCardVideo(
   urls: readonly string[],
   onProgress: (done: number) => void,
   isCancelled: () => boolean = () => false,
+  options: VideoOptions = DEFAULT_VIDEO,
 ): Promise<BlobLike> {
-  const chosen = urls.slice(0, VIDEO.maxCards);
-  if (chosen.length === 0) throw new VideoRefused("failed");
-  const images: ImageLike[] = [];
+  const schedule = videoSchedule(urls.length, options);
+  const count = schedule.segments.filter((s) => s.kind === "card" && !s.closing).length;
+  const wanted = layerUrls(urls, count);
+  if (wanted.intro === null || wanted.cards.length === 0) throw new VideoRefused("failed");
+  const loaded: ImageLike[] = [];
+  const keep = async (url: string) => {
+    const image = await bitmap(url);
+    loaded.push(image);
+    return image;
+  };
   try {
-    for (const url of chosen) {
-      const response = await fetch(url);
-      if (response.status === 401) throw new VideoRefused("sign-in");
-      if (!response.ok) throw new VideoRefused("failed");
-      images.push(await createImageBitmap(await response.blob()));
-    }
+    const [plate, name, ...layers] = await Promise.all([
+      keep(wanted.intro.plate),
+      keep(wanted.intro.name),
+      ...wanted.cards.flatMap((c) => [keep(c.base), keep(c.reveal)]),
+    ]);
+    const cards = wanted.cards.map((_, i) => ({
+      base: layers[2 * i] as ImageLike,
+      reveal: layers[2 * i + 1] as ImageLike,
+    }));
+    const plates: Plates = { intro: { plate: plate as ImageLike, name: name as ImageLike }, cards };
     const mb = await import("mediabunny");
     const surface = canvas();
     const ctx = surface.getContext("2d");
@@ -209,7 +349,6 @@ export async function makeCardVideo(
     });
     output.addVideoTrack(source, { frameRate: VIDEO.fps });
     await output.start();
-    const schedule = videoSchedule(chosen.length);
     const frames = Math.round(schedule.duration * VIDEO.fps);
     for (let f = 0; f < frames; f++) {
       if (isCancelled()) {
@@ -217,7 +356,7 @@ export async function makeCardVideo(
         throw new VideoRefused("cancelled");
       }
       const time = f / VIDEO.fps;
-      draw(ctx, images, schedule.frameAt(time));
+      draw(ctx, plates, schedule.frameAt(time), options.motion);
       await source.add(time, 1 / VIDEO.fps);
       onProgress((f + 1) / frames);
     }
@@ -230,6 +369,6 @@ export async function makeCardVideo(
     if (cause instanceof VideoRefused) throw cause;
     throw new VideoRefused("failed");
   } finally {
-    for (const image of images) image.close?.();
+    for (const image of loaded) image.close?.();
   }
 }

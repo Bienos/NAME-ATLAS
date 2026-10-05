@@ -1042,6 +1042,14 @@ export const UI = {
     studioVideoWorking: "Tworzę wideo… {n}%",
     studioVideoCancel: "Anuluj",
     studioVideoFailed: "Nie udało się utworzyć wideo.",
+    studioPdf: "Pobierz PDF ze wszystkimi kartami",
+    videoHook: "Ile osób nosi to nazwisko?",
+    studioVideoLength: "Długość",
+    studioVideoShort: "Krótkie (ok. 7 s)",
+    studioVideoFull: "Pełne (wszystkie karty)",
+    studioVideoMotion: "Przejścia",
+    studioVideoUp: "Z dołu",
+    studioVideoSide: "Z boku",
     scaleLabel: "Skala rzadkości",
     scaleCommon: "częstsze",
     scaleRare: "rzadsze",
@@ -1391,9 +1399,8 @@ export const UI = {
       "Dziesięć najczęstszych nazwisk listy kobiet to nie te same nazwiska w tej samej " +
       "kolejności, co na liście z {first}\u00a0r.",
     lfP7Foot:
-      "Wydań z 2019 r. nie pokazujemy: ich opis nie mówi, że to osoby żyjące i nazwisko " +
-      "aktualne, więc zmiana od nich mogłaby być zmianą definicji. Pokazujemy, co się " +
-      "zmieniło, nie dlaczego.",
+      "Pliki z 2019 roku opisują swoją zawartość krótszym opisem niż późniejsze. Czytamy je jako " +
+      "tę samą listę: osoby z nazwiskiem aktualnym. Pokazujemy, co się zmieniło, nie dlaczego.",
     contactLink: "Kontakt",
     privacyLink: "Prywatność",
     reportLink: "Zgłoś błąd",
@@ -1751,6 +1758,14 @@ export const UI = {
     studioVideoWorking: "Making the video… {n}%",
     studioVideoCancel: "Cancel",
     studioVideoFailed: "The video could not be made.",
+    studioPdf: "Download a PDF of every card",
+    videoHook: "How many people carry this surname?",
+    studioVideoLength: "Length",
+    studioVideoShort: "Short (about 7 s)",
+    studioVideoFull: "Full (every card)",
+    studioVideoMotion: "Transitions",
+    studioVideoUp: "From below",
+    studioVideoSide: "From the side",
     scaleLabel: "Rarity scale",
     scaleCommon: "more common",
     scaleRare: "rarer",
@@ -2065,9 +2080,8 @@ export const UI = {
       "The ten most common surnames on the female list are not the same, in the same order, as " +
       "on the {first} list.",
     lfP7Foot:
-      "The 2019 editions are left out: their description does not say that they cover living " +
-      "persons by their current surname, so a change from them could be a change of " +
-      "definition. We show what changed, not why.",
+      "The 2019 files describe their contents in fewer words than the later ones. We read them as " +
+      "the same list: people with their current surname. We show what changed, not why.",
     contactLink: "Contact",
     privacyLink: "Privacy",
     reportLink: "Report a problem",
