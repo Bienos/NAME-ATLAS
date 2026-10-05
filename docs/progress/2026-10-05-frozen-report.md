@@ -21,7 +21,22 @@ M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next s
 
 ## Verification (commands run, results as returned)
 
-Local CI run in progress; results follow in the next commit.
+CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `bf477b3`, against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | exit 0 |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0, 6 tests |
+| `pnpm test` | exit 0; 2,260 tests (db 11, with 0037 in the migration list; truth 395) |
+| `pnpm db:migrate` | exit 0; "0037_reports: applied" |
+| `pnpm db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0; the committed types match |
+| `pnpm report:build` with no surname | "usage: pnpm report:build -- --surname NAME", exit 2 |
+| `pnpm report:build -- --surname KOWALCZYK` on that empty register | "[report] KOWALCZYK: NOT_RESOLVED", exit 1; `SELECT count(*) FROM reports` = 0 |
+| `pnpm test:integration` | exit 0; 37 files, 462 tests (4 new; the migration lists and the public table list include 0037; `0037` comes down cleanly in the canonical-key step-down) |
+| `pnpm test:golden` | exit 0; 4 files, 364 tests |
+| `pnpm build` | exit 0 |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0; 10 Playwright tests passed |
 
 What the integration tests show on the committed PESEL male excerpt, with the synthetic meaning works and ZAREMBA's recorded Polona responses:
 
