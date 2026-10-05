@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * The free tree's cap (TASK-111, ADR-0037 §2.1): a tree whose owner has no
+ * The free tree's cap (TASK-112, ADR-0037 §2.1): a tree whose owner has no
  * paid tier holds at most 5 people, so adding a person first counts the
  * tree's rows. The `persons_select` policy hides the living from an editor
  * whose `sees_living` is off, and a declined row from everyone but the owner,

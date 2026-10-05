@@ -8,11 +8,88 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-041 — the terms: how they change for account holders, how the contract starts and ends, and our closing of an account
+
+**Status:** NON-BLOCKING NOW (no account exists in production); needed before accounts go on. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (`docs/progress/2026-10-04-legal-review.md`, J-07).
+
+Facts: the terms say "Zmiany regulaminu publikujemy na tej stronie z nową datą." The code asks an account holder to accept a newer version only at the tree's consent step (`apps/web/src/lib/tree-routes.ts:121-128`; `packages/accounts/src/service.ts:622-633`). The terms version is a date compared as text, so the tree clause's version must be later than the version accepted without the tree. When the base terms and the tree clause change on the same day, as they did on 2026-10-04, an account opened with the tree off records `ACCOUNTS_LEGAL_UPDATED` (2026-10-01) while the page shows 2026-10-04. The account terms say we may close an abusive account and "napiszemy o tym na adres konta", with no notice period. The terms do not say when the contract is formed or ends for a reader without an account.
+
+Options: (a) email account holders a set number of days before a change takes effect, with the right to delete the account before then; (b) ask for re-acceptance at the next sign-in for every change; (c) keep publishing only (today's text). Separately: track the tree clause's acceptance apart from the terms version, so that the two dates cannot collide (a code task).
+**Recommendation (not a decision):** (a) with 14 days' notice for changes that are not purely in the user's favour, plus the separate tree-clause record; state formation and ending for readers without an account (by use; ends when they stop); give a notice and a way to object before closing an account, except for abuse in progress.
+
+---
+
+## D-040 — the terms: how a complaint (reklamacja) is made and how fast it is answered
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-06).
+
+Facts: the terms say only that complaints go to the contact address (`apps/web/src/lib/legal-text.ts`, "Zgłoszenia i reklamacje"). UŚUDE art. 8 ust. 3 pkt 4 requires the terms to set the complaint procedure. Ustawa o prawach konsumenta art. 7a deems a consumer's complaint accepted if not answered within 14 days (to be confirmed by the lawyer for a free service).
+
+Options: (a) 14 days, with what a complaint should contain (the address, the page, what is wrong) and that the answer comes by email; (b) a shorter deadline; (c) leave as is.
+**Recommendation (not a decision):** (a).
+
+---
+
+## D-039 — the tree invitation keeps an unsalted hash of the invitee's address
+
+**Status:** NON-BLOCKING NOW; decide before the tree goes live. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (J-05).
+
+Facts: an invitation stores `address_hash` = `sha256("accounts:email:" + normalised address)` (`apps/web/src/lib/tree-routes.ts:394`; `packages/accounts/src/tokens.ts:32-33`), the same key as `accounts.sign_in_failures`. It is not salted per tree, so it can be matched across trees and against a known address. It is kept on every invitation and on the tree's suppression list for as long as the tree (`packages/db/migrations/0033_family_invitations.ts:68-102`). The notice now says "skrót"; it does not claim the hash cannot be linked.
+
+Options: (a) keep it, and say in the notice that it is a hash of the address; (b) a keyed hash (HMAC with a server secret), still global, so the suppression works; (c) a per-tree salt, so that it cannot be linked across trees.
+**Recommendation (not a decision):** (b) or (c), as a code task with a migration. (c) matches the per-tree suppression list the notice describes most closely.
+
+---
+
+## D-038 — processors and their roles: Gmail, Google sign-in, Oracle, and the DPAs
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-04).
+
+Facts: the notice names "Google — skrzynka pocztowa" (the contact address is a consumer Gmail address, `apps/web/src/lib/contact.ts:8`), "Google Ireland Limited … osobny administrator" for sign-in (`legal-google.ts`, already marked as awaiting legal review), and "Oracle — serwer bazy danych we Frankfurcie" with no legal entity. The repo does not record whether the Vercel, Resend or Oracle data processing terms were accepted, or which Oracle entity holds the contract.
+
+Options: (a) confirm each entity and DPA and name them in the notice; (b) move the mailbox to a business mailbox with a DPA (Google Workspace or another provider).
+**Recommendation (not a decision):** (a) now; (b) before taking payments.
+
+---
+
+## D-037 — Vercel Web Analytics and terminal storage consent (PT art. 399)
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** the legal review of 2026-10-04 (J-03).
+
+Facts: the script sets no cookie and stores nothing in the browser (no `localStorage`, `sessionStorage`, `document.cookie` or `indexedDB` anywhere in `apps/web/src`). It runs in the browser and sends each page view to `/_vercel/insights` (`apps/web/src/lib/site-analytics.tsx:13-19`). The notice relies on art. 6(1)(f) GDPR and asks no consent.
+
+Options: (a) counsel confirms that no consent is needed; (b) a consent banner before the script loads; (c) server-side counting only.
+**Recommendation (not a decision):** ask counsel; until then keep (a)'s text, which states the facts.
+
+---
+
+## D-036 — the legal basis for relatives entered in a tree, and how they are informed (GDPR art. 6, 14)
+
+**Status:** BLOCKS the tree's release, together with D-031's legal review. **Owner:** project owner, legal counsel. **Raised by:** the legal review of 2026-10-04 (J-02).
+
+Facts: the notice says data about other people is kept "na Twoje zlecenie w ramach tej samej umowy" (art. 6(1)(b)). A contract with the account holder is not a basis for processing a relative's data. Only an invited, adult, living person receives anything (one invitation email, `apps/web/src/lib/tree-mail.ts`); others are never told.
+
+Options: (a) art. 6(1)(f) for the controller's storage, with the account holder's household activity as the source, and art. 14(5)(b) (disproportionate effort) for not informing each person; (b) treat Name Atlas as the account holder's processor (art. 28) for that data; (c) keep the current text.
+**Recommendation (not a decision):** (a), stated in the notice once counsel agrees.
+
+---
+
+## D-035 — retention periods the code does not set
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner. **Raised by:** the legal review of 2026-10-04 (J-01, J-08).
+
+Facts: the notice says emails and contact messages are kept "tak długo, jak to potrzebne do załatwienia sprawy", and the waiting list "do startu usługi albo do Twojej prośby o wypisanie". They live in the Gmail mailbox and in Resend's sending logs, and no period is set for either. Well-known bearers stay until the next data refresh after an objection, with no period otherwise. Backups (TASK-049) will hold the accounts and family schemas, and their retention is not yet stated in the notice.
+
+Options: (a) a fixed period per category, for example messages 12 months after the matter is closed, the waiting list until launch plus 3 months; (b) keep the "as long as needed" wording.
+**Recommendation (not a decision):** (a), with the backup retention added to the notice when TASK-049's upload runs in production.
+
+---
+
 ## D-034 — RESOLVED (2026-10-04): the family tree is free with an account
 
 **Resolution:** The project owner, 2026-10-04: "tree free with sign up". Any complete account may build a tree at no cost; it is no longer in the 29,99 zł tier. This supersedes D-029 ("paid; the tree stays dark until checkout exists"). The offer page moves the tree to the free tier (TASK-084). The paid tier keeps connecting trees, extra research, the report and the well-known bearers.
 
-**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. A limit on the number of trees is not decided. TASK-111 builds the 5-person cap below. It enforces it on the server, with no account holding a paid tier until checkout exists. The second-cousin limit waits for tree matching, which does not exist yet. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
+**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. A limit on the number of trees is not decided. TASK-112 builds the 5-person cap below. It enforces it on the server, with no account holding a paid tier until checkout exists. The second-cousin limit waits for tree matching, which does not exist yet. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
 
 ---
 

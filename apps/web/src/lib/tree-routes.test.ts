@@ -353,7 +353,7 @@ describe("the tree's actions (TASK-076)", () => {
     ).toBe("/pl/konto/drzewa?status=forbidden");
   });
 
-  it("add-person: a free tree that is full goes to the tree with the word that points to the offer (TASK-111)", async () => {
+  it("add-person: a free tree that is full goes to the tree with the word that points to the offer (TASK-112)", async () => {
     const { deps, family } = fakes();
     family.addPerson.mockResolvedValueOnce({ kind: "PERSON_LIMIT", limit: 5 });
     expect(

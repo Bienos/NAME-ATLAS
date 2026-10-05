@@ -397,7 +397,7 @@ describe("family tree (TASK-066, ADR-0029)", () => {
     }
   });
 
-  it("caps a free tree at 5 people, counting rows an editor cannot see, and any paid tier lifts it (TASK-111)", async () => {
+  it("caps a free tree at 5 people, counting rows an editor cannot see, and any paid tier lifts it (TASK-112)", async () => {
     const created = await family.createTree({ userId: OWNER, title: "Free cap fixture" });
     if (created.kind !== "CREATED") throw new Error("fixture tree failed");
     const treeId = created.treeId;
@@ -449,7 +449,7 @@ describe("family tree (TASK-066, ADR-0029)", () => {
     }
   });
 
-  it("lets only one of two concurrent adds take a free tree's last place (TASK-111)", async () => {
+  it("lets only one of two concurrent adds take a free tree's last place (TASK-112)", async () => {
     const created = await family.createTree({ userId: OWNER, title: "Free cap race" });
     if (created.kind !== "CREATED") throw new Error("fixture tree failed");
     const treeId = created.treeId;
@@ -474,7 +474,7 @@ describe("family tree (TASK-066, ADR-0029)", () => {
     }
   });
 
-  it("answers a tree_person_count of 0 to a caller who may not write the tree (TASK-111)", async () => {
+  it("answers a tree_person_count of 0 to a caller who may not write the tree (TASK-112)", async () => {
     const created = await family.createTree({ userId: OWNER, title: "Count fixture" });
     if (created.kind !== "CREATED") throw new Error("fixture tree failed");
     try {

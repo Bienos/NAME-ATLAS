@@ -11,7 +11,7 @@
 - **Supersedes:** ADR-0026 §2.1 (the three tiers and their contents) and §4's open questions (answered by D-024). ADR-0026 §2.2–§2.6 still hold: paid tiers stay "Wkrótce" with no buy button, a sign-up or an enquiry is an email the reader sends, the partner is not named and readers are asked not to send DNA results or health data by email, the tree's rules on living people and on connecting only people who have died, and `PRODUCT.md` §7 in every tier. ADR-0023 §2.4–§2.5 still hold: no real payments before the owner's legal and tax gates.
 - **Amends:** ADR-0035 §2.5 (the couple report's place on the offer page no longer waits for D-025).
 - **Changes:** `PRODUCT.md` §6 and §8.
-- **Implemented by:** TASK-104 (the offer page); TASK-111 (the tree's 5-person cap, on the server, with an entitlement that answers "no paid tier" for every account until checkout exists). The second-cousin limit waits for tree matching; the unlock's wiring and checkout are later tasks.
+- **Implemented by:** TASK-104 (the offer page); TASK-112 (the tree's 5-person cap, on the server, with an entitlement that answers "no paid tier" for every account until checkout exists). The second-cousin limit waits for tree matching; the unlock's wiring and checkout are later tasks.
 
 ## 1. Context
 

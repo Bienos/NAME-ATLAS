@@ -130,7 +130,7 @@ describe("invitations (TASK-094, ADR-0029 §2.6.20)", () => {
   });
 });
 
-describe("the free tree (TASK-111)", () => {
+describe("the free tree (TASK-112)", () => {
   it("holds 5 people, and no account has a paid tier before checkout exists", async () => {
     expect(FREE_TREE_PERSONS_MAX).toBe(5);
     expect(await noPaidTier("0199a1b2-0000-7000-8000-00000000aa01")).toBe(false);

@@ -56,7 +56,7 @@ export interface FamilyDeps {
   /**
    * Whether an account has a paid tier, which lifts the free tree's cap
    * (`FREE_TREE_PERSONS_MAX`). Defaults to `noPaidTier`: no account has one
-   * until checkout exists (TASK-111).
+   * until checkout exists (TASK-112).
    */
   readonly hasPaidTier?: (userId: string) => Promise<boolean>;
 }

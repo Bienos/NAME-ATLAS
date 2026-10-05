@@ -18,7 +18,7 @@ export const PARENTS_MAX = 2;
 
 /**
  * A tree whose owner has no paid tier holds at most this many people; adding
- * one more needs a paid tier, any of the four (ADR-0037 §2.1, D-025, TASK-111).
+ * one more needs a paid tier, any of the four (ADR-0037 §2.1, D-025, TASK-112).
  */
 export const FREE_TREE_PERSONS_MAX = 5;
 

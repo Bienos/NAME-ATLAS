@@ -146,7 +146,7 @@ describe("the tree's pages render from their data, in both languages (TASK-076)"
     expect(render(treeData("en", withHidden))).toContain(TREE_TEXT.en.pedigree.hidden);
   });
 
-  it("says a full free tree is full and links to the offer, with no way to buy (TASK-111)", () => {
+  it("says a full free tree is full and links to the offer, with no way to buy (TASK-112)", () => {
     const offer = { pl: "/pl/oferta", en: "/en/offer" } as const;
     for (const lang of LANGS) {
       const html = render(treeData(lang, tree(), "person-limit"));

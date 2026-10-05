@@ -1,4 +1,4 @@
-# TASK-111 — The free tree's limits: 5 people, and what limits matches
+# TASK-112 — The free tree's limits: 5 people, and what limits matches
 
 - **Status:** IMPLEMENTED 2026-10-04 (`docs/progress/2026-10-04-tree-free-limits.md`). The second-cousin limit is not built: it has nothing to limit yet (§2.4).
 - **Requested by:** the project owner, 2026-10-04: build the free limits they decided that day (D-025, D-034), using a minimal entitlement that answers "no" for everyone until checkout exists.
@@ -21,7 +21,7 @@ A free account's tree holds at most 5 people. The server refuses a sixth, and th
 ## 3. In scope
 
 1. `packages/family`: `FREE_TREE_PERSONS_MAX = 5` and `noPaidTier` (returns false) in `rules.ts`. `FamilyDeps.hasPaidTier`, defaulting to `noPaidTier`. `addPerson` answers `{ kind: "PERSON_LIMIT", limit: 5 }` (`AddPersonResult`) when the tree's **owner** has no paid tier and the tree already holds 5 people. The check counts under the tree lock.
-2. Migration `0034_family_person_count.ts`: `family.tree_person_count(t)`, SECURITY DEFINER. It returns the count of every row to a caller who may write the tree, and 0 to anyone else.
+2. Migration `0035_family_person_count.ts`: `family.tree_person_count(t)`, SECURITY DEFINER. It returns the count of every row to a caller who may write the tree, and 0 to anyone else.
 3. `apps/web`: the add route answers `PERSON_LIMIT` with a redirect to the tree page carrying `?status=person-limit`. That status has Polish and English words and a link to `offerPath` (`/pl/oferta`, `/en/offer`). There is no buy button.
 4. Tests: the rule (unit); the route and the page in both languages (unit); against real PostgreSQL, the cap for the owner and for an editor who cannot see the living rows; two concurrent adds for the last place; the paid-tier lift, asked about the owner's account; and the function answering 0 to a stranger.
 5. Docs: `docs/contracts/tree.md` (the section on the free tree's limits), `docs/CODEMAP.md`, D-034's line in `docs/DECISIONS_NEEDED.md`, ADR-0037's "Implemented by" line, `STATUS.md`, and a progress record.

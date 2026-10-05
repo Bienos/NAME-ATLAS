@@ -10,7 +10,8 @@
  *
  * A tree page's address carries a tree's id and a person's id (TASK-076 AC-7);
  * both are replaced the same way, and the one-question flow's draft, which is
- * in the query, goes with the query.
+ * in the query, goes with the query. A claimant's own card
+ * (`/pl/konto/drzewa/karta/{person}`) has a person's id and no tree's.
  *
  * Pure: `site-analytics.tsx` hands it to `beforeSend`.
  */
@@ -20,7 +21,10 @@ const SURNAME_PREFIXES = ["/pl/nazwisko/", "/en/surname/"] as const;
 
 export const SLUG_PLACEHOLDER = "[slug]";
 
-/** The routes under which the fourth segment is a tree's id and the sixth a person's. */
+/**
+ * The routes under which an id right after the prefix is a tree's and any
+ * later id a person's (`{tree}/osoba/{person}`, `karta/{person}`).
+ */
 const TREE_PREFIXES = ["/pl/konto/drzewa/", "/en/account/trees/"] as const;
 
 export const TREE_PLACEHOLDER = "[tree]";
@@ -33,10 +37,13 @@ export function redactTreePath(pathname: string): string {
   for (const prefix of TREE_PREFIXES) {
     if (!pathname.startsWith(prefix)) continue;
     const parts = pathname.split("/");
-    // ["", "pl", "konto", "drzewa", tree, "osoba", person]
-    if (parts.length >= 5 && UUID.test(parts[4] ?? "")) parts[4] = TREE_PLACEHOLDER;
-    if (parts.length >= 7 && UUID.test(parts[6] ?? "")) parts[6] = PERSON_PLACEHOLDER;
-    return parts.join("/");
+    // ["", "pl", "konto", "drzewa", tree, "osoba", person] or [..., "drzewa", "karta", person]
+    return parts
+      .map((part, i) => {
+        if (i < 4 || !UUID.test(part)) return part;
+        return i === 4 ? TREE_PLACEHOLDER : PERSON_PLACEHOLDER;
+      })
+      .join("/");
   }
   return pathname;
 }

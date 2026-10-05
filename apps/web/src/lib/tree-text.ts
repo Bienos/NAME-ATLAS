@@ -22,7 +22,7 @@ import type { SlotRole, TreePage } from "./tree-paths.js";
 export interface StatusWords {
   readonly text: string;
   readonly tone: "ok" | "problem";
-  /** A link to the offer page after the text, with these words (TASK-111). */
+  /** A link to the offer page after the text, with these words (TASK-112). */
   readonly offer?: string;
 }
 
