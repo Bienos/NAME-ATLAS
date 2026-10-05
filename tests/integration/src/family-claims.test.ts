@@ -104,7 +104,12 @@ describe("invitations and claims (TASK-094, ADR-0029 §2.6)", () => {
       `.execute(db().db);
     }
     appPool = createPool({ databaseUrl: urlAs(db().connectionUri, "nameatlas_app", APP_PASSWORD) });
-    family = createFamily({ db: createFamilyDb(appPool) });
+    // These fixtures hold more people than a free tree (TASK-112); the cap
+    // has its own tests in `family.test.ts`, so here the owner has a paid tier.
+    family = createFamily({
+      db: createFamilyDb(appPool),
+      hasPaidTier: () => Promise.resolve(true),
+    });
 
     const created = await family.createTree({ userId: OWNER, title: "Rodzina Zielińskich" });
     if (created.kind !== "CREATED") throw new Error("fixture tree failed");

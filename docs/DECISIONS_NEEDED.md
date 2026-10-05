@@ -8,6 +8,17 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-042 — Google Analytics page views without consent (PT art. 399, GDPR art. 6(1)(f), 21)
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** TASK-115 (ADR-0040).
+
+Facts: since TASK-115, Google's script (`gtag.js`) is in every page and, on `name-atlas.pl`, sends a page view for every visitor, including one who pressed "Reject". Until "Accept", consent mode keeps `analytics_storage` denied, so Google sets no cookie (`apps/web/src/lib/consent-banner.tsx`); the request still carries the IP address, the redacted address, the referrer and details of the browser and device to Google Ireland and Google LLC (USA). The notice now rests those page views on art. 6(1)(f) GDPR and the cookies on consent (`apps/web/src/lib/legal-text.ts`). The site offers no way to stop the page views short of blocking the script; the notice's right to object is by email. D-037 asks the same art. 399 question for Vercel Web Analytics, which is first-party and cookieless.
+
+Options: (a) counsel confirms that page views without cookies need no consent and that art. 6(1)(f) holds; (b) back to ADR-0038's rule: nothing goes to Google before "Accept"; (c) keep the page views but stop them after "Reject".
+**Recommendation (not a decision):** ask counsel together with D-037; until then the notice states what is sent.
+
+---
+
 ## D-041 — the terms: how they change for account holders, how the contract starts and ends, and our closing of an account
 
 **Status:** NON-BLOCKING NOW (no account exists in production); needed before accounts go on. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (`docs/progress/2026-10-04-legal-review.md`, J-07).
@@ -89,7 +100,7 @@ Options: (a) a fixed period per category, for example messages 12 months after t
 
 **Resolution:** The project owner, 2026-10-04: "tree free with sign up". Any complete account may build a tree at no cost; it is no longer in the 29,99 zł tier. This supersedes D-029 ("paid; the tree stays dark until checkout exists"). The offer page moves the tree to the free tier (TASK-084). The paid tier keeps connecting trees, extra research, the report and the well-known bearers.
 
-**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. Whether a free tree has limits (a number of trees or people) is not decided; none is built. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
+**What it does not change:** going live still needs accounts on, the restore-tested off-host backup (TASK-049, ADR-0029's precondition) and `FAMILY_TREE_ENABLED=1`. The legal review D-031 names was asked about on 2026-10-04 and not yet answered. A limit on the number of trees is not decided. TASK-112 builds the 5-person cap below. It enforces it on the server, with no account holding a paid tier until checkout exists. The second-cousin limit waits for tree matching, which does not exist yet. (2026-10-04, D-025 §3: the owner set two limits in principle: matches beyond second cousins, and adding more people, need a paid tier. Later the same day: a free tree holds 5 people, and any paid tier unlocks more people and matches beyond second cousins.)
 
 ---
 

@@ -5,14 +5,17 @@ import { ListFactsInputError } from "./histogram.js";
 import { LIST_EDITIONS_METHOD_VERSION } from "../version.js";
 
 /**
- * `list_editions@1` on a synthetic series (TASK-044 §4.3, ADR-0019): three
+ * `list_editions@2` on a synthetic series (TASK-044 §4.3, ADR-0019): three
  * editions and a publisher duplicate of the second, recorded as a gap.
  */
 
 const SERIES = "pesel_living_current_surname_national_female";
 
 const edition = (resource_id: string, data_date: string, sha: string, counts: number[]) =>
-  editionFigures({ series: SERIES, resource_id, data_date, sha256: sha.repeat(64) }, counts);
+  editionFigures(
+    { series: SERIES, universe_note_code: null, resource_id, data_date, sha256: sha.repeat(64) },
+    counts,
+  );
 
 const first = edition("22815", "2020-01-22", "a", [5, 2, 3]);
 const second = edition("35279", "2021-02-02", "b", [6, 2, 3, 2]);
@@ -31,6 +34,7 @@ describe("editionFigures", () => {
   it("counts one edition's surnames, people and smallest count, from its counts alone", () => {
     expect(first).toEqual({
       series: SERIES,
+      universe_note_code: null,
       resource_id: "22815",
       data_date: "2020-01-22",
       sha256: "a".repeat(64),
@@ -94,11 +98,39 @@ describe("listEditions", () => {
     expect(() => listEditions(SERIES, [first, male, last], [])).toThrow(/not pesel_living/u);
   });
 
+  it("takes the list's 2019 edition first, in no series and noted as described differently", () => {
+    const before = editionFigures(
+      {
+        series: null,
+        universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
+        resource_id: "18989",
+        data_date: "2019-06-30",
+        sha256: "f".repeat(64),
+      },
+      [4, 2, 3],
+    );
+    const editions = listEditions(SERIES, [before, first, second, last], [duplicate]);
+    expect(editions.series).toBe(SERIES);
+    expect(editions.items[0]).toMatchObject({
+      series: null,
+      universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS",
+    });
+
+    // Anywhere but first, or without its note, an edition in no series is refused;
+    // and an edition of the series carries no note.
+    expect(() => listEditions(SERIES, [first, before, last], [])).toThrow(/only the first/u);
+    const unnoted = { ...before, universe_note_code: null };
+    expect(() => listEditions(SERIES, [unnoted, first, last], [])).toThrow(/only the first/u);
+    const noted = { ...first, universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS" as const };
+    expect(() => listEditions(SERIES, [noted, second, last], [])).toThrow(/only the first/u);
+  });
+
   it("refuses two editions with one SHA-256: a publisher duplicate is not an edition", () => {
     const twin = { ...duplicate, sha256: second.sha256 };
     const asEdition = editionFigures(
       {
         series: SERIES,
+        universe_note_code: null,
         resource_id: twin.resource_id,
         data_date: twin.data_date,
         sha256: twin.sha256,

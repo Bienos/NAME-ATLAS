@@ -25,6 +25,7 @@ function editionRows(resource_id: string, data_date: string, rows: readonly Row[
     edition: editionFigures(
       {
         series: "pesel_living_current_surname_national_male",
+        universe_note_code: null,
         resource_id,
         data_date,
         sha256: resource_id.slice(-1).repeat(64),

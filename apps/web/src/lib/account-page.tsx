@@ -15,6 +15,9 @@ import type { AccountAction, AccountStep } from "./account-paths.js";
 import { ACCOUNT_TEXT, statusWords } from "./account-text.js";
 import { accountsEnabled, googleEnabled, mailEnabled } from "./accounts-config.js";
 import { accountsRuntime } from "./accounts-runtime.js";
+import { checkoutRuntime } from "./checkout-runtime.js";
+import { CheckoutSection, checkoutStatusFrom } from "./checkout-section.js";
+import type { PurchaseRow } from "./checkout-section.js";
 import { legalPath } from "./legal-text.js";
 import { GOOGLE_MARK } from "./design-tokens.js";
 import { formatDate } from "./messages.js";
@@ -266,7 +269,17 @@ function TermsCheck({ lang }: { readonly lang: Lang }) {
   );
 }
 
-export function AccountView({ data }: { readonly data: AccountPageData }) {
+/**
+ * `purchases` is test-mode checkout's section (TASK-111), rendered on the
+ * account step under the account's own controls; absent while checkout is off.
+ */
+export function AccountView({
+  data,
+  purchases,
+}: {
+  readonly data: AccountPageData;
+  readonly purchases?: ReactNode;
+}) {
   const { lang, step, token, session, ways } = data;
   const t = ACCOUNT_TEXT[lang];
   const other: Lang = lang === "pl" ? "en" : "pl";
@@ -478,6 +491,7 @@ export function AccountView({ data }: { readonly data: AccountPageData }) {
               )}
               <Send danger>{t.account.deleteSubmit}</Send>
             </Form>
+            {purchases ?? null}
           </>
         ) : null}
       </section>
@@ -505,12 +519,14 @@ export async function AccountPage({
   const step = enabled ? stepFromSlug(lang, segments) : null;
 
   let session: SessionView | null = null;
+  let userId: string | null = null;
   const runtime = enabled && step !== null && stepNeedsSession(step) ? accountsRuntime() : null;
   if (runtime !== null) {
     const token = (await cookies()).get(sessionCookieName(runtime.secure))?.value;
     try {
       const found = token === undefined ? null : await runtime.accounts.sessionFromToken(token);
       if (found !== null) {
+        userId = found.userId;
         session = {
           email: found.email,
           hasPassword: found.hasPassword,
@@ -529,7 +545,32 @@ export async function AccountPage({
   const decision = decideAccountPage({ enabled, lang, segments, query, session, ways });
   if (decision.kind === "not-found") notFound();
   if (decision.kind === "redirect") redirect(decision.to);
-  return <AccountView data={decision.data} />;
+
+  // Test-mode checkout (TASK-111): on the account step only, with the reader's purchases.
+  const checkout = step === "account" && userId !== null ? checkoutRuntime() : null;
+  let purchases: ReactNode = null;
+  if (checkout !== null && userId !== null) {
+    let rows: readonly PurchaseRow[] = [];
+    try {
+      rows = (await checkout.purchases.listForUser(userId)).map((p) => ({
+        tier: p.tier,
+        amountTotal: p.amountTotal,
+        paidOn: p.paidAt.toISOString().slice(0, 10),
+      }));
+    } catch {
+      // The list is unreadable for now; the buy buttons still work.
+      rows = [];
+    }
+    const word = query["checkout"];
+    purchases = (
+      <CheckoutSection
+        lang={lang}
+        status={checkoutStatusFrom(typeof word === "string" ? word : null)}
+        purchases={rows}
+      />
+    );
+  }
+  return <AccountView data={decision.data} purchases={purchases} />;
 }
 
 export async function accountMetadataFor(

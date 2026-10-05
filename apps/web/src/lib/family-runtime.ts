@@ -1,3 +1,4 @@
+import { createAccountsDb, createPurchases } from "@name-atlas/accounts";
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 import type { Accounts, Mailer } from "@name-atlas/accounts";
@@ -12,6 +13,11 @@ import { TREE_LEGAL_UPDATED } from "./legal-text.js";
  * instance is what the serverless host can afford (`accounts-runtime.ts`).
  * The read-only pool of `db.ts` is never used for a tree; the birthplace
  * lookup uses it, with no user id in that query (`tree-places.ts`).
+ *
+ * The free tree's cap (TASK-112) is lifted for an owner with any recorded
+ * purchase (TASK-114, D-025): `accounts.purchases`, read through the accounts
+ * package on the same pool and role. Only test-mode rows can exist
+ * (migration 0036), and checkout stays behind its own flag.
  *
  * `null` when the tree is off (`family-config.ts`): nothing is created.
  */
@@ -35,8 +41,12 @@ export function familyRuntime(env: NodeJS.ProcessEnv = process.env): FamilyRunti
   if (!familyTreeEnabled(env)) return (cached = null);
   const accounts = accountsRuntime(env);
   if (accounts === null) return (cached = null);
+  const purchases = createPurchases({ db: createAccountsDb(accounts.pool) });
   cached = {
-    family: createFamily({ db: createFamilyDb(accounts.pool) }),
+    family: createFamily({
+      db: createFamilyDb(accounts.pool),
+      hasPaidTier: (userId) => purchases.hasPurchase(userId),
+    }),
     accounts: accounts.accounts,
     secure: accounts.secure,
     livingTermsVersion: TREE_LEGAL_UPDATED,

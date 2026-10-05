@@ -7,6 +7,7 @@
 - **Amends:**
   - ADR-0019 §3's last alternative ("trends per surname on the surname page … a larger change to the claim chain"): this ADR is that change, for the national count only.
   - ADR-0019 §2.2 and its first alternative, **for the surname-level section only**: the 2019 editions join it (§2.2 below). The landing's series is unchanged until a later task amends ADR-0019 for it.
+- **Amended by:** TASK-106, 2026-10-04: ADR-0019 is amended for the landing (its §5), so Plate VII reads 2019–2026 too, and the "until a later task amends ADR-0019" below no longer holds.
 - **Code:** `packages/sources/src/registry.ts`, `packages/truth/src/shift.ts`, `packages/db/migrations/0024_distribution_shift.ts`, `packages/contracts/src/surname-result.ts` (schema 1.7), `apps/web`.
 
 ## 1. Context

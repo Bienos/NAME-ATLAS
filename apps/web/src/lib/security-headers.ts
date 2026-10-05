@@ -24,7 +24,7 @@
  *   page uses a `data:` or `blob:` image;
  * - `connect-src 'self'`: the only client requests are `/api/v1/surname-prefix`
  *   and `/api/v1/events`;
- * - Google Analytics, only after the visitor's consent (TASK-109): its script
+ * - Google Analytics on every page (TASK-109, TASK-115): its script
  *   from `www.googletagmanager.com`, and its hits to `*.google-analytics.com`
  *   and `*.analytics.google.com` (requests and, as a fallback, image pings).
  *
@@ -52,7 +52,9 @@ export const CONTENT_SECURITY_POLICY: string = [
   "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  // The buy form's 303 leads to Stripe's hosted checkout (TASK-111), and a
+  // browser holds a form's redirect to `form-action` too.
+  "form-action 'self' https://checkout.stripe.com",
   "frame-ancestors 'none'",
 ].join("; ");
 

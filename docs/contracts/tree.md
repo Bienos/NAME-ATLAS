@@ -88,3 +88,15 @@ Parentage writes are serialized per tree before checking its current graph, so c
 Visibility changes and membership removal take the same tree lock as parentage edits. A waiting graph edit rechecks living-person visibility after it obtains the lock; a revoked permission cannot leave it checking a partially hidden graph.
 
 A child has at most one `MOTHER` and one `FATHER`, held by a partial unique index and answered as `ROLE_TAKEN`; other links use `PARENT`, and a child still has two parents at most. Deleting a person removes every link to and from them, so it takes the tree lock and the same view of living people as a parentage change: an editor who cannot see the living receives `FORBIDDEN`. Every edit by an owner or an editor moves the tree's `updated_at`, through `family.touch_tree`, because the policy on `trees` lets only the owner update it.
+
+## The free tree's limits (TASK-112, ADR-0037 §2.1)
+
+A tree whose owner's account has no paid tier holds at most 5 people (`FREE_TREE_PERSONS_MAX`). Any paid tier lifts the cap.
+
+- `addPerson` answers `PERSON_LIMIT` (with `limit: 5`) when the tree already holds 5 people, and saves nothing. The answer is the same for the owner and for an editor: the cap belongs to the owner's account, whoever adds the person.
+- The count is every row of the tree, including the living and the declined rows an editor cannot see. `family.tree_person_count(t)` (migration 0035, SECURITY DEFINER) returns it to a caller who may write the tree, and 0 to anyone else. It is read under the tree lock, so two adds at once cannot both take the last place.
+- The question "has this account a paid tier?" is `FamilyDeps.hasPaidTier`. Its default, `noPaidTier`, answers false for every account. The web passes the accounts package's `hasPurchase`: any row in `accounts.purchases` for the account is a paid tier (TASK-114). Purchases are one-time payments and never expire. Only test-mode rows can exist (migration 0036).
+- The POST route answers the cap with a 303 to the tree's page, `?status=person-limit`. That page says, in Polish and in English, that a free tree holds 5 people, and links to the offer (`/pl/oferta`, `/en/offer`). It has no buy button.
+- Removing a person makes room again. A tree already larger than 5 keeps everyone in it, but nobody can be added to it.
+- The GET response and its schema version are unchanged.
+- **Matches beyond second cousins** are not limited, because no matching exists: there is no match index, no proposal and no link between two trees (ADR-0029 §2.18, "neither door is in the first release"). The task that builds matching applies the limit there.
