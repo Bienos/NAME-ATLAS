@@ -1,7 +1,7 @@
 # ADR-0032 — Given names: a second name type, kept apart from surnames
 
 - **Status:** Proposed 2026-10-03. The first build (TASK-078) is internal: no page, no contract and no claim read it.
-- **Deciders:** the project owner asked on 2026-10-03 to "design adding full name report to paid so you can find name meaning", and then to "start the first-name statistics". This ADR records the storage that start needs. The product questions (which tier, free or paid, which meaning sources) are open in the design draft and are not decided here.
+- **Deciders:** the project owner asked on 2026-10-03 to "design adding full name report to paid so you can find name meaning", and then to "start the first-name statistics". This ADR records the storage that start needs. The product questions (which tier, free or paid, which meaning sources) are open in the design draft and are not decided here. The owner answered them on 2026-10-05 (D-043): paid, in the 28,99 zł tier; every listed name; meanings only from a free publisher's permission or the public domain, never Wiktionary and never a paid licence.
 - **Supersedes:** nothing. It adds an entity that `docs/canonical/11` does not have.
 
 ## Context

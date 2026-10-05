@@ -92,7 +92,7 @@ Rules:
 - The surname report never implies anything about the buyer's specific family. Only what the reader enters into their own tree, or asks a genealogist to research, is about their family.
 - Five tiers, in PLN, each a one-time payment (ADR-0037, which supersedes ADR-0026's three):
   - **Free, with an account.** The cards, a share card for each answer, the full page and the comparison; famous bearers ("shares the surname — not your relative"); a family tree of up to 5 people; connecting trees, with matches up to second cousins.
-  - **"smaller research"**, 28,99 zł: the tree unlock (a tree of more than 5 people, and matches beyond second cousins). Anything else is not yet confirmed.
+  - **"smaller research"**, 28,99 zł: the tree unlock (a tree of more than 5 people, and matches beyond second cousins), and the full-name report once it is built (D-043): the PESEL statistics of a given name beside the surname's, for every name on the list, with a meaning only where a free permission or a public-domain source gives one. Anything else is not yet confirmed.
   - **"couple"**, 89,99 zł: the couple report (ADR-0035), and the tree unlock.
   - **"family review"**, 199 zł: the tree unlock. Anything else is not yet confirmed.
   - **"genealogist research"**, 800 zł: research into the reader's family by a partner genealogist, with DNA analysis, paid to Name Atlas; and the tree unlock. Enquiries go to the owner by email.

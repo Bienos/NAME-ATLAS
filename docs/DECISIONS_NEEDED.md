@@ -8,6 +8,27 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-043 — RESOLVED (2026-10-05): the full-name report: paid in the 28,99 zł tier, every listed name, meanings only from a free permission or the public domain
+
+**Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6.
+**Owner:** project owner.
+**Raised by:** STATUS's "full-name report" line (design draft of 2026-10-03) left six product questions open. The owner answered them on 2026-10-05 in a Claude Code session.
+
+The answers, in the owner's words where they gave them:
+
+1. **Free or paid:** paid ("płatny").
+2. **Which tier:** the smallest ("za najmniejszy tier"), which is "smaller research", 28,99 zł (ADR-0037). Nothing was said about the 89,99, 199 and 800 zł tiers; whether they include the report is not decided.
+3. **Meaning sources:** a dictionary with a licence. Asked to choose between that and not paying for a licence, the owner asked "da sie to zrobic za free?", and then accepted this: meanings come only from a dictionary whose publisher gives **free** permission for short quotations with attribution, or from works in the **public domain** (in Poland, 70 years after the author's death). Until one of those exists, the report shows the PESEL statistics and no meaning, and no meaning is guessed or written by the project.
+4. **Wiktionary (Wikisłownik):** no.
+5. **Paying for a dictionary licence:** no.
+6. **How many names first:** every name on the list ("Wszystkie z listy"; 71,433 given names on the 2026-01-20 first-name lists, TASK-078). ADR-0032 §4 still holds: a placeholder is never a name, and a doubtful form (one character, or a full stop) is not shown until reviewed. A name without a meaning shows its statistics only.
+
+**What it does not change:** D-033 (no count of people with an exact first name and surname) stays open; the report does not multiply shares into such a count. The payment gates (ADR-0023 §2.5) still hold: the tier stays "Wkrótce" until it can lawfully be sold. Nothing is built by this record.
+
+**Follow-ups, not decided here:** a request to dictionary publishers for free permission, and a search for public-domain given-name dictionaries, each a task of its own; the `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` claims; the report itself; the offer page naming the report in the 28,99 zł tier once it exists.
+
+---
+
 ## D-042 — Google Analytics page views without consent (PT art. 399, GDPR art. 6(1)(f), 21)
 
 **Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** TASK-115 (ADR-0040).
