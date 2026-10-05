@@ -84,6 +84,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0032_accounts_google_identities",
       "0033_family_invitations",
       "0034_family_release_claims_on_account_deletion",
+      "0035_family_person_count",
+      "0036_accounts_purchases",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);

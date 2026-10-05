@@ -1,8 +1,8 @@
 /**
- * `list_facts_pipeline@3` — from the bytes of every edition of one published
+ * `list_facts_pipeline@4` — from the bytes of every edition of one published
  * national list's series to its validated facts, and from the two lists to
- * the `list_facts@3` artefact (TASK-040, TASK-043, TASK-044, ADR-0015,
- * ADR-0018, ADR-0019, `docs/contracts/list-facts.md`).
+ * the `list_facts@4` artefact (TASK-040, TASK-043, TASK-044, TASK-106,
+ * ADR-0015, ADR-0018, ADR-0019, `docs/contracts/list-facts.md`).
  *
  * Pure: bytes in, facts out, no file system and no database. The generator
  * (`bin/build-list-facts.ts`) reads the files and writes the result.
@@ -20,7 +20,9 @@
  *   5. the source's rights allow the FREE surface.
  *
  * Then the series itself: every edition is the list's partition and of its
- * series, and no two editions share a SHA-256 — a publisher duplicate is
+ * series (the first may instead be the list's 2019-06-30 edition, in no
+ * series and noted as described differently: TASK-106, ADR-0019 §2.2 as
+ * amended), and no two editions share a SHA-256 — a publisher duplicate is
  * refused, never counted as an edition (ADR-0019 §2.2). The `list_facts@2`
  * sections describe the last edition, the list the page names; `editions`
  * and `change` compare it with the earlier editions of the same series.
@@ -175,7 +177,8 @@ function gateEdition({ descriptor, bytes }: ListInput): GatedEdition {
   }
 
   const actualSha = sha256Hex(bytes);
-  const rows = parsePeselFile(decodePeselBytes(bytes));
+  // The registry's header for the resource: the 2019 files head `nazwisko,liczba`.
+  const rows = parsePeselFile(decodePeselBytes(bytes), descriptor.header);
 
   const completeness = assessUniverseCompleteness({
     externalRecordId: descriptor.resource_id,
@@ -287,7 +290,13 @@ function computeList({ editions, refused }: SeriesInput): ComputedList {
     const gated = gateEdition(input);
     const partition = gated.descriptor.role;
     const series = PESEL_SERIES_KEYS[partition];
-    if (partition !== role || gated.descriptor.series !== series) {
+    // Only the first edition may be in no series: the list's 2019 edition,
+    // which the registry notes as described differently (ADR-0020 §2.2).
+    const before =
+      i === 0 &&
+      gated.descriptor.series === null &&
+      gated.descriptor.universe_note_code === "UNIVERSE_DESCRIPTION_DIFFERS";
+    if (partition !== role || (!before && gated.descriptor.series !== series)) {
       throw new ListFactsRefusedError(
         "SERIES_MISMATCHED",
         `resource ${gated.descriptor.resource_id} (${partition}, series ` +
@@ -306,7 +315,8 @@ function computeList({ editions, refused }: SeriesInput): ComputedList {
     }
     const figure = editionFigures(
       {
-        series,
+        series: before ? null : series,
+        universe_note_code: before ? "UNIVERSE_DESCRIPTION_DIFFERS" : null,
         resource_id: gated.descriptor.resource_id,
         data_date: gated.descriptor.data_date,
         sha256: gated.sha256,

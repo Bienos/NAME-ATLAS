@@ -5,6 +5,7 @@ import {
   PESEL_NATIONAL_SERIES,
   PESEL_REFUSED_RESOURCES,
   PESEL_SERIES_KEYS,
+  PESEL_TREND_EDITIONS,
   PESEL_SOURCE,
 } from "@name-atlas/sources";
 import { LIST_ENDINGS, NAMED_SURNAME_FLOOR } from "@name-atlas/contracts";
@@ -246,24 +247,41 @@ describe.each(lists)("the %s list, list_facts@2 sections", (_key, list: ListFact
 });
 
 describe.each(lists)(
-  "the %s list, list_facts@3 editions and change (ADR-0019)",
+  "the %s list, list_facts@4 editions and change (ADR-0019)",
   (_key, list: ListFacts, descriptor) => {
     const partition = descriptor.role as "national_male" | "national_female";
     const { editions, change } = list;
 
-    it("holds every edition of its registry series, in date order, pinned byte for byte", () => {
+    it("holds every edition a trend reads, 2019 first, in date order, pinned byte for byte", () => {
       expect(editions.method_version).toBe(LIST_EDITIONS_METHOD_VERSION);
       expect(editions.series).toBe(PESEL_SERIES_KEYS[partition]);
+      // TASK-106: the 2019 edition, in no series and noted, then the series.
       expect(
-        editions.items.map((e) => [e.series, e.resource_id, e.data_date, e.sha256, e.row_count]),
+        editions.items.map((e) => [
+          e.series,
+          e.universe_note_code,
+          e.resource_id,
+          e.data_date,
+          e.sha256,
+          e.row_count,
+        ]),
       ).toEqual(
-        PESEL_NATIONAL_SERIES[partition].map((d) => [
+        PESEL_TREND_EDITIONS[partition].map((d) => [
           d.series,
+          d.universe_note_code ?? null,
           d.resource_id,
           d.data_date,
           d.official_sha256,
           d.official_row_count,
         ]),
+      );
+      expect(editions.items[0]).toMatchObject({ data_date: "2019-06-30", series: null });
+      expect(editions.items.slice(1).map((e) => e.series)).toEqual(
+        PESEL_NATIONAL_SERIES[partition].map((d) => d.series),
+      );
+      // Each edition's people are the registry's pinned sum of its file (TASK-051).
+      expect(editions.items.map((e) => e.people)).toEqual(
+        PESEL_TREND_EDITIONS[partition].map((d) => d.official_people_sum),
       );
       // ADR-0019 §1: every edition has the same publication floor.
       for (const edition of editions.items) {
@@ -408,10 +426,11 @@ describe("surname strings are only ADR-0018's named selections", () => {
       "named_top.method_version",
       "named_top.items[].key",
       "named_top.items[].published",
-      // list_facts@3 (ADR-0019): lineage, and the keys of TOP_3 on the first edition.
+      // list_facts@4 (ADR-0019): lineage, and the keys of TOP_3 on the first edition.
       "editions.method_version",
       "editions.series",
       "editions.items[].series",
+      "editions.items[].universe_note_code",
       "editions.items[].resource_id",
       "editions.items[].data_date",
       "editions.items[].sha256",

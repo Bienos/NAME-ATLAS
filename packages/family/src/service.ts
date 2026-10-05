@@ -4,10 +4,12 @@ import type { Kysely, Transaction } from "kysely";
 import {
   checkHiddenFields,
   checkPerson,
+  FREE_TREE_PERSONS_MAX,
   INVITATION_DAYS,
   INVITATION_WINDOW_DAYS,
   INVITATIONS_PER_WINDOW,
   inviteProblem,
+  noPaidTier,
   parentCount,
   treatedAsLiving,
   wouldCycle,
@@ -51,6 +53,12 @@ export interface FamilyDeps {
   readonly db: Kysely<FamilyDB>;
   readonly now?: () => Date;
   readonly newId?: () => string;
+  /**
+   * Whether an account has a paid tier, which lifts the free tree's cap
+   * (`FREE_TREE_PERSONS_MAX`). Defaults to `noPaidTier`: no account has one
+   * until checkout exists (TASK-112).
+   */
+  readonly hasPaidTier?: (userId: string) => Promise<boolean>;
 }
 
 export type TreeRole = "OWNER" | MemberRole;
@@ -169,6 +177,12 @@ export type PersonWriteResult =
   | { readonly kind: "CLAIMED" }
   | NotFound
   | Forbidden;
+/**
+ * `addPerson`'s answers: a write's, and the free tree's cap, reached when the
+ * tree's owner has no paid tier and the tree already holds `limit` people.
+ */
+export type AddPersonResult =
+  PersonWriteResult | { readonly kind: "PERSON_LIMIT"; readonly limit: number };
 export type InviteResult =
   | { readonly kind: "OK"; readonly invitationId: string; readonly expiresAt: Date }
   | { readonly kind: "INVALID"; readonly problem: InviteProblem }
@@ -253,6 +267,7 @@ export function createFamily(deps: FamilyDeps) {
   const { db } = deps;
   const now = deps.now ?? (() => new Date());
   const newId = deps.newId ?? randomUUID;
+  const hasPaidTier = deps.hasPaidTier ?? noPaidTier;
 
   /**
    * One transaction as one user: the policies see `app.user_id` for its
@@ -557,7 +572,7 @@ export function createFamily(deps: FamilyDeps) {
       readonly userId: string;
       readonly treeId: string;
       readonly person: PersonInput;
-    }): Promise<PersonWriteResult> {
+    }): Promise<AddPersonResult> {
       const checked = checkPerson(input.person);
       if (!checked.ok) return { kind: "INVALID", problems: checked.problems };
       const personId = newId();
@@ -565,6 +580,22 @@ export function createFamily(deps: FamilyDeps) {
         const role = await roleIn(trx, input.treeId, input.userId);
         if (role === null) return { kind: "NOT_FOUND" as const };
         if (role === "VIEWER") throw new ForbiddenError();
+        // The cap is the owner's account's, whoever adds the person. The count
+        // is every row of the tree, also those an editor may not see, and the
+        // lock keeps two adds from both passing it.
+        const tree = await trx
+          .selectFrom("trees")
+          .select("owner_user_id")
+          .where("tree_id", "=", input.treeId)
+          .executeTakeFirstOrThrow();
+        if (!(await hasPaidTier(tree.owner_user_id))) {
+          await lockTree(trx, input.treeId);
+          const count = await sql<{
+            n: number;
+          }>`SELECT family.tree_person_count(${input.treeId}::uuid) AS n`.execute(trx);
+          if ((count.rows[0]?.n ?? 0) >= FREE_TREE_PERSONS_MAX)
+            return { kind: "PERSON_LIMIT" as const, limit: FREE_TREE_PERSONS_MAX };
+        }
         const at = now();
         await trx
           .insertInto("persons")

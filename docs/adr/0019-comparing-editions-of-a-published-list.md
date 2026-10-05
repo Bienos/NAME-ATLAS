@@ -7,7 +7,8 @@
 - **Amends:**
   - ADR-0015 §4, for list-scope figures of the editions of §2.1;
   - ADR-0018 §2.5 (named surnames are text, not links), because production's search now answers for every surname.
-- **Code:** `packages/sources/src/registry.ts`, `packages/contracts/src/list-facts.ts` (`list_facts@3`), `packages/truth/src/list-facts/`, `docs/contracts/list-facts.md`
+- **Amended by:** TASK-106, 2026-10-04, in §2.2 and §3 (§5 below): the landing reads each list's 2019-06-30 edition before its series, as a surname's change over time does since ADR-0020.
+- **Code:** `packages/sources/src/registry.ts`, `packages/contracts/src/list-facts.ts` (`list_facts@3`; `list_facts@4` since TASK-106), `packages/truth/src/list-facts/`, `docs/contracts/list-facts.md`
 
 ## 1. Context
 
@@ -52,3 +53,10 @@
 
 - The registry gains eleven national descriptors plus one refused resource. `fetch-pesel` can download them, and the list-facts generator reads them.
 - A new edition extends a series once its universe description matches. A changed description starts a new series.
+
+## 5. Amendment: the 2019 editions on the landing (TASK-106, 2026-10-04)
+
+- **What changed.** The project owner ruled on 2026-09-30 that the 2019-06-30 lists describe living persons with their current surname (TASK-045 §2, R-1). ADR-0020 §2.2 put them in a surname's change over time on that ruling and left the landing's Plate VII at 2020–2026 until this ADR was amended. The site then gave two first years for one list. On 2026-10-04 the owner asked for this fix ("do the 2019 fix").
+- **The rule now.** Plate VII reads, per list, the editions a surname's change reads (`PESEL_TREND_EDITIONS`): the list's 2019-06-30 edition, then its series of §2.1. The 2019 edition stays in no series, since its published description still differs. In `list_facts@4` its `series` is null and its `universe_note_code` is `UNIVERSE_DESCRIPTION_DIFFERS`. Only the first edition may be in no series, and only with that note. It passes the same gates as every edition and has the same publication floor (2). `change` compares it with the 2026 edition.
+- **What §2.2 and §3 now say.** The 2019 editions are no longer left out of the landing. The page says instead that their files describe their contents in fewer words and that the site reads them as the same list, in the words the surname page uses. The female 2022 gap, §2.3–§2.6, and the rule that the two lists are never added are unchanged.
+- **Do not revisit unless** the publisher states that the 2019 lists have a different universe. Then both the landing and a surname's change drop 2019 together, as ADR-0020 says.

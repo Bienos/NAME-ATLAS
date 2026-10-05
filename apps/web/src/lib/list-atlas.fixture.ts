@@ -74,6 +74,7 @@ function edition(
 ): ListEdition {
   return {
     series,
+    universe_note_code: null,
     resource_id: resourceId,
     data_date: dataDate,
     sha256: digit.repeat(64),
@@ -273,7 +274,7 @@ const MALE: ListFacts = {
     ],
   },
   editions: {
-    method_version: "list_editions@1",
+    method_version: "list_editions@2",
     series: "pesel_living_current_surname_national_male",
     items: [
       edition(MALE_SERIES, "22817", "2020-01-22", "a", 30511, 2011234),
@@ -492,7 +493,7 @@ const FEMALE: ListFacts = {
     ],
   },
   editions: {
-    method_version: "list_editions@1",
+    method_version: "list_editions@2",
     series: "pesel_living_current_surname_national_female",
     items: [
       edition(FEMALE_SERIES, "22815", "2020-01-22", "e", 31622, 2051234),
@@ -531,9 +532,9 @@ const FEMALE: ListFacts = {
 };
 
 export const LIST_FACTS_FIXTURE: ListFactsArtefact = {
-  schema_version: "list_facts@3",
+  schema_version: "list_facts@4",
   generated_by: "apps/web/src/lib/list-atlas.fixture.ts (SYNTHETIC)",
-  pipeline_version: "list_facts_pipeline@3",
+  pipeline_version: "list_facts_pipeline@4",
   snapshot_date: "2026-01-20",
   birthday_reference: { n_half: 23, p_at_n_half: 0.507297234 },
   lists: { male: MALE, female: FEMALE },
