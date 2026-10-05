@@ -1,6 +1,6 @@
 # 2026-10-05 — The frozen surname report (TASK-119, RPT-001 first step)
 
-M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next step premium report" after TASK-117 merged, and chose a frozen, stored report with no page, for any surname under an internal test entitlement (§6). Built on `main` @ `512e48b` as TASK-118, then renumbered 119 and merged with `1a8e210` (#142, which took 118 for the one-page PDF; of these files it touched only `STATUS.md` and `docs/CODEMAP.md`). Nothing is deployed, applied on the VM or built on production.
+M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next step premium report" after TASK-117 merged, and chose a frozen, stored report with no page, for any surname under an internal test entitlement (§6). Built on `main` @ `512e48b` as TASK-118, then renumbered 119 and merged with `1a8e210` (#142, which took 118 for the one-page PDF) and `c840b06` (#140, Vercel Speed Insights); of these files they touched only `STATUS.md` and `docs/CODEMAP.md`. Nothing is deployed, applied on the VM or built on production.
 
 ## What changed
 
