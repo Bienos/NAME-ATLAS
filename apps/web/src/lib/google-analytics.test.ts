@@ -88,7 +88,7 @@ describe("TASK-109 AC-3: the privacy notice names Google Analytics and lets you 
   });
 });
 
-describe("TASK-114 AC-1: the tag on every page, counting on production only", () => {
+describe("TASK-115 AC-1: the tag on every page, counting on production only", () => {
   it("names the measurement id in the script every page loads", () => {
     expect(GA_SCRIPT_URL).toBe("https://www.googletagmanager.com/gtag/js?id=G-ZC9D1RK4NN");
   });
@@ -108,7 +108,7 @@ describe("TASK-114 AC-1: the tag on every page, counting on production only", ()
   });
 });
 
-describe("TASK-114 AC-3: the notice and the banner say page views go without cookies", () => {
+describe("TASK-115 AC-3: the notice and the banner say page views go without cookies", () => {
   it("says the script loads on every page, cookies wait for consent, and names both bases", () => {
     const pl = JSON.stringify(legalDocument("privacy", "pl"));
     expect(pl).toContain("Skrypt Google jest wczytywany na każdej stronie");

@@ -17,7 +17,7 @@ import type { Consent, GaPageParams } from "./google-analytics.js";
 
 /**
  * The consent banner and Google Analytics behind it (TASK-109, ADR-0038;
- * TASK-114, ADR-0040). Google's script is in every page (`app/layout.tsx`);
+ * TASK-115, ADR-0040). Google's script is in every page (`app/layout.tsx`);
  * on production's host this island configures it and sends one redacted
  * `page_view` per route, whatever the choice. The banner decides the cookies
  * only: until "Accept", and after "Reject", `analytics_storage` stays denied,

@@ -5,7 +5,7 @@
 - **Deciders:** the project owner. Told that GA loaded only after "Accept" (ADR-0038), they answered "it should be there always, not only when users say ok". Cookies without consent were not built: the banner still decides them (see Context).
 - **Amends:** ADR-0038 §1 ("GA4 loads only after the visitor presses Accept … Before that, and after Reject, no request goes to Google"). ADR-0038 §2–§4 still hold.
 - **Relates to:** TASK-109, D-037, D-042, `ARCHITECTURE.md` §9 (separate analytics per environment).
-- **Implemented by:** TASK-114.
+- **Implemented by:** TASK-115.
 
 ## Context
 

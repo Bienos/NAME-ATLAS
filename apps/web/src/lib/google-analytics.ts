@@ -3,7 +3,7 @@ import type { Lang } from "./messages.js";
 
 /**
  * Google Analytics 4 on every page, its cookies only after the visitor agrees
- * (TASK-109, ADR-0038; TASK-114, ADR-0040).
+ * (TASK-109, ADR-0038; TASK-115, ADR-0040).
  *
  * Google's script is in every page's HTML and, on production's host, counts
  * every page view in consent mode: until the visitor presses "Accept" on the

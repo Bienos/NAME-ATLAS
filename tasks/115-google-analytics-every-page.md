@@ -1,4 +1,4 @@
-# TASK-114 — Google Analytics on every page, its cookies only with consent
+# TASK-115 — Google Analytics on every page, its cookies only with consent
 
 - **Status:** IMPLEMENTED 2026-10-05 on `claude/wizardly-dirac-9ik3dv` (`docs/progress/2026-10-05-google-analytics-every-page.md`).
 - **Requested by:** the project owner, 2026-10-05: Google's "Set up a Google tag" page for `G-ZC9D1RK4NN` with "install google analytics"; told it was already installed behind the consent banner (TASK-109), "but it should be there always, not only when users say ok".

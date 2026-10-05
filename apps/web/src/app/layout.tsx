@@ -81,7 +81,7 @@ export const metadata: Metadata = {
  * follows the page, with the surname kept out of its events (TASK-058).
  * Google's tag is in every page's head; it counts page views on production
  * only, and sets its cookies only after the visitor accepts the consent
- * banner (TASK-109, ADR-0038; TASK-114, ADR-0040).
+ * banner (TASK-109, ADR-0038; TASK-115, ADR-0040).
  */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

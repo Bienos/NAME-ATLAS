@@ -1,6 +1,6 @@
-# 2026-10-05 — TASK-114: Google Analytics on every page, its cookies only with consent
+# 2026-10-05 — TASK-115: Google Analytics on every page, its cookies only with consent
 
-**Task:** `tasks/114-google-analytics-every-page.md`. **Decision:** ADR-0040 (amends ADR-0038 §1); the legal question it leaves is D-042. **Numbers:** TASK-114, ADR-0040 and D-042, the next free on `main` @ `de39642` (TASK up to 113, ADR up to 0038, D up to 041) and in the open pull requests (#108: TASK-099, ADR-0036; #132: ADR-0039). **Requested by:** the project owner, who, told that GA loaded only after "Accept" (TASK-109), answered "it should be there always, not only when users say ok". Google's cookies without consent were not built.
+**Task:** `tasks/115-google-analytics-every-page.md`. **Decision:** ADR-0040 (amends ADR-0038 §1); the legal question it leaves is D-042. **Numbers:** ADR-0040 and D-042, the next free on `main` @ `de39642` (TASK up to 113, ADR up to 0038, D up to 041) and in the open pull requests (#108: TASK-099, ADR-0036; #132: ADR-0039). First numbered TASK-114, which open pull request #134 took before this one opened, so it is TASK-115. **Requested by:** the project owner, who, told that GA loaded only after "Accept" (TASK-109), answered "it should be there always, not only when users say ok". Google's cookies without consent were not built.
 
 ## What changed
 
@@ -9,7 +9,7 @@
 - `apps/web/src/lib/consent-banner.tsx`: on production's host, for every visitor, `startGa` configures GA from consent mode with every type denied, grants `analytics_storage` when the stored choice is "granted", sets the redacted address before `config`, and the island sends one redacted `page_view` per route. A change of choice updates `analytics_storage`. "Reject" deletes the `_ga` cookies and no longer sets `ga-disable-…`. The client no longer adds the script itself.
 - `apps/web/src/lib/legal-text.ts` (both languages): the summary names Google Analytics beside Vercel; the GA paragraph says the script loads on every page, what Google receives with each page view, no cookies without consent on art. 6(1)(f), the cookies on consent (art. 6(1)(a)), and that withdrawing deletes the cookies while page views go on; the processor line; `LEGAL_UPDATED.privacy` is 2026-10-05. `legal-accounts.ts`: the same summary sentence.
 - `apps/web/src/lib/security-headers.ts`: the CSP's comment only.
-- Tests: `google-analytics.test.ts` (TASK-114 AC-1 and AC-3; TASK-109's "script not loaded" assertions removed), `legal-page.test.ts` (each document's own date), `legal-google.test.ts` (the later of the Google variant's date and the base's).
+- Tests: `google-analytics.test.ts` (TASK-115 AC-1 and AC-3; TASK-109's "script not loaded" assertions removed), `legal-page.test.ts` (each document's own date), `legal-google.test.ts` (the later of the Google variant's date and the base's).
 - `docs/adr/0040-google-analytics-on-every-page.md` (new), ADR-0038's "Amended by" line, `docs/DECISIONS_NEEDED.md` D-042, `docs/CODEMAP.md`, `STATUS.md`, the task file.
 
 No new dependency.

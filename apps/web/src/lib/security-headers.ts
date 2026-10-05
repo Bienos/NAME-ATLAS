@@ -24,7 +24,7 @@
  *   page uses a `data:` or `blob:` image;
  * - `connect-src 'self'`: the only client requests are `/api/v1/surname-prefix`
  *   and `/api/v1/events`;
- * - Google Analytics on every page (TASK-109, TASK-114): its script
+ * - Google Analytics on every page (TASK-109, TASK-115): its script
  *   from `www.googletagmanager.com`, and its hits to `*.google-analytics.com`
  *   and `*.analytics.google.com` (requests and, as a fallback, image pings).
  *

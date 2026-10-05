@@ -27,7 +27,7 @@ export const CONTROLLER_PLACE = "Iława";
  * the consent banner (TASK-109), and for the legal review of 2026-10-04
  * (`docs/progress/2026-10-04-legal-review.md`), which also added the terms'
  * ban on unlawful content, then for Google Analytics on every page, its
- * cookies only with consent (TASK-114).
+ * cookies only with consent (TASK-115).
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
   privacy: "2026-10-05",
