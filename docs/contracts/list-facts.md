@@ -1,8 +1,8 @@
 # Contract — list facts (statistics about one whole published list)
 
-- **Status:** `list_facts@1` accepted with ADR-0015 (TASK-040, merged in #32 on 2026-09-30). `list_facts@2` (TASK-043) accepted with ADR-0018 (merged in #37 on 2026-09-30). `list_facts@3` (TASK-044) is proposed with ADR-0019 and accepted when TASK-044's pull request is merged.
-- **Schema:** `packages/contracts/src/list-facts.ts` (`listFactsArtefactSchema`, `LIST_FACTS_SCHEMA_VERSION = "list_facts@3"`).
-- **Producer:** `packages/truth/bin/build-list-facts.ts` (`pnpm truth:list-facts`), which runs the pure pipeline `computeListFacts` / `buildListFactsArtefact` in `packages/truth/src/list-facts/build.ts` (pipeline version `list_facts_pipeline@3`, `LIST_FACTS_METHOD_VERSION` in `packages/truth/src/version.ts`) over every edition of each national list's series (`PESEL_NATIONAL_SERIES` in `packages/sources/src/registry.ts`) and writes the generated module `packages/truth/src/generated/list-facts.ts` (`LIST_FACTS_DATA`).
+- **Status:** `list_facts@1` accepted with ADR-0015 (TASK-040, merged in #32 on 2026-09-30). `list_facts@2` (TASK-043) accepted with ADR-0018 (merged in #37 on 2026-09-30). `list_facts@3` (TASK-044) accepted with ADR-0019. `list_facts@4` (TASK-106, ADR-0019 §5) is accepted when TASK-106's pull request is merged.
+- **Schema:** `packages/contracts/src/list-facts.ts` (`listFactsArtefactSchema`, `LIST_FACTS_SCHEMA_VERSION = "list_facts@4"`).
+- **Producer:** `packages/truth/bin/build-list-facts.ts` (`pnpm truth:list-facts`), which runs the pure pipeline `computeListFacts` / `buildListFactsArtefact` in `packages/truth/src/list-facts/build.ts` (pipeline version `list_facts_pipeline@4`, `LIST_FACTS_METHOD_VERSION` in `packages/truth/src/version.ts`) over each national list's 2019-06-30 edition and every edition of its series (`PESEL_TREND_EDITIONS` in `packages/sources/src/registry.ts`) and writes the generated module `packages/truth/src/generated/list-facts.ts` (`LIST_FACTS_DATA`).
 - **Consumer:** the landing page (`apps/web`), server-side, through `listFacts()` from `@name-atlas/truth` (`packages/truth/src/list-facts/artefact.ts`). It parses the module against the schema once, memoises it and throws if it does not parse; the page then renders without the atlas section.
 - **Canonical basis:** ADR-0015 (the data path: list-scope statistics derived offline into a committed, SHA-pinned artefact), ADR-0018 (named selections and the one comparison of the two lists), ADR-0019 (editions of one list compared within one declared series), TASK-040, TASK-043 and TASK-044 (scope). The statistics themselves are not specified in the canonical corpus; `docs/canonical/14` §30 (a derived statistic is a FACT about a deterministic calculation) is the confidence rule the artefact applies, and `docs/canonical/12` §6.3–§6.4 the surface rule.
 
@@ -59,7 +59,7 @@ Since `list_facts@2` it also refuses:
 Since `list_facts@3` it also refuses (TASK-044 AC-02):
 
 - `editions.items` out of ascending order of `data_date`, with a date twice, or with fewer than two editions;
-- editions of different series in one list: every `editions.items[].series` must be the list's `editions.series`; and the two lists in one series (`lists.male.editions.series` must differ from `lists.female.editions.series`);
+- editions of different series in one list: every `editions.items[].series` must be the list's `editions.series`, with a null `universe_note_code`, except that the first may be null with `UNIVERSE_DESCRIPTION_DIFFERS` (since `list_facts@4`); and the two lists in one series (`lists.male.editions.series` must differ from `lists.female.editions.series`);
 - two editions sharing a SHA-256 (a publisher duplicate is a gap, never an edition), a resource that is both an edition and a gap or twice either, or an edition whose `surnames` differ from its `row_count`;
 - a gap without a `reason`, with a reason other than `PUBLISHER_DUPLICATE`, out of date order, on a date with an edition, or whose `duplicate_of` is not an edition of the list;
 - a last edition that is not the list itself: its `resource_id`, `sha256`, `row_count` and `data_date` must equal the list's `source` (`external_record_id`, `sha256`, `row_count`, `snapshot_date`), and its `surnames`, `people` and `min_count` the list's `summary`;
@@ -201,17 +201,17 @@ Same model. Ratios of binomials C(N − c, n) / C(N, n) = Π_{j<c}(1 − n/(N �
 |---|---|
 | `items[]` | ADR-0018 `TOP_3`: the list's three most common surnames in selection order, those at or above the floor (so up to three). The first one's count is `summary.max_count`. |
 
-### `editions` — `list_editions@1` (`list_facts@3`)
+### `editions` — `list_editions@2` (`list_facts@4`)
 
-The editions of the list's series (ADR-0019 §2.1), each read from its own SHA-pinned file and passed through the same gates as the list itself: registry size and SHA-256, the completeness gate, the confidence rule and the FREE surface. The male series is `pesel_living_current_surname_national_male` (seven editions, 2020-01-22 to 2026-01-20), the female `pesel_living_current_surname_national_female` (six editions: no 2022 edition). The 2019-06-30 editions are in neither: their universe description differs (ADR-0019 §2.2).
+The editions of the list's series (ADR-0019 §2.1), preceded by the list's 2019-06-30 edition (ADR-0019 §5, TASK-106). Each one is read from its own SHA-pinned file, the 2019 one with its own header (`nazwisko,liczba`), and passed through the same gates as the list itself: registry size and SHA-256, the completeness gate, the confidence rule and the FREE surface. The male series is `pesel_living_current_surname_national_male` (seven editions, 2020-01-22 to 2026-01-20), the female `pesel_living_current_surname_national_female` (six editions: no 2022 edition). The 2019-06-30 editions are in neither: their universe description differs. They are read as the same list on the project owner's ruling (ADR-0020 §2.2), and so carry `series: null` and `universe_note_code: "UNIVERSE_DESCRIPTION_DIFFERS"`.
 
 | Field | Definition |
 |---|---|
 | `series` | The list's one series (the registry's `series`). |
-| `items[]` | Each edition, ascending by `data_date`, the last one being the list itself: `series`, `resource_id`, `data_date` (the reference date the publisher states, never a portal timestamp), `sha256` and `row_count` (equal to the registry's), `surnames` (its rows), `people` (the sum of its counts, within that edition) and `min_count` (its smallest count: its publication floor). |
+| `items[]` | Each edition, ascending by `data_date`, the last one being the list itself: `series` (null only for the first, the 2019 edition), `universe_note_code` (`UNIVERSE_DESCRIPTION_DIFFERS` exactly when `series` is null, else null: a consumer says that edition is described in fewer words), `resource_id`, `data_date` (the reference date the publisher states, never a portal timestamp), `sha256` and `row_count` (equal to the registry's), `surnames` (its rows), `people` (the sum of its counts, within that edition) and `min_count` (its smallest count: its publication floor). |
 | `gaps[]` | Each resource of the series the registry refused, ascending by `data_date`: `{data_date, resource_id, reason, duplicate_of}`. The one reason is `PUBLISHER_DUPLICATE`: the resource's bytes are exactly those of the edition `duplicate_of` (the female resource `38772`, dated 2022-01-27, repeats `35279`, dated 2021-02-02). A gap carries no figure: the page shows it as a gap with its reason, never as a value. |
 
-### `change` — `list_change@1` (`list_facts@3`)
+### `change` — `list_change@1` (`list_facts@3`; its first edition is the 2019 one since `list_facts@4`)
 
 The list's first edition against its last (the first and last of `editions.items`), surnames compared by `canonical_key_v2`, exactly. A surname on one edition only is not on the other edition's list, never zero people: it may be below the floor there. Integers only; every difference is stored so that no page subtracts.
 
@@ -251,7 +251,7 @@ No surname is selected for its change: the artefact holds no ranking of growth o
 ## Regenerating
 
 ```sh
-pnpm fetch:pesel --series   # every edition of the two national series, byte-exact, into data/ (git-ignored)
+pnpm fetch:pesel --series   # every edition a trend reads (2019 and the two series), byte-exact, into data/ (git-ignored)
 pnpm truth:list-facts       # refuses, writing nothing, unless every check above passes for every edition
 ```
 
@@ -264,6 +264,7 @@ The generator is deterministic: a second run over the same bytes writes a byte-i
 | `list_facts@1` | `list_facts_pipeline@1` | TASK-040, ADR-0015: `source`, `assessment`, `summary`, `collision`, `crowd` per list and `birthday_reference`. No surname string, no comparison of the two lists. |
 | `list_facts@2` | `list_facts_pipeline@2` | TASK-043, ADR-0018: every `list_facts@1` section and definition unchanged. Adds per list `dots` (`list_dots@1`), `concentration` (`list_concentration@1`), `bands` (`list_bands@1`), `endings` (`list_endings@1`), `initials` (`list_initials@1`), `hyphenated` (`list_hyphenated@1`) and `named_top` (`list_named_top@1`), and at artefact level `overlap` (`list_overlap@1`). Amends "Never both lists" (the surname-set comparison) and "Never a named surname" (the named selections at or above the floor of 20). A breaking change: `overlap` is a figure spanning both lists, and the named selections put surname strings in the artefact. |
 | `list_facts@3` | `list_facts_pipeline@3` | TASK-044, ADR-0019: every `list_facts@2` section, definition and value unchanged. The pipeline reads every edition of each list's series through the same gates and refuses a publisher duplicate. Adds per list `editions` (`list_editions@1`) and `change` (`list_change@1`). Amends rule 5 (a trend within one series, in one artefact) and rule 9 (a named surname may link to its search answer). A breaking change: the list now spans several resources, and `editions` and `change` are required. |
+| `list_facts@4` | `list_facts_pipeline@4` | TASK-106, ADR-0019 §5: every `list_facts@3` section and definition unchanged. The pipeline reads each list's 2019-06-30 edition first, with its own header, through the same gates. `editions` becomes `list_editions@2`: an edition gains `universe_note_code`, and the first edition's `series` may be null, only with `UNIVERSE_DESCRIPTION_DIFFERS`. `change` now runs from 2019-06-30 to 2026-01-20. A breaking change: `series` is nullable and a field is required. |
 
 ## Compatibility
 

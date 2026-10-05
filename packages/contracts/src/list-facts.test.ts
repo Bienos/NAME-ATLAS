@@ -19,7 +19,7 @@ import type { ListChange, ListEditions, ListFacts, ListInitial } from "./list-fa
  *
  * On both lists: nowak and wójcik; on one list only: three surnames each.
  *
- * list_facts@3 (TASK-044, ADR-0019): each list above is the last edition of
+ * list_facts@4 (TASK-044, ADR-0019): each list above is the last edition of
  * its series. The first editions, also made up:
  *
  *   male   2020-01-22: NOWAK 42, KOWALSKI 26, WÓJCIK 3, KOWAL 2                  (73 people)
@@ -123,7 +123,8 @@ const edition = (
   surnames: number,
   people: number,
 ) => ({
-  series: SERIES[partition],
+  series: SERIES[partition] as string | null,
+  universe_note_code: null as "UNIVERSE_DESCRIPTION_DIFFERS" | null,
   resource_id,
   data_date,
   sha256,
@@ -141,13 +142,13 @@ function editions(
   const last = edition(partition, id, "2026-01-20", sha, 5, FIGURES[partition].people);
   return partition === "national_male"
     ? {
-        method_version: "list_editions@1",
+        method_version: "list_editions@2",
         series: SERIES[partition],
         items: [edition(partition, "22817", "2020-01-22", "c".repeat(64), 4, 73), last],
         gaps: [],
       }
     : {
-        method_version: "list_editions@1",
+        method_version: "list_editions@2",
         series: SERIES[partition],
         items: [
           edition(partition, "22815", "2020-01-22", "d".repeat(64), 5, 86),
@@ -345,7 +346,7 @@ function artefact(overrides: Record<string, unknown> = {}) {
   return {
     schema_version: LIST_FACTS_SCHEMA_VERSION,
     generated_by: "packages/truth/bin/build-list-facts.ts",
-    pipeline_version: "list_facts_pipeline@3",
+    pipeline_version: "list_facts_pipeline@4",
     snapshot_date: "2026-01-20",
     birthday_reference: { n_half: 23, p_at_n_half: 0.507297234 },
     lists: { male, female },
@@ -542,7 +543,7 @@ describe("listFactsArtefactSchema", () => {
         "overlap.one_list_top.male.published",
         "overlap.one_list_top.female.key",
         "overlap.one_list_top.female.published",
-        // list_facts@3: the editions' lineage, and the keys of TOP_3 on the first edition.
+        // list_facts@4: the editions' lineage, and the keys of TOP_3 on the first edition.
         "lists.*.editions.method_version",
         "lists.*.editions.series",
         "lists.*.editions.items[].series",
@@ -727,7 +728,7 @@ const withBoth = (patch: (l: ListFacts) => unknown) =>
 
 describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
   it("keeps list_facts@2's floor of 20 people for a named surname", () => {
-    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@3");
+    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@4");
     expect(NAMED_SURNAME_FLOOR).toBe(20);
     expect(issues(artefact())).toEqual([]);
   });
@@ -1082,7 +1083,7 @@ describe("listFactsArtefactSchema, list_facts@2 (TASK-043, ADR-0018)", () => {
     const withItems = (items: unknown[]) => (l: ListFacts) => ({
       ...l,
       named_top: { ...l.named_top, items },
-      // list_facts@3: change follows named_top key by key; only named_top is under test here.
+      // list_facts@4: change follows named_top key by key; only named_top is under test here.
       change: {
         ...l.change,
         top3_first_counts: (items as { key: string }[]).map((item) => ({
@@ -1184,11 +1185,50 @@ const withFemaleEditions = (patch: (e: ListEditions) => unknown) =>
 const withMaleChange = (patch: (c: ListChange) => unknown) =>
   withMale((l) => ({ ...l, change: patch(l.change) }));
 
-describe("listFactsArtefactSchema, list_facts@3 (TASK-044, ADR-0019)", () => {
-  it("is list_facts@3, and the example with a gap is accepted", () => {
-    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@3");
+describe("listFactsArtefactSchema, list_facts@4 (TASK-044, ADR-0019)", () => {
+  it("is list_facts@4, and the example with a gap is accepted", () => {
+    expect(LIST_FACTS_SCHEMA_VERSION).toBe("list_facts@4");
     expect(issues(artefact())).toEqual([]);
     expect(female.editions.gaps).toHaveLength(1);
+  });
+
+  it("takes a first edition in no series only with its note, and a note on no other (TASK-106)", () => {
+    const NOTE = "UNIVERSE_DESCRIPTION_DIFFERS" as const;
+    const before = (e: ListEditions, i: number) =>
+      e.items.map((item, j) =>
+        j === i ? { ...item, series: null, universe_note_code: NOTE } : item,
+      );
+    expect(issues(withFemaleEditions((e) => ({ ...e, items: before(e, 0) })))).toEqual([]);
+
+    const rule = "every edition of a list must belong to the list's one series, but the first";
+    expectRefused(
+      withFemaleEditions((e) => ({ ...e, items: before(e, 1) })),
+      rule,
+    );
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: e.items.map((item, j) => (j === 0 ? { ...item, series: null } : item)),
+      })),
+      rule,
+    );
+    expectRefused(
+      withFemaleEditions((e) => ({
+        ...e,
+        items: e.items.map((item, j) => (j === 0 ? { ...item, universe_note_code: NOTE } : item)),
+      })),
+      rule,
+    );
+    expect(
+      accepts(
+        withFemaleEditions((e) => ({
+          ...e,
+          items: e.items.map((item, j) =>
+            j === 0 ? { ...item, series: null, universe_note_code: "OTHER" } : item,
+          ),
+        })),
+      ),
+    ).toBe(false);
   });
 
   it("refuses editions out of date order, or with a date twice", () => {
