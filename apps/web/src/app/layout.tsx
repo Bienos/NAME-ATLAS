@@ -3,7 +3,7 @@ import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { GoogleAnalytics } from "../lib/consent-banner.js";
 import { GA_SCRIPT_URL } from "../lib/google-analytics.js";
-import { SiteAnalytics } from "../lib/site-analytics.js";
+import { SiteAnalytics, SiteSpeedInsights } from "../lib/site-analytics.js";
 import { SITE_COPY, SITE_PREVIEW_IMAGE } from "../lib/site-metadata.js";
 import { siteOrigin } from "../lib/surname-page.js";
 import "./globals.css";
@@ -78,7 +78,8 @@ export const metadata: Metadata = {
  * Every page renders in the dusk scope (ADR-0021): the body carries `.dusk`,
  * which re-points the system's token names at the dusk values, and each page
  * draws its own world behind it (`site-shell.tsx`). Vercel Web Analytics (#58)
- * follows the page, with the surname kept out of its events (TASK-058).
+ * follows the page, with the surname kept out of its events (TASK-058), and
+ * so does Vercel Speed Insights, under the same filter.
  * Google's tag is in every page's head; it counts page views on production
  * only, and sets its cookies only after the visitor accepts the consent
  * banner (TASK-109, ADR-0038; TASK-115, ADR-0040).
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="dusk">
         {children}
         <SiteAnalytics />
+        <SiteSpeedInsights />
         <GoogleAnalytics />
       </body>
     </html>

@@ -27,7 +27,7 @@ export const CONTROLLER_PLACE = "Iława";
  * the consent banner (TASK-109), and for the legal review of 2026-10-04
  * (`docs/progress/2026-10-04-legal-review.md`), which also added the terms'
  * ban on unlawful content, then for Google Analytics on every page, its
- * cookies only with consent (TASK-115).
+ * cookies only with consent (TASK-115), and for Vercel Speed Insights.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
   privacy: "2026-10-05",
@@ -87,7 +87,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Czego nie robimy",
         paragraphs: [
-          "Name Atlas nie ma kont ani reklam. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez Twojej zgody serwis nie zapisuje w przeglądarce plików cookie; zapamiętuje tylko Twój wybór w sprawie Google Analytics (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+          "Name Atlas nie ma kont ani reklam. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej). Szybkość wczytywania stron mierzy Vercel Speed Insights, również bez nazwiska w adresie i bez plików cookie. Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez Twojej zgody serwis nie zapisuje w przeglądarce plików cookie; zapamiętuje tylko Twój wybór w sprawie Google Analytics (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
         ],
       },
       {
@@ -107,6 +107,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
           "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz), wybrany temat, treść wiadomości i język strony, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę. Link „Zgłoś błąd” przygotowuje wiadomość w Twoim programie pocztowym z adresem strony i nazwiskiem, którego dotyczy; wysyłasz ją sam.",
           "Statystyki odwiedzin (które strony są oglądane, ile razy i skąd) prowadzimy na tej samej podstawie. Zbiera je Vercel Web Analytics: bez plików cookie; odwiedzający są rozróżniani skrótem obliczonym z żądania, kasowanym po 24 godzinach. Dla każdej odsłony zapisuje czas, adres strony, stronę odsyłającą, kraj, region i miasto, system, przeglądarkę i typ urządzenia. Zanim adres trafi do statystyk, nasz kod zastępuje w nim nazwisko oznaczeniem [slug] i usuwa parametry zapytania, więc statystyki nie zawierają wyszukiwanego nazwiska.",
+          "Na tej samej podstawie Vercel Speed Insights mierzy, jak szybko wczytują się strony, bez plików cookie. Przy każdym wczytaniu strony przesyła wyniki pomiarów (na przykład czas do wyświetlenia treści), wskazanie elementu strony, którego pomiar dotyczy, adres strony i jego wzorzec, rodzaj połączenia, przeglądarkę, typ urządzenia, system i kraj. Vercel podaje, że z pomiarów nie da się odtworzyć przeglądania między stronami ani rozpoznać odwiedzającego. Zanim pomiar opuści przeglądarkę, nasz kod zastępuje w adresie i we wzorcu nazwisko oznaczeniem [slug] i usuwa parametry zapytania.",
           "Korzystamy też z Google Analytics, żeby lepiej wiedzieć, jak serwis jest czytany. Skrypt Google jest wczytywany na każdej stronie, a przy każdej odsłonie Google otrzymuje adres IP urządzenia, adres strony, stronę odsyłającą, przybliżoną lokalizację, dane o urządzeniu i przeglądarce oraz zdarzenia na stronie. Bez Twojej zgody (baner na dole strony) Google nie zapisuje w przeglądarce plików cookie; podstawą jest wtedy nasz prawnie uzasadniony interes w wiedzy, które strony są czytane (art. 6 ust. 1 lit. f RODO). Jeśli się zgodzisz, Google zapisuje też pliki cookie _ga i _ga_<identyfikator>, które rozpoznają powracające urządzenie; ich podstawą jest Twoja zgoda (art. 6 ust. 1 lit. a RODO). Możesz ją wycofać w każdej chwili przyciskiem na końcu tej strony: usuwamy wtedy te pliki cookie, a odsłony są dalej liczone bez nich. Wycofanie nie wpływa na zgodność z prawem tego, co działo się wcześniej. Tak jak w statystykach Vercel, nasz kod zastępuje w adresie i tytule strony nazwisko oznaczeniem [slug] i usuwa parametry zapytania. Sygnały Google służące reklamie są wyłączone. Twój wybór zapamiętujemy w pamięci przeglądarki (localStorage), żeby nie pytać o niego na każdej stronie.",
           "Jeśli zapiszesz się na listę oczekujących albo zapytasz o badanie genealogiczne, przetwarzamy Twój adres i to, co napiszesz, żeby odpowiedzieć i dać znać, gdy usługa ruszy. Podstawą jest działanie na Twoje żądanie przed zawarciem umowy (art. 6 ust. 1 lit. b RODO). Nie wysyłaj nam wyników testu DNA ani informacji o zdrowiu: to dane szczególnie chronione, a do pierwszej odpowiedzi nie są potrzebne.",
           "Zanim przekażemy Twoje dane genealogom, którzy prowadzą badanie, zapytamy Cię o zgodę i powiemy, kim są.",
@@ -119,13 +120,14 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "Dostawca hostingu (Vercel) przechowuje dziennik żądań, w tym adres strony, od jednej godziny do jednego dnia, zależnie od planu usługi.",
           "Wiadomości e-mail przechowujemy tak długo, jak to potrzebne do załatwienia sprawy. Zapis na listę oczekujących trzymamy do startu usługi albo do Twojej prośby o wypisanie.",
           "Statystyki odwiedzin Vercel przechowuje przez miesiąc (okno raportowania naszego planu) i może dłużej.",
+          "Pomiary szybkości Vercel przechowuje przez 7 dni (okno raportowania naszego planu) i może dłużej.",
           "Pliki cookie Google Analytics wygasają po 2 latach od ostatniej wizyty, chyba że wcześniej wycofasz zgodę (wtedy je usuwamy) albo wyczyścisz przeglądarkę. Dane w Google Analytics są przechowywane przez okres ustawiony w usłudze, domyślnie 2 miesiące.",
         ],
       },
       {
         heading: "Komu powierzamy dane",
         items: [
-          "Vercel Inc. (USA) — hosting serwisu i statystyki odwiedzin (Vercel Web Analytics); strony są generowane we Frankfurcie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
+          "Vercel Inc. (USA) — hosting serwisu, statystyki odwiedzin (Vercel Web Analytics) i pomiar szybkości stron (Vercel Speed Insights); strony są generowane we Frankfurcie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
           "Oracle — serwer bazy danych we Frankfurcie. Otrzymuje zapytanie o nazwisko, ale nie adres IP odwiedzającego.",
           "Google — skrzynka pocztowa, na którą przychodzą wiadomości.",
           "Google Ireland Limited i Google LLC (USA) — Google Analytics: odsłony bez plików cookie, a pliki cookie tylko po Twojej zgodzie. Przekazanie do USA opiera się na EU-U.S. Data Privacy Framework i standardowych klauzulach umownych.",
@@ -168,7 +170,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "What we do not do",
         paragraphs: [
-          "Name Atlas has no accounts or advertising. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without your consent the site stores no cookies in your browser; it only remembers your choice about Google Analytics (below). We do not profile anyone and make no automated decisions.",
+          "Name Atlas has no accounts or advertising. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below). Vercel Speed Insights measures how fast pages load, also without the surname in the address and without cookies. The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without your consent the site stores no cookies in your browser; it only remembers your choice about Google Analytics (below). We do not profile anyone and make no automated decisions.",
         ],
       },
       {
@@ -186,6 +188,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
           "If you email us or write through the contact form, we process your address, your name (if you give it), the topic you choose, your message and the page's language to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox. The “Report a problem” link prepares an email in your own mail program with the page's address and the surname it concerns; you send it yourself.",
           "Visit statistics (which pages are viewed, how often and from where) rest on the same basis. Vercel Web Analytics collects them: no cookies; visitors are told apart by a hash computed from the request, discarded after 24 hours. For each page view it records the time, the page address, the referring page, the country, region and city, the operating system, the browser and the device type. Before the address reaches the statistics, our code replaces the surname in it with [slug] and removes the query parameters, so the statistics never contain the surname searched for.",
+          "On the same basis, Vercel Speed Insights measures how fast pages load, without cookies. On each page load it sends the measurements (for example, how long the content took to appear), which page element a measurement concerns, the page address and its pattern, the connection type, the browser, the device type, the operating system and the country. Vercel states that the measurements cannot be used to reconstruct a visit across pages or to identify a visitor. Before a measurement leaves the browser, our code replaces the surname in the address and the pattern with [slug] and removes the query parameters.",
           "We also use Google Analytics, to understand better how the site is read. Google's script is loaded on every page, and with each page view Google receives the device's IP address, the page address, the referring page, an approximate location, details of the device and browser, and events on the page. Without your consent (the banner at the bottom of the page) Google stores no cookies in your browser; the basis is then our legitimate interest in knowing which pages are read (Article 6(1)(f) GDPR). If you agree, Google also stores the cookies _ga and _ga_<id>, which recognise a returning device; their basis is your consent (Article 6(1)(a) GDPR). You can withdraw it at any time with the button at the end of this page: we then delete those cookies, and page views go on being counted without them. Withdrawing does not affect what happened before. As with the Vercel statistics, our code replaces the surname in the page's address and title with [slug] and removes the query parameters. Google's advertising signals are switched off. We remember your choice in your browser's storage (localStorage), so as not to ask on every page.",
           "If you join the waiting list or ask about genealogy research, we process your address and what you write to reply and to tell you when the service starts. The basis is taking steps at your request before entering into a contract (Article 6(1)(b) GDPR). Do not send us DNA results or health information: they are specially protected data, and a first reply does not need them.",
           "Before we pass your details to the genealogists who carry out the research, we will ask for your consent and tell you who they are.",
@@ -198,13 +201,14 @@ const PRIVACY: Record<Lang, LegalDocument> = {
           "The hosting provider (Vercel) keeps a request log, including the page address, for between one hour and one day, depending on the service plan.",
           "Emails are kept as long as needed to deal with the matter. A place on the waiting list is kept until the service starts or until you ask to be taken off.",
           "Vercel keeps the visit statistics for one month (our plan's reporting window), and may keep them longer.",
+          "Vercel keeps the speed measurements for 7 days (our plan's reporting window), and may keep them longer.",
           "The Google Analytics cookies expire 2 years after the last visit, unless you withdraw consent first (we then delete them) or clear your browser. Data in Google Analytics is kept for the period set in the service, 2 months by default.",
         ],
       },
       {
         heading: "Who processes data for us",
         items: [
-          "Vercel Inc. (USA): hosting and visit statistics (Vercel Web Analytics); pages are generated in Frankfurt. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",
+          "Vercel Inc. (USA): hosting, visit statistics (Vercel Web Analytics) and page speed measurement (Vercel Speed Insights); pages are generated in Frankfurt. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",
           "Oracle: the database server, in Frankfurt. It receives the query for a surname, not the visitor's IP address.",
           "Google: the mailbox that receives email.",
           "Google Ireland Limited and Google LLC (USA): Google Analytics, page views without cookies, and its cookies only after your consent. Transfers to the USA rely on the EU-U.S. Data Privacy Framework and standard contractual clauses.",

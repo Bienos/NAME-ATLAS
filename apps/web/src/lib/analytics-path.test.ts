@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { analyticsUrl, redactSurnamePath, redactTreePath } from "./analytics-path.js";
-import { beforeSend } from "./site-analytics.js";
+import { beforeSend, speedInsightsBeforeSend, speedInsightsRoute } from "./site-analytics.js";
 
 const HOST = "https://name-atlas-two.vercel.app";
 
@@ -123,5 +123,31 @@ describe("a claimant's own card in the statistics (TASK-094)", () => {
   it("leaves the cards list and the invitation page as they are; the token is in the query", () => {
     expect(analyticsUrl("/pl/konto/drzewa/karty")).toBe("/pl/konto/drzewa/karty");
     expect(analyticsUrl("/en/account/trees/invitation?t=abc")).toBe("/en/account/trees/invitation");
+  });
+});
+
+describe("Vercel Speed Insights never sees a surname", () => {
+  const TREE = "0199a1b2-0000-7000-8000-00000000aa01";
+
+  it("filters a measurement's address and keeps the rest; an unreadable one is not sent", () => {
+    const event = {
+      type: "vital" as const,
+      url: `${HOST}/pl/nazwisko/d%C4%85browski?view=cards#where`,
+      route: "/pl/nazwisko/[slug]",
+    };
+    expect(speedInsightsBeforeSend(event)).toEqual({ ...event, url: `${HOST}/pl/nazwisko/[slug]` });
+    expect(speedInsightsBeforeSend({ type: "vital", url: "http://" })).toBeNull();
+  });
+
+  it("files a measurement under the filtered path, whatever the slug's letters", () => {
+    expect(speedInsightsRoute("/pl/nazwisko/d%C4%85browski")).toBe("/pl/nazwisko/[slug]");
+    expect(speedInsightsRoute("/pl/nazwisko/dąbrowski/karta/rarity")).toBe(
+      "/pl/nazwisko/[slug]/karta/rarity",
+    );
+    expect(speedInsightsRoute(`/en/account/trees/${TREE}/map`)).toBe(
+      "/en/account/trees/[tree]/map",
+    );
+    expect(speedInsightsRoute("/pl/oferta")).toBe("/pl/oferta");
+    expect(speedInsightsRoute(null)).toBeNull();
   });
 });

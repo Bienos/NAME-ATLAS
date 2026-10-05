@@ -92,15 +92,20 @@ describe("legal pages (TASK-046)", () => {
 
   it("claim no cookies or accounts the site does not have, and name the analytics it has", () => {
     // If one of these ever appears in the site, the notice must change with it.
-    // Vercel Web Analytics arrived with #58; the notice names it (TASK-058).
+    // Vercel Web Analytics arrived with #58; the notice names it (TASK-058),
+    // and Vercel Speed Insights with it.
     const pl = JSON.stringify(legalDocument("privacy", "pl"));
     expect(pl).toContain("nie zapisuje w przeglądarce plików cookie");
     expect(pl).toContain("Vercel Web Analytics");
+    expect(pl).toContain("Vercel Speed Insights");
+    expect(pl).toContain("zastępuje w adresie i we wzorcu nazwisko oznaczeniem [slug]");
     expect(pl).toContain("zastępuje w nim nazwisko oznaczeniem [slug]");
     expect(pl).not.toContain("zewnętrznych narzędzi analitycznych");
     const en = JSON.stringify(legalDocument("privacy", "en"));
     expect(en).toContain("stores no cookies");
     expect(en).toContain("Vercel Web Analytics");
+    expect(en).toContain("Vercel Speed Insights");
+    expect(en).toContain("replaces the surname in the address and the pattern with [slug]");
     expect(en).toContain("replaces the surname in it with [slug]");
     expect(en).not.toContain("third-party analytics");
   });
