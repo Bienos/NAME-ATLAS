@@ -13,6 +13,7 @@ export type {
 export {
   checkHiddenFields,
   checkPerson,
+  FREE_TREE_PERSONS_MAX,
   HIDDEN_FIELDS,
   INVITATION_DAYS,
   INVITATION_MIN_AGE,
@@ -21,6 +22,7 @@ export {
   inviteProblem,
   isHiddenField,
   NAME_MAX,
+  noPaidTier,
   NOTES_MAX,
   PARENTS_MAX,
   parentCount,
@@ -39,6 +41,7 @@ export type {
 } from "./rules.js";
 export { createFamily } from "./service.js";
 export type {
+  AddPersonResult,
   AnswerProblem,
   AnswerResult,
   CardInput,

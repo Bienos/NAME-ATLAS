@@ -43,6 +43,7 @@ describe("MIGRATIONS_DIR", () => {
       "0032_accounts_google_identities.ts", // TASK-084 / ADR-0033 — Google sign-in
       "0033_family_invitations.ts", // TASK-094 / ADR-0029 §2.6 — invitations and claims
       "0034_family_release_claims_on_account_deletion.ts", // ADR-0029 §2.6.22 — a deleted claimant leaves
+      "0035_family_person_count.ts", // TASK-112 / ADR-0037 — the free tree's 5-person cap
     ]);
   });
 });
