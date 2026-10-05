@@ -193,6 +193,18 @@ export async function loadInterpretations(
 }
 
 /**
+ * The root an interpretation proposes, as compared: root form and language,
+ * case-folded (`MEANING_AGREEMENT_BASIS`). Two interpretations with the same
+ * key propose the same origin.
+ */
+export function meaningRootKey(i: {
+  readonly root_form: string | null;
+  readonly root_language: string | null;
+}): string {
+  return `${(i.root_form ?? "").toLocaleLowerCase()}|${(i.root_language ?? "").toLocaleLowerCase()}`;
+}
+
+/**
  * Whether every interpretation proposes the same root and language
  * (`MEANING_AGREEMENT_BASIS`).
  *
@@ -202,10 +214,8 @@ export async function loadInterpretations(
  */
 export function interpretationsAgree(interpretations: readonly OnomasticInterpretation[]): boolean {
   if (interpretations.length <= 1) return true;
-  const key = (i: OnomasticInterpretation): string =>
-    `${(i.root_form ?? "").toLocaleLowerCase()}|${(i.root_language ?? "").toLocaleLowerCase()}`;
-  const first = key(interpretations[0]!);
-  return interpretations.every((i) => key(i) === first);
+  const first = meaningRootKey(interpretations[0]!);
+  return interpretations.every((i) => meaningRootKey(i) === first);
 }
 
 /** How many distinct works support the interpretations, not how many entries. */

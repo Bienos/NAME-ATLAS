@@ -312,28 +312,19 @@ function emptyTiers<T>(make: () => T): Record<CoverageTier, T> {
 }
 
 /**
- * Assesses every active surname in the register, in `surname_id` order, and
- * tallies the result. Read-only. Each surname is read through the same query
- * service as a page, so the run and a single assessment cannot disagree.
+ * Visits every active surname in the register, in `surname_id` order, a batch
+ * at a time and `concurrency` at once. Read-only. Returns how many were read.
+ * Shared by the register-wide runs, so they cannot read different registers.
  */
-export async function coverageRun(
+export async function forEachActiveSurname(
   db: Kysely<DB>,
-  options: CoverageRunOptions = {},
-): Promise<CoverageRunTally> {
+  options: CoverageRunOptions,
+  visit: (canonicalDisplay: string) => Promise<void>,
+): Promise<number> {
   const concurrency = Math.max(1, options.concurrency ?? 4);
   const batchSize = options.batchSize ?? 500;
   const limit = options.limit ?? Number.POSITIVE_INFINITY;
-  const tiers = emptyTiers(() => 0);
-  const lists: Record<string, Record<CoverageTier, { surnames: number; people: number }>> = {};
-  const dimensions = Object.fromEntries(
-    COVERAGE_DIMENSIONS.map((d) => [
-      d,
-      Object.fromEntries(COVERAGE_AVAILABILITIES.map((a) => [a, 0])),
-    ]),
-  ) as Record<CoverageDimensionName, Record<CoverageAvailability, number>>;
   let read = 0;
-  let notResolved = 0;
-  let unavailable = 0;
   let after = "";
 
   while (read < limit) {
@@ -352,29 +343,54 @@ export async function coverageRun(
     const worker = async () => {
       for (let i = next++; i < batch.length; i = next++) {
         const row = batch[i];
-        if (row === undefined) continue;
-        const outcome = await assessCoverage(db, row.canonical_display);
-        if (outcome.kind === "NOT_RESOLVED") notResolved += 1;
-        else if (outcome.kind === "UNAVAILABLE") unavailable += 1;
-        else {
-          const a = outcome.assessment;
-          tiers[a.tier] += 1;
-          for (const p of a.people) {
-            const list = (lists[p.list] ??= emptyTiers(() => ({
-              surnames: 0,
-              people: 0,
-            })));
-            list[a.tier].surnames += 1;
-            list[a.tier].people += p.people;
-          }
-          for (const d of a.dimensions) dimensions[d.dimension][d.availability] += 1;
-        }
+        if (row !== undefined) await visit(row.canonical_display);
       }
     };
     await Promise.all(Array.from({ length: concurrency }, worker));
     read += batch.length;
     options.onProgress?.(read);
   }
+  return read;
+}
+
+/**
+ * Assesses every active surname in the register, in `surname_id` order, and
+ * tallies the result. Read-only. Each surname is read through the same query
+ * service as a page, so the run and a single assessment cannot disagree.
+ */
+export async function coverageRun(
+  db: Kysely<DB>,
+  options: CoverageRunOptions = {},
+): Promise<CoverageRunTally> {
+  const tiers = emptyTiers(() => 0);
+  const lists: Record<string, Record<CoverageTier, { surnames: number; people: number }>> = {};
+  const dimensions = Object.fromEntries(
+    COVERAGE_DIMENSIONS.map((d) => [
+      d,
+      Object.fromEntries(COVERAGE_AVAILABILITIES.map((a) => [a, 0])),
+    ]),
+  ) as Record<CoverageDimensionName, Record<CoverageAvailability, number>>;
+  let notResolved = 0;
+  let unavailable = 0;
+
+  const read = await forEachActiveSurname(db, options, async (surname) => {
+    const outcome = await assessCoverage(db, surname);
+    if (outcome.kind === "NOT_RESOLVED") notResolved += 1;
+    else if (outcome.kind === "UNAVAILABLE") unavailable += 1;
+    else {
+      const a = outcome.assessment;
+      tiers[a.tier] += 1;
+      for (const p of a.people) {
+        const list = (lists[p.list] ??= emptyTiers(() => ({
+          surnames: 0,
+          people: 0,
+        })));
+        list[a.tier].surnames += 1;
+        list[a.tier].people += p.people;
+      }
+      for (const d of a.dimensions) dimensions[d.dimension][d.availability] += 1;
+    }
+  });
 
   return {
     assessment_version: COVERAGE_ASSESSMENT_VERSION,
