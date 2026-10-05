@@ -64,6 +64,13 @@ export {
   selectBearersCandidates,
 } from "./bearers.js";
 export type { BearersCandidate, BearersDerivation, PersistedNotableBearers } from "./bearers.js";
+export {
+  MAX_FAILED_BATCHES,
+  bearersBatchSize,
+  bearersBatches,
+  loadBearersInBatches,
+} from "./bearers-batch.js";
+export type { BearersLoadTally } from "./bearers-batch.js";
 export type { SurnameQueryOptions, SurnameQueryOutcome } from "./query.js";
 export {
   buildRankTable,

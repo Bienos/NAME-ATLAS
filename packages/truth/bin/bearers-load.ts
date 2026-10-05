@@ -1,19 +1,23 @@
 #!/usr/bin/env tsx
 /**
- * Loads the known bearers of the most common surnames from Wikidata (TASK-073,
- * ADR-0030).
+ * Loads the known bearers of surnames from Wikidata (TASK-073, ADR-0030; in
+ * batches since TASK-140, ADR-0044).
  *
  *   pnpm truth:bearers-load --top-rank 2000 [--limit N] [--refresh-days 30]
  *   pnpm truth:bearers-load --surname ZAREMBA
  *
- * For each surname ranked within `--top-rank` in either register list, best
- * rank first: ask Wikidata (`fetchWikidataBearers`, one or two paced queries),
- * store the summary as a source record, and derive the `NOTABLE_BEARERS` claim.
+ * Every surname ranked within `--top-rank` in either register list, best rank
+ * first, in batches (`loadBearersInBatches`: 50, 100 or 400 surnames to a
+ * Wikidata query, by rank); any rank of 301,370 or more takes every surname.
+ * Each surname's summary is stored as a source record and its
+ * `NOTABLE_BEARERS` claim derived, exactly as before. `--surname` asks for one
+ * surname with its own two queries (`fetchWikidataBearers`), as a removal
+ * request needs (ADR-0030 §2.5).
  *
  * Resumable and idempotent, as `archive-load` is: a surname queried within
  * `--refresh-days` is not queried again; a surname whose queries fail, or whose
  * answers do not parse, is logged and left for the next run; ten failures in a
- * row stop the run.
+ * row (ten whole batches, in batches) stop the run.
  */
 import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
 import { resolveSurname } from "@name-atlas/resolver";
@@ -23,9 +27,11 @@ import {
   WikidataShapeError,
   ensureWikidataSource,
   fetchWikidataBearers,
+  fetchWikidataBearersBatch,
   storeWikidataBearers,
 } from "@name-atlas/sources";
 import { deriveNotableBearers, selectBearersCandidates } from "../src/bearers.js";
+import { loadBearersInBatches } from "../src/bearers-batch.js";
 import type { BearersCandidate } from "../src/bearers.js";
 import { BEARERS_REFRESH_DAYS } from "../src/version.js";
 
@@ -80,6 +86,21 @@ async function main(): Promise<void> {
       sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
       now: () => Date.now(),
     });
+    if (one === undefined) {
+      const { tally, stopped } = await loadBearersInBatches(db, {
+        sourceId,
+        candidates,
+        fetchBatch: (surnames) => fetchWikidataBearersBatch(surnames, pacer),
+        log: (line) => console.log(`[bearers-load] ${line}`),
+      });
+      if (stopped) process.exitCode = 1;
+      console.log(
+        `[bearers-load] done in ${String(Math.round((Date.now() - startedAt) / 1000))} s: ` +
+          `${String(tally.stored)} stored, ${String(tally.unchanged)} unchanged, ` +
+          `${String(tally.derived)} claims derived, ${String(tally.failed)} skipped`,
+      );
+      return;
+    }
     const tally = { stored: 0, unchanged: 0, derived: 0, failed: 0 };
     let consecutive = 0;
     for (const [index, candidate] of candidates.entries()) {

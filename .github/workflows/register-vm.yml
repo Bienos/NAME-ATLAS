@@ -20,7 +20,8 @@ name: Register VM
 #                  the input top_rank sets its rank limit (TASK-087; 2000 when empty);
 #                  restart_archive stops a running load and starts it again on this commit (TASK-099)
 #   bearers        ops/vm/bearers.sh (TASK-077): migrate, then start Wikidata's well-known bearers load and return;
-#                  the input top_rank sets its rank limit too (TASK-125; 2000 when empty)
+#                  the input top_rank sets its rank limit too (TASK-125; 2000 when empty, 301370 or more for every
+#                  surname, in batches, TASK-140, ADR-0044); restart_bearers stops a running load and starts it again on this commit
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   given-names    ops/vm/given-names.sh (TASK-133): migrate, download and import the PESEL first-name lists, derive every
 #                  name's count and rank on each list, the gate
@@ -66,12 +67,17 @@ on:
             staging-migrate,
           ]
       top_rank:
-        description: archive and bearers only, the rank limit on either register list (empty for 2000)
+        description: archive and bearers, the rank limit on either register list (empty for 2000; 999999 for every surname)
         required: false
         type: string
         default: ""
       restart_archive:
         description: archive only, stop a running archive load and start it again on this commit
+        required: false
+        type: boolean
+        default: false
+      restart_bearers:
+        description: bearers only, stop a running bearers load and start it again on this commit
         required: false
         type: boolean
         default: false
@@ -279,8 +285,9 @@ jobs:
         if: steps.step.outputs.step == 'bearers'
         env:
           TOP_RANK: ${{ inputs.top_rank }}
+          RESTART_BEARERS: ${{ inputs.restart_bearers }}
         run: |
-          # Digits only: the value goes into the command line on the VM (TASK-125, as archive's).
+          # Digits only: the value goes into the command line on the VM (TASK-087, TASK-125).
           top_rank=$(printf '%s' "$TOP_RANK" | tr -d '[:space:]')
           if [ -z "$top_rank" ]; then
             top_rank=2000
@@ -289,10 +296,15 @@ jobs:
             exit 1
           fi
           echo "::notice::bearers rank limit: $top_rank"
+          restart=""
+          if [ "$RESTART_BEARERS" = true ]; then
+            restart=restart
+            echo "::notice::a running bearers load is restarted on this commit"
+          fi
           # The pushed commit's tree: the loader, and migration 0029 it needs.
           git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
           scp -q ops/vm/bearers.sh vm:name-atlas-ops/bearers.sh
-          ssh vm "sudo bash ~/name-atlas-ops/bearers.sh ~/name-atlas-ops/app.tar.gz $top_rank"
+          ssh vm "sudo bash ~/name-atlas-ops/bearers.sh ~/name-atlas-ops/app.tar.gz $top_rank $restart"
 
       - name: meanings
         if: steps.step.outputs.step == 'meanings'
