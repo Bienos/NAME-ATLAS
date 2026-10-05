@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "../lib/consent-banner.js";
 import { GA_SCRIPT_URL } from "../lib/google-analytics.js";
 import { SiteAnalytics } from "../lib/site-analytics.js";
@@ -93,6 +94,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {children}
         <SiteAnalytics />
         <GoogleAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   );
