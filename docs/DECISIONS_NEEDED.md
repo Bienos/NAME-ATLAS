@@ -67,7 +67,7 @@ Options: (a) confirm each entity and DPA and name them in the notice; (b) move t
 
 **Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** the legal review of 2026-10-04 (J-03).
 
-Facts: the script sets no cookie and stores nothing in the browser (no `localStorage`, `sessionStorage`, `document.cookie` or `indexedDB` anywhere in `apps/web/src`). It runs in the browser and sends each page view to `/_vercel/insights` (`apps/web/src/lib/site-analytics.tsx:13-19`). The notice relies on art. 6(1)(f) GDPR and asks no consent.
+Facts: the script sets no cookie and stores nothing in the browser (no `localStorage`, `sessionStorage`, `document.cookie` or `indexedDB` anywhere in `apps/web/src`). It runs in the browser and sends each page view to `/_vercel/insights` (`apps/web/src/lib/site-analytics.tsx:47-49`). Vercel Speed Insights, added on 2026-10-05, is in the same position: its script sets no cookie, stores nothing, and sends each page's speed measurements to `/_vercel/speed-insights` (`site-analytics.tsx:56-67`). The notice relies on art. 6(1)(f) GDPR for both and asks no consent.
 
 Options: (a) counsel confirms that no consent is needed; (b) a consent banner before the script loads; (c) server-side counting only.
 **Recommendation (not a decision):** ask counsel; until then keep (a)'s text, which states the facts.

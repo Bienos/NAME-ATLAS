@@ -104,4 +104,17 @@ describe("legal pages (TASK-046)", () => {
     expect(en).toContain("replaces the surname in it with [slug]");
     expect(en).not.toContain("third-party analytics");
   });
+
+  it("name Vercel Speed Insights, what it records, the surname's removal and how long it is shown", () => {
+    const pl = JSON.stringify(legalDocument("privacy", "pl"));
+    expect(pl).toContain("mierzy, też bez nazwiska i bez plików cookie, Vercel Speed Insights");
+    expect(pl).toContain("zastępuje w adresie i we wzorcu nazwisko oznaczeniem [slug]");
+    expect(pl).toContain("z ostatnich 7 dni");
+    expect(pl).toContain("pomiary szybkości stron (Vercel Speed Insights)");
+    const en = JSON.stringify(legalDocument("privacy", "en"));
+    expect(en).toContain("also without the surname and without cookies, by Vercel Speed Insights");
+    expect(en).toContain("replaces the surname in the address and in the pattern with [slug]");
+    expect(en).toContain("for the last 7 days");
+    expect(en).toContain("page speed measurements (Vercel Speed Insights)");
+  });
 });
