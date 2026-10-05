@@ -52,7 +52,7 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
     rightsHeading: "Twoje prawa",
     requiredHeading: "Czy musisz podać dane",
     noAccountsParagraph:
-      "Name Atlas nie ma reklam. Konto jest dobrowolne: żeby czytać serwis, nie trzeba go zakładać. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez konta i bez Twojej zgody na Google Analytics serwis nie zapisuje w przeglądarce plików cookie (zapamiętuje tylko Twój wybór w tej sprawie); po zalogowaniu zapisuje jeden plik cookie, który utrzymuje Cię zalogowanym (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+      "Name Atlas nie ma reklam. Konto jest dobrowolne: żeby czytać serwis, nie trzeba go zakładać. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej), a szybkość ładowania stron mierzy, też bez nazwiska i bez plików cookie, Vercel Speed Insights (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez konta i bez Twojej zgody na Google Analytics serwis nie zapisuje w przeglądarce plików cookie (zapamiętuje tylko Twój wybór w tej sprawie); po zalogowaniu zapisuje jeden plik cookie, który utrzymuje Cię zalogowanym (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
     sections: [
       {
         heading: "Konto: jakie dane",
@@ -94,7 +94,7 @@ const PRIVACY: Record<Lang, PrivacyWords> = {
     rightsHeading: "Your rights",
     requiredHeading: "Whether you must give data",
     noAccountsParagraph:
-      "Name Atlas has no advertising. An account is optional: you do not need one to read the site. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without an account and without your consent to Google Analytics the site stores no cookies in your browser (it only remembers that choice); once you sign in it stores one cookie that keeps you signed in (below). We do not profile anyone and make no automated decisions.",
+      "Name Atlas has no advertising. An account is optional: you do not need one to read the site. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below), and page loading speed is measured, also without the surname and without cookies, by Vercel Speed Insights (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without an account and without your consent to Google Analytics the site stores no cookies in your browser (it only remembers that choice); once you sign in it stores one cookie that keeps you signed in (below). We do not profile anyone and make no automated decisions.",
     sections: [
       {
         heading: "The account: what data",
