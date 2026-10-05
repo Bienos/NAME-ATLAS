@@ -316,6 +316,8 @@ export type {
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildReport,
+  isReportVersionId,
+  readReportVersion,
   REPORT_SCHEMA_VERSION,
   REPORT_SECTION_TYPES,
   reportSectionsOf,
@@ -328,6 +330,7 @@ export type {
   ReportPayload,
   ReportSection,
   ReportSectionType,
+  StoredReportVersion,
 } from "./report.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,

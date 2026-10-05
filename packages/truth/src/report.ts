@@ -396,3 +396,105 @@ export async function buildReport(db: Kysely<DB>, input: string): Promise<BuildR
     };
   });
 }
+
+/** A stored version as written: its frozen payload is returned unparsed. */
+export interface StoredReportVersion {
+  readonly report_version_id: string;
+  readonly version_number: number;
+  readonly report_schema_version: string;
+  readonly eligibility_state: string;
+  readonly generated_at: string;
+  readonly payload: unknown;
+  readonly sections: readonly {
+    readonly section_type: string;
+    readonly sequence_number: number;
+    readonly title_payload: unknown;
+    readonly body_payload: unknown;
+    readonly section_confidence_summary: unknown;
+    readonly claims: readonly ReportClaimReference[];
+  }[];
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/u;
+
+/** Whether a string could be a report version's id: a lower-case UUID. */
+export function isReportVersionId(value: string): boolean {
+  return UUID.test(value);
+}
+
+/**
+ * Reads one stored version with its sections, in order, and the claims behind
+ * each (TASK-120). Read-only. Null when the id is not a UUID or no version has
+ * it. The caller validates the payload before it renders anything from it.
+ */
+export async function readReportVersion(
+  db: Kysely<DB>,
+  reportVersionId: string,
+): Promise<StoredReportVersion | null> {
+  if (!isReportVersionId(reportVersionId)) return null;
+  const version = await db
+    .selectFrom("report_versions")
+    .select([
+      "report_version_id",
+      "version_number",
+      "report_schema_version",
+      "eligibility_state",
+      sql<string>`to_char(generated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`.as(
+        "generated_at",
+      ),
+      "rendered_payload",
+    ])
+    .where("report_version_id", "=", reportVersionId)
+    .executeTakeFirst();
+  if (version === undefined) return null;
+
+  const sections = await db
+    .selectFrom("report_sections")
+    .select([
+      "report_section_id",
+      "section_type",
+      "sequence_number",
+      "title_payload",
+      "body_payload",
+      "section_confidence_summary",
+    ])
+    .where("report_version_id", "=", reportVersionId)
+    .orderBy("sequence_number")
+    .execute();
+  const refs =
+    sections.length === 0
+      ? []
+      : await db
+          .selectFrom("report_claim_references")
+          .select(["report_section_id", "claim_id", "presentation_role", "sequence"])
+          .where(
+            "report_section_id",
+            "in",
+            sections.map((s) => s.report_section_id),
+          )
+          .orderBy("report_section_id")
+          .orderBy("sequence")
+          .execute();
+
+  return {
+    report_version_id: version.report_version_id,
+    version_number: version.version_number,
+    report_schema_version: version.report_schema_version,
+    eligibility_state: version.eligibility_state,
+    generated_at: version.generated_at,
+    payload: version.rendered_payload,
+    sections: sections.map((s) => ({
+      section_type: s.section_type,
+      sequence_number: s.sequence_number,
+      title_payload: s.title_payload,
+      body_payload: s.body_payload,
+      section_confidence_summary: s.section_confidence_summary,
+      claims: refs
+        .filter((r) => r.report_section_id === s.report_section_id)
+        .map((r) => ({
+          claim_id: r.claim_id,
+          presentation_role: r.presentation_role as PresentationRole,
+        })),
+    })),
+  };
+}

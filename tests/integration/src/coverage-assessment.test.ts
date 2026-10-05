@@ -33,6 +33,7 @@ import {
   assessPremiumEligibility,
   buildReport,
   premiumEligibilityRun,
+  readReportVersion,
   querySurnameResult,
   REPORT_SECTION_TYPES,
 } from "@name-atlas/truth";
@@ -572,6 +573,30 @@ describe("coverage assessment (TASK-080)", () => {
         expect(origin?.claims.map((c) => c.presentation_role)).toEqual(["LIMITATION"]);
         expect(built.eligibility.state).toBe("RIGHTS_BLOCKED");
       });
+    });
+
+    it("reads a stored version back as it was written (TASK-120)", async () => {
+      const built = await buildReport(db(), "NOWAK");
+      if (built.kind !== "BUILT") throw new Error(built.kind);
+      const read = await readReportVersion(db(), built.report_version_id);
+      expect(read).toMatchObject({
+        report_version_id: built.report_version_id,
+        version_number: built.version_number,
+        report_schema_version: "report@0",
+        eligibility_state: built.eligibility.state,
+      });
+      expect(read?.generated_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+      expect(read?.sections.map((x) => x.section_type)).toEqual([...REPORT_SECTION_TYPES]);
+      expect(read?.sections.map((x) => x.claims)).toEqual(built.sections.map((x) => x.claims));
+      expect(read?.sections.map((x) => x.body_payload)).toEqual(
+        built.sections.map((x) => x.body_payload),
+      );
+      expect(
+        (read?.payload as { response: { surname: { display_name: string } } }).response.surname
+          .display_name,
+      ).toBe("NOWAK");
+      expect(await readReportVersion(db(), "not-a-uuid")).toBeNull();
+      expect(await readReportVersion(db(), "01920000-0000-7000-8000-000000000001")).toBeNull();
     });
 
     it("says what is missing for a surname with nothing deeper, and writes nothing for an unknown one (AC-5)", async () => {
