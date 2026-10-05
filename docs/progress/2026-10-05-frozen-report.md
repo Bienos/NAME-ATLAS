@@ -1,6 +1,6 @@
-# 2026-10-05 — The frozen surname report (TASK-118, RPT-001 first step)
+# 2026-10-05 — The frozen surname report (TASK-119, RPT-001 first step)
 
-M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next step premium report" after TASK-117 merged, and chose a frozen, stored report with no page, for any surname under an internal test entitlement (§6). Built on `main` @ `512e48b`. Nothing is deployed, applied on the VM or built on production.
+M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next step premium report" after TASK-117 merged, and chose a frozen, stored report with no page, for any surname under an internal test entitlement (§6). Built on `main` @ `512e48b` as TASK-118, then renumbered 119 and merged with `1a8e210` (#142, which took 118 for the one-page PDF; of these files it touched only `STATUS.md` and `docs/CODEMAP.md`). Nothing is deployed, applied on the VM or built on production.
 
 ## What changed
 
@@ -16,12 +16,12 @@ M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next s
   - It stores the next version (`report@0`), its sections and its claim references.
   - `reportSectionsOf(payload, claims)` is the pure section builder: presented fields and their states, confidence summaries, sourceless sections' availability, SOURCES' citation ids, LIMITATIONS' coverage, index and eligibility gaps, and claim roles (HERO, SUPPORT, or LIMITATION when the PAID surface does not show the claim's field).
 - **`packages/truth/bin/report-build.ts`**, `pnpm report:build -- --surname NAME` (root) and `report-build` (`@name-atlas/truth`).
-- `packages/truth/src/index.ts` exports. Migration lists in `packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts` (and its table list) and `tests/integration/src/canonical-key-v2.test.ts`. `tests/integration/src/coverage-assessment.test.ts`: a `the frozen report (TASK-118)` block of 4 tests.
+- `packages/truth/src/index.ts` exports. Migration lists in `packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts` (and its table list) and `tests/integration/src/canonical-key-v2.test.ts`. `tests/integration/src/coverage-assessment.test.ts`: a `the frozen report (TASK-119)` block of 4 tests.
 - `tasks/118-frozen-report.md`, `STATUS.md`, `PLAN.md` (the M5 row), `docs/CODEMAP.md`.
 
 ## Verification (commands run, results as returned)
 
-CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `bf477b3`, against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
+CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `bf477b3` (before the renumbering and the merge of #142), against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
 
 | Command | Result |
 |---|---|

@@ -45,7 +45,7 @@ describe("MIGRATIONS_DIR", () => {
       "0034_family_release_claims_on_account_deletion.ts", // ADR-0029 §2.6.22 — a deleted claimant leaves
       "0035_family_person_count.ts", // TASK-112 / ADR-0037 — the free tree's 5-person cap
       "0036_accounts_purchases.ts", // TASK-111 — test-mode checkout's purchases
-      "0037_reports.ts", // TASK-118 — the frozen surname report, internal test only
+      "0037_reports.ts", // TASK-119 — the frozen surname report, internal test only
     ]);
   });
 });

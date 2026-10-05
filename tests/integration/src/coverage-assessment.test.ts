@@ -49,7 +49,7 @@ import { raritySectionSchema, surnameResultResponseSchema } from "@name-atlas/co
 /**
  * TASK-080: coverage on the PAID surface, read through the query service from
  * a real PostgreSQL; TASK-116: the DiscoveryIndex over the same data; and
- * TASK-117: premium eligibility over both; and TASK-118: the frozen report.
+ * TASK-117: premium eligibility over both; and TASK-119: the frozen report.
  *
  * GENUINE surnames and counts (the committed PESEL national male excerpt).
  * SYNTHETIC meanings: `fixtures/onomastics/` carries `"synthetic": true`, and
@@ -464,7 +464,7 @@ describe("coverage assessment (TASK-080)", () => {
       expect(tally.lists["pesel_2026_national_male"]?.eligible.surnames).toBe(0);
     });
   });
-  describe("the frozen report (TASK-118)", () => {
+  describe("the frozen report (TASK-119)", () => {
     const section = (sections: readonly ReportSection[], type: string) =>
       sections.find((x) => x.section_type === type);
 

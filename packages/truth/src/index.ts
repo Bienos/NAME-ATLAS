@@ -313,7 +313,7 @@ export type {
   PremiumEligibilityState,
   PremiumIneligibilityReason,
 } from "./premium-eligibility.js";
-// The frozen surname report — TASK-118, RPT-001: internal test versions only.
+// The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildReport,
   REPORT_SCHEMA_VERSION,

@@ -3,7 +3,7 @@ import { downloadGate } from "../../../../../lib/download-gate.js";
 import { surnamePdfResponse } from "../../../../../lib/share-pdf.js";
 
 /**
- * `/en/surname/{slug}/pdf`: every card of the surname in one PDF (TASK-107).
+ * `/en/surname/{slug}/pdf`: the surname's sheet, one A4 page (TASK-107, TASK-118).
  * With accounts on, the file goes to a reader with a session (TASK-064).
  */
 

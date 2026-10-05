@@ -1,5 +1,5 @@
 /**
- * The frozen surname report (TASK-118, M5's first step; `docs/canonical/11`
+ * The frozen surname report (TASK-119, M5's first step; `docs/canonical/11`
  * §26, `docs/canonical/23` RPT-001).
  *
  * A report version is an immutable snapshot of what the PAID surface says

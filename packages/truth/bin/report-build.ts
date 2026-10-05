@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Freezes one surname's report as its next version, under the INTERNAL_TEST
- * entitlement (TASK-118), and prints what it froze as JSON.
+ * entitlement (TASK-119), and prints what it froze as JSON.
  *
  *   pnpm report:build -- --surname KOWALCZYK
  *

@@ -1,7 +1,7 @@
-# TASK-118 — The frozen surname report: immutable versions, internal test only
+# TASK-119 — The frozen surname report: immutable versions, internal test only
 
 - **Status:** IMPLEMENTED 2026-10-05 (`docs/progress/2026-10-05-frozen-report.md`); migration 0037 is not applied on the VM, and no report is built on production.
-- **Number:** 118, migration 0037. `main` holds TASK-117 and migration 0036; the one open pull request (#137, Vercel Speed Insights) takes no number on 2026-10-05.
+- **Number:** 119, migration 0037. Drafted as 118; #142 (the one-page PDF) took 118 on `main` while this was being built, so this is 119. `main` holds migration 0036, and the open pull requests (#137, #138, #140, #141, Vercel Speed Insights) take no task or migration number on 2026-10-05.
 - **Requested by:** the project owner, 2026-10-05: "build next step premium report", after TASK-117 (#139) merged. They chose "frozen report only" over a preview page or an unstored one, and "any surname, internal" over eligible surnames only (§6).
 - **Milestone:** M5, first step (`PLAN.md` M5; `docs/canonical/23` §22 "Report", RPT-001).
 - **Decision:** no new ADR. The tables follow `docs/canonical/11` §26; the owner's two answers are §6.

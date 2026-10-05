@@ -18,6 +18,7 @@ import {
   shareCardFor,
   shareCardPath,
   shareFacts,
+  sheetFacts,
   summaryFacts,
 } from "./share-facts.js";
 import type { ShareFacts } from "./share-facts.js";
@@ -1195,5 +1196,55 @@ describe("TASK-073: the known people's card", () => {
   it("shares the summary, having no image of its own", () => {
     const card = deckCards(FULL, "pl", LINKS).find((c) => c.key === "bearers");
     expect(card?.share).toMatch(/\/udostepnij\?card=summary$/u);
+  });
+});
+
+describe("TASK-118: the one-page sheet says only what the cards say", () => {
+  it("holds every card the studio offers, each with the card's own facts", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const sheet = sheetFacts(FULL, lang);
+      expect(Object.keys(sheet?.cards ?? {}).sort()).toEqual([...studioCards(FULL, lang)].sort());
+      for (const card of studioCards(FULL, lang)) {
+        expect(sheet?.cards[card], `${lang}.${card}`).toEqual(shareFacts(FULL, card, lang));
+      }
+    }
+  });
+
+  it("takes the counts and their sources from the summary card", () => {
+    const summary = summaryFacts(FULL, "pl");
+    const sheet = sheetFacts(FULL, "pl");
+    expect(sheet?.surname).toBe("KOWALSKI");
+    expect(sheet?.counts).toEqual(summary?.counts);
+    expect(sheet?.sources).toEqual(summary?.sources);
+    expect(sheet?.sources.join(" ")).toMatch(/\b20\d\d\b/u);
+  });
+
+  it("has only the counts when only the count is ready, and nothing for no answer", () => {
+    const few = sheetFacts(COUNT_ONLY, "pl");
+    expect(Object.keys(few?.cards ?? {})).toEqual(["summary"]);
+    expect(few?.counts.length).toBeGreaterThan(0);
+    const unresolved = surnameResultResponseSchema.parse({
+      schema_version: "1.12",
+      status: "UNRESOLVED",
+      surname: null,
+      population: null,
+      rarity: null,
+      distribution: null,
+      suggestions: {
+        state: "UNAVAILABLE",
+        outcome: null,
+        decision_mode: null,
+        reason_code: "INPUT_TOO_SHORT",
+        suggestions: [],
+      },
+      meaning: null,
+      change: null,
+      archive: null,
+      bearers: null,
+      neighbours: null,
+      other_form: null,
+      localities: null,
+    });
+    expect(sheetFacts(unresolved, "pl")).toBeNull();
   });
 });

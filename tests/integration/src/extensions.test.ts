@@ -104,7 +104,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // from M3 for exactly that reason and no wider. TASK-039 added
     // `administrative_memberships`, the TERC/SIMC hierarchy. TASK-075 added
     // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
-    // from surnames. TASK-118 added `reports`, `report_versions`,
+    // from surnames. TASK-119 added `reports`, `report_versions`,
     // `report_sections` and `report_claim_references`: the frozen report.
     //
     // Anything beyond this set is an accidental table. TASK-009 added

@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * The frozen surname report (TASK-118, M5's first step; `docs/canonical/11`
+ * The frozen surname report (TASK-119, M5's first step; `docs/canonical/11`
  * §26, `docs/canonical/23` RPT-001).
  *
  * - `reports`: one logical report per surname, type and entitlement. The only
@@ -115,7 +115,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 export async function down(db: Kysely<any>): Promise<void> {
   const held = await sql<{ n: string }>`SELECT count(*)::text AS n FROM reports`.execute(db);
   if (Number(held.rows[0]?.n ?? "0") > 0) {
-    throw new Error("refusing to undo 0037: reports are stored (TASK-118).");
+    throw new Error("refusing to undo 0037: reports are stored (TASK-119).");
   }
   await sql`DROP TABLE report_claim_references`.execute(db);
   await sql`DROP TABLE report_sections`.execute(db);
