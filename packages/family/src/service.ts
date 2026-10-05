@@ -55,8 +55,8 @@ export interface FamilyDeps {
   readonly newId?: () => string;
   /**
    * Whether an account has a paid tier, which lifts the free tree's cap
-   * (`FREE_TREE_PERSONS_MAX`). Defaults to `noPaidTier`: no account has one
-   * until checkout exists (TASK-112).
+   * (`FREE_TREE_PERSONS_MAX`). Defaults to `noPaidTier` (TASK-112); the web
+   * passes the accounts package's `hasPurchase` (TASK-114).
    */
   readonly hasPaidTier?: (userId: string) => Promise<boolean>;
 }
