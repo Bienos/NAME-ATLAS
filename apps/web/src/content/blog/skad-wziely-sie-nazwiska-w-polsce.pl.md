@@ -47,17 +47,27 @@ Stałe nazwisko przychodziło kolejno: najpierw do szlachty, potem do mieszczan,
 
 Na nazwiska wpływały też inne języki. Pod wpływem ukraińskim i białoruskim dawną polską końcówkę -ic, -owic zaczęto wymawiać i pisać jako -icz, -owicz. Stara forma przetrwała w nielicznych nazwiskach, jak Staszic. Białoruski rodowód mają według Wolnicz-Pawłowskiej nazwiska Mickiewicz (od Mićko, czyli Mikołaj) i Sienkiewicz (od Sieńko, czyli Symeon).
 
-Dla genealoga to ważna wskazówka. W starych księgach nazwisko przodka może być zapisane na kilka sposobów, a w najstarszych w ogóle go nie być.
+Osobne formy miały nazwiska kobiet. Małgorzata Kowalska, która badała XIX-wieczne księgi metrykalne parafii Pisarzowa, odnotowuje przyrostki -owa, -ina, -ówna i -anka, na przykład Kowalczykowa czy Wróblówna. Takie formy mogły oznaczać zarówno żonę, jak i córkę. We współczesnych gwarach -owa i -ina wychodzą z użycia.
+
+Dla genealoga to ważna wskazówka. W starych księgach nazwisko przodka może być zapisane na kilka sposobów, kobiety często pod formą na -owa czy -ówna, a w najstarszych księgach nazwiska może w ogóle nie być.
 
 ## Rozbiory i akta stanu cywilnego
 
+Wcześniej chrzty i śluby zapisywały parafie. W listopadzie 1563 r. sobór trydencki nakazał proboszczom prowadzenie ksiąg metrykalnych. W Polsce obowiązek ten potwierdzały do końca lat siedemdziesiątych XVI wieku synody w poszczególnych diecezjach, a synod piotrkowski rozciągnął go na całą Rzeczpospolitą.
+
 Kaleta wskazuje, że prawny obowiązek noszenia dziedzicznego nazwiska pojawił się na ziemiach polskich pod koniec XVIII wieku, wraz z przepisami Austrii, Prus i Rosji po rozbiorach. Od tej pory nazwisko było sprawą prawa, a nie tylko zwyczaju.
+
+Najlepiej udokumentowane są przepisy o nazwiskach Żydów, wśród których dziedziczenie nazwiska do końca XVIII wieku nie było powszechne:
+
+- w zaborze austriackim patenty cesarza Józefa II z 1787 r. nakazały Żydom przyjęcie stałego nazwiska w ciągu dwóch lat,
+- w Prusach Południowych i Nowowschodnich generalny statut dla Żydów z 17 kwietnia 1797 r. zobowiązał ich do przybrania nazwisk,
+- w Królestwie Polskim postanowienie namiestnika z marca 1821 r. dało każdemu Żydowi sześć miesięcy na zgłoszenie w urzędzie imienia i nazwiska, których odtąd miał używać bez zmian.
 
 W Księstwie Warszawskim przełomem był Kodeks Napoleona. Historyk prawa Stanisław Grodziski przytacza dekret z 27 stycznia 1808 r., który wprowadził go od 1 maja 1808 r. Razem z kodeksem przyszły akta stanu cywilnego. Ponieważ brakowało urzędników, obowiązki urzędnika stanu cywilnego powierzono proboszczom. Dlatego wiele aktów z XIX wieku spisywał ksiądz występujący jako urzędnik państwa. Opisujemy to też we [wpisie o historii genealogii](/pl/blog/historia-genealogii), a jak dziś szukać takich aktów, w [poradniku o szukaniu przodków](/pl/blog/jak-szukac-przodkow).
 
 ## Nazwisko w prawie: zmiana i małżeństwo
 
-W PRL zmianę nazwiska regulowała ustawa z 15 listopada 1956 r. o zmianie imion i nazwisk. W brzmieniu, które obowiązywało do 2008 r., nazwisko można było zmienić z ważnych względów, między innymi gdy było ośmieszające albo nielicujące z godnością człowieka, miało brzmienie niepolskie albo formę imienia. W tym brzmieniu ustawa mówiła też, że nazwisko może mieć najwyżej dwa człony.
+Po wojnie zmianę nazwiska regulował najpierw dekret z 10 listopada 1945 r. o zmianie i ustalaniu imion i nazwisk. Później w PRL obowiązywała ustawa z 15 listopada 1956 r. o zmianie imion i nazwisk. W brzmieniu, które obowiązywało do 2008 r., nazwisko można było zmienić z ważnych względów, między innymi gdy było ośmieszające albo nielicujące z godnością człowieka, miało brzmienie niepolskie albo formę imienia. W tym brzmieniu ustawa mówiła też, że nazwisko może mieć najwyżej dwa człony.
 
 Dziś obowiązuje ustawa z 17 października 2008 r. o zmianie imienia i nazwiska. Też wymaga ważnych powodów i wymienia między innymi nazwisko ośmieszające albo nielicujące z godnością człowieka, zmianę na nazwisko faktycznie używane i powrót do nazwiska bezprawnie zmienionego. Niepolskiego brzmienia na tej liście już nie ma. O zmianie decyduje kierownik urzędu stanu cywilnego.
 
@@ -65,7 +75,7 @@ Nazwisko zmienia się też po ślubie. Co mówi o tym Kodeks rodzinny i opiekuń
 
 ## PESEL: nazwisko w rejestrze
 
-Ostatni rozdział tej historii to rejestr. Sylwia Czubkowska opisała w portalu Forsal, jak powstawał Powszechny Elektroniczny System Ewidencji Ludności. W czerwcu 1970 r. Prezydium Rządu zdecydowało o przygotowaniu jego koncepcji, a ustawa z 1974 r. wyznaczyła start systemu na 1979 r. Pierwsze dowody z numerami PESEL dostali w ramach pilotażu pod koniec lat 70. mieszkańcy warszawskiej Woli, a numery dla wszystkich obywateli nadano do 1984 r.
+Ostatni rozdział tej historii to rejestr. Sylwia Czubkowska opisała w portalu Forsal, jak powstawał Powszechny Elektroniczny System Ewidencji Ludności. W czerwcu 1970 r. Prezydium Rządu zdecydowało o przygotowaniu jego koncepcji, a ustawa z 1974 r. wyznaczyła start systemu na 1979 r. Pierwsze dowody z numerami PESEL dostali w ramach pilotażu pod koniec lat 70. mieszkańcy warszawskiej Woli, a numery dla wszystkich obywateli nadano do 1984 r. Centralny Ośrodek Informatyki podaje, że 1 lipca 1985 r. uruchomiono centralną bazę danych PESEL.
 
 Ministerstwo Cyfryzacji nazywa dziś rejestr PESEL najważniejszym w państwie rejestrem danych osobowo-adresowych. Według jego opisu rejestr gromadzi między innymi nazwisko, nazwisko rodowe oraz imiona i nazwiska rodowe rodziców. Z tego rejestru ministerstwo publikuje w serwisie dane.gov.pl wykazy nazwisk osób żyjących. Wykazy liczą nazwisko aktualne i pomijają nazwiska z pojedynczą liczbą wystąpień oraz dane osób zmarłych.
 
@@ -97,6 +107,10 @@ Nie. Od XVI wieku nazwiska na -ski przyjmowali także ludzie spoza szlachty, a w
 
 Bo jeszcze w XIX wieku nazwisko mieszczan i chłopów nie miało jednej ustalonej postaci. Ta sama osoba mogła być zapisana jako Szulowski, Sulowski albo Siulowski. Warto szukać wszystkich wariantów.
 
+### Dlaczego w starych księgach kobieta ma nazwisko na -owa albo -ówna?
+
+W XIX-wiecznych księgach nazwiska kobiet często miały własne formy: -owa, -ina, -ówna czy -anka, na przykład Kowalczykowa albo Wróblówna. Mogły oznaczać zarówno żonę, jak i córkę. Szukając przodkini, warto sprawdzić te formy obok nazwiska jej męża albo ojca.
+
 ### Kiedy zaczęto prowadzić akta stanu cywilnego?
 
 W Księstwie Warszawskim wraz z Kodeksem Napoleona, który obowiązywał od 1 maja 1808 r. Wcześniej chrzty, śluby i zgony zapisywały parafie w księgach metrykalnych, o czym piszemy we [wpisie o historii genealogii](/pl/blog/historia-genealogii).
@@ -110,9 +124,17 @@ Nie. Wykazy z rejestru PESEL pokazują, ile żyjących osób nosi dziś dane naz
 - Ewa Wolnicz-Pawłowska, [O nazwiskach polskich. Co znaczą i o czym mówią nasze nazwiska?](https://bazhum.muzhp.pl/media/texts/prace-jezykoznawcze/1999-tom-1/prace_jezykoznawcze-r1999-t1-s128-137.pdf), *Prace Językoznawcze* 1, Olsztyn: UWM, 1999, s. 128-137.
 - Zofia Kaleta, *The Surname as a Cultural Value and an Ethnic Heritage. Tracing Your Polish Roots*, Warszawa: Slawistyczny Ośrodek Wydawniczy, Instytut Slawistyki PAN, 1997; omówienie: Ladislav Zgusta, [*Names* 46(4)](https://ans-names.pitt.edu/ans/article/view/1533), 1998, s. 282-284.
 - Instytut Języka Polskiego PAN, [Internetowy słownik nazwisk w Polsce](https://nazwiska.ijppan.pl/), [opis „O słowniku”](https://nazwiska.ijppan.pl/info/oslowniku), stan na 4 października 2026.
+- Anna Stachowska-Krzyżankowska, [Chrzty szlacheckie w parafii Luzino w drugiej połowie XVIII wieku](https://www.zapiskihistoryczne.pl/files/issues/e6d746a63829fdb53dd9ecee8e90b8dd_ZH_2015_3_Stachowska_N.pdf), *Zapiski Historyczne* 80(3), 2015.
+- Leonarda Dacewicz, [*Historia nazwisk na kresach północno-wschodnich Rzeczypospolitej (XVI-XVIII w.)*](https://repozytorium.uwb.edu.pl/jspui/bitstream/11320/16115/1/L_Dacewicz_Historia_nazwisk_na_kresach.pdf), Białystok: Wydawnictwo Uniwersytetu w Białymstoku, 2014, s. 286.
+- Mariusz Koper, [O imionach i nazwiskach Żydów](https://onomastica.ijppan.pl/index.php/ONOM/article/download/473/597/), *Onomastica* 67, 2023.
+- Andrzej Gulczyński, [recenzja książki M. Wagner-Kerna *Staat und Namensänderung*](https://pressto.amu.edu.pl/index.php/cph/article/download/40789/34141/91583), *Czasopismo Prawno-Historyczne* 57(1), 2005, s. 423-426.
+- Jan Kirszrot, [*Prawa Żydów w Królestwie Polskiem*](https://bc.wbp.lodz.pl//Content/12342/Kirszrot_Prawa_Zydow_w_Krolestwie_Polskiem_a.pdf), Warszawa 1917, s. 223-224.
+- Małgorzata Kowalska, [Nazwiska kobiet w dziewiętnastowiecznych księgach metrykalnych z Pisarzowej](https://studialinguistica.uken.krakow.pl/article/download/5111/4789/17061), *Annales Universitatis Paedagogicae Cracoviensis. Studia Linguistica* 8, 2013.
 - Stanisław Grodziski, [Wpływy Code civil oraz innych kodyfikacji napoleońskich na ziemiach polskich (część I)](https://pressto.amu.edu.pl/index.php/cph/article/view/41021), *Czasopismo Prawno-Historyczne* 57(2), 2005.
+- [Dekret z dnia 10 listopada 1945 r. o zmianie i ustalaniu imion i nazwisk](https://eli.gov.pl/eli/DU/1945/310/ogl), Dz.U. 1945 nr 56 poz. 310.
 - [Ustawa z dnia 15 listopada 1956 r. o zmianie imion i nazwisk](https://eli.gov.pl/eli/DU/1956/254/ogl), Dz.U. 1956 nr 56 poz. 254, w brzmieniu tekstu jednolitego Dz.U. 2005 nr 233 poz. 1992, art. 2 i 6.
 - [Ustawa z dnia 17 października 2008 r. o zmianie imienia i nazwiska](https://eli.gov.pl/eli/DU/2008/1414/ogl), Dz.U. 2008 nr 220 poz. 1414, art. 4, 12 i 17.
 - Sylwia Czubkowska, [Historia informatyzacji w Polsce: system PESEL największym osiągnięciem](https://forsal.pl/artykuly/590823,historia-informatyzacji-w-polsce-system-pesel-najwiekszym-osiagnieciem.html), Forsal.pl, 3 lutego 2012.
+- Centralny Ośrodek Informatyki, [Jak SRP rozwinął się przez 10 lat?](https://www.coi.gov.pl/strefa-wiedzy/wpis/jak-srp-rozwinal-sie-przez-10-lat), coi.gov.pl, sierpień 2025.
 - Ministerstwo Cyfryzacji, [Rejestr PESEL](https://www.gov.pl/web/cyfryzacja/rejestr-pesel1), gov.pl.
 - Ministerstwo Cyfryzacji, [Nazwiska występujące w rejestrze PESEL](https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel), dane.gov.pl.

@@ -47,17 +47,27 @@ A fixed surname came in turn: first to the nobility, then to townspeople, last t
 
 Other languages shaped surnames too. Under Ukrainian and Belarusian influence the old Polish ending -ic, -owic came to be pronounced and written -icz, -owicz. The old form survives in a few names, such as Staszic. According to Wolnicz-Pawłowska, the surnames Mickiewicz (from Mićko, that is Mikołaj) and Sienkiewicz (from Sieńko, that is Symeon) are Belarusian in origin.
 
-That matters for anyone tracing a family. In old registers an ancestor's surname may be spelled several ways, and in the oldest it may be missing.
+Women's surnames had forms of their own. Małgorzata Kowalska, who studied the nineteenth-century parish registers of Pisarzowa, records the suffixes -owa, -ina, -ówna and -anka, such as Kowalczykowa or Wróblówna. Such forms could mean either a wife or a daughter. In today's dialects -owa and -ina are falling out of use.
+
+That matters for anyone tracing a family. In old registers an ancestor's surname may be spelled several ways, women often appear under a form in -owa or -ówna, and in the oldest registers the surname may be missing altogether.
 
 ## The partitions and civil registration
 
+Before that, baptisms and marriages were recorded by parishes. In November 1563 the Council of Trent ordered parish priests to keep registers. In Poland, diocesan synods confirmed the duty until the end of the 1570s, and the synod of Piotrków extended it to the whole Commonwealth.
+
 Kaleta points out that a legal duty to carry a hereditary surname came to the Polish lands at the end of the eighteenth century, through the laws of Austria, Prussia and Russia after the partitions. From then on a surname was a matter of law, not only of custom.
+
+The best-documented rules concern Jews, among whom inherited surnames were not common until the end of the eighteenth century:
+
+- in the Austrian partition, the patents of Emperor Joseph II in 1787 required Jews to take a fixed surname within two years,
+- in South Prussia and New East Prussia, the general statute for Jews of 17 April 1797 obliged them to take surnames,
+- in the Kingdom of Poland, a decision of the viceroy in March 1821 gave every Jew six months to declare at an office the first name and surname they would use, unchanged, from then on.
 
 In the Duchy of Warsaw the turning point was the Napoleonic Code. The legal historian Stanisław Grodziski quotes the decree of 27 January 1808 that brought it in from 1 May 1808. Civil registration came with the code. Because there were not enough officials, parish priests were made civil registrars. That is why many nineteenth-century civil records were written by a priest acting as a state official. We cover this in our [post on the history of genealogy](/en/blog/historia-genealogii) too, and how to find such records today in our [guide to finding ancestors](/en/blog/jak-szukac-przodkow).
 
 ## Surnames in law: changing one, and marriage
 
-In communist Poland changing a surname was governed by the Act of 15 November 1956 on changing first names and surnames. In the wording in force until 2008, a surname could be changed for important reasons, among them a surname that was ridiculous or offended human dignity, sounded non-Polish, or had the form of a first name. In that wording the act also said a surname could have at most two parts.
+After the war, changing a surname was first governed by the decree of 10 November 1945 on changing and establishing first names and surnames. Later in communist Poland the Act of 15 November 1956 on changing first names and surnames applied. In the wording in force until 2008, a surname could be changed for important reasons, among them a surname that was ridiculous or offended human dignity, sounded non-Polish, or had the form of a first name. In that wording the act also said a surname could have at most two parts.
 
 Today the Act of 17 October 2008 on changing a first name and surname applies. It too requires important reasons and lists, among others, a ridiculous surname or one that offends human dignity, a change to the surname a person actually uses, and a return to a surname changed unlawfully. A non-Polish sound is no longer on the list. The decision is made by the head of the civil registry office.
 
@@ -65,7 +75,7 @@ A surname also changes at marriage. What the Family and Guardianship Code says a
 
 ## PESEL: the surname in a register
 
-The last chapter of the story is a register. Sylwia Czubkowska described on the Forsal news site how the Universal Electronic System for Registration of the Population (PESEL) was built. In June 1970 the government's presidium decided to prepare its concept, and an act of 1974 set the system's start for 1979. As a pilot, residents of Warsaw's Wola district received the first identity cards with PESEL numbers at the end of the 1970s, and all citizens had been given numbers by 1984.
+The last chapter of the story is a register. Sylwia Czubkowska described on the Forsal news site how the Universal Electronic System for Registration of the Population (PESEL) was built. In June 1970 the government's presidium decided to prepare its concept, and an act of 1974 set the system's start for 1979. As a pilot, residents of Warsaw's Wola district received the first identity cards with PESEL numbers at the end of the 1970s, and all citizens had been given numbers by 1984. The state IT centre, Centralny Ośrodek Informatyki, says the central PESEL database went into service on 1 July 1985.
 
 Today the Ministry of Digital Affairs calls the PESEL register the most important register of personal and address data in the state. According to its description the register holds, among other things, the surname, the surname at birth, and the parents' first names and surnames at birth. From this register the ministry publishes lists of living people's surnames on dane.gov.pl. The lists count the current surname and leave out surnames with a single occurrence and data on people who have died.
 
@@ -97,6 +107,10 @@ No. From the sixteenth century people outside the nobility took -ski surnames to
 
 Because even in the nineteenth century the surnames of townspeople and peasants had no single fixed form. The same person could be written as Szulowski, Sulowski or Siulowski. Search for every variant.
 
+### Why does a woman's surname end in -owa or -ówna in old registers?
+
+In nineteenth-century registers women's surnames often had forms of their own: -owa, -ina, -ówna or -anka, such as Kowalczykowa or Wróblówna. They could mean either a wife or a daughter. When looking for a female ancestor, check these forms alongside her husband's or father's surname.
+
 ### When did civil registration begin?
 
 In the Duchy of Warsaw, with the Napoleonic Code, in force from 1 May 1808. Before that, parishes recorded baptisms, marriages and deaths in their registers, as we describe in our [post on the history of genealogy](/en/blog/historia-genealogii).
@@ -110,9 +124,17 @@ No. The lists from the PESEL register show how many living people carry a surnam
 - Ewa Wolnicz-Pawłowska, [O nazwiskach polskich. Co znaczą i o czym mówią nasze nazwiska?](https://bazhum.muzhp.pl/media/texts/prace-jezykoznawcze/1999-tom-1/prace_jezykoznawcze-r1999-t1-s128-137.pdf) (On Polish surnames: what they mean and what they tell us), *Prace Językoznawcze* 1, Olsztyn: UWM, 1999, pp. 128-137.
 - Zofia Kaleta, *The Surname as a Cultural Value and an Ethnic Heritage. Tracing Your Polish Roots*, Warsaw: Slavistic Publishing Centre, Institute of Slavic Studies, Polish Academy of Sciences, 1997; reviewed by Ladislav Zgusta, [*Names* 46(4)](https://ans-names.pitt.edu/ans/article/view/1533), 1998, pp. 282-284.
 - Institute of the Polish Language, Polish Academy of Sciences, [Internetowy słownik nazwisk w Polsce](https://nazwiska.ijppan.pl/) (Internet Dictionary of Surnames in Poland), [“O słowniku” (About the dictionary)](https://nazwiska.ijppan.pl/info/oslowniku), as of 4 October 2026.
+- Anna Stachowska-Krzyżankowska, [Chrzty szlacheckie w parafii Luzino w drugiej połowie XVIII wieku](https://www.zapiskihistoryczne.pl/files/issues/e6d746a63829fdb53dd9ecee8e90b8dd_ZH_2015_3_Stachowska_N.pdf) (Noble baptisms in the parish of Luzino in the second half of the eighteenth century), *Zapiski Historyczne* 80(3), 2015.
+- Leonarda Dacewicz, [*Historia nazwisk na kresach północno-wschodnich Rzeczypospolitej (XVI-XVIII w.)*](https://repozytorium.uwb.edu.pl/jspui/bitstream/11320/16115/1/L_Dacewicz_Historia_nazwisk_na_kresach.pdf) (A history of surnames in the north-eastern borderlands of the Commonwealth, 16th-18th centuries), Białystok: University of Białystok Press, 2014, p. 286.
+- Mariusz Koper, [O imionach i nazwiskach Żydów](https://onomastica.ijppan.pl/index.php/ONOM/article/download/473/597/) (On Jewish first names and surnames), *Onomastica* 67, 2023.
+- Andrzej Gulczyński, [review of M. Wagner-Kern, *Staat und Namensänderung*](https://pressto.amu.edu.pl/index.php/cph/article/download/40789/34141/91583), *Czasopismo Prawno-Historyczne* 57(1), 2005, pp. 423-426 (in Polish).
+- Jan Kirszrot, [*Prawa Żydów w Królestwie Polskiem*](https://bc.wbp.lodz.pl//Content/12342/Kirszrot_Prawa_Zydow_w_Krolestwie_Polskiem_a.pdf) (The rights of Jews in the Kingdom of Poland), Warsaw 1917, pp. 223-224.
+- Małgorzata Kowalska, [Nazwiska kobiet w dziewiętnastowiecznych księgach metrykalnych z Pisarzowej](https://studialinguistica.uken.krakow.pl/article/download/5111/4789/17061) (Women's surnames in the nineteenth-century parish registers of Pisarzowa), *Annales Universitatis Paedagogicae Cracoviensis. Studia Linguistica* 8, 2013.
 - Stanisław Grodziski, [Wpływy Code civil oraz innych kodyfikacji napoleońskich na ziemiach polskich (część I)](https://pressto.amu.edu.pl/index.php/cph/article/view/41021) (The influence of the Code civil and other Napoleonic codes on the Polish lands, part I), *Czasopismo Prawno-Historyczne* 57(2), 2005.
+- [Decree of 10 November 1945 on changing and establishing first names and surnames](https://eli.gov.pl/eli/DU/1945/310/ogl), Dz.U. 1945 no. 56 item 310 (in Polish).
 - [Act of 15 November 1956 on changing first names and surnames](https://eli.gov.pl/eli/DU/1956/254/ogl), Dz.U. 1956 no. 56 item 254, as consolidated in Dz.U. 2005 no. 233 item 1992, arts. 2 and 6 (in Polish).
 - [Act of 17 October 2008 on changing a first name and surname](https://eli.gov.pl/eli/DU/2008/1414/ogl), Dz.U. 2008 no. 220 item 1414, arts. 4, 12 and 17 (in Polish).
 - Sylwia Czubkowska, [Historia informatyzacji w Polsce: system PESEL największym osiągnięciem](https://forsal.pl/artykuly/590823,historia-informatyzacji-w-polsce-system-pesel-najwiekszym-osiagnieciem.html) (The history of computerisation in Poland: PESEL as its greatest achievement), Forsal.pl, 3 February 2012.
+- Centralny Ośrodek Informatyki, [Jak SRP rozwinął się przez 10 lat?](https://www.coi.gov.pl/strefa-wiedzy/wpis/jak-srp-rozwinal-sie-przez-10-lat) (How the SRP developed over ten years), coi.gov.pl, August 2025.
 - Ministry of Digital Affairs, [Rejestr PESEL](https://www.gov.pl/web/cyfryzacja/rejestr-pesel1) (The PESEL register), gov.pl.
 - Ministry of Digital Affairs, [Nazwiska występujące w rejestrze PESEL](https://dane.gov.pl/pl/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel) (Surnames in the PESEL register), dane.gov.pl.
