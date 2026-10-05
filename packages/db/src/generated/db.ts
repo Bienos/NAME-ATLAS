@@ -321,6 +321,7 @@ export interface ReportClaimReferences {
 export interface Reports {
   created_at: Generated<Timestamp>;
   entitlement_kind: string;
+  given_name_id: string | null;
   report_id: string;
   report_type: string;
   status: string;

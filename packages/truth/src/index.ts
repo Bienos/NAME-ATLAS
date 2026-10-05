@@ -332,7 +332,10 @@ export type {
 export { GIVEN_NAME_POPULATION_METHOD_VERSION, GIVEN_NAME_RANK_METHOD_VERSION } from "./version.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
+  buildFullNameReport,
   buildReport,
+  FULL_NAME_REPORT_SCHEMA_VERSION,
+  FULL_NAME_SECTION_TYPES,
   isReportVersionId,
   readReportVersion,
   REPORT_SCHEMA_VERSION,
@@ -340,6 +343,7 @@ export {
   reportSectionsOf,
 } from "./report.js";
 export type {
+  BuildFullNameReportOutcome,
   BuildReportOutcome,
   PresentationRole,
   ReportClaim,
@@ -349,6 +353,15 @@ export type {
   ReportSectionType,
   StoredReportVersion,
 } from "./report.js";
+// The full-name report's first-name facts — TASK-124, ADR-0041: read from the name's claims.
+export { parseGivenNameFacts, readGivenNameFacts } from "./given-name-facts.js";
+export type {
+  GivenNameConfidence,
+  GivenNameCountFact,
+  GivenNameFacts,
+  GivenNameListFacts,
+  GivenNameRankFact,
+} from "./given-name-facts.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.
