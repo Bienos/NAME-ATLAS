@@ -1,0 +1,153 @@
+name: Release
+
+# Puts what staging.name-atlas.pl shows on name-atlas.pl (ADR-0039). Vercel
+# builds the live site from the branch `production` and the staging site from
+# `main`; this moves `production` forward to a commit of `main`, and Vercel's
+# production deployment follows the push. Run it from the Actions tab: Release
+# > Run workflow. It never runs on its own.
+#
+# It refuses, and changes nothing, when:
+#   - the commit is not on main, or is behind what is already live (a rollback is
+#     Vercel's Instant Rollback, not this workflow);
+#   - `production` holds a commit main does not (someone pushed to it directly);
+#   - CI's `verify` job has not passed on that very commit;
+#   - the commit carries a migration the production database has not applied:
+#     the order is migration, then deploy (ADR-0020 §2.10). The Register VM step
+#     that runs the task's own load, or `accounts`, applies pending migrations.
+#
+# The first run creates `production`. The push is a plain fast-forward, never a
+# force push, so git itself refuses anything else.
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: The commit of main to release (empty for main's latest, which staging shows)
+        required: false
+        type: string
+        default: ""
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  checks: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout main with its whole history
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Choose the commit
+        id: pick
+        env:
+          INPUT_COMMIT: ${{ inputs.commit }}
+        run: |
+          commit=$(printf '%s' "$INPUT_COMMIT" | tr -d '[:space:]')
+          if [ -z "$commit" ]; then
+            commit=origin/main
+          elif ! [[ "$commit" =~ ^[0-9a-f]{7,40}$ ]]; then
+            echo "::error::commit must be a commit hash (7 to 40 hex characters), got '$INPUT_COMMIT'"
+            exit 1
+          fi
+          sha=$(git rev-parse --verify --quiet "$commit^{commit}") ||
+            { echo "::error::no commit '$commit' in this repository"; exit 1; }
+          git merge-base --is-ancestor "$sha" origin/main ||
+            { echo "::error::$sha is not on main; only a commit of main is released"; exit 1; }
+          live=""
+          if live=$(git rev-parse --verify --quiet origin/production); then
+            if [ "$live" = "$sha" ]; then
+              echo "::notice::$sha is already live; nothing to do"
+              echo "skip=1" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            if ! git merge-base --is-ancestor "$live" origin/main; then
+              echo "::error::production ($live) holds a commit main does not. Merge it into main first," \
+                "or reset production by hand; this workflow only moves it forward."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$live" "$sha"; then
+              echo "::error::$sha is behind what is live ($live). To go back, use Vercel's Instant Rollback."
+              exit 1
+            fi
+          fi
+          { echo "sha=$sha"; echo "live=$live"; echo "skip=0"; } >> "$GITHUB_OUTPUT"
+          echo "release $sha; live now: ${live:-nothing, production does not exist yet}"
+
+      - name: CI passed on that commit
+        if: steps.pick.outputs.skip == '0'
+        env:
+          SHA: ${{ steps.pick.outputs.sha }}
+        run: |
+          # The latest `verify` run on the commit: CI runs on every push to main.
+          run=$(gh api "repos/$GITHUB_REPOSITORY/commits/$SHA/check-runs?check_name=verify&per_page=100" \
+            --jq '.check_runs | sort_by(.id) | last // empty | "\(.status) \(.conclusion) \(.html_url)"')
+          [ -n "$run" ] || { echo "::error::CI's verify job has not run on $SHA"; exit 1; }
+          read -r status conclusion url <<< "$run"
+          if [ "$status" != completed ] || [ "$conclusion" != success ]; then
+            echo "::error::CI's verify job on $SHA is $status/$conclusion, not completed/success: $url"
+            exit 1
+          fi
+          echo "verify passed: $url"
+
+      - name: Every migration of the release is applied in production
+        if: steps.pick.outputs.skip == '0'
+        env:
+          SHA: ${{ steps.pick.outputs.sha }}
+          VM_HOST: ${{ secrets.VM_HOST }}
+          PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
+        run: |
+          [ -n "$VM_HOST" ] || { echo "::error::repository secret VM_HOST is not set"; exit 1; }
+          [ -n "$PGPASSWORD" ] || { echo "::error::repository secret VM_DB_WEB_PASSWORD is not set"; exit 1; }
+          PGPASSWORD=$(printf '%s' "$PGPASSWORD" | tr -d '[:space:]')
+          export PGPASSWORD
+          # Kysely names a migration after its file, without the extension.
+          git ls-tree --name-only "$SHA" packages/db/migrations/ |
+            sed -n 's|^packages/db/migrations/\([0-9]\{4\}_[^/]*\)\.ts$|\1|p' | sort > wanted.txt
+          [ -s wanted.txt ] || { echo "::error::no migrations found in $SHA"; exit 1; }
+          # As the read-only web role, the way the live site connects.
+          conn="host=$VM_HOST port=6432 dbname=name_atlas user=nameatlas_web sslmode=require connect_timeout=15"
+          psql "$conn" -X -v ON_ERROR_STOP=1 -tAc 'SELECT name FROM kysely_migration' | sort > applied.txt
+          missing=$(comm -23 wanted.txt applied.txt)
+          if [ -n "$missing" ]; then
+            echo "::error::the production database has not applied: $(echo "$missing" | tr '\n' ' ')." \
+              "Run the Register VM step that applies them first (ops/vm/README.md), then release."
+            exit 1
+          fi
+          echo "production has applied all $(wc -l < wanted.txt) migrations of this release"
+
+      - name: Move production to the commit
+        if: steps.pick.outputs.skip == '0'
+        env:
+          SHA: ${{ steps.pick.outputs.sha }}
+          LIVE: ${{ steps.pick.outputs.live }}
+        run: |
+          git push origin "$SHA:refs/heads/production"
+          {
+            echo "## Released \`${SHA:0:7}\`"
+            echo
+            echo "Vercel now builds name-atlas.pl from this commit:"
+            echo "https://vercel.com/bienos/name-atlas/deployments"
+            echo
+            echo "### Changes"
+            echo
+            if [ -n "$LIVE" ]; then
+              git log --format='- %s (%h)' "$LIVE..$SHA"
+            else
+              echo "- the first release: production now starts at ${SHA:0:7}"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
