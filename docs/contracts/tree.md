@@ -95,7 +95,7 @@ A tree whose owner's account has no paid tier holds at most 5 people (`FREE_TREE
 
 - `addPerson` answers `PERSON_LIMIT` (with `limit: 5`) when the tree already holds 5 people, and saves nothing. The answer is the same for the owner and for an editor: the cap belongs to the owner's account, whoever adds the person.
 - The count is every row of the tree, including the living and the declined rows an editor cannot see. `family.tree_person_count(t)` (migration 0035, SECURITY DEFINER) returns it to a caller who may write the tree, and 0 to anyone else. It is read under the tree lock, so two adds at once cannot both take the last place.
-- The question "has this account a paid tier?" is `FamilyDeps.hasPaidTier`. Until checkout exists (ADR-0023 §2.5) it defaults to `noPaidTier`, which answers false for every account. Nothing stores a tier.
+- The question "has this account a paid tier?" is `FamilyDeps.hasPaidTier`. Its default, `noPaidTier`, answers false for every account. The web passes the accounts package's `hasPurchase`: any row in `accounts.purchases` for the account is a paid tier (TASK-114). Purchases are one-time payments and never expire. Only test-mode rows can exist (migration 0036).
 - The POST route answers the cap with a 303 to the tree's page, `?status=person-limit`. That page says, in Polish and in English, that a free tree holds 5 people, and links to the offer (`/pl/oferta`, `/en/offer`). It has no buy button.
 - Removing a person makes room again. A tree already larger than 5 keeps everyone in it, but nobody can be added to it.
 - The GET response and its schema version are unchanged.
