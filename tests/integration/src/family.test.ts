@@ -6,6 +6,7 @@ import { sql } from "kysely";
 import { createMigrator, createPool } from "@name-atlas/db";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
+import { createAccountsDb, createPurchases } from "@name-atlas/accounts";
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 
@@ -471,6 +472,62 @@ describe("family tree (TASK-066, ADR-0029)", () => {
       expect(results.filter((r) => r.kind === "PERSON_LIMIT")).toHaveLength(2);
     } finally {
       await family.deleteTree({ userId: OWNER, treeId });
+    }
+  });
+
+  it("lets an account with a recorded purchase add a 6th person, and one without not (TASK-114)", async () => {
+    // Wired as `apps/web/src/lib/family-runtime.ts` wires it: the purchases
+    // store and the family service on one pool, logged in as `nameatlas_app`.
+    const purchases = createPurchases({ db: createAccountsDb(app()) });
+    const wired = createFamily({
+      db: createFamilyDb(app()),
+      hasPaidTier: (userId) => purchases.hasPurchase(userId),
+    });
+    expect(
+      await purchases.record({
+        userId: OWNER,
+        tier: "smaller",
+        checkoutSessionId: "cs_test_tree_unlock",
+        amountTotal: 2899,
+        currency: "pln",
+        livemode: false,
+      }),
+    ).toBe(true);
+    const trees: string[] = [];
+    try {
+      for (const [owner, expected] of [
+        [OWNER, "OK"],
+        [MEMBER, "PERSON_LIMIT"],
+      ] as const) {
+        const created = await wired.createTree({ userId: owner, title: "Paid tier fixture" });
+        if (created.kind !== "CREATED") throw new Error("fixture tree failed");
+        trees.push(created.treeId);
+        for (const givenNames of ["A", "B", "C", "D", "E"]) {
+          const added = await wired.addPerson({
+            userId: owner,
+            treeId: created.treeId,
+            person: { givenNames, surname: "Fixture", deathYear: 1900 },
+          });
+          expect(added.kind).toBe("OK");
+        }
+        const sixth = await wired.addPerson({
+          userId: owner,
+          treeId: created.treeId,
+          person: { givenNames: "F", surname: "Fixture", deathYear: 1900 },
+        });
+        expect(sixth.kind).toBe(expected);
+        const count = await sql<{ n: number }>`
+          SELECT count(*)::int AS n FROM family.persons WHERE tree_id = ${created.treeId}
+        `.execute(db().db);
+        expect(count.rows[0]?.n).toBe(expected === "OK" ? 6 : 5);
+      }
+    } finally {
+      for (const [i, treeId] of trees.entries())
+        await wired.deleteTree({ userId: i === 0 ? OWNER : MEMBER, treeId });
+      // The other tests here expect OWNER to have no paid tier.
+      await sql`DELETE FROM accounts.purchases WHERE checkout_session_id = 'cs_test_tree_unlock'`.execute(
+        db().db,
+      );
     }
   });
 

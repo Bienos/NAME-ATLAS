@@ -6,6 +6,7 @@
 - **Amends:** `docs/canonical/18` §1 ("Do not add another analytics vendor in P0", PostHog as the P0 platform): Google Analytics 4 is added beside Vercel Web Analytics. PostHog is not built.
 - **Relates to:** TASK-058 (no surname in analytics), TASK-046 (the privacy notice), TASK-048 (the CSP), `DECISIONS_NEEDED.md`'s "consent-gated when it is".
 - **Implemented by:** TASK-109.
+- **Amended by:** ADR-0040 (2026-10-05): §1 no longer holds. Google's script is in every page and counts every page view on production; the banner decides only the cookies.
 
 ## Decision
 

@@ -2,19 +2,36 @@ import { analyticsUrl } from "./analytics-path.js";
 import type { Lang } from "./messages.js";
 
 /**
- * Google Analytics 4, only after the visitor agrees (TASK-109, ADR-0038).
+ * Google Analytics 4 on every page, its cookies only after the visitor agrees
+ * (TASK-109, ADR-0038; TASK-115, ADR-0040).
  *
- * GA sets cookies (`_ga`, `_ga_<id>`), so under the ePrivacy rules nothing of
- * Google's loads until the visitor presses "Accept" on the banner
- * (`google-analytics.tsx`). The choice itself is kept in `localStorage`, which
- * is what lets the banner stay away on the next page; the privacy notice says
- * so. Every address GA is given goes through `analyticsUrl` first, so GA, like
- * Vercel Web Analytics, never sees a searched surname, a tree's id or a query.
+ * Google's script is in every page's HTML and, on production's host, counts
+ * every page view in consent mode: until the visitor presses "Accept" on the
+ * banner (`consent-banner.tsx`), and after "Reject", `analytics_storage` is
+ * denied, so Google sets no cookie (`_ga`, `_ga_<id>`). The choice itself is kept in `localStorage`, which is what lets the banner
+ * stay away on the next page; the privacy notice says so. Every address GA is
+ * given goes through `analyticsUrl` first, so GA, like Vercel Web Analytics,
+ * never sees a searched surname, a tree's id or a query.
  *
  * Pure: the component hands it the browser's values.
  */
 
 export const GA_MEASUREMENT_ID = "G-ZC9D1RK4NN";
+
+/** Google's script, rendered into every page by the root layout. */
+export const GA_SCRIPT_URL = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+
+/**
+ * The hosts whose page views GA counts: production's primary domain (the
+ * other production hosts redirect to it). Elsewhere (staging, previews, CI's
+ * end-to-end run, a local `next start`) the script loads but is never
+ * configured, so it sends nothing.
+ */
+export const GA_HOSTS: readonly string[] = ["name-atlas.pl"];
+
+export function gaCounts(hostname: string): boolean {
+  return GA_HOSTS.includes(hostname);
+}
 
 /** The `localStorage` key that holds the visitor's choice. */
 export const CONSENT_KEY = "name-atlas:analytics-consent";
@@ -55,7 +72,7 @@ export function gaPageParams(href: string, referrer: string): GaPageParams | nul
     : { page_location: location, page_title: title, page_referrer: ref };
 }
 
-/** The consent state GA starts from: everything off, and the ad signals stay off. */
+/** The consent state GA starts from on every page: everything off, and the ad signals stay off. */
 export const CONSENT_DEFAULT = {
   ad_storage: "denied",
   ad_user_data: "denied",
@@ -77,16 +94,16 @@ export const CONSENT_COPY: Readonly<
   >
 > = {
   pl: {
-    label: "Zgoda na statystyki Google",
-    text: "Za Twoją zgodą korzystamy z Google Analytics, żeby wiedzieć, które strony są czytane. Google zapisze w przeglądarce pliki cookie. Nazwiska z adresu nie wysyłamy. Możesz zmienić zdanie w każdej chwili na stronie polityki prywatności.",
+    label: "Zgoda na pliki cookie Google Analytics",
+    text: "Korzystamy z Google Analytics, żeby wiedzieć, które strony są czytane. Bez Twojej zgody Google liczy odsłony bez plików cookie; za zgodą zapisze je w przeglądarce. Nazwiska z adresu nie wysyłamy. Możesz zmienić zdanie w każdej chwili na stronie polityki prywatności.",
     accept: "Zgadzam się",
     reject: "Nie zgadzam się",
     privacy: "Polityka prywatności",
     change: "Zmień zgodę na Google Analytics",
   },
   en: {
-    label: "Consent to Google statistics",
-    text: "With your consent we use Google Analytics to learn which pages are read. Google will store cookies in your browser. We never send the surname in the address. You can change your mind at any time on the privacy notice page.",
+    label: "Consent to Google Analytics cookies",
+    text: "We use Google Analytics to learn which pages are read. Without your consent Google counts page views without cookies; with it, Google stores cookies in your browser. We never send the surname in the address. You can change your mind at any time on the privacy notice page.",
     accept: "Accept",
     reject: "Reject",
     privacy: "Privacy notice",

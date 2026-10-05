@@ -77,3 +77,43 @@ The wildcard search group remains controlled by `SEO_INDEXING_ENABLED`, which th
 not enable. Meta's own cached scrape/UI and messages already sent must be verified separately
 from HTTP output; a successful simulated user-agent request alone does not verify the card in a
 messaging app.
+
+## Staging and releases (ADR-0039)
+
+`staging.name-atlas.pl` shows `main`, as merged; `name-atlas.pl` shows the branch `production`,
+which only the **Release** workflow moves. The order below keeps the live site unchanged
+throughout. Read 2026-10-04 through Vercel's API: the production branch is `main`, every
+environment variable targets Production only, and Deployment Protection is Vercel Authentication
+with `deploymentType: all_except_custom_domains`.
+
+1. Merge the change that carries ADR-0039. It deploys to production one last time from `main`.
+2. **Create `production`:** GitHub → Actions → **Release** → Run workflow, commit left empty. It
+   pushes `main`'s latest commit to a new branch `production` and makes no new production build,
+   because Vercel's production branch is still `main`. It refuses until CI on that commit has passed. If it
+   names migrations production has not applied, run `Register VM` → `accounts` first (it applies
+   pending migrations), then run Release again.
+3. **Production branch:** [Settings → Environments → Production](https://vercel.com/bienos/name-atlas/settings/environments)
+   (older dashboards: Settings → Git), branch tracking **`production`**. The current production
+   deployment stays live.
+4. **The staging domain:** [Settings → Domains](https://vercel.com/bienos/name-atlas/settings/domains)
+   → Add `staging.name-atlas.pl` → environment **Preview**, Git branch **`main`**. In home.pl, add
+   the record Vercel shows for it (a `CNAME` named `staging`), beside the others in the table above.
+5. **The staging database:** `ops/vm/README.md` → "Staging: the owner's part" (one GitHub secret, the
+   `staging` step, one Preview `DATABASE_URL` for branch `main`).
+6. **Push to `main` once, or redeploy its latest preview,** so the preview is built with the new
+   `DATABASE_URL`.
+7. **Check:** open `https://staging.name-atlas.pl` in a private window. It must ask for a Vercel sign-in.
+   If it shows the site, open [Settings → Deployment Protection](https://vercel.com/bienos/name-atlas/settings/deployment-protection)
+   and choose **Standard Protection**: the older setting read above leaves custom domains,
+   a preview's included, open. Even open, it serves `Disallow: /` and `noindex`, because
+   `SEO_INDEXING_ENABLED` is unset for Preview. Signed in, a surname page must show its figures.
+
+**Releasing:** check staging, then GitHub → Actions → **Release** → Run workflow. It refuses a commit CI
+has not passed or whose migrations production has not applied, and says which. Vercel builds
+`name-atlas.pl` from the push. **Going back:** Vercel → Deployments → the previous production
+deployment → Instant Rollback. After a rollback Vercel stops assigning `name-atlas.pl` to new
+production builds until a deployment is promoted again (Deployments → ⋯ → Promote), so the next
+release must be promoted by hand once.
+
+From step 3 on, a merge into `main` changes staging only. Only `main` and `production` are built
+(`git.deploymentEnabled` in `apps/web/vercel.json`); a task branch gets no preview.

@@ -31,6 +31,12 @@ export interface Purchases {
   /** True when this call stored the purchase, false when it was already stored. */
   record(paid: PaidCheckout): Promise<boolean>;
   listForUser(userId: string): Promise<readonly PurchaseView[]>;
+  /**
+   * Whether the account has any recorded purchase. Every sold tier unlocks the
+   * tree beyond 5 people (D-025, ADR-0037 §2.1), and a purchase is a one-time
+   * payment, so it never expires (TASK-114).
+   */
+  hasPurchase(userId: string): Promise<boolean>;
 }
 
 export function createPurchases(deps: {
@@ -71,6 +77,15 @@ export function createPurchases(deps: {
         .orderBy("paid_at", "desc")
         .execute();
       return rows.map((r) => ({ tier: r.tier, amountTotal: r.amount_total, paidAt: r.paid_at }));
+    },
+    async hasPurchase(userId) {
+      const row = await deps.db
+        .selectFrom("purchases")
+        .select("purchase_id")
+        .where("user_id", "=", userId)
+        .limit(1)
+        .executeTakeFirst();
+      return row !== undefined;
     },
   };
 }
