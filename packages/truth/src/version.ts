@@ -368,3 +368,11 @@ export const BEARERS_REFRESH_DAYS = 30;
 
 /** How many bearers the free page and deck show; the rest are for the paid report (ADR-0030 §2.7). */
 export const BEARERS_SHOWN_FREE = 3;
+
+/**
+ * Given-name claims (TASK-121, ADR-0032 §6). The count is the publisher's own
+ * on one list; the rank is a competition rank within that list, over the
+ * names a complete import stored (placeholders are not names).
+ */
+export const GIVEN_NAME_POPULATION_METHOD_VERSION = "given_name_population@1";
+export const GIVEN_NAME_RANK_METHOD_VERSION = "given_name_rank@1";

@@ -46,6 +46,7 @@ describe("MIGRATIONS_DIR", () => {
       "0035_family_person_count.ts", // TASK-112 / ADR-0037 — the free tree's 5-person cap
       "0036_accounts_purchases.ts", // TASK-111 — test-mode checkout's purchases
       "0037_reports.ts", // TASK-119 — the frozen surname report, internal test only
+      "0038_given_name_claims.ts", // TASK-121 / ADR-0032 §6 — first-name counts and ranks as claims
     ]);
   });
 });

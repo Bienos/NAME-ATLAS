@@ -21,6 +21,7 @@
     "discovery-index": "tsx bin/discovery-index.ts",
     "premium-eligibility": "tsx bin/premium-eligibility.ts",
     "report-build": "tsx bin/report-build.ts",
+    "derive-given-names": "tsx bin/derive-given-names.ts",
     "build-list-facts": "tsx bin/build-list-facts.ts",
     "archive-load": "tsx bin/archive-load.ts",
     "bearers-load": "tsx bin/bearers-load.ts"
