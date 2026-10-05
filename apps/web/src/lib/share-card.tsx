@@ -19,7 +19,7 @@ export const SHARE_SIZE = { width: 1080, height: 1920 } as const;
 const PAD_X = 88;
 const MEASURE = SHARE_SIZE.width - PAD_X * 2;
 
-const DUSK = {
+export const DUSK = {
   ground: TOKENS["dusk-surface"],
   raised: TOKENS["dusk-surface-raised"],
   ink: TOKENS["dusk-ink"],
@@ -44,7 +44,7 @@ const DUSK = {
 } as const;
 
 /** The old-print card's paper. */
-const PAPER = {
+export const PAPER = {
   ground: TOKENS.paper,
   deep: TOKENS["paper-deep"],
   ink: TOKENS["paper-ink"],
