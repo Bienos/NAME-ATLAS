@@ -1144,10 +1144,10 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
-    it("0035 refuses to go down while a purchase is stored (TASK-111)", async () => {
+    it("0036 refuses to go down while a purchase is stored (TASK-111)", async () => {
       const migrator = createMigrator(db().db);
       const refused = await migrator.migrateTo("0034_family_release_claims_on_account_deletion");
-      expect(String(refused.error)).toMatch(/refusing to undo 0035/u);
+      expect(String(refused.error)).toMatch(/refusing to undo 0036/u);
       expect(await rows("SELECT 1 FROM accounts.purchases LIMIT 1")).toHaveLength(1);
 
       // Emptied (here only; nothing deletes a purchase), it goes down and up again.

@@ -4,7 +4,7 @@ import type { Kysely } from "kysely";
 import type { AccountsDB, PurchaseTier } from "./schema.js";
 
 /**
- * What a reader bought (TASK-111, migration 0035). Written only from Stripe's
+ * What a reader bought (TASK-111, migration 0036). Written only from Stripe's
  * signed webhook; read by the account page.
  *
  * `record` is idempotent on the Checkout Session's id: Stripe may send the

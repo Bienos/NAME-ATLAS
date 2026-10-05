@@ -67,7 +67,7 @@ export interface IdentitiesTable {
   last_used_at: Date;
 }
 
-/** What a reader bought (migration 0035, TASK-111): one row per paid test-mode Checkout Session. */
+/** What a reader bought (migration 0036, TASK-111): one row per paid test-mode Checkout Session. */
 export interface PurchasesTable {
   purchase_id: string;
   /** Null once the account is deleted; the record of the sale stays. */

@@ -1,10 +1,10 @@
 # 2026-10-04 — Test-mode checkout (TASK-111)
 
-Numbered TASK-111 and migration 0035 on rebase: `main` took TASK-109 and TASK-110 meanwhile, and open PR #128 claims migration 0034.
+Numbered TASK-111 and migration 0035 on rebase: `main` took TASK-109 and TASK-110 meanwhile, and open PR #128 claims migration 0034. Renumbered to migration 0036 on 2026-10-05, when #131 (TASK-112) merged first with 0035.
 
 ## What changed
 
-- **Migration 0035** `accounts.purchases`: one row per paid Checkout Session; `checkout_session_id` unique; `tier` in (`smaller`, `couple`, `family`); `currency = 'pln'`; `livemode = false` enforced; `user_id` set to null on account deletion. Down refuses while a purchase is stored. Covered by the existing default privileges of `ops/vm/accounts-roles.sql` (unchanged).
+- **Migration 0036** `accounts.purchases`: one row per paid Checkout Session; `checkout_session_id` unique; `tier` in (`smaller`, `couple`, `family`); `currency = 'pln'`; `livemode = false` enforced; `user_id` set to null on account deletion. Down refuses while a purchase is stored. Covered by the existing default privileges of `ops/vm/accounts-roles.sql` (unchanged).
 - **`@name-atlas/accounts`**: `createPurchases` (`record`, idempotent on the session id, null user when the account is already gone; `listForUser`), `PurchasesTable` in `schema.ts`.
 - **`apps/web`**: `checkout-config.ts` (gate and tiers), `stripe.ts` (Checkout Session over `fetch`, webhook signature over `node:crypto`; no new dependency), `checkout-routes.ts` (`POST /api/checkout`, `POST /api/stripe/webhook`), `checkout-runtime.ts`, `checkout-section.tsx` (on the account page), the two route modules, and `form-action 'self' https://checkout.stripe.com` in the (report-only) CSP.
 - Migration lists in `packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts`, `canonical-key-v2.test.ts`; purchases tests in `tests/integration/src/accounts.test.ts`.

@@ -12,6 +12,7 @@ import { legalPath } from "./legal-text.js";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
+import { offerPath } from "./site-links.js";
 import { SiteShell } from "./site-shell.js";
 import { TreeMapView } from "./tree-map-view.js";
 import { TreeConstellation } from "./tree-stars.js";
@@ -85,6 +86,12 @@ function Status({
       role={status.tone === "problem" ? "alert" : "status"}
     >
       {text ?? status.text}
+      {status.offer === undefined ? null : (
+        <>
+          {" "}
+          <a href={offerPath(lang)}>{status.offer}</a>
+        </>
+      )}
     </p>
   );
 }

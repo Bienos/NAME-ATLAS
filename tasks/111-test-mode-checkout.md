@@ -12,7 +12,7 @@ A signed-in reader can buy one of the three tiers through Stripe's hosted Checko
 
 ## 2. In scope
 
-1. **Migration 0035:** `accounts.purchases` (tier, Checkout Session id unique, amount, `pln`, `livemode = false` enforced, `user_id` set to null when the account is deleted). Down refuses while a purchase is stored.
+1. **Migration 0036:** `accounts.purchases` (tier, Checkout Session id unique, amount, `pln`, `livemode = false` enforced, `user_id` set to null when the account is deleted). Down refuses while a purchase is stored.
 2. **`@name-atlas/accounts`:** `createPurchases` (`record`, idempotent on the session id; `listForUser`).
 3. **The gate** (`checkout-config.ts`): `CHECKOUT_ENABLED=1`, a **test** key in `STRIPE_SECRET_KEY` (`sk_test_`/`rk_test_`; a live key turns checkout off), `STRIPE_WEBHOOK_SECRET`, and accounts on. `STRIPE_AUTOMATIC_TAX=1` turns Stripe Tax on, off by default.
 4. **`POST /api/checkout`:** same-site, signed-in, known tier → a Checkout Session (`mode: payment`, one PLN line, `tax_behavior: inclusive`, tax code `txcd_10701411`, no `payment_method_types`, API version pinned) → 303 to Stripe.

@@ -50,7 +50,7 @@ export async function down(db: Kysely<any>): Promise<void> {
     SELECT count(*)::text AS n FROM accounts.purchases
   `.execute(db);
   if (Number(held.rows[0]?.n ?? "0") > 0) {
-    throw new Error("refusing to undo 0035: purchases are stored (TASK-111).");
+    throw new Error("refusing to undo 0036: purchases are stored (TASK-111).");
   }
   await sql`DROP TABLE accounts.purchases`.execute(db);
 }
