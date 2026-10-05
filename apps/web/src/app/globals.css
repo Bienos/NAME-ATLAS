@@ -561,6 +561,45 @@ footer {
   }
 }
 
+/* The snapshot's one heading (TASK-123): the eyebrow and the surname, each set
+   as it was on its own; the heading adds nothing to their look. */
+.snapshot-title {
+  margin: 0;
+  font: inherit;
+}
+
+.snapshot-title > span {
+  display: block;
+}
+
+/* The answer first (TASK-123): the counts with their date, as one sentence. */
+.snapshot-answer {
+  margin: 0 0 var(--space-5);
+  max-inline-size: 40rem;
+  color: var(--text-secondary);
+}
+
+/* The surname page's breadcrumb (TASK-123): one quiet line above the name. */
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.breadcrumbs li + li::before {
+  content: "›";
+  margin-inline-end: var(--space-3);
+}
+
+.breadcrumbs a {
+  color: inherit;
+}
+
 .hero {
   display: flex;
   flex-wrap: wrap;
@@ -6647,6 +6686,18 @@ a.tree-card:hover {
 .site-journey .snapshot {
   min-height: calc(100svh - 9rem);
   padding-top: var(--space-6);
+}
+
+/* The breadcrumb's line comes out of the first screen, not after it. */
+.site-journey .breadcrumbs {
+  padding-top: var(--space-6);
+  font-family: var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+}
+
+.site-journey .breadcrumbs ~ .result .snapshot {
+  min-height: calc(100svh - 11rem);
+  padding-top: var(--space-5);
 }
 
 .site-journey .eyebrow,

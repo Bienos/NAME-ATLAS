@@ -17,6 +17,7 @@ import type { CommonList } from "../lib/common-surnames.js";
 import { currentPathFor, pathForSlug } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin, siteOrigin } from "../lib/surname-page.js";
 import { landingMetadata } from "../lib/site-metadata.js";
+import { jsonLd, siteGraph } from "../lib/structured-data.js";
 import { DuskZoom } from "../lib/dusk-zoom.js";
 import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
@@ -306,6 +307,8 @@ export default async function HomePage({ searchParams }: PageProps) {
     // The register line names the artefact's own date; without the artefact
     // it names the register alone. Never a count, and never the two lists
     // added up.
+    const canonicalOrigin = siteOrigin();
+    const siteJsonLd = canonicalOrigin === null ? null : jsonLd(siteGraph(canonicalOrigin));
     const eyebrow =
       atlas === null
         ? t.landingEyebrow
@@ -313,6 +316,11 @@ export default async function HomePage({ searchParams }: PageProps) {
     return (
       <SiteShell lang={lang} otherPath={otherPath} world={{ mode: "hero" }} mainClassName="landing">
         <DuskZoom />
+        {/* Who publishes the site, and the site (TASK-123, `docs/canonical/21`
+            §80): on the landing page only, and only with an absolute origin. */}
+        {siteJsonLd === null ? null : (
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: siteJsonLd }} />
+        )}
         <section className="landing-stage" aria-labelledby="landing-headline">
           <p className="landing-eyebrow">{eyebrow}</p>
           {/* The words are ADR-0021's; their letters drift apart into points

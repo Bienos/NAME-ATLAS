@@ -6,17 +6,13 @@ import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
-import { assessIndexability, indexingEnabled, siteOrigin } from "./seo.js";
+import { assessIndexability, indexingEnabled, publishableFamilies, siteOrigin } from "./seo.js";
+import { surnameDescription, surnameHeading, surnameTitle } from "./surname-seo.js";
+import { jsonLd, surnamePageGraph } from "./structured-data.js";
+import type { Crumb } from "./structured-data.js";
 import { seoGatesFor } from "./seo-surface.js";
 import { currentPathFor, pathForSlug, resolveSlug } from "./slug.js";
-import {
-  formatDate,
-  formatInteger,
-  htmlLang,
-  parseIntent,
-  partitionLabel,
-  UI,
-} from "./messages.js";
+import { htmlLang, parseIntent, UI } from "./messages.js";
 import type { Intent, Lang } from "./messages.js";
 import { Result } from "./result-view.js";
 import { ShareButton } from "./share-button.js";
@@ -236,6 +232,24 @@ export function canonicalPathFor(answer: PageAnswer, lang: Lang, slug: string): 
   return lang === "en" ? `/en/surname/${encoded}` : `/pl/nazwisko/${encoded}`;
 }
 
+/**
+ * The other language's address, for `hreflang` (TASK-123): only where the
+ * surname has a stored address in both languages, so the pair is reciprocal.
+ * `x-default` is the Polish page, as on the landing page.
+ */
+export function languageAlternates(
+  answer: PageAnswer,
+  lang: Lang,
+  canonical: string,
+  origin: string | null,
+): Record<string, string> | null {
+  if (answer.kind !== "RESULT" || answer.otherLangPath === null) return null;
+  const other = origin === null ? answer.otherLangPath : `${origin}${answer.otherLangPath}`;
+  const pl = lang === "pl" ? canonical : other;
+  const en = lang === "en" ? canonical : other;
+  return { pl, en, "x-default": pl };
+}
+
 export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metadata {
   const t = UI[lang];
   const origin = siteOrigin();
@@ -257,39 +271,57 @@ export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metad
     seoSurfaceAllowed: answer.gates.seoSurfaceAllowed,
     privacyPublic: answer.gates.privacyPublic,
   });
-  const description =
-    r.population?.state === "READY"
-      ? r.population.observations
-          .map((o) => {
-            const sex = partitionLabel(o.comparability_group, lang);
-            const n = o.value.value === null ? null : formatInteger(o.value.value, lang);
-            if (n === null) return null;
-            // The date travels with the count. `ARCHITECTURE.md` §10 invariant 5
-            // applies to a search-result snippet as much as to the page: a
-            // count without its date is not a count (review, 2026-09-21).
-            const on = formatDate(o.snapshot_date, lang);
-            return lang === "pl"
-              ? `${n} osób${sex ? ` (${sex})` : ""} w rejestrze PESEL na dzień ${on}`
-              : `${n} people${sex ? ` (${sex})` : ""} in the PESEL register on ${on}`;
-          })
-          .filter((s): s is string => s !== null)
-          .join(" · ")
-      : r.population?.reason_code === "NOT_DERIVED_YET"
-        ? t.heroNotDerived
-        : t.heroNoCount;
+  // The title names only what the page can publish (`docs/canonical/21` §67), and
+  // the description opens with the answer the page shows under its `<h1>`, each
+  // count with its date (`ARCHITECTURE.md` §10 invariant 5; TASK-123).
+  const title = surnameTitle(answer.display, publishableFamilies(r), lang);
+  const description = surnameDescription(r, answer.display, lang);
+  const languages = languageAlternates(answer, lang, canonical, origin);
   return {
     ...base,
-    title: `${answer.display} — ${t.title}`,
+    alternates: languages === null ? { canonical } : { canonical, languages },
+    title,
     description,
     robots: { index: indexability.indexability === "INDEX", follow: true },
     openGraph: {
-      title: `${answer.display} — ${t.title}`,
+      title,
       description,
       url: canonical,
       type: "website",
       locale: lang === "pl" ? "pl_PL" : "en_GB",
     },
   };
+}
+
+/**
+ * The visible breadcrumb (`docs/canonical/21` §62, §73), and so the JSON-LD's.
+ * Two steps until a surname directory exists to stand between them.
+ */
+export function surnameCrumbs(display: string, lang: Lang, path: string): readonly Crumb[] {
+  return [
+    { name: "Name Atlas", path: lang === "en" ? "/?lang=en" : "/" },
+    { name: surnameHeading(display, lang), path },
+  ];
+}
+
+function Breadcrumbs({ crumbs, lang }: { crumbs: readonly Crumb[]; lang: Lang }) {
+  return (
+    <nav className="breadcrumbs" aria-label={UI[lang].breadcrumbLabel}>
+      <ol>
+        {crumbs.map((crumb, index) =>
+          index === crumbs.length - 1 ? (
+            <li key={crumb.path} aria-current="page">
+              {crumb.name}
+            </li>
+          ) : (
+            <li key={crumb.path}>
+              <a href={crumb.path}>{crumb.name}</a>
+            </li>
+          ),
+        )}
+      </ol>
+    </nav>
+  );
 }
 
 export function CanonicalSurnamePage({
@@ -330,6 +362,24 @@ export function CanonicalSurnamePage({
   const deck = answer.kind === "RESULT" ? deckCards(answer.response, lang, { path, shareUrl }) : [];
   // Where the deck's last card leads (TASK-093): the share studio, when it has a card.
   const studio = answer.kind === "RESULT" ? deckFinish(answer.response, lang, path) : null;
+  // The breadcrumb and the page's structured data (TASK-123): the same crumbs
+  // for both, and no JSON-LD without `SITE_ORIGIN`, the canonical URL's origin
+  // (a request's `Host` is not one).
+  const crumbs = answer.kind === "RESULT" ? surnameCrumbs(answer.display, lang, path) : null;
+  const canonicalOrigin = siteOrigin();
+  const graph =
+    answer.kind === "RESULT" && canonicalOrigin !== null && crumbs !== null
+      ? jsonLd(
+          surnamePageGraph({
+            origin: canonicalOrigin,
+            path,
+            name: surnameHeading(answer.display, lang),
+            description: surnameDescription(answer.response, answer.display, lang),
+            lang,
+            crumbs,
+          }),
+        )
+      : null;
 
   return (
     <SiteShell
@@ -351,6 +401,10 @@ export function CanonicalSurnamePage({
         </section>
       ) : answer.kind === "RESULT" ? (
         <>
+          {crumbs === null ? null : <Breadcrumbs crumbs={crumbs} lang={lang} />}
+          {graph === null ? null : (
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: graph }} />
+          )}
           <Result
             response={answer.response}
             lang={lang}

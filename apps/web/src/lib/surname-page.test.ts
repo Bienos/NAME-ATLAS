@@ -1,13 +1,21 @@
-import { describe, expect, it } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import {
+  CanonicalSurnamePage,
   canonicalPathFor,
+  languageAlternates,
   metadataFor,
   referrerPath,
   searchOrigin,
   siteOrigin,
 } from "./surname-page.js";
 import type { PageAnswer } from "./surname-page.js";
+
+// The result body is tested in result-view.test.ts; the page's head and
+// breadcrumb are what is tested here.
+vi.mock("./result-view.js", () => ({ Result: () => null }));
 
 /** TASK-023 §2.6 and TASK-024 AC-4 — pure helpers of the canonical page. */
 describe("searchOrigin", () => {
@@ -83,5 +91,111 @@ describe("canonicalPathFor", () => {
     expect(canonicalPathFor({ kind: "UNKNOWN", slug: "nowakk" }, "pl", "nowakk")).toBe(
       "/pl/nazwisko/nowakk",
     );
+  });
+});
+
+describe("TASK-123 AC-3: hreflang between the surname's two addresses", () => {
+  const answer = (otherLangPath: string | null): PageAnswer => ({
+    kind: "RESULT",
+    response: { status: "RESOLVED", surname: { display_name: "NOWAK" } } as SurnameResultResponse,
+    display: "NOWAK",
+    slug: "nowak",
+    otherLangPath,
+    gates: { seoSurfaceAllowed: false, privacyPublic: true },
+  });
+
+  it("declares pl, en and x-default from either page, reciprocally", () => {
+    const fromPl = languageAlternates(
+      answer("/en/surname/nowak"),
+      "pl",
+      "https://a.test/pl/nazwisko/nowak",
+      "https://a.test",
+    );
+    expect(fromPl).toEqual({
+      pl: "https://a.test/pl/nazwisko/nowak",
+      en: "https://a.test/en/surname/nowak",
+      "x-default": "https://a.test/pl/nazwisko/nowak",
+    });
+    const fromEn = languageAlternates(
+      answer("/pl/nazwisko/nowak"),
+      "en",
+      "https://a.test/en/surname/nowak",
+      "https://a.test",
+    );
+    expect(fromEn).toEqual(fromPl);
+  });
+
+  it("declares nothing without the other address, or without a result", () => {
+    expect(languageAlternates(answer(null), "pl", "/pl/nazwisko/nowak", null)).toBeNull();
+    expect(languageAlternates({ kind: "UNAVAILABLE" }, "pl", "/x", null)).toBeNull();
+  });
+
+  it("reaches the page's metadata, and leaves the canonical and robots as they were", () => {
+    const m = metadataFor(answer("/en/surname/nowak"), "pl", "nowak");
+    expect(m.alternates).toEqual({
+      canonical: "/pl/nazwisko/nowak",
+      languages: {
+        pl: "/pl/nazwisko/nowak",
+        en: "/en/surname/nowak",
+        "x-default": "/pl/nazwisko/nowak",
+      },
+    });
+    expect(m.robots).toEqual({ index: false, follow: true });
+    expect(m.title).toBe("Nazwisko NOWAK | Name Atlas");
+    expect(metadataFor(answer(null), "pl", "nowak").alternates).toEqual({
+      canonical: "/pl/nazwisko/nowak",
+    });
+  });
+});
+
+describe("TASK-123: the surname page's breadcrumb and JSON-LD", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  const render = () =>
+    renderToStaticMarkup(
+      createElement(CanonicalSurnamePage, {
+        answer: {
+          kind: "RESULT",
+          // Read only by the mocked body and the deck, which has no card for it.
+          response: {} as SurnameResultResponse,
+          display: "NOWAK",
+          slug: "nowak",
+          otherLangPath: null,
+          gates: { seoSurfaceAllowed: false, privacyPublic: true },
+        },
+        lang: "pl",
+        slug: "nowak",
+        intent: "default",
+        origin: "https://a.test",
+      }),
+    );
+
+  it("shows the breadcrumb the JSON-LD names", () => {
+    vi.stubEnv("SITE_ORIGIN", "https://a.test");
+    const html = render();
+    expect(html).toMatch(
+      /<nav class="breadcrumbs" aria-label="Ścieżka nawigacyjna"><ol><li><a href="\/">Name Atlas<\/a><\/li><li aria-current="page">Nazwisko NOWAK<\/li><\/ol><\/nav>/u,
+    );
+    const scripts = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gu)];
+    expect(scripts).toHaveLength(1);
+    const graph = (
+      JSON.parse(scripts[0]?.[1] ?? "{}") as { "@graph": { itemListElement?: unknown }[] }
+    )["@graph"];
+    expect(graph[1]?.itemListElement).toEqual([
+      { "@type": "ListItem", position: 1, name: "Name Atlas", item: "https://a.test/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Nazwisko NOWAK",
+        item: "https://a.test/pl/nazwisko/nowak",
+      },
+    ]);
+  });
+
+  it("emits no JSON-LD without SITE_ORIGIN, though the request has a host", () => {
+    vi.stubEnv("SITE_ORIGIN", "");
+    expect(render()).not.toContain("application/ld+json");
   });
 });
