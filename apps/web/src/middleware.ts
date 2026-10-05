@@ -4,6 +4,7 @@ import { clientKey, evictExpired, rateLimit } from "./lib/rate-limit.js";
 import type { RateLimitStore } from "./lib/rate-limit.js";
 import { LONGEST_WINDOW_MS, policyFor } from "./lib/request-policy.js";
 import { COUPLE_CACHE_CONTROL, isCouplePath } from "./lib/couple-config.js";
+import { isReportPath, REPORT_CACHE_CONTROL } from "./lib/report-config.js";
 
 /**
  * Request rate limiting (TASK-029).
@@ -64,6 +65,8 @@ export function middleware(request: NextRequest): NextResponse {
   response.headers.set("x-ratelimit-remaining", String(decision.remaining));
   // The couple report is one reader's page: never kept by a browser or a cache (TASK-100).
   if (isCouplePath(pathname)) response.headers.set("cache-control", COUPLE_CACHE_CONTROL);
+  // A report preview is an internal artifact: never kept by a browser or a cache (TASK-120).
+  if (isReportPath(pathname)) response.headers.set("cache-control", REPORT_CACHE_CONTROL);
   return response;
 }
 

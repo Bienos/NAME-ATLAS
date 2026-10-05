@@ -4490,6 +4490,213 @@ body.dusk {
   font-size: 0.875rem;
 }
 
+/* --- the report preview (TASK-120): a stored internal test report as a dusk dossier --- */
+
+.site > main.report-page {
+  max-width: 52rem;
+}
+
+.report-cover {
+  padding-bottom: var(--space-7);
+  border-bottom: 1px solid var(--dusk-line);
+}
+
+.report-eyebrow {
+  margin: 0 0 var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.report-title {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(3rem, 2rem + 5vw, 5.5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--dusk-ink);
+  overflow-wrap: anywhere;
+}
+
+.report-title::after {
+  content: "";
+  display: block;
+  width: 6rem;
+  height: 2px;
+  margin-top: var(--space-5);
+  background: var(--dusk-amber);
+}
+
+.report-stamp {
+  display: inline-block;
+  margin: var(--space-5) 0 var(--space-3);
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--dusk-amber);
+  border-radius: 999px;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-amber);
+}
+
+.report-verdict {
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+}
+
+.report-frozen,
+.report-caveat,
+.report-assessment {
+  font-size: 0.9375rem;
+  color: var(--dusk-ink-muted);
+}
+
+.report-frozen {
+  margin: 0;
+}
+
+.report-toc {
+  padding-block: var(--space-6);
+}
+
+.report-toc h2,
+.report-chapter h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--dusk-ink);
+}
+
+.report-toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report-toc li {
+  display: flex;
+  gap: var(--space-3);
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: 0.5rem;
+  border-bottom: 1px dotted var(--dusk-line);
+}
+
+.report-toc a {
+  color: var(--dusk-ink);
+  text-decoration: none;
+}
+
+.report-toc-count {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  color: var(--dusk-ink-muted);
+}
+
+.report-num {
+  display: inline-block;
+  min-width: 1.75em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  color: var(--dusk-amber);
+}
+
+/* Each chapter is a section, so the site's section rule already separates them. */
+.report-chapter {
+  scroll-margin-top: var(--space-5);
+}
+
+.reading .report-chapter h3 {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+}
+
+.report-table {
+  width: 100%;
+  margin-block: var(--space-4);
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+/* Every column reads from the left, overriding the result tables' right-aligned figures. */
+.report-table th,
+.report-table td {
+  text-align: left;
+}
+
+.report-table th {
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-bottom: 1px solid var(--dusk-line);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dusk-ink-muted);
+}
+
+.report-table td {
+  padding: 0.625rem 0.75rem 0.625rem 0;
+  border-bottom: 1px solid var(--dusk-line);
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+  color: var(--dusk-ink-soft);
+}
+
+.report-note a {
+  margin-left: 0.15em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75em;
+  text-decoration: none;
+  color: var(--dusk-amber);
+}
+
+.report-label {
+  margin: var(--space-4) 0 var(--space-2);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.report-leaders,
+.report-bib {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--dusk-ink-soft);
+}
+
+.report-bib li {
+  margin-bottom: 0.5rem;
+  scroll-margin-top: var(--space-5);
+}
+
+.report-claims {
+  margin-top: var(--space-4);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-muted);
+}
+
+.report-claims summary {
+  cursor: pointer;
+}
+
+.report-claims code {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+}
+
+@media (max-width: 40rem) {
+  .report-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
 /* --- the offer (TASK-057): three tiers side by side, stacked on a phone --- */
 
 .site > main.offer {
