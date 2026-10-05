@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-04, by the better share video (TASK-108, `docs/progress/2026-10-04-better-video.md`).
+**Last rewritten:** 2026-10-04, by TASK-103: end-to-end tests of the reader's journey, in CI (`docs/progress/2026-10-04-end-to-end-tests.md`).
 
 ## Production
 

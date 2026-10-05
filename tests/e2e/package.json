@@ -1,0 +1,20 @@
+{
+  "name": "@name-atlas/e2e-tests",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "seed": "bash seed.sh",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@name-atlas/db": "workspace:*",
+    "@name-atlas/resolver": "workspace:*",
+    "@name-atlas/sources": "workspace:*",
+    "@name-atlas/truth": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

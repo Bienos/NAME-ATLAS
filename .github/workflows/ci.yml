@@ -99,3 +99,23 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # TASK-103: the reader's journey on the built site, in Chromium at a
+      # desktop and a phone size, against the committed fixtures seeded into
+      # the database the migrations step prepared.
+      - name: Seed the end-to-end database
+        run: pnpm e2e:seed
+
+      - name: Install Chromium for Playwright
+        run: pnpm --filter @name-atlas/e2e-tests exec playwright install --with-deps chromium
+
+      - name: End-to-end tests (Playwright)
+        run: pnpm test:e2e
+
+      - name: Keep the Playwright traces of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: tests/e2e/test-results/
+          retention-days: 7
