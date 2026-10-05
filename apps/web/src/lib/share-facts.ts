@@ -168,6 +168,7 @@ const EXPLAIN = {
       `Cała lista zmieniła się w tym czasie o ${list}. Mówimy, co się zmieniło, nie dlaczego.`,
     print: "To wyniki wyszukiwania słowa w każdej odmianie w zbiorach Polony, nie liczba osób.",
     summary: "Każda liczba ma źródło i datę. Listy męska i żeńska nigdy nie są sumowane.",
+    sheet: "Arkusz nazwiska",
     page: "s.",
     mostIn: "najczęściej",
     people: "osób",
@@ -189,6 +190,7 @@ const EXPLAIN = {
       "Search results for the word, in any form, in Polona's collections; not a count of people.",
     summary:
       "Every figure has a source and a date. The men's and women's lists are never added up.",
+    sheet: "Surname sheet",
     page: "p.",
     mostIn: "most common in",
     people: "people",
@@ -575,6 +577,48 @@ export function summaryFacts(given: SurnameResultResponse, lang: Lang): SummaryF
   return { surname, countUnit: e.people, counts, rarity, where, change, print, meaning, sources };
 }
 
+/**
+ * The surname's one-page sheet (TASK-118): every card the studio offers, on
+ * one A4 page. It says nothing of its own: each panel is a card's facts, with
+ * its explanation, source and date, and the counts are the summary's. Null
+ * when the surname has no card.
+ */
+export interface SheetFacts {
+  readonly surname: string;
+  readonly eyebrow: string;
+  /** Each list's count, the main list first, as on the summary card. */
+  readonly counts: SummaryFacts["counts"];
+  readonly countUnit: string;
+  /** The counts' sources and dates, as on the summary card. */
+  readonly sources: readonly string[];
+  readonly cards: Partial<Readonly<Record<ShareCardKey, ShareFacts>>>;
+  /** The summary's line: every figure has a source and a date. */
+  readonly note: string;
+  readonly cta: string;
+}
+
+export function sheetFacts(given: SurnameResultResponse, lang: Lang): SheetFacts | null {
+  if (given.status !== "RESOLVED" || given.surname === null) return null;
+  const cards: Partial<Record<ShareCardKey, ShareFacts>> = {};
+  for (const card of SHARE_CARDS) {
+    const facts = shareFacts(given, card, lang);
+    if (facts !== null) cards[card] = facts;
+  }
+  if (Object.keys(cards).length === 0) return null;
+  const summary = cards.summary?.visual?.kind === "recap" ? cards.summary.visual.summary : null;
+  const e = EXPLAIN[lang];
+  return {
+    surname: inDeckOrder(given).surname?.display_name ?? given.surname.display_name,
+    eyebrow: e.sheet,
+    counts: summary?.counts ?? [],
+    countUnit: e.people,
+    sources: summary?.sources ?? [],
+    cards,
+    note: e.summary,
+    cta: e.cta,
+  };
+}
+
 /** The card a deck card shares: its own image, or the summary for one without (the surname, the catalogue). */
 export function shareCardFor(deckKey: string): ShareCardKey {
   if (deckKey === "catalogue") return "print";
@@ -591,7 +635,7 @@ export function sharePreviewPath(pagePath: string, card: ShareCardKey, lang: Lan
   return `${shareCardPath(pagePath, card, lang)}/${lang === "en" ? "preview" : "podglad"}`;
 }
 
-/** Every card of the surname in one PDF (TASK-107): `/pl/nazwisko/{slug}/pdf`. */
+/** The surname's one-page PDF (TASK-107, TASK-118): `/pl/nazwisko/{slug}/pdf`. */
 export function surnamePdfPath(pagePath: string): string {
   return `${pagePath}/pdf`;
 }
