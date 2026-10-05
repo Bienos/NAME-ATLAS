@@ -295,6 +295,24 @@ export type {
   DiscoveryListTally,
   DiscoveryRunTally,
 } from "./discovery-index.js";
+// Premium eligibility — TASK-117, PRE-002: whether a paid report may be offered.
+export {
+  assessPremiumEligibility,
+  PREMIUM_ELIGIBILITY_STATES,
+  PREMIUM_ELIGIBILITY_VERSION,
+  PREMIUM_INELIGIBILITY_REASONS,
+  premiumEligibilityOf,
+  premiumEligibilityRun,
+  premiumEligibilityRunMarkdown,
+} from "./premium-eligibility.js";
+export type {
+  PremiumCategory,
+  PremiumEligibility,
+  PremiumEligibilityOutcome,
+  PremiumEligibilityRunTally,
+  PremiumEligibilityState,
+  PremiumIneligibilityReason,
+} from "./premium-eligibility.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.
