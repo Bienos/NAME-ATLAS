@@ -8,6 +8,17 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-042 — Google Analytics page views without consent (PT art. 399, GDPR art. 6(1)(f), 21)
+
+**Status:** NON-BLOCKING NOW. **Owner:** project owner, legal counsel (`docs/canonical/19` §2.4: "LEGAL COUNSEL REVIEW REQUIRED"). **Raised by:** TASK-114 (ADR-0040).
+
+Facts: since TASK-114, Google's script (`gtag.js`) is in every page and, on `name-atlas.pl`, sends a page view for every visitor, including one who pressed "Reject". Until "Accept", consent mode keeps `analytics_storage` denied, so Google sets no cookie (`apps/web/src/lib/consent-banner.tsx`); the request still carries the IP address, the redacted address, the referrer and details of the browser and device to Google Ireland and Google LLC (USA). The notice now rests those page views on art. 6(1)(f) GDPR and the cookies on consent (`apps/web/src/lib/legal-text.ts`). The site offers no way to stop the page views short of blocking the script; the notice's right to object is by email. D-037 asks the same art. 399 question for Vercel Web Analytics, which is first-party and cookieless.
+
+Options: (a) counsel confirms that page views without cookies need no consent and that art. 6(1)(f) holds; (b) back to ADR-0038's rule: nothing goes to Google before "Accept"; (c) keep the page views but stop them after "Reject".
+**Recommendation (not a decision):** ask counsel together with D-037; until then the notice states what is sent.
+
+---
+
 ## D-041 — the terms: how they change for account holders, how the contract starts and ends, and our closing of an account
 
 **Status:** NON-BLOCKING NOW (no account exists in production); needed before accounts go on. **Owner:** project owner, with legal review. **Raised by:** the legal review of 2026-10-04 (`docs/progress/2026-10-04-legal-review.md`, J-07).

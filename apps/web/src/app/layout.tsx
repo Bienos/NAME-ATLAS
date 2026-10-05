@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { GoogleAnalytics } from "../lib/consent-banner.js";
+import { GA_SCRIPT_URL } from "../lib/google-analytics.js";
 import { SiteAnalytics } from "../lib/site-analytics.js";
 import { SITE_COPY, SITE_PREVIEW_IMAGE } from "../lib/site-metadata.js";
 import { siteOrigin } from "../lib/surname-page.js";
@@ -78,12 +79,16 @@ export const metadata: Metadata = {
  * which re-points the system's token names at the dusk values, and each page
  * draws its own world behind it (`site-shell.tsx`). Vercel Web Analytics (#58)
  * follows the page, with the surname kept out of its events (TASK-058).
- * Google Analytics loads only after the visitor accepts the consent banner
- * (TASK-109, ADR-0038).
+ * Google's tag is in every page's head; it counts page views on production
+ * only, and sets its cookies only after the visitor accepts the consent
+ * banner (TASK-109, ADR-0038; TASK-114, ADR-0040).
  */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pl" className={`${display.variable} ${ui.variable} ${data.variable}`}>
+      <head>
+        <script async src={GA_SCRIPT_URL} />
+      </head>
       <body className="dusk">
         {children}
         <SiteAnalytics />
