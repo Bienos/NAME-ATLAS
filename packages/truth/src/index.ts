@@ -234,6 +234,7 @@ export {
   distinctWorks,
   interpretationsAgree,
   loadInterpretations,
+  meaningRootKey,
   surnameMeaningClaimKey,
 } from "./meaning.js";
 export type {
@@ -259,6 +260,7 @@ export {
   coverageRun,
   coverageRunMarkdown,
   coverageTier,
+  forEachActiveSurname,
 } from "./coverage-assessment.js";
 export type {
   CoverageAssessment,
@@ -272,6 +274,27 @@ export type {
   CoverageTier,
 } from "./coverage-assessment.js";
 export type { CoverageBand, CoverageCell, CoverageFamily, ResourceCoverage } from "./coverage.js";
+// The DiscoveryIndex — TASK-116, PRE-001: what a paid report could truthfully count.
+export {
+  buildDiscoveryIndex,
+  DISCOVERY_CATEGORIES,
+  DISCOVERY_COUNT_SEMANTICS,
+  DISCOVERY_INDEX_VERSION,
+  discoveryIndexOf,
+  discoveryRun,
+  discoveryRunMarkdown,
+  originAlternatives,
+  worksCited,
+} from "./discovery-index.js";
+export type {
+  DiscoveryCategory,
+  DiscoveryCategoryTally,
+  DiscoveryIndex,
+  DiscoveryIndexEntry,
+  DiscoveryIndexOutcome,
+  DiscoveryListTally,
+  DiscoveryRunTally,
+} from "./discovery-index.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.

@@ -20,6 +20,7 @@ import type { PolonaFetchDeps } from "@name-atlas/sources";
 import {
   assessCoverage,
   assessResponse,
+  buildDiscoveryIndex,
   COVERAGE_DIMENSIONS,
   coverageRun,
   deriveArchiveAvailability,
@@ -27,14 +28,21 @@ import {
   deriveCurrentRank,
   deriveRarityContext,
   deriveSurnameMeaning,
+  DISCOVERY_CATEGORIES,
+  discoveryRun,
   querySurnameResult,
 } from "@name-atlas/truth";
-import type { CoverageAssessment, CoverageDimensionName } from "@name-atlas/truth";
+import type {
+  CoverageAssessment,
+  CoverageDimensionName,
+  DiscoveryCategory,
+  DiscoveryIndex,
+} from "@name-atlas/truth";
 import { raritySectionSchema, surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
  * TASK-080: coverage on the PAID surface, read through the query service from
- * a real PostgreSQL.
+ * a real PostgreSQL; and TASK-116: the DiscoveryIndex over the same data.
  *
  * GENUINE surnames and counts (the committed PESEL national male excerpt).
  * SYNTHETIC meanings: `fixtures/onomastics/` carries `"synthetic": true`, and
@@ -179,7 +187,8 @@ describe("coverage assessment (TASK-080)", () => {
     });
   });
 
-  it("reads a source whose commercial use is unknown as BLOCKED_RIGHTS on the paid surface (AC-4)", async () => {
+  /** Runs `check` with the meaning works' commercial use UNKNOWN, then restores it. */
+  async function withMeaningCommercialUseUnknown(check: () => Promise<void>): Promise<void> {
     await sql`
       UPDATE rights_profiles SET commercial_use = 'UNKNOWN'
        WHERE rights_profile_id IN (
@@ -187,9 +196,7 @@ describe("coverage assessment (TASK-080)", () => {
        )
     `.execute(db());
     try {
-      expect(of(await assessed("KOWALCZYK"), "ETYMOLOGY")).toMatchObject({
-        availability: "BLOCKED_RIGHTS",
-      });
+      await check();
     } finally {
       await sql`
         UPDATE rights_profiles SET commercial_use = 'ALLOWED'
@@ -198,6 +205,14 @@ describe("coverage assessment (TASK-080)", () => {
          )
       `.execute(db());
     }
+  }
+
+  it("reads a source whose commercial use is unknown as BLOCKED_RIGHTS on the paid surface (AC-4)", async () => {
+    await withMeaningCommercialUseUnknown(async () => {
+      expect(of(await assessed("KOWALCZYK"), "ETYMOLOGY")).toMatchObject({
+        availability: "BLOCKED_RIGHTS",
+      });
+    });
     expect(of(await assessed("KOWALCZYK"), "ETYMOLOGY")).toMatchObject({ availability: "STRONG" });
   });
 
@@ -244,5 +259,119 @@ describe("coverage assessment (TASK-080)", () => {
     expect(Object.keys(tally.lists)).toEqual(["pesel_2026_national_male"]);
     expect(tally.dimensions.ETYMOLOGY.STRONG).toBe(1);
     expect(tally.dimensions.ARCHIVES.PARTIAL).toBe(1);
+  });
+
+  describe("the DiscoveryIndex (TASK-116)", () => {
+    async function indexed(input: string): Promise<DiscoveryIndex> {
+      const outcome = await buildDiscoveryIndex(db(), input);
+      if (outcome.kind !== "INDEXED") throw new Error(`${input}: ${outcome.kind}`);
+      return outcome.index;
+    }
+    const entry = (i: DiscoveryIndex, c: DiscoveryCategory) =>
+      i.entries.find((e) => e.category === c);
+
+    it("lists all eight categories, and says 'not searched' rather than 'none' (AC-1)", async () => {
+      const i = await indexed("MAZUR");
+      expect(i.entries.map((e) => e.category)).toEqual([...DISCOVERY_CATEGORIES]);
+      expect(i.generation_version).toBe("discovery@0");
+      expect(entry(i, "ORIGIN_ALTERNATIVES")).toMatchObject({
+        availability_status: "NONE",
+        eligible_count: 0,
+        preview_allowed: false,
+      });
+      expect(entry(i, "ARCHIVE_REFERENCES")).toMatchObject({
+        availability_status: "NOT_RETRIEVED",
+      });
+      for (const c of [
+        "HISTORICAL_OCCURRENCES",
+        "HISTORICAL_VARIANTS",
+        "HISTORICAL_PLACES",
+        "MIGRATION_CLUES",
+        "HISTORICAL_LAYERS",
+      ] as const) {
+        expect(entry(i, c)).toMatchObject({
+          availability_status: "NOT_RETRIEVED",
+          reason_code: "NO_SOURCE_YET",
+          validated_count: 0,
+          eligible_count: 0,
+          preview_allowed: false,
+        });
+      }
+    });
+
+    it("counts none of Polona's search matches as archive references (AC-2, canonical/17 §42)", async () => {
+      const paid = await querySurnameResult(db(), "KOWALCZYK", { surface: "PAID" });
+      if (paid.kind !== "OK") throw new Error(paid.kind);
+      expect(paid.response.archive?.catalogue_records).toBeGreaterThan(0);
+      expect(entry(await indexed("KOWALCZYK"), "ARCHIVE_REFERENCES")).toMatchObject({
+        availability_status: "PARTIAL",
+        reason_code: "UNVERIFIED_SEARCH_MATCHES",
+        validated_count: 0,
+        eligible_count: 0,
+        preview_allowed: false,
+      });
+    });
+
+    it("counts two works agreeing on a root as one alternative from two sources, and a conflict as two (AC-3)", async () => {
+      const kowalczyk = await indexed("KOWALCZYK");
+      expect(entry(kowalczyk, "ORIGIN_ALTERNATIVES")).toMatchObject({
+        availability_status: "STRONG",
+        validated_count: 1,
+        eligible_count: 1,
+        confidence_distribution: { LIKELY: 1 },
+        preview_allowed: true,
+      });
+      expect(entry(kowalczyk, "SOURCES")).toMatchObject({ validated_count: 2, eligible_count: 2 });
+
+      const nowak = await indexed("NOWAK");
+      expect(entry(nowak, "ORIGIN_ALTERNATIVES")).toMatchObject({
+        availability_status: "PARTIAL",
+        reason_code: "CONFIDENCE_CONFLICTING",
+        eligible_count: 2,
+        confidence_distribution: { CONFLICTING: 2 },
+      });
+      expect(entry(nowak, "SOURCES")).toMatchObject({ eligible_count: 2 });
+    });
+
+    it("never counts rights-blocked evidence as paid inventory, but still sees it (AC-4, canonical/17 §42)", async () => {
+      await withMeaningCommercialUseUnknown(async () => {
+        const i = await indexed("KOWALCZYK");
+        expect(entry(i, "ORIGIN_ALTERNATIVES")).toMatchObject({
+          availability_status: "BLOCKED_RIGHTS",
+          validated_count: 1,
+          eligible_count: 0,
+          confidence_distribution: {},
+          preview_allowed: false,
+        });
+        expect(entry(i, "SOURCES")).toMatchObject({
+          validated_count: 2,
+          eligible_count: 0,
+          preview_allowed: false,
+        });
+      });
+    });
+
+    it("indexes every surname of the register once, and tallies the inventory per list (AC-5)", async () => {
+      const tally = await discoveryRun(db(), { concurrency: 2, batchSize: 7 });
+      const surnames = await sql<{ n: string }>`
+        SELECT count(*)::text AS n FROM surnames WHERE entity_status = 'ACTIVE'
+      `.execute(db());
+      expect(tally.read).toBe(Number(surnames.rows[0]?.n));
+      expect(tally.not_resolved + tally.unavailable).toBe(0);
+      expect(tally.with_inventory).toBe(2);
+      expect(tally.categories.ORIGIN_ALTERNATIVES).toMatchObject({
+        with_eligible: 2,
+        eligible_items: 3,
+        blocked_only: 0,
+      });
+      expect(tally.categories.SOURCES.eligible_items).toBe(4);
+      expect(tally.categories.ARCHIVE_REFERENCES).toMatchObject({
+        with_eligible: 0,
+        eligible_items: 0,
+      });
+      expect(tally.categories.ARCHIVE_REFERENCES.availability.PARTIAL).toBe(1);
+      expect(Object.keys(tally.lists)).toEqual(["pesel_2026_national_male"]);
+      expect(tally.lists["pesel_2026_national_male"]?.with_inventory.surnames).toBe(2);
+    });
   });
 });
