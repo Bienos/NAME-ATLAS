@@ -17,6 +17,7 @@ import type { Lang } from "./messages.js";
 import { surnameEm } from "./surname-fit.js";
 import { NextStep } from "./next-step.js";
 import { SNAPSHOT_ANCHOR } from "./sections.js";
+import { answerSentence } from "./surname-seo.js";
 import type { Step } from "./next-step.js";
 
 /**
@@ -109,6 +110,7 @@ export function Snapshot({
   const rarity = response.rarity;
   const distribution = response.distribution;
   const line = tallyLine(response, lang);
+  const answer = answerSentence(response, surname, lang);
 
   const readyGeo =
     distribution?.state === "READY"
@@ -146,14 +148,21 @@ export function Snapshot({
 
   return (
     <header className="snapshot" id={SNAPSHOT_ANCHOR}>
-      <p className="eyebrow">{t.searchLabel}</p>
-      {/* Its measured width, for the stylesheet to fit it to one line (`surname-fit.ts`). */}
-      <h2
-        className="surname"
-        style={{ "--surname-em": surnameEm(surname).toFixed(3) } as CSSProperties}
-      >
-        {surname}
-      </h2>
+      {/* The page's one heading (TASK-123, `docs/canonical/21` §63): the
+          eyebrow and the surname read as "Nazwisko NOWAK". The surname keeps
+          its measured width, for the stylesheet to fit it to one line
+          (`surname-fit.ts`). */}
+      <h1 className="snapshot-title">
+        <span className="eyebrow">{t.searchLabel}</span>{" "}
+        <span
+          className="surname"
+          style={{ "--surname-em": surnameEm(surname).toFixed(3) } as CSSProperties}
+        >
+          {surname}
+        </span>
+      </h1>
+      {/* The answer first (§64): the counts with their date, as text. */}
+      {answer !== null ? <p className="snapshot-answer">{answer}</p> : null}
       {line !== null ? <p className="tally">{line}</p> : null}
 
       {/* One column per register list: its count, its 1 in X and its strongest

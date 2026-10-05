@@ -1141,7 +1141,7 @@ describe("the snapshot surname is measured for fitting", () => {
   it("carries its width in em for the stylesheet, and nothing else changes", () => {
     const markup = render(RESOLVED, "pl");
     // NOWAK: 3.883 em of Fraunces advances, less 5 × 0.04 em of tracking (surname-fit.ts).
-    expect(markup).toContain('<h2 class="surname" style="--surname-em:3.683">NOWAK</h2>');
+    expect(markup).toContain('<span class="surname" style="--surname-em:3.683">NOWAK</span>');
   });
 });
 
@@ -1157,7 +1157,8 @@ describe("the profile layout", () => {
     const swapped = structuredClone(RESOLVED) as { rarity: { entries: unknown[] } };
     swapped.rarity.entries.reverse();
     const markup = render(swapped, "en");
-    const snapshot = markup.slice(markup.indexOf('class="snapshot"'), markup.indexOf("</header>"));
+    // The columns, not the answer sentence above them, which names both counts (TASK-123).
+    const snapshot = markup.slice(markup.indexOf('class="hero"'), markup.indexOf("</header>"));
     const male = snapshot.indexOf("98,387");
     const x215 = snapshot.indexOf("about 1 in 215");
     const female = snapshot.indexOf("99,738");

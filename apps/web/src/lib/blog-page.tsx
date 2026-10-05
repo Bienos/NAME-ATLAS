@@ -8,6 +8,7 @@ import { SiteShell } from "./site-shell.js";
 import { blogPath, blogPostPath } from "./site-links.js";
 import { SITE_PREVIEW_IMAGE } from "./site-metadata.js";
 import { indexingEnabled } from "./seo.js";
+import { jsonLd, publisher } from "./structured-data.js";
 import { SearchForm } from "./search-form.js";
 import { postsIn } from "./blog.js";
 import type { Block, BlogPost, Inline } from "./blog.js";
@@ -86,8 +87,9 @@ export function blogPostMetadata(
 
 /**
  * The post's `Article` structured data, as the text of a JSON-LD script. No
- * author: nothing says who writes the posts. `<` is escaped so no title or
- * description can close the script element.
+ * author: nothing says who writes the posts. The publisher is the site's
+ * `Organization`, by the `@id` the landing page gives it (TASK-123). `<` is
+ * escaped so no title or description can close the script element.
  */
 export function articleJsonLd(post: BlogPost, origin: string | null): string {
   const data = {
@@ -97,13 +99,13 @@ export function articleJsonLd(post: BlogPost, origin: string | null): string {
     description: post.description,
     datePublished: post.date,
     inLanguage: post.lang,
-    publisher: { "@type": "Organization", name: "Name Atlas" },
+    publisher: publisher(origin),
     image: `${origin ?? ""}${shareImage(post).url}`,
     ...(origin === null
       ? {}
       : { mainEntityOfPage: `${origin}${blogPostPath(post.lang, post.slug)}` }),
   };
-  return JSON.stringify(data).replace(/</gu, "\\u003c");
+  return jsonLd(data);
 }
 
 /** A suffix written on its own, like "-czyk": a hyphen with no letter or digit before it. */
