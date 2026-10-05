@@ -125,7 +125,7 @@ const LOCALITIES_READY = {
 };
 
 const RESOLVED: unknown = {
-  schema_version: "1.12",
+  schema_version: "1.13",
   neighbours: {
     state: "UNAVAILABLE",
     lists: [],
@@ -133,6 +133,7 @@ const RESOLVED: unknown = {
     surface: SURFACE,
   },
   other_form: null,
+  other_spelling: null,
   localities: LOCALITIES_READY,
   change: { state: "UNAVAILABLE", entries: [], reason_code: "NO_CHANGE_DERIVED", surface: SURFACE },
   status: "RESOLVED",
@@ -271,7 +272,7 @@ const LOW_COVERAGE: unknown = {
 };
 
 const RIGHTS_BLOCKED: unknown = {
-  schema_version: "1.12",
+  schema_version: "1.13",
   neighbours: {
     state: "RIGHTS_BLOCKED",
     lists: [],
@@ -279,6 +280,7 @@ const RIGHTS_BLOCKED: unknown = {
     surface: { surface: "PAID", decision: "BLOCKED", reason_code: "COMMERCIAL_USE_UNKNOWN" },
   },
   other_form: null,
+  other_spelling: null,
   localities: {
     state: "NOT_LOADED",
     reference_date: null,
@@ -354,9 +356,10 @@ const RIGHTS_BLOCKED: unknown = {
 };
 
 const WITH_SUGGESTIONS: unknown = {
-  schema_version: "1.12",
+  schema_version: "1.13",
   neighbours: null,
   other_form: null,
+  other_spelling: null,
   localities: null,
   change: null,
   status: "UNRESOLVED",
@@ -407,9 +410,10 @@ const NO_SUGGESTIONS: unknown = {
 };
 
 const MIXED_SCRIPT: unknown = {
-  schema_version: "1.12",
+  schema_version: "1.13",
   neighbours: null,
   other_form: null,
+  other_spelling: null,
   localities: null,
   change: null,
   status: "AMBIGUOUS",
@@ -1864,5 +1868,155 @@ describe("TASK-073: the known people's chapter", () => {
     const markup = render(none, "pl");
     expect(text(markup)).toContain("Wikidane nie wymieniają nikogo o nazwisku NOWAK");
     expect(markup).not.toContain("bearers-removal");
+  });
+});
+
+describe("TASK-125: the other spelling, under the answer", () => {
+  const MALE = "pesel_2026_national_male";
+  const FEMALE = "pesel_2026_national_female";
+  const NBSP = " ";
+
+  // Each surname's real counts, ranks and rarity on the 2026-01-20 register, and
+  // its real id, as GET /api/v1/surname-results on name-atlas.pl returned them on
+  // 2026-10-05. Rarity is READY: the other spelling is read only where it is.
+  function listEntry(
+    x: number,
+    rank: number,
+    numerator: number,
+    denominator: number,
+    share: number,
+    group: string,
+  ) {
+    return {
+      ...rarity(x, numerator, group),
+      supporting: [{ metric: "RANK", value: rank }],
+      denominator,
+      share,
+    };
+  }
+  function page(
+    surname: { id: string; display_name: string },
+    lists: readonly (readonly [number, number, number, number, number, string])[],
+    otherSpelling: unknown,
+  ): unknown {
+    return {
+      ...(RESOLVED as Record<string, unknown>),
+      surname: { ...surname, script: "Latn" },
+      population: {
+        state: "READY",
+        observations: lists.map(([, , count, , , group]) => observation(count, group)),
+        reason_code: null,
+        surface: SURFACE,
+      },
+      rarity: {
+        state: "READY",
+        entries: lists.map((l) => listEntry(...l)),
+        reason_code: null,
+        surface: SURFACE,
+      },
+      distribution: {
+        state: "UNAVAILABLE",
+        entries: [],
+        reason_code: "NO_COMPLETE_REGIONAL_UNIVERSE",
+        surface: SURFACE,
+      },
+      localities: {
+        state: "NOT_LOADED",
+        reference_date: null,
+        places: [],
+        total: null,
+        confidence: null,
+        citation: null,
+        reason_code: "TERYT_NOT_LOADED",
+        surface: SURFACE,
+      },
+      other_spelling: otherSpelling,
+    };
+  }
+  const spelling = (id: string, display_name: string, group: string, count: number) => ({
+    surname: { id, display_name, script: "Latn" },
+    rule_code: "POLISH_DIACRITIC_FOLD",
+    comparability_group: group,
+    snapshot_date: "2026-01-20",
+    count,
+    surface: SURFACE,
+  });
+
+  const WISNIEWSKI = page(
+    { id: "01a0f034-2af1-708d-8a53-f4f0838a0223", display_name: "WISNIEWSKI" },
+    [
+      [201_881, 28_282, 105, 21_197_537, 4.953e-6, MALE],
+      [226_951, 31_069, 95, 21_560_302, 4.406e-6, FEMALE],
+    ],
+    spelling("01a0f034-282d-7691-8243-14df4bbb066e", "WIŚNIEWSKI", MALE, 53_079),
+  );
+  const DABROWA = page(
+    { id: "01a0f034-4067-76b2-acb4-63e71693319e", display_name: "DABROWA" },
+    [
+      [10_598_769, 301_370, 2, 21_197_537, 9.4e-8, MALE],
+      [3_080_043, 159_394, 7, 21_560_302, 3.25e-7, FEMALE],
+    ],
+    spelling("01a0f034-28f0-7233-bf93-afa049e0e8f6", "DĄBROWA", FEMALE, 1_211),
+  );
+  // ZMUDA TRZEBIATOWSKI (248 men) is the more common spelling: ŻMUDA
+  // TRZEBIATOWSKI has 88, so the producer gives no other spelling.
+  const ZMUDA = page(
+    { id: "01a0f034-29cc-73c5-8f07-9e19627cff7d", display_name: "ZMUDA TRZEBIATOWSKI" },
+    [
+      [85_474, 13_132, 248, 21_197_537, 1.1699e-5, MALE],
+      [10_780_151, 301_308, 2, 21_560_302, 9.3e-8, FEMALE],
+    ],
+    null,
+  );
+
+  it("asks WISNIEWSKI's reader about WIŚNIEWSKI, with its count, list and date, and links it", () => {
+    const markup = render(WISNIEWSKI, "pl");
+    expect(text(markup)).toContain(
+      `Szukasz WIŚNIEWSKI ? 53${NBSP}079 osób (mężczyźni) w rejestrze PESEL na dzień 20 stycznia 2026 r.`,
+    );
+    expect(markup).toContain(
+      '<p class="other-spelling">Szukasz <a href="/?surname=WI%C5%9ANIEWSKI">WIŚNIEWSKI</a>?',
+    );
+  });
+
+  it("puts the line in the first screen, after the answer and before the first chapter", () => {
+    const markup = render(WISNIEWSKI, "pl");
+    const line = markup.indexOf('class="other-spelling"');
+    expect(line).toBeGreaterThan(markup.indexOf('class="snapshot-answer"'));
+    expect(line).toBeLessThan(markup.indexOf("</header>"));
+    expect(line).toBeLessThan(markup.indexOf('class="chapter-nav"'));
+  });
+
+  it("says nothing about kinship, family or a misspelling", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const markup = render(WISNIEWSKI, lang);
+      const start = markup.indexOf('<p class="other-spelling"');
+      const line = text(markup.slice(start, markup.indexOf("</p>", start)));
+      expect(line).toContain("WIŚNIEWSKI");
+      expect(line).not.toMatch(
+        /spokrewn|rodzin|krewn|błęd|błąd|literówk|\brelat|\bfamil|\bkin\b|\btypo|mistak|misspel/iu,
+      );
+    }
+  });
+
+  it("asks in English, and keeps the language in the link", () => {
+    const markup = render(WISNIEWSKI, "en");
+    expect(text(markup)).toContain(
+      "Looking for WIŚNIEWSKI ? 53,079 people (male) in the PESEL register on 20 January 2026.",
+    );
+    expect(markup).toContain('href="/?surname=WI%C5%9ANIEWSKI&amp;lang=en"');
+  });
+
+  it("asks DABROWA's reader about DĄBROWA, on the women's list where it is larger", () => {
+    expect(text(render(DABROWA, "pl"))).toContain(
+      `Szukasz DĄBROWA ? 1${NBSP}211 osób (kobiety) w rejestrze PESEL na dzień 20 stycznia 2026 r.`,
+    );
+  });
+
+  it("shows no line where the ASCII spelling is the more common one", () => {
+    const markup = render(ZMUDA, "pl");
+    expect(markup).not.toContain("other-spelling");
+    expect(text(markup)).not.toContain("Szukasz");
+    expect(text(markup)).not.toContain("ŻMUDA");
   });
 });

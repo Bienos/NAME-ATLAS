@@ -59,7 +59,7 @@ const who = (n: number, display_name: string) => ({ id: id(n), display_name, scr
 const MALE = "pesel_2026_national_male";
 
 const FULL_INPUT = {
-  schema_version: "1.12",
+  schema_version: "1.13",
   status: "RESOLVED",
   surname: who(1, "KOWALSKI"),
   population: {
@@ -132,6 +132,7 @@ const FULL_INPUT = {
     count: 67_308,
     surface: SURFACE,
   },
+  other_spelling: null,
   // SYNTHETIC: two real localities of the TERYT excerpt (TASK-039) stand in for
   // the section's shape; nothing here asserts that a locality named KOWALSKI exists.
   localities: {
@@ -391,6 +392,7 @@ const COUNT_ONLY: SurnameResultResponse = surnameResultResponseSchema.parse({
     surface: SURFACE,
   },
   other_form: null,
+  other_spelling: null,
   localities: {
     state: "NOT_LOADED",
     reference_date: null,
@@ -494,7 +496,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
 
   it("gives no deck to a surname that did not resolve", () => {
     const unresolved = surnameResultResponseSchema.parse({
-      schema_version: "1.12",
+      schema_version: "1.13",
       status: "UNRESOLVED",
       surname: null,
       population: null,
@@ -513,6 +515,7 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
       bearers: null,
       neighbours: null,
       other_form: null,
+      other_spelling: null,
       localities: null,
     });
     expect(deckCards(unresolved, "pl", LINKS)).toEqual([]);
@@ -975,7 +978,7 @@ describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () =>
 
   it("is nothing for a surname that did not resolve", () => {
     const unresolved = surnameResultResponseSchema.parse({
-      schema_version: "1.12",
+      schema_version: "1.13",
       status: "UNRESOLVED",
       surname: null,
       population: null,
@@ -994,6 +997,7 @@ describe("TASK-060 AC-2: a section that is not ready leaves its slot out", () =>
       bearers: null,
       neighbours: null,
       other_form: null,
+      other_spelling: null,
       localities: null,
     });
     expect(summaryFacts(unresolved, "pl")).toBeNull();
@@ -1224,7 +1228,7 @@ describe("TASK-118: the one-page sheet says only what the cards say", () => {
     expect(Object.keys(few?.cards ?? {})).toEqual(["summary"]);
     expect(few?.counts.length).toBeGreaterThan(0);
     const unresolved = surnameResultResponseSchema.parse({
-      schema_version: "1.12",
+      schema_version: "1.13",
       status: "UNRESOLVED",
       surname: null,
       population: null,
@@ -1243,6 +1247,7 @@ describe("TASK-118: the one-page sheet says only what the cards say", () => {
       bearers: null,
       neighbours: null,
       other_form: null,
+      other_spelling: null,
       localities: null,
     });
     expect(sheetFacts(unresolved, "pl")).toBeNull();

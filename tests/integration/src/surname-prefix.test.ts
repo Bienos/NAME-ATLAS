@@ -19,8 +19,11 @@ import { seedTestSurname } from "@name-atlas/resolver/testing";
  *
  * GENUINE: the two national excerpts, imported through the real importer, so the
  * ordering is by the publisher's own counts. SYNTHETIC: `WISNIEWSKI` without
- * diacritics and one script-confusable surname, seeded to reach the two cases
- * the excerpts do not contain.
+ * diacritics, DABROWA and DĄBROWA, ZMUDA TRZEBIATOWSKI and ŻMUDA TRZEBIATOWSKI,
+ * and one script-confusable surname, seeded to reach the cases the excerpts do
+ * not contain. The seeded national counts are each surname's larger count on the
+ * 2026-01-20 register, as name-atlas.pl's API returned them on 2026-10-05
+ * (TASK-125), attached by cloning an imported national snapshot.
  */
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -69,7 +72,32 @@ describe("prefix suggestions", () => {
       });
       if (outcome.kind !== "IMPORTED") throw new Error(`import failed: ${JSON.stringify(outcome)}`);
     }
-    await seedTestSurname(db(), { canonical_display: "WISNIEWSKI" });
+    for (const [display, count] of [
+      ["WISNIEWSKI", 105],
+      ["DABROWA", 7],
+      ["DĄBROWA", 1211],
+      ["ZMUDA TRZEBIATOWSKI", 248],
+      ["ŻMUDA TRZEBIATOWSKI", 88],
+    ] as const) {
+      const seeded = await seedTestSurname(db(), { canonical_display: display });
+      await sql`
+        WITH snapshot AS (
+          INSERT INTO distribution_snapshots
+          SELECT (jsonb_populate_record(NULL::distribution_snapshots, to_jsonb(d) ||
+                   jsonb_build_object('distribution_snapshot_id', gen_random_uuid(),
+                                      'surname_id', ${seeded.surname_id}::uuid))).*
+            FROM distribution_snapshots d WHERE d.geography_level = 'NATIONAL' LIMIT 1
+          RETURNING distribution_snapshot_id
+        )
+        INSERT INTO distribution_values
+        SELECT (jsonb_populate_record(NULL::distribution_values, to_jsonb(v) ||
+                 jsonb_build_object('distribution_value_id', gen_random_uuid(),
+                                    'distribution_snapshot_id', snapshot.distribution_snapshot_id,
+                                    'count', ${count}::int))).*
+          FROM snapshot, distribution_values v WHERE v.place_id IS NULL LIMIT 1
+      `.execute(db());
+    }
+    await seedTestSurname(db(), { canonical_display: "WISNIEWSKIX" });
     const confusable = await seedTestSurname(db(), { canonical_display: "KOWALSKIJ" });
     await sql`
       UPDATE surnames SET mixed_script = true, script_confusable_flag = true
@@ -86,13 +114,20 @@ describe("prefix suggestions", () => {
     expect(await names("kow")).toEqual(["KOWALSKA", "KOWALSKI", "KOWALCZYK"]);
   });
 
-  it("finds diacritic surnames from input typed without diacritics", async () => {
-    // The seeded WISNIEWSKI matches `wisn` as typed, so it leads; the fold finds the others.
-    expect(await names("wisn")).toEqual(["WISNIEWSKI", "WIŚNIEWSKA", "WIŚNIEWSKI"]);
+  it("finds diacritic surnames from input typed without diacritics, and puts the far more common first", async () => {
+    // TASK-125: WISNIEWSKI (105) matches `wisn` as typed, but WIŚNIEWSKA (54,177) and
+    // WIŚNIEWSKI (53,079) are more than five times as common. WISNIEWSKIX has no count.
+    expect(await names("wisn")).toEqual(["WIŚNIEWSKA", "WIŚNIEWSKI", "WISNIEWSKI", "WISNIEWSKIX"]);
+    expect(await names("dabrowa")).toEqual(["DĄBROWA", "DABROWA"]);
+  });
+
+  it("keeps the spelling as typed first where it is the more common one", async () => {
+    expect(await names("zmuda t")).toEqual(["ZMUDA TRZEBIATOWSKI", "ŻMUDA TRZEBIATOWSKI"]);
   });
 
   it("puts surnames matching the diacritics as typed first", async () => {
-    expect(await names("WIŚ")).toEqual(["WIŚNIEWSKA", "WIŚNIEWSKI", "WISNIEWSKI"]);
+    expect(await names("WIŚ")).toEqual(["WIŚNIEWSKA", "WIŚNIEWSKI", "WISNIEWSKI", "WISNIEWSKIX"]);
+    expect(await names("ŻMUDA")).toEqual(["ŻMUDA TRZEBIATOWSKI", "ZMUDA TRZEBIATOWSKI"]);
   });
 
   it("breaks count ties alphabetically", async () => {

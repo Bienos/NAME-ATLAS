@@ -279,6 +279,7 @@ describe("top-level response", () => {
         change: null,
         neighbours: null,
         other_form: null,
+        other_spelling: null,
         localities: null,
       }).success,
     ).toBe(true);
@@ -964,6 +965,7 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
       bearers: null,
       neighbours: null,
       other_form: null,
+      other_spelling: null,
       localities: null,
     };
     expect(surnameResultResponseSchema.safeParse({ ...base, change: null }).success).toBe(true);
@@ -977,8 +979,8 @@ describe("change over time (TASK-051, ADR-0020; schema 1.7)", () => {
     expect(surnameResultResponseSchema.safeParse(base).success).toBe(false);
   });
 
-  it("is schema version 1.12", () => {
-    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.12");
+  it("is schema version 1.13", () => {
+    expect(SURNAME_RESULT_SCHEMA_VERSION).toBe("1.13");
   });
 });
 
@@ -1101,6 +1103,7 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
     },
     neighbours: { state: "READY", lists: [LIST], reason_code: null, surface: SURFACE },
     other_form: OTHER,
+    other_spelling: null,
     localities: {
       state: "NOT_LOADED",
       reference_date: null,
@@ -1136,12 +1139,58 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
       bearers: null,
       neighbours: null,
       other_form: null,
+      other_spelling: null,
       localities: null,
     };
     const check = (r: unknown) => surnameResultResponseSchema.safeParse(r);
     expect(check(unresolved).success).toBe(true);
     expect(check({ ...unresolved, neighbours: resolved.neighbours }).success).toBe(false);
     expect(check({ ...unresolved, other_form: OTHER }).success).toBe(false);
+  });
+
+  it("carries an other spelling on a resolved surname only, and never the surname itself (1.13)", () => {
+    // WIŚNIEWSKI's men's count on the 2026-01-20 register, on WISNIEWSKI's page (TASK-125).
+    const spelling = {
+      surname: {
+        id: "01a0b9e3-34f3-7633-a239-2b8596dfc0ff",
+        display_name: "WIŚNIEWSKI",
+        script: "Latn",
+      },
+      rule_code: "POLISH_DIACRITIC_FOLD",
+      comparability_group: "pesel_2026_national_male",
+      snapshot_date: "2026-01-20",
+      count: 53079,
+      surface: SURFACE,
+    };
+    const check = (r: unknown) => surnameResultResponseSchema.safeParse(r);
+    expect(check({ ...resolved, other_spelling: spelling }).success).toBe(true);
+    expect(
+      check({ ...resolved, other_spelling: { ...spelling, surname: resolved.surname } }).success,
+    ).toBe(false);
+    expect(
+      check({ ...resolved, other_spelling: { ...spelling, rule_code: "FUZZY" } }).success,
+    ).toBe(false);
+    expect(check({ ...resolved, other_spelling: { ...spelling, count: 0 } }).success).toBe(false);
+    const { other_spelling: _, ...without } = resolved;
+    expect(check(without).success).toBe(false);
+    const unresolved = {
+      ...resolved,
+      status: "UNRESOLVED" as const,
+      surname: null,
+      population: null,
+      rarity: null,
+      distribution: null,
+      suggestions: NO_SUGGESTIONS,
+      meaning: null,
+      change: null,
+      archive: null,
+      bearers: null,
+      neighbours: null,
+      other_form: null,
+      localities: null,
+    };
+    expect(check({ ...unresolved, other_spelling: null }).success).toBe(true);
+    expect(check({ ...unresolved, other_spelling: spelling }).success).toBe(false);
   });
 
   describe("localities with the surname's name (TASK-090, ADR-0025 §2.7; schema 1.11)", () => {
@@ -1239,6 +1288,7 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
         archive: null,
         neighbours: null,
         other_form: null,
+        other_spelling: null,
         localities: null,
         bearers: null,
       };

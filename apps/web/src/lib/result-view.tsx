@@ -33,6 +33,7 @@ import type {
   NeighbourList,
   NeighboursSection,
   OtherForm,
+  OtherSpelling,
   PopulationObservation,
   PopulationSection,
   RarityEntry,
@@ -64,6 +65,7 @@ import {
   localityAdminLine,
   localityKindLabel,
   otherFormSentence,
+  otherSpellingParts,
   partitionLabel,
   populationSentence,
   rankSentence,
@@ -258,6 +260,22 @@ function OtherFormNote({ other, lang }: { other: OtherForm; lang: Lang }) {
       </p>
       <p className="note">{t.otherFormNote}</p>
     </div>
+  );
+}
+
+/**
+ * WIŚNIEWSKI on WISNIEWSKI's page (TASK-125): a question with a link, under the
+ * answer, for a reader who may have typed without diacritics. A plain line;
+ * the two are separate register entries and it says nothing about kinship.
+ */
+function OtherSpellingLine({ other, lang }: { other: OtherSpelling; lang: Lang }) {
+  const { lead, name, rest } = otherSpellingParts(other, lang);
+  return (
+    <p className="other-spelling">
+      {lead}
+      <a href={href(name, lang)}>{name}</a>
+      {rest}
+    </p>
   );
 }
 
@@ -1373,6 +1391,11 @@ export function Result({
         <Snapshot
           response={{ ...response, status: "RESOLVED" }}
           next={steps[0] ?? null}
+          notice={
+            response.other_spelling === null ? null : (
+              <OtherSpellingLine other={response.other_spelling} lang={lang} />
+            )
+          }
           lang={lang}
         />
         <ChapterNav order={order} sources={hasSources} lang={lang} />
