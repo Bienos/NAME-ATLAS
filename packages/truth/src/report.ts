@@ -19,21 +19,31 @@
  * cannot be nested in another, so the reads are bracketed instead: the
  * surname's active claims are read before them and again in the transaction
  * that writes, and a build whose claims changed in between writes nothing.
+ *
+ * The full-name report (TASK-124, ADR-0041) is the same report for a first
+ * name and a surname together: a first-name chapter, `GIVEN_NAME`, before the
+ * surname's nine, read from the name's own claims. The two names are never
+ * combined into a count of people (ADR-0032 §7, D-033).
  */
 import { sql } from "kysely";
-import type { Kysely } from "kysely";
+import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
+import { canonicalKey } from "@name-atlas/resolver";
 import type { CoverageAssessment } from "./coverage-assessment.js";
 import { buildDiscoveryIndex } from "./discovery-index.js";
 import type { DiscoveryIndex } from "./discovery-index.js";
+import { readGivenNameFacts } from "./given-name-facts.js";
+import type { GivenNameFacts } from "./given-name-facts.js";
 import { assessPremiumEligibility } from "./premium-eligibility.js";
 import type { PremiumEligibility } from "./premium-eligibility.js";
 import { querySurnameResult } from "./query.js";
 
 export const REPORT_SCHEMA_VERSION = "report@0";
+/** The full-name report's payload: `report@0`'s, plus the first name's facts (TASK-124). */
+export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@0";
 
 /** `docs/canonical/11` §26.3's section types, in the report's order. */
 export const REPORT_SECTION_TYPES = [
@@ -47,7 +57,9 @@ export const REPORT_SECTION_TYPES = [
   "SOURCES",
   "LIMITATIONS",
 ] as const;
-export type ReportSectionType = (typeof REPORT_SECTION_TYPES)[number];
+/** The full-name report's sections: the first name's chapter, then the surname's (ADR-0041). */
+export const FULL_NAME_SECTION_TYPES = ["GIVEN_NAME", ...REPORT_SECTION_TYPES] as const;
+export type ReportSectionType = (typeof FULL_NAME_SECTION_TYPES)[number];
 
 export type PresentationRole = "HERO" | "SUPPORT" | "LIMITATION";
 
@@ -73,8 +85,18 @@ const CLAIM_PLACEMENT: Readonly<
   ARCHIVE_AVAILABILITY: { section: "ARCHIVES", field: "archive", role: "HERO" },
 };
 
+/**
+ * The first name's claims, all in the GIVEN_NAME chapter: the count leads, the
+ * rank supports it. A claim the frozen facts do not show is a LIMITATION.
+ */
+const GIVEN_NAME_ROLES: Readonly<Record<string, PresentationRole>> = {
+  GIVEN_NAME_POPULATION: "HERO",
+  GIVEN_NAME_RANK: "SUPPORT",
+};
+
 /** The response fields each section presents. */
 const SECTION_FIELDS: Readonly<Record<ReportSectionType, readonly ResponseField[]>> = {
+  GIVEN_NAME: [],
   ORIGIN: ["meaning"],
   DISTRIBUTION: ["population", "rarity", "distribution"],
   TIMELINE: ["change"],
@@ -119,7 +141,10 @@ export interface ReportPayload {
   readonly response: SurnameResultResponse;
   readonly coverage: CoverageAssessment;
   readonly discovery_index: DiscoveryIndex;
+  /** The surname's eligibility under its own policy; a full-name report freezes it too. */
   readonly eligibility: PremiumEligibility;
+  /** The first name's facts: a full-name report only. */
+  readonly given_name?: GivenNameFacts;
 }
 
 function shown(response: SurnameResultResponse, field: ResponseField): boolean {
@@ -169,21 +194,54 @@ function countBy(values: readonly string[]): Record<string, number> {
   return out;
 }
 
+/** A full-name report's gaps about the first name, for LIMITATIONS. */
+function givenNameGaps(facts: GivenNameFacts): Record<string, unknown>[] {
+  return [
+    // D-043: meanings only from a free permission or the public domain; none yet.
+    { topic: "MEANING", reason_code: "NO_ADMISSIBLE_SOURCE" },
+    // D-033, ADR-0032 §7: no source pairs first names with surnames.
+    { topic: "FULL_NAME_COUNT", reason_code: "NO_SOURCE_PAIRS_NAMES" },
+    ...(facts.state === "READY"
+      ? facts.lists
+          .filter((l) => l.rank === null)
+          .map((l) => ({
+            topic: "RANK",
+            comparability_group: l.comparability_group,
+            reason_code: "NO_ACTIVE_CLAIM",
+          }))
+      : [{ topic: "COUNT", reason_code: facts.state }]),
+  ];
+}
+
 /**
  * The sections of one report version: a pure function of what is frozen and
- * of the surname's active claims.
+ * of the subject's active claims (the surname's, and for a full-name report
+ * the first name's too).
  */
 export function reportSectionsOf(
   payload: ReportPayload,
   claims: readonly ReportClaim[],
 ): ReportSection[] {
-  const { response, coverage, discovery_index: index, eligibility } = payload;
+  const { response, coverage, discovery_index: index, eligibility, given_name: given } = payload;
   const roleOrder: Record<PresentationRole, number> = { HERO: 0, SUPPORT: 1, LIMITATION: 2 };
+  const types = given === undefined ? REPORT_SECTION_TYPES : FULL_NAME_SECTION_TYPES;
+  const givenShown = new Set(
+    (given?.lists ?? []).flatMap((l) => [
+      l.count.claim_id,
+      ...(l.rank === null ? [] : [l.rank.claim_id]),
+    ]),
+  );
 
-  return REPORT_SECTION_TYPES.map((type): ReportSection => {
+  return types.map((type): ReportSection => {
     const fields = SECTION_FIELDS[type];
     const refs = claims
       .flatMap((c) => {
+        if (type === "GIVEN_NAME") {
+          const placed = GIVEN_NAME_ROLES[c.claim_type];
+          if (placed === undefined) return [];
+          const role: PresentationRole = givenShown.has(c.claim_id) ? placed : "LIMITATION";
+          return [{ claim_id: c.claim_id, presentation_role: role, claim_type: c.claim_type }];
+        }
         const placed = CLAIM_PLACEMENT[c.claim_type];
         if (placed === undefined || placed.section !== type) return [];
         const role: PresentationRole = shown(response, placed.field) ? placed.role : "LIMITATION";
@@ -199,7 +257,18 @@ export function reportSectionsOf(
 
     let body: Record<string, unknown>;
     let summary: Record<string, number> = {};
-    if (fields.length > 0) {
+    if (type === "GIVEN_NAME" && given !== undefined) {
+      body = {
+        state: given.state,
+        lists: given.lists.map((l) => ({
+          comparability_group: l.comparability_group,
+          snapshot_date: l.snapshot_date,
+          rank: l.rank === null ? "NO_ACTIVE_CLAIM" : "READY",
+        })),
+        meaning: { availability: "NOT_RETRIEVED", reason_code: "NO_ADMISSIBLE_SOURCE" },
+      };
+      summary = countBy(confidences(given.lists));
+    } else if (fields.length > 0) {
       body = {
         fields,
         states: Object.fromEntries(
@@ -208,7 +277,10 @@ export function reportSectionsOf(
       };
       summary = countBy(fields.flatMap((f) => confidences(response[f])));
     } else if (type === "SOURCES") {
-      body = { citation_ids: [...citationsOf(response).keys()] };
+      // The first name's sources lead, as its chapter does.
+      body = {
+        citation_ids: [...citationsOf(given === undefined ? response : [given, response]).keys()],
+      };
     } else if (type === "LIMITATIONS") {
       body = {
         coverage: coverage.dimensions
@@ -226,6 +298,7 @@ export function reportSectionsOf(
             reason_code: e.reason_code,
           })),
         eligibility: { state: eligibility.state, reason_codes: eligibility.reason_codes },
+        ...(given === undefined ? {} : { given_name: givenNameGaps(given) }),
       };
     } else {
       const dimension = coverage.dimensions.find((d) => d.dimension === SOURCELESS[type]);
@@ -256,15 +329,22 @@ export type BuildReportOutcome =
     }
   | { readonly kind: "NOT_RESOLVED" }
   | { readonly kind: "UNAVAILABLE"; readonly reason: string }
-  /** The surname's active claims changed while the build read them; nothing was written. */
+  /** The subject's active claims changed while the build read them; nothing was written. */
   | { readonly kind: "CLAIMS_CHANGED" };
 
-/** The surname's active claims, in a stable order. */
-async function activeClaims(db: Kysely<DB>, surnameId: string): Promise<ReportClaim[]> {
+export type BuildFullNameReportOutcome =
+  | BuildReportOutcome
+  /** No first name with this written form is on the lists. */
+  | { readonly kind: "GIVEN_NAME_NOT_FOUND" }
+  /** A one-character or abbreviated form, not shown until reviewed (ADR-0032 §4). */
+  | { readonly kind: "GIVEN_NAME_UNREVIEWED"; readonly form_review: string };
+
+/** An entity's active claims, in a stable order. */
+async function activeClaims(db: Kysely<DB>, entityId: string): Promise<ReportClaim[]> {
   return db
     .selectFrom("claims")
     .select(["claim_id", "claim_type"])
-    .where("subject_entity_id", "=", surnameId)
+    .where("subject_entity_id", "=", entityId)
     .where("claim_status", "=", "ACTIVE")
     .orderBy("claim_type")
     .orderBy("claim_id")
@@ -274,13 +354,17 @@ async function activeClaims(db: Kysely<DB>, surnameId: string): Promise<ReportCl
 const sameClaims = (a: readonly ReportClaim[], b: readonly ReportClaim[]): boolean =>
   a.length === b.length && a.every((c, i) => c.claim_id === b[i]?.claim_id);
 
-/**
- * Freezes the surname's report as its next version, under the INTERNAL_TEST
- * entitlement. The response, coverage, index and eligibility are read between
- * two reads of the surname's active claims; the second is in the transaction
- * that writes, which writes nothing when the two differ.
- */
-export async function buildReport(db: Kysely<DB>, input: string): Promise<BuildReportOutcome> {
+/** The surname's part of a report: what the PAID surface says, and the claims it was read between. */
+type SurnamePart =
+  | {
+      readonly kind: "READ";
+      readonly surnameId: string;
+      readonly claims: readonly ReportClaim[];
+      readonly payload: ReportPayload;
+    }
+  | Exclude<BuildReportOutcome, { kind: "BUILT" } | { kind: "CLAIMS_CHANGED" }>;
+
+async function readSurnamePart(db: Kysely<DB>, input: string): Promise<SurnamePart> {
   const probe = await querySurnameResult(db, input, { surface: "PAID" });
   if (probe.kind === "UNAVAILABLE") return { kind: "UNAVAILABLE", reason: probe.reason };
   if (probe.kind !== "OK" || probe.response.surname === null) return { kind: "NOT_RESOLVED" };
@@ -299,107 +383,202 @@ export async function buildReport(db: Kysely<DB>, input: string): Promise<BuildR
   const assessed = await assessPremiumEligibility(db, input);
   if (assessed.kind !== "ASSESSED") return assessed;
 
-  const payload: ReportPayload = {
-    report_schema_version: REPORT_SCHEMA_VERSION,
-    surface: "PAID",
-    entitlement_kind: "INTERNAL_TEST",
-    response,
-    coverage: built.coverage,
-    discovery_index: built.index,
-    eligibility: assessed.eligibility,
+  return {
+    kind: "READ",
+    surnameId,
+    claims,
+    payload: {
+      report_schema_version: REPORT_SCHEMA_VERSION,
+      surface: "PAID",
+      entitlement_kind: "INTERNAL_TEST",
+      response,
+      coverage: built.coverage,
+      discovery_index: built.index,
+      eligibility: assessed.eligibility,
+    },
   };
-  const sections = reportSectionsOf(payload, claims);
+}
+
+/** Writes the next version of the subject's report, with its sections and their claims. */
+async function writeVersion(
+  trx: Transaction<DB>,
+  subject: {
+    readonly surnameId: string;
+    readonly givenNameId: string | null;
+    readonly reportType: "NAME_ATLAS" | "FULL_NAME";
+  },
+  payload: ReportPayload,
+  sections: readonly ReportSection[],
+): Promise<Extract<BuildReportOutcome, { kind: "BUILT" }>> {
+  await trx
+    .insertInto("reports")
+    .values({
+      report_id: uuidv7(),
+      surname_id: subject.surnameId,
+      given_name_id: subject.givenNameId,
+      report_type: subject.reportType,
+      entitlement_kind: "INTERNAL_TEST",
+      status: "READY",
+    })
+    .onConflict((oc) => oc.constraint("reports_one_per_subject").doNothing())
+    .execute();
+  const report = await trx
+    .selectFrom("reports")
+    .select("report_id")
+    .where("surname_id", "=", subject.surnameId)
+    .where((eb) =>
+      subject.givenNameId === null
+        ? eb("given_name_id", "is", null)
+        : eb("given_name_id", "=", subject.givenNameId),
+    )
+    .where("report_type", "=", subject.reportType)
+    .where("entitlement_kind", "=", "INTERNAL_TEST")
+    .forUpdate()
+    .executeTakeFirstOrThrow();
+  const last = await trx
+    .selectFrom("report_versions")
+    .select(sql<number>`coalesce(max(version_number), 0)`.as("n"))
+    .where("report_id", "=", report.report_id)
+    .executeTakeFirstOrThrow();
+  const versionNumber = Number(last.n) + 1;
+
+  const reportVersionId = uuidv7();
+  await trx
+    .insertInto("report_versions")
+    .values({
+      report_version_id: reportVersionId,
+      report_id: report.report_id,
+      version_number: versionNumber,
+      report_schema_version: payload.report_schema_version,
+      coverage_assessment_version: payload.coverage.assessment_version,
+      discovery_index_version: payload.discovery_index.generation_version,
+      eligibility_policy_version: payload.eligibility.policy_version,
+      eligibility_state: payload.eligibility.state,
+      rendered_payload: JSON.stringify(payload),
+    })
+    .execute();
+
+  for (const [i, section] of sections.entries()) {
+    const sectionId = uuidv7();
+    await trx
+      .insertInto("report_sections")
+      .values({
+        report_section_id: sectionId,
+        report_version_id: reportVersionId,
+        section_type: section.section_type,
+        sequence_number: i + 1,
+        title_payload: JSON.stringify(section.title_payload),
+        body_payload: JSON.stringify(section.body_payload),
+        section_confidence_summary: JSON.stringify(section.section_confidence_summary),
+      })
+      .execute();
+    if (section.claims.length > 0) {
+      await trx
+        .insertInto("report_claim_references")
+        .values(
+          section.claims.map((c, j) => ({
+            report_section_id: sectionId,
+            claim_id: c.claim_id,
+            presentation_role: c.presentation_role,
+            sequence: j + 1,
+          })),
+        )
+        .execute();
+    }
+  }
+
+  return {
+    kind: "BUILT",
+    report_id: report.report_id,
+    report_version_id: reportVersionId,
+    version_number: versionNumber,
+    eligibility: payload.eligibility,
+    sections,
+  };
+}
+
+/**
+ * Freezes the surname's report as its next version, under the INTERNAL_TEST
+ * entitlement. The response, coverage, index and eligibility are read between
+ * two reads of the surname's active claims; the second is in the transaction
+ * that writes, which writes nothing when the two differ.
+ */
+export async function buildReport(db: Kysely<DB>, input: string): Promise<BuildReportOutcome> {
+  const part = await readSurnamePart(db, input);
+  if (part.kind !== "READ") return part;
+  const sections = reportSectionsOf(part.payload, part.claims);
 
   return db.transaction().execute(async (trx): Promise<BuildReportOutcome> => {
-    if (!sameClaims(claims, await activeClaims(trx, surnameId))) {
+    if (!sameClaims(part.claims, await activeClaims(trx, part.surnameId))) {
       return { kind: "CLAIMS_CHANGED" };
     }
-
-    await trx
-      .insertInto("reports")
-      .values({
-        report_id: uuidv7(),
-        surname_id: surnameId,
-        report_type: "NAME_ATLAS",
-        entitlement_kind: "INTERNAL_TEST",
-        status: "READY",
-      })
-      .onConflict((oc) => oc.columns(["surname_id", "report_type", "entitlement_kind"]).doNothing())
-      .execute();
-    const report = await trx
-      .selectFrom("reports")
-      .select("report_id")
-      .where("surname_id", "=", surnameId)
-      .where("report_type", "=", "NAME_ATLAS")
-      .where("entitlement_kind", "=", "INTERNAL_TEST")
-      .forUpdate()
-      .executeTakeFirstOrThrow();
-    const last = await trx
-      .selectFrom("report_versions")
-      .select(sql<number>`coalesce(max(version_number), 0)`.as("n"))
-      .where("report_id", "=", report.report_id)
-      .executeTakeFirstOrThrow();
-    const versionNumber = Number(last.n) + 1;
-
-    const reportVersionId = uuidv7();
-    await trx
-      .insertInto("report_versions")
-      .values({
-        report_version_id: reportVersionId,
-        report_id: report.report_id,
-        version_number: versionNumber,
-        report_schema_version: REPORT_SCHEMA_VERSION,
-        coverage_assessment_version: payload.coverage.assessment_version,
-        discovery_index_version: payload.discovery_index.generation_version,
-        eligibility_policy_version: payload.eligibility.policy_version,
-        eligibility_state: payload.eligibility.state,
-        rendered_payload: JSON.stringify(payload),
-      })
-      .execute();
-
-    for (const [i, section] of sections.entries()) {
-      const sectionId = uuidv7();
-      await trx
-        .insertInto("report_sections")
-        .values({
-          report_section_id: sectionId,
-          report_version_id: reportVersionId,
-          section_type: section.section_type,
-          sequence_number: i + 1,
-          title_payload: JSON.stringify(section.title_payload),
-          body_payload: JSON.stringify(section.body_payload),
-          section_confidence_summary: JSON.stringify(section.section_confidence_summary),
-        })
-        .execute();
-      if (section.claims.length > 0) {
-        await trx
-          .insertInto("report_claim_references")
-          .values(
-            section.claims.map((c, j) => ({
-              report_section_id: sectionId,
-              claim_id: c.claim_id,
-              presentation_role: c.presentation_role,
-              sequence: j + 1,
-            })),
-          )
-          .execute();
-      }
-    }
-
-    return {
-      kind: "BUILT",
-      report_id: report.report_id,
-      report_version_id: reportVersionId,
-      version_number: versionNumber,
-      eligibility: payload.eligibility,
+    return writeVersion(
+      trx,
+      { surnameId: part.surnameId, givenNameId: null, reportType: "NAME_ATLAS" },
+      part.payload,
       sections,
-    };
+    );
+  });
+}
+
+/**
+ * Freezes the full-name report for a first name and a surname as its next
+ * version (TASK-124, ADR-0041): the surname's part exactly as
+ * {@link buildReport} reads it, and the first name's facts from its own
+ * claims, on the PAID surface. Both names' claims are read before and again
+ * in the transaction that writes. A first name not on the lists, or one held
+ * for review, writes nothing.
+ */
+export async function buildFullNameReport(
+  db: Kysely<DB>,
+  input: { readonly givenName: string; readonly surname: string },
+): Promise<BuildFullNameReportOutcome> {
+  const name = await db
+    .selectFrom("given_names")
+    .select(["given_name_id", "canonical_display", "form_review"])
+    .where("canonical_key", "=", canonicalKey(input.givenName))
+    .executeTakeFirst();
+  if (name === undefined) return { kind: "GIVEN_NAME_NOT_FOUND" };
+  if (name.form_review !== null) {
+    return { kind: "GIVEN_NAME_UNREVIEWED", form_review: name.form_review };
+  }
+  const givenClaims = await activeClaims(db, name.given_name_id);
+  const given = await readGivenNameFacts(
+    db,
+    { id: name.given_name_id, display_name: name.canonical_display },
+    "PAID",
+  );
+
+  const part = await readSurnamePart(db, input.surname);
+  if (part.kind !== "READ") return part;
+  const payload: ReportPayload = {
+    ...part.payload,
+    report_schema_version: FULL_NAME_REPORT_SCHEMA_VERSION,
+    given_name: given,
+  };
+  const sections = reportSectionsOf(payload, [...givenClaims, ...part.claims]);
+
+  return db.transaction().execute(async (trx): Promise<BuildFullNameReportOutcome> => {
+    if (
+      !sameClaims(part.claims, await activeClaims(trx, part.surnameId)) ||
+      !sameClaims(givenClaims, await activeClaims(trx, name.given_name_id))
+    ) {
+      return { kind: "CLAIMS_CHANGED" };
+    }
+    return writeVersion(
+      trx,
+      { surnameId: part.surnameId, givenNameId: name.given_name_id, reportType: "FULL_NAME" },
+      payload,
+      sections,
+    );
   });
 }
 
 /** A stored version as written: its frozen payload is returned unparsed. */
 export interface StoredReportVersion {
   readonly report_version_id: string;
+  /** `NAME_ATLAS`, the surname report, or `FULL_NAME` (TASK-124). */
+  readonly report_type: string;
   readonly version_number: number;
   readonly report_schema_version: string;
   readonly eligibility_state: string;
@@ -433,18 +612,20 @@ export async function readReportVersion(
 ): Promise<StoredReportVersion | null> {
   if (!isReportVersionId(reportVersionId)) return null;
   const version = await db
-    .selectFrom("report_versions")
+    .selectFrom("report_versions as v")
+    .innerJoin("reports as r", "r.report_id", "v.report_id")
     .select([
-      "report_version_id",
-      "version_number",
-      "report_schema_version",
-      "eligibility_state",
-      sql<string>`to_char(generated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`.as(
+      "v.report_version_id",
+      "r.report_type",
+      "v.version_number",
+      "v.report_schema_version",
+      "v.eligibility_state",
+      sql<string>`to_char(v.generated_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')`.as(
         "generated_at",
       ),
-      "rendered_payload",
+      "v.rendered_payload",
     ])
-    .where("report_version_id", "=", reportVersionId)
+    .where("v.report_version_id", "=", reportVersionId)
     .executeTakeFirst();
   if (version === undefined) return null;
 
@@ -478,6 +659,7 @@ export async function readReportVersion(
 
   return {
     report_version_id: version.report_version_id,
+    report_type: version.report_type,
     version_number: version.version_number,
     report_schema_version: version.report_schema_version,
     eligibility_state: version.eligibility_state,

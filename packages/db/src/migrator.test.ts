@@ -47,6 +47,7 @@ describe("MIGRATIONS_DIR", () => {
       "0036_accounts_purchases.ts", // TASK-111 — test-mode checkout's purchases
       "0037_reports.ts", // TASK-119 — the frozen surname report, internal test only
       "0038_given_name_claims.ts", // TASK-122 / ADR-0032 §6 — first-name counts and ranks as claims
+      "0039_full_name_reports.ts", // TASK-124 / ADR-0041 — the full-name report
     ]);
   });
 });

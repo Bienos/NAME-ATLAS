@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { CitationDto, SurnameResultResponse } from "@name-atlas/contracts";
-import type { StoredReportVersion } from "@name-atlas/truth";
+import { parseGivenNameFacts } from "@name-atlas/truth";
+import type { GivenNameFacts, StoredReportVersion } from "@name-atlas/truth";
 import {
   assessmentWord,
   changeListLabel,
@@ -26,6 +27,10 @@ import { SiteShell } from "./site-shell.js";
  * and derives nothing: every figure is a field of that response, every gap
  * a state or code the report froze. A response frozen under an earlier
  * contract is not shown at all; the page says so.
+ *
+ * A full-name report (TASK-124) adds the first name's chapter before the
+ * surname's: its count and rank on each list, apart, from the facts the
+ * report froze. It never shows a count of people with both names.
  */
 
 /** What the page renders, from one stored version. */
@@ -35,7 +40,16 @@ export interface ReportPreview {
   readonly generatedOn: string;
   /** Null when the frozen response no longer validates (an earlier contract). */
   readonly response: SurnameResultResponse | null;
+  /** The surname, or for a full-name report the first name and the surname. */
   readonly displayName: string;
+  /** A full-name report's first-name facts; null for a surname report. */
+  readonly givenName: GivenNameFacts | null;
+  /** A full-name report's frozen gaps about the first name. */
+  readonly givenGaps: readonly {
+    readonly topic: string;
+    readonly reason_code: string;
+    readonly comparability_group: string | null;
+  }[];
   readonly eligibility: { readonly state: string; readonly reason_codes: readonly string[] };
   readonly gaps: readonly {
     readonly dimension: string;
@@ -72,13 +86,35 @@ export function toReportPreview(stored: StoredReportVersion): ReportPreview | nu
   ) {
     return null;
   }
+  let givenName: GivenNameFacts | null = null;
+  if (stored.report_type === "FULL_NAME") {
+    givenName = parseGivenNameFacts(payload["given_name"]);
+    if (givenName === null) return null;
+  }
+  const limitations = record(
+    stored.sections.find((s) => s.section_type === "LIMITATIONS")?.body_payload,
+  );
+  const givenGaps = Array.isArray(limitations?.["given_name"])
+    ? limitations["given_name"].flatMap((g) => {
+        const x = record(g);
+        const topic = x?.["topic"];
+        const reason = x?.["reason_code"];
+        const group = x?.["comparability_group"];
+        return isString(topic) && isString(reason)
+          ? [{ topic, reason_code: reason, comparability_group: isString(group) ? group : null }]
+          : [];
+      })
+    : [];
   const response = surnameResultResponseSchema.safeParse(payload["response"]);
   return {
     id: stored.report_version_id,
     version: stored.version_number,
     generatedOn: stored.generated_at.slice(0, 10),
     response: response.success ? response.data : null,
-    displayName,
+    displayName:
+      givenName === null ? displayName : `${givenName.given_name.display_name} ${displayName}`,
+    givenName,
+    givenGaps,
     eligibility: { state, reason_codes: reasons },
     gaps: dimensions.flatMap((d) => {
       const x = record(d);
@@ -105,6 +141,7 @@ type Words = Readonly<Record<string, { readonly pl: string; readonly en: string 
 const word = (words: Words, key: string, lang: Lang): string => words[key]?.[lang] ?? key;
 
 const SECTION_TITLES: Words = {
+  GIVEN_NAME: { pl: "Imię", en: "First name" },
   ORIGIN: { pl: "Pochodzenie nazwiska", en: "Origin of the name" },
   DISTRIBUTION: { pl: "Liczebność i rozmieszczenie", en: "Numbers and distribution" },
   TIMELINE: { pl: "Zmiana w czasie", en: "Change over time" },
@@ -194,9 +231,26 @@ const STATES: Words = {
   NOT_SEARCHED: { pl: "Jeszcze nie przeszukano.", en: "Not searched yet." },
 };
 
+/** A full-name report's gaps about the first name, by topic. */
+const GIVEN_GAPS: Words = {
+  MEANING: {
+    pl: "Znaczenie imienia: nie ma jeszcze słownika, którego wydawca pozwala bezpłatnie cytować objaśnienia, ani słownika z domeny publicznej.",
+    en: "The name's meaning: there is not yet a dictionary whose publisher allows its explanations to be quoted free of charge, nor one in the public domain.",
+  },
+  FULL_NAME_COUNT: {
+    pl: "Ile osób nosi to imię i to nazwisko razem: żadne źródło nie łączy imion z nazwiskami, więc raport tego nie podaje i nie szacuje.",
+    en: "How many people have this first name and this surname together: no source pairs first names with surnames, so the report neither states nor estimates it.",
+  },
+  COUNT: {
+    pl: "Liczba osób z tym imieniem: brak zatwierdzonych danych.",
+    en: "People with this first name: no approved data.",
+  },
+};
+
 const COPY = {
   pl: {
     eyebrow: (v: number, d: string) => `Raport · wersja ${v} · ${d}`,
+    fullEyebrow: (v: number, d: string) => `Raport imienia i nazwiska · wersja ${v} · ${d}`,
     internal: "Test wewnętrzny — ten raport nie jest sprzedawany.",
     eligible: "Kwalifikuje się do płatnego raportu.",
     notEligible: "Nie kwalifikuje się do płatnego raportu, bo",
@@ -235,9 +289,17 @@ const COPY = {
     whyNot: "Dlaczego raport nie jest oferowany",
     noGaps: "Brak luk.",
     other: "English",
+    rankOf: (rank: string, of: string) => `${rank} z ${of}`,
+    noRank: "brak",
+    listsApart:
+      "Każda lista PESEL jest liczona osobno i list nie sumujemy. Miejsce: równe liczby dzielą miejsce.",
+    givenGaps: "Imię",
+    rankGap: (list: string) => `Miejsce na liście (${list}): brak zatwierdzonego twierdzenia.`,
+    surnameNotOffered: "Dlaczego sama część o nazwisku nie byłaby oferowana",
   },
   en: {
     eyebrow: (v: number, d: string) => `Report · version ${v} · ${d}`,
+    fullEyebrow: (v: number, d: string) => `Full-name report · version ${v} · ${d}`,
     internal: "Internal test — this report is not for sale.",
     eligible: "Eligible for a paid report.",
     notEligible: "Not eligible for a paid report, because",
@@ -276,6 +338,13 @@ const COPY = {
     whyNot: "Why the report is not offered",
     noGaps: "No gaps.",
     other: "Polski",
+    rankOf: (rank: string, of: string) => `${rank} of ${of}`,
+    noRank: "none",
+    listsApart:
+      "Each PESEL list is counted on its own, and the lists are never added together. Rank: equal counts share a place.",
+    givenGaps: "First name",
+    rankGap: (list: string) => `Rank on the list (${list}): no approved claim.`,
+    surnameNotOffered: "Why the surname part alone would not be offered",
   },
 } as const;
 
@@ -506,6 +575,55 @@ function Archives({
   );
 }
 
+function GivenName({
+  facts,
+  lang,
+  numbers,
+}: {
+  facts: GivenNameFacts;
+  lang: Lang;
+  numbers: ReadonlyMap<string, number>;
+}) {
+  const t = COPY[lang];
+  const meaning = <p className="report-caveat">{word(GIVEN_GAPS, "MEANING", lang)}</p>;
+  if (facts.state !== "READY") {
+    return (
+      <>
+        <p>{word(STATES, facts.state, lang)}</p>
+        {meaning}
+      </>
+    );
+  }
+  return (
+    <>
+      <Table
+        head={[t.list, t.people, t.rank, t.asOf]}
+        rows={facts.lists.map((l) => [
+          listName(l.comparability_group, lang),
+          <>
+            {formatInteger(l.count.count, lang)}
+            <Note id={l.count.citation.id} numbers={numbers} />
+          </>,
+          l.rank === null ? (
+            t.noRank
+          ) : (
+            <>
+              {t.rankOf(
+                formatInteger(l.rank.rank, lang),
+                formatInteger(l.rank.universe_size, lang),
+              )}
+              <Note id={l.rank.citation.id} numbers={numbers} />
+            </>
+          ),
+          formatDate(l.snapshot_date, lang),
+        ])}
+      />
+      <p className="report-caveat">{t.listsApart}</p>
+      {meaning}
+    </>
+  );
+}
+
 /** A citation's locator in words: a dataset's resource number, or the locator as written. */
 function locatorWords(locator: string, lang: Lang): string {
   const resource = /^resource:(\S+)$/u.exec(locator);
@@ -569,9 +687,23 @@ function chapterBody(
             ))}
           </ul>
         )}
+        {p.givenName !== null ? (
+          <>
+            <h3>{t.givenGaps}</h3>
+            <ul>
+              {p.givenGaps.map((g) => (
+                <li key={`${g.topic}-${g.comparability_group ?? ""}`}>
+                  {g.topic === "RANK"
+                    ? t.rankGap(listName(g.comparability_group, lang))
+                    : word(GIVEN_GAPS, g.topic, lang)}
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
         {p.eligibility.reason_codes.length > 0 ? (
           <>
-            <h3>{t.whyNot}</h3>
+            <h3>{p.givenName === null ? t.whyNot : t.surnameNotOffered}</h3>
             <ul>
               {p.eligibility.reason_codes.map((code) => (
                 <li key={code}>{word(REASONS, code, lang)}</li>
@@ -583,6 +715,11 @@ function chapterBody(
     );
   }
   if (type in SOURCELESS) return <p>{t.sourceless(word(SOURCELESS, type, lang))}</p>;
+  if (type === "GIVEN_NAME") {
+    return p.givenName === null ? null : (
+      <GivenName facts={p.givenName} lang={lang} numbers={numbers} />
+    );
+  }
   if (r === null) return <p>{t.stale}</p>;
   switch (type) {
     case "ORIGIN":
@@ -620,23 +757,29 @@ export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang:
   const t = COPY[lang];
   const sourceIds = preview.sections.find((s) => s.type === "SOURCES")?.citationIds ?? [];
   const numbers = new Map(sourceIds.map((id, i) => [id, i + 1]));
-  const citations = preview.response === null ? new Map() : citationsById(preview.response);
+  const citations = citationsById([preview.givenName, preview.response]);
   const date = formatDate(preview.generatedOn, lang);
   const eligible = preview.eligibility.state === "ELIGIBLE";
+  const fullName = preview.givenName !== null;
 
   return (
     <article className="report">
       <header className="report-cover">
-        <p className="report-eyebrow">{t.eyebrow(preview.version, date)}</p>
+        <p className="report-eyebrow">
+          {fullName ? t.fullEyebrow(preview.version, date) : t.eyebrow(preview.version, date)}
+        </p>
         <h1 className="report-title">{preview.displayName}</h1>
         <p className="report-stamp">{t.internal}</p>
-        <p className="report-verdict">
-          {eligible
-            ? t.eligible
-            : `${t.notEligible} ${preview.eligibility.reason_codes
-                .map((code) => word(REASONS, code, lang))
-                .join("; ")}.`}
-        </p>
+        {/* The eligibility policy judges a surname report; a full-name report's lives in its last chapter. */}
+        {fullName ? null : (
+          <p className="report-verdict">
+            {eligible
+              ? t.eligible
+              : `${t.notEligible} ${preview.eligibility.reason_codes
+                  .map((code) => word(REASONS, code, lang))
+                  .join("; ")}.`}
+          </p>
+        )}
         <p className="report-frozen">{t.frozen(date)}</p>
       </header>
 
