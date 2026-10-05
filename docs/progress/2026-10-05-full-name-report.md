@@ -45,7 +45,8 @@ CI's `verify` job cannot run on GitHub because of the account's billing block (s
 | `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0, no diff |
 | `pnpm test:integration` | exit 0: 39 files, 475 tests |
 | `pnpm test:golden` | exit 0: 4 files, 364 tests |
-| `pnpm build`, `e2e:seed`, `test:e2e` | running when the pull request opened; results follow in the next commit |
+| `pnpm build` | exit 0; the routes list `ƒ /en/report/[id]` and `ƒ /pl/raport/[id]` |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
 
 **`pnpm report:build` on real first-name data.** These runs used the database `gn_full`, which holds the full official 2026-01-20 first-name lists and their TASK-122 claims. `tests/e2e/seed.sh` was first run against it (exit 0), which applied 0039 and added the e2e surnames.
 - `--surname NOWAK --given-name PIOTR`: exit 0, version 1. The `GIVEN_NAME` section has 4 claims (a count and a rank on each list), and both lists' rank is `READY`.
@@ -54,6 +55,29 @@ CI's `verify` job cannot run on GitHub because of the account's billing block (s
 - `--given-name "BRAK DANYCH"`: `[report] GIVEN_NAME_NOT_FOUND`, exit 1.
 - `--given-name` with no value: the usage line, exit 2.
 - No output line held a name.
+
+**The preview against `next start`**, from CI's build, with `DATABASE_URL` set to `gn_full` and `REPORT_PREVIEW_ENABLED=1`:
+- `curl` returned:
+
+  | Address | Status |
+  |---|---|
+  | `/pl/raport/{PIOTR NOWAK}`, `/en/report/{PIOTR NOWAK}`, `/pl/raport/{ANNA NOWAK}` | 200 |
+  | `/pl/raport/nowak` | 404 |
+  | `/pl/raport/01920000-0000-7000-8000-000000000001` | 404 |
+
+  Each was sent with `cache-control: private, no-store`, and the page carries `noindex`.
+- PIOTR NOWAK's page showed:
+  - on the cover, "Raport imienia i nazwiska · wersja 1 · 5 października 2026 r." and "PIOTR NOWAK", with no eligibility verdict;
+  - chapter 1, "Imię": kobiety 3, "14 831 z 28 781"; mężczyźni 682 516, "1 z 46 197"; each footnoted [1]–[4] to resources 1159670 and 1159669;
+  - the line on the lists being counted apart, and the meaning's absence;
+  - chapters 2–10, the surname's;
+  - under "Czego nie wiemy", the two first-name gaps and "Dlaczego sama część o nazwisku nie byłaby oferowana".
+- Playwright, after dismissing the consent banner, measured the page's scroll width against its client width:
+  - PIOTR NOWAK, Polish, 1440 × 900: 1440 / 1440;
+  - ANNA NOWAK, English, 390 × 844: 390 / 390;
+  - ANNA NOWAK, Polish, 390 × 844: 390 / 390.
+
+  None overflows. In the screenshots, the first-name table wraps "1 of 28,781" within its column on the phone.
 
 ## Not verified
 
