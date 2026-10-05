@@ -257,7 +257,7 @@ const ARTEFACTS = [
 ] as const;
 
 describe("the synthetic fixture", () => {
-  it("is a valid list_facts@3 artefact, so the view is tested against the contract's own shape", () => {
+  it("is a valid list_facts@4 artefact, so the view is tested against the contract's own shape", () => {
     expect(listFactsArtefactSchema.safeParse(LIST_FACTS_FIXTURE).success).toBe(true);
     // Both wordings of plate IV's headline are exercised.
     expect(isOneInFour(M.endings.entries[0]!.share_of_people)).toBe(true);
@@ -666,11 +666,11 @@ describe("plate VII: change over time (TASK-044 AC-04, AC-05)", () => {
     const { male, female } = REAL.lists;
     expect(flat(headline(REAL, "pl", "male"))).toContain(
       `Lista mężczyzn z 2026 r. ma o ${flat(formatInteger(male.change.surnames_delta, "pl"))} ` +
-        "nazwisk więcej niż lista z 2020 r.",
+        "nazwiska więcej niż lista z 2019 r.",
     );
     expect(headline(REAL, "en", "female")).toContain(
       `The 2026 female list has ${formatInteger(female.change.surnames_delta, "en")} more ` +
-        "surnames than the 2020 one.",
+        "surnames than the 2019 one.",
     );
   });
 
@@ -713,7 +713,8 @@ describe("plate VII: change over time (TASK-044 AC-04, AC-05)", () => {
     expect(female).toContain("ALFA 95 011 → 93 456");
     const en = flat(text(variant(LIST_FACTS_FIXTURE, "en", "female")));
     expect(en).toContain("GAMMOWA not on the 2020 list → 46,789");
-    expect(flat(text(variant(REAL, "pl", "male")))).toContain("NOWAK 101 036 → 98 387");
+    // The committed artefact's first edition is 2019-06-30 (TASK-106).
+    expect(flat(text(variant(REAL, "pl", "male")))).toContain("NOWAK 101 473 → 98 387");
   });
 
   it("says whether the ten most common surnames are unchanged, as the artefact says", () => {

@@ -181,14 +181,17 @@ export const MEANING_AGREEMENT_BASIS = "identical root_form and root_language, c
 /**
  * The list-facts pipeline: the gate, confidence and rights checks and the
  * methods below, run by `bin/build-list-facts.ts`. Recorded on the artefact as
- * `pipeline_version`; it is not the artefact's `schema_version` (`list_facts@3`).
+ * `pipeline_version`; it is not the artefact's `schema_version` (`list_facts@4`).
  * `@2` (TASK-043) keeps each row's key and published string past the parser,
  * for the named selections and the overlap, and adds the eight methods below.
  * `@3` (TASK-044, ADR-0019) reads every edition of each list's series through
  * the same gates, refuses a publisher duplicate, and adds `editions` and
  * `change`. Every `@2` method and figure is unchanged.
+ * `@4` (TASK-106, ADR-0019 §2.2 as amended) reads each list's 2019-06-30
+ * edition first, with its own header, as a surname's change over time does
+ * (`PESEL_TREND_EDITIONS`); every other step is unchanged.
  */
-export const LIST_FACTS_METHOD_VERSION = "list_facts_pipeline@3";
+export const LIST_FACTS_METHOD_VERSION = "list_facts_pipeline@4";
 
 /** People, surnames, extremes, medians, thresholds and quantiles of one list. */
 export const LIST_SUMMARY_METHOD_VERSION = "list_summary@1";
@@ -270,8 +273,11 @@ export const LIST_NAMED_TOP_METHOD_VERSION = "list_named_top@1";
  */
 export const LIST_OVERLAP_METHOD_VERSION = "list_overlap@1";
 
-/** Each edition of the list's series: lineage, surnames, people and floor, and the series' gaps. */
-export const LIST_EDITIONS_METHOD_VERSION = "list_editions@1";
+/**
+ * Each edition of the list's series: lineage, surnames, people and floor, and the
+ * series' gaps. `@2` (TASK-106): the first edition may be the 2019 one, in no series.
+ */
+export const LIST_EDITIONS_METHOD_VERSION = "list_editions@2";
 
 /**
  * The list's first edition against its last, by `canonical_key_v2`: the
