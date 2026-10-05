@@ -9369,6 +9369,12 @@ main.studio h1 {
   align-items: start;
 }
 
+/* A horizontal swipe on the card shows the next one; vertical scrolling stays the page's. */
+.studio-swipe {
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .studio-image {
   display: block;
   width: 100%;
@@ -9398,6 +9404,7 @@ main.studio h1 {
 
 .studio-actions button,
 .studio-video button,
+.studio-pdf,
 .studio-gate a,
 .studio-more a,
 .studio-more .share button {
@@ -9430,6 +9437,54 @@ main.studio h1 {
 }
 
 .studio-actions button:disabled,
+/* The video's choices (TASK-108): two options a row, as pills. */
+.studio-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.studio-choice legend {
+  width: 100%;
+  margin-bottom: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+}
+
+.studio-choice label {
+  position: relative;
+  display: inline-flex;
+}
+
+.studio-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.studio-choice span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--dusk-line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.studio-choice input:checked + span {
+  border-color: var(--dusk-amber);
+  color: var(--dusk-amber);
+}
+
+.studio-choice input:focus-visible + span {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
 .studio-video button:disabled {
   opacity: 0.6;
   cursor: default;

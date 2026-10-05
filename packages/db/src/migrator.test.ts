@@ -42,6 +42,7 @@ describe("MIGRATIONS_DIR", () => {
       "0031_given_names.ts", // TASK-078 / ADR-0032 — given names, apart from surnames
       "0032_accounts_google_identities.ts", // TASK-084 / ADR-0033 — Google sign-in
       "0033_family_invitations.ts", // TASK-094 / ADR-0029 §2.6 — invitations and claims
+      "0034_family_release_claims_on_account_deletion.ts", // ADR-0029 §2.6.22 — a deleted claimant leaves
       "0035_accounts_purchases.ts", // TASK-111 — test-mode checkout's purchases
     ]);
   });

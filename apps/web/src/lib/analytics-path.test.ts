@@ -107,3 +107,21 @@ describe("the Mapa's address in the statistics (TASK-092, AC-1)", () => {
     );
   });
 });
+
+describe("a claimant's own card in the statistics (TASK-094)", () => {
+  const PERSON_ID = "0199a1b2-0000-7000-8000-00000000ab03";
+
+  it("replaces the person's id on the card route, in both languages", () => {
+    expect(analyticsUrl(`/pl/konto/drzewa/karta/${PERSON_ID}`)).toBe(
+      "/pl/konto/drzewa/karta/[person]",
+    );
+    expect(analyticsUrl(`https://name-atlas.pl/en/account/trees/card/${PERSON_ID}?saved=1`)).toBe(
+      "https://name-atlas.pl/en/account/trees/card/[person]",
+    );
+  });
+
+  it("leaves the cards list and the invitation page as they are; the token is in the query", () => {
+    expect(analyticsUrl("/pl/konto/drzewa/karty")).toBe("/pl/konto/drzewa/karty");
+    expect(analyticsUrl("/en/account/trees/invitation?t=abc")).toBe("/en/account/trees/invitation");
+  });
+});

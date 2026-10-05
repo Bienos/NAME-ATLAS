@@ -125,7 +125,8 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     `.execute(db);
 
     // `0035` down to `0007` sit above `0006` and revert cleanly (the purchases,
-    // which refuse only while a purchase is stored and none is here, the invitations,
+    // which refuse only while a purchase is stored and none is here, the claimant
+    // deletion trigger, the invitations,
     // which refuse only while a claim is stored and none is here, the Google
     // identities, the given-name tables, the family safeguards, a claim type, the family and accounts
     // schemas, which refuse only while a tree or a user is stored and none is
@@ -139,6 +140,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     const migrator = createMigrator(db);
     for (const expected of [
       "0035_accounts_purchases",
+      "0034_family_release_claims_on_account_deletion",
       "0033_family_invitations",
       "0032_accounts_google_identities",
       "0031_given_names",

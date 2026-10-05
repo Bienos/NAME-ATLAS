@@ -8,7 +8,7 @@ Numbered TASK-111 and migration 0035 on rebase: `main` took TASK-109 and TASK-11
 - **`@name-atlas/accounts`**: `createPurchases` (`record`, idempotent on the session id, null user when the account is already gone; `listForUser`), `PurchasesTable` in `schema.ts`.
 - **`apps/web`**: `checkout-config.ts` (gate and tiers), `stripe.ts` (Checkout Session over `fetch`, webhook signature over `node:crypto`; no new dependency), `checkout-routes.ts` (`POST /api/checkout`, `POST /api/stripe/webhook`), `checkout-runtime.ts`, `checkout-section.tsx` (on the account page), the two route modules, and `form-action 'self' https://checkout.stripe.com` in the (report-only) CSP.
 - Migration lists in `packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts`, `canonical-key-v2.test.ts`; purchases tests in `tests/integration/src/accounts.test.ts`.
-- `tasks/109-test-mode-checkout.md`, `STATUS.md`, `docs/CODEMAP.md`.
+- `tasks/111-test-mode-checkout.md`, `STATUS.md`, `docs/CODEMAP.md`.
 
 ## Verification (commands run, results as returned)
 
