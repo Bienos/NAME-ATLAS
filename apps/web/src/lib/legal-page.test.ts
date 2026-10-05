@@ -2,7 +2,13 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { LegalView, legalMetadata } from "./legal-page.js";
-import { CONTROLLER_NAME, CONTROLLER_PLACE, legalDocument, legalPath } from "./legal-text.js";
+import {
+  CONTROLLER_NAME,
+  CONTROLLER_PLACE,
+  LEGAL_UPDATED,
+  legalDocument,
+  legalPath,
+} from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
 import { CONTACT_EMAIL } from "./contact.js";
 import { SiteFooter } from "./site-footer.js";
@@ -19,7 +25,7 @@ describe("legal pages (TASK-046)", () => {
         const doc = legalDocument(kind, lang);
         expect(html).toContain(`<main lang="${htmlLang(lang)}"`);
         expect(html).toContain(`<h2>${doc.title}</h2>`);
-        expect(html).toContain(`<time dateTime="2026-10-04">`);
+        expect(html).toContain(`<time dateTime="${LEGAL_UPDATED[kind]}">`);
         for (const s of doc.sections) expect(html).toContain(`<h3>${s.heading}</h3>`);
       }
     }

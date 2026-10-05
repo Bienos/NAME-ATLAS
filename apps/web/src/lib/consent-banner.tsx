@@ -9,15 +9,19 @@ import {
   CONSENT_REOPEN_EVENT,
   GA_MEASUREMENT_ID,
   consentLang,
+  gaCounts,
   gaPageParams,
   parseConsent,
 } from "./google-analytics.js";
-import type { Consent } from "./google-analytics.js";
+import type { Consent, GaPageParams } from "./google-analytics.js";
 
 /**
- * The consent banner and Google Analytics behind it (TASK-109, ADR-0038).
- * Google's script is added to the page only after "Accept"; until then, and
- * after "Reject", no request goes to Google. Rendered once by the root layout.
+ * The consent banner and Google Analytics behind it (TASK-109, ADR-0038;
+ * TASK-115, ADR-0040). Google's script is in every page (`app/layout.tsx`);
+ * on production's host this island configures it and sends one redacted
+ * `page_view` per route, whatever the choice. The banner decides the cookies
+ * only: until "Accept", and after "Reject", `analytics_storage` stays denied,
+ * so Google sets no cookie. Rendered once by the root layout.
  *
  * The browser members this island uses, declared rather than widening the
  * app's `lib` to the DOM (as `dusk-zoom.tsx` and `surname-combobox.tsx` do).
@@ -25,15 +29,9 @@ import type { Consent } from "./google-analytics.js";
 
 type Gtag = (...args: unknown[]) => void;
 
-interface ScriptLike {
-  async: boolean;
-  src: string;
-}
-
 declare const window: {
   dataLayer?: unknown[];
   gtag?: Gtag;
-  [key: `ga-disable-${string}`]: boolean | undefined;
   readonly localStorage: {
     getItem(key: string): string | null;
     setItem(key: string, value: string): void;
@@ -47,8 +45,6 @@ declare const window: {
 declare const document: {
   cookie: string;
   readonly referrer: string;
-  readonly head: { appendChild(node: ScriptLike): unknown };
-  createElement(tag: "script"): ScriptLike;
 };
 
 declare const Event: new (type: string) => unknown;
@@ -91,8 +87,12 @@ type Snapshot = Consent | "unset" | "server";
 const clientSnapshot = (): Snapshot => readStored() ?? "unset";
 const serverSnapshot = (): Snapshot => "server";
 
-/** Adds Google's script once, starting from "everything denied", then grants analytics only. */
-function loadGa(): Gtag {
+/**
+ * Configures Google's script once, starting from "everything denied" and
+ * granting analytics storage only if the visitor accepted. The redacted
+ * address is set before `config`, so no request carries the real one.
+ */
+function startGa(params: GaPageParams): Gtag {
   if (window.gtag) return window.gtag;
   window.dataLayer = window.dataLayer ?? [];
   const gtag: Gtag = function gtag() {
@@ -102,23 +102,19 @@ function loadGa(): Gtag {
   };
   window.gtag = gtag;
   gtag("consent", "default", CONSENT_DEFAULT);
-  gtag("consent", "update", { analytics_storage: "granted" });
+  if (readStored() === "granted") gtag("consent", "update", { analytics_storage: "granted" });
+  gtag("set", params);
   gtag("js", new Date());
   gtag("config", GA_MEASUREMENT_ID, {
     send_page_view: false,
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
   });
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-  document.head.appendChild(script);
   return gtag;
 }
 
-/** Turns GA off on this page and removes the cookies it set on this site. */
-function stopGa(): void {
-  window[`ga-disable-${GA_MEASUREMENT_ID}`] = true;
+/** Withdraws analytics storage on this page and removes the cookies GA set on this site. */
+function dropGaCookies(): void {
   window.gtag?.("consent", "update", { analytics_storage: "denied" });
   const host = window.location.hostname;
   for (const part of document.cookie.split(";")) {
@@ -141,21 +137,29 @@ export function GoogleAnalytics() {
     return () => window.removeEventListener(CONSENT_REOPEN_EVENT, reopen);
   }, []);
 
+  // A change of mind on this page; the first page's choice is read by `startGa`.
   useEffect(() => {
-    if (consent !== "granted") return;
+    if (consent === "server") return;
+    window.gtag?.("consent", "update", {
+      analytics_storage: consent === "granted" ? "granted" : "denied",
+    });
+  }, [consent]);
+
+  const hydrated = consent !== "server";
+  useEffect(() => {
+    if (!hydrated || !gaCounts(window.location.hostname)) return;
     const params = gaPageParams(window.location.href, document.referrer);
     if (params === null) return;
-    const gtag = loadGa();
-    window[`ga-disable-${GA_MEASUREMENT_ID}`] = false;
+    const gtag = startGa(params);
     gtag("set", params);
     gtag("event", "page_view", params);
-  }, [consent, pathname]);
+  }, [hydrated, pathname]);
 
   if (consent === "server" || (consent !== "unset" && !reopened)) return null;
   const lang = consentLang(pathname);
   const t = CONSENT_COPY[lang];
   const choose = (choice: Consent) => {
-    if (choice === "denied") stopGa();
+    if (choice === "denied") dropGaCookies();
     store(choice);
     setReopened(false);
   };
