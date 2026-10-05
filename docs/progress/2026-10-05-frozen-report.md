@@ -21,7 +21,7 @@ M5's first step (`tasks/118-frozen-report.md`). The owner asked to "build next s
 
 ## Verification (commands run, results as returned)
 
-CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `bf477b3` (before the renumbering and the merge of #142), against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
+CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `bf477b3`, and again, with the same results, on `7c592a8` (after the renumbering and the merge of #142, where `pnpm test` counts 2,264 with #142's tests), against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
 
 | Command | Result |
 |---|---|
