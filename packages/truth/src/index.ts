@@ -313,6 +313,23 @@ export type {
   PremiumEligibilityState,
   PremiumIneligibilityReason,
 } from "./premium-eligibility.js";
+// Given-name claims — TASK-122, ADR-0032 §6: first-name counts and ranks per list.
+export {
+  deriveAllGivenNames,
+  deriveGivenName,
+  givenNamePopulationClaimKey,
+  givenNameRankClaimKey,
+  newGivenNameRunCache,
+} from "./given-name.js";
+export type {
+  GivenNameClaimOutcome,
+  GivenNameDerivationOutcome,
+  GivenNameListResult,
+  GivenNameRunCache,
+  GivenNameRunOptions,
+  GivenNameRunTally,
+} from "./given-name.js";
+export { GIVEN_NAME_POPULATION_METHOD_VERSION, GIVEN_NAME_RANK_METHOD_VERSION } from "./version.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildReport,

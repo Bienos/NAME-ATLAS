@@ -97,6 +97,13 @@ export interface GivenNameResourceDescriptor {
   readonly official_row_count: number;
   /** The sum of every count in the file, placeholders included. */
   readonly official_people_sum: number;
+  /**
+   * Data rows that are names, placeholders excluded: the rows a complete
+   * import stores in `given_name_counts`. Observed on the full file by
+   * TASK-078's import on 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`).
+   * The completeness gate compares a rank's universe against it (TASK-122).
+   */
+  readonly official_name_row_count: number;
   readonly universe_description: string;
   readonly methodology_key: string;
   readonly comparability_group: string;
@@ -123,6 +130,7 @@ export const GIVEN_NAMES_FIRST_MALE_2026: GivenNameResourceDescriptor = {
   official_byte_size: 1_095_529,
   official_row_count: 46_202,
   official_people_sum: 21_462_794,
+  official_name_row_count: 46_197,
   // The publisher's resource title, verbatim: the file carries no universe line of its own.
   universe_description: "lista imion męskich w rejestrze PESEL stan na 20.01.2026 - imię pierwsze",
   methodology_key: "pesel_given_name_first_2026_male_resource",
@@ -144,6 +152,7 @@ export const GIVEN_NAMES_FIRST_FEMALE_2026: GivenNameResourceDescriptor = {
   official_byte_size: 557_487,
   official_row_count: 28_786,
   official_people_sum: 22_589_659,
+  official_name_row_count: 28_781,
   universe_description: "lista imion żeńskich w rejestrze PESEL stan na 20.01.2026 - imię pierwsze",
   methodology_key: "pesel_given_name_first_2026_female_resource",
   comparability_group: "pesel_given_names_2026_first_female",

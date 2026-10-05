@@ -45,3 +45,4 @@
 - Migration 0031 adds `GIVEN_NAME` to `entity_type` and `source_granularity`, plus the two tables. It follows `main`'s 0029 (#84) and #76's 0030 (family safeguards).
 - Second names, earlier editions (2019–2025), the deceased-inclusive list (dataset 1501) and births by year (dataset 219) each fit the same tables as further resources. They are not imported here.
 - A later page that shows a given name reads claims, not this table (ADR-0001, `ARCHITECTURE.md` §6).
+- §6 is carried out by TASK-122 (2026-10-05): migration 0038 adds the two claim types and a `BASIC_GIVEN_NAME` run type; ranks are refused unless the stored names are the complete official list.
