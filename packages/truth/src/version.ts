@@ -370,7 +370,7 @@ export const BEARERS_REFRESH_DAYS = 30;
 export const BEARERS_SHOWN_FREE = 3;
 
 /**
- * Given-name claims (TASK-121, ADR-0032 §6). The count is the publisher's own
+ * Given-name claims (TASK-122, ADR-0032 §6). The count is the publisher's own
  * on one list; the rank is a competition rank within that list, over the
  * names a complete import stored (placeholders are not names).
  */

@@ -1,6 +1,8 @@
-# 2026-10-05 — First-name counts and ranks as claims (TASK-121)
+# 2026-10-05 — First-name counts and ranks as claims (TASK-122)
 
-The full-name report's first derived fact (`tasks/121-given-name-claims.md`; ADR-0032 §6). The owner asked to "build the first-name counts" after D-043. Built on `main` @ `ab23f2f`. Nothing is deployed, applied on the VM or derived on production.
+The full-name report's first derived fact (`tasks/122-given-name-claims.md`; ADR-0032 §6). The owner asked to "build the first-name counts" after D-043. Built on `main` @ `ab23f2f`. Nothing is deployed, applied on the VM or derived on production.
+
+It was built as TASK-121, the name its first two commits use, and renumbered TASK-122 because #146 opened with TASK-121 first (`AGENTS.md` §11). Only the number changed.
 
 ## What changed
 
@@ -15,7 +17,7 @@ The full-name report's first derived fact (`tasks/121-given-name-claims.md`; ADR
   - `version.ts` adds `given_name_population@1` and `given_name_rank@1`.
 - **`packages/truth/bin/derive-given-names.ts`**, `pnpm truth:derive-given-names` (root) and `derive-given-names` (`@name-atlas/truth`).
 - **Tests:** `tests/integration/src/given-name-claims.test.ts` (6). The migration lists in `packages/db/src/migrator.test.ts`, `tests/integration/src/extensions.test.ts` and `canonical-key-v2.test.ts` include 0038.
-- `tasks/121-given-name-claims.md`, `STATUS.md`, `docs/CODEMAP.md`, ADR-0032 (one consequence line).
+- `tasks/122-given-name-claims.md`, `STATUS.md`, `docs/CODEMAP.md`, ADR-0032 (one consequence line).
 
 ## Verification (commands run, results as returned)
 

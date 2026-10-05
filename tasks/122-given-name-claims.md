@@ -1,7 +1,7 @@
-# TASK-121 — First-name counts and ranks as claims (`GIVEN_NAME_POPULATION`, `GIVEN_NAME_RANK`)
+# TASK-122 — First-name counts and ranks as claims (`GIVEN_NAME_POPULATION`, `GIVEN_NAME_RANK`)
 
 - **Status:** IMPLEMENTED 2026-10-05 (`docs/progress/2026-10-05-given-name-claims.md`); migration 0038 is not applied on the VM, and nothing is derived on production.
-- **Number:** 121, migration 0038. `main` holds TASK-120 and migration 0037; there is no open pull request on 2026-10-05.
+- **Number:** 122, migration 0038. `main` holds TASK-120 and migration 0037. TASK-121 is the surname PDF at 200 dpi, open in #146, which adds no migration.
 - **Requested by:** the project owner, 2026-10-05: "build the first-name counts", after D-043 (#145) made the full-name report a paid part of the 28,99 zł tier.
 - **Design:** ADR-0032 §6: "`GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` are the next task, through the same evidence → claim → confidence → citation chain as the surname claims." No new ADR; this task carries that sentence out.
 - **Model guidance:** implementation session.

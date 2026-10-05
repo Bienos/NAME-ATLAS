@@ -101,7 +101,7 @@ export interface GivenNameResourceDescriptor {
    * Data rows that are names, placeholders excluded: the rows a complete
    * import stores in `given_name_counts`. Observed on the full file by
    * TASK-078's import on 2026-10-03 (`docs/progress/2026-10-03-given-name-ingestion.md`).
-   * The completeness gate compares a rank's universe against it (TASK-121).
+   * The completeness gate compares a rank's universe against it (TASK-122).
    */
   readonly official_name_row_count: number;
   readonly universe_description: string;

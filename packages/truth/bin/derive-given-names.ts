@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Derives `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` for every stored given
- * name (TASK-121), or for one: `--name ANNA`. Idempotent: a claim that stands
+ * name (TASK-122), or for one: `--name ANNA`. Idempotent: a claim that stands
  * is reused. A rank is refused, never computed, for a list whose stored names
  * are not the complete official file.
  *

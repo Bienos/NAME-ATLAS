@@ -313,7 +313,7 @@ export type {
   PremiumEligibilityState,
   PremiumIneligibilityReason,
 } from "./premium-eligibility.js";
-// Given-name claims — TASK-121, ADR-0032 §6: first-name counts and ranks per list.
+// Given-name claims — TASK-122, ADR-0032 §6: first-name counts and ranks per list.
 export {
   deriveAllGivenNames,
   deriveGivenName,

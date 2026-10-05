@@ -18,7 +18,7 @@ import {
 } from "@name-atlas/truth";
 
 /**
- * TASK-121: `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` against a real
+ * TASK-122: `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` against a real
  * PostgreSQL, on the committed first-name excerpts (genuine lines of the
  * official files, `fixtures/pesel-given-names/`).
  *
@@ -39,7 +39,7 @@ const payload = (id: string): unknown =>
     ).toString("utf8"),
   );
 
-describe("given-name claims (TASK-121)", () => {
+describe("given-name claims (TASK-122)", () => {
   let database: TestDatabase | undefined;
   const db = (): TestDatabase["db"] => {
     if (!database) throw new Error("test database was not started");

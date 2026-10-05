@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * Given-name claims (TASK-121, ADR-0032 §6): how many people carry a first
+ * Given-name claims (TASK-122, ADR-0032 §6): how many people carry a first
  * name on one PESEL list, and its rank on that list.
  *
  * - `claim_type` gains `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK`.
