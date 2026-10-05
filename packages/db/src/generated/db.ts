@@ -311,6 +311,45 @@ export interface Places {
   updated_at: Generated<Timestamp>;
 }
 
+export interface ReportClaimReferences {
+  claim_id: string;
+  presentation_role: string;
+  report_section_id: string;
+  sequence: number;
+}
+
+export interface Reports {
+  created_at: Generated<Timestamp>;
+  entitlement_kind: string;
+  report_id: string;
+  report_type: string;
+  status: string;
+  surname_id: string;
+}
+
+export interface ReportSections {
+  body_payload: Json;
+  report_section_id: string;
+  report_version_id: string;
+  section_confidence_summary: Json;
+  section_type: string;
+  sequence_number: number;
+  title_payload: Json;
+}
+
+export interface ReportVersions {
+  coverage_assessment_version: string;
+  discovery_index_version: string;
+  eligibility_policy_version: string;
+  eligibility_state: string;
+  generated_at: Generated<Timestamp>;
+  rendered_payload: Json;
+  report_id: string;
+  report_schema_version: string;
+  report_version_id: string;
+  version_number: number;
+}
+
 export interface ResearchRuns {
   completed_at: Timestamp | null;
   connector_manifest: Json;
@@ -479,6 +518,10 @@ export interface DB {
   name_forms: NameForms;
   place_names: PlaceNames;
   places: Places;
+  report_claim_references: ReportClaimReferences;
+  report_sections: ReportSections;
+  report_versions: ReportVersions;
+  reports: Reports;
   research_runs: ResearchRuns;
   resolvable_name_forms: ResolvableNameForms;
   rights_profiles: RightsProfiles;

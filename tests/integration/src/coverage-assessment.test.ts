@@ -31,8 +31,10 @@ import {
   DISCOVERY_CATEGORIES,
   discoveryRun,
   assessPremiumEligibility,
+  buildReport,
   premiumEligibilityRun,
   querySurnameResult,
+  REPORT_SECTION_TYPES,
 } from "@name-atlas/truth";
 import type {
   CoverageAssessment,
@@ -40,13 +42,14 @@ import type {
   DiscoveryCategory,
   DiscoveryIndex,
   PremiumEligibility,
+  ReportSection,
 } from "@name-atlas/truth";
 import { raritySectionSchema, surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
  * TASK-080: coverage on the PAID surface, read through the query service from
  * a real PostgreSQL; TASK-116: the DiscoveryIndex over the same data; and
- * TASK-117: premium eligibility over both.
+ * TASK-117: premium eligibility over both; and TASK-118: the frozen report.
  *
  * GENUINE surnames and counts (the committed PESEL national male excerpt).
  * SYNTHETIC meanings: `fixtures/onomastics/` carries `"synthetic": true`, and
@@ -459,6 +462,136 @@ describe("coverage assessment (TASK-080)", () => {
       );
       expect(tally.reasons.ALL_SHOWN_FREE).toBe(2);
       expect(tally.lists["pesel_2026_national_male"]?.eligible.surnames).toBe(0);
+    });
+  });
+  describe("the frozen report (TASK-118)", () => {
+    const section = (sections: readonly ReportSection[], type: string) =>
+      sections.find((x) => x.section_type === type);
+
+    it("freezes every section in order, each linked to the claims behind it (AC-1, AC-2)", async () => {
+      const built = await buildReport(db(), "KOWALCZYK");
+      if (built.kind !== "BUILT") throw new Error(built.kind);
+      expect(built.version_number).toBe(1);
+      expect(built.sections.map((x) => x.section_type)).toEqual([...REPORT_SECTION_TYPES]);
+      expect(built.eligibility.state).toBe("INSUFFICIENT_MEANINGFUL_CONTENT");
+
+      const origin = section(built.sections, "ORIGIN");
+      expect(origin?.body_payload).toEqual({
+        fields: ["meaning"],
+        states: { meaning: "AVAILABLE" },
+      });
+      expect(origin?.claims.map((c) => c.presentation_role)).toEqual(["HERO"]);
+      expect(origin?.section_confidence_summary).toEqual({ LIKELY: 1 });
+      expect(section(built.sections, "DISTRIBUTION")?.claims[0]?.presentation_role).toBe("HERO");
+      expect(section(built.sections, "ARCHIVES")?.claims.map((c) => c.presentation_role)).toEqual([
+        "HERO",
+      ]);
+      for (const type of ["VARIANTS", "PLACES", "MIGRATION"]) {
+        expect(section(built.sections, type)).toMatchObject({
+          body_payload: { availability: "NOT_RETRIEVED", reason_code: "NO_SOURCE_YET" },
+          claims: [],
+        });
+      }
+      expect(
+        (section(built.sections, "SOURCES")?.body_payload as { citation_ids: string[] })
+          .citation_ids.length,
+      ).toBeGreaterThan(0);
+      expect(section(built.sections, "LIMITATIONS")?.body_payload).toMatchObject({
+        eligibility: {
+          state: "INSUFFICIENT_MEANINGFUL_CONTENT",
+          reason_codes: ["ALL_SHOWN_FREE", "COVERAGE_BELOW_STANDARD"],
+        },
+      });
+
+      const stored = await sql<{
+        eligibility_state: string;
+        display_name: string;
+        entitlement_kind: string;
+        sections: string;
+        refs: string;
+      }>`
+        SELECT v.eligibility_state,
+               v.rendered_payload -> 'response' -> 'surname' ->> 'display_name' AS display_name,
+               r.entitlement_kind,
+               (SELECT count(*) FROM report_sections s WHERE s.report_version_id = v.report_version_id)::text AS sections,
+               (SELECT count(*) FROM report_claim_references c
+                  JOIN report_sections s ON s.report_section_id = c.report_section_id
+                 WHERE s.report_version_id = v.report_version_id)::text AS refs
+          FROM report_versions v JOIN reports r ON r.report_id = v.report_id
+         WHERE v.report_version_id = ${built.report_version_id}::uuid
+      `.execute(db());
+      expect(stored.rows[0]).toEqual({
+        eligibility_state: "INSUFFICIENT_MEANINGFUL_CONTENT",
+        display_name: "KOWALCZYK",
+        entitlement_kind: "INTERNAL_TEST",
+        sections: "9",
+        refs: String(built.sections.reduce((n, x) => n + x.claims.length, 0)),
+      });
+    });
+
+    it("builds a new version and leaves the old one as it was; the database refuses changes (AC-3)", async () => {
+      const first = await sql<{ payload: string; generated_at: string }>`
+        SELECT rendered_payload::text AS payload, generated_at::text
+          FROM report_versions v JOIN reports r ON r.report_id = v.report_id
+          JOIN surnames s ON s.surname_id = r.surname_id
+         WHERE s.canonical_display = 'KOWALCZYK' AND v.version_number = 1
+      `.execute(db());
+      const again = await buildReport(db(), "KOWALCZYK");
+      if (again.kind !== "BUILT") throw new Error(again.kind);
+      expect(again.version_number).toBe(2);
+      const after = await sql<{ payload: string; generated_at: string }>`
+        SELECT rendered_payload::text AS payload, generated_at::text
+          FROM report_versions v JOIN reports r ON r.report_id = v.report_id
+          JOIN surnames s ON s.surname_id = r.surname_id
+         WHERE s.canonical_display = 'KOWALCZYK' AND v.version_number = 1
+      `.execute(db());
+      expect(after.rows).toEqual(first.rows);
+
+      await expect(
+        sql`UPDATE report_versions SET eligibility_state = 'ELIGIBLE'`.execute(db()),
+      ).rejects.toThrow(/immutable/);
+      await expect(sql`DELETE FROM report_claim_references`.execute(db())).rejects.toThrow(
+        /immutable/,
+      );
+      await expect(sql`DELETE FROM report_sections`.execute(db())).rejects.toThrow(/immutable/);
+      await expect(
+        sql`
+          INSERT INTO reports (report_id, surname_id, report_type, entitlement_kind, status)
+          SELECT gen_random_uuid(), surname_id, 'NAME_ATLAS', 'PAID', 'READY'
+            FROM surnames WHERE canonical_display = 'MAZUR'
+        `.execute(db()),
+      ).rejects.toThrow(/reports_internal_test_only/);
+    });
+
+    it("references a claim the PAID surface cannot show as a LIMITATION (AC-4)", async () => {
+      await withMeaningCommercialUseUnknown(async () => {
+        const built = await buildReport(db(), "KOWALCZYK");
+        if (built.kind !== "BUILT") throw new Error(built.kind);
+        const origin = section(built.sections, "ORIGIN");
+        expect(origin?.body_payload).toMatchObject({ states: { meaning: "RIGHTS_BLOCKED" } });
+        expect(origin?.claims.map((c) => c.presentation_role)).toEqual(["LIMITATION"]);
+        expect(built.eligibility.state).toBe("RIGHTS_BLOCKED");
+      });
+    });
+
+    it("says what is missing for a surname with nothing deeper, and writes nothing for an unknown one (AC-5)", async () => {
+      const built = await buildReport(db(), "MAZUR");
+      if (built.kind !== "BUILT") throw new Error(built.kind);
+      expect(section(built.sections, "ORIGIN")).toMatchObject({
+        body_payload: { states: { meaning: "NO_SOURCED_MEANING" } },
+        claims: [],
+      });
+      expect(section(built.sections, "ARCHIVES")).toMatchObject({
+        body_payload: { states: { archive: "NOT_SEARCHED" } },
+        claims: [],
+      });
+
+      const before = await sql<{ n: string }>`SELECT count(*)::text AS n FROM reports`.execute(
+        db(),
+      );
+      expect((await buildReport(db(), "ZZZQXWYNOTASURNAME")).kind).toBe("NOT_RESOLVED");
+      const after = await sql<{ n: string }>`SELECT count(*)::text AS n FROM reports`.execute(db());
+      expect(after.rows).toEqual(before.rows);
     });
   });
 });

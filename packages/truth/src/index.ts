@@ -313,6 +313,22 @@ export type {
   PremiumEligibilityState,
   PremiumIneligibilityReason,
 } from "./premium-eligibility.js";
+// The frozen surname report — TASK-118, RPT-001: internal test versions only.
+export {
+  buildReport,
+  REPORT_SCHEMA_VERSION,
+  REPORT_SECTION_TYPES,
+  reportSectionsOf,
+} from "./report.js";
+export type {
+  BuildReportOutcome,
+  PresentationRole,
+  ReportClaim,
+  ReportClaimReference,
+  ReportPayload,
+  ReportSection,
+  ReportSectionType,
+} from "./report.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.

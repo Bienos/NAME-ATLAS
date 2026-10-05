@@ -36,6 +36,7 @@
     "coverage:assess": "pnpm --silent --filter @name-atlas/truth run coverage-assess",
     "discovery:index": "pnpm --silent --filter @name-atlas/truth run discovery-index",
     "premium:eligibility": "pnpm --silent --filter @name-atlas/truth run premium-eligibility",
+    "report:build": "pnpm --silent --filter @name-atlas/truth run report-build",
     "demo:surname": "pnpm --filter @name-atlas/truth run demo:surname",
     "demo:surname-rank": "pnpm --filter @name-atlas/truth run demo:surname-rank",
     "demo:surname-rarity": "pnpm --filter @name-atlas/truth run demo:surname-rarity",
