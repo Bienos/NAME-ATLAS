@@ -9,7 +9,8 @@
 #   4. start the systemd unit name-atlas-archive-load, which runs
 #      `pnpm truth:archive-load --top-rank N` (N defaults to 2000): every surname
 #      ranked within N in either register list, best rank first, eight paced
-#      requests to Polona each, about 7.3 s a surname, so hours.
+#      requests to Polona each, at least 250 ms apart (ADR-0036), so at least
+#      2 s a surname and more when Polona answers slowly: hours.
 #
 # The load is resumable: a surname searched within the last 90 days is not
 # searched again, so a restart continues where it stopped. Ten Polona failures
@@ -19,8 +20,12 @@
 # boot or otherwise. Running this step again starts a fresh pass, which
 # searches only the surnames whose last search is older than 90 days.
 #
+# A running load is left alone unless the third argument is `restart`
+# (TASK-099): then it is stopped and started again on the pushed commit, and
+# the restart continues where it stopped.
+#
 # Runs after finalize.sh (its marker is required). Runs as root:
-# `sudo bash archive.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK]`. Everything under
+# `sudo bash archive.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK [restart]]`. Everything under
 # the build user's home is done as the build user, over the Unix socket.
 set -euo pipefail
 
@@ -37,6 +42,7 @@ FINALIZED=$STATE/register-finalized
 LOADED=$STATE/archive/loaded
 ARCHIVE=${1:-}
 TOP_RANK=${2:-2000}
+RESTART=${3:-}
 
 log() { echo "[archive] $*"; }
 die() { echo "[archive] ERROR: $*" >&2; exit 1; }
@@ -65,14 +71,21 @@ case "$state" in
   active | activating | deactivating | reloading) die "name-atlas-bearers-load is running (ActiveState=$state)" ;;
 esac
 state=$(systemctl show -p ActiveState --value "$UNIT" 2>/dev/null || true)
+case "$RESTART" in '' | restart) ;; *) die "the third argument must be 'restart' or empty, got '$RESTART'" ;; esac
 if [ "$state" = active ] || [ "$state" = activating ]; then
-  # Unpacking now would change the code under the running loader.
-  log "already running ($state); nothing unpacked or started. status.sh shows its progress."
-  exit 0
+  if [ "$RESTART" != restart ]; then
+    # Unpacking now would change the code under the running loader.
+    log "already running ($state); nothing unpacked or started. status.sh shows its progress."
+    exit 0
+  fi
+  log "already running ($state); stopping it to restart on the pushed commit (TASK-099)"
+  systemctl stop "$UNIT"
+  state=$(systemctl show -p ActiveState --value "$UNIT")
+  [ "$state" = inactive ] || [ "$state" = failed ] || die "$UNIT did not stop (ActiveState=$state)"
 fi
 
 log "1/4 unpack the pushed commit into $APP and pnpm install (the register build is left alone)"
-case "$ARCHIVE" in /*) ;; *) die "usage: archive.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK]" ;; esac
+case "$ARCHIVE" in /*) ;; *) die "usage: archive.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK [restart]]" ;; esac
 if [ ! -f "$ARCHIVE" ] || [ -L "$ARCHIVE" ] || [ ! -s "$ARCHIVE" ]; then
   die "$ARCHIVE must be a non-empty regular file"
 fi
@@ -137,4 +150,4 @@ systemctl start --no-block "$UNIT"
 sleep 45
 systemctl show -p ActiveState,SubState,MainPID "$UNIT" | sed 's/^/[archive]   /'
 journalctl -u "$UNIT" -o cat --no-pager -n 15 | sed 's/^/[archive]   /'
-log "started. About 7 s a surname; status.sh reports the progress."
+log "started. At least 2 s a surname; status.sh reports the progress."
