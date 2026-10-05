@@ -20,7 +20,21 @@ M4's third step (`tasks/117-premium-eligibility.md`). The owner asked to "build 
 
 ## Verification (commands run, results as returned)
 
-Local CI run in progress; results follow in the next commit.
+CI's `verify` job cannot run on GitHub (the account's billing block; see #136). Its steps from `.github/workflows/ci.yml` were run locally in order, on the working tree of `ed24695`, against PostgreSQL 16.13 with PostGIS 3.4.2 (`DATABASE_URL` a fresh `name_atlas`; `TEST_DATABASE_URL` the same server), with the pre-installed Chromium for Playwright.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | exit 0 |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0, 6 tests |
+| `pnpm test` | exit 0; 2,260 tests, of which truth 395 (7 new) |
+| `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0; generated types unchanged |
+| `pnpm premium:eligibility -- --limit 5` on that fresh migrated database | exit 0; the tables print with 0 surnames |
+| `pnpm premium:eligibility -- --limit 0` | "--limit needs a positive whole number", exit 2 |
+| `pnpm test:integration` | exit 0; 37 files, 458 tests (5 new; TASK-080's and TASK-116's still pass) |
+| `pnpm test:golden` | exit 0; 4 files, 364 tests |
+| `pnpm build` | exit 0 |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0; 10 Playwright tests passed |
 
 What the tests show:
 
