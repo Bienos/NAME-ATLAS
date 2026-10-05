@@ -208,8 +208,8 @@ export type DiscoveryIndexOutcome =
   | {
       readonly kind: "INDEXED";
       readonly index: DiscoveryIndex;
-      /** The known count on each list, for weighting a register-wide run. */
-      readonly people: CoverageAssessment["people"];
+      /** The coverage the index read its availabilities from: its tier, and each list's count. */
+      readonly coverage: CoverageAssessment;
     }
   | { readonly kind: "NOT_RESOLVED" }
   | { readonly kind: "UNAVAILABLE"; readonly reason: string };
@@ -239,7 +239,7 @@ export async function buildDiscoveryIndex(
   return {
     kind: "INDEXED",
     index: indexOf(coverage, paid.response, internal),
-    people: coverage.people,
+    coverage,
   };
 }
 
@@ -327,7 +327,7 @@ export async function discoveryRun(
         }
       }
       if (any) withInventory += 1;
-      for (const p of outcome.people) {
+      for (const p of outcome.coverage.people) {
         const list = (lists[p.list] ??= {
           surnames: 0,
           people: 0,

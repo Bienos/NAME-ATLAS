@@ -30,6 +30,8 @@ import {
   deriveSurnameMeaning,
   DISCOVERY_CATEGORIES,
   discoveryRun,
+  assessPremiumEligibility,
+  premiumEligibilityRun,
   querySurnameResult,
 } from "@name-atlas/truth";
 import type {
@@ -37,12 +39,14 @@ import type {
   CoverageDimensionName,
   DiscoveryCategory,
   DiscoveryIndex,
+  PremiumEligibility,
 } from "@name-atlas/truth";
 import { raritySectionSchema, surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
  * TASK-080: coverage on the PAID surface, read through the query service from
- * a real PostgreSQL; and TASK-116: the DiscoveryIndex over the same data.
+ * a real PostgreSQL; TASK-116: the DiscoveryIndex over the same data; and
+ * TASK-117: premium eligibility over both.
  *
  * GENUINE surnames and counts (the committed PESEL national male excerpt).
  * SYNTHETIC meanings: `fixtures/onomastics/` carries `"synthetic": true`, and
@@ -372,6 +376,89 @@ describe("coverage assessment (TASK-080)", () => {
       expect(tally.categories.ARCHIVE_REFERENCES.availability.PARTIAL).toBe(1);
       expect(Object.keys(tally.lists)).toEqual(["pesel_2026_national_male"]);
       expect(tally.lists["pesel_2026_national_male"]?.with_inventory.surnames).toBe(2);
+    });
+  });
+  describe("premium eligibility (TASK-117)", () => {
+    async function assessedEligibility(input: string): Promise<PremiumEligibility> {
+      const outcome = await assessPremiumEligibility(db(), input);
+      if (outcome.kind !== "ASSESSED") throw new Error(`${input}: ${outcome.kind}`);
+      return outcome.eligibility;
+    }
+
+    it("is not eligible with nothing to sell, and says why (AC-1)", async () => {
+      expect(await assessedEligibility("MAZUR")).toMatchObject({
+        eligible: false,
+        state: "INSUFFICIENT_MEANINGFUL_CONTENT",
+        reason_codes: ["NO_PREMIUM_INVENTORY", "COVERAGE_BELOW_STANDARD"],
+        premium_categories: [],
+        policy_version: "eligibility@0",
+      });
+    });
+
+    it("never counts a meaning the free page already shows (AC-2, PRODUCT.md §6)", async () => {
+      expect(await assessedEligibility("KOWALCZYK")).toMatchObject({
+        eligible: false,
+        reason_codes: ["ALL_SHOWN_FREE", "COVERAGE_BELOW_STANDARD"],
+        premium_categories: [],
+      });
+    });
+
+    it("counts a meaning the PAID surface allows and the free page cannot show (AC-2)", async () => {
+      const before = await sql<{ metadata_rights: string }>`
+        SELECT metadata_rights FROM rights_profiles
+         WHERE rights_profile_id IN (
+           SELECT default_rights_profile_id FROM sources WHERE source_type = 'DICTIONARY'
+         )
+      `.execute(db());
+      const original = before.rows[0]?.metadata_rights;
+      if (original === undefined) throw new Error("no dictionary rights profile");
+      await sql`
+        UPDATE rights_profiles SET metadata_rights = 'PROHIBITED'
+         WHERE rights_profile_id IN (
+           SELECT default_rights_profile_id FROM sources WHERE source_type = 'DICTIONARY'
+         )
+      `.execute(db());
+      try {
+        const free = await querySurnameResult(db(), "KOWALCZYK", { surface: "FREE" });
+        if (free.kind !== "OK") throw new Error(free.kind);
+        expect(free.response.meaning?.state).toBe("RIGHTS_BLOCKED");
+        expect(await assessedEligibility("KOWALCZYK")).toMatchObject({
+          eligible: false,
+          reason_codes: ["ONE_CATEGORY_ONLY", "COVERAGE_BELOW_STANDARD"],
+          premium_categories: [{ category: "ORIGIN_ALTERNATIVES", premium_items: 1 }],
+        });
+      } finally {
+        await sql`
+          UPDATE rights_profiles SET metadata_rights = ${original}
+           WHERE rights_profile_id IN (
+             SELECT default_rights_profile_id FROM sources WHERE source_type = 'DICTIONARY'
+           )
+        `.execute(db());
+      }
+    });
+
+    it("reports RIGHTS_BLOCKED when paid rights alone leave nothing (AC-3)", async () => {
+      await withMeaningCommercialUseUnknown(async () => {
+        expect(await assessedEligibility("KOWALCZYK")).toMatchObject({
+          eligible: false,
+          state: "RIGHTS_BLOCKED",
+          reason_codes: ["PAID_RIGHTS_BLOCKED", "COVERAGE_BELOW_STANDARD"],
+        });
+      });
+    });
+
+    it("assesses every surname of the register once, and finds none eligible today (AC-4)", async () => {
+      const tally = await premiumEligibilityRun(db(), { concurrency: 2, batchSize: 7 });
+      const surnames = await sql<{ n: string }>`
+        SELECT count(*)::text AS n FROM surnames WHERE entity_status = 'ACTIVE'
+      `.execute(db());
+      expect(tally.read).toBe(Number(surnames.rows[0]?.n));
+      expect(tally.states.ELIGIBLE).toBe(0);
+      expect(tally.states.INSUFFICIENT_MEANINGFUL_CONTENT + tally.states.RIGHTS_BLOCKED).toBe(
+        tally.read - tally.not_resolved - tally.unavailable,
+      );
+      expect(tally.reasons.ALL_SHOWN_FREE).toBe(2);
+      expect(tally.lists["pesel_2026_national_male"]?.eligible.surnames).toBe(0);
     });
   });
 });
