@@ -2,17 +2,17 @@ import { db as sharedDb } from "../../lib/db.js";
 import { sitemapCount } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
+import { seoBlockedProfileIds } from "../../lib/seo-surface.js";
 import { BLOG_SITEMAP_PATH, pageCount, sitemapIndexXml } from "../../lib/sitemap-xml.js";
 import { blogPosts } from "../../lib/blog-posts.js";
 
 /**
  * `/sitemap.xml` — the sitemap index (TASK-027, ADR-0010 §3).
  *
- * Empty while `SEO_INDEXING_ENABLED` is unset, and empty today even when it is
- * set, because `docs/canonical/21` §42 wants two substantive value families and
- * only `CURRENT_STATS` can be produced from the data in this repository. An
- * empty sitemap index is valid XML and an honest statement: nothing here has
- * been cleared for indexing.
+ * Empty while `SEO_INDEXING_ENABLED` is unset: an empty sitemap index is valid
+ * XML and an honest statement that nothing has been cleared for indexing. With
+ * the flag on, it names one page per 50,000 surnames that `@name-atlas/seo`'s
+ * query lists (only pages that serve `index`, TASK-126) and the blog's sitemap.
  */
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,9 @@ export async function GET(): Promise<Response> {
   const log = createLogger({ service: "web", base: { route: "/sitemap.xml" } });
   try {
     const db = sharedDb();
-    const total = await sitemapCount(db, "pl");
+    const total = await sitemapCount(db, "pl", {
+      seoBlockedProfileIds: await seoBlockedProfileIds(db),
+    });
     // The blog's sitemap (TASK-071), only when it has a post to list.
     const extra = blogPosts().length > 0 ? [BLOG_SITEMAP_PATH] : [];
     return new Response(sitemapIndexXml(origin, pageCount(total), extra), {
