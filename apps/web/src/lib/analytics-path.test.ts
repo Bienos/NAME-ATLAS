@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { analyticsUrl, redactSurnamePath, redactTreePath } from "./analytics-path.js";
-import { beforeSend } from "./site-analytics.js";
+import { beforeSend, speedInsightsRoute } from "./site-analytics.js";
 
 const HOST = "https://name-atlas-two.vercel.app";
 
@@ -123,5 +123,55 @@ describe("a claimant's own card in the statistics (TASK-094)", () => {
   it("leaves the cards list and the invitation page as they are; the token is in the query", () => {
     expect(analyticsUrl("/pl/konto/drzewa/karty")).toBe("/pl/konto/drzewa/karty");
     expect(analyticsUrl("/en/account/trees/invitation?t=abc")).toBe("/en/account/trees/invitation");
+  });
+});
+
+describe("Vercel Speed Insights never sees a surname either", () => {
+  const TREE = "0199a1b2-0000-7000-8000-00000000aa01";
+  const PERSON = "0199a1b2-0000-7000-8000-00000000bb01";
+
+  it("rewrites a measurement's address and keeps the rest; an unreadable one is not sent", () => {
+    const vital = {
+      type: "vital" as const,
+      url: `${HOST}/pl/nazwisko/nowak?view=cards`,
+      route: "/pl/nazwisko/[slug]",
+    };
+    expect(beforeSend(vital)).toEqual({ ...vital, url: `${HOST}/pl/nazwisko/[slug]` });
+    expect(beforeSend({ type: "vital" as const, url: "http://" })).toBeNull();
+  });
+
+  it("gives the route's pattern when the params match the path", () => {
+    expect(speedInsightsRoute("/pl/nazwisko/kowalski", { slug: "kowalski" })).toBe(
+      "/pl/nazwisko/[slug]",
+    );
+    expect(
+      speedInsightsRoute("/en/surname/kowalski/card/rarity", { slug: "kowalski", card: "rarity" }),
+    ).toBe("/en/surname/[slug]/card/[card]");
+    expect(
+      speedInsightsRoute(`/pl/konto/drzewa/${TREE}/osoba/${PERSON}`, {
+        rest: [TREE, "osoba", PERSON],
+      }),
+    ).toBe("/pl/konto/drzewa/[...rest]");
+    expect(speedInsightsRoute("/pl/oferta", {})).toBe("/pl/oferta");
+    expect(speedInsightsRoute("/pl/konto/drzewa", { rest: undefined })).toBe("/pl/konto/drzewa");
+  });
+
+  it("still drops the surname when the path and the params differ in encoding", () => {
+    // A slug keeps its Polish letters; the pattern match fails on one side
+    // percent-encoded and the other not, and the path would go out as it is.
+    expect(speedInsightsRoute("/pl/nazwisko/%C5%82uczak", { slug: "łuczak" })).toBe(
+      "/pl/nazwisko/[slug]",
+    );
+    expect(speedInsightsRoute("/pl/nazwisko/łuczak/karta/rarity", { slug: "%C5%82uczak" })).toBe(
+      "/pl/nazwisko/[slug]/karta/rarity",
+    );
+    expect(speedInsightsRoute("/en/surname/nowak", null)).toBe("/en/surname/[slug]");
+    expect(speedInsightsRoute(`/pl/konto/drzewa/${TREE}/osoba/${PERSON}`, null)).toBe(
+      "/pl/konto/drzewa/[tree]/osoba/[person]",
+    );
+  });
+
+  it("loads nothing when there is no path", () => {
+    expect(speedInsightsRoute(null, null)).toBeNull();
   });
 });

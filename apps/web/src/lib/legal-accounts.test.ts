@@ -70,6 +70,15 @@ describe("the notice and the terms with accounts (AC-2)", () => {
     }
   });
 
+  it("name Vercel Speed Insights in their own paragraph on what the site does not do", () => {
+    expect(text("privacy", "pl", true)).toContain(
+      "mierzy, też bez nazwiska i bez plików cookie, Vercel Speed Insights",
+    );
+    expect(text("privacy", "en", true)).toContain(
+      "also without the surname and without cookies, by Vercel Speed Insights",
+    );
+  });
+
   it("add two sections to the notice and one to the terms, in both languages alike", () => {
     for (const lang of LANGS) {
       const base = legalDocument("privacy", lang).sections.length;
