@@ -17,7 +17,7 @@ import type { Lang } from "./messages.js";
  * the card's (TASK-064): with accounts on, a reader needs a session.
  */
 
-/** An A4 page in points; the sheet's 2480 × 3508 px fill it at 300 dpi. */
+/** An A4 page in points; the sheet's 1653 × 2339 px fill it at 200 dpi. */
 export const PDF_PAGE = { width: 595.28, height: 841.89 } as const;
 
 /** The download's file name: `kowalski-name-atlas.pdf`. */
