@@ -21,6 +21,8 @@ DB=name_atlas
 BUILD_ROLE=nameatlas         # owns the database; the build connects as it over the socket (peer)
 WEB_ROLE=nameatlas_web       # read-only; the web app connects as it through PgBouncer
 APP_ROLE=nameatlas_app       # accounts only (TASK-063); created by accounts.sh, listed in PgBouncer here once it has a password
+STAGING_DB=name_atlas_staging        # the staging copy (ADR-0039); made by staging.sh, listed in PgBouncer here
+STAGING_ROLE=nameatlas_staging_web   # read-only on the staging copy; created by staging.sh, listed here once it has a password
 OPS_HOME=/srv/name-atlas     # the build user's home: root never writes inside it
 STATE=/var/lib/name-atlas    # root-owned: the finalized marker and the dump
 POOLER_PORT=6432
@@ -226,7 +228,7 @@ SQL
 runuser -u postgres -- psql -X -tAc \
   "SELECT '[provision]   ' || datname || ' ' || pg_encoding_to_char(encoding) || ' ' || datcollate || ' owner=' || pg_get_userbyid(datdba) FROM pg_database WHERE datname = '$DB'"
 
-log "6/9 PgBouncer on :$POOLER_PORT (TLS, SCRAM, transaction pooling, $WEB_ROLE and, once set up, $APP_ROLE)"
+log "6/9 PgBouncer on :$POOLER_PORT (TLS, SCRAM, transaction pooling, $WEB_ROLE and, once set up, $APP_ROLE and $STAGING_ROLE)"
 PGB=/etc/pgbouncer
 if [ ! -s "$PGB/server.key" ] || [ ! -s "$PGB/server.crt" ]; then
   # Self-signed: the app connects with uselibpqcompat=true&sslmode=require, which
@@ -240,12 +242,13 @@ chmod 644 "$PGB/server.crt"
 # PgBouncer logs in to PostgreSQL with the client's own SCRAM secret, so the
 # secret in the auth file must be byte-identical to pg_authid's. One line for
 # each role that has one, the web role first: it always does, and the accounts
-# role does once ops/vm/accounts.sh has set its password, so running provision
-# again keeps it in the pooler (and writes the file accounts.sh wrote, so
-# nothing changes). The same loop is in accounts.sh.
+# role and the staging role do once ops/vm/accounts.sh and ops/vm/staging.sh have
+# set their passwords, so running provision again keeps them in the pooler (and
+# writes the file those scripts wrote, so nothing changes). The same loop is in
+# accounts.sh and staging.sh.
 umask 077
 : >"$PGB/userlist.txt.new"
-for role in "$WEB_ROLE" "$APP_ROLE"; do
+for role in "$WEB_ROLE" "$APP_ROLE" "$STAGING_ROLE"; do
   secret=$(runuser -u postgres -- psql -X -tAc "SELECT rolpassword FROM pg_authid WHERE rolname = '$role'")
   if [[ "$secret" == SCRAM-SHA-256\$* ]]; then
     printf '"%s" "%s"\n' "$role" "$secret" >>"$PGB/userlist.txt.new"
@@ -258,6 +261,7 @@ cat >"$PGB/pgbouncer.ini.new" <<INI
 ; Written by ops/vm/provision.sh (TASK-040). Do not edit by hand.
 [databases]
 $DB = host=127.0.0.1 port=5432 dbname=$DB
+$STAGING_DB = host=127.0.0.1 port=5432 dbname=$STAGING_DB pool_size=5 max_db_connections=10
 
 [pgbouncer]
 listen_addr = 0.0.0.0

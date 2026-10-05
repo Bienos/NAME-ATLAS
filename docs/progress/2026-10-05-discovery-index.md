@@ -1,6 +1,6 @@
 # 2026-10-05 — The DiscoveryIndex (TASK-116, PRE-001)
 
-M4's second step (`tasks/116-discovery-index.md`). The owner asked to "build next step premium report" and, offered the DiscoveryIndex, PremiumEligibility with it, or the report itself, chose the DiscoveryIndex. Built on `main` @ `de39642` and rebased onto `45168cb` (TASK-114, #134), then merged with `e1b18c2` (TASK-115, #135); of these files they touched only `STATUS.md` and `docs/CODEMAP.md`. Nothing is deployed, stored or run on production.
+M4's second step (`tasks/116-discovery-index.md`). The owner asked to "build next step premium report" and, offered the DiscoveryIndex, PremiumEligibility with it, or the report itself, chose the DiscoveryIndex. Built on `main` @ `de39642` and rebased onto `45168cb` (TASK-114, #134), then merged with `e1b18c2` (TASK-115, #135) and `291caaa` (ADR-0039, #132); of these files they touched only `STATUS.md` and `docs/CODEMAP.md`. Nothing is deployed, stored or run on production.
 
 ## What changed
 
