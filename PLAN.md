@@ -13,7 +13,7 @@ These are coarse milestone states; `STATUS.md` owns deployment and release facts
 | M0–M2 | Complete. |
 | M3 | Polona connector, archive claims and async runtime implemented; closed-beta release not signed off. |
 | M4 | Coverage assessment (TASK-080), DiscoveryIndex (TASK-116) and premium eligibility (TASK-117) exist; none has yet run on the full register. |
-| M5 | Not implemented; requires M4's real inventory decision. |
+| M5 | Frozen, immutable report versions (TASK-119) exist, internal test only; no delivery preview yet, and M4's inventory runs have not been made. |
 | M6 | Offer pages and inactive accounts implemented early; checkout and payments remain blocked on product and operating decisions. |
 | M7 | Launch hygiene and backup tooling implemented; production encrypted upload, restore drill and release review remain outstanding. |
 | M8 | Slugs, sitemap and indexing gates implemented early; a qualified SEO cohort remains to be released. |

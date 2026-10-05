@@ -86,6 +86,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0034_family_release_claims_on_account_deletion",
       "0035_family_person_count",
       "0036_accounts_purchases",
+      "0037_reports",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -103,7 +104,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // from M3 for exactly that reason and no wider. TASK-039 added
     // `administrative_memberships`, the TERC/SIMC hierarchy. TASK-075 added
     // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
-    // from surnames.
+    // from surnames. TASK-119 added `reports`, `report_versions`,
+    // `report_sections` and `report_claim_references`: the frozen report.
     //
     // Anything beyond this set is an accidental table. TASK-009 added
     // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
@@ -132,6 +134,10 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "name_forms", table_type: "BASE TABLE" },
       { table_name: "place_names", table_type: "BASE TABLE" },
       { table_name: "places", table_type: "BASE TABLE" },
+      { table_name: "report_claim_references", table_type: "BASE TABLE" },
+      { table_name: "report_sections", table_type: "BASE TABLE" },
+      { table_name: "report_versions", table_type: "BASE TABLE" },
+      { table_name: "reports", table_type: "BASE TABLE" },
       { table_name: "research_runs", table_type: "BASE TABLE" },
       { table_name: "resolvable_name_forms", table_type: "VIEW" },
       { table_name: "rights_profiles", table_type: "BASE TABLE" },
