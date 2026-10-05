@@ -23,11 +23,12 @@ describe("the surname's PDF (TASK-107, TASK-118)", () => {
     expect(doc.getTitle()).toBe("KOWALSKI — Name Atlas");
   });
 
-  it("draws the sheet in A4's proportions, at 300 dpi", () => {
+  it("draws the sheet in A4's proportions, at 200 dpi (TASK-121)", () => {
     // A4 is 210 × 297 mm: 595.28 × 841.89 pt.
     expect(PDF_PAGE.height / PDF_PAGE.width).toBeCloseTo(297 / 210, 3);
     expect(SHEET_SIZE.height / SHEET_SIZE.width).toBeCloseTo(297 / 210, 3);
-    expect(Math.round((SHEET_SIZE.width * SHEET_SCALE) / (210 / 25.4))).toBe(300);
+    expect(Math.round((SHEET_SIZE.width * SHEET_SCALE) / (210 / 25.4))).toBe(200);
+    expect(Math.round((SHEET_SIZE.height * SHEET_SCALE) / (297 / 25.4))).toBe(200);
   });
 
   it("names the file after the surname and sits beside the page", () => {

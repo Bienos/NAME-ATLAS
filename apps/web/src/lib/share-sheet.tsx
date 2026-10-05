@@ -22,8 +22,11 @@ import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
 
 /** A4 at 150 dpi, the units the sheet is laid out in. */
 export const SHEET_SIZE = { width: 1240, height: 1754 } as const;
-/** Drawn at twice that, 300 dpi, so it prints sharp. */
-export const SHEET_SCALE = 2;
+/**
+ * Drawn at 4/3 of that, 200 dpi (TASK-121): sharp enough to print, with
+ * 4/9 of the pixels of 300 dpi, so the PDF is quicker to make.
+ */
+export const SHEET_SCALE = 4 / 3;
 
 const PAD_X = 72;
 const MEASURE = SHEET_SIZE.width - PAD_X * 2;
@@ -702,7 +705,7 @@ function sheetFace(sheet: SheetFacts, host: string | null): ReactElement {
   );
 }
 
-/** Draws the sheet as one PNG, A4 at 300 dpi. */
+/** Draws the sheet as one PNG, A4 at 200 dpi (1653 × 2339 px). */
 export async function renderSurnameSheet(
   sheet: SheetFacts,
   host: string | null,
@@ -725,8 +728,8 @@ export async function renderSurnameSheet(
       </div>
     </div>,
     {
-      width: SHEET_SIZE.width * SHEET_SCALE,
-      height: SHEET_SIZE.height * SHEET_SCALE,
+      width: Math.round(SHEET_SIZE.width * SHEET_SCALE),
+      height: Math.round(SHEET_SIZE.height * SHEET_SCALE),
       ...fonts,
     },
   );
