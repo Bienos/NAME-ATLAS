@@ -44,8 +44,15 @@ describe("the section registry (TASK-034)", () => {
   });
 
   it("covers exactly the contract's chapter sections — a new section cannot be forgotten", () => {
-    // Everything else in the payload is identity, or shown only when nothing resolved.
-    const notChapters = new Set(["schema_version", "status", "surname", "suggestions"]);
+    // Everything else in the payload is identity, shown only when nothing resolved,
+    // or the other spelling: a line in the first screen, not a chapter (TASK-131).
+    const notChapters = new Set([
+      "schema_version",
+      "status",
+      "surname",
+      "suggestions",
+      "other_spelling",
+    ]);
     const contractSections = Object.keys(surnameResultResponseSchema.shape).filter(
       (field) => !notChapters.has(field),
     );

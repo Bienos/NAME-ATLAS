@@ -29,9 +29,10 @@ import { z } from "zod";
  * TASK-054 reached `main` first, as 1.8, while TASK-051 was still open as 1.7,
  * so 1.9 is the first version on `main` that carries both. 1.10 adds
  * `neighbours` and `other_form` (TASK-055, ADR-0025). 1.11 adds `localities`
- * (TASK-090, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030).
+ * (TASK-090, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030). 1.13
+ * adds `other_spelling` (TASK-131).
  */
-export const SURNAME_RESULT_SCHEMA_VERSION = "1.12";
+export const SURNAME_RESULT_SCHEMA_VERSION = "1.13";
 
 /**
  * `docs/canonical/16` §26. `value` is null for every status but `KNOWN`;
@@ -900,6 +901,21 @@ export const otherFormSchema = z.object({
   surface: surfaceEligibilitySchema,
 });
 
+/**
+ * The same surname key with other Polish diacritics, much more common than this
+ * one (TASK-131): WIŚNIEWSKI on WISNIEWSKI's page. Its largest count on one
+ * list, with that list and its date, from its rank claim. Two register entries,
+ * and nothing here relates the people who bear them.
+ */
+export const otherSpellingSchema = z.object({
+  surname: publicSurnameIdentitySchema,
+  rule_code: z.literal("POLISH_DIACRITIC_FOLD"),
+  comparability_group: z.string().min(1),
+  snapshot_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/u),
+  count: z.number().int().positive(),
+  surface: surfaceEligibilitySchema,
+});
+
 /** How many localities a section lists; the total says how many there are. */
 export const LOCALITIES_LIMIT = 20;
 
@@ -1033,6 +1049,11 @@ export const surnameResultResponseSchema = z
     other_form: otherFormSchema.nullable(),
     /** Added in 1.11 (TASK-090). Present exactly when RESOLVED. */
     localities: localitiesSectionSchema.nullable(),
+    /**
+     * Added in 1.13 (TASK-131). Null unless RESOLVED, and null unless a surname
+     * with the same diacritic-folded key is much more common than this one.
+     */
+    other_spelling: otherSpellingSchema.nullable(),
   })
   .refine((r) => (r.status === "RESOLVED" ? r.surname !== null : r.surname === null), {
     message: "surname identity is present exactly when status is RESOLVED",
@@ -1072,6 +1093,12 @@ export const surnameResultResponseSchema = z
   })
   .refine((r) => (r.status === "RESOLVED" ? r.localities !== null : r.localities === null), {
     message: "localities section is present exactly when status is RESOLVED",
+  })
+  .refine((r) => r.status === "RESOLVED" || r.other_spelling === null, {
+    message: "an other spelling is present only when status is RESOLVED",
+  })
+  .refine((r) => r.other_spelling === null || r.other_spelling.surname.id !== r.surname?.id, {
+    message: "the other spelling is a different surname",
   });
 
 export const surnameResultRequestSchema = z.object({
@@ -1131,6 +1158,7 @@ export type NeighbourEntry = z.infer<typeof neighbourEntrySchema>;
 export type NeighbourList = z.infer<typeof neighbourListSchema>;
 export type NeighboursSection = z.infer<typeof neighboursSectionSchema>;
 export type OtherForm = z.infer<typeof otherFormSchema>;
+export type OtherSpelling = z.infer<typeof otherSpellingSchema>;
 export type LocalityKind = z.infer<typeof localityKindSchema>;
 export type LocalityEntry = z.infer<typeof localityEntrySchema>;
 export type LocalitiesState = z.infer<typeof localitiesStateSchema>;

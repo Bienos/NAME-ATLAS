@@ -41,7 +41,7 @@ const observation = (cit: string, group: string) => ({
 
 function response(patch: Partial<SurnameResultResponse>): SurnameResultResponse {
   const base = {
-    schema_version: "1.12",
+    schema_version: "1.13",
     neighbours: {
       state: "UNAVAILABLE",
       lists: [],
@@ -49,6 +49,7 @@ function response(patch: Partial<SurnameResultResponse>): SurnameResultResponse 
       surface: SURFACE,
     },
     other_form: null,
+    other_spelling: null,
     localities: {
       state: "NOT_LOADED",
       reference_date: null,

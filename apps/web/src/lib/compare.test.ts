@@ -50,7 +50,7 @@ function rarity(x: number, group: string, denominator = 21_197_537, date = "2026
 }
 function side(observations: unknown[], rarities: unknown[] = []): SurnameResultResponse {
   return {
-    schema_version: "1.12",
+    schema_version: "1.13",
     neighbours: {
       state: "UNAVAILABLE",
       lists: [],
@@ -58,6 +58,7 @@ function side(observations: unknown[], rarities: unknown[] = []): SurnameResultR
       surface: SURFACE,
     },
     other_form: null,
+    other_spelling: null,
     localities: {
       state: "NOT_LOADED",
       reference_date: null,

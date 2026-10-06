@@ -59,7 +59,7 @@ function entry(
 
 function response(name: string, entries: unknown[]): SurnameResultResponse {
   return surnameResultResponseSchema.parse({
-    schema_version: "1.12",
+    schema_version: "1.13",
     neighbours: {
       state: "UNAVAILABLE",
       lists: [],
@@ -67,6 +67,7 @@ function response(name: string, entries: unknown[]): SurnameResultResponse {
       surface: SURFACE,
     },
     other_form: null,
+    other_spelling: null,
     localities: {
       state: "NOT_LOADED",
       reference_date: null,

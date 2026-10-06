@@ -35,6 +35,7 @@ import type {
   LocalityEntry,
   LocalityKind,
   OtherForm,
+  OtherSpelling,
   PopulationObservation,
   RarityEntry,
 } from "@name-atlas/contracts";
@@ -433,6 +434,37 @@ export function otherFormSentence(other: OtherForm, lang: Lang): string {
       ? `${other.surname.display_name}${sex}: ${count} ${other.count === 1 ? "osoba" : "osób"}, miejsce ${rank} na liście nazwisk na dzień ${on}`
       : `${other.surname.display_name}${sex}: ${count} ${other.count === 1 ? "person" : "people"}, rank ${rank} on the surname list on ${on}`,
   );
+}
+
+/**
+ * The other spelling's line (TASK-131), as a question: "Szukasz WIŚNIEWSKI?"
+ * then its count on its own list, with the list's date. In three parts, so the
+ * page can link the name. It asks; it never says the reader misspelled, and it
+ * states no relation between the two surnames' bearers.
+ */
+export function otherSpellingParts(
+  other: OtherSpelling,
+  lang: Lang,
+): { readonly lead: string; readonly name: string; readonly rest: string } {
+  const sex = parenthetical(partitionLabel(other.comparability_group, lang));
+  const count = formatInteger(other.count, lang);
+  const on = formatDate(other.snapshot_date, lang);
+  const name = other.surname.display_name;
+  return lang === "pl"
+    ? {
+        lead: "Szukasz ",
+        name,
+        rest: terminate(
+          `? ${count} ${pluralPl(other.count, "osoba", "osoby", "osób")}${sex} w rejestrze PESEL na dzień ${on}`,
+        ),
+      }
+    : {
+        lead: "Looking for ",
+        name,
+        rest: terminate(
+          `? ${count} ${other.count === 1 ? "person" : "people"}${sex} in the PESEL register on ${on}`,
+        ),
+      };
 }
 
 /**

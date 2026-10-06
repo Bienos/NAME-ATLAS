@@ -38,6 +38,8 @@ export {
   readRankNeighbours,
 } from "./neighbours.js";
 export type { OtherForm, RankNeighbour, RankNeighbourList } from "./neighbours.js";
+export { OTHER_SPELLING_RULE, readOtherSpelling } from "./other-spelling.js";
+export type { OtherSpelling } from "./other-spelling.js";
 export { TERYT_NOT_LOADED, localitiesSectionFor } from "./localities.js";
 export {
   archiveAvailabilityClaimKey,

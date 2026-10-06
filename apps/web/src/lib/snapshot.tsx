@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type {
   DistributionEntry,
   PlaceStat,
@@ -97,11 +97,14 @@ function tallyLine(response: SurnameResultResponse, lang: Lang): string | null {
 export function Snapshot({
   response,
   next = null,
+  notice = null,
   lang,
 }: {
   response: SurnameResultResponse & { status: "RESOLVED" };
   /** The journey's first step, linked at the foot of the first screen (TASK-053). */
   next?: Step | null;
+  /** A line under the answer: the other spelling (TASK-131). */
+  notice?: ReactNode;
   lang: Lang;
 }) {
   const t = UI[lang];
@@ -164,6 +167,7 @@ export function Snapshot({
       {/* The answer first (§64): the counts with their date, as text. */}
       {answer !== null ? <p className="snapshot-answer">{answer}</p> : null}
       {line !== null ? <p className="tally">{line}</p> : null}
+      {notice}
 
       {/* One column per register list: its count, its 1 in X and its strongest
           voivodeship, matched to the column by the list each claim belongs to,

@@ -82,7 +82,7 @@ export function resolved(options: FixtureOptions): SurnameResultResponse {
   const counts = options.counts ?? [[1000, "male"]];
   const region = options.region ?? "WIELKOPOLSKIE";
   const payload = {
-    schema_version: "1.12",
+    schema_version: "1.13",
     neighbours: {
       state: "UNAVAILABLE",
       lists: [],
@@ -105,6 +105,7 @@ export function resolved(options: FixtureOptions): SurnameResultResponse {
             count: 900,
             surface: SURFACE,
           },
+    other_spelling: null,
     localities: {
       state: "NOT_LOADED",
       reference_date: null,
@@ -211,9 +212,10 @@ export function resolved(options: FixtureOptions): SurnameResultResponse {
 
 export function unresolved(): SurnameResultResponse {
   return surnameResultResponseSchema.parse({
-    schema_version: "1.12",
+    schema_version: "1.13",
     neighbours: null,
     other_form: null,
+    other_spelling: null,
     localities: null,
     change: null,
     status: "UNRESOLVED",

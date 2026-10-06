@@ -1,8 +1,8 @@
 # Contract — Surname result read
 
 - **Status:** Accepted
-- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-090 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03
-- **Schema version:** `1.12` · **API version:** `v1`
+- **Accepted by:** TASK-006 (`tasks/006-surname-result-read-api.md`), 2026-09-19; extended by TASK-014 (`rarity`, 1.1), TASK-012 (`distribution`, 1.2) and TASK-016 (`suggestions`, 1.3), all 2026-09-20; TASK-022 (`meaning`, 1.4) and TASK-023 (`retrieved_at`, `methodology_code`, 1.5), both 2026-09-21; ADR-0012 (`source_page_url`, 1.6), 2026-09-24; TASK-054 (`archive`, 1.8), 2026-10-01; TASK-051 / ADR-0020 (`change`, 1.9; 1.7 on its own branch), 2026-10-01; TASK-055 / ADR-0025 (`neighbours`, `other_form`, 1.10), 2026-10-01; TASK-090 / ADR-0025 §2.7 (`localities`, 1.11), 2026-10-01; TASK-073 / ADR-0030 (`bearers`, 1.12), 2026-10-03; TASK-131 (`other_spelling`, 1.13), 2026-10-05
+- **Schema version:** `1.13` · **API version:** `v1`
 - **Runtime schema:** `packages/contracts/src/surname-result.ts`
 - **Canonical semantics:** `docs/canonical/16` — this document records what was accepted and implemented, and does not restate it.
 
@@ -249,6 +249,19 @@ A resolved surname also carries its neighbours on each list it is ranked on, and
 }
 ```
 
+A resolved surname also carries its other spelling (1.13): a surname whose canonical key folds to the same key under the Polish diacritic fold (`docs/canonical/13` §6.1, retrieval only) and that has at least five times as many people on its larger list as this surname has on its own larger list. On WISNIEWSKI (105 men, 95 women on 2026-01-20) it is WIŚNIEWSKI:
+
+```jsonc
+"other_spelling": {               // null unless RESOLVED, rarity is READY and such a surname exists
+  "surname": { "id": "…", "display_name": "WIŚNIEWSKI", "script": "Latn" },
+  "rule_code": "POLISH_DIACRITIC_FOLD",
+  "comparability_group": "pesel_2026_national_male", // its larger list
+  "snapshot_date": "2026-01-20",
+  "count": 53079,
+  "surface": { "surface": "FREE", "decision": "ALLOWED", "reason_code": "RIGHTS_PERMIT_FREE_SURFACE" }
+}
+```
+
 A resolved surname also carries the localities in the TERYT register whose official name is the surname (1.11), on TERYT's own rights, with the register's reference date. A lookup, not a claim: a shared name is a coincidence in the register, and no field says, and no surface may say, that the surname began in or is connected with any of these places. `READY` with no place is an answer; `NOT_LOADED` says the database holds no SIMC file.
 
 ```jsonc
@@ -340,6 +353,8 @@ These are schema constraints, not conventions — a violating payload fails vali
 32. **The localities section is present exactly when the surname resolved.** Added in 1.11. On every other status it is null, like the other sections.
 33. **A bearer shares the surname, nothing more.** Added in 1.12. `people` are those whose own name in Wikidata ends with exactly the surname and who have a Wikipedia article (ADR-0030 §2.1). No field relates them to each other or to the reader, and the page says so beside them. A null `died` means Wikidata states no date of death, not that the person is alive. Where Wikidata states a death before the birth, both years are null (TASK-085); the person still counts in `with_death_date`.
 34. **`people` and `more` add up to `total`.** Added in 1.12. How many are listed depends on the surface (ADR-0030 §2.7); the count does not. `NOT_SEARCHED` carries no count, date or person, and a `READY` section with a total of zero is an answer.
+35. **The other spelling is another register entry, never the surname itself and never a relation.** Added in 1.13. `rule_code` is the literal `POLISH_DIACRITIC_FOLD`: the two canonical keys are equal once ą ć ę ł ń ó ś ź ż become a c e l n o s z z. Spaces and hyphens are not folded, so ŻMUDA-TRZEBIATOWSKI is not ZMUDA TRZEBIATOWSKI's other spelling. No field states that the two are one name or that their bearers are related, and no field says the reader misspelled.
+36. **The other spelling is present only where it is much more common.** Added in 1.13. Its largest count on one list, read from its active rank claim, is at least five times this surname's largest count on one list (`OTHER_SPELLING_RATIO` in `@name-atlas/resolver`, the same rule that orders suggest-as-you-type; TASK-131). The two lists are never added up. It is null on every status but `RESOLVED`, null where this surname has no rank (it is read with the neighbours, on rarity's rights), and null where no such surname exists. Script-confusable, merged and inactive surnames are never given.
 
 ## Accepted rendering of a rarity entry
 
@@ -396,6 +411,14 @@ Decided with TASK-090 (2026-10-01, ADR-0025 §2.7: localities "under a line sayi
 - **Never** "comes from", "originates", "pochodzi", "lives in" or "mieszka": the page's forbidden words hold for this chapter as for the distribution.
 - The chapter and the card are shown only for a `READY` section with at least one place; no place is not a chapter.
 
+## Accepted rendering of the other spelling
+
+Decided with TASK-131 (2026-10-05). One line under the answer, in the page's first screen, as a question with the other surname as a link; then its count with its list and date. It asks, and never says the reader misspelled or that the two surnames are related:
+
+- PL: `Szukasz {surname}? {count} {osoba|osoby|osób} ({sex}) w rejestrze PESEL na dzień {date}.` — e.g. *Szukasz WIŚNIEWSKI? 53 079 osób (mężczyźni) w rejestrze PESEL na dzień 20 stycznia 2026 r.*
+- EN: `Looking for {surname}? {count} {person|people} ({sex}) in the PESEL register on {date}.` — e.g. *Looking for WIŚNIEWSKI? 53,079 people (male) in the PESEL register on 20 January 2026.*
+- No line where the section is null.
+
 ## Recorded deviations
 
 - **`unit` is a two-member enum, and PESEL now emits `PEOPLE`.** `docs/canonical/16` §26 fixes the unit as the single literal `"PEOPLE"`. **ADR-0004** (`docs/adr/0004-population-value-unit.md`) widened it to `"PEOPLE" | "SURNAME_OCCURRENCES"` while TASK-004 §14 U-4 was open. On 2026-09-20 the project owner decided U-4 on the field's definition — the counted field is *nazwisko aktualne*, of which every living person in PESEL has exactly one, so an occurrence among living persons is one person — and PESEL-derived values emit `"PEOPLE"` since then (ADR-0004, amendment of 2026-09-20). `"SURNAME_OCCURRENCES"` stays in the enum for a source whose counted field is not one-per-person. Not a breaking change: the enum is unchanged, only the emitted value.
@@ -414,6 +437,8 @@ Breaking this contract requires a `schema_version` bump and a stated compatibili
 
 **1.10 → 1.11 (2026-10-01, TASK-090, ADR-0025 §2.7).** Adds `localities` (required, nullable, present exactly when `status` is `RESOLVED`). A consumer written against 1.10 is unaffected; a producer must now supply it. It is a lookup in the TERYT register TASK-039 loads, through the indexes migrations 0010 and 0023 made, so no new derivation, claim or migration comes with it; its state and surface come from `pl_teryt`'s stored rights profile, as the archive's do from Polona's.
 **1.11 → 1.12 (2026-10-03, TASK-073, ADR-0030).** Adds the `bearers` section, required and nullable, present exactly when `status` is `RESOLVED`. A consumer written against 1.11 is unaffected; a producer must now supply it. 1.11 is `localities` (TASK-090, #70 and #77), not on `main` when this was written; whichever lands second carries both.
+
+**1.12 → 1.13 (2026-10-05, TASK-131).** Adds `other_spelling` (required, nullable, null unless `RESOLVED`). A consumer written against 1.12 is unaffected; a producer must now supply it. It is read from rank claims that already exist, over migration 0020's trigram index on the folded key, so no new derivation, claim or migration comes with it. It does not go into `suggestions`, which 1.3 keeps for a query that did not resolve. A report version frozen under 1.12 no longer parses as the current schema, and the report preview says so, as after every earlier version.
 
 **1.9 → 1.10 (2026-10-01, TASK-055, ADR-0025).** Adds `neighbours` (required, nullable, present exactly when `status` is `RESOLVED`) and `other_form` (required, nullable, null unless `RESOLVED`). A consumer written against 1.9 is unaffected; a producer must now supply both. Both are read from rank claims that already exist, so no new derivation comes with them; migration 0026 adds an index so that the neighbours of a rare surname, whose place is shared by tens of thousands, are read without a sort.
 

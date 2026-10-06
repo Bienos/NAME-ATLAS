@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type {
   ChangeEntry,
   DistributionEntry,
+  OtherSpelling,
   PopulationObservation,
   RarityEntry,
 } from "@name-atlas/contracts";
@@ -23,6 +24,7 @@ import {
   formatQuantile,
   formatShare,
   formatSigned,
+  otherSpellingParts,
   parseLang,
   parseTemplate,
   pluralForm,
@@ -707,5 +709,37 @@ describe("changeSentence and its notes (TASK-051, ADR-0020)", () => {
         expect(sentence).not.toMatch(causal);
       }
     }
+  });
+});
+
+describe("otherSpellingParts (TASK-131)", () => {
+  // SYNTHETIC counts, to reach each Polish plural form; the name is a placeholder.
+  const other = (count: number, group: string): OtherSpelling => ({
+    surname: { id: "01a0f034-0000-7000-8000-000000000001", display_name: "ŁĄCKI", script: "Latn" },
+    rule_code: "POLISH_DIACRITIC_FOLD",
+    comparability_group: group,
+    snapshot_date: "2026-01-20",
+    count,
+    surface: { surface: "FREE", decision: "ALLOWED", reason_code: "RIGHTS_PERMIT_FREE_SURFACE" },
+  });
+  const sentence = (o: OtherSpelling, lang: "pl" | "en") => {
+    const { lead, name, rest } = otherSpellingParts(o, lang);
+    return `${lead}${name}${rest}`;
+  };
+
+  it("asks, with the count agreeing in Polish and the list and date named", () => {
+    const male = "pesel_2026_national_male";
+    expect(sentence(other(1, male), "pl")).toBe(
+      "Szukasz ŁĄCKI? 1 osoba (mężczyźni) w rejestrze PESEL na dzień 20 stycznia 2026 r.",
+    );
+    expect(sentence(other(3, male), "pl")).toContain("? 3 osoby (mężczyźni)");
+    expect(sentence(other(12, male), "pl")).toContain("? 12 osób (mężczyźni)");
+    expect(sentence(other(1, "pesel_2026_national_female"), "en")).toBe(
+      "Looking for ŁĄCKI? 1 person (female) in the PESEL register on 20 January 2026.",
+    );
+  });
+
+  it("omits the list label for a list it does not recognise, rather than guessing", () => {
+    expect(sentence(other(5, "some_list"), "pl")).toContain("? 5 osób w rejestrze PESEL");
   });
 });

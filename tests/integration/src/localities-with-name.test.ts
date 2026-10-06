@@ -308,7 +308,7 @@ describe("the section on the response, through the query service", () => {
     const outcome = await querySurnameResult(db.db, "KOWALSKI");
     expect(outcome.kind).toBe("OK");
     if (outcome.kind !== "OK") return;
-    expect(outcome.response.schema_version).toBe("1.12");
+    expect(outcome.response.schema_version).toBe("1.13");
     expect(outcome.response.status).toBe("RESOLVED");
     expect(surnameResultResponseSchema.safeParse(outcome.response).success).toBe(true);
     const localities = outcome.response.localities;

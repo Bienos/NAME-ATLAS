@@ -25,6 +25,7 @@ import { archiveSectionFor } from "./archive.js";
 import { localitiesSectionFor } from "./localities.js";
 import { bearersSectionFor } from "./bearers.js";
 import { OTHER_FORM_RULE, readOtherForm, readRankNeighbours } from "./neighbours.js";
+import { OTHER_SPELLING_RULE, readOtherSpelling } from "./other-spelling.js";
 import type { DB } from "@name-atlas/db";
 import type {
   ChangeEntry,
@@ -43,6 +44,7 @@ import type {
   MeaningInterpretation as MeaningInterpretationDto,
   NeighboursSection,
   OtherForm as OtherFormDto,
+  OtherSpelling as OtherSpellingDto,
 } from "@name-atlas/contracts";
 import { SURNAME_RESULT_SCHEMA_VERSION } from "@name-atlas/contracts";
 import { resolveSurname, suggestSurnames } from "@name-atlas/resolver";
@@ -135,16 +137,21 @@ function emptyNeighbours(
 }
 
 /**
- * The deck's neighbours and other grammatical form (TASK-055, ADR-0025). Both
- * are read from rank claims on the same national lists as the rarity section,
- * so they are shown exactly when rarity is, on rarity's rights.
+ * The deck's neighbours and other grammatical form (TASK-055, ADR-0025), and
+ * the page's other spelling (TASK-131). All three are read from rank claims on
+ * the same national lists as the rarity section, so they are shown exactly when
+ * rarity is, on rarity's rights.
  */
 async function rankExtras(
   db: Kysely<DB>,
   surnameId: string,
   displayName: string,
   rarity: RaritySection,
-): Promise<{ neighbours: NeighboursSection; other_form: OtherFormDto | null }> {
+): Promise<{
+  neighbours: NeighboursSection;
+  other_form: OtherFormDto | null;
+  other_spelling: OtherSpellingDto | null;
+}> {
   if (rarity.state !== "READY") {
     return {
       neighbours: emptyNeighbours(
@@ -153,10 +160,12 @@ async function rankExtras(
         rarity.surface,
       ),
       other_form: null,
+      other_spelling: null,
     };
   }
   const lists = await readRankNeighbours(db, surnameId);
   const other = await readOtherForm(db, displayName);
+  const spelling = await readOtherSpelling(db, surnameId, displayName);
   return {
     neighbours:
       lists.length === 0
@@ -190,6 +199,21 @@ async function rankExtras(
             snapshot_date: other.snapshot_date,
             rank: other.rank,
             count: other.count,
+            surface: rarity.surface,
+          },
+    other_spelling:
+      spelling === null
+        ? null
+        : {
+            surname: {
+              id: spelling.surname_id,
+              display_name: spelling.display_name,
+              script: spelling.script,
+            },
+            rule_code: OTHER_SPELLING_RULE,
+            comparability_group: spelling.comparability_group,
+            snapshot_date: spelling.snapshot_date,
+            count: spelling.count,
             surface: rarity.surface,
           },
   };
@@ -625,6 +649,7 @@ export async function querySurnameResult(
         neighbours: null,
         other_form: null,
         localities: null,
+        other_spelling: null,
       },
     };
   }
@@ -650,6 +675,7 @@ export async function querySurnameResult(
         neighbours: null,
         other_form: null,
         localities: null,
+        other_spelling: null,
       },
     };
   }
@@ -713,6 +739,7 @@ export async function querySurnameResult(
         neighbours: emptyNeighbours("UNAVAILABLE", reason, noRights),
         other_form: null,
         localities,
+        other_spelling: null,
       },
     };
   }
@@ -750,6 +777,7 @@ export async function querySurnameResult(
         neighbours: emptyNeighbours("RIGHTS_BLOCKED", eligibility.reason_code, eligibility),
         other_form: null,
         localities,
+        other_spelling: null,
       },
     };
   }
@@ -852,6 +880,7 @@ export async function querySurnameResult(
       neighbours: extras.neighbours,
       other_form: extras.other_form,
       localities,
+      other_spelling: extras.other_spelling,
     },
   };
 }

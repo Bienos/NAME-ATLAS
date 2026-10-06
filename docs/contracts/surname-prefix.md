@@ -40,7 +40,7 @@
 - **A link, never a resolution.** Nothing is filled in or chosen for the reader; the page it opens resolves exactly or not at all.
 - **No figure crosses this boundary.** No count, rank, share, score or similarity — only a name and an address. The schema strips any other field.
 - **Matching:** the input's Polish-diacritic fold is a prefix of the surname's folded canonical key, so `wisn` finds WIŚNIEWSKI. The fold is retrieval only (`docs/canonical/13` §6.1).
-- **Order:** surnames whose key starts with the input *as typed*, diacritics included, first; then by the larger of the surname's national counts — used only to order, never returned, and the two national resources never summed; then alphabetically.
+- **Order (since TASK-131, 2026-10-05):** surnames whose key starts with the input *as typed*, diacritics included, first, unless a surname found only through the fold has at least five times as many people (`OTHER_SPELLING_RATIO` in `@name-atlas/resolver`), which then goes ahead of it: `wisniew` lists WIŚNIEWSKA and WIŚNIEWSKI before WISNIEWSKI, while `zmuda t` keeps ZMUDA TRZEBIATOWSKI (248) before ŻMUDA TRZEBIATOWSKI (88). "As many people" is the larger of the surname's national counts — used only to order, never returned, and the two national resources never summed. A surname with no count comes after every surname with one. Ties stay with the spelling as typed, then alphabetical. The response is unchanged, so the schema stays `1.0`.
 - **Never offered:** surnames flagged `script_confusable_flag`, merged or inactive surnames.
 
 ## Errors — the `docs/canonical/16` §78 envelope
