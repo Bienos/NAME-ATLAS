@@ -53,6 +53,7 @@ describe("MIGRATIONS_DIR", () => {
       "0042_purchases_babynames_tier.ts", // TASK-144 / D-045 — the 8,99 zł baby-names product's tier
       "0043_given_name_birth_list_index.ts", // TASK-146 / D-047 — one birth-name list's claims, by list
       "0044_given_name_meaning.ts", // TASK-147 / ADR-0045 — first-name origins and meanings as claims
+      "0046_purchases_fullnames_tier.ts", // TASK-155 / D-049 — the 15,99 zł full-name comparison's tier
     ]);
   });
 });

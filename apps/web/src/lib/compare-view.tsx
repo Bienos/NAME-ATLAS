@@ -1,32 +1,38 @@
-import type { DistributionEntry, SurnameResultResponse } from "@name-atlas/contracts";
+import { slugFor } from "@name-atlas/seo";
+import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { compareDistribution, comparePopulation, compareRarity, rarerOf } from "./compare.js";
 import type { NotComparable } from "./compare.js";
 import {
-  coverageWarning,
-  formatDate,
-  formatInteger,
-  formatPercent,
-  partitionLabel,
-  UI,
-} from "./messages.js";
+  Chapter,
+  DistributionMaps,
+  FigureBars,
+  FullNamesCard,
+  NamePlates,
+  OddsFigures,
+} from "./compare-figures.js";
+import { COMPARE_EXAMPLES, COMPARE_TEXT } from "./compare-text.js";
+import { formatDate, formatInteger, partitionLabel, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
-import { mapInputs } from "./voivodeship-map-input.js";
 import { ReportLink } from "./report-link.js";
 import { anchorOf } from "./sections.js";
 import { SiteShell } from "./site-shell.js";
 import { comparisonPath } from "./compare-request.js";
 
 /**
- * The comparison page (TASK-025, directive §24–§25).
+ * The comparison page (TASK-025, directive §24–§25; redesigned by TASK-155).
  *
  * Two surnames side by side, and a figure compared **only** where scope, date
- * and denominator agree. Where they do not, the page says so and shows both
- * numbers without ranking them — which is the honest outcome, not a failure.
+ * and denominator agree. Where they do not, the page says so and draws nothing
+ * for that partition — which is the honest outcome, not a failure.
  *
- * The disclaimer is fixed and always rendered: a surname comparison says nothing
- * about ancestry, ethnicity or family relation, and the page must not let the
- * side-by-side layout imply otherwise.
+ * The page reads as one spread: the two names as plates with the mark between
+ * them, the disclaimer, then numbered chapters. A count is drawn as two bars on
+ * one scale; a rarity as two "1 in X" figures (a bar would draw the rarer
+ * surname as the longer one); the regions as two maps on one scale.
+ *
+ * The disclaimer is fixed and always rendered before any figure: a surname
+ * comparison says nothing about ancestry, ethnicity or family relation, and the
+ * page must not let the side-by-side layout imply otherwise.
  *
  * `noindex`: the metadata is set by the route. Comparison is a product feature,
  * and indexing surname pairs would be the programmatic explosion
@@ -50,7 +56,7 @@ export interface ComparisonSide {
   readonly path: string | null;
 }
 
-function reasonWords(reason: NotComparable, lang: Lang): string {
+export function reasonWords(reason: NotComparable, lang: Lang): string {
   const words: Record<NotComparable, { pl: string; en: string }> = {
     DIFFERENT_PARTITION: {
       pl: "Te liczby pochodzą z różnych zbiorów i nie są bezpośrednio porównywalne.",
@@ -72,7 +78,7 @@ function reasonWords(reason: NotComparable, lang: Lang): string {
   return words[reason][lang];
 }
 
-function groupWords(group: string | null, lang: Lang): string {
+export function groupWords(group: string | null, lang: Lang): string {
   return partitionLabel(group, lang) ?? (lang === "pl" ? "zbiór" : "dataset");
 }
 
@@ -96,7 +102,7 @@ export function comparePath(a: string, b: string, lang: Lang): string {
  * page echoes a parameter as text; the language switch carries both slugs
  * only URL-encoded, behind a fixed path (`comparePath`).
  */
-function displayFor(side: ComparisonSide): string {
+export function displayFor(side: ComparisonSide): string {
   if (side.display !== null) return side.display;
   const slug = side.slug.trim();
   if (slug === "") return "—";
@@ -108,18 +114,23 @@ export function ComparisonView({
   b,
   lang,
   origin = null,
+  fullNamesHref = null,
 }: {
   a: ComparisonSide;
   b: ComparisonSide;
   lang: Lang;
   /** `SITE_ORIGIN`, for the report link's absolute address; else the path alone. */
   origin?: string | null;
+  /** The full-name comparison's address, only while that page exists (D-049). */
+  fullNamesHref?: string | null;
 }) {
   const t = UI[lang];
+  const c = COMPARE_TEXT[lang];
   const bothResolved = a.response !== null && b.response !== null;
   const populationPairs = bothResolved ? comparePopulation(a.response!, b.response!) : [];
   const rarityPairs = bothResolved ? compareRarity(a.response!, b.response!) : [];
   const distributionPairs = bothResolved ? compareDistribution(a.response!, b.response!) : [];
+  const names = [displayFor(a), displayFor(b)];
 
   return (
     // `compare` widens the canvas on desktop so the two sides sit side by side.
@@ -129,21 +140,23 @@ export function ComparisonView({
       world={{ mode: "quiet" }}
       current="compare"
       search={{ query: "" }}
-      mainClassName="compare"
+      mainClassName="compare cmp atlas-v1"
     >
-      <h2 className="surname compare-heading">
-        {displayFor(a)}
-        <span className="versus">{t.compareVersus}</span>
-        {displayFor(b)}
-      </h2>
+      <header className="cmp-head">
+        <p className="cmp-eyebrow">{c.eyebrow}</p>
+        <NamePlates
+          names={names.map((name, i) => ({ key: String(i), lines: [name] }))}
+          lang={lang}
+        />
+      </header>
 
       {/* Before any figure. The layout is the thing that could mislead, so the
             sentence that refuses the inference comes first. */}
-      <p className="warning">{t.compareDisclaimer}</p>
+      <p className="warning cmp-disclaimer">{t.compareDisclaimer}</p>
 
       {!bothResolved ? (
-        <section>
-          <h3>{t.unresolvedHeading}</h3>
+        <section className="cmp-chapter">
+          <h2>{t.unresolvedHeading}</h2>
           <p className="absent">
             {[a, b]
               .filter((side) => side.response === null)
@@ -155,119 +168,85 @@ export function ComparisonView({
         </section>
       ) : (
         <>
-          <section id={anchorOf("count")}>
-            <h3>{t.sectionPopulation}</h3>
+          <Chapter id={anchorOf("count")} n={1} title={t.sectionPopulation} lang={lang}>
             {populationPairs.length === 0 ? (
               <p className="absent">{t.compareNothingToCompare}</p>
             ) : (
-              populationPairs.map((pair, index) => (
-                <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
-                  <p className="compare-group">{groupWords(pair.group, lang)}</p>
-                  {pair.comparable ? (
-                    <>
-                      <div
-                        className="table-scroll"
-                        tabIndex={0}
-                        role="region"
-                        aria-label={t.searchLabel}
-                      >
-                        <table>
-                          <thead>
-                            <tr>
-                              <th scope="col">{t.searchLabel}</th>
-                              <th scope="col">{t.countColumn}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <th scope="row">{a.display}</th>
-                              <td>
-                                {pair.a.value.value === null
-                                  ? "—"
-                                  : formatInteger(pair.a.value.value, lang)}
-                              </td>
-                            </tr>
-                            <tr>
-                              <th scope="row">{b.display}</th>
-                              <td>
-                                {pair.b.value.value === null
-                                  ? "—"
-                                  : formatInteger(pair.b.value.value, lang)}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <p className="note">
-                        {t.snapshotLabel}: {formatDate(pair.a.snapshot_date, lang)}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="absent">{reasonWords(pair.reason, lang)}</p>
-                  )}
-                </div>
-              ))
+              <div className="cmp-panels">
+                {populationPairs.map((pair, index) => (
+                  <div
+                    className="compare-row cmp-panel"
+                    key={`${String(pair.group)}-${String(index)}`}
+                  >
+                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                    {pair.comparable ? (
+                      <>
+                        <FigureBars
+                          label={`${t.sectionPopulation}: ${groupWords(pair.group, lang)}`}
+                          rows={[pair.a, pair.b].map((obs, i) => ({
+                            key: String(i),
+                            side: i,
+                            name: names[i] ?? "",
+                            value: obs.value.value,
+                            text:
+                              obs.value.value === null ? "—" : formatInteger(obs.value.value, lang),
+                          }))}
+                        />
+                        <p className="note">
+                          {t.snapshotLabel}: {formatDate(pair.a.snapshot_date, lang)}
+                        </p>
+                      </>
+                    ) : (
+                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
-          </section>
+          </Chapter>
 
-          <section id={anchorOf("rarity")}>
-            <h3>{t.sectionRarity}</h3>
+          <Chapter id={anchorOf("rarity")} n={2} title={t.sectionRarity} lang={lang}>
             {rarityPairs.length === 0 ? (
               <p className="absent">{t.compareNothingToCompare}</p>
             ) : (
-              rarityPairs.map((pair, index) => (
-                <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
-                  <p className="compare-group">{groupWords(pair.group, lang)}</p>
-                  {pair.comparable ? (
-                    <>
-                      <div
-                        className="table-scroll"
-                        tabIndex={0}
-                        role="region"
-                        aria-label={t.searchLabel}
-                      >
-                        <table>
-                          <thead>
-                            <tr>
-                              <th scope="col">{t.searchLabel}</th>
-                              <th scope="col">{t.compareOneIn}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <th scope="row">{a.display}</th>
-                              <td>{formatInteger(pair.a.primary.value, lang)}</td>
-                            </tr>
-                            <tr>
-                              <th scope="row">{b.display}</th>
-                              <td>{formatInteger(pair.b.primary.value, lang)}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                      <p className="note">{t.limitationRounded}</p>
-                      <p className="note">
-                        {(() => {
-                          const rarer = rarerOf(pair);
-                          if (rarer === null) return t.compareEqualRarity;
-                          if (rarer === "TOO_CLOSE") return t.compareTooClose;
-                          const name = rarer === "a" ? a.display : b.display;
-                          return lang === "pl"
-                            ? `${name ?? ""} jest rzadsze w tym zbiorze.`
-                            : `${name ?? ""} is rarer in this dataset.`;
-                        })()}
-                      </p>
-                    </>
-                  ) : (
-                    <p className="absent">{reasonWords(pair.reason, lang)}</p>
-                  )}
-                </div>
-              ))
+              <div className="cmp-panels">
+                {rarityPairs.map((pair, index) => (
+                  <div
+                    className="compare-row cmp-panel"
+                    key={`${String(pair.group)}-${String(index)}`}
+                  >
+                    <p className="compare-group">{groupWords(pair.group, lang)}</p>
+                    {pair.comparable ? (
+                      <>
+                        <OddsFigures
+                          lang={lang}
+                          rows={[pair.a, pair.b].map((entry, i) => ({
+                            key: String(i),
+                            side: i,
+                            name: names[i] ?? "",
+                            value: formatInteger(entry.primary.value, lang),
+                          }))}
+                        />
+                        <p className="cmp-verdict">
+                          {(() => {
+                            const rarer = rarerOf(pair);
+                            if (rarer === null) return t.compareEqualRarity;
+                            if (rarer === "TOO_CLOSE") return t.compareTooClose;
+                            return c.rarerVerdict(rarer === "a" ? names[0]! : names[1]!);
+                          })()}
+                        </p>
+                        <p className="note">{t.limitationRounded}</p>
+                      </>
+                    ) : (
+                      <p className="absent">{reasonWords(pair.reason, lang)}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
-          </section>
+          </Chapter>
 
-          <section id={anchorOf("map")}>
-            <h3>{t.sectionDistribution}</h3>
+          <Chapter id={anchorOf("map")} n={3} title={t.sectionDistribution} lang={lang}>
             {distributionPairs.length === 0 ? (
               <p className="absent">{t.compareNothingToCompare}</p>
             ) : (
@@ -275,10 +254,10 @@ export function ComparisonView({
                 <div className="compare-row" key={`${String(pair.group)}-${String(index)}`}>
                   <p className="compare-group">{groupWords(pair.group, lang)}</p>
                   {pair.comparable ? (
-                    <DistributionPair
-                      pair={[
-                        { name: a.display ?? "", entry: pair.a },
-                        { name: b.display ?? "", entry: pair.b },
+                    <DistributionMaps
+                      sides={[
+                        { name: a.display ?? "", side: 0, entry: pair.a },
+                        { name: b.display ?? "", side: 1, entry: pair.b },
                       ]}
                       lang={lang}
                     />
@@ -288,11 +267,12 @@ export function ComparisonView({
                 </div>
               ))
             )}
-          </section>
+          </Chapter>
         </>
       )}
 
-      <p className="again">
+      <p className="again cmp-pages">
+        <span className="cmp-pages-label">{c.pages}</span>
         {[a, b].map((side) =>
           side.path === null || side.display === null ? null : (
             <a key={side.slug} href={side.path}>
@@ -301,6 +281,16 @@ export function ComparisonView({
           ),
         )}
       </p>
+
+      <div className="cmp-next">
+        <section className="cmp-again" aria-labelledby="cmp-again-title">
+          <h2 id="cmp-again-title">{c.again}</h2>
+          <p className="note">{c.againLede}</p>
+          <PickerForm lang={lang} first="" second="" error={false} compact />
+        </section>
+        {fullNamesHref === null ? null : <FullNamesCard href={fullNamesHref} lang={lang} />}
+      </div>
+
       <ReportLink
         surnames={[a.display, b.display].filter((d): d is string => d !== null)}
         pageUrl={`${origin ?? ""}${comparePath(a.slug, b.slug, lang)}`}
@@ -311,43 +301,40 @@ export function ComparisonView({
 }
 
 /**
- * The comparison's picker (TASK-052): the header's "Porównaj" opens it. Two
- * plain fields, typed as the surnames are written, and a `GET` to this same
- * route, which turns them into addresses (`compare-request.ts`). The
- * disclaimer stands above the fields, as it stands above every comparison.
- * The couple report (TASK-100) uses it with its own address and words.
+ * The two fields with the mark between them, and a `GET` to the comparison,
+ * which turns what was typed into addresses (`compare-request.ts`). `compact`
+ * is the second comparison at the foot of a result: its own field ids, so the
+ * page never holds two elements with one id.
  */
-export function ComparePicker({
+function PickerForm({
   lang,
   first,
   second,
   error,
   copy = null,
+  compact = false,
 }: {
   lang: Lang;
   first: string;
   second: string;
   error: boolean;
-  /** Another page's address and words in place of the comparison's. */
   copy?: PickerCopy | null;
+  compact?: boolean;
 }) {
   const t = UI[lang];
+  const c = COMPARE_TEXT[lang];
   const action = copy?.action ?? (lang === "pl" ? "/pl/porownaj" : "/en/compare");
+  const ids = compact ? (["qa-again", "qb-again"] as const) : (["qa", "qb"] as const);
   return (
-    <SiteShell
-      lang={lang}
-      otherPath={copy?.otherPath ?? (lang === "pl" ? "/en/compare" : "/pl/porownaj")}
-      world={{ mode: "quiet" }}
-      current={copy === null ? "compare" : null}
-      mainClassName="compare compare-pick"
+    <form
+      className={compact ? "cmp-duel cmp-duel-compact" : "cmp-duel"}
+      action={action}
+      method="get"
     >
-      <h1 className="page-title">{copy?.heading ?? t.compareHeading}</h1>
-      <p className="page-lede">{copy?.intro ?? t.compareIntro}</p>
-      <p className="warning">{t.compareDisclaimer}</p>
-      <form className="compare-form" action={action} method="get">
-        <label htmlFor="qa">{t.compareFirstLabel}</label>
+      <div className="cmp-field" data-side={0}>
+        <label htmlFor={ids[0]}>{t.compareFirstLabel}</label>
         <input
-          id="qa"
+          id={ids[0]}
           name="qa"
           type="text"
           defaultValue={first.slice(0, 80)}
@@ -356,9 +343,14 @@ export function ComparePicker({
           spellCheck={false}
           autoCapitalize="words"
         />
-        <label htmlFor="qb">{t.compareSecondLabel}</label>
+      </div>
+      <span className="cmp-vs" aria-hidden="true">
+        {c.versus}
+      </span>
+      <div className="cmp-field" data-side={1}>
+        <label htmlFor={ids[1]}>{t.compareSecondLabel}</label>
         <input
-          id="qb"
+          id={ids[1]}
           name="qb"
           type="text"
           defaultValue={second.slice(0, 80)}
@@ -366,111 +358,91 @@ export function ComparePicker({
           spellCheck={false}
           autoCapitalize="words"
         />
-        {error ? (
-          <p className="compare-error" role="alert">
-            {t.compareNeedsTwo}
-          </p>
-        ) : null}
-        <button type="submit">{copy?.submit ?? t.compareAction}</button>
-      </form>
-    </SiteShell>
+      </div>
+      {error ? (
+        <p className="compare-error" role="alert">
+          {t.compareNeedsTwo}
+        </p>
+      ) : null}
+      <button type="submit">{copy?.submit ?? t.compareAction}</button>
+    </form>
   );
 }
 
 /**
- * Two regional breakdowns from the same resource: two maps on **one shared
- * scale** (so a shade means the same share in both), one legend, each side's
- * coverage warning above its own map, and a table with both columns.
+ * The comparison's picker (TASK-052, redesigned by TASK-155): the header's
+ * "Porównaj" opens it. Two plain fields, typed as the surnames are written,
+ * with the mark between them. The disclaimer stands above the fields, as it
+ * stands above every comparison. Below: pairs to try, what is compared, and,
+ * while it exists, the full-name comparison (D-049). The couple report
+ * (TASK-100) uses it with its own address and words, and none of the extras.
  */
-function DistributionPair({
-  pair,
+export function ComparePicker({
   lang,
+  first,
+  second,
+  error,
+  copy = null,
+  fullNamesHref = null,
 }: {
-  pair: readonly [
-    { name: string; entry: DistributionEntry },
-    { name: string; entry: DistributionEntry },
-  ];
   lang: Lang;
+  first: string;
+  second: string;
+  error: boolean;
+  /** Another page's address and words in place of the comparison's. */
+  copy?: PickerCopy | null;
+  /** The full-name comparison's address, only while that page exists (D-049). */
+  fullNamesHref?: string | null;
 }) {
   const t = UI[lang];
-  const input = mapInputs(
-    pair.map((side) => side.entry),
-    lang,
-  );
-  const places = new Map<string, { name: string; a?: number; b?: number }>();
-  pair[0].entry.regions.forEach((r) =>
-    places.set(r.place_id, {
-      ...places.get(r.place_id),
-      name: r.display_name,
-      a: r.share_of_covered,
-    }),
-  );
-  pair[1].entry.regions.forEach((r) =>
-    places.set(r.place_id, {
-      ...places.get(r.place_id),
-      name: r.display_name,
-      b: r.share_of_covered,
-    }),
-  );
-  const rows = [...places.values()].sort((x, y) => x.name.localeCompare(y.name, "pl"));
-  const labels = {
-    title: t.mapTitle,
-    legendTitle: t.mapLegend,
-    bandLabels: input?.bandLabels ?? [],
-    notListed: t.mapNotListed,
-    hint: t.mapHint,
-  };
+  const c = COMPARE_TEXT[lang];
   return (
-    <>
-      {input === null ? null : (
+    <SiteShell
+      lang={lang}
+      otherPath={copy?.otherPath ?? (lang === "pl" ? "/en/compare" : "/pl/porownaj")}
+      world={{ mode: "quiet" }}
+      current={copy === null ? "compare" : null}
+      mainClassName="compare compare-pick cmp cmp-pick atlas-v1"
+    >
+      <header className="cmp-intro">
+        {copy === null ? <p className="cmp-eyebrow">{c.eyebrow}</p> : null}
+        <h1 className="page-title">{copy?.heading ?? t.compareHeading}</h1>
+        <p className="page-lede">{copy?.intro ?? t.compareIntro}</p>
+      </header>
+      <p className="warning cmp-disclaimer">{t.compareDisclaimer}</p>
+      <PickerForm lang={lang} first={first} second={second} error={error} copy={copy} />
+      {copy === null ? (
         <>
-          <div className="compare-maps">
-            {pair.map((side, i) => {
-              const warning = coverageWarning(side.entry, lang);
+          <nav className="cmp-try" aria-label={c.tryHeading}>
+            <span className="cmp-try-label">{c.tryHeading}</span>
+            {COMPARE_EXAMPLES.map(([x, y]) => {
+              const sx = slugFor(x);
+              const sy = slugFor(y);
+              if (sx === null || sy === null) return null;
               return (
-                <div key={side.name + String(i)}>
-                  <h4>{side.name}</h4>
-                  {warning === null ? null : <p className="warning">{warning}</p>}
-                  <VoivodeshipMap
-                    regions={input.maps[i] ?? []}
-                    labels={{ ...labels, title: `${t.mapTitle}: ${side.name}` }}
-                    legend={false}
-                  />
-                </div>
+                <a key={`${x}-${y}`} href={comparisonPath(sx, sy, lang)}>
+                  {x} <span className="cmp-try-vs">{c.versus}</span> {y}
+                </a>
               );
             })}
-          </div>
-          <MapLegend
-            title={labels.legendTitle}
-            bandLabels={labels.bandLabels}
-            notListed={labels.notListed}
-          />
+          </nav>
+          <section className="cmp-gives" aria-labelledby="cmp-gives-title">
+            <h2 id="cmp-gives-title">{c.givesHeading}</h2>
+            <ol>
+              {c.gives.map((item, i) => (
+                <li key={item.title}>
+                  <span className="cmp-chapter-no" aria-hidden="true">
+                    {c.chapter(i + 1)}
+                  </span>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
+          {fullNamesHref === null ? null : <FullNamesCard href={fullNamesHref} lang={lang} />}
         </>
-      )}
-      <div className="table-scroll" tabIndex={0} role="region" aria-label={t.regionsHeading}>
-        <table>
-          <caption>{t.coveredNote}</caption>
-          <thead>
-            <tr>
-              <th scope="col">{t.regionColumn}</th>
-              <th scope="col">{pair[0].name}</th>
-              <th scope="col">{pair[1].name}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.name}>
-                <th scope="row">{row.name}</th>
-                <td>{row.a === undefined ? t.mapNotListedShort : formatPercent(row.a, lang)}</td>
-                <td>{row.b === undefined ? t.mapNotListedShort : formatPercent(row.b, lang)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="note">
-        {t.snapshotLabel}: {formatDate(pair[0].entry.snapshot_date, lang)}
-      </p>
-    </>
+      ) : null}
+    </SiteShell>
   );
 }

@@ -24,6 +24,15 @@ describe("the account page's purchases section (TASK-111, TASK-144)", () => {
     expect(en).toContain("Buy “Baby names” — PLN 8.99");
   });
 
+  it("shows the 15,99 zł full-name comparison between the 8,99 zł product and the 28,99 zł tier (TASK-155)", () => {
+    const pl = render("pl");
+    expect(pl).toContain('name="tier" value="fullnames"');
+    expect(pl).toContain("Kup „Porównanie imion i nazwisk” — 15,99 zł");
+    expect(pl.indexOf('value="babynames"')).toBeLessThan(pl.indexOf('value="fullnames"'));
+    expect(pl.indexOf('value="fullnames"')).toBeLessThan(pl.indexOf('value="smaller"'));
+    expect(render("en")).toContain("Buy “Full-name comparison” — PLN 15.99");
+  });
+
   it("lists a purchase of it by its name", () => {
     expect(render("pl", [{ tier: "babynames", amountTotal: 899 }])).toContain(
       "Imiona dla dziecka — 8,99 zł",

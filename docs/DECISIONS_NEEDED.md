@@ -8,6 +8,26 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-049 — RESOLVED as read in this session (2026-10-06): the surname comparison stays free and is redesigned; comparing first names and surnames, of up to four people, is a 15,99 zł product
+
+**Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Built by TASK-155.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-06, in a Claude Code session: "redesign me the whole porównanie nazwisk a za 15.99 PLN możesz porównać imię i nazwisko i innym też" ("redesign the whole surname comparison, and for 15.99 PLN you can compare first name and surname, with others too").
+
+What is decided, in this session's reading:
+
+1. **The surname comparison stays free and is redesigned.** Same addresses, same figures, same rule on what may be ranked (`compare.ts`): only the page's design changes.
+2. **A 15,99 zł product, one payment: "Porównanie imion i nazwisk" / "Full-name comparison"** (key `fullnames`). "I innym też" is read as "with other people too": a reader compares a first name and a surname with others', **two to four people**, at `/pl/porownaj/imie-i-nazwisko` and `/en/compare/full-name`. Per person it shows what the site already holds as claims: the first name's count and rank in the PESEL register's list of men and of women (never summed), the children given it in the latest year with rank and direction, its origin and meaning as the works state them, and the surname's count, rarity and map; across the people, bars on one scale only where the same list and date allow.
+3. **Who has it:** a `fullnames` purchase, and every tier from 28,99 zł up (`FULL_NAME_COMPARE_TIERS`), as the baby-names figures are included in them (D-044 §4). It does not unlock the tree (D-044 §5's rule) and does not open the baby-names figures; `babynames` does not open it.
+4. **Signed in, without it:** the form, what the comparison shows, and the locked card "15,99 zł · Wkrótce" with no button; nothing is read. **Signed out:** what it is and a sign-in link.
+5. **Dark until the owner turns it on:** `FULL_NAME_COMPARE_ENABLED=1` and accounts on, else a 404; `noindex`, `private, no-store`, in no sitemap.
+
+**What it does not change:** the payment gates (ADR-0023 §2.5): no buy button or checkout link on any public page; the product is test-mode checkout only. ADR-0032 §7 and D-033: no count of people with a first name and a surname together; the page says that no source publishes one. The offer page's tiers: listing the product there needs the owner's wording.
+
+**Not decided:** whether four is the right limit; whether the free comparison should take a first name too; the offer page's wording.
+
+---
+
 ## D-047 — RESOLVED as read in this session (2026-10-06): "the whole list" is a browsable, ranked list of a year's names; the top 10 of the latest year is free, everything else is the 8,99 zł view
 
 **Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Built by TASK-146. It answers the "Not decided" of D-045 and amends nothing else of D-044 or D-045.
