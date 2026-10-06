@@ -73,6 +73,13 @@ The steps of `.github/workflows/ci.yml` were run locally, in order, on commit `a
 | `pnpm build` | exit 0 |
 | `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
 
+**After merging `main` (`c0b19b4`, which brought #175).** The same steps were run again from a new empty `name_atlas`, so the unit tests met an empty database, as on GitHub. Every step exited 0:
+- `pnpm test`: 2,464 tests (web 1,009);
+- `pnpm test:integration`: 49 files, 536 tests;
+- `pnpm test:golden`: 4 files, 364 tests;
+- `pnpm build`;
+- `pnpm test:e2e`: 10 Playwright tests passed.
+
 **On real first-name data.** These runs used `gn_full`, the local database holding the full official 2026-01-20 first-name lists and their TASK-122 claims.
 
 - **Import and derivation:**
