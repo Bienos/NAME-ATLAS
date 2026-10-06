@@ -1,4 +1,5 @@
 import { sql } from "kysely";
+import type { RawBuilder } from "kysely";
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
 import type { SlugLocale } from "./slug.js";
@@ -62,7 +63,7 @@ export interface SitemapQueryOptions {
  * slower over a register-sized table (TASK-126). Usually empty, since no
  * claim cites a blocked profile.
  */
-async function seoBlockedSurnameIds(
+export async function seoBlockedSurnameIds(
   db: Kysely<DB>,
   options: SitemapQueryOptions,
 ): Promise<readonly string[]> {
@@ -113,13 +114,18 @@ async function seoBlockedSurnameIds(
  * distributions are found in one pass, and the population claim by
  * `claims_subject_type_status_idx`.
  */
-function eligible(locale: SlugLocale, blockedSurnameIds: readonly string[]) {
+export function eligible(
+  locale: SlugLocale,
+  blockedSurnameIds: readonly string[],
+  /** A further condition on `s`, such as the directory's first letter (TASK-129). */
+  filter: RawBuilder<unknown> = sql``,
+) {
   const rightsGate =
     blockedSurnameIds.length === 0
       ? sql``
       : sql`AND NOT (s.surname_id = ANY(${[...blockedSurnameIds]}::uuid[]))`;
   return sql`
-    SELECT s.surname_id, sl.slug, s.canonical_display
+    SELECT s.surname_id, sl.slug, s.canonical_display, s.canonical_key
       FROM surnames s
       JOIN knowledge_entities ke ON ke.entity_id = s.surname_id
       JOIN surname_slugs sl      ON sl.surname_id = s.surname_id
@@ -148,7 +154,8 @@ function eligible(locale: SlugLocale, blockedSurnameIds: readonly string[]) {
             AND EXISTS (SELECT 1 FROM citations pc WHERE pc.claim_id = p.claim_id)
        )
        -- §40: the SEO surface.
-       ${rightsGate}`;
+       ${rightsGate}
+       ${filter}`;
 }
 
 export async function sitemapEntries(
