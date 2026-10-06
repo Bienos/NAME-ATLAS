@@ -20,6 +20,7 @@ describe("Brand System v1", () => {
   it("keeps the brand lab out of production", () => {
     const page = readFileSync(path.join(ROOT, "app", "dev", "brand", "page.tsx"), "utf8");
     expect(page).toContain('process.env.VERCEL_ENV === "production"');
+    expect(page).toContain('process.env.NODE_ENV === "production"');
     expect(page).toContain("notFound()");
   });
 });
