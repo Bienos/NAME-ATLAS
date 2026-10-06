@@ -39,6 +39,7 @@ PostgreSQL 16.15 with PostGIS 3.4.2 in the session container (`apt-get install p
 - `pnpm build`: exit 0.
 - `pnpm test:integration`: first run exit 1, 3 failed and 493 passed: `extensions.test.ts` (2) and `canonical-key-v2.test.ts` (1) list every migration and table and did not yet name 0040. After adding it: exit 0, 43 files, 496 tests passed.
 - `pnpm test:golden`: exit 0, 4 files, 364 tests passed.
+- After the rebase onto `fb83fbf`, all eight commands again: typecheck, lint, format:check, check:ids, test (sources 600 passed), build: exit 0; `pnpm test:integration`: exit 0, 44 files, 500 tests passed; `pnpm test:golden`: exit 0, 364 tests passed.
 
 **The full files, once, on a disposable local database** (`atlas_births`, migrated to 0040, holding nothing else): `pnpm import:given-name-births --resource {id} --file {full file} --metadata {saved object}` for all thirteen resources, each `IMPORTED`, exit 0, no placeholder and 0 flagged. Stored, per list (rows = counts stored = the file's rows; children = the sum of stored counts = the file's sum; the smallest stored count equals the cut-off in every list):
 
