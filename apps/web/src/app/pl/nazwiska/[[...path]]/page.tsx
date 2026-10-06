@@ -4,6 +4,7 @@ import {
   DirectoryLetterView,
   directoryMetadata,
   DirectoryRootView,
+  directoryStaticPaths,
   loadDirectoryLetter,
   loadDirectoryLetters,
   parseDirectoryPath,
@@ -13,19 +14,19 @@ import {
  * `/pl/nazwiska`, `/pl/nazwiska/{letter}` and `/pl/nazwiska/{letter}/{n}`: the
  * alphabetical surname directory (TASK-129).
  *
- * Rendered on the first request for each address and then kept for 6 hours
- * (incremental static regeneration), as the sitemaps are (TASK-127): a letter
- * reads the same predicate as the sitemap, which takes seconds over the full
- * register, and its list changes only when claims do. No address is rendered
- * at build time (`generateStaticParams` names none), so a build needs no
- * database.
+ * Kept for 6 hours and then rendered again (incremental static regeneration),
+ * as the sitemaps are (TASK-127): a letter reads the same predicate as the
+ * sitemap, which takes seconds over the full register, and its list changes
+ * only when claims do. The build renders every address it can read from the
+ * database (`directoryStaticPaths`, TASK-138); without one it renders none, and
+ * each address is rendered on its first request.
  */
 
 export const revalidate = 21600;
 export const dynamicParams = true;
 
-export function generateStaticParams(): { path: string[] }[] {
-  return [];
+export async function generateStaticParams(): Promise<{ path: string[] }[]> {
+  return (await directoryStaticPaths()).map((path) => ({ path }));
 }
 
 interface Props {
