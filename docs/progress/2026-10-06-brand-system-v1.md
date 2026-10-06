@@ -1,7 +1,7 @@
 # 2026-10-06 — Name Atlas Brand System v1.0
 
-**Task:** TASK-147  
-**Decision:** ADR-0045  
+**Task:** TASK-148  
+**Decision:** ADR-0046  
 **Branch:** `task-147-brand-system-v1`  
 **Pull request:** #177  
 **Code head when this record was written:** `4287ff99491c3e691193ad4ac36cb14821ed3db2`
