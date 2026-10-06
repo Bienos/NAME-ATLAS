@@ -58,5 +58,6 @@
 
 - On the full 2026-01-20 lists, 168 names get a claim: 139 POSSIBLE, 27 LIKELY, 2 CONFLICTING (TOMASZ, MACIEJ: Hebrew in Buryan, Aramaic in Yonge). This was measured locally. Common modern names such as Krzysztof, Łukasz, Joanna and Julia have none, and the report says so.
 - The two works are old and not linguists' dictionaries (tier C, `LEGAL_REVIEW_REQUIRED` like Buryan's surname file). The page names author and year beside every reading.
-- A later work (Brückner, or Grzenia with permission) is a new file of the same format. It adds a row and may move a name to LIKELY or CONFLICTING.
+- A later work is a new file of the same format. It adds a row and may move a name to LIKELY or CONFLICTING. Brückner 1927 is the first (TASK-150, 33 names). Grzenia's book would need permission.
+- Works can differ on the step they name. Brückner says Polish took Piotr from Latin ("z łac. Petrus przejęte"); Buryan and Yonge name Greek. The claim is CONFLICTING, and the page shows each work's words, so a reader sees what each says.
 - `ops/vm/given-names.sh` imports both files and derives the meanings after the counts. The production database gets them when the step is next run.

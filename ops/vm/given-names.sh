@@ -14,8 +14,9 @@
 #      (packages/sources/src/given-names/registry.ts) into $FILES, unless the
 #      copy there already has the registry's size and SHA-256; a download that
 #      differs in either is refused, never imported;
-#   4. import each file with its committed metadata, and the two committed
-#      first-name meaning files (sources/given-name-meanings/). Identical bytes
+#   4. import each file with its committed metadata, and the three committed
+#      first-name meaning files (sources/given-name-meanings/; Brückner 1927
+#      since TASK-150). Identical bytes
 #      import nothing; the importer checks the checksum again before parsing;
 #   5. derive every name's GIVEN_NAME_POPULATION on each list and, the files
 #      being the complete official ones, its GIVEN_NAME_RANK, in one process;
@@ -47,8 +48,8 @@ FILES=$APP/data/given-names
 METADATA=$APP/docs/sources/acquisition/2026-10-03/metadata
 REGISTRY=./packages/sources/src/given-names/registry.ts
 SOURCE_KEY=pl_pesel_given_names
-MEANING_FILES=(buryan-1933 yonge-1884)
-MEANING_SOURCE_KEYS=(buryan_1933_skad_pochodzi yonge_1884_history_of_christian_names)
+MEANING_FILES=(buryan-1933 yonge-1884 bruckner-1927)
+MEANING_SOURCE_KEYS=(buryan_1933_skad_pochodzi yonge_1884_history_of_christian_names bruckner_1927_slownik_etymologiczny)
 ARCHIVE=${1:-}
 
 log() { echo "[given-names] $*"; }
