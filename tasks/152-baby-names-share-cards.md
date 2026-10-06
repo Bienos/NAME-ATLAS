@@ -3,7 +3,7 @@
 - **Status:** IMPLEMENTED 2026-10-06 (`docs/progress/2026-10-06-baby-names-share-cards.md`). Dark behind the same flag as the page.
 - **Requested by:** the project owner, 2026-10-06: the baby-names result should be "easy to share to close ones": image cards a parent can send to family, showing the name's rarity and figures. Four boards on the design canvas (the free story card 1080 × 1920, the free square card 1080 × 1080, the paid "rok po roku" story card 1080 × 1920, a phone share sheet at 390 px).
 - **Decision:** ADR-0046 (Brand System v1: Atlas Blue for the lit point and the action, amber for the peak year's bar alone, the semantic tokens by value since `next/og` reads no CSS), ADR-0043 §4 (the shares), ADR-0045 (no meaning on a card: out of scope), ADR-0023 §2.5 (no buy button, no checkout link; the paid option is inert and "Wkrótce" without the entitlement), D-044, D-045, D-047. No new ADR, no migration, no D- number: nothing here needed a decision the owner has not made.
-- **Numbers:** TASK 152. 151 is the last on `main` (`0d0b2a2`, #182); open #179 holds TASK-150 and open #181 takes no number. `pnpm check:ids` exit 0.
+- **Numbers:** TASK 152. 151 is the last on `main` (`0d0b2a2`, #182); open #179 holds TASK-150 and open #181 takes no number. `pnpm check:ids` exit 0. #179 merged during the session and `origin/main` was merged into the branch before the pull request.
 - **Model guidance:** implementation session.
 
 ## 1. Goal

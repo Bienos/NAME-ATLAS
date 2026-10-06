@@ -1,6 +1,6 @@
 # 2026-10-06 — TASK-152: baby-names share cards (story, square, paid) and the share sheet
 
-Task: `tasks/152-baby-names-share-cards.md`. Decisions: ADR-0046 (Brand System v1 by value in `next/og`), ADR-0043 §4, ADR-0045 (no meaning on a card), ADR-0023 §2.5 (no buy button, no checkout link), D-044, D-045, D-047. Built on `main` @ `0d0b2a2` (#182, TASK-151). Numbers taken: TASK-152 (151 is the last on `main`; open #179 holds TASK-150, open #181 takes none). No ADR, no migration, no D- number.
+Task: `tasks/152-baby-names-share-cards.md`. Decisions: ADR-0046 (Brand System v1 by value in `next/og`), ADR-0043 §4, ADR-0045 (no meaning on a card), ADR-0023 §2.5 (no buy button, no checkout link), D-044, D-045, D-047. Built on `main` @ `0d0b2a2` (#182, TASK-151); `origin/main` moved to `61ae8b1` (#179, TASK-150) during the session and was merged into the branch (`STATUS.md` alone conflicted: its "Last rewritten" line and the baby-names bullet, resolved by keeping TASK-150's wording and adding this change's sentence). Numbers taken: TASK-152 (151 is the last on `main`; open #179 holds TASK-150, open #181 takes none). No ADR, no migration, no D- number.
 
 ## What changed
 
