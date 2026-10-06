@@ -1,14 +1,19 @@
 import { createHash } from "node:crypto";
 import {
   WIKIDATA_SPARQL_ENDPOINT,
+  WikidataShapeError,
+  batchBearers,
   keptBearers,
   exactBearers,
+  summariseCandidates,
   summariseWikidataBearers,
+  wikidataBearersBatchQuery,
   wikidataBearersQuery,
+  wikidataDetailsById,
   wikidataDetailsQuery,
   wikidataFamilyNameLabels,
 } from "./bearers.js";
-import type { WikidataBearers } from "./bearers.js";
+import type { WikidataBearers, WikidataCandidate, WikidataDetails } from "./bearers.js";
 
 /**
  * The Wikidata connector's network half (TASK-073, ADR-0030 §2.2).
@@ -30,7 +35,12 @@ export const WIKIDATA_USER_AGENT =
 export interface WikidataFetchDeps {
   readonly fetch: (
     url: string,
-    init: { method: "GET"; headers: Record<string, string>; signal: AbortSignal },
+    init: {
+      method: "GET" | "POST";
+      headers: Record<string, string>;
+      body?: string;
+      signal: AbortSignal;
+    },
   ) => Promise<{
     readonly ok: boolean;
     readonly status: number;
@@ -52,6 +62,8 @@ export class WikidataRequestError extends Error {
     readonly requestName: string,
     readonly status: number | null,
     message: string,
+    /** A batch query that ran out of time: it is split, not asked again (ADR-0044). */
+    readonly tooLarge = false,
   ) {
     super(message);
     this.name = "WikidataRequestError";
@@ -93,26 +105,47 @@ function retryAfterMs(value: string | null): number | null {
   return Math.min(Number(value) * 1000, 300_000);
 }
 
+/**
+ * One query, paced, with up to {@link WIKIDATA_ATTEMPTS} tries. `POST` sends
+ * the query in the body, for a batch too long for an address (ADR-0044); a
+ * batch that runs out of time, on our clock or the service's, is not asked
+ * again but thrown as `tooLarge`, for the caller to split.
+ */
 async function ask(
   name: string,
   query: string,
   pacer: WikidataPacer,
   deps: WikidataFetchDeps,
+  method: "GET" | "POST" = "GET",
 ): Promise<string> {
   let lastError: WikidataRequestError | null = null;
+  const headers = {
+    Accept: "application/sparql-results+json",
+    "User-Agent": WIKIDATA_USER_AGENT,
+  };
   for (let attempt = 1; attempt <= WIKIDATA_ATTEMPTS; attempt++) {
     await pacer.wait();
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), WIKIDATA_TIMEOUT_MS);
     let wait: number | null = null;
     try {
-      const response = await deps.fetch(wikidataQueryUrl(query), {
-        method: "GET",
-        headers: { Accept: "application/sparql-results+json", "User-Agent": WIKIDATA_USER_AGENT },
-        signal: controller.signal,
-      });
+      const response = await (method === "POST"
+        ? deps.fetch(WIKIDATA_SPARQL_ENDPOINT, {
+            method: "POST",
+            headers: { ...headers, "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ query, format: "json" }).toString(),
+            signal: controller.signal,
+          })
+        : deps.fetch(wikidataQueryUrl(query), {
+            method: "GET",
+            headers,
+            signal: controller.signal,
+          }));
       const body = await response.text();
       if (response.ok) return body;
+      if (method === "POST" && response.status === 500 && body.includes("TimeoutException")) {
+        throw new WikidataRequestError(name, 500, `${name}: the service's time ran out`, true);
+      }
       lastError = new WikidataRequestError(
         name,
         response.status,
@@ -120,6 +153,15 @@ async function ask(
       );
       wait = retryAfterMs(response.headers.get("retry-after"));
     } catch (cause) {
+      if (cause instanceof WikidataRequestError) throw cause;
+      if (method === "POST" && controller.signal.aborted) {
+        throw new WikidataRequestError(
+          name,
+          null,
+          `${name}: no answer in ${String(WIKIDATA_TIMEOUT_MS)} ms`,
+          true,
+        );
+      }
       lastError = new WikidataRequestError(
         name,
         null,
@@ -171,4 +213,142 @@ export async function fetchWikidataBearers(
     retrieved_at: new Date(startedAt).toISOString(),
     response_sha256: hashes,
   };
+}
+
+/** How many people one details query asks about in a batch (ADR-0044). */
+export const WIKIDATA_DETAILS_PER_QUERY = 200;
+
+/** One surname's outcome in a batch: its bearers, or why it was left for the next run. */
+export type WikidataBatchOutcome =
+  | { readonly surname: string; readonly fetched: FetchedWikidataBearers }
+  | { readonly surname: string; readonly error: WikidataRequestError | WikidataShapeError };
+
+/**
+ * Asks Wikidata for a batch of surnames' bearers at once (ADR-0044): one query
+ * for the people of all of them, then details queries for the people the
+ * surnames keep, at most {@link WIKIDATA_DETAILS_PER_QUERY} at a time and a
+ * surname's people never split between two. Each surname's summary is the one
+ * its own two queries give (`summariseCandidates`), so it is stored and
+ * derived exactly as one surname's is.
+ *
+ * A batch whose first query runs out of time, or whose answer is cut off, is
+ * split in two and each half asked again, down to one surname. Any other
+ * failure leaves the surnames it touches for the next run, each with its own
+ * error; one surname's unreadable row fails only that surname. Outcomes come
+ * back in the order the surnames were given. Queries stay one at a time and
+ * paced, as one surname's are.
+ */
+export async function fetchWikidataBearersBatch(
+  surnames: readonly string[],
+  pacer: WikidataPacer,
+  deps: WikidataFetchDeps = defaultWikidataFetchDeps,
+): Promise<readonly WikidataBatchOutcome[]> {
+  const outcomes: WikidataBatchOutcome[] = [];
+  await askBatch(surnames, pacer, deps, outcomes);
+  return outcomes;
+}
+
+async function askBatch(
+  surnames: readonly string[],
+  pacer: WikidataPacer,
+  deps: WikidataFetchDeps,
+  outcomes: WikidataBatchOutcome[],
+): Promise<void> {
+  if (surnames.length === 0) return;
+  const startedAt = deps.now();
+  let body: string;
+  let found: readonly (readonly WikidataCandidate[] | WikidataShapeError)[];
+  try {
+    body = await ask(
+      "bearers",
+      wikidataBearersBatchQuery(surnames.flatMap((s) => wikidataFamilyNameLabels(s))),
+      pacer,
+      deps,
+      "POST",
+    );
+    found = batchBearers(surnames, body);
+  } catch (error) {
+    if (!(error instanceof WikidataRequestError) && !(error instanceof WikidataShapeError)) {
+      throw error;
+    }
+    // Out of time, or an answer cut off mid-way (the service can stream a 200
+    // and stop): half the batch is asked again, then the other half.
+    const split =
+      surnames.length > 1 && (error instanceof WikidataShapeError || error.tooLarge === true);
+    if (split) {
+      const half = Math.ceil(surnames.length / 2);
+      await askBatch(surnames.slice(0, half), pacer, deps, outcomes);
+      await askBatch(surnames.slice(half), pacer, deps, outcomes);
+      return;
+    }
+    for (const surname of surnames) outcomes.push({ surname, error });
+    return;
+  }
+  const bearersHash = sha256(body);
+
+  // The details, in groups of whole surnames.
+  const groups: { readonly at: number[]; readonly qids: string[] }[] = [];
+  for (const [at, result] of found.entries()) {
+    if (result instanceof WikidataShapeError) continue;
+    const qids = keptBearers(result).map((c) => c.qid);
+    if (qids.length === 0) continue;
+    const last = groups.at(-1);
+    if (last && last.qids.length + qids.length <= WIKIDATA_DETAILS_PER_QUERY) {
+      last.at.push(at);
+      last.qids.push(...qids);
+    } else {
+      groups.push({ at: [at], qids: [...qids] });
+    }
+  }
+  const detailsOf = new Map<
+    number,
+    { details: WikidataDetails; hash: string } | WikidataRequestError | WikidataShapeError
+  >();
+  for (const group of groups) {
+    let outcome:
+      { details: WikidataDetails; hash: string } | WikidataRequestError | WikidataShapeError;
+    try {
+      const details = await ask("details", wikidataDetailsQuery(group.qids), pacer, deps, "POST");
+      outcome = { details: wikidataDetailsById(details), hash: sha256(details) };
+    } catch (error) {
+      if (!(error instanceof WikidataRequestError) && !(error instanceof WikidataShapeError)) {
+        throw error;
+      }
+      outcome = error;
+    }
+    for (const at of group.at) detailsOf.set(at, outcome);
+  }
+
+  const retrievedAt = new Date(startedAt).toISOString();
+  for (const [at, surname] of surnames.entries()) {
+    const result = found[at];
+    if (result === undefined || result instanceof WikidataShapeError) {
+      outcomes.push({
+        surname,
+        error: result ?? new WikidataShapeError("bearers", `no result for ${surname}`),
+      });
+      continue;
+    }
+    const details = detailsOf.get(at);
+    if (details instanceof WikidataRequestError || details instanceof WikidataShapeError) {
+      outcomes.push({ surname, error: details });
+      continue;
+    }
+    try {
+      outcomes.push({
+        surname,
+        fetched: {
+          bearers: summariseCandidates(surname, result, details?.details ?? new Map()),
+          retrieved_at: retrievedAt,
+          response_sha256:
+            details === undefined
+              ? { bearers_batch: bearersHash }
+              : { bearers_batch: bearersHash, details_batch: details.hash },
+        },
+      });
+    } catch (error) {
+      if (!(error instanceof WikidataShapeError)) throw error;
+      outcomes.push({ surname, error });
+    }
+  }
 }

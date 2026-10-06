@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Loads the well-known bearers of the most common surnames from Wikidata on the
-# database VM (TASK-077; the loader is TASK-073, ADR-0030) and returns at once:
+# Loads the well-known bearers of surnames from Wikidata on the database VM
+# (TASK-077; the loader is TASK-073, ADR-0030; in batches since TASK-140,
+# ADR-0044) and returns at once:
 #
 #   1. unpack the pushed commit into $APP (data/ and node_modules/ kept) and
 #      pnpm install, as archive.sh does; the register build is left alone;
@@ -9,8 +10,12 @@
 #   3. read access for the web role, checked;
 #   4. start the systemd unit name-atlas-bearers-load, which runs
 #      `pnpm truth:bearers-load --top-rank N` (N defaults to 2000): every
-#      surname ranked within N in either register list, best rank first, one or
-#      two queries to the Wikidata Query Service each, at least a second apart.
+#      surname ranked within N in either register list, best rank first, in
+#      batches of 50, 100 or 400 surnames to a query of the Wikidata Query
+#      Service, one query at a time and at least a second apart. Any N of
+#      301,370 or more takes every surname: about 4-6 hours for all 598,476,
+#      measured on samples on 2026-10-05, where one query a surname took 7-22
+#      days.
 #
 # The load is resumable: a surname queried within the last 30 days is not
 # queried again, so a restart continues where it stopped. Ten failures in a
@@ -20,10 +25,14 @@
 # otherwise. Running this step again starts a fresh pass, which queries only
 # the surnames whose last query is older than 30 days.
 #
+# A running load is left alone unless the third argument is `restart`
+# (TASK-140, as archive.sh's): then it is stopped and started again on the
+# pushed commit, and the restart continues where it stopped.
+#
 # Runs after finalize.sh (its marker is required), and not while the archive
 # load or the change-over-time batch runs, since unpacking would change the
 # code under them. Runs as root:
-# `sudo bash bearers.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK]`. Everything under
+# `sudo bash bearers.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK [restart]]`. Everything under
 # the build user's home is done as the build user, over the Unix socket.
 set -euo pipefail
 
@@ -41,6 +50,7 @@ FINALIZED=$STATE/register-finalized
 LOADED=$STATE/bearers/loaded
 ARCHIVE=${1:-}
 TOP_RANK=${2:-2000}
+RESTART=${3:-}
 
 log() { echo "[bearers] $*"; }
 die() { echo "[bearers] ERROR: $*" >&2; exit 1; }
@@ -70,14 +80,21 @@ for unit in "${OTHER_UNITS[@]}"; do
   esac
 done
 state=$(systemctl show -p ActiveState --value "$UNIT" 2>/dev/null || true)
+case "$RESTART" in '' | restart) ;; *) die "the third argument must be 'restart' or empty, got '$RESTART'" ;; esac
 if [ "$state" = active ] || [ "$state" = activating ]; then
-  # Unpacking now would change the code under the running loader.
-  log "already running ($state); nothing unpacked or started. status.sh shows its progress."
-  exit 0
+  if [ "$RESTART" != restart ]; then
+    # Unpacking now would change the code under the running loader.
+    log "already running ($state); nothing unpacked or started. status.sh shows its progress."
+    exit 0
+  fi
+  log "already running ($state); stopping it to restart on the pushed commit (TASK-140)"
+  systemctl stop "$UNIT"
+  state=$(systemctl show -p ActiveState --value "$UNIT")
+  [ "$state" = inactive ] || [ "$state" = failed ] || die "$UNIT did not stop (ActiveState=$state)"
 fi
 
 log "1/4 unpack the pushed commit into $APP and pnpm install (the register build is left alone)"
-case "$ARCHIVE" in /*) ;; *) die "usage: bearers.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK]" ;; esac
+case "$ARCHIVE" in /*) ;; *) die "usage: bearers.sh ABSOLUTE_PATH_TO_ARCHIVE [TOP_RANK [restart]]" ;; esac
 if [ ! -f "$ARCHIVE" ] || [ -L "$ARCHIVE" ] || [ ! -s "$ARCHIVE" ]; then
   die "$ARCHIVE must be a non-empty regular file"
 fi
@@ -109,10 +126,10 @@ install -d -o "$BUILD_USER" -g "$BUILD_USER" -m 755 "$STATE/bearers"
 cat >/etc/systemd/system/$UNIT.service <<UNITFILE
 # Written by ops/vm/bearers.sh (TASK-077). Do not edit by hand.
 [Unit]
-Description=Name Atlas: load Wikidata's well-known bearers for the top-ranked surnames
+Description=Name Atlas: load Wikidata's well-known bearers for the surnames ranked within $TOP_RANK
 After=postgresql@17-main.service network-online.target
 Wants=network-online.target
-# The loader exits with an error after ten Wikidata failures in a row. Six
+# The loader exits with an error after ten failed batches in a row. Six
 # restarts within 12 hours stop the unit, so an outage cannot loop forever.
 StartLimitIntervalSec=12h
 StartLimitBurst=6
@@ -142,4 +159,4 @@ systemctl start --no-block "$UNIT"
 sleep 45
 systemctl show -p ActiveState,SubState,MainPID "$UNIT" | sed 's/^/[bearers]   /'
 journalctl -u "$UNIT" -o cat --no-pager -n 15 | sed 's/^/[bearers]   /'
-log "started. One or two queries a surname, a second apart at least; status.sh reports the progress."
+log "started. Batches of 50, 100 or 400 surnames a query, a second apart at least; status.sh reports the progress."

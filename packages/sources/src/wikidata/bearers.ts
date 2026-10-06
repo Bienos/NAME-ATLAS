@@ -153,18 +153,34 @@ function sparqlString(value: string): string {
 
 /** The first query: every person filed under one of the labels, with a Wikipedia article. */
 export function wikidataBearersQuery(labels: readonly string[]): string {
+  return peopleQuery(labels, false);
+}
+
+/**
+ * The first query for a batch of surnames (ADR-0044): the same query over all
+ * their labels, grouped by person and by the label the person was found under
+ * (`?key`), so that each surname's answer is the rows whose `key` is one of
+ * its own labels: the people its own query returns. Sent by POST, since a
+ * batch's labels make it too long for an address.
+ */
+export function wikidataBearersBatchQuery(labels: readonly string[]): string {
+  return peopleQuery([...new Set(labels)], true);
+}
+
+function peopleQuery(labels: readonly string[], batch: boolean): string {
   const values = labels
     .flatMap((label) => ["pl", "mul", "en"].map((lang) => `${sparqlString(label)}@${lang}`))
     .join(" ");
   const classes = WIKIDATA_FAMILY_NAME_CLASSES.map((q) => `wd:${q}`).join(" ");
   const polishStates = WIKIDATA_POLISH_STATES.map((q) => `wd:${q}`).join(", ");
   return [
-    "SELECT ?person (MAX(?links) AS ?sitelinks) (MIN(YEAR(?b)) AS ?born) (MIN(YEAR(?d)) AS ?died)",
+    `SELECT ?person${batch ? " ?key" : ""} (MAX(?links) AS ?sitelinks) (MIN(YEAR(?b)) AS ?born) (MIN(YEAR(?d)) AS ?died)`,
     "       (SAMPLE(?pc) AS ?polish)",
     "       (SAMPLE(?pl) AS ?label_pl) (SAMPLE(?mul) AS ?label_mul) (SAMPLE(?en) AS ?label_en) WHERE {",
     `  VALUES ?label { ${values} }`,
     `  VALUES ?cls { ${classes} }`,
     "  ?fn rdfs:label ?label ; wdt:P31 ?cls .",
+    ...(batch ? ["  BIND(STR(?label) AS ?key)"] : []),
     "  ?person wdt:P734 ?fn ; wdt:P31 wd:Q5 ; wikibase:sitelinks ?links .",
     '  FILTER EXISTS { ?a schema:about ?person ; schema:isPartOf/wikibase:wikiGroup "wikipedia" . }',
     "  OPTIONAL { ?person wdt:P569 ?b }",
@@ -173,7 +189,7 @@ export function wikidataBearersQuery(labels: readonly string[]): string {
     '  OPTIONAL { ?person rdfs:label ?pl FILTER(LANG(?pl) = "pl") }',
     '  OPTIONAL { ?person rdfs:label ?mul FILTER(LANG(?mul) = "mul") }',
     '  OPTIONAL { ?person rdfs:label ?en FILTER(LANG(?en) = "en") }',
-    "} GROUP BY ?person",
+    batch ? "} GROUP BY ?person ?key" : "} GROUP BY ?person",
   ].join("\n");
 }
 
@@ -284,9 +300,17 @@ export function exactBearers(
   bearersResponse: string,
   excluded: readonly string[] = WIKIDATA_EXCLUDED_PEOPLE,
 ): readonly WikidataCandidate[] {
+  return exactBearersIn(surname, bindingsOf(bearersResponse, "bearers"), excluded);
+}
+
+function exactBearersIn(
+  surname: string,
+  rows: readonly Binding[],
+  excluded: readonly string[],
+): readonly WikidataCandidate[] {
   const out: WikidataCandidate[] = [];
   const seen = new Set<string>();
-  for (const [i, b] of bindingsOf(bearersResponse, "bearers").entries()) {
+  for (const [i, b] of rows.entries()) {
     const path = `bearers.results.bindings[${String(i)}]`;
     const qid = qidOf(b, path);
     if (seen.has(qid)) throw new WikidataShapeError(path, `${qid} appears twice`);
@@ -314,6 +338,55 @@ export function exactBearers(
       b.sitelinks - a.sitelinks ||
       qidNumber(a.qid) - qidNumber(b.qid),
   );
+}
+
+/**
+ * Each surname's exact bearers from one batch answer (ADR-0044), in the order
+ * the surnames were given: the rows whose `key` is one of the surname's own
+ * labels, each person once (a woman filed under both "Kowalska" and
+ * "Kowalski" is one row in her surname's own query), then {@link exactBearers}'s
+ * test. The same people as the surname's own query: its rows are the batch's
+ * rows for its labels, and every value in them is the person's, whichever
+ * label found them.
+ *
+ * Throws `WikidataShapeError` when the answer as a whole does not parse; a
+ * row that does not parse fails only the surnames whose labels it carries,
+ * as that surname's own query would have failed.
+ */
+export function batchBearers(
+  surnames: readonly string[],
+  bearersResponse: string,
+  excluded: readonly string[] = WIKIDATA_EXCLUDED_PEOPLE,
+): readonly (readonly WikidataCandidate[] | WikidataShapeError)[] {
+  const rows = bindingsOf(bearersResponse, "bearers");
+  const byKey = new Map<string, Binding[]>();
+  for (const [i, b] of rows.entries()) {
+    const key = text(b, "key");
+    if (key === null) {
+      throw new WikidataShapeError(`bearers.results.bindings[${String(i)}].key`, "missing");
+    }
+    const list = byKey.get(key) ?? [];
+    list.push(b);
+    byKey.set(key, list);
+  }
+  return surnames.map((surname) => {
+    const own: Binding[] = [];
+    const seen = new Set<string>();
+    try {
+      for (const label of wikidataFamilyNameLabels(surname)) {
+        for (const b of byKey.get(label) ?? []) {
+          const qid = qidOf(b, `bearers[${label}]`);
+          if (seen.has(qid)) continue;
+          seen.add(qid);
+          own.push(b);
+        }
+      }
+      return exactBearersIn(surname, own, excluded);
+    } catch (error) {
+      if (error instanceof WikidataShapeError) return error;
+      throw error;
+    }
+  });
 }
 
 /** Whether the answer gives a Polish state as the person's citizenship; any other value is refused. */
@@ -375,16 +448,39 @@ export function summariseWikidataBearers(
   excluded: readonly string[] = WIKIDATA_EXCLUDED_PEOPLE,
 ): WikidataBearers {
   const candidates = exactBearers(surname, bearersResponse, excluded);
-  const kept = keptBearers(candidates);
-  const details = new Map<string, Binding>();
-  if (kept.length > 0) {
+  let details: WikidataDetails = new Map();
+  if (keptBearers(candidates).length > 0) {
     if (detailsResponse === null) {
       throw new WikidataShapeError("details", "missing while bearers were kept");
     }
-    for (const [i, b] of bindingsOf(detailsResponse, "details").entries()) {
-      details.set(qidOf(b, `details.results.bindings[${String(i)}]`), b);
-    }
+    details = wikidataDetailsById(detailsResponse);
   }
+  return summariseCandidates(surname, candidates, details);
+}
+
+/** The second query's answer, by person. */
+export type WikidataDetails = ReadonlyMap<string, Binding>;
+
+/** Reads a details answer (one or several, merged by the caller) into rows by person. */
+export function wikidataDetailsById(detailsResponse: string): WikidataDetails {
+  const details = new Map<string, Binding>();
+  for (const [i, b] of bindingsOf(detailsResponse, "details").entries()) {
+    details.set(qidOf(b, `details.results.bindings[${String(i)}]`), b);
+  }
+  return details;
+}
+
+/**
+ * The summary of one surname from its exact bearers and the details of the
+ * people it keeps, however the two answers were asked for: one surname's own
+ * queries, or a batch's (ADR-0044).
+ */
+export function summariseCandidates(
+  surname: string,
+  candidates: readonly WikidataCandidate[],
+  details: WikidataDetails,
+): WikidataBearers {
+  const kept = keptBearers(candidates);
   return {
     version: WIKIDATA_BEARERS_VERSION,
     surname,
