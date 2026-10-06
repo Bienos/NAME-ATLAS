@@ -26,7 +26,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: >
           pnpm exec prettier --write
-          apps/web/src/app/icon.svg
           apps/web/src/app/layout.tsx
           apps/web/src/design-system/public-dark-atlas.css
           apps/web/src/lib/dusk-world.tsx
@@ -42,6 +41,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add apps/web/src/app/icon.svg apps/web/src/app/layout.tsx apps/web/src/design-system/public-dark-atlas.css apps/web/src/lib/dusk-world.tsx apps/web/src/lib/og-card.tsx apps/web/src/lib/share-card.tsx apps/web/src/lib/site-footer.tsx apps/web/src/lib/site-nav.tsx apps/web/src/lib/site-shell.tsx
+          git add apps/web/src/app/layout.tsx apps/web/src/design-system/public-dark-atlas.css apps/web/src/lib/dusk-world.tsx apps/web/src/lib/og-card.tsx apps/web/src/lib/share-card.tsx apps/web/src/lib/site-footer.tsx apps/web/src/lib/site-nav.tsx apps/web/src/lib/site-shell.tsx
           git commit -m "TASK-149: format Dark Atlas migration files"
           git push origin HEAD:task-149-dark-atlas-frontend
