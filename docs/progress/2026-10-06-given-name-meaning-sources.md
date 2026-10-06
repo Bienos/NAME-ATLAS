@@ -14,7 +14,7 @@ The owner asked to "start the first-name meaning source search", after TASK-124 
 
 | Work | Copy | Result |
 |---|---|---|
-| Buryan 1933 | `https://www.zbc.uz.zgora.pl/Content/82526/download/` | 17,117,073 bytes, SHA-256 `91d69b0e…c43c`, equal to the checksum in `docs/sources/bruckner-buryan-package.md`. `pdftotext` of PDF pages 1–10: chapter A "Imiona" on printed pp. 3–5, before "B. NAZWISKA". |
+| Buryan 1933 | `https://www.zbc.uz.zgora.pl/Content/82526/download/` | 17,117,073 bytes, SHA-256 `91d69b0e…c43c`, equal to the checksum in `docs/sources/bruckner-buryan-package.md`. `pdftotext` of PDF pages 1–10, and the page images of PDF pages 6–8: chapter A "Imiona" runs over printed pp. 4–6 (page numbers are in the footers), ending before "B. NAZWISKA" on p. 6. |
 | Brückner 1927 | Internet Archive `slownik_etymologiczny_jezyka_polskiego`, full-text file | 2,959,031 bytes, SHA-256 `1e94c893…f5f8`; item licence URL CC0 1.0, date 1927. |
 | Yonge 1884 | `https://www.gutenberg.org/cache/epub/70419/pg70419.txt` | 1,986,520 bytes, SHA-256 `20f0b2b1…c5aa`; "Release date: March 30, 2023 [eBook #70419]". 150 index lines parse as "form, sex, _Pol._, root language and meaning, page". |
 | Gloger, "Imiona staro-polskie" | Polish Wikisource page `Encyklopedia_staropolska/Imiona_staro-polskie` | Read through a fetch: Old Polish names with dates and roots, few meanings. Not measured. |
