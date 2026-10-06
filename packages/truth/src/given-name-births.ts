@@ -7,7 +7,7 @@
  *            → ClaimEvidence → ConfidenceAssessment → Citation        (count)
  *   … → COMPLETENESS GATE → rank → derived EvidenceItem
  *     → EvidenceDependency(COUNT, UNIVERSE) → Claim → …              (rank)
- *   latest count + count five years earlier (or that list's cut-off)
+ *   latest share + share five years earlier (or that list's cut-off)
  *     → derived EvidenceItem → EvidenceDependency → Claim → …        (trend)
  *
  * The same chain as TASK-122 (`given-name.ts`), with these rules:
@@ -25,6 +25,10 @@
  *      than that list's stored `publication_threshold`. The trend reads the
  *      cut-off from the list and treats the earlier count as an unknown number
  *      below it, never as 0 (`AGENTS.md` §10, D-044 §6).
+ *   5. **The trend compares shares** (D-044 §6, amended 2026-10-06): a name's
+ *      count ÷ its list's `people_sum`, the children on that published list.
+ *      Names below the cut-off are not in that sum, so it is a share of the
+ *      listed children, not of all births.
  *   4. **A flagged form gets no claim** (ADR-0032 §4, ADR-0042 §5). TASK-122
  *      gave flagged forms their claims and left them to the surface; here none
  *      is written. No 2000–2025 national list holds such a form.
@@ -64,7 +68,7 @@ import {
 
 const COUNTRY_CODE = "PL";
 const RANK_DERIVATION_METHOD = "competition_rank_over_birth_list_given_name_counts";
-const TREND_DERIVATION_METHOD = "birth_count_against_count_five_years_earlier";
+const TREND_DERIVATION_METHOD = "birth_share_against_share_five_years_earlier";
 
 /** D-044 §6: the latest year is compared with the year this many years earlier. */
 export const BIRTH_TREND_WINDOW_YEARS = 5;
@@ -73,44 +77,88 @@ export const BIRTH_TREND_CHANGE_PERCENT = 10;
 
 export type BirthTrendDirection = "RISING" | "STEADY" | "FALLING";
 
-/** The earlier side of a trend: the publisher's count, or absent below the list's cut-off. */
+/** One side of a trend that is on its list: the publisher's count and the list's `people_sum`. */
+export interface BirthTrendListed {
+  readonly count: number;
+  /** The children on the published list, read from the file: the share's denominator. */
+  readonly peopleSum: number;
+}
+
+/** The earlier side of a trend: listed, or absent below the list's cut-off. */
 export type BirthTrendEarlier =
-  | { readonly kind: "LISTED"; readonly count: number }
-  | { readonly kind: "BELOW_CUTOFF"; readonly publicationThreshold: number };
+  | ({ readonly kind: "LISTED" } & BirthTrendListed)
+  | {
+      readonly kind: "BELOW_CUTOFF";
+      readonly publicationThreshold: number;
+      readonly peopleSum: number;
+    };
 
 export type BirthTrendVerdict =
   | { readonly kind: "TREND"; readonly direction: BirthTrendDirection }
   /**
-   * Absent earlier, and the latest count is not more than 10% above the
-   * largest count the earlier cut-off allows. Cannot happen while the earlier
-   * cut-off is 2 (2013 on); it can for an earlier year up to 2012 (cut-off 5).
+   * Absent earlier, and the latest share is not more than 10% above the
+   * largest share the earlier cut-off allows (its count at most the cut-off
+   * minus one). Rare under a cut-off of 2; likelier under 5 (up to 2012).
    */
   | { readonly kind: "INDETERMINATE"; readonly reason: "BELOW_CUTOFF_TOO_CLOSE" };
 
+function wholeNumber(value: number, what: string, min: number): bigint {
+  if (!Number.isInteger(value) || value < min) {
+    throw new TruthInvariantError("INVALID_DISTRIBUTION_COUNT", `${what} ${value}`);
+  }
+  return BigInt(value);
+}
+
 /**
- * D-044 §6, in integers. `latest` is the count on the latest list; the
- * earlier side is the count five years before, or the fact that the name was
- * absent from that list (so its count was at most the cut-off minus one).
+ * D-044 §6 as amended 2026-10-06, in whole numbers. A side's share is its
+ * count ÷ its list's `people_sum`. With L, Ls the latest count and people_sum
+ * and E, Es the earlier, the latest share is more than 10% above the earlier
+ * when L/Ls > 1.1·E/Es, that is `L·Es·100 > E·Ls·110`. Products are in
+ * `BigInt`: each factor fits a PostgreSQL integer, so a product can exceed
+ * `Number.MAX_SAFE_INTEGER`.
+ *
+ * An earlier side absent from its list had some count from 0 to the cut-off
+ * minus one, never known and never 0. Rising holds for every one of them
+ * only if it holds for the largest; nothing else can be said.
  */
-export function birthTrend(latest: number, earlier: BirthTrendEarlier): BirthTrendVerdict {
-  const up = 100 + BIRTH_TREND_CHANGE_PERCENT;
-  const down = 100 - BIRTH_TREND_CHANGE_PERCENT;
-  if (!Number.isInteger(latest) || latest < 1) {
-    throw new TruthInvariantError("INVALID_DISTRIBUTION_COUNT", `latest count ${latest}`);
+export function birthTrend(
+  latest: BirthTrendListed,
+  earlier: BirthTrendEarlier,
+): BirthTrendVerdict {
+  const up = BigInt(100 + BIRTH_TREND_CHANGE_PERCENT);
+  const down = BigInt(100 - BIRTH_TREND_CHANGE_PERCENT);
+  const l = wholeNumber(latest.count, "latest count", 1);
+  const ls = wholeNumber(latest.peopleSum, "latest people_sum", 1);
+  const es = wholeNumber(earlier.peopleSum, "earlier people_sum", 1);
+  if (l > ls) {
+    throw new TruthInvariantError(
+      "INVALID_DISTRIBUTION_COUNT",
+      `latest count ${latest.count} above its list's people_sum ${latest.peopleSum}`,
+    );
   }
   if (earlier.kind === "LISTED") {
-    if (!Number.isInteger(earlier.count) || earlier.count < 1) {
-      throw new TruthInvariantError("INVALID_DISTRIBUTION_COUNT", `earlier count ${earlier.count}`);
+    const e = wholeNumber(earlier.count, "earlier count", 1);
+    if (e > es) {
+      throw new TruthInvariantError(
+        "INVALID_DISTRIBUTION_COUNT",
+        `earlier count ${earlier.count} above its list's people_sum ${earlier.peopleSum}`,
+      );
     }
-    if (latest * 100 > earlier.count * up) return { kind: "TREND", direction: "RISING" };
-    if (latest * 100 < earlier.count * down) return { kind: "TREND", direction: "FALLING" };
+    if (l * es * 100n > e * ls * up) return { kind: "TREND", direction: "RISING" };
+    if (l * es * 100n < e * ls * down) return { kind: "TREND", direction: "FALLING" };
     return { kind: "TREND", direction: "STEADY" };
   }
-  // The earlier count is some whole number from 0 to threshold − 1. Rising
-  // holds for every one of them only if it holds for the largest.
-  const largest = earlier.publicationThreshold - 1;
-  if (latest * 100 > largest * up) return { kind: "TREND", direction: "RISING" };
+  const largest = wholeNumber(earlier.publicationThreshold, "publication_threshold", 2) - 1n;
+  if (l * es * 100n > largest * ls * up) return { kind: "TREND", direction: "RISING" };
   return { kind: "INDETERMINATE", reason: "BELOW_CUTOFF_TOO_CLOSE" };
+}
+
+/**
+ * A share in parts per million, rounded down, for a reader to recheck a
+ * trend at a glance. The comparison itself uses the exact fraction.
+ */
+export function sharePerMillion(count: number, peopleSum: number): number {
+  return Number((BigInt(count) * 1_000_000n) / BigInt(peopleSum));
 }
 
 /** Stable identity of a count claim: the name on one list. */
@@ -141,6 +189,8 @@ export interface BirthListContext {
   readonly birth_year: number;
   readonly sex: BirthListSex;
   readonly publication_threshold: number;
+  /** The children on the published list, read from the file at import (ADR-0042). */
+  readonly people_sum: number;
   readonly comparability_group: string;
   readonly universe_description: string | null;
   readonly source_url: string | null;
@@ -178,6 +228,7 @@ export async function loadBirthRunContext(db: Kysely<DB>): Promise<BirthRunConte
       "l.sex",
       "l.publication_threshold",
       "l.row_count",
+      "l.people_sum",
       "l.comparability_group",
       "sr.source_id",
       "sr.external_record_id",
@@ -240,6 +291,7 @@ export async function loadBirthRunContext(db: Kysely<DB>): Promise<BirthRunConte
       birth_year: row.birth_year,
       sex,
       publication_threshold: row.publication_threshold,
+      people_sum: row.people_sum,
       comparability_group: row.comparability_group,
       universe_description: row.universe_description,
       source_url: row.source_url,
@@ -299,6 +351,8 @@ export interface BirthListResult {
     readonly direction?: BirthTrendDirection;
     readonly earlier_year?: number;
     readonly earlier_count?: number | null;
+    readonly latest_share_per_million?: number;
+    readonly earlier_share_per_million?: number | null;
   };
 }
 
@@ -308,6 +362,8 @@ export type BirthNameDerivationOutcome =
       readonly given_name_id: string;
       readonly display_name: string;
       readonly lists: readonly BirthListResult[];
+      /** Trend claims of an older method version set SUPERSEDED by this run. */
+      readonly superseded_trends: number;
     }
   /** Flagged for review (ADR-0032 §4): no claim is written. */
   | { readonly kind: "FLAGGED"; readonly given_name_id: string; readonly display_name: string }
@@ -426,11 +482,12 @@ async function deriveBirthNameById(
       return runId;
     };
 
+    const staleTrends = await supersedeStaleTrends(trx, givenNameId);
     // The count evidence of each list the name is on, for the rank and the trend.
     const countEvidence = new Map<string, { evidenceId: string; count: number }>();
     const out: BirthListResult[] = [];
     for (const row of rows) {
-      out.push(await deriveList(trx, givenNameId, row, context, countEvidence, run));
+      out.push(await deriveList(trx, givenNameId, row, context, countEvidence, staleTrends, run));
     }
     if (runId !== null) {
       await trx
@@ -439,10 +496,39 @@ async function deriveBirthNameById(
         .where("research_run_id", "=", runId)
         .execute();
     }
-    return out;
+    return { out, superseded: staleTrends.size };
   });
 
-  return { kind: "DERIVED", given_name_id: givenNameId, display_name: displayName, lists };
+  return {
+    kind: "DERIVED",
+    given_name_id: givenNameId,
+    display_name: displayName,
+    lists: lists.out,
+    superseded_trends: lists.superseded,
+  };
+}
+
+/**
+ * A trend claim of an older method version is not left ACTIVE once this
+ * method runs (`version.ts`; `@1` compared raw counts). Each is set
+ * SUPERSEDED, never deleted (docs/canonical/11 keeps history), whether or not
+ * this run writes a claim with the same key. Returns them by key, so a new
+ * claim with that key can name the one it supersedes.
+ */
+async function supersedeStaleTrends(
+  trx: Transaction<DB>,
+  givenNameId: string,
+): Promise<ReadonlyMap<string, string>> {
+  const stale = await trx
+    .updateTable("claims")
+    .set({ claim_status: "SUPERSEDED" })
+    .where("subject_entity_id", "=", givenNameId)
+    .where("claim_type", "=", "GIVEN_NAME_BIRTH_TREND")
+    .where("claim_status", "=", "ACTIVE")
+    .where("method_version", "<>", GIVEN_NAME_BIRTH_TREND_METHOD_VERSION)
+    .returning(["claim_id", "claim_key"])
+    .execute();
+  return new Map(stale.map((c) => [c.claim_key, c.claim_id]));
 }
 
 function publicationDate(list: BirthListContext): string | null {
@@ -455,6 +541,7 @@ async function deriveList(
   row: NameCountRow,
   context: BirthRunContext,
   countEvidence: Map<string, { evidenceId: string; count: number }>,
+  staleTrends: ReadonlyMap<string, string>,
   run: () => Promise<string>,
 ): Promise<BirthListResult> {
   const { list } = row;
@@ -572,6 +659,7 @@ async function deriveList(
     countEvidenceId,
     context,
     countEvidence,
+    staleTrends,
     run,
   );
   return { ...base, count_claim: countClaim, rank, trend };
@@ -659,27 +747,41 @@ async function deriveTrend(
   latestEvidenceId: string,
   context: BirthRunContext,
   countEvidence: ReadonlyMap<string, { evidenceId: string; count: number }>,
+  staleTrends: ReadonlyMap<string, string>,
   run: () => Promise<string>,
 ): Promise<NonNullable<BirthListResult["trend"]>> {
   const latest = row.list;
   const earlier = context.earlier.get(latest.sex);
   if (earlier === undefined) return { kind: "REFUSED", reason: "NO_EARLIER_LIST" };
   if (earlier.descriptor === undefined) return { kind: "REFUSED", reason: "UNKNOWN_RESOURCE" };
-  const earlierCount = countEvidence.get(earlier.list_id);
-  if (earlierCount === undefined && earlier.completeness.kind === "INCOMPLETE") {
-    // Absent from an excerpt says nothing about the official list.
-    return { kind: "REFUSED", reason: earlier.completeness.reason };
+  // A share needs the list's own people_sum, and an absence needs the whole
+  // list: an excerpt's sum is not the list's, and absent from an excerpt says
+  // nothing about the official list. Both lists must pass the gate.
+  for (const list of [latest, earlier]) {
+    if (list.completeness.kind === "INCOMPLETE") {
+      return { kind: "REFUSED", reason: list.completeness.reason };
+    }
   }
+  const earlierCount = countEvidence.get(earlier.list_id);
   const side: BirthTrendEarlier =
     earlierCount === undefined
-      ? { kind: "BELOW_CUTOFF", publicationThreshold: earlier.publication_threshold }
-      : { kind: "LISTED", count: earlierCount.count };
-  const verdict = birthTrend(row.count, side);
+      ? {
+          kind: "BELOW_CUTOFF",
+          publicationThreshold: earlier.publication_threshold,
+          peopleSum: earlier.people_sum,
+        }
+      : { kind: "LISTED", count: earlierCount.count, peopleSum: earlier.people_sum };
+  const verdict = birthTrend({ count: row.count, peopleSum: latest.people_sum }, side);
   if (verdict.kind === "INDETERMINATE") return { kind: "REFUSED", reason: verdict.reason };
+  const latestShare = sharePerMillion(row.count, latest.people_sum);
+  const earlierShare =
+    earlierCount === undefined ? null : sharePerMillion(earlierCount.count, earlier.people_sum);
   const shown = {
     direction: verdict.direction,
     earlier_year: earlier.birth_year,
     earlier_count: earlierCount?.count ?? null,
+    latest_share_per_million: latestShare,
+    earlier_share_per_million: earlierShare,
   };
 
   const trendKey = givenNameBirthTrendClaimKey(givenNameId, latest.list_id, earlier.list_id);
@@ -691,12 +793,32 @@ async function deriveTrend(
   if (earlierCount !== undefined) dependencies.push([earlierCount.evidenceId, "COUNT"]);
   else dependencies.push([await insertUniverseEvidence(trx, earlier, runId), "UNIVERSE"]);
 
+  const latestValue = {
+    birth_year: latest.birth_year,
+    count: row.count,
+    people_sum: latest.people_sum,
+    share_per_million: latestShare,
+    comparability_group: latest.comparability_group,
+  };
   const earlierValue = {
     birth_year: earlier.birth_year,
     count: earlierCount?.count ?? null,
     // Set only when absent: the count was below this, never zero.
     below_publication_threshold: earlierCount === undefined ? earlier.publication_threshold : null,
+    people_sum: earlier.people_sum,
+    share_per_million: earlierShare,
     comparability_group: earlier.comparability_group,
+  };
+  const comparison = {
+    basis: "SHARE_OF_CHILDREN_ON_PUBLISHED_LIST",
+    // The whole-number test the direction was decided by (see `birthTrend`).
+    rising_if:
+      "latest.count * earlier.people_sum * 100 > earlier_count_used * latest.people_sum * 110",
+    falling_if:
+      "latest.count * earlier.people_sum * 100 < earlier_count_used * latest.people_sum * 90",
+    earlier_count_used:
+      earlierCount === undefined ? earlier.publication_threshold - 1 : earlierCount.count,
+    share_rounding: "share_per_million rounded down; the comparison uses the exact fraction",
   };
   const derivedEvidenceId = uuidv7();
   await trx
@@ -708,8 +830,9 @@ async function deriveTrend(
       subject_entity_id: givenNameId,
       structured_value: JSON.stringify({
         direction: verdict.direction,
-        latest_count: row.count,
+        latest: latestValue,
         earlier: earlierValue,
+        comparison,
         window_years: BIRTH_TREND_WINDOW_YEARS,
         change_percent: BIRTH_TREND_CHANGE_PERCENT,
         algorithm_version: GIVEN_NAME_BIRTH_TREND_METHOD_VERSION,
@@ -734,18 +857,16 @@ async function deriveTrend(
     value: {
       direction: verdict.direction,
       sex: latest.sex,
-      latest: {
-        birth_year: latest.birth_year,
-        count: row.count,
-        comparability_group: latest.comparability_group,
-      },
+      latest: latestValue,
       earlier: earlierValue,
+      comparison,
       window_years: BIRTH_TREND_WINDOW_YEARS,
       change_percent: BIRTH_TREND_CHANGE_PERCENT,
       country_code: COUNTRY_CODE,
     },
     evidenceId: derivedEvidenceId,
     reasonCode: "DERIVED_TREND_FOR_GIVEN_NAME_BIRTHS",
+    supersedesClaimId: staleTrends.get(trendKey) ?? null,
   });
   await insertDerivedAssessment(trx, claimId, derivedEvidenceId, [latest, earlier], context);
   return { kind: "DERIVED", claim_id: claimId, ...shown };
@@ -823,6 +944,8 @@ async function insertClaim(
     readonly value: unknown;
     readonly evidenceId: string;
     readonly reasonCode: string;
+    /** The older claim with this key that this one replaces, already set SUPERSEDED. */
+    readonly supersedesClaimId?: string | null;
   },
 ): Promise<void> {
   await trx
@@ -838,7 +961,7 @@ async function insertClaim(
       structured_value: JSON.stringify(args.value),
       statement_key: null,
       claim_status: "ACTIVE",
-      supersedes_claim_id: null,
+      supersedes_claim_id: args.supersedesClaimId ?? null,
       created_by_run_id: args.runId,
       method_version: args.methodVersion,
     })
@@ -952,6 +1075,8 @@ export interface BirthNameRunTally {
   readonly trend: Tally & {
     /** Derived and existing trend claims by sex and direction. */
     readonly directions: Record<BirthListSex, Record<BirthTrendDirection, number>>;
+    /** Trend claims of an older method version set SUPERSEDED. */
+    readonly superseded: number;
   };
   /** The years compared, by sex. */
   readonly trend_years: Partial<Record<BirthListSex, { latest: number; earlier: number | null }>>;
@@ -992,6 +1117,7 @@ export async function deriveAllBirthNames(
   const rank = newTally();
   const trend = {
     ...newTally(),
+    superseded: 0,
     directions: {
       MALE: { RISING: 0, STEADY: 0, FALLING: 0 },
       FEMALE: { RISING: 0, STEADY: 0, FALLING: 0 },
@@ -1034,6 +1160,7 @@ export async function deriveAllBirthNames(
           row.canonical_display,
           context,
         );
+        trend.superseded += outcome.superseded_trends;
         for (const list of outcome.lists) {
           record(count, list.count_claim);
           record(rank, list.rank);

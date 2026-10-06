@@ -10,7 +10,7 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ## D-044 — RESOLVED (2026-10-06): first names given to children by year, for parents: signed-in only, a free basic view, the full numbers for 5,99 zł
 
-**Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6.
+**Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6; §6 below, and its amendment of 2026-10-06, in ADR-0043 §4.
 **Owner:** project owner.
 **Raised by:** the owner, 2026-10-06, in a Claude Code session: a section where mothers and fathers can see how many children were given a first name in each year, to choose a more or a less common name.
 
@@ -41,10 +41,18 @@ The answers, in the owner's words where they gave them:
 Nothing is built by this record.
 
 **Answered later the same day** (the owner accepted this session's three proposals: "go with your suggestions"):
-6. **Rising or falling:** the latest full year's count against the count five years earlier, on the same list (boys or girls). More than 10% higher is rising, more than 10% lower is falling, anything else is steady.
+6. **Rising or falling:** (amended 2026-10-06, below: shares, not counts) the latest full year's count against the count five years earlier, on the same list (boys or girls). More than 10% higher is rising, more than 10% lower is falling, anything else is steady.
    - Both years are from 2013 on, where the cut-off is 2. A name absent five years earlier but on the latest list is rising: its earlier count is below 2 and its latest at least 2.
    - A name absent from the latest list has no free count, rank or direction; the page says it was given fewer than 2 times.
    - Edge cases beyond these are for the claims task, which may not treat an absent count as zero.
+
+   **Amended 2026-10-06: compare shares, not counts.** The text above is §6 as first decided; TASK-137 built it as `given_name_birth_trend@1`. The children on the published lists fell from 186,590 boys and 176,829 girls in 2020 to 126,404 and 119,788 in 2025 (−32%, TASK-136's record), and under the count rule almost every popular name read falling: ZOFIA was rank 1 but falling, though her share of listed girls went only from 4.0% to 3.7%. Asked whether to compare share instead, the owner answered, in a Claude Code session, "yes switch to share and merge it". From this amendment (ADR-0043 §4, `given_name_birth_trend@2`, TASK-139):
+   - **Share:** a name's count ÷ that list's `people_sum`, the children on that published list as read from the file. It is a share of the children on the published list, not of all births: names below the cut-off are not in the denominator.
+   - **Comparison:** the latest list's share against the share five years earlier, on the same sex's list; the latest year is read from the data. More than 10% higher (relative to the earlier share) is rising, more than 10% lower is falling, anything else is steady. Whole numbers only, by cross-multiplication.
+   - **Absent five years earlier:** the earlier count is at most that list's cut-off minus one. Rising only if the rule holds for that largest count; otherwise no direction is stated. Never zero. The first text's "absent five years earlier is rising" no longer holds without that check.
+   - **Absent from the latest list:** no direction, as before.
+   - **Unchanged:** the five-year window, the 10% threshold, and boys' and girls' lists never mixed.
+   - A trend claim of the count rule does not stay active once the share rule has run.
 7. **One page or many:** one page with a search box, not a page per name (`PRODUCT.md` §8, non-goal 14).
 8. **The section's name:** "Imiona dla dziecka" in Polish and "Baby names" in English, the working names ADR-0037 §3 already uses.
 
