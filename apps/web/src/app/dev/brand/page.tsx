@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { AtlasHero, AtlasPoint, ContourField, CoordinateLabel, TopographicCrop } from "../../../design-system/graphics/index.js";
 import { Button, ConfidenceBadge, DataStat, EvidenceCard, LoadingState, Panel, SearchInput, SourceCard, Timeline, TimelineEvent } from "../../../design-system/components/index.js";
@@ -14,7 +15,7 @@ export default function BrandLabPage() {
         <SearchInput aria-label="Wpisz nazwisko" placeholder="Wpisz nazwisko, np. Kowalski" />
       </AtlasHero>
 
-      <section className="brand-lab-section"><p className="atlas-eyebrow">LOGO / POINT</p><div className="brand-lab-row"><img src="/brand/logo/name-atlas-mark-dark.svg" alt="Name Atlas Evolved Contour mark"/><AtlasPoint size={18}/><CoordinateLabel>52.2297 N · 21.0122 E</CoordinateLabel></div></section>
+      <section className="brand-lab-section"><p className="atlas-eyebrow">LOGO / POINT</p><div className="brand-lab-row"><Image src="/brand/logo/name-atlas-mark-dark.svg" alt="Name Atlas Evolved Contour mark" width={112} height={112} /><AtlasPoint size={18}/><CoordinateLabel>52.2297 N · 21.0122 E</CoordinateLabel></div></section>
 
       <section className="brand-lab-section"><p className="atlas-eyebrow">TYPE</p><h2 className="atlas-surname">Łukasiewicz</h2><h2 className="brand-lab-serif">Żółkiewski · Sękowski</h2><p>Instrument Sans carries interface and reading copy.</p><CoordinateLabel>[DATASET, DATE] · [SOURCE]</CoordinateLabel></section>
 
