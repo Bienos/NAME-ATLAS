@@ -204,3 +204,19 @@ describe("an invitation to a tree as a return address (TASK-094, AC-6)", () => {
     }
   });
 });
+
+describe("the baby-names page as a return address (TASK-141)", () => {
+  it("takes the page's two bare addresses, and nothing more", () => {
+    expect(safeNext("/pl/imiona-dla-dziecka")).toBe("/pl/imiona-dla-dziecka");
+    expect(safeNext("/en/baby-names")).toBe("/en/baby-names");
+    for (const value of [
+      "/pl/imiona-dla-dziecka?imie=ZOFIA",
+      "/pl/imiona-dla-dziecka/",
+      "/en/baby-names/x",
+      "/pl/baby-names",
+      "//evil.example/pl/imiona-dla-dziecka",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
+  });
+});

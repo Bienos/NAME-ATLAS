@@ -364,6 +364,28 @@ export {
   GIVEN_NAME_BIRTH_RANK_METHOD_VERSION,
   GIVEN_NAME_BIRTH_TREND_METHOD_VERSION,
 } from "./version.js";
+// The baby-names page's figures — TASK-141, D-044: read from the name's birth-list claims.
+export {
+  assembleBirthNameFacts,
+  BIRTH_HISTORY_FIRST_YEAR,
+  BIRTH_NAME_MAX_LENGTH,
+  BIRTH_SEXES,
+  findBirthGivenName,
+  readActiveBirthLists,
+  readBirthNameFacts,
+} from "./given-name-birth-facts.js";
+export type {
+  BirthClaimRow,
+  BirthCountFigure,
+  BirthListInfo,
+  BirthNameFacts,
+  BirthNameLookup,
+  BirthRankFigure,
+  BirthSex,
+  BirthSexFigures,
+  BirthTrendFigure,
+  BirthYearFigures,
+} from "./given-name-birth-facts.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildFullNameReport,
