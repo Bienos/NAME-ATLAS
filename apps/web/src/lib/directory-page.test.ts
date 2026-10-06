@@ -7,7 +7,10 @@ import {
   DirectoryLetterView,
   directoryMetadata,
   DirectoryRootView,
+  forgetDirectoryLettersForTests,
+  LETTERS_TTL_MS,
   loadDirectoryLetter,
+  loadDirectoryLetters,
   parseDirectoryPath,
 } from "./directory-page.js";
 import type { LetterPage } from "./directory-page.js";
@@ -30,6 +33,7 @@ vi.mock("@name-atlas/seo", async (importOriginal) => ({
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.clearAllMocks();
+  forgetDirectoryLettersForTests();
 });
 
 describe("parseDirectoryPath", () => {
@@ -68,6 +72,42 @@ describe("parseDirectoryPath", () => {
     ]) {
       expect(parseDirectoryPath(segments), segments.join("/")).toEqual({ kind: "NOT_FOUND" });
     }
+  });
+});
+
+describe("loadDirectoryLetters (TASK-134)", () => {
+  it("reads the letters once and shares them, also with renders that start together", async () => {
+    const [first, second] = await Promise.all([loadDirectoryLetters(), loadDirectoryLetters()]);
+    const third = await loadDirectoryLetters();
+    expect(first).toEqual(["k", "ł", "inne"]);
+    expect(second).toBe(first);
+    expect(third).toBe(first);
+    expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(1);
+  });
+
+  it("reads them again once they are as old as a kept page", async () => {
+    const start = Date.now();
+    await loadDirectoryLetters(start);
+    await loadDirectoryLetters(start + LETTERS_TTL_MS - 1);
+    expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(1);
+    await loadDirectoryLetters(start + LETTERS_TTL_MS);
+    expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(2);
+    expect(LETTERS_TTL_MS).toBe(21_600_000);
+  });
+
+  it("does not keep a failed read: the next render asks again", async () => {
+    vi.mocked(directoryLetters).mockRejectedValueOnce(new Error("no database connection"));
+    await expect(loadDirectoryLetters()).rejects.toThrow(/no database connection/u);
+    expect(await loadDirectoryLetters()).toEqual(["k", "ł", "inne"]);
+    expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(2);
+  });
+
+  it("serves every letter page from the one read", async () => {
+    await loadDirectoryLetter("k", 1);
+    await loadDirectoryLetter("ł", 1);
+    await directoryMetadata({ kind: "ROOT" });
+    expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -139,6 +179,8 @@ describe("directoryMetadata", () => {
       follow: true,
     });
     vi.stubEnv("SEO_INDEXING_ENABLED", "true");
+    // A fresh instance, whose first read finds no letters.
+    forgetDirectoryLettersForTests();
     vi.mocked(directoryLetters).mockResolvedValueOnce([]);
     expect((await directoryMetadata({ kind: "ROOT" })).robots).toEqual({
       index: false,
