@@ -1,10 +1,10 @@
 /**
- * Whether the baby-names page exists (TASK-141, D-044): first names given to
+ * Whether the baby-names page and its list exist (TASK-141, D-044; TASK-146, D-047): first names given to
  * children by year, signed-in only, with a paid view that cannot be sold yet
  * (ADR-0023 §2.5).
  *
- * On only when `BABY_NAMES_ENABLED` is exactly `1`. Otherwise both pages
- * answer 404 and the header does not link to them (TASK-143).
+ * On only when `BABY_NAMES_ENABLED` is exactly `1`. Otherwise every address
+ * answers 404 and the header does not link to them (TASK-143).
  *
  * Reads the variable by name and imports nothing that reaches the database,
  * so the middleware and the pages can both use it.
@@ -14,6 +14,20 @@ export const BABY_NAMES_ENV = "BABY_NAMES_ENABLED";
 
 /** The page's two addresses, without their query. */
 export const BABY_NAMES_PATHS = { pl: "/pl/imiona-dla-dziecka", en: "/en/baby-names" } as const;
+
+/**
+ * The whole list's two addresses, without their query (TASK-146, D-047): the
+ * names of one year's list, ranked, boys and girls apart. Same flag, same
+ * rules as the page itself.
+ */
+export const BABY_NAMES_LIST_PATHS = {
+  pl: "/pl/imiona-dla-dziecka/lista",
+  en: "/en/baby-names/list",
+} as const;
+
+/** Rows to a page of the list (the 8,99 zł view), and the rows the free view shows. */
+export const BABY_NAMES_LIST_PAGE_SIZE = 100;
+export const BABY_NAMES_LIST_FREE_ROWS = 10;
 
 /** The search box's field, per language: `?imie=ZOFIA`, `?name=ZOFIA`. */
 export const BABY_NAMES_FIELD = { pl: "imie", en: "name" } as const;
@@ -27,7 +41,12 @@ export function babyNamesEnabled(env: Env = process.env): boolean {
   return env[BABY_NAMES_ENV] === "1";
 }
 
-/** Whether a request path is one of the page's two addresses. */
+/** Whether a request path is one of the page's or the list's four addresses. */
 export function isBabyNamesPath(pathname: string): boolean {
-  return pathname === BABY_NAMES_PATHS.pl || pathname === BABY_NAMES_PATHS.en;
+  return (
+    pathname === BABY_NAMES_PATHS.pl ||
+    pathname === BABY_NAMES_PATHS.en ||
+    pathname === BABY_NAMES_LIST_PATHS.pl ||
+    pathname === BABY_NAMES_LIST_PATHS.en
+  );
 }

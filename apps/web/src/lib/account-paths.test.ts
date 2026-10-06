@@ -205,6 +205,21 @@ describe("an invitation to a tree as a return address (TASK-094, AC-6)", () => {
   });
 });
 
+describe("the baby-names list as a return address (TASK-146)", () => {
+  it("takes the list's two bare addresses, and nothing more", () => {
+    expect(safeNext("/pl/imiona-dla-dziecka/lista")).toBe("/pl/imiona-dla-dziecka/lista");
+    expect(safeNext("/en/baby-names/list")).toBe("/en/baby-names/list");
+    for (const value of [
+      "/pl/imiona-dla-dziecka/lista?sex=girls",
+      "/en/baby-names/list/",
+      "/pl/baby-names/list",
+      "//evil.example/en/baby-names/list",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
+  });
+});
+
 describe("the baby-names page as a return address (TASK-141)", () => {
   it("takes the page's two bare addresses, and nothing more", () => {
     expect(safeNext("/pl/imiona-dla-dziecka")).toBe("/pl/imiona-dla-dziecka");

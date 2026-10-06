@@ -55,6 +55,9 @@ export interface BabyNamesText {
   readonly registerRank: string;
   readonly registerAsOf: (date: string) => string;
   readonly registerNone: string;
+  /** The link to the whole list (TASK-146), on the page and in the locked card. */
+  readonly listLink: string;
+  readonly lockedListNote: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -110,6 +113,8 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     registerRank: "Miejsce na liście rejestru",
     registerAsOf: (date) => `Stan na ${date}`,
     registerNone: "Nie mamy liczby z listy rejestru PESEL dla tego imienia.",
+    listLink: "Cała lista imion",
+    lockedListNote: "Pełna lista imion każdego roku, z kierunkiem, jest w tym samym pakiecie.",
   },
   en: {
     title: "Baby names",
@@ -163,5 +168,8 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     registerRank: "Place on the register's list",
     registerAsOf: (date) => `As of ${date}`,
     registerNone: "We have no figure from the PESEL register's list for this name.",
+    listLink: "The whole list",
+    lockedListNote:
+      "The full list of names for every year, with direction, is in the same package.",
   },
 };

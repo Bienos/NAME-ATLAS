@@ -7064,6 +7064,56 @@ a.tree-card:hover {
   color: var(--dusk-ink-muted);
 }
 
+/* --- the baby-names list (TASK-146) --- */
+
+.baby-list-link {
+  margin: var(--space-3) 0 0;
+}
+
+.baby-list-form select {
+  min-height: 52px;
+  margin-bottom: var(--space-4);
+  padding: 0 var(--space-5);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+  background: var(--dusk-glass);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: var(--radius-md);
+}
+
+.baby-list-form select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.baby-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-list-table caption {
+  text-align: left;
+  padding: var(--space-3) 0;
+  font-weight: 600;
+}
+
+.baby-list-table th,
+.baby-list-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--dusk-tile-line);
+}
+
+.baby-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  align-items: baseline;
+  margin-top: var(--space-5);
+}
+
 .baby-below {
   color: var(--dusk-ink-muted);
 }
