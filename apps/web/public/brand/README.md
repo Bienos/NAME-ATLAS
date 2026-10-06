@@ -27,7 +27,8 @@ Raster exports are not checked in by TASK-147 because the SVG is the production 
 - `contours/contour-field-a.svg`
 - `topography/topographic-crop-a.svg`
 - `icons/` brand-specific semantic icons
-- `social/og-master.svg`
-- `print/research-card-master.svg`
+- `marks/app-icon.svg`
+- `social/og-master.svg`, `social/square-1080.svg`, `social/portrait-1080x1350.svg`, `social/story-1080x1920.svg`
+- `print/research-card-master.svg`, `print/report-cover-master.svg`
 
 Decorative contour/topography assets do not encode research data.
