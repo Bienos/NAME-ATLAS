@@ -7,9 +7,10 @@ import type { Lang } from "./messages.js";
  * checkout is on: a buy button per sellable tier, the reader's purchases, and
  * the word Stripe's return leaves in the query.
  *
- * It says plainly that this is a test: no card is charged, and nothing a
- * purchase unlocks is built yet (the tree unlock of ADR-0037 §2.1 is a later
- * task). A plain form per tier, so it needs no script.
+ * It says plainly that this is a test: no card is charged. What a purchase
+ * unlocks (the tree's cap, TASK-114; the baby-names figures, TASK-141) is shown
+ * by the dashboard's plan panel (TASK-153). A plain form per tier, so it needs
+ * no script.
  */
 
 export type CheckoutStatus = "success" | "cancelled" | "error";
@@ -24,7 +25,7 @@ export interface PurchaseRow {
 const TEXT = {
   pl: {
     heading: "Zakupy (tryb testowy)",
-    lede: "To próbna kasa Stripe: płatności są testowe i nie obciążają żadnej karty. Użyj karty testowej 4242 4242 4242 4242. Zakup niczego jeszcze nie odblokowuje.",
+    lede: "To próbna kasa Stripe: płatności są testowe i nie obciążają żadnej karty. Użyj karty testowej 4242 4242 4242 4242. Co odblokowuje zakup, pokazuje „Twój plan”.",
     buy: (name: string, price: string) => `Kup „${name}” — ${price}`,
     yours: "Twoje zakupy",
     none: "Nie masz jeszcze zakupów.",
@@ -37,7 +38,7 @@ const TEXT = {
   },
   en: {
     heading: "Purchases (test mode)",
-    lede: "This is Stripe's test checkout: payments are test payments and no card is charged. Use the test card 4242 4242 4242 4242. A purchase does not unlock anything yet.",
+    lede: "This is Stripe's test checkout: payments are test payments and no card is charged. Use the test card 4242 4242 4242 4242. “Your plan” shows what a purchase unlocks.",
     buy: (name: string, price: string) => `Buy “${name}” — ${price}`,
     yours: "Your purchases",
     none: "You have no purchases yet.",
@@ -65,7 +66,10 @@ export function CheckoutSection({
 }) {
   const t = TEXT[lang];
   return (
-    <section className="account-purchases" aria-labelledby="account-purchases-heading">
+    <section
+      className="account-panel account-purchases account-checkout"
+      aria-labelledby="account-purchases-heading"
+    >
       <h3 id="account-purchases-heading">{t.heading}</h3>
       {status === null ? null : (
         <p className="account-status" role="status">

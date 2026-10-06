@@ -2,25 +2,33 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { isTokenShape } from "@name-atlas/accounts";
+import { createAccountsDb, createPurchases, isTokenShape } from "@name-atlas/accounts";
+import type { Purchases } from "@name-atlas/accounts";
+import { FREE_TREE_PERSONS_MAX } from "@name-atlas/family";
+import { AtlasGrid, AtlasPoint, ContourField } from "../design-system/graphics/index.js";
+import { AccountDashboard } from "./account-dashboard.js";
+import { Field, Form, Send } from "./account-form.js";
+import { loadAccountOverview, NO_FEATURES, UNKNOWN_OVERVIEW } from "./account-overview.js";
+import type { AccountFeatures, AccountOverview } from "./account-overview.js";
 import {
   accountPath,
-  actionPath,
   googleStartPath,
   isTreeNext,
   safeNext,
   stepFromSlug,
 } from "./account-paths.js";
-import type { AccountAction, AccountStep } from "./account-paths.js";
+import type { AccountStep } from "./account-paths.js";
 import { ACCOUNT_TEXT, statusWords } from "./account-text.js";
 import { accountsEnabled, googleEnabled, mailEnabled } from "./accounts-config.js";
 import { accountsRuntime } from "./accounts-runtime.js";
+import type { AccountsRuntime } from "./accounts-runtime.js";
+import { babyNamesEnabled } from "./baby-names-config.js";
 import { checkoutRuntime } from "./checkout-runtime.js";
 import { CheckoutSection, checkoutStatusFrom } from "./checkout-section.js";
-import type { PurchaseRow } from "./checkout-section.js";
+import { familyTreeEnabled } from "./family-config.js";
+import { familyRuntime } from "./family-runtime.js";
 import { legalPath } from "./legal-text.js";
 import { GOOGLE_MARK } from "./design-tokens.js";
-import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
@@ -43,6 +51,10 @@ import { SiteShell } from "./site-shell.js";
  *
  * `decideAccountPage` holds every decision and is pure; the component below it
  * only fetches the session and renders the answer.
+ *
+ * TASK-153 draws the pages on Brand System v1 (ADR-0046): the sign-in steps as
+ * a form card beside an art panel, and the account step as a dashboard
+ * (`account-dashboard.tsx`) over the facts `account-overview.ts` reads.
  */
 
 export interface SessionView {
@@ -145,79 +157,6 @@ export function accountMetadata(lang: Lang, step: AccountStep): Metadata {
   };
 }
 
-function Field({
-  name,
-  label,
-  type,
-  autoComplete,
-  hint,
-  minLength,
-  maxLength,
-}: {
-  readonly name: string;
-  readonly label: string;
-  readonly type: "email" | "password";
-  readonly autoComplete: string;
-  readonly hint?: string;
-  readonly minLength?: number;
-  readonly maxLength: number;
-}) {
-  return (
-    <label>
-      <span>{label}</span>
-      <input
-        name={name}
-        type={type}
-        autoComplete={autoComplete}
-        required
-        minLength={minLength}
-        maxLength={maxLength}
-        autoCapitalize="none"
-        spellCheck={false}
-      />
-      {hint === undefined ? null : <small>{hint}</small>}
-    </label>
-  );
-}
-
-function Form({
-  action,
-  lang,
-  children,
-  label,
-}: {
-  readonly action: AccountAction;
-  readonly lang: Lang;
-  readonly children: ReactNode;
-  readonly label: string;
-}) {
-  return (
-    <form
-      className="offer-form account-form"
-      method="post"
-      action={actionPath(action)}
-      aria-label={label}
-    >
-      <input type="hidden" name="lang" value={lang} />
-      {children}
-    </form>
-  );
-}
-
-function Send({
-  children,
-  danger = false,
-}: {
-  readonly children: ReactNode;
-  readonly danger?: boolean;
-}) {
-  return (
-    <button type="submit" className={danger ? "offer-send account-danger" : "offer-send"}>
-      {children}
-    </button>
-  );
-}
-
 /**
  * "Continue with Google": a plain link to the start route, so it needs no
  * script. Google's mark is drawn inline in its own four colours, on white, as
@@ -273,12 +212,84 @@ function TermsCheck({ lang }: { readonly lang: Lang }) {
  * `purchases` is test-mode checkout's section (TASK-111), rendered on the
  * account step under the account's own controls; absent while checkout is off.
  */
+/**
+ * The sign-in pages' art panel (TASK-153): a contour field, the Atlas Point,
+ * a stamp and what an account gives, one line per section this site has. It
+ * sits beside the form on a wide screen and under it on a phone; it holds no
+ * form, so a page that must show none (a spent link) still shows none.
+ */
+function AuthArt({ lang, features }: { readonly lang: Lang; readonly features: AccountFeatures }) {
+  const a = ACCOUNT_TEXT[lang].art;
+  // The ring the stamp's words run round, and its length, so any wording fills it once.
+  const ring = 44;
+  return (
+    <aside className="account-art" aria-label={a.label}>
+      <div className="account-art-field" aria-hidden="true">
+        <ContourField
+          seed={23}
+          density={9}
+          variant="blue"
+          opacity={0.6}
+          focusPoint={{ x: 62, y: 40 }}
+        />
+        <ContourField
+          seed={7}
+          density={6}
+          variant="ivory"
+          opacity={0.2}
+          orientation="falling"
+          className="account-contour-b"
+        />
+        <AtlasGrid />
+      </div>
+      <svg className="account-stamp" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+        <defs>
+          <path
+            id="account-stamp-ring"
+            d={`M60,60 m-${ring},0 a${ring},${ring} 0 1,1 ${2 * ring},0 a${ring},${ring} 0 1,1 -${2 * ring},0`}
+          />
+        </defs>
+        <circle cx="60" cy="60" r="55" />
+        <circle cx="60" cy="60" r="34" />
+        <text textLength={Math.round(2 * Math.PI * ring)} lengthAdjust="spacing">
+          <textPath href="#account-stamp-ring">{a.stamp}</textPath>
+        </text>
+      </svg>
+      <span className="account-art-point" aria-hidden="true">
+        <AtlasPoint size={12} glow />
+      </span>
+      <div className="account-art-copy">
+        <p className="account-art-kicker">{a.kicker}</p>
+        <p className="account-art-title">
+          {a.title[0]} <em>{a.title[1]}</em>
+        </p>
+        <p className="account-art-perks-heading">{a.perksHeading}</p>
+        <ul className="account-art-perks">
+          <li>{a.perks.cards}</li>
+          {features.tree ? <li>{a.perks.tree(FREE_TREE_PERSONS_MAX)}</li> : null}
+          {features.babyNames ? <li>{a.perks.babyNames}</li> : null}
+        </ul>
+      </div>
+    </aside>
+  );
+}
+
+/**
+ * The account's pages. `purchases` is test-mode checkout's section (TASK-111);
+ * `overview` is the dashboard's facts and `features` the signed-in sections
+ * this site has (TASK-153). Both default to "unknown" and "none", so a page
+ * rendered without them claims nothing.
+ */
 export function AccountView({
   data,
   purchases,
+  overview = UNKNOWN_OVERVIEW,
+  features = NO_FEATURES,
 }: {
   readonly data: AccountPageData;
   readonly purchases?: ReactNode;
+  readonly overview?: AccountOverview;
+  readonly features?: AccountFeatures;
 }) {
   const { lang, step, token, session, ways } = data;
   const t = ACCOUNT_TEXT[lang];
@@ -286,6 +297,30 @@ export function AccountView({
   const status = statusWords(lang, step, data.status);
   const heading = t.headings[step];
   const lede = t.ledes[step];
+
+  if (step === "account") {
+    return (
+      <SiteShell
+        lang={lang}
+        otherPath={accountPath(other, step)}
+        world={{ mode: "quiet" }}
+        mainClassName="reading account-page"
+        current="account"
+      >
+        {session === null ? null : (
+          <AccountDashboard
+            lang={lang}
+            session={session}
+            ways={ways}
+            status={status}
+            overview={overview}
+            features={features}
+            purchases={purchases ?? null}
+          />
+        )}
+      </SiteShell>
+    );
+  }
 
   // The two token steps show a form only while there is a token to spend.
   const showTokenForm =
@@ -305,198 +340,167 @@ export function AccountView({
       lang={lang}
       otherPath={accountPath(other, step)}
       world={{ mode: "quiet" }}
-      mainClassName="reading account"
+      mainClassName="reading account-page"
       current="account"
     >
-      <section>
-        <h2>{heading}</h2>
-        {step === "sign-in" && isTreeNext(data.next) ? (
-          <p className="account-context">{t.google.forTree}</p>
-        ) : null}
-        {lede !== "" && step !== "account" ? <p>{lede}</p> : null}
-        {status === null ? null : (
-          <p
-            className={`account-status account-status-${status.tone}`}
-            role={status.tone === "problem" ? "alert" : "status"}
-          >
-            {status.text}
+      <div className="account-shell account-plate atlas-v1">
+        <section className="account-card">
+          <span className="account-card-ticks" aria-hidden="true" />
+          <p className="account-eyebrow">
+            <AtlasPoint size={8} glow />
+            {t.eyebrows[step]}
           </p>
-        )}
-
-        {googleFirst}
-
-        {step === "sign-in" && ways.mail ? (
-          <>
-            <Form action="sign-in" lang={lang} label={heading}>
-              {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
-              <Field
-                name="email"
-                label={t.email}
-                type="email"
-                autoComplete="email"
-                maxLength={254}
-              />
-              <Field
-                name="password"
-                label={t.password}
-                type="password"
-                autoComplete="current-password"
-                maxLength={128}
-              />
-              <Send>{t.submit["sign-in"]}</Send>
-            </Form>
-            <p className="account-links">
-              {t.links.noAccount} <a href={accountPath(lang, "sign-up")}>{t.links.signUp}</a>
-              {" · "}
-              <a href={accountPath(lang, "reset")}>{t.links.forgot}</a>
+          <h2>{heading}</h2>
+          {step === "sign-in" && isTreeNext(data.next) ? (
+            <p className="account-context">{t.google.forTree}</p>
+          ) : null}
+          {lede === "" ? null : <p className="account-lede">{lede}</p>}
+          {status === null ? null : (
+            <p
+              className={`account-status account-status-${status.tone}`}
+              role={status.tone === "problem" ? "alert" : "status"}
+            >
+              {status.text}
             </p>
-          </>
-        ) : null}
+          )}
 
-        {step === "sign-up" && ways.mail ? (
-          <>
-            <Form action="sign-up" lang={lang} label={heading}>
-              <Field
-                name="email"
-                label={t.email}
-                type="email"
-                autoComplete="email"
-                maxLength={254}
-              />
-              <Send>{t.submit["sign-up"]}</Send>
-            </Form>
-            <p className="account-links">
-              {t.links.haveAccount} <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
-            </p>
-          </>
-        ) : null}
+          {googleFirst}
 
-        {step === "reset" ? (
-          <>
-            <Form action="reset-request" lang={lang} label={heading}>
-              <Field
-                name="email"
-                label={t.email}
-                type="email"
-                autoComplete="email"
-                maxLength={254}
-              />
-              <Send>{t.submit.reset}</Send>
-            </Form>
-            <p className="account-links">
-              <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
-            </p>
-          </>
-        ) : null}
-
-        {step === "confirm" && showTokenForm ? (
-          <Form action="complete" lang={lang} label={heading}>
-            <input type="hidden" name="token" value={token ?? ""} />
-            <Field
-              name="password"
-              label={t.password}
-              type="password"
-              autoComplete="new-password"
-              hint={t.passwordHint}
-              minLength={10}
-              maxLength={128}
-            />
-            <TermsCheck lang={lang} />
-            <Send>{t.submit.confirm}</Send>
-          </Form>
-        ) : null}
-
-        {step === "welcome" && showTokenForm ? (
-          <Form action="google-complete" lang={lang} label={heading}>
-            <input type="hidden" name="token" value={token ?? ""} />
-            {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
-            <TermsCheck lang={lang} />
-            <Send>{t.submit.welcome}</Send>
-          </Form>
-        ) : null}
-        {step === "welcome" && !showTokenForm ? (
-          <p className="account-links">
-            <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
-          </p>
-        ) : null}
-
-        {step === "new-password" && showTokenForm ? (
-          <Form action="reset" lang={lang} label={heading}>
-            <input type="hidden" name="token" value={token ?? ""} />
-            <Field
-              name="password"
-              label={t.newPassword}
-              type="password"
-              autoComplete="new-password"
-              hint={t.passwordHint}
-              minLength={10}
-              maxLength={128}
-            />
-            <Send>{t.submit["new-password"]}</Send>
-          </Form>
-        ) : null}
-
-        {step === "confirm" && !showTokenForm ? (
-          <p className="account-links">
-            <a href={accountPath(lang, "sign-up")}>{t.links.signUp}</a>
-          </p>
-        ) : null}
-        {step === "new-password" && !showTokenForm ? (
-          <p className="account-links">
-            <a href={accountPath(lang, "reset")}>{t.links.requestNew}</a>
-          </p>
-        ) : null}
-
-        {step === "account" && session !== null ? (
-          <>
-            <p>
-              {t.account.signedInAs} <strong>{session.email}</strong>
-            </p>
-            {session.hasPassword ? null : (
-              <p>
-                {t.account.viaGoogle}
-                {ways.mail ? (
-                  <>
-                    {" "}
-                    <a href={accountPath(lang, "reset")}>{t.account.setPassword}</a>
-                  </>
-                ) : null}
-              </p>
-            )}
-            <p>
-              {t.account.termsAccepted(
-                formatDate(session.termsVersion, lang),
-                formatDate(session.termsAcceptedOn, lang),
-              )}
-            </p>
-            <Form action="sign-out" lang={lang} label={t.account.signOut}>
-              <Send>{t.account.signOut}</Send>
-            </Form>
-            <h3>{t.account.deleteHeading}</h3>
-            <p>{session.hasPassword ? t.account.deleteLede : t.account.deleteLedeNoPassword}</p>
-            <Form action="delete" lang={lang} label={t.account.deleteHeading}>
-              {session.hasPassword ? (
+          {step === "sign-in" && ways.mail ? (
+            <>
+              <Form action="sign-in" lang={lang} label={heading}>
+                {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
+                <Field
+                  name="email"
+                  label={t.email}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={254}
+                />
                 <Field
                   name="password"
-                  label={t.account.deletePassword}
+                  label={t.password}
                   type="password"
                   autoComplete="current-password"
                   maxLength={128}
                 />
-              ) : (
-                <label className="account-check">
-                  <input type="checkbox" name="confirm" value="on" required />
-                  <span>{t.account.deleteConfirm}</span>
-                </label>
-              )}
-              <Send danger>{t.account.deleteSubmit}</Send>
+                <Send>{t.submit["sign-in"]}</Send>
+              </Form>
+              <p className="account-links">
+                {t.links.noAccount} <a href={accountPath(lang, "sign-up")}>{t.links.signUp}</a>
+                {" · "}
+                <a href={accountPath(lang, "reset")}>{t.links.forgot}</a>
+              </p>
+            </>
+          ) : null}
+
+          {step === "sign-up" && ways.mail ? (
+            <>
+              <Form action="sign-up" lang={lang} label={heading}>
+                <Field
+                  name="email"
+                  label={t.email}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={254}
+                />
+                <Send>{t.submit["sign-up"]}</Send>
+              </Form>
+              <p className="account-links">
+                {t.links.haveAccount} <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
+              </p>
+            </>
+          ) : null}
+
+          {step === "reset" ? (
+            <>
+              <Form action="reset-request" lang={lang} label={heading}>
+                <Field
+                  name="email"
+                  label={t.email}
+                  type="email"
+                  autoComplete="email"
+                  maxLength={254}
+                />
+                <Send>{t.submit.reset}</Send>
+              </Form>
+              <p className="account-links">
+                <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
+              </p>
+            </>
+          ) : null}
+
+          {step === "confirm" && showTokenForm ? (
+            <Form action="complete" lang={lang} label={heading}>
+              <input type="hidden" name="token" value={token ?? ""} />
+              <Field
+                name="password"
+                label={t.password}
+                type="password"
+                autoComplete="new-password"
+                hint={t.passwordHint}
+                minLength={10}
+                maxLength={128}
+              />
+              <TermsCheck lang={lang} />
+              <Send>{t.submit.confirm}</Send>
             </Form>
-            {purchases ?? null}
-          </>
-        ) : null}
-      </section>
+          ) : null}
+
+          {step === "welcome" && showTokenForm ? (
+            <Form action="google-complete" lang={lang} label={heading}>
+              <input type="hidden" name="token" value={token ?? ""} />
+              {data.next === null ? null : <input type="hidden" name="next" value={data.next} />}
+              <TermsCheck lang={lang} />
+              <Send>{t.submit.welcome}</Send>
+            </Form>
+          ) : null}
+          {step === "welcome" && !showTokenForm ? (
+            <p className="account-links">
+              <a href={accountPath(lang, "sign-in")}>{t.links.signIn}</a>
+            </p>
+          ) : null}
+
+          {step === "new-password" && showTokenForm ? (
+            <Form action="reset" lang={lang} label={heading}>
+              <input type="hidden" name="token" value={token ?? ""} />
+              <Field
+                name="password"
+                label={t.newPassword}
+                type="password"
+                autoComplete="new-password"
+                hint={t.passwordHint}
+                minLength={10}
+                maxLength={128}
+              />
+              <Send>{t.submit["new-password"]}</Send>
+            </Form>
+          ) : null}
+
+          {step === "confirm" && !showTokenForm ? (
+            <p className="account-links">
+              <a href={accountPath(lang, "sign-up")}>{t.links.signUp}</a>
+            </p>
+          ) : null}
+          {step === "new-password" && !showTokenForm ? (
+            <p className="account-links">
+              <a href={accountPath(lang, "reset")}>{t.links.requestNew}</a>
+            </p>
+          ) : null}
+        </section>
+        <AuthArt lang={lang} features={features} />
+      </div>
     </SiteShell>
   );
+}
+
+/** The purchases store over the accounts pool, made once per instance, for the dashboard. */
+let purchaseStore: { readonly pool: unknown; readonly store: Purchases } | undefined;
+function purchasesOn(pool: AccountsRuntime["pool"]): Purchases {
+  if (purchaseStore?.pool !== pool) {
+    purchaseStore = { pool, store: createPurchases({ db: createAccountsDb(pool) }) };
+  }
+  return purchaseStore.store;
 }
 
 /**
@@ -546,31 +550,43 @@ export async function AccountPage({
   if (decision.kind === "not-found") notFound();
   if (decision.kind === "redirect") redirect(decision.to);
 
-  // Test-mode checkout (TASK-111): on the account step only, with the reader's purchases.
+  const features: AccountFeatures = { tree: familyTreeEnabled(), babyNames: babyNamesEnabled() };
+
+  // The dashboard's facts (TASK-153), on the account step only: three reads at
+  // once, each of which may fail alone and then shows as "not available".
+  let overview: AccountOverview | undefined;
+  if (step === "account" && userId !== null && runtime !== null) {
+    const family = features.tree ? familyRuntime() : null;
+    const purchases = purchasesOn(runtime.pool);
+    overview = await loadAccountOverview({
+      userId,
+      summary: (id) => runtime.accounts.accountSummary(id),
+      purchases: (id) => purchases.listForUser(id),
+      trees: family === null ? null : (id) => family.family.listTrees(id),
+    });
+  }
+
+  // Test-mode checkout (TASK-111): on the account step only, with the purchases just read.
   const checkout = step === "account" && userId !== null ? checkoutRuntime() : null;
   let purchases: ReactNode = null;
-  if (checkout !== null && userId !== null) {
-    let rows: readonly PurchaseRow[] = [];
-    try {
-      rows = (await checkout.purchases.listForUser(userId)).map((p) => ({
-        tier: p.tier,
-        amountTotal: p.amountTotal,
-        paidOn: p.paidAt.toISOString().slice(0, 10),
-      }));
-    } catch {
-      // The list is unreadable for now; the buy buttons still work.
-      rows = [];
-    }
+  if (checkout !== null) {
     const word = query["checkout"];
     purchases = (
       <CheckoutSection
         lang={lang}
         status={checkoutStatusFrom(typeof word === "string" ? word : null)}
-        purchases={rows}
+        purchases={overview?.purchases ?? []}
       />
     );
   }
-  return <AccountView data={decision.data} purchases={purchases} />;
+  return (
+    <AccountView
+      data={decision.data}
+      purchases={purchases}
+      overview={overview}
+      features={features}
+    />
+  );
 }
 
 export async function accountMetadataFor(

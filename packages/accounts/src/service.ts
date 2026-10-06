@@ -127,6 +127,19 @@ export interface Session {
   readonly expiresAt: Date;
 }
 
+/**
+ * What the account page's dashboard says about the account itself (TASK-153):
+ * read on that page only, never on a hot path.
+ */
+export interface AccountSummary {
+  readonly createdAt: Date;
+  readonly lastSignInAt: Date | null;
+  /** Whether a Google account is linked (ADR-0033). */
+  readonly googleLinked: boolean;
+  /** Sessions that have not expired, this one included. */
+  readonly activeSessions: number;
+}
+
 export type ResetResult =
   | { readonly kind: "OK" }
   | { readonly kind: "INVALID_OR_EXPIRED" }
@@ -675,6 +688,43 @@ export function createAccounts(deps: AccountsDeps) {
         termsVersion: row.terms_version,
         termsAcceptedAt: row.terms_accepted_at,
         expiresAt,
+      };
+    },
+
+    /**
+     * The account's own facts for its dashboard (TASK-153): when it was made,
+     * its last sign-in, whether Google is linked and how many sessions are live.
+     * Null for an id with no complete account. One read, no write.
+     */
+    async accountSummary(userId: string): Promise<AccountSummary | null> {
+      const at = now();
+      const row = await db
+        .selectFrom("users as u")
+        .select((eb) => [
+          "u.created_at",
+          "u.last_sign_in_at",
+          eb
+            .selectFrom("identities as i")
+            .select(sql<number>`count(*)::int`.as("n"))
+            .whereRef("i.user_id", "=", "u.user_id")
+            .where("i.provider", "=", "GOOGLE")
+            .as("google_count"),
+          eb
+            .selectFrom("sessions as s")
+            .select(sql<number>`count(*)::int`.as("n"))
+            .whereRef("s.user_id", "=", "u.user_id")
+            .where("s.expires_at", ">", at)
+            .as("session_count"),
+        ])
+        .where("u.user_id", "=", userId)
+        .where("u.email_verified_at", "is not", null)
+        .executeTakeFirst();
+      if (row === undefined) return null;
+      return {
+        createdAt: row.created_at,
+        lastSignInAt: row.last_sign_in_at,
+        googleLinked: (row.google_count ?? 0) > 0,
+        activeSessions: row.session_count ?? 0,
       };
     },
 
