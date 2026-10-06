@@ -7,6 +7,7 @@ import { createMigrator, createPool } from "@name-atlas/db";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import {
+  BABY_NAMES_FULL_TIERS,
   createAccounts,
   createAccountsDb,
   createPurchases,
@@ -1025,6 +1026,23 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       expect(await purchases.listForUser(userId)).toEqual([
         { tier: "smaller", amountTotal: 2899, paidAt: clock },
       ]);
+    });
+
+    it("answers by tier: the baby-names figures need a tier that holds them (TASK-141)", async () => {
+      const purchases = createPurchases({ db: createAccountsDb(app()) });
+      const none = await account("no.purchase@example.com");
+      expect(await purchases.hasPurchaseOf(none, BABY_NAMES_FULL_TIERS)).toBe(false);
+      for (const tier of ["smaller", "couple", "family"] as const) {
+        const userId = await account(`tier.${tier}@example.com`);
+        await purchases.record({ ...paid(userId, `cs_test_tier_${tier}`), tier });
+        expect(await purchases.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS), tier).toBe(true);
+        // Another tier's purchase is not this one.
+        const others = BABY_NAMES_FULL_TIERS.filter((t) => t !== tier);
+        expect(await purchases.hasPurchaseOf(userId, others), tier).toBe(false);
+        expect(await purchases.hasPurchaseOf(userId, []), tier).toBe(false);
+      }
+      // One reader's purchase is never another's.
+      expect(await purchases.hasPurchaseOf(none, BABY_NAMES_FULL_TIERS)).toBe(false);
     });
 
     it("refuses a live purchase, an unknown tier and another currency", async () => {

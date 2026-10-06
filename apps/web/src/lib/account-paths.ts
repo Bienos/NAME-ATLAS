@@ -121,6 +121,9 @@ const TREE_HOMES: ReadonlySet<string> = new Set(["/pl/konto/drzewa", "/en/accoun
 const TREE_INVITATION =
   /^\/(?:pl\/konto\/drzewa\/zaproszenie|en\/account\/trees\/invitation)\?t=[A-Za-z0-9_-]{43}$/u;
 
+/** The baby-names page (TASK-141), signed-in only: a sign-in comes back to it, without its query. */
+const BABY_NAMES_HOMES: ReadonlySet<string> = new Set(["/pl/imiona-dla-dziecka", "/en/baby-names"]);
+
 /** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
 export function isTreeNext(next: string | null): boolean {
   return next !== null && (TREE_HOMES.has(next) || TREE_INVITATION.test(next));
@@ -128,8 +131,9 @@ export function isTreeNext(next: string | null): boolean {
 
 /**
  * Where a sign-in may send the reader on (TASK-064): the surname page they came
- * from, which the deck's prompt names, the family tree's page (TASK-084) or
- * an invitation to a tree with its token (TASK-094), and nothing else. It is checked again
+ * from, which the deck's prompt names, the family tree's page (TASK-084),
+ * an invitation to a tree with its token (TASK-094), or the baby-names page
+ * (TASK-141), and nothing else. It is checked again
  * by the sign-in action, because a form field can say anything, and a redirect
  * to an address a stranger chose is how a sign-in page is turned into a trap.
  *
@@ -155,6 +159,7 @@ const NEXT_PATTERN = new RegExp(
 export function safeNext(value: unknown): string | null {
   if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
   if (TREE_HOMES.has(value) || TREE_INVITATION.test(value)) return value;
+  if (BABY_NAMES_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;
   const segment = match[1] ?? match[2] ?? "";
