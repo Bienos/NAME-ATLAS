@@ -7692,6 +7692,213 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   list-style: none;
 }
 
+/* --- the share entry and the share sheet (TASK-152) ---
+   The way to a sex's share cards on the page, and the sheet itself, a page in
+   the same `.baby-names.atlas-v1` scope: the card picker and the format toggle
+   are links, the preview an image, the actions one island. Atlas Blue for the
+   chosen option and the primary action; the locked option has no link and no
+   button. */
+
+.baby-names.atlas-v1 .bn-share-entry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
+  margin: var(--space-sm) 0 0;
+}
+
+.baby-names.atlas-v1 .bn-share-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bn-share-link:hover {
+  background: var(--color-accent-hover);
+}
+
+.baby-names.atlas-v1 .bn-share-note {
+  margin: 0;
+}
+
+.baby-names.atlas-v1.bn-share-page {
+  max-width: 28rem;
+}
+
+.baby-names.atlas-v1 .bns-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  min-height: 44px;
+  margin: 0 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bns-back {
+  justify-self: start;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bns-title {
+  margin: 0;
+  font: 600 var(--type-body-lg) / 1.2 var(--font-ui, system-ui, sans-serif);
+  letter-spacing: 0;
+}
+
+.baby-names.atlas-v1 .bns-label {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--type-data-md);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bns-picker,
+.baby-names.atlas-v1 .bns-format {
+  margin: 0 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bns-options {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bns-option {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: var(--space-sm) var(--space-md);
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-panel);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bns-option-sub {
+  font-weight: 400;
+  font-size: var(--type-data-md);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bns-option[aria-current="page"] {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: transparent;
+}
+
+.baby-names.atlas-v1 .bns-option[aria-current="page"] .bns-option-sub {
+  color: var(--atlas-ivory-50);
+}
+
+.baby-names.atlas-v1 .bns-locked {
+  color: var(--color-text-tertiary);
+  border-style: dashed;
+}
+
+.baby-names.atlas-v1 .bns-pill {
+  min-height: 44px;
+  border-radius: var(--radius-pill);
+}
+
+.baby-names.atlas-v1 .bns-preview {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bns-preview img {
+  display: block;
+  width: 100%;
+  max-width: 238px;
+  height: auto;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bns-preview[data-card="square"] img {
+  max-width: 320px;
+}
+
+.baby-names.atlas-v1 .bns-story-only {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bns-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: var(--space-lg) 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bns-actions button,
+.baby-names.atlas-v1 .bns-actions a[download] {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-md);
+  font: 600 var(--type-body-md) / 1.2 var(--font-ui, system-ui, sans-serif);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.baby-names.atlas-v1 .bns-actions .bns-primary {
+  min-height: 52px;
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: transparent;
+}
+
+.baby-names.atlas-v1 .bns-actions .bns-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.baby-names.atlas-v1 .bns-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.baby-names.atlas-v1 .bns-secondary {
+  display: flex;
+  gap: 10px;
+}
+
+.baby-names.atlas-v1 .bns-status {
+  min-height: 1.5em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bns-link-note {
+  margin: 0 0 var(--space-lg);
+}
+
+.baby-names.atlas-v1 .bns-footer {
+  margin: 0;
+  font: 500 var(--type-data-md) / 1.6 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  color: var(--color-text-tertiary);
+}
+
 /* --- the baby-names list (TASK-146) --- */
 
 .baby-list-link {
