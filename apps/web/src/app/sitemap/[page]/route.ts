@@ -3,6 +3,7 @@ import { SITEMAP_PAGE_SIZE, sitemapEntries } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled, siteOrigin } from "../../../lib/seo.js";
 import { sitemapPageXml } from "../../../lib/sitemap-xml.js";
+import { seoBlockedProfileIds } from "../../../lib/seo-surface.js";
 
 /**
  * `/sitemap/{n}.xml` — one page of at most 50,000 URLs (TASK-027, ADR-0010 §3).
@@ -39,6 +40,7 @@ export async function GET(
     const entries = await sitemapEntries(db, "pl", {
       limit: SITEMAP_PAGE_SIZE,
       offset: (index - 1) * SITEMAP_PAGE_SIZE,
+      seoBlockedProfileIds: await seoBlockedProfileIds(db),
     });
     if (entries.length === 0) return new Response("not found", { status: 404 });
     return new Response(sitemapPageXml(origin, "pl", entries), { status: 200, headers: XML });
