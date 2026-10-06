@@ -268,7 +268,7 @@ describe("the full-name report's dossier (TASK-124)", () => {
 
   it("says the meaning and a count of the two names together are not known", () => {
     const page = html(preview(fullName()));
-    expect(page).toContain("Znaczenie imienia: nie ma jeszcze słownika");
+    expect(page).toContain("Znaczenie imienia: żadne dzieło, które wolno nam cytować");
     expect(page).toContain("żadne źródło nie łączy imion z nazwiskami");
     expect(page).toContain("Miejsce na liście (mężczyźni): brak zatwierdzonego twierdzenia.");
     const en = html(preview(fullName()), "en");
@@ -291,5 +291,165 @@ describe("the full-name report's dossier (TASK-124)", () => {
       toReportPreview(fullName({ ...PIOTR, lists: [{ ...PIOTR.lists[1], count: { count: -1 } }] })),
     ).toBeNull();
     expect(toReportPreview(fullName(null))).toBeNull();
+  });
+});
+
+/**
+ * TASK-147: MAŁGORZATA's origin and meaning, as the two committed files state
+ * them (`sources/given-name-meanings/`), and her GENUINE count on the
+ * 2026-01-20 women's list. The citations are SYNTHETIC in their ids and dates.
+ */
+const work = (id: string, title: string, author: string, year: number, locator: string) => ({
+  id,
+  title,
+  publisher: author,
+  publication_date: `${year}-01-01`,
+  source_type: "DICTIONARY",
+  locator,
+  url: null,
+  attribution: null,
+  terms: "PUBLIC_DOMAIN_ART36",
+  retrieved_at: "2026-10-06T10:00:00Z",
+  source_page_url: null,
+});
+const YONGE_LOCATOR =
+  "Glossary of Christian Names (pp. xviii–cxliii), s.v. Malgorzata, which refers to p. 121";
+const BURYAN_LOCATOR = "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)";
+const MALGORZATA = {
+  given_name: { id: "00000000-0000-4000-8000-0000000000bb", display_name: "MAŁGORZATA" },
+  state: "READY",
+  lists: [
+    {
+      comparability_group: "pesel_given_names_2026_first_female",
+      snapshot_date: "2026-01-20",
+      count: { claim_id: "c-f", count: 572067, confidence, citation: citation("gn-f", "1159670") },
+      rank: null,
+    },
+  ],
+  meaning: {
+    state: "READY",
+    claim_id: "m-1",
+    confidence: {
+      status: "LIKELY",
+      methodology_code: "onomastic_origin_agreement_rule@given_name_origin_confidence@1",
+    },
+    works: [
+      {
+        work: {
+          title: "History of Christian Names",
+          author_or_publisher: "Charlotte M. Yonge",
+          year: 1884,
+        },
+        printed_form: "Malgorzata",
+        origin: { code: "grc", as_printed: "Gr." },
+        literal_gloss: "pearl",
+        translation: { language: "pl", text: "perła", by: "Name Atlas" },
+        locator: YONGE_LOCATOR,
+        quotation: "Malgorzata, f. Pol. Gr. pearl, 121",
+        citation: work(
+          "w-y",
+          "History of Christian Names",
+          "Charlotte M. Yonge",
+          1884,
+          YONGE_LOCATOR,
+        ),
+      },
+      {
+        work: {
+          title: "Skąd pochodzi twoje imię i nazwisko",
+          author_or_publisher: "ks. Józef Buryan",
+          year: 1933,
+        },
+        printed_form: "Małgorzata",
+        origin: { code: "grc", as_printed: "z greckich" },
+        literal_gloss: null,
+        translation: null,
+        locator: BURYAN_LOCATOR,
+        quotation: "Z greckich przyjęły się: […] Adolf, Małgorzata, Teodor i dalsze.",
+        citation: work(
+          "w-b",
+          "Skąd pochodzi twoje imię i nazwisko",
+          "ks. Józef Buryan",
+          1933,
+          BURYAN_LOCATOR,
+        ),
+      },
+    ],
+  },
+};
+function withMeaning(given: unknown = MALGORZATA): StoredReportVersion {
+  const base = fullName(given);
+  return {
+    ...base,
+    report_schema_version: "full_name_report@1",
+    sections: base.sections.map((s) =>
+      s.section_type === "LIMITATIONS"
+        ? {
+            ...s,
+            body_payload: {
+              given_name: [{ topic: "FULL_NAME_COUNT", reason_code: "NO_SOURCE_PAIRS_NAMES" }],
+            },
+          }
+        : s.section_type === "SOURCES"
+          ? { ...s, body_payload: { citation_ids: ["gn-f", "w-y", "w-b", "cit-1"] } }
+          : s,
+    ),
+  };
+}
+
+describe("the first name's origin and meaning (TASK-147)", () => {
+  it("quotes each work with its page, and Name Atlas's translation marked as ours (AC-4)", () => {
+    const page = html(preview(withMeaning()));
+    expect(page).toContain("<h3>Pochodzenie i znaczenie</h3>");
+    expect(page).toContain("greckie („Gr.”)");
+    expect(page).toContain("greckie („z greckich”)");
+    expect(page).toContain("„pearl”<br/>przekład Name Atlas: „perła”");
+    expect(page).toContain("Przekład na polski jest nasz (Name Atlas)");
+    expect(page).toContain(
+      `Charlotte M. Yonge, History of Christian Names (1884), ${YONGE_LOCATOR}`,
+    );
+    expect(page).toContain("„Malgorzata, f. Pol. Gr. pearl, 121”");
+    expect(page).toContain("Ocena: Prawdopodobne");
+    expect(page).not.toContain("Znaczenie imienia: żadne dzieło");
+  });
+
+  it("cites both works in the bibliography, after the list they follow", () => {
+    const page = html(preview(withMeaning()));
+    const bibliography = page.slice(page.indexOf('<ol class="report-bib">'));
+    expect(bibliography.indexOf("Lista imion")).toBeLessThan(
+      bibliography.indexOf("History of Christian Names"),
+    );
+    expect(bibliography.indexOf("History of Christian Names")).toBeLessThan(
+      bibliography.indexOf("Skąd pochodzi twoje imię i nazwisko"),
+    );
+  });
+
+  it("shows the English meaning verbatim on the English page, without the translation", () => {
+    const en = html(preview(withMeaning()), "en");
+    expect(en).toContain("<h3>Origin and meaning</h3>");
+    expect(en).toContain("Greek (“Gr.”)");
+    expect(en).toContain("<td>“pearl”</td>");
+    expect(en).not.toContain("perła");
+    expect(en).toContain("Assessment: Likely");
+  });
+
+  it("renders a version frozen under full_name_report@0, with no meaning, as no source (AC-5)", () => {
+    const old = preview(fullName());
+    expect(old.givenName?.meaning).toEqual({ state: "NO_SOURCE" });
+    const page = html(old);
+    expect(page).toContain("<h3>Pochodzenie i znaczenie</h3>");
+    expect(page).toContain("Znaczenie imienia: żadne dzieło, które wolno nam cytować");
+  });
+
+  it("refuses a meaning that does not check", () => {
+    const broken = (patch: object) =>
+      withMeaning({ ...MALGORZATA, meaning: { ...MALGORZATA.meaning, ...patch } });
+    expect(toReportPreview(broken({ works: [] }))).toBeNull();
+    expect(toReportPreview(broken({ state: "MAYBE" }))).toBeNull();
+    expect(
+      toReportPreview(
+        broken({ works: [{ ...MALGORZATA.meaning.works[0], translation: { language: "pl" } }] }),
+      ),
+    ).toBeNull();
   });
 });

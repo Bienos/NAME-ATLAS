@@ -35,15 +35,19 @@ import { canonicalKey } from "@name-atlas/resolver";
 import type { CoverageAssessment } from "./coverage-assessment.js";
 import { buildDiscoveryIndex } from "./discovery-index.js";
 import type { DiscoveryIndex } from "./discovery-index.js";
-import { readGivenNameFacts } from "./given-name-facts.js";
-import type { GivenNameFacts } from "./given-name-facts.js";
+import { readGivenNameFacts, readGivenNameMeaning } from "./given-name-facts.js";
+import type { GivenNameReportFacts } from "./given-name-facts.js";
 import { assessPremiumEligibility } from "./premium-eligibility.js";
 import type { PremiumEligibility } from "./premium-eligibility.js";
 import { querySurnameResult } from "./query.js";
 
 export const REPORT_SCHEMA_VERSION = "report@0";
-/** The full-name report's payload: `report@0`'s, plus the first name's facts (TASK-124). */
-export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@0";
+/**
+ * The full-name report's payload: `report@0`'s, plus the first name's facts
+ * (TASK-124). `@1` adds the name's origin and meaning (TASK-147); a version
+ * frozen under `@0` has none.
+ */
+export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@1";
 
 /** `docs/canonical/11` §26.3's section types, in the report's order. */
 export const REPORT_SECTION_TYPES = [
@@ -87,11 +91,13 @@ const CLAIM_PLACEMENT: Readonly<
 
 /**
  * The first name's claims, all in the GIVEN_NAME chapter: the count leads, the
- * rank supports it. A claim the frozen facts do not show is a LIMITATION.
+ * rank and the meaning support it. A claim the frozen facts do not show is a
+ * LIMITATION.
  */
 const GIVEN_NAME_ROLES: Readonly<Record<string, PresentationRole>> = {
   GIVEN_NAME_POPULATION: "HERO",
   GIVEN_NAME_RANK: "SUPPORT",
+  GIVEN_NAME_MEANING: "SUPPORT",
 };
 
 /** The response fields each section presents. */
@@ -144,7 +150,7 @@ export interface ReportPayload {
   /** The surname's eligibility under its own policy; a full-name report freezes it too. */
   readonly eligibility: PremiumEligibility;
   /** The first name's facts: a full-name report only. */
-  readonly given_name?: GivenNameFacts;
+  readonly given_name?: GivenNameReportFacts;
 }
 
 function shown(response: SurnameResultResponse, field: ResponseField): boolean {
@@ -195,10 +201,19 @@ function countBy(values: readonly string[]): Record<string, number> {
 }
 
 /** A full-name report's gaps about the first name, for LIMITATIONS. */
-function givenNameGaps(facts: GivenNameFacts): Record<string, unknown>[] {
+function givenNameGaps(facts: GivenNameReportFacts): Record<string, unknown>[] {
   return [
-    // D-043: meanings only from a free permission or the public domain; none yet.
-    { topic: "MEANING", reason_code: "NO_ADMISSIBLE_SOURCE" },
+    // D-043, D-046: meanings only from a free permission or the public domain,
+    // and none of those works explains this name.
+    ...(facts.meaning.state === "READY"
+      ? []
+      : [
+          {
+            topic: "MEANING",
+            reason_code:
+              facts.meaning.state === "RIGHTS_BLOCKED" ? "RIGHTS_BLOCKED" : "NO_ADMISSIBLE_SOURCE",
+          },
+        ]),
     // D-033, ADR-0032 §7: no source pairs first names with surnames.
     { topic: "FULL_NAME_COUNT", reason_code: "NO_SOURCE_PAIRS_NAMES" },
     ...(facts.state === "READY"
@@ -225,12 +240,13 @@ export function reportSectionsOf(
   const { response, coverage, discovery_index: index, eligibility, given_name: given } = payload;
   const roleOrder: Record<PresentationRole, number> = { HERO: 0, SUPPORT: 1, LIMITATION: 2 };
   const types = given === undefined ? REPORT_SECTION_TYPES : FULL_NAME_SECTION_TYPES;
-  const givenShown = new Set(
-    (given?.lists ?? []).flatMap((l) => [
+  const givenShown = new Set([
+    ...(given?.lists ?? []).flatMap((l) => [
       l.count.claim_id,
       ...(l.rank === null ? [] : [l.rank.claim_id]),
     ]),
-  );
+    ...(given?.meaning.state === "READY" ? [given.meaning.claim_id] : []),
+  ]);
 
   return types.map((type): ReportSection => {
     const fields = SECTION_FIELDS[type];
@@ -265,9 +281,12 @@ export function reportSectionsOf(
           snapshot_date: l.snapshot_date,
           rank: l.rank === null ? "NO_ACTIVE_CLAIM" : "READY",
         })),
-        meaning: { availability: "NOT_RETRIEVED", reason_code: "NO_ADMISSIBLE_SOURCE" },
+        meaning:
+          given.meaning.state === "READY"
+            ? { state: "READY", works: given.meaning.works.length }
+            : { state: given.meaning.state },
       };
-      summary = countBy(confidences(given.lists));
+      summary = countBy(confidences([given.lists, given.meaning]));
     } else if (fields.length > 0) {
       body = {
         fields,
@@ -543,11 +562,14 @@ export async function buildFullNameReport(
     return { kind: "GIVEN_NAME_UNREVIEWED", form_review: name.form_review };
   }
   const givenClaims = await activeClaims(db, name.given_name_id);
-  const given = await readGivenNameFacts(
-    db,
-    { id: name.given_name_id, display_name: name.canonical_display },
-    "PAID",
-  );
+  const given: GivenNameReportFacts = {
+    ...(await readGivenNameFacts(
+      db,
+      { id: name.given_name_id, display_name: name.canonical_display },
+      "PAID",
+    )),
+    meaning: await readGivenNameMeaning(db, name.given_name_id, "PAID"),
+  };
 
   const part = await readSurnamePart(db, input.surname);
   if (part.kind !== "READ") return part;

@@ -252,7 +252,7 @@ export type {
   SurnameMeaningClaimResult,
   SurnameMeaningResult,
 } from "./meaning.js";
-export { assessSurnameMeaning } from "./confidence.js";
+export { assessGivenNameMeaning, assessSurnameMeaning } from "./confidence.js";
 export type { MeaningConfidenceInputs } from "./confidence.js";
 export { regionalUniverseSize, universeSize } from "./universe.js";
 export type { UniverseSizeCache } from "./universe.js";
@@ -431,14 +431,42 @@ export type {
   StoredReportVersion,
 } from "./report.js";
 // The full-name report's first-name facts — TASK-124, ADR-0041: read from the name's claims.
-export { parseGivenNameFacts, readGivenNameFacts } from "./given-name-facts.js";
+export {
+  parseGivenNameFacts,
+  readGivenNameFacts,
+  readGivenNameMeaning,
+} from "./given-name-facts.js";
 export type {
   GivenNameConfidence,
   GivenNameCountFact,
   GivenNameFacts,
   GivenNameListFacts,
+  GivenNameMeaningFacts,
+  GivenNameMeaningWork,
   GivenNameRankFact,
+  GivenNameReportFacts,
 } from "./given-name-facts.js";
+// First-name origins and meanings — TASK-147, ADR-0045, D-046.
+export {
+  deriveAllGivenNameMeanings,
+  deriveGivenNameMeaning,
+  deriveGivenNameMeaningFor,
+  givenNameMeaningAgreement,
+  givenNameMeaningClaimKey,
+  loadGivenNameInterpretations,
+} from "./given-name-meaning.js";
+export type {
+  GivenNameInterpretation,
+  GivenNameMeaningOutcome,
+  GivenNameMeaningTally,
+} from "./given-name-meaning.js";
+export {
+  GIVEN_NAME_MEANING_AGREEMENT_BASIS,
+  GIVEN_NAME_MEANING_CONFIDENCE_ASSESSMENT_METHOD,
+  GIVEN_NAME_MEANING_CONFIDENCE_ASSESSMENT_VERSION,
+  GIVEN_NAME_MEANING_METHOD_VERSION,
+  GIVEN_NAME_MEANING_PAYLOAD_VERSION,
+} from "./version.js";
 
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.

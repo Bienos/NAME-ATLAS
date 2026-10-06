@@ -1,6 +1,6 @@
 # First-name meanings — which sources D-043 allows, and what they cover
 
-Searched and measured on 2026-10-06 for the full-name report (TASK-124, ADR-0041), whose first-name chapter shows no meaning yet. D-043 allows a meaning only from a dictionary whose publisher gives **free** permission for short quotations with attribution, or from a work in the **public domain** (in Poland, 70 years after the author's death; art. 36). It rules out Wiktionary and any paid licence, and nothing may be guessed or written by the project. Nothing here is imported or shown. The owner answered **D-046** the same day (§6).
+Searched and measured on 2026-10-06 for the full-name report (TASK-124, ADR-0041), whose first-name chapter shows no meaning yet. D-043 allows a meaning only from a dictionary whose publisher gives **free** permission for short quotations with attribution, or from a work in the **public domain** (in Poland, 70 years after the author's death; art. 36). It rules out Wiktionary and any paid licence, and nothing may be guessed or written by the project. The owner answered **D-046** the same day (§6). TASK-147 imports Buryan's and Yonge's entries (`sources/given-name-meanings/`, ADR-0045).
 
 ## 1. Result in one paragraph
 

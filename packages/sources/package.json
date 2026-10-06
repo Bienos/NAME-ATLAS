@@ -15,7 +15,8 @@
     "seed-sources": "tsx bin/seed-source-catalogue.ts",
     "import-teryt": "tsx bin/import-teryt.ts",
     "import-given-names": "tsx bin/import-given-names.ts",
-    "import-given-name-births": "tsx bin/import-given-name-births.ts"
+    "import-given-name-births": "tsx bin/import-given-name-births.ts",
+    "import-given-name-meanings": "tsx bin/import-given-name-meanings.ts"
   },
   "dependencies": {
     "@name-atlas/db": "workspace:*",

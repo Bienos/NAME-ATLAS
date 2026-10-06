@@ -391,3 +391,18 @@ export const GIVEN_NAME_RANK_METHOD_VERSION = "given_name_rank@1";
 export const GIVEN_NAME_BIRTH_COUNT_METHOD_VERSION = "given_name_birth_count@1";
 export const GIVEN_NAME_BIRTH_RANK_METHOD_VERSION = "given_name_birth_rank@1";
 export const GIVEN_NAME_BIRTH_TREND_METHOD_VERSION = "given_name_birth_trend@2";
+
+/**
+ * First-name meanings (TASK-147, ADR-0045, D-046): one `GIVEN_NAME_MEANING`
+ * claim per name, carrying what each public-domain work states about it.
+ * Confidence compares the language of origin each work states
+ * (`GIVEN_NAME_MEANING_AGREEMENT_BASIS`). The glosses are not compared: the
+ * works write them in different languages, and comparing a translation would
+ * compare the project's words, not the works'.
+ */
+export const GIVEN_NAME_MEANING_METHOD_VERSION = "given_name_meaning@1";
+export const GIVEN_NAME_MEANING_PAYLOAD_VERSION = "given_name_meaning_payload@1";
+export const GIVEN_NAME_MEANING_CONFIDENCE_ASSESSMENT_METHOD = "onomastic_origin_agreement_rule";
+export const GIVEN_NAME_MEANING_CONFIDENCE_ASSESSMENT_VERSION = "given_name_origin_confidence@1";
+export const GIVEN_NAME_MEANING_AGREEMENT_BASIS =
+  "the same origin code, stated by every work that states an origin";

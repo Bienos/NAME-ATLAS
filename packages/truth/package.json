@@ -23,6 +23,7 @@
     "report-build": "tsx bin/report-build.ts",
     "derive-given-names": "tsx bin/derive-given-names.ts",
     "derive-given-name-births": "tsx bin/derive-given-name-births.ts",
+    "derive-given-name-meanings": "tsx bin/derive-given-name-meanings.ts",
     "build-list-facts": "tsx bin/build-list-facts.ts",
     "archive-load": "tsx bin/archive-load.ts",
     "bearers-load": "tsx bin/bearers-load.ts"

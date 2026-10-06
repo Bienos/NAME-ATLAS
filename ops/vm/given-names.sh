@@ -1,26 +1,31 @@
 #!/usr/bin/env bash
 # Loads the PESEL first-name lists on the database VM and derives every name's
-# count and rank on each list (TASK-133), so the full-name report (TASK-124)
-# has its first-name facts in production:
+# count and rank on each list (TASK-133), and every name's origin and meaning
+# from the two public-domain works (TASK-147), so the full-name report
+# (TASK-124) has its first-name facts in production:
 #
 #   1. unpack the pushed commit into $APP (data/ and node_modules/ kept) and
 #      pnpm install, as meanings.sh does; the register build is left alone;
 #   2. pnpm db:migrate: 0031 (the given-name tables, TASK-078), 0038 (their
-#      claim types, TASK-122), 0039 (the full-name report, TASK-124) and any
-#      other migration still pending;
+#      claim types, TASK-122), 0039 (the full-name report, TASK-124), 0044
+#      (the meaning claim type, TASK-147) and any other migration still
+#      pending;
 #   3. download each first-name file of the registry
 #      (packages/sources/src/given-names/registry.ts) into $FILES, unless the
 #      copy there already has the registry's size and SHA-256; a download that
 #      differs in either is refused, never imported;
-#   4. import each file with its committed metadata. Identical bytes import
-#      nothing; the importer checks the checksum again before parsing;
+#   4. import each file with its committed metadata, and the two committed
+#      first-name meaning files (sources/given-name-meanings/). Identical bytes
+#      import nothing; the importer checks the checksum again before parsing;
 #   5. derive every name's GIVEN_NAME_POPULATION on each list and, the files
-#      being the complete official ones, its GIVEN_NAME_RANK, in one process.
-#      A claim that already stands is reused;
+#      being the complete official ones, its GIVEN_NAME_RANK, in one process;
+#      then every GIVEN_NAME_MEANING the meaning files support. A claim that
+#      already stands is reused;
 #   6. the gate: one ACTIVE record per file, the registry's count of names on
 #      each, a count claim and a rank claim for every stored row, nothing
-#      refused, one ACTIVE claim per claim_key; then read access for the web
-#      role.
+#      refused, one ACTIVE record per meaning file, as many ACTIVE meaning
+#      claims as the derivation tallied, one ACTIVE claim per claim_key; then
+#      read access for the web role.
 #
 # Repeatable: a second run downloads, imports and derives nothing, and passes
 # the gate. Runs after finalize.sh, and not while the register build, the
@@ -42,6 +47,8 @@ FILES=$APP/data/given-names
 METADATA=$APP/docs/sources/acquisition/2026-10-03/metadata
 REGISTRY=./packages/sources/src/given-names/registry.ts
 SOURCE_KEY=pl_pesel_given_names
+MEANING_FILES=(buryan-1933 yonge-1884)
+MEANING_SOURCE_KEYS=(buryan_1933_skad_pochodzi yonge_1884_history_of_christian_names)
 ARCHIVE=${1:-}
 
 log() { echo "[given-names] $*"; }
@@ -84,8 +91,9 @@ log "2/6 pnpm db:migrate"
 as_build pnpm db:migrate | tail -n 10
 q "SELECT '[given-names]   migrations ' || count(*) || ', last ' || max(name) FROM kysely_migration"
 [ "$(q "SELECT count(*) FROM pg_enum e JOIN pg_type t ON t.oid = e.enumtypid
-         WHERE t.typname = 'claim_type' AND e.enumlabel IN ('GIVEN_NAME_POPULATION', 'GIVEN_NAME_RANK')")" = 2 ] ||
-  die "claim_type has no GIVEN_NAME_POPULATION and GIVEN_NAME_RANK after the migration"
+         WHERE t.typname = 'claim_type'
+           AND e.enumlabel IN ('GIVEN_NAME_POPULATION', 'GIVEN_NAME_RANK', 'GIVEN_NAME_MEANING')")" = 3 ] ||
+  die "claim_type has no GIVEN_NAME_POPULATION, GIVEN_NAME_RANK and GIVEN_NAME_MEANING after the migration"
 
 # One line per file: resource id, SHA-256, bytes, names a complete import stores, URL.
 mapfile -t resources < <(as_build pnpm exec tsx -e "
@@ -122,6 +130,10 @@ for line in "${resources[@]}"; do
     --metadata "$METADATA/pesel_given_names_2026_first_$id.official_resource.json" |
     sed 's/^/[given-names]   /'
 done
+for file in "${MEANING_FILES[@]}"; do
+  as_build pnpm exec tsx packages/sources/bin/import-given-name-meanings.ts \
+    --file "sources/given-name-meanings/$file.json" | sed 's/^/[given-names]   /'
+done
 
 log "5/6 every name's count and rank on each list, in one process"
 # The tally is the one JSON document on stdout; progress goes to stderr.
@@ -134,6 +146,12 @@ read -r names pop_derived pop_existing pop_refused rank_derived rank_existing ra
       t.rank.derived, t.rank.existing, refused].join(" "));' "$tally")
 log "  $names names: counts $pop_derived new, $pop_existing kept, $pop_refused refused; ranks $rank_derived new, $rank_existing kept, $rank_refused refused"
 [ "$rank_refused" = 0 ] || log "  rank refusals by reason: $(as_build node -e 'console.log(JSON.stringify(JSON.parse(process.argv[1]).rank.refused))' "$tally")"
+meanings=$(as_build pnpm exec tsx packages/truth/bin/derive-given-name-meanings.ts)
+read -r m_names m_derived m_existing m_superseded m_retracted < <(
+  as_build node -e '
+    const t = JSON.parse(process.argv[1]);
+    console.log([t.names, t.derived, t.existing, t.superseded, t.retracted].join(" "));' "$meanings")
+log "  meanings of $m_names names: $m_derived new ($m_superseded replacing one), $m_existing kept, $m_retracted retracted"
 
 log "6/6 the gate, then read access for $WEB_ROLE"
 fail=0
@@ -161,6 +179,14 @@ check "ACTIVE GIVEN_NAME_POPULATION claims" "$stored_total" "$(q "
   SELECT count(*) FROM claims WHERE claim_type::text = 'GIVEN_NAME_POPULATION' AND claim_status = 'ACTIVE'")"
 check "ACTIVE GIVEN_NAME_RANK claims" "$stored_total" "$(q "
   SELECT count(*) FROM claims WHERE claim_type::text = 'GIVEN_NAME_RANK' AND claim_status = 'ACTIVE'")"
+for i in "${!MEANING_FILES[@]}"; do
+  check "${MEANING_FILES[$i]}: ACTIVE first-name meaning records" 1 "$(q "
+    SELECT count(*) FROM source_records sr JOIN sources s ON s.source_id = sr.source_id
+     WHERE s.source_key = '${MEANING_SOURCE_KEYS[$i]}'
+       AND sr.external_record_id LIKE '%:given-names' AND sr.record_status = 'ACTIVE'")"
+done
+check "ACTIVE GIVEN_NAME_MEANING claims" "$((m_derived + m_existing))" "$(q "
+  SELECT count(*) FROM claims WHERE claim_type::text = 'GIVEN_NAME_MEANING' AND claim_status = 'ACTIVE'")"
 check "ACTIVE claims sharing a claim_key" 0 \
   "$(q "SELECT count(*) FROM (SELECT 1 FROM claims WHERE claim_status = 'ACTIVE' GROUP BY claim_key HAVING count(*) > 1) d")"
 q "GRANT SELECT ON ALL TABLES IN SCHEMA public TO $WEB_ROLE" >/dev/null
@@ -171,4 +197,4 @@ check "tables $WEB_ROLE cannot read" 0 "$(q "
 [ "$fail" = 0 ] || die "the gate failed"
 
 date -u +%Y-%m-%dT%H:%M:%SZ >"$STATE/given-names-loaded"
-log "done: $names first names, each with its count and rank on every list it is on"
+log "done: $names first names, each with its count and rank on every list it is on; $((m_derived + m_existing)) with an origin or meaning"
