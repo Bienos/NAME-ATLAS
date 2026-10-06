@@ -16,14 +16,18 @@ import { deriveAllBirthNames, deriveBirthName } from "@name-atlas/truth";
 
 /**
  * TASK-137 (ADR-0043): count, rank and trend claims on the first names given
- * to children, by year, in a real PostgreSQL.
+ * to children, by year, in a real PostgreSQL. TASK-139: the trend compares
+ * each name's share of the children on its list (D-044 §6, amended
+ * 2026-10-06), and supersedes a trend claim of the older method.
  *
  * GENUINE data: the full official files of the boys' and girls' lists of 2020
  * and 2025 (their checksums are the registry's), and TASK-136's excerpt of the
  * 2000–2019 file. The only data a test changes is one name's `form_review`,
  * set by hand to show that a flagged name gets no claim, and one excerpt cut
  * in the test from a full file, to show that an absence from an excerpt is
- * not read as an absence from the list.
+ * not read as an absence from the list. To stand in for claims derived by
+ * `given_name_birth_trend@1`, the supersession test sets `method_version`
+ * (and, for one, the key) of stored trend claims by hand.
  */
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const read = (p: string) => readFileSync(path.join(repoRoot, p));
@@ -137,20 +141,36 @@ describe("given-name birth claims on full official lists (TASK-137)", () => {
     });
     expect(tally.trend.derived).toBe(965 + 939);
     expect(tally.trend.refused).toEqual({});
+    expect(tally.trend.superseded).toBe(0);
+    // By share of the listed children: 126,404 boys and 119,788 girls in 2025,
+    // 186,590 and 176,829 in 2020.
     expect(tally.trend.directions).toEqual({
-      MALE: { RISING: 621, STEADY: 98, FALLING: 246 },
-      FEMALE: { RISING: 580, STEADY: 104, FALLING: 255 },
+      MALE: { RISING: 771, STEADY: 68, FALLING: 126 },
+      FEMALE: { RISING: 727, STEADY: 63, FALLING: 149 },
     });
   });
 
   it("states ZOFIA, ANTONI, JULIA and JAKUB for 2025 as the files give them", async () => {
+    const girls = { latest: 119788, earlier: 176829 };
+    const boys = { latest: 126404, earlier: 186590 };
     const expected = [
-      ["ZOFIA", "FEMALE", 4415, 1, 939, 7073, "FALLING"],
-      ["ANTONI", "MALE", 5253, 2, 965, 8368, "FALLING"],
-      ["JULIA", "FEMALE", 3207, 6, 939, 7351, "FALLING"],
-      ["JAKUB", "MALE", 3386, 9, 965, 7162, "FALLING"],
+      ["ZOFIA", "FEMALE", 4415, 1, 939, 7073, girls, 36856, 39999, "STEADY"],
+      ["ANTONI", "MALE", 5253, 2, 965, 8368, boys, 41557, 44846, "STEADY"],
+      ["JULIA", "FEMALE", 3207, 6, 939, 7351, girls, 26772, 41571, "FALLING"],
+      ["JAKUB", "MALE", 3386, 9, 965, 7162, boys, 26787, 38383, "FALLING"],
     ] as const;
-    for (const [name, sex, count, rank, of, earlier, direction] of expected) {
+    for (const [
+      name,
+      sex,
+      count,
+      rank,
+      of,
+      earlier,
+      sums,
+      ppm,
+      earlierPpm,
+      direction,
+    ] of expected) {
       const claims = await claimsOf(db(), name);
       const in2025 = claims.filter((c) => c.value["birth_year"] === 2025);
       expect(in2025.find((c) => c.claim_type === "GIVEN_NAME_BIRTH_COUNT")?.value).toMatchObject({
@@ -169,8 +189,15 @@ describe("given-name birth claims on full official lists (TASK-137)", () => {
       expect(trends[0]?.value).toMatchObject({
         direction,
         sex,
-        latest: { birth_year: 2025, count },
-        earlier: { birth_year: 2020, count: earlier, below_publication_threshold: null },
+        latest: { birth_year: 2025, count, people_sum: sums.latest, share_per_million: ppm },
+        earlier: {
+          birth_year: 2020,
+          count: earlier,
+          below_publication_threshold: null,
+          people_sum: sums.earlier,
+          share_per_million: earlierPpm,
+        },
+        comparison: { basis: "SHARE_OF_CHILDREN_ON_PUBLISHED_LIST", earlier_count_used: earlier },
         window_years: 5,
         change_percent: 10,
       });
@@ -184,8 +211,16 @@ describe("given-name birth claims on full official lists (TASK-137)", () => {
     );
     expect(trend?.value).toMatchObject({
       direction: "RISING",
-      latest: { birth_year: 2025, count: 17 },
-      earlier: { birth_year: 2020, count: null, below_publication_threshold: 2 },
+      latest: { birth_year: 2025, count: 17, people_sum: 126404 },
+      earlier: {
+        birth_year: 2020,
+        count: null,
+        below_publication_threshold: 2,
+        people_sum: 186590,
+        share_per_million: null,
+      },
+      // The largest count the cut-off allows, never 0.
+      comparison: { earlier_count_used: 1 },
     });
     // Its derived evidence depends on the 2025 count and on the 2020 list as a universe.
     const roles = await sql<{ dependency_role: string }>`
@@ -252,6 +287,65 @@ describe("given-name birth claims on full official lists (TASK-137)", () => {
     expect(one.lists.every((l) => l.count_claim.kind === "EXISTING")).toBe(true);
     expect(await tableCounts()).toEqual(before);
   });
+
+  it("supersedes a trend claim of the older method and leaves none of it ACTIVE", async () => {
+    // By hand, as `given_name_birth_trend@1` would have left them: ZOFIA's and
+    // JULIA's trends, and one more of JAKUB's on a pair of lists no longer compared.
+    await sql`UPDATE claims c SET method_version = 'given_name_birth_trend@1'
+                FROM given_names g
+               WHERE g.given_name_id = c.subject_entity_id AND c.claim_status = 'ACTIVE'
+                 AND c.claim_type = 'GIVEN_NAME_BIRTH_TREND'
+                 AND g.canonical_display IN ('ZOFIA', 'JULIA', 'JAKUB')`.execute(db());
+    await sql`UPDATE claims c SET claim_key = c.claim_key || '-older-pair'
+                FROM given_names g
+               WHERE g.given_name_id = c.subject_entity_id AND c.claim_status = 'ACTIVE'
+                 AND c.claim_type = 'GIVEN_NAME_BIRTH_TREND'
+                 AND g.canonical_display = 'JAKUB'`.execute(db());
+    const before = await tableCounts();
+
+    const tally = await deriveAllBirthNames(db(), { concurrency: 3 });
+    expect(tally.trend).toMatchObject({ derived: 3, existing: 965 + 939 - 3, refused: {} });
+    expect(tally.trend.superseded).toBe(3);
+    expect(tally.count.derived + tally.rank.derived).toBe(0);
+    // Three new claims, none deleted.
+    expect((await tableCounts()).claims).toBe(before.claims + 3);
+
+    const stale = await n(sql`
+      SELECT count(*)::text AS n FROM claims
+       WHERE claim_type = 'GIVEN_NAME_BIRTH_TREND' AND claim_status = 'ACTIVE'
+         AND method_version <> 'given_name_birth_trend@2'`);
+    expect(stale).toBe(0);
+    const links = await sql<{ name: string; old_status: string; old_key_kept: boolean }>`
+      SELECT g.canonical_display AS name, o.claim_status AS old_status,
+             o.claim_key = c.claim_key AS old_key_kept
+        FROM claims c
+        JOIN claims o ON o.claim_id = c.supersedes_claim_id
+        JOIN given_names g ON g.given_name_id = c.subject_entity_id
+       WHERE c.claim_type = 'GIVEN_NAME_BIRTH_TREND' AND c.claim_status = 'ACTIVE'
+       ORDER BY 1`.execute(db());
+    // ZOFIA's and JULIA's new claims replace the old ones with the same key.
+    expect(links.rows).toEqual([
+      { name: "JULIA", old_status: "SUPERSEDED", old_key_kept: true },
+      { name: "ZOFIA", old_status: "SUPERSEDED", old_key_kept: true },
+    ]);
+    // JAKUB's old claim is superseded with no successor of its key; the 2025
+    // against 2020 claim is new.
+    const jakub = await sql<{ claim_status: string; method_version: string }>`
+      SELECT c.claim_status, c.method_version FROM claims c
+        JOIN given_names g ON g.given_name_id = c.subject_entity_id
+       WHERE g.canonical_display = 'JAKUB' AND c.claim_type = 'GIVEN_NAME_BIRTH_TREND'
+       ORDER BY c.claim_status`.execute(db());
+    expect(jakub.rows).toEqual([
+      { claim_status: "ACTIVE", method_version: "given_name_birth_trend@2" },
+      { claim_status: "SUPERSEDED", method_version: "given_name_birth_trend@1" },
+    ]);
+
+    // And a run after that writes nothing.
+    const settled = await tableCounts();
+    const again = await deriveAllBirthNames(db(), { concurrency: 3 });
+    expect(again.trend).toMatchObject({ derived: 0, superseded: 0 });
+    expect(await tableCounts()).toEqual(settled);
+  });
 });
 
 describe("given-name birth trends without a complete earlier list (TASK-137)", () => {
@@ -277,13 +371,15 @@ describe("given-name birth trends without a complete earlier list (TASK-137)", (
     expect(tally.rank.derived).toBe(965);
   });
 
-  it("does not read an absence from an excerpt of 2020 as an absence from the list", async () => {
+  it("gives no trend against an excerpt of 2020: neither its absences nor its sum are the list's", async () => {
     // The header and the first three lines of the genuine 2020 boys' file.
     const lines = Buffer.from(MALE_2020.bytes).toString("utf8").split("\r\n");
     const excerpt = new Uint8Array(Buffer.from(`${lines.slice(0, 4).join("\r\n")}\r\n`, "utf8"));
     await importFile(db(), { resource: MALE_2020.resource, bytes: excerpt });
     const tally = await deriveAllBirthNames(db());
-    // Names on the excerpt and on 2025 get a trend; every other 2025 name is refused.
+    // TASK-137 gave the three names on the excerpt and on 2025 a trend by
+    // count. A share needs the list's people_sum, which an excerpt does not
+    // hold, so under the share rule (TASK-139) every 2025 name is refused.
     const listed = (
       await sql<{ n: string }>`
       SELECT count(*)::text AS n FROM given_name_birth_counts c
@@ -297,9 +393,9 @@ describe("given-name birth trends without a complete earlier list (TASK-137)", (
     ).rows[0]?.n;
     expect(Number(listed)).toBe(3);
     expect(tally.trend).toMatchObject({
-      derived: 3,
+      derived: 0,
       existing: 0,
-      refused: { CONTENT_HASH_MISMATCH: 962 },
+      refused: { CONTENT_HASH_MISMATCH: 965 },
     });
     expect(tally.rank).toMatchObject({
       derived: 0,

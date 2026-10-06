@@ -383,7 +383,11 @@ export const GIVEN_NAME_RANK_METHOD_VERSION = "given_name_rank@1";
  * the rank is a competition rank among that list's names; the trend is
  * D-044 §6's rule (`BIRTH_TREND_WINDOW_YEARS`, `BIRTH_TREND_CHANGE_PERCENT`).
  * Bump the trend's version if either parameter changes.
+ *
+ * `@2` (D-044 §6 as amended 2026-10-06): the trend compares the name's share
+ * of the children on each list (count ÷ the list's `people_sum`), not its
+ * raw count. `@1` compared raw counts; its claims are superseded when `@2` runs.
  */
 export const GIVEN_NAME_BIRTH_COUNT_METHOD_VERSION = "given_name_birth_count@1";
 export const GIVEN_NAME_BIRTH_RANK_METHOD_VERSION = "given_name_birth_rank@1";
-export const GIVEN_NAME_BIRTH_TREND_METHOD_VERSION = "given_name_birth_trend@1";
+export const GIVEN_NAME_BIRTH_TREND_METHOD_VERSION = "given_name_birth_trend@2";

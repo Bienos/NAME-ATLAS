@@ -343,6 +343,7 @@ export {
   givenNameBirthRankClaimKey,
   givenNameBirthTrendClaimKey,
   loadBirthRunContext,
+  sharePerMillion,
 } from "./given-name-births.js";
 export type {
   BirthClaimOutcome,
@@ -355,6 +356,7 @@ export type {
   BirthRunContext,
   BirthTrendDirection,
   BirthTrendEarlier,
+  BirthTrendListed,
   BirthTrendVerdict,
 } from "./given-name-births.js";
 export {
