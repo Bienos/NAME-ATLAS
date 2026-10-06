@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CitationDto } from "@name-atlas/contracts";
-import { assembleBirthNameFacts, stockListOfSex } from "./given-name-birth-facts.js";
+import { assembleBirthNameFacts, birthShare, stockListOfSex } from "./given-name-birth-facts.js";
 import type { GivenNameListFacts } from "./given-name-facts.js";
 import type { BirthClaimRow, BirthListInfo } from "./given-name-birth-facts.js";
 import { GIVEN_NAME_BIRTH_TREND_METHOD_VERSION } from "./version.js";
@@ -34,11 +34,17 @@ const citation = (id: string, resource: string): CitationDto => ({
   source_page_url: null,
 });
 
-const list = (id: string, year: number, sex: "MALE" | "FEMALE"): BirthListInfo => ({
+const list = (
+  id: string,
+  year: number,
+  sex: "MALE" | "FEMALE",
+  people_sum = 119_788,
+): BirthListInfo => ({
   list_id: id,
   birth_year: year,
   sex,
   publication_threshold: year <= 2012 ? 5 : 2,
+  people_sum,
 });
 
 const LISTS: BirthListInfo[] = [
@@ -76,6 +82,7 @@ function trend(
   earlier: string,
   direction: string,
   version = GIVEN_NAME_BIRTH_TREND_METHOD_VERSION,
+  earlierShare: number | null = 39999,
 ): BirthClaimRow[] {
   const base = {
     claim_id: `t-${latest}-${version}`,
@@ -84,8 +91,8 @@ function trend(
     method_version: version,
     payload: JSON.stringify({
       direction,
-      latest: { birth_year: 2025 },
-      earlier: { birth_year: 2020 },
+      latest: { birth_year: 2025, share_per_million: 36856 },
+      earlier: { birth_year: 2020, share_per_million: earlierShare },
       window_years: 5,
       change_percent: 10,
     }),
@@ -191,6 +198,70 @@ describe("assembleBirthNameFacts (TASK-141)", () => {
     });
   });
 
+  it("gives each count claim its share of its own list's children and its 1 in N (TASK-151)", () => {
+    // 4 415 of 119 788 girls: 36 857 per million rounded down (3.7%), one in 27.
+    const rows = [count("f2025", 4415), count("f2020", 7073), count("m2025", 3)];
+    const lists = [
+      ...LISTS.filter((l) => l.list_id !== "f2020"),
+      list("f2020", 2020, "FEMALE", 176_829),
+    ];
+    const facts = assembleBirthNameFacts(NAME, lists, rows, PAID);
+    const [boys, girls] = facts.sexes;
+    expect(girls?.latest?.count).toMatchObject({
+      count: 4415,
+      share_per_million: 36856,
+      one_in: 27,
+    });
+    // The 2020 figure is a share of the 2020 list's own sum, never the latest list's.
+    expect(girls?.history?.find((y) => y.birth_year === 2020)?.count).toMatchObject({
+      count: 7073,
+      share_per_million: 39999,
+      one_in: 25,
+    });
+    expect(boys?.latest?.count).toMatchObject({ count: 3, share_per_million: 25, one_in: 39929 });
+    // A year with no count claim has no share: nothing to divide, and never 0.
+    expect(girls?.history?.find((y) => y.birth_year === 2011)?.count).toBeNull();
+  });
+
+  it("reads the two shares the direction was decided on from the trend claim, the earlier null when absent", () => {
+    const steady = assembleBirthNameFacts(
+      NAME,
+      LISTS,
+      [count("f2025", 4415), ...trend("f2025", "f2020", "STEADY")],
+      FREE,
+    );
+    expect(steady.sexes[1]?.trend).toMatchObject({
+      latest_share_per_million: 36856,
+      earlier_share_per_million: 39999,
+    });
+    // Absent five years earlier: the claim carries null, and so does the figure.
+    const rising = assembleBirthNameFacts(
+      NAME,
+      LISTS,
+      [count("m2025", 40), ...trend("m2025", "m2020", "RISING", undefined, null)],
+      FREE,
+    );
+    expect(rising.sexes[0]?.trend).toMatchObject({
+      direction: "RISING",
+      latest_share_per_million: 36856,
+      earlier_share_per_million: null,
+    });
+    // A claim without the figures (an older payload) gives null, not 0.
+    const bare = trend("f2025", "f2020", "STEADY").map((row) => ({
+      ...row,
+      payload: JSON.stringify({
+        direction: "STEADY",
+        latest: { birth_year: 2025 },
+        earlier: { birth_year: 2020 },
+        window_years: 5,
+        change_percent: 10,
+      }),
+    }));
+    expect(
+      assembleBirthNameFacts(NAME, LISTS, [count("f2025", 4415), ...bare], FREE).sexes[1]?.trend,
+    ).toMatchObject({ latest_share_per_million: null, earlier_share_per_million: null });
+  });
+
   it("refuses two active lists of one year and sex (ADR-0042 §3)", () => {
     expect(() =>
       assembleBirthNameFacts(NAME, [...LISTS, list("f2025b", 2025, "FEMALE")], [], FREE),
@@ -235,5 +306,30 @@ describe("stockListOfSex (TASK-145)", () => {
   it("takes the latest date when two lists of one sex stand, never both", () => {
     const later = stock("pesel_given_names_2027_first_female", "2027-01-20", 300);
     expect(stockListOfSex([women, later], "FEMALE")).toBe(later);
+  });
+});
+
+describe("birthShare (TASK-151)", () => {
+  it("is the trend claim's definition: parts per million rounded down, and 1 in N rounded", () => {
+    expect(birthShare(4415, 119_788)).toEqual({ share_per_million: 36856, one_in: 27 });
+    expect(birthShare(7073, 176_829)).toEqual({ share_per_million: 39999, one_in: 25 });
+    expect(birthShare(1, 3)).toEqual({ share_per_million: 333333, one_in: 3 });
+    expect(birthShare(2, 3)).toEqual({ share_per_million: 666666, one_in: 2 });
+    expect(birthShare(119_788, 119_788)).toEqual({ share_per_million: 1_000_000, one_in: 1 });
+  });
+
+  it("gives null, never 0, when the stored figures contradict each other", () => {
+    for (const [count, sum] of [
+      [0, 100],
+      [5, 0],
+      [101, 100],
+      [-1, 100],
+      [1.5, 100],
+    ] as const) {
+      expect(birthShare(count, sum), `${count} of ${sum}`).toEqual({
+        share_per_million: null,
+        one_in: null,
+      });
+    }
   });
 });

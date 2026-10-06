@@ -4,9 +4,10 @@ import type { Lang } from "./messages.js";
  * The baby-names page's words (TASK-141, D-044), in Polish and English.
  *
  * Plain, and nothing beyond the data: a count, a rank on one year's list and
- * a direction. No meaning, no kinship, no "popular" or "rare". Every number
- * the functions below put in a sentence comes from a claim or from a list's
- * stored cut-off; none is written here.
+ * a direction. No kinship, no "popular" or "rare". Every number the functions
+ * below put in a sentence comes from a claim or from a list's stored cut-off or
+ * `people_sum`; none is written here. A meaning is shown only in a work's own
+ * words (TASK-151, ADR-0045).
  */
 
 export type BirthDirection = "RISING" | "STEADY" | "FALLING";
@@ -58,6 +59,69 @@ export interface BabyNamesText {
   /** The link to the whole list (TASK-146), on the page and in the locked card. */
   readonly listLink: string;
   readonly lockedListNote: string;
+  // --- TASK-151: the redesigned page. Every number comes in as a formatted string. ---
+  /** The sex tabs' accessible name. */
+  readonly tabsLabel: string;
+  /** The hero tile's eyebrow: "W 2025 TO IMIĘ DOSTAŁO". */
+  readonly eyebrowGot: (year: number) => string;
+  /** The noun after the big number: "dziewczynek" / "chłopców". */
+  readonly noun: { readonly MALE: string; readonly FEMALE: string };
+  /** "To 3,7% wszystkich dziewczynek z listy za 2025 r." */
+  readonly shareLine: (share: string, sex: "MALE" | "FEMALE", year: number) => string;
+  /** "Miejsce 1" */
+  readonly place: (rank: string) => string;
+  /** "z 939 imion" */
+  readonly ofNames: (of: string) => string;
+  /** The rank track's two ends. */
+  readonly trackMost: string;
+  readonly trackRarest: string;
+  /** The rank track's accessible name. */
+  readonly trackLabel: (rank: string, of: string) => string;
+  readonly howCommonHeading: string;
+  /** "1 na 27" */
+  readonly oneIn: (n: string) => string;
+  /** "dziewczynek z listy" */
+  readonly oneInNoun: { readonly MALE: string; readonly FEMALE: string };
+  /** The dot grid's accessible name. */
+  readonly dotsLabel: (n: string) => string;
+  /** "Z każdych 27 dziewczynek z listy za 2025 r. jedna dostała imię ZOFIA." */
+  readonly oneInCaption: (n: string, sex: "MALE" | "FEMALE", year: number, name: string) => string;
+  /** "Udział: 2020 r. 4,0% → 2025 r. 3,7%"; the earlier side reads "poniżej progu" when absent. */
+  readonly sharesLine: (
+    earlierYear: number,
+    earlier: string,
+    latestYear: number,
+    latest: string,
+  ) => string;
+  readonly belowThreshold: string;
+  readonly meaningHeading: string;
+  /** The one line when no work explains the name. */
+  readonly meaningNone: string;
+  readonly origin: string;
+  readonly meaning: string;
+  readonly quote: (text: string) => string;
+  readonly translatedBy: string;
+  /** Empty on the English page. */
+  readonly translationNote: string;
+  readonly assessment: string;
+  /** "Buryan, Title (1933), s. 12" */
+  readonly workLine: (author: string, title: string, year: number, locator: string) => string;
+  /** "×4,8" and its wording; `more` is latest ≥ first. */
+  readonly times: (factor: string) => string;
+  readonly timesWording: (more: boolean, year: number) => string;
+  readonly calloutFirst: string;
+  readonly calloutPeak: string;
+  readonly calloutLatest: string;
+  readonly peakWord: string;
+  readonly childrenWord: string;
+  readonly chartLabel: (sex: "MALE" | "FEMALE", first: number, latest: number) => string;
+  readonly cutoffTick: string;
+  readonly ladderHeading: string;
+  readonly topYears: (years: string) => string;
+  readonly allYears: (n: string) => string;
+  readonly latestYearsShown: (n: string) => string;
+  /** The other sex's line when it is on no list in any year. */
+  readonly noneSince: (sex: "MALE" | "FEMALE", first: number) => string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -115,6 +179,52 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     registerNone: "Nie mamy liczby z listy rejestru PESEL dla tego imienia.",
     listLink: "Cała lista imion",
     lockedListNote: "Pełna lista imion każdego roku, z kierunkiem, jest w tym samym pakiecie.",
+    tabsLabel: "Płeć",
+    eyebrowGot: (year) => `W ${year} to imię dostało`,
+    noun: { MALE: "chłopców", FEMALE: "dziewczynek" },
+    shareLine: (share, sex, year) =>
+      `To ${share} wszystkich ${sex === "MALE" ? "chłopców" : "dziewczynek"} z listy za ${year} r.`,
+    place: (rank) => `Miejsce ${rank}`,
+    ofNames: (of) => `z ${of} imion`,
+    trackMost: "najczęstsze",
+    trackRarest: "najrzadsze z listy",
+    trackLabel: (rank, of) =>
+      `Miejsce ${rank} z ${of} na osi od najczęstszego imienia (po lewej) do najrzadszego z listy (po prawej)`,
+    howCommonHeading: "Jak częste",
+    oneIn: (n) => `1 na ${n}`,
+    oneInNoun: { MALE: "chłopców z listy", FEMALE: "dziewczynek z listy" },
+    dotsLabel: (n) => `${n} kropek, jedna podświetlona`,
+    oneInCaption: (n, sex, year, name) =>
+      `Z każdych ${n} ${sex === "MALE" ? "chłopców" : "dziewczynek"} z listy za ${year} r. ${sex === "MALE" ? "jeden dostał" : "jedna dostała"} imię ${name}.`,
+    sharesLine: (earlierYear, earlier, latestYear, latest) =>
+      `Udział: ${earlierYear} r. ${earlier} → ${latestYear} r. ${latest}`,
+    belowThreshold: "poniżej progu",
+    meaningHeading: "Co znaczy",
+    meaningNone: "Brak danych o pochodzeniu i znaczeniu.",
+    origin: "Pochodzenie",
+    meaning: "Znaczenie",
+    quote: (text) => `„${text}”`,
+    translatedBy: "przekład Name Atlas",
+    translationNote:
+      "Objaśnienia po angielsku przytaczamy dosłownie. Przekład na polski jest nasz (Name Atlas), dosłowny, i nie pochodzi z dzieła.",
+    assessment: "Ocena",
+    workLine: (author, title, year, locator) => `${author}, ${title} (${year}), ${locator}`,
+    times: (factor) => `×${factor}`,
+    timesWording: (more, year) => `tyle razy ${more ? "częściej" : "rzadziej"} niż w ${year} r.`,
+    calloutFirst: "Pierwszy rok na liście",
+    calloutPeak: "Szczyt",
+    calloutLatest: "Ostatni rok",
+    peakWord: "najwięcej",
+    childrenWord: "dzieci",
+    chartLabel: (sex, first, latest) =>
+      `Liczba ${sex === "MALE" ? "chłopców" : "dziewczynek"} z tym imieniem rok po roku, od ${first} do ${latest}; słupek szczytowego roku jest wyróżniony, rok bez imienia na liście ma kreskę progu zamiast słupka. Tabela poniżej podaje te same liczby.`,
+    cutoffTick: "poniżej progu listy",
+    ladderHeading: "Miejsce na liście",
+    topYears: (years) => `Imię nr 1 w latach: ${years}.`,
+    allYears: (n) => `Wszystkie ${n} lat`,
+    latestYearsShown: (n) => `Ostatnie ${n} lat`,
+    noneSince: (sex, first) =>
+      `Nie ma go na żadnej liście ${sex === "MALE" ? "chłopców" : "dziewczynek"} od ${first} r.`,
   },
   en: {
     title: "Baby names",
@@ -171,5 +281,50 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     listLink: "The whole list",
     lockedListNote:
       "The full list of names for every year, with direction, is in the same package.",
+    tabsLabel: "Sex",
+    eyebrowGot: (year) => `In ${year} this name went to`,
+    noun: { MALE: "boys", FEMALE: "girls" },
+    shareLine: (share, sex, year) =>
+      `That is ${share} of all ${sex === "MALE" ? "boys" : "girls"} on the ${year} list.`,
+    place: (rank) => `Place ${rank}`,
+    ofNames: (of) => `of ${of} names`,
+    trackMost: "most common",
+    trackRarest: "rarest on the list",
+    trackLabel: (rank, of) =>
+      `Place ${rank} of ${of} on a line from the most common name (left) to the rarest on the list (right)`,
+    howCommonHeading: "How common",
+    oneIn: (n) => `1 in ${n}`,
+    oneInNoun: { MALE: "boys on the list", FEMALE: "girls on the list" },
+    dotsLabel: (n) => `${n} dots, one lit`,
+    oneInCaption: (n, sex, year, name) =>
+      `Of every ${n} ${sex === "MALE" ? "boys" : "girls"} on the ${year} list, one was given the name ${name}.`,
+    sharesLine: (earlierYear, earlier, latestYear, latest) =>
+      `Share: ${earlierYear} ${earlier} → ${latestYear} ${latest}`,
+    belowThreshold: "below the cut-off",
+    meaningHeading: "What it means",
+    meaningNone: "No data on origin or meaning.",
+    origin: "Origin",
+    meaning: "Meaning",
+    quote: (text) => `“${text}”`,
+    translatedBy: "translated by Name Atlas",
+    translationNote: "",
+    assessment: "Assessment",
+    workLine: (author, title, year, locator) => `${author}, ${title} (${year}), ${locator}`,
+    times: (factor) => `×${factor}`,
+    timesWording: (more, year) => `times ${more ? "more" : "less"} often than in ${year}`,
+    calloutFirst: "First year on the list",
+    calloutPeak: "Peak",
+    calloutLatest: "Latest year",
+    peakWord: "most",
+    childrenWord: "children",
+    chartLabel: (sex, first, latest) =>
+      `The number of ${sex === "MALE" ? "boys" : "girls"} given this name year by year, ${first} to ${latest}; the peak year's bar is highlighted, and a year the name is not on the list has a cut-off tick instead of a bar. The table below gives the same figures.`,
+    cutoffTick: "below the list's cut-off",
+    ladderHeading: "Place on the list",
+    topYears: (years) => `Name no. 1 in: ${years}.`,
+    allYears: (n) => `All ${n} years`,
+    latestYearsShown: (n) => `The latest ${n} years`,
+    noneSince: (sex, first) =>
+      `It is on no ${sex === "MALE" ? "boys'" : "girls'"} list since ${first}.`,
   },
 };

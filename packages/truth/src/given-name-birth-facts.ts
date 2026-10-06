@@ -20,6 +20,7 @@ import type { DB } from "@name-atlas/db";
 import type { CitationDto } from "@name-atlas/contracts";
 import { canonicalKey } from "@name-atlas/resolver";
 import type { GivenNameListFacts } from "./given-name-facts.js";
+import { sharePerMillion } from "./given-name-births.js";
 import { evaluateSurface, sectionEligibility } from "./rights.js";
 import type { EffectiveRights, Surface } from "./rights.js";
 import { GIVEN_NAME_BIRTH_TREND_METHOD_VERSION } from "./version.js";
@@ -40,11 +41,23 @@ export interface BirthListInfo {
   readonly sex: BirthSex;
   /** The publisher's cut-off: a name given fewer times is not on the list. */
   readonly publication_threshold: number;
+  /** The children on the published list, read from the file at import (ADR-0042). */
+  readonly people_sum: number;
 }
 
 export interface BirthCountFigure {
   readonly claim_id: string;
   readonly count: number;
+  /**
+   * The name's share of the children on its list, in parts per million,
+   * rounded down: count × 1 000 000 ÷ the list's `people_sum`, the definition
+   * the trend claim uses (ADR-0043 §4; TASK-151). Null only when the stored
+   * figures contradict each other (a count above the list's sum, or a sum
+   * below 1), never 0.
+   */
+  readonly share_per_million: number | null;
+  /** "1 na N": the list's `people_sum` ÷ the count, rounded to a whole number; null as above. */
+  readonly one_in: number | null;
   readonly citation: CitationDto;
 }
 
@@ -71,6 +84,14 @@ export interface BirthTrendFigure {
   readonly earlier_year: number;
   readonly window_years: number;
   readonly change_percent: number;
+  /**
+   * The two shares the direction was decided on, as the claim states them
+   * (`structured_value.latest.share_per_million`, `earlier.share_per_million`;
+   * TASK-151). The earlier is null when the name was absent from the earlier
+   * list, below its cut-off; either is null when the claim does not carry it.
+   */
+  readonly latest_share_per_million: number | null;
+  readonly earlier_share_per_million: number | null;
   readonly citations: readonly CitationDto[];
 }
 
@@ -163,7 +184,13 @@ export async function readActiveBirthLists(db: Kysely<DB>): Promise<BirthListInf
   const rows = await db
     .selectFrom("given_name_birth_lists as l")
     .innerJoin("source_records as sr", "sr.source_record_id", "l.source_record_id")
-    .select(["l.given_name_birth_list_id", "l.birth_year", "l.sex", "l.publication_threshold"])
+    .select([
+      "l.given_name_birth_list_id",
+      "l.birth_year",
+      "l.sex",
+      "l.publication_threshold",
+      "l.people_sum",
+    ])
     .where("sr.record_status", "=", "ACTIVE")
     .orderBy("l.birth_year")
     .orderBy("l.sex")
@@ -176,6 +203,7 @@ export async function readActiveBirthLists(db: Kysely<DB>): Promise<BirthListInf
             birth_year: r.birth_year,
             sex: r.sex,
             publication_threshold: r.publication_threshold,
+            people_sum: r.people_sum,
           },
         ]
       : [],
@@ -266,10 +294,40 @@ interface RankValue {
 }
 interface TrendValue {
   readonly direction: "RISING" | "STEADY" | "FALLING";
-  readonly latest: { readonly birth_year: number };
-  readonly earlier: { readonly birth_year: number };
+  readonly latest: { readonly birth_year: number; readonly share_per_million?: unknown };
+  readonly earlier: { readonly birth_year: number; readonly share_per_million?: unknown };
   readonly window_years: number;
   readonly change_percent: number;
+}
+
+/** A share the claim states, or null: a number it does not carry is not 0. */
+function shareOf(side: { readonly share_per_million?: unknown }): number | null {
+  const value = side.share_per_million;
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+/**
+ * A count claim's share of its list's children and its "1 na N", from the
+ * count and the list's stored `people_sum`, by the trend claim's definition
+ * (ADR-0043 §4). Null when the stored figures contradict each other; never 0.
+ */
+export function birthShare(
+  count: number,
+  peopleSum: number,
+): { share_per_million: number | null; one_in: number | null } {
+  if (
+    !Number.isInteger(count) ||
+    !Number.isInteger(peopleSum) ||
+    count < 1 ||
+    peopleSum < 1 ||
+    count > peopleSum
+  ) {
+    return { share_per_million: null, one_in: null };
+  }
+  return {
+    share_per_million: sharePerMillion(count, peopleSum),
+    one_in: Math.round(peopleSum / count),
+  };
 }
 
 /**
@@ -309,13 +367,19 @@ export function assembleBirthNameFacts(
   });
 
   const counts = new Map<string, BirthCountFigure>();
+  const peopleSumOf = (listId: string): number => byId.get(listId)?.people_sum ?? 0;
   const ranks = new Map<string, BirthRankFigure>();
   const trends = new Map<string, { row: BirthClaimRow; citations: CitationDto[] }>();
   for (const row of kept) {
     const listId = parts(row)[2] ?? "";
     if (row.claim_type === "GIVEN_NAME_BIRTH_COUNT" && !counts.has(listId)) {
       const value = JSON.parse(row.payload) as CountValue;
-      counts.set(listId, { claim_id: row.claim_id, count: value.count, citation: row.citation });
+      counts.set(listId, {
+        claim_id: row.claim_id,
+        count: value.count,
+        ...birthShare(value.count, peopleSumOf(listId)),
+        citation: row.citation,
+      });
     } else if (row.claim_type === "GIVEN_NAME_BIRTH_RANK" && !ranks.has(listId)) {
       const value = JSON.parse(row.payload) as RankValue;
       ranks.set(listId, {
@@ -391,6 +455,8 @@ export function assembleBirthNameFacts(
               earlier_year: trendValue.earlier.birth_year,
               window_years: trendValue.window_years,
               change_percent: trendValue.change_percent,
+              latest_share_per_million: shareOf(trendValue.latest),
+              earlier_share_per_million: shareOf(trendValue.earlier),
               citations: trend.citations,
             },
       history,

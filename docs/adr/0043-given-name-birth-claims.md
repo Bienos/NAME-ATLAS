@@ -40,5 +40,6 @@
 
 - `pnpm truth:derive-given-name-births` (`-- --name ZOFIA` for one name) derives every claim. On the full 2000–2025 import (TASK-137's record): 35,598 counts, 35,598 ranks, 1,904 trends, no refusal. Under the share rule (TASK-139's record) the same 1,904 trends, with every `@1` trend superseded: boys 771 rising, 68 steady, 126 falling (under `@1`: 621, 98, 246); girls 727, 63, 149 (580, 104, 255).
 - No page, contract or API field reads the claims yet; the free/paid split of D-044 §2 is the page task's.
+- **Amendment 2026-10-06 (TASK-151):** the baby-names page's share ("3,7% wszystkich dziewczynek z listy") and its "1 na N" are a count claim's count ÷ the same list's stored `people_sum`, computed by the reader (`birthShare` in `packages/truth/src/given-name-birth-facts.ts`): the share in parts per million rounded down, identical to the trend claim's `share_per_million` (§4), and N the sum ÷ the count rounded to a whole number. The page also shows the trend claim's own `latest.share_per_million` and `earlier.share_per_million`. No new claim type: these are readings of the count claim and the list, never stored.
 - Shares of all births, voivodeships, half-years, second names and civil registry offices are not derived. Each needs its own lists first (ADR-0042, Consequences).
 - Nothing is applied or derived on staging or production by this ADR.
