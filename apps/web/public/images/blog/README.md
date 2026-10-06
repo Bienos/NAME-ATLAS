@@ -15,6 +15,7 @@ One image per post, shared by its Polish and English versions (TASK-075). Each p
 | `czy-to-samo-nazwisko-to-rodzina.webp` | czy-to-samo-nazwisko-to-rodzina | 1600 × 840, 18,668 bytes | `68d746df1cbb483376077b53f2bd73684ae163c54aab62fdf3e378868b8f892a` |
 | `mapa-nazwiska-a-mapa-rodziny.webp` | mapa-nazwiska-a-mapa-rodziny | 1600 × 840, 8,424 bytes | `ebba7bf425017bc51a4fcaa7dc9b6304f64a605d4a02f71b01f06a573c3faab4` |
 | `skad-wziely-sie-nazwiska-w-polsce.webp` | skad-wziely-sie-nazwiska-w-polsce | 1600 × 840, 13,306 bytes | `edb07c89440f9648c2cea092df109b6b10cdc9bfa4ff3c9298c109836109252b` |
+| `nazwiska-odmiejscowe.webp` | nazwiska-odmiejscowe | 1600 × 840, 12,856 bytes | `9675f9d6c99fe625139aa402082f2c52d7466bef275392310c9333ccdc98ddf8` |
 
 - **Origin:** drawn as SVG by `apps/web/scripts/build-blog-images.ts`, written in this repository on 2026-10-03 (Claude Code, for the project owner; later scenes added by each post's own task, the same day or after), from the dusk palette's `--dusk-*` values (ADR-0021). Each shape is defined in that script; its random placements come from a fixed seed, so a run reproduces the same images.
 - **Tools:** headless Chromium 1194 (`/opt/pw-browsers`) rendered the SVG to PNG; ImageMagick 6.9.12 with libwebp 1.3.2 cropped it and encoded WebP at quality 82, with metadata stripped.
