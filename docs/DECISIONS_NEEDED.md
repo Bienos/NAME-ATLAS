@@ -57,6 +57,8 @@ What was decided, in this session's reading of those words (the owner may correc
 - Everything else in D-044: the free basic view, signed-in only, every tier from 28,99 zł up including the full figures, and the paid tier not unlocking the tree (D-044 §5). TASK-114's code still lifts the tree cap for any recorded purchase, so the 8,99 zł product must not exist before that is changed.
 - The payment gates (ADR-0023 §2.5): there is still no product, no checkout and no buy button for it. The page keeps showing it as "Wkrótce".
 
+**Built (TASK-144, 2026-10-06):** the product's key is `babynames`, in test-mode checkout only; the tree cap is lifted by `TREE_UNLOCK_TIERS` (`smaller`, `couple`, `family`) alone, so a `babynames` purchase does not lift it. No buy button is on any public page.
+
 **Not decided:** whether "cała lista" ("the whole list") means more than D-044's paid view, for example a browsable list of all names for a year, ranked, with their direction. This record reads it as the paid view D-044 already describes, which is every name's figures; a list that can be browsed without typing a name is a new feature and needs its own answer.
 
 ---

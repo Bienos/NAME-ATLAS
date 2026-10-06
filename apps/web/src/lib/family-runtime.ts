@@ -1,4 +1,4 @@
-import { createAccountsDb, createPurchases } from "@name-atlas/accounts";
+import { createAccountsDb, createPurchases, TREE_UNLOCK_TIERS } from "@name-atlas/accounts";
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 import type { Accounts, Mailer } from "@name-atlas/accounts";
@@ -45,7 +45,7 @@ export function familyRuntime(env: NodeJS.ProcessEnv = process.env): FamilyRunti
   cached = {
     family: createFamily({
       db: createFamilyDb(accounts.pool),
-      hasPaidTier: (userId) => purchases.hasPurchase(userId),
+      hasPaidTier: (userId) => purchases.hasPurchaseOf(userId, TREE_UNLOCK_TIERS),
     }),
     accounts: accounts.accounts,
     secure: accounts.secure,

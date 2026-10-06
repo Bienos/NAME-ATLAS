@@ -252,8 +252,8 @@ describe("the baby-names pages (TASK-141)", () => {
     expect(html).not.toContain("baby-locked");
   });
 
-  it("checks the tier, not any purchase: only 28,99, 89,99 and 199 zł open the history (AC-4)", async () => {
-    for (const tier of ["smaller", "couple", "family"] as const) {
+  it("checks the tier, not any purchase: only 8,99, 28,99, 89,99 and 199 zł open the history (AC-3)", async () => {
+    for (const tier of ["babynames", "smaller", "couple", "family"] as const) {
       const html = await render("pl", { imie: "Zofia" }, { userId: "u" }, { u: [tier] });
       expect(html, tier).toContain('data-year="2000"');
     }
@@ -292,6 +292,7 @@ describe("loadBabyNames", () => {
     const readFacts = vi.fn((_n: unknown, history: boolean) => Promise.resolve(zofia(history)));
     for (const [bought, history] of [
       [{}, false],
+      [{ u: ["babynames"] }, true],
       [{ u: ["smaller"] }, true],
     ] as const) {
       await loadBabyNames({
