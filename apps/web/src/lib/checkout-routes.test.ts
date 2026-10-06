@@ -80,6 +80,15 @@ describe("POST /api/checkout (TASK-111)", () => {
     expect(body.get("cancel_url")).toBe(`${ORIGIN}/en/account?checkout=cancelled`);
   });
 
+  it("sells the 8,99 zł baby-names product at 899 grosze (TASK-144)", async () => {
+    const { deps, stripe } = checkoutFakes();
+    const response = await handleCheckoutPost(buy({ tier: "babynames", lang: "pl" }), deps);
+    expect(response.status).toBe(303);
+    const body = new URLSearchParams(String(stripe.mock.calls[0]?.[1]?.body));
+    expect(body.get("line_items[0][price_data][unit_amount]")).toBe("899");
+    expect(body.get("metadata[tier]")).toBe("babynames");
+  });
+
   it("sends a reader with no session to sign in, and calls nobody", async () => {
     const { deps, stripe } = checkoutFakes();
     const response = await handleCheckoutPost(buy({ tier: "smaller" }, { cookie: "" }), deps);
@@ -172,6 +181,31 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
       tier: "smaller",
       checkoutSessionId: "cs_test_1",
       amountTotal: 2899,
+      currency: "pln",
+      livemode: false,
+    });
+  });
+
+  it("records a baby-names purchase at 899 grosze only (TASK-144)", async () => {
+    const { deps, record } = webhookFakes();
+    const babynames = { metadata: { tier: "babynames", user_id: USER } };
+    for (const amount_total of [2899, 100]) {
+      const response = await handleStripeWebhook(
+        deliver(sessionEvent("checkout.session.completed", { ...babynames, amount_total })),
+        deps,
+      );
+      expect(response.status).toBe(200);
+    }
+    expect(record).not.toHaveBeenCalled();
+    await handleStripeWebhook(
+      deliver(sessionEvent("checkout.session.completed", { ...babynames, amount_total: 899 })),
+      deps,
+    );
+    expect(record).toHaveBeenCalledWith({
+      userId: USER,
+      tier: "babynames",
+      checkoutSessionId: "cs_test_1",
+      amountTotal: 899,
       currency: "pln",
       livemode: false,
     });

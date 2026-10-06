@@ -50,6 +50,7 @@ describe("MIGRATIONS_DIR", () => {
       "0039_full_name_reports.ts", // TASK-124 / ADR-0041 — the full-name report
       "0040_given_name_birth_years.ts", // TASK-136 / ADR-0042 — first names given to children, by year
       "0041_given_name_birth_claims.ts", // TASK-137 / ADR-0043 — their count, rank and trend as claims
+      "0042_purchases_babynames_tier.ts", // TASK-144 / D-045 — the 8,99 zł baby-names product's tier
     ]);
   });
 });
