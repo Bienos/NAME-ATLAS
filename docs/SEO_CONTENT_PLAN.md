@@ -57,7 +57,7 @@ The first thirty pieces, in the strategy's order. Its proposed score is kept for
 | 4 | Mapa nazwiska nie jest mapą Twojej rodziny. Jak ją poprawnie czytać? | 96 | live: `mapa-nazwiska-a-mapa-rodziny` (TASK-102) |
 | 5 | Skąd wzięły się nazwiska w Polsce? Od średniowiecza do PESEL | 95 | live: `skad-wziely-sie-nazwiska-w-polsce` (TASK-105); `genealogia` keeps its short history section and links to it |
 | 6 | Co oznacza końcówka -ski w polskim nazwisku? | 94 | done as an extension of `koncowki-nazwisk` (TASK-110): its -ski section answers the question; the original -ski statistic belongs to data study §7 |
-| 7 | Nazwiska odmiejscowe: kiedy nazwisko naprawdę pochodzi od miejsca? | 94 | queued |
+| 7 | Nazwiska odmiejscowe: kiedy nazwisko naprawdę pochodzi od miejsca? | 94 | live: `nazwiska-odmiejscowe` (TASK-135) |
 | 8 | Nazwiska patronimiczne: utworzone od imienia ojca | 92 | queued |
 | 9 | Nazwiska od zawodów: od Kowala do Krawca | 90 | queued |
 | 10 | Jak czytać dane PESEL o nazwiskach? | 94 | queued |
