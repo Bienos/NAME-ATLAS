@@ -27,7 +27,7 @@
    | Tier | Price | Holds (confirmed) |
    |---|---|---|
    | Free, with an account | 0 | the cards, a share card per answer, the full page and the comparison; famous bearers; a family tree of up to 5 people; connecting trees, with matches up to second cousins; the basic view of first names given to children (D-044), once it is built |
-   | "baby names" | 8,99 zł | the full figures of first names given to children, for every name, once they are built (amended 2026-10-06, D-044; priced at 8,99 zł by D-045, the same day, instead of 5,99 zł). No tree unlock |
+   | "baby names" | 8,99 zł | the full figures of first names given to children, for every name, once they are built (amended 2026-10-06, D-044; priced at 8,99 zł by D-045, the same day, instead of 5,99 zł; **the whole list of a year's names, every year, with its direction filter, is part of this view, D-047, TASK-146**). No tree unlock |
    | "smaller research" | 28,99 zł | the tree unlock; the full-name report (ADR-0032), once it is built (amended 2026-10-05, D-043) |
    | "couple" | 89,99 zł | the couple report (ADR-0035), and the tree unlock |
    | "family review" | 199 zł | the tree unlock |

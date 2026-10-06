@@ -125,7 +125,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     `.execute(db);
 
     // `0044` down to `0007` sit above `0006` and revert cleanly (the meaning claims'
-    // scope check, the purchases' tier
+    // scope check, the birth-name list index, the purchases' tier
     // check, which refuses only while a `babynames` purchase is stored and none is here, the birth-year
     // claims' scope check, the birth-year
     // given-name tables, the full-name reports, which refuse only while one is stored and none is here, the
@@ -147,6 +147,7 @@ describe("canonical_key_v2 against a real PostgreSQL database", () => {
     const migrator = createMigrator(db);
     for (const expected of [
       "0044_given_name_meaning",
+      "0043_given_name_birth_list_index",
       "0042_purchases_babynames_tier",
       "0041_given_name_birth_claims",
       "0040_given_name_birth_years",

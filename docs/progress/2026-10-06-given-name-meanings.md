@@ -1,6 +1,6 @@
 # 2026-10-06 — First-name origins and meanings in the full-name report (TASK-147)
 
-The owner asked "yes build the first-name meanings" after deciding D-046 (`tasks/147-given-name-meanings.md`; ADR-0045, proposed). Built on `main` @ `0596cc6`. It was built as TASK-146 and migration 0043. Then the open pull request #175 took TASK-146, migration 0043 and D-047, so this was renumbered TASK-147 and migration 0044. It must merge after #175, because the migrator refuses a migration older than one already applied. Nothing is deployed, applied on the VM, imported or derived on production, or sold.
+The owner asked "yes build the first-name meanings" after deciding D-046 (`tasks/147-given-name-meanings.md`; ADR-0045, proposed). Built on `main` @ `0596cc6`. It was built as TASK-146 and migration 0043. Then the open pull request #175 took TASK-146, migration 0043 and D-047, so this was renumbered TASK-147 and migration 0044. #175 merged first (`13b0b40`), as it had to, because the migrator refuses a migration older than one already applied. `main` was then merged into this branch. Nothing is deployed, applied on the VM, imported or derived on production, or sold.
 
 ## What changed
 

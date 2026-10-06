@@ -394,6 +394,19 @@ export type {
   BirthTrendFigure,
   BirthYearFigures,
 } from "./given-name-birth-facts.js";
+// One birth-name list, a page of it — TASK-146, D-047.
+export {
+  assembleBirthListPage,
+  BIRTH_LIST_MAX_LIMIT,
+  readBirthListPage,
+} from "./given-name-birth-list.js";
+export type {
+  BirthDirectionValue,
+  BirthListOptions,
+  BirthListPage,
+  BirthListPageRowSql,
+  BirthListRow,
+} from "./given-name-birth-list.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildFullNameReport,

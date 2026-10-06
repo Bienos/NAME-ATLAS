@@ -121,8 +121,13 @@ const TREE_HOMES: ReadonlySet<string> = new Set(["/pl/konto/drzewa", "/en/accoun
 const TREE_INVITATION =
   /^\/(?:pl\/konto\/drzewa\/zaproszenie|en\/account\/trees\/invitation)\?t=[A-Za-z0-9_-]{43}$/u;
 
-/** The baby-names page (TASK-141), signed-in only: a sign-in comes back to it, without its query. */
-const BABY_NAMES_HOMES: ReadonlySet<string> = new Set(["/pl/imiona-dla-dziecka", "/en/baby-names"]);
+/** The baby-names page (TASK-141) and its list (TASK-146), signed-in only: a sign-in comes back to it, without its query. */
+const BABY_NAMES_HOMES: ReadonlySet<string> = new Set([
+  "/pl/imiona-dla-dziecka",
+  "/en/baby-names",
+  "/pl/imiona-dla-dziecka/lista",
+  "/en/baby-names/list",
+]);
 
 /** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
 export function isTreeNext(next: string | null): boolean {

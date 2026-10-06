@@ -1,7 +1,7 @@
 # TASK-147 — First-name origins and meanings in the full-name report (Buryan 1933, Yonge 1884)
 
 - **Status:** IMPLEMENTED 2026-10-06 (`docs/progress/2026-10-06-given-name-meanings.md`). Migration 0044 is not applied on the VM, and nothing is imported or derived on production.
-- **Number:** 147, migration 0044, ADR-0045. `main` holds TASK-145, migration 0042 and ADR-0044. The open pull request #175 holds TASK-146, migration 0043 and D-047; it was opened while this was built as 146 and 0043, so this was renumbered. The migrator refuses a migration older than one already applied, so this must merge after #175.
+- **Number:** 147, migration 0044, ADR-0045. `main` holds TASK-145, migration 0042 and ADR-0044. #175 took TASK-146, migration 0043 and D-047 while this was being built as 146 and 0043, so this was renumbered. #175 merged first (`13b0b40`), as it had to: the migrator refuses a migration older than one already applied.
 - **Requested by:** the project owner, 2026-10-06: "yes build the first-name meanings", after D-046.
 - **Decision:** D-046 (resolved), recorded as ADR-0045 (proposed).
 - **Model guidance:** implementation session.
