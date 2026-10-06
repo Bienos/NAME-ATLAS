@@ -1,6 +1,6 @@
 # TASK-149 — Migrate the public frontend to Dark Atlas Brand System v1.0
 
-- **Status:** IN PROGRESS on `task-149-dark-atlas-frontend`.
+- **Status:** REVERTED (2026-10-06). Merged as #178 (`39267c1`); its production deployment was stopped by the owner and the change reverted at the owner's request before it went live. The public site keeps the TASK-065 dusk look.
 - **Requested by:** project owner, 2026-10-06.
 - **Decision:** ADR-0046.
 - **Depends on:** TASK-148 Brand System v1.0, ADR-0021 dusk direction, TASK-052 shared shell, TASK-065 landing, TASK-055 surname deck.
