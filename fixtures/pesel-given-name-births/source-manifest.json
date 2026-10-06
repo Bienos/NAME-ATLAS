@@ -1,5 +1,5 @@
 {
-  "$comment": "TASK-136 (ADR-0042). GENUINE excerpts of four files of dane.gov.pl dataset 219: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. first-2000-2019.csv keeps each (year, sex) list's two first rows, every NIKOLA row (on the girls' lists every year and on the boys' in 2007 and 2019) and ABDUL in 2012 (5, the cut-off) and 2013 (3). The yearly files keep their three first rows and, where present, NIKOLA. The full files were downloaded by the TASK-136 session on 2026-10-06 (the XLSX resources from their CSV endpoint); their checksums are the registry's official_sha256.",
+  "$comment": "TASK-136 (ADR-0042). GENUINE excerpts of four files of dane.gov.pl dataset 219: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. first-2000-2019.csv keeps each (year, sex) list's two first rows, every NIKOLA row (on the girls' lists every year and on the boys' in 2007 and 2019) and ABDUL in 2012 (5, the cut-off) and 2013 (3). The yearly files keep their three first rows and, where present, NIKOLA. The full files were downloaded by the TASK-136 session on 2026-10-06 (the XLSX resources from their CSV endpoint); their checksums are the registry's official_sha256. TASK-137 adds four full files, byte for byte as the TASK-137 session downloaded them on 2026-10-06 from the registry's official_source_url (each checksum equals the registry's official_sha256): the boys' and girls' lists of 2020 and 2025, so a test can derive real ranks and trends without the completeness gate being bypassed.",
   "dataset": {
     "dataset_id": "219",
     "dataset_title": "Imiona nadawane dzieciom w Polsce",
@@ -42,6 +42,42 @@
       "sha256": "98b375aff3cc8543e1fa040148878e09fc5f4f3dbc0c4ef5ee652a16530221e1",
       "rows_excluding_header": 4,
       "people_on_rows": 12792,
+      "full_file_sha256": "213d8c29e64bb61982ec534d39c98113dfd402451e88613a18842f2891c187e4",
+      "full_file_rows_excluding_header": 939
+    },
+    {
+      "file": "full-first-male-2020.csv",
+      "resource_id": "28020",
+      "sha256": "dfd0f1394c316601888a03c2eaea7413639114997a6331dd75148a2110533125",
+      "rows_excluding_header": 799,
+      "people_on_rows": 186590,
+      "full_file_sha256": "dfd0f1394c316601888a03c2eaea7413639114997a6331dd75148a2110533125",
+      "full_file_rows_excluding_header": 799
+    },
+    {
+      "file": "full-first-female-2020.csv",
+      "resource_id": "28021",
+      "sha256": "ae0033ec115300b791a64468cd48a06975147177a1c7d110f5d99871854599cf",
+      "rows_excluding_header": 799,
+      "people_on_rows": 176829,
+      "full_file_sha256": "ae0033ec115300b791a64468cd48a06975147177a1c7d110f5d99871854599cf",
+      "full_file_rows_excluding_header": 799
+    },
+    {
+      "file": "full-first-male-2025.csv",
+      "resource_id": "1159536",
+      "sha256": "447f64ad7008f7960341710322d4f4d20e928129753f9469a10abc593da92beb",
+      "rows_excluding_header": 965,
+      "people_on_rows": 126404,
+      "full_file_sha256": "447f64ad7008f7960341710322d4f4d20e928129753f9469a10abc593da92beb",
+      "full_file_rows_excluding_header": 965
+    },
+    {
+      "file": "full-first-female-2025.csv",
+      "resource_id": "1159538",
+      "sha256": "213d8c29e64bb61982ec534d39c98113dfd402451e88613a18842f2891c187e4",
+      "rows_excluding_header": 939,
+      "people_on_rows": 119788,
       "full_file_sha256": "213d8c29e64bb61982ec534d39c98113dfd402451e88613a18842f2891c187e4",
       "full_file_rows_excluding_header": 939
     }

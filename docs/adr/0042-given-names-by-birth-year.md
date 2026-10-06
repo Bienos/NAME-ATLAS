@@ -40,3 +40,4 @@
 - A name only on the birth lists is a `given_names` row with no `given_name_counts` row. TASK-122's derivation then finds no list for it and writes nothing, as it would for any name with no count.
 - The voivodeship files, the half-year files, second names and the civil registry office (USC) files are not imported here. Each is a further list of a year and a sex (with a region, a half-year or a name position) and needs its own decision on where that dimension goes.
 - `pnpm import:given-name-births` loads a file already on disk; it downloads nothing. Nothing is loaded on staging or production by this ADR.
+- §8 is carried out by TASK-137 (ADR-0043, 2026-10-06): migration 0041 adds `GIVEN_NAME_BIRTH_COUNT`, `GIVEN_NAME_BIRTH_RANK` and `GIVEN_NAME_BIRTH_TREND`, derived from these lists. The trend reads each list's stored cut-off and never treats an absent count as zero.
