@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { CitationDto } from "@name-atlas/contracts";
-import { assembleBirthNameFacts } from "./given-name-birth-facts.js";
+import { assembleBirthNameFacts, stockListOfSex } from "./given-name-birth-facts.js";
+import type { GivenNameListFacts } from "./given-name-facts.js";
 import type { BirthClaimRow, BirthListInfo } from "./given-name-birth-facts.js";
 import { GIVEN_NAME_BIRTH_TREND_METHOD_VERSION } from "./version.js";
 
@@ -203,5 +204,36 @@ describe("assembleBirthNameFacts (TASK-141)", () => {
       state: "RIGHTS_BLOCKED",
       sexes: [],
     });
+  });
+});
+
+describe("stockListOfSex (TASK-145)", () => {
+  const stock = (group: string, date: string, people: number): GivenNameListFacts => ({
+    comparability_group: group,
+    snapshot_date: date,
+    count: {
+      claim_id: `c-${group}`,
+      count: people,
+      confidence: { status: "HIGH", methodology_code: "x@1" },
+      citation: citation(`cit-${group}`, "1159670"),
+    },
+    rank: null,
+  });
+  const men = stock("pesel_given_names_2026_first_male", "2026-01-20", 100);
+  const women = stock("pesel_given_names_2026_first_female", "2026-01-20", 200);
+
+  it("takes each sex's own list and never sums the two", () => {
+    expect(stockListOfSex([men, women], "MALE")).toBe(men);
+    expect(stockListOfSex([men, women], "FEMALE")).toBe(women);
+  });
+
+  it("is null for a sex with no claim, never a zero", () => {
+    expect(stockListOfSex([women], "MALE")).toBeNull();
+    expect(stockListOfSex([], "FEMALE")).toBeNull();
+  });
+
+  it("takes the latest date when two lists of one sex stand, never both", () => {
+    const later = stock("pesel_given_names_2027_first_female", "2027-01-20", 300);
+    expect(stockListOfSex([women, later], "FEMALE")).toBe(later);
   });
 });

@@ -4,19 +4,29 @@ import { notFound } from "next/navigation";
 import { BABY_NAMES_FULL_TIERS, createAccountsDb, createPurchases } from "@name-atlas/accounts";
 import type { Purchases } from "@name-atlas/accounts";
 import type { CitationDto } from "@name-atlas/contracts";
-import { findBirthGivenName, readBirthNameFacts } from "@name-atlas/truth";
+import {
+  BIRTH_SEXES,
+  findBirthGivenName,
+  readActiveBirthLists,
+  readBirthNameFacts,
+  readGivenNameFacts,
+  stockListOfSex,
+} from "@name-atlas/truth";
 import type {
+  BirthListInfo,
   BirthNameFacts,
   BirthNameLookup,
+  BirthSex,
   BirthSexFigures,
   BirthYearFigures,
+  GivenNameFacts,
 } from "@name-atlas/truth";
 import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
 import { BABY_NAMES_FIELD, BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { db } from "./db.js";
-import { formatInteger } from "./messages.js";
+import { formatDate, formatInteger } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
@@ -31,6 +41,12 @@ import { SiteShell } from "./site-shell.js";
  * everyone, and every year since 2000 for an account holding a tier that
  * includes it (`BABY_NAMES_FULL_TIERS`). Nobody else is offered a way to pay:
  * the 8,99 zł tier is "Wkrótce", with no button (ADR-0023 §2.5).
+ *
+ * TASK-145: under each sex, apart from the birth-year figures, the people
+ * holding the name in the PESEL register's list of men or of women
+ * (`readGivenNameFacts`, claims only): free for every signed-in reader. The
+ * two lists are never summed, and never added to a birth-year figure. To move
+ * the register block into the 8,99 zł view, render it only when `full` is true.
  *
  * A 404 unless `BABY_NAMES_ENABLED` is `1` and accounts are on; `noindex`;
  * `private, no-store` from the middleware.
@@ -49,6 +65,13 @@ export interface BabyNamesDeps {
     givenName: { readonly id: string; readonly display_name: string },
     history: boolean,
   ) => Promise<BirthNameFacts>;
+  /** The name's register (stock) facts, claims only (TASK-145). */
+  readonly readStock: (givenName: {
+    readonly id: string;
+    readonly display_name: string;
+  }) => Promise<GivenNameFacts>;
+  /** The stored birth lists, for a name that is on none of them. */
+  readonly readLists: () => Promise<readonly BirthListInfo[]>;
   /** Whether the account holds a tier that includes the full figures. */
   readonly hasFullView: (userId: string) => Promise<boolean>;
 }
@@ -66,8 +89,40 @@ export type BabyNamesData =
         | { readonly kind: "INVALID" }
         | { readonly kind: "NOT_FOUND" }
         | { readonly kind: "HELD" }
-        | { readonly kind: "FACTS"; readonly facts: BirthNameFacts };
+        | {
+            readonly kind: "FACTS";
+            readonly facts: BirthNameFacts;
+            readonly stock: GivenNameFacts;
+          }
+        /** On no birth list, but the register holds it: the register block and each sex's cut-off. */
+        | {
+            readonly kind: "STOCK_ONLY";
+            readonly name: { readonly id: string; readonly display_name: string };
+            readonly stock: GivenNameFacts;
+            readonly cutoffs: readonly BirthCutoff[];
+          };
     };
+
+/** The latest stored list of one sex: the year and cut-off a rare name stayed below. */
+export interface BirthCutoff {
+  readonly sex: BirthSex;
+  readonly birth_year: number;
+  readonly threshold: number;
+}
+
+function cutoffsOf(lists: readonly BirthListInfo[]): BirthCutoff[] {
+  return BIRTH_SEXES.flatMap((sex) => {
+    const latest = lists
+      .filter((l) => l.sex === sex)
+      .reduce<BirthListInfo | null>(
+        (best, l) => (best === null || l.birth_year > best.birth_year ? l : best),
+        null,
+      );
+    return latest === null
+      ? []
+      : [{ sex, birth_year: latest.birth_year, threshold: latest.publication_threshold }];
+  });
+}
 
 function first(query: Query, key: string): string {
   const value = query[key];
@@ -96,11 +151,19 @@ export async function loadBabyNames(input: {
   if (lookup.kind !== "FOUND") {
     return { kind: "signed-in", lang, typed, full, result: { kind: lookup.kind } };
   }
-  const facts = await deps.readFacts(lookup.given_name, full);
+  const [facts, stock] = await Promise.all([
+    deps.readFacts(lookup.given_name, full),
+    deps.readStock(lookup.given_name),
+  ]);
   if (facts.state === "NOT_ON_ANY_LIST") {
-    return { kind: "signed-in", lang, typed, full, result: { kind: "NOT_FOUND" } };
+    if (stock.state === "UNAVAILABLE") {
+      return { kind: "signed-in", lang, typed, full, result: { kind: "NOT_FOUND" } };
+    }
+    const cutoffs = cutoffsOf(await deps.readLists());
+    const result = { kind: "STOCK_ONLY", name: lookup.given_name, stock, cutoffs } as const;
+    return { kind: "signed-in", lang, typed, full, result };
   }
-  return { kind: "signed-in", lang, typed, full, result: { kind: "FACTS", facts } };
+  return { kind: "signed-in", lang, typed, full, result: { kind: "FACTS", facts, stock } };
 }
 
 // ---------------------------------------------------------------------------
@@ -287,18 +350,115 @@ function Locked({ lang }: { lang: Lang }) {
   );
 }
 
-function Facts({ facts, full, lang }: { facts: BirthNameFacts; full: boolean; lang: Lang }) {
+/** The register's list of this sex, apart from the birth-year figures; never a sum, never 0. */
+function Register({ stock, sex, lang }: { stock: GivenNameFacts; sex: BirthSex; lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  const list = stock.state === "READY" ? stockListOfSex(stock.lists, sex) : null;
+  return (
+    <div className="baby-register" data-register={sex}>
+      <h4>{t.registerHeading}</h4>
+      {stock.state === "RIGHTS_BLOCKED" ? (
+        <p className="note">{t.rightsBlocked}</p>
+      ) : list === null ? (
+        <p className="note">{t.registerNone}</p>
+      ) : (
+        <>
+          <dl className="baby-figures">
+            <div>
+              <dt>{t.registerCount}</dt>
+              <dd data-figure="register-count">{formatInteger(list.count.count, lang)}</dd>
+            </div>
+            {list.rank === null ? null : (
+              <div>
+                <dt>{t.registerRank}</dt>
+                <dd data-figure="register-rank">
+                  {t.rankOf(
+                    formatInteger(list.rank.rank, lang),
+                    formatInteger(list.rank.universe_size, lang),
+                  )}
+                </dd>
+              </div>
+            )}
+          </dl>
+          <p className="note baby-basis">{t.registerAsOf(formatDate(list.snapshot_date, lang))}</p>
+          <Source
+            citations={distinct(
+              list.rank === null
+                ? [list.count.citation]
+                : [list.count.citation, list.rank.citation],
+            )}
+            lang={lang}
+          />
+        </>
+      )}
+    </div>
+  );
+}
+
+/** A rare name: on no birth list, held by the register. */
+function StockOnly({
+  name,
+  stock,
+  cutoffs,
+  lang,
+}: {
+  name: { readonly display_name: string };
+  stock: GivenNameFacts;
+  cutoffs: readonly BirthCutoff[];
+  lang: Lang;
+}) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <>
+      <h2 className="baby-name">{name.display_name}</h2>
+      <p className="note">{t.apart}</p>
+      <p className="note baby-differs">{t.registerDiffers}</p>
+      <div className="baby-sexes">
+        {BIRTH_SEXES.map((sex) => {
+          const cutoff = cutoffs.find((c) => c.sex === sex);
+          return (
+            <section key={sex} className="baby-sex" data-sex={sex}>
+              <h3>{t.sex[sex]}</h3>
+              {cutoff === undefined ? (
+                <p className="note">{t.noList}</p>
+              ) : (
+                <p className="baby-absent">
+                  {t.belowCutoff(cutoff.birth_year, formatInteger(cutoff.threshold, lang))}
+                </p>
+              )}
+              <Register stock={stock} sex={sex} lang={lang} />
+            </section>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function Facts({
+  facts,
+  stock,
+  full,
+  lang,
+}: {
+  facts: BirthNameFacts;
+  stock: GivenNameFacts;
+  full: boolean;
+  lang: Lang;
+}) {
   const t = BABY_NAMES_TEXT[lang];
   if (facts.state === "RIGHTS_BLOCKED") return <p className="note">{t.rightsBlocked}</p>;
   return (
     <>
       <h2 className="baby-name">{facts.given_name.display_name}</h2>
       <p className="note">{t.apart}</p>
+      <p className="note baby-differs">{t.registerDiffers}</p>
       <div className="baby-sexes">
         {facts.sexes.map((figures) => (
           <section key={figures.sex} className="baby-sex" data-sex={figures.sex}>
             <h3>{t.sex[figures.sex]}</h3>
             <Latest figures={figures} lang={lang} />
+            <Register stock={stock} sex={figures.sex} lang={lang} />
           </section>
         ))}
       </div>
@@ -364,7 +524,20 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
             {data.result.kind === "NOT_FOUND" ? <p>{t.notFound(data.typed)}</p> : null}
             {data.result.kind === "HELD" ? <p>{t.held}</p> : null}
             {data.result.kind === "FACTS" ? (
-              <Facts facts={data.result.facts} full={data.full} lang={lang} />
+              <Facts
+                facts={data.result.facts}
+                stock={data.result.stock}
+                full={data.full}
+                lang={lang}
+              />
+            ) : null}
+            {data.result.kind === "STOCK_ONLY" ? (
+              <StockOnly
+                name={data.result.name}
+                stock={data.result.stock}
+                cutoffs={data.result.cutoffs}
+                lang={lang}
+              />
             ) : null}
           </div>
         </>
@@ -387,6 +560,8 @@ function runningDeps(pool: Parameters<typeof createAccountsDb>[0]): BabyNamesDep
     findName: (typed) => findBirthGivenName(db(), typed),
     readFacts: (givenName, history) =>
       readBirthNameFacts(db(), givenName, { surface: history ? "PAID" : "FREE", history }),
+    readStock: (givenName) => readGivenNameFacts(db(), givenName, "FREE"),
+    readLists: () => readActiveBirthLists(db()),
     hasFullView: (userId) => store.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS),
   };
 }

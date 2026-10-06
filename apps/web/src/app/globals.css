@@ -7025,6 +7025,17 @@ a.tree-card:hover {
   font-size: 0.8125rem;
 }
 
+/* The register's figures, apart from the birth-year ones in the same section. */
+.baby-register {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--dusk-tile-line);
+}
+
+.baby-register h4 {
+  margin: 0 0 var(--space-3);
+}
+
 .baby-full,
 .baby-locked {
   margin-top: var(--space-7);
