@@ -49,6 +49,7 @@ describe("MIGRATIONS_DIR", () => {
       "0038_given_name_claims.ts", // TASK-122 / ADR-0032 §6 — first-name counts and ranks as claims
       "0039_full_name_reports.ts", // TASK-124 / ADR-0041 — the full-name report
       "0040_given_name_birth_years.ts", // TASK-136 / ADR-0042 — first names given to children, by year
+      "0041_given_name_birth_claims.ts", // TASK-137 / ADR-0043 — their count, rank and trend as claims
     ]);
   });
 });

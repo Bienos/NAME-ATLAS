@@ -376,3 +376,14 @@ export const BEARERS_SHOWN_FREE = 3;
  */
 export const GIVEN_NAME_POPULATION_METHOD_VERSION = "given_name_population@1";
 export const GIVEN_NAME_RANK_METHOD_VERSION = "given_name_rank@1";
+
+/**
+ * Claims on the first names given to children, by year (TASK-137, ADR-0043).
+ * The count is the publisher's own on one list (a year of birth and a sex);
+ * the rank is a competition rank among that list's names; the trend is
+ * D-044 §6's rule (`BIRTH_TREND_WINDOW_YEARS`, `BIRTH_TREND_CHANGE_PERCENT`).
+ * Bump the trend's version if either parameter changes.
+ */
+export const GIVEN_NAME_BIRTH_COUNT_METHOD_VERSION = "given_name_birth_count@1";
+export const GIVEN_NAME_BIRTH_RANK_METHOD_VERSION = "given_name_birth_rank@1";
+export const GIVEN_NAME_BIRTH_TREND_METHOD_VERSION = "given_name_birth_trend@1";

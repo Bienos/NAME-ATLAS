@@ -332,6 +332,36 @@ export type {
   GivenNameRunTally,
 } from "./given-name.js";
 export { GIVEN_NAME_POPULATION_METHOD_VERSION, GIVEN_NAME_RANK_METHOD_VERSION } from "./version.js";
+// First names given to children, by year — TASK-137, ADR-0043.
+export {
+  BIRTH_TREND_CHANGE_PERCENT,
+  BIRTH_TREND_WINDOW_YEARS,
+  birthTrend,
+  deriveAllBirthNames,
+  deriveBirthName,
+  givenNameBirthCountClaimKey,
+  givenNameBirthRankClaimKey,
+  givenNameBirthTrendClaimKey,
+  loadBirthRunContext,
+} from "./given-name-births.js";
+export type {
+  BirthClaimOutcome,
+  BirthClaimRefusal,
+  BirthListContext,
+  BirthListResult,
+  BirthNameDerivationOutcome,
+  BirthNameRunOptions,
+  BirthNameRunTally,
+  BirthRunContext,
+  BirthTrendDirection,
+  BirthTrendEarlier,
+  BirthTrendVerdict,
+} from "./given-name-births.js";
+export {
+  GIVEN_NAME_BIRTH_COUNT_METHOD_VERSION,
+  GIVEN_NAME_BIRTH_RANK_METHOD_VERSION,
+  GIVEN_NAME_BIRTH_TREND_METHOD_VERSION,
+} from "./version.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
 export {
   buildFullNameReport,
