@@ -1,4 +1,6 @@
 import { Pool } from "pg";
+import type { PoolClient } from "pg";
+import type { PostgresPool } from "kysely";
 import type { DbConfig } from "./config.js";
 
 /**
@@ -98,4 +100,104 @@ export function createPool(config: DbConfig, options: PoolOptions | IdleErrorHan
   });
   pool.on("error", opts.onIdleError ?? reportToStderr);
   return pool;
+}
+
+export interface CheckoutQueueOptions {
+  /** The pool's own `max`: how many checkouts may be out at once. */
+  readonly max: number;
+  /** How long a checkout waits for one of them to come back before it fails. */
+  readonly waitMillis: number;
+}
+
+/** What a checkout that waited `waitMillis` for a busy connection fails with. */
+export class CheckoutWaitTimeoutError extends Error {
+  constructor(waitMillis: number) {
+    super(`no database connection came free within ${String(waitMillis)} ms`);
+    this.name = "CheckoutWaitTimeoutError";
+  }
+}
+
+/**
+ * A pool whose checkouts wait their turn (TASK-132).
+ *
+ * `pg-pool` has one `connectionTimeoutMillis` for two different waits: opening
+ * a new connection, and waiting in its queue for a busy one to come back. A
+ * short value is right for the first, so a request fails fast when the database
+ * is unreachable, and wrong for the second: on production a page's third query
+ * gave up after 5 s while two slow queries held the instance's two connections
+ * (TASK-130).
+ *
+ * So the waiting happens here, in a queue of its own with its own limit, and a
+ * checkout reaches the pool only when fewer than `max` are out. The pool then
+ * always has an idle connection or room to open one, never queues, and its
+ * `connectionTimeoutMillis` times only the opening. Checkouts are served in the
+ * order they asked.
+ *
+ * The result is what Kysely's `PostgresDialect` takes. It is not a `pg` `Pool`:
+ * nothing else should check out from the pool behind it, or the count here is
+ * wrong.
+ */
+export function queueCheckouts(pool: Pool, options: CheckoutQueueOptions): PostgresPool {
+  let free = options.max;
+  const waiting: (() => void)[] = [];
+
+  function giveBack(): void {
+    const next = waiting.shift();
+    if (next === undefined) free += 1;
+    else next();
+  }
+
+  function take(): Promise<void> {
+    if (free > 0) {
+      free -= 1;
+      return Promise.resolve();
+    }
+    return new Promise((resolve, reject) => {
+      const turn = (): void => {
+        clearTimeout(timer);
+        resolve();
+      };
+      const timer = setTimeout(() => {
+        const index = waiting.indexOf(turn);
+        if (index !== -1) waiting.splice(index, 1);
+        reject(new CheckoutWaitTimeoutError(options.waitMillis));
+      }, options.waitMillis);
+      waiting.push(turn);
+    });
+  }
+
+  return {
+    // Kysely reads these only to cancel a query, on a connection of its own.
+    // `pg-pool` sets `Client` on every pool; `@types/pg` does not declare it.
+    options: pool.options,
+    Client: (pool as Pool & Pick<PostgresPool, "Client">).Client,
+    end: () => pool.end(),
+    async connect(): Promise<PoolClient> {
+      await take();
+      let client: PoolClient;
+      try {
+        client = await pool.connect();
+      } catch (error) {
+        // A failed opening holds nothing: the next in line may try.
+        giveBack();
+        throw error;
+      }
+      // `pg-pool` sets a fresh `release` on every checkout, so this wrapper
+      // lasts for this checkout only. The turn is passed on once the
+      // connection is back in the pool, and only once.
+      const release = client.release;
+      let released = false;
+      client.release = (error?: Error | boolean) => {
+        try {
+          release(error);
+        } finally {
+          if (!released) {
+            released = true;
+            giveBack();
+          }
+        }
+      };
+      return client;
+    },
+  };
 }
