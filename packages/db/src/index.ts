@@ -1,6 +1,7 @@
 export { loadAccountsDbConfig, loadDbConfig, MissingDatabaseUrlError } from "./config.js";
 export type { DbConfig } from "./config.js";
-export { createPool } from "./pool.js";
+export { CheckoutWaitTimeoutError, createPool, queueCheckouts } from "./pool.js";
+export type { CheckoutQueueOptions } from "./pool.js";
 export { createDb } from "./kysely.js";
 // For tools outside the workspace packages, which cannot resolve `kysely` themselves.
 export { sql } from "kysely";

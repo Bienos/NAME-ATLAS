@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createPool } from "./pool.js";
+import type { Pool, PoolClient } from "pg";
+import { CheckoutWaitTimeoutError, createPool, queueCheckouts } from "./pool.js";
 
 /**
  * The pool's `error` listener. No database is needed: the point is that the
@@ -84,5 +85,105 @@ describe("createPool", () => {
     }
     expect(written.join("")).toContain("pool_idle_client_error");
     expect(written.join("")).not.toContain("SUPERSECRETPW");
+  });
+});
+
+/**
+ * TASK-132 — checkouts wait their turn with a limit of their own. A stand-in
+ * for `pg-pool` that counts what is out and, like it, gives each checkout a
+ * fresh `release`; `tests/integration/src/pool-checkout.test.ts` runs the same
+ * against PostgreSQL.
+ */
+describe("queueCheckouts", () => {
+  function standIn(failures = 0) {
+    const state = { out: 0, most: 0, asked: 0, failures };
+    const pool = {
+      options: {},
+      Client: class {},
+      end: async () => undefined,
+      connect: async (): Promise<PoolClient> => {
+        state.asked += 1;
+        if (state.failures > 0) {
+          state.failures -= 1;
+          throw new Error("Connection terminated due to connection timeout");
+        }
+        state.out += 1;
+        state.most = Math.max(state.most, state.out);
+        let released = false;
+        return {
+          release: () => {
+            // `pg-pool` throws on a second release of one checkout.
+            if (released)
+              throw new Error("Release called on client which has already been released");
+            released = true;
+            state.out -= 1;
+          },
+        } as unknown as PoolClient;
+      },
+    };
+    return { pool: pool as unknown as Pool, state };
+  }
+
+  /** Whether a promise has settled by the next turn of the event loop. */
+  async function settled(promise: Promise<unknown>): Promise<boolean> {
+    let done = false;
+    void promise.then(
+      () => (done = true),
+      () => (done = true),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    return done;
+  }
+
+  it("lets `max` checkouts out at once and serves the rest in the order they asked", async () => {
+    const { pool, state } = standIn();
+    const queued = queueCheckouts(pool, { max: 2, waitMillis: 1_000 });
+    const first = await queued.connect();
+    const second = await queued.connect();
+    const third = queued.connect();
+    const fourth = queued.connect();
+    expect(await settled(third)).toBe(false);
+    expect(state.asked).toBe(2);
+    first.release();
+    expect(await settled(third)).toBe(true);
+    expect(await settled(fourth)).toBe(false);
+    second.release();
+    (await third).release();
+    (await fourth).release();
+    expect(state.most).toBe(2);
+    expect(state.out).toBe(0);
+  });
+
+  it("fails a checkout that waits past its limit with its own error, and the queue moves on", async () => {
+    const { pool } = standIn();
+    const queued = queueCheckouts(pool, { max: 1, waitMillis: 20 });
+    const held = await queued.connect();
+    await expect(queued.connect()).rejects.toBeInstanceOf(CheckoutWaitTimeoutError);
+    held.release();
+    const next = queued.connect();
+    expect(await settled(next)).toBe(true);
+    (await next).release();
+  });
+
+  it("gives the turn back when opening a connection fails", async () => {
+    const { pool, state } = standIn(1);
+    const queued = queueCheckouts(pool, { max: 1, waitMillis: 20 });
+    await expect(queued.connect()).rejects.toThrow(/connection timeout/u);
+    const client = await queued.connect();
+    expect(state.asked).toBe(2);
+    client.release();
+  });
+
+  it("passes a turn on once, however often a checkout is released", async () => {
+    const { pool } = standIn();
+    const queued = queueCheckouts(pool, { max: 1, waitMillis: 1_000 });
+    const client = await queued.connect();
+    client.release();
+    expect(() => client.release()).toThrow(/already been released/u);
+    const next = await queued.connect();
+    const after = queued.connect();
+    expect(await settled(after)).toBe(false);
+    next.release();
+    (await after).release();
   });
 });
