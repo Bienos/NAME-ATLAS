@@ -13,12 +13,7 @@ type ContourVariant = "amber" | "ivory" | "blue";
 type ContourOrientation = "rising" | "falling";
 type HeroVariant = "homepage" | "surname" | "editorial" | "share";
 
-
-export function EvolvedContourMark({
-  className = "",
-}: {
-  className?: string;
-}) {
+export function EvolvedContourMark({ className = "" }: { className?: string }) {
   return (
     <svg
       className={`evolved-contour-mark ${className}`}
