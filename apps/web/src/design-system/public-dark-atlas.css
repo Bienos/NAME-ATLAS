@@ -529,7 +529,7 @@ body.dusk.atlas-v1 :is(input, textarea, select) {
   color-scheme: dark;
 }
 
-body.dusk.atlas-v1 :is(input, textarea, select):not(.landing-stage *) {
+body.dusk.atlas-v1 .site:not(.site-hero) :is(input, textarea, select) {
   color: var(--color-text-primary);
   background-color: color-mix(in srgb, var(--color-surface-interactive) 82%, transparent);
   border-color: var(--color-border-default);
@@ -574,6 +574,17 @@ body.dusk.atlas-v1 .footer-cta-action {
 
 body.dusk.atlas-v1 .footer-group h2 {
   color: var(--color-text-tertiary);
+}
+
+body.dusk.atlas-v1 .footer-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+body.dusk.atlas-v1 .footer-wordmark-mark {
+  width: 40px;
+  height: 40px;
 }
 
 body.dusk.atlas-v1 .footer-group a,
