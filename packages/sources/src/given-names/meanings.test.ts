@@ -32,6 +32,7 @@ describe("the committed first-name meaning files", () => {
     for (const [name, count] of [
       ["buryan-1933.json", 112],
       ["yonge-1884.json", 86],
+      ["bruckner-1927.json", 33],
     ] as const) {
       const parsed = parseGivenNameMeaningFile(file(name));
       if (parsed.kind !== "PARSED") throw new Error(`${name}: ${parsed.problems.join("; ")}`);
