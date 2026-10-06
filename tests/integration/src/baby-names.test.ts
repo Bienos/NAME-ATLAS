@@ -135,6 +135,49 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(girls.history).toBeNull();
   });
 
+  it("gives the list's people_sum, each count's share and 1 in N, and the trend's two shares (TASK-151)", async () => {
+    const zofia = await facts("Zofia", true);
+    const girls = sex(zofia, "FEMALE");
+    const latest = girls.latest;
+    if (latest?.list === null || latest?.count == null) throw new Error("no latest count");
+    // The 2025 girls' list holds 119 788 children (D-044 §6 as amended); the reader exposes it.
+    expect(latest.list.people_sum).toBe(119_788);
+    const stored = await sql<{ people_sum: number }>`
+      SELECT people_sum FROM given_name_birth_lists
+       WHERE given_name_birth_list_id = ${latest.list.list_id}::uuid`.execute(db());
+    expect(stored.rows[0]?.people_sum).toBe(119_788);
+    // 4 415 of 119 788: 36 856 per million rounded down, one in 27.
+    expect(latest.count).toMatchObject({ count: 4415, share_per_million: 36856, one_in: 27 });
+    // The trend claim's own shares are the same definition on each list's own sum.
+    expect(girls.trend?.latest_share_per_million).toBe(36856);
+    const earlier = girls.history?.find((y) => y.birth_year === 2020);
+    if (earlier?.list === null || earlier?.count == null) throw new Error("no 2020 count");
+    expect(girls.trend?.earlier_share_per_million).toBe(earlier.count.share_per_million);
+    expect(earlier.count.share_per_million).toBe(
+      Number((BigInt(earlier.count.count) * 1_000_000n) / BigInt(earlier.list.people_sum)),
+    );
+    expect(earlier.count.one_in).toBe(Math.round(earlier.list.people_sum / earlier.count.count));
+    expect(earlier.list.people_sum).not.toBe(latest.list.people_sum);
+    // The claim carries what the reader reads: nothing is recomputed differently.
+    const claim = await sql<{ value: string }>`
+      SELECT structured_value::text AS value FROM claims WHERE claim_id = ${girls.trend?.claim_id}::uuid`.execute(
+      db(),
+    );
+    const value = JSON.parse(claim.rows[0]?.value ?? "{}") as {
+      latest: { share_per_million: number; people_sum: number };
+      earlier: { share_per_million: number; people_sum: number };
+    };
+    expect(value.latest).toMatchObject({ share_per_million: 36856, people_sum: 119_788 });
+    expect(value.earlier).toMatchObject({
+      share_per_million: earlier.count.share_per_million,
+      people_sum: earlier.list.people_sum,
+    });
+    // A year the name is on no list has no count and so no share, never 0; the boys' latest too.
+    const absent = girls.history?.find((y) => y.list !== null && y.count === null);
+    expect(absent).toBeDefined();
+    expect(sex(zofia, "MALE").latest?.count).toBeNull();
+  });
+
   it("gives JAKUB FALLING on the boys' list", async () => {
     const boys = sex(await facts("JAKUB", false), "MALE");
     expect(boys.latest).toMatchObject({

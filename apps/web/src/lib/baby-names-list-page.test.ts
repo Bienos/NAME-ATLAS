@@ -54,6 +54,7 @@ for (const sex of ["MALE", "FEMALE"] as const) {
       birth_year: year,
       sex,
       publication_threshold: year <= 2012 ? 5 : 2,
+      people_sum: 100000,
     });
   }
 }

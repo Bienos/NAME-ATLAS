@@ -7118,6 +7118,580 @@ a.tree-card:hover {
   color: var(--dusk-ink-muted);
 }
 
+/* --- the baby-names page in Brand System v1 (TASK-151, ADR-0046) ---
+   The single-name page family lives in the `.atlas-v1` scope: semantic tokens
+   only, Atlas Blue for action, focus and the lit point, amber for the peak
+   year's bar alone. The rules above stay for the list page (TASK-146), which
+   is not migrated; every rule here is scoped to `.baby-names.atlas-v1`. No
+   animation is used, so reduced motion needs nothing. */
+
+.baby-names.atlas-v1 {
+  max-width: 64rem;
+  background: transparent;
+}
+
+.baby-names.atlas-v1 a {
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .baby-sign-in {
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .baby-form input {
+  color: var(--color-text-primary);
+  background: var(--color-surface-interactive);
+  border-color: var(--color-border-default);
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .baby-form button {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .baby-form button:hover {
+  background: var(--color-accent-hover);
+}
+
+.baby-names.atlas-v1 .bn-name {
+  margin: var(--space-xl) 0 var(--space-sm);
+  font: 500 var(--type-display-lg) / 0.96 var(--font-display, Georgia, serif);
+  letter-spacing: -0.03em;
+  font-optical-sizing: auto;
+  overflow-wrap: anywhere;
+}
+
+/* The sex tabs: in-page links; the current one is marked by its text, a point and a rule. */
+.baby-names.atlas-v1 .bn-tabs {
+  margin-top: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.baby-names.atlas-v1 .bn-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bn-tab[aria-current="true"] {
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-tab[aria-current="true"]::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-signal-atlas);
+}
+
+.baby-names.atlas-v1 .bn-tab[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  background: var(--color-accent-primary);
+}
+
+/* One column on a phone; the two sexes side by side from 900 px. */
+.baby-names.atlas-v1 .bn-sexes {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+@media (min-width: 900px) {
+  .baby-names.atlas-v1 .bn-sexes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.baby-names.atlas-v1 .bn-sex {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  min-width: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.baby-names.atlas-v1 .bn-sex-heading {
+  margin: 0;
+  font: 500 var(--type-heading-md) / 1.1 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-tile {
+  min-width: 0;
+  margin: 0;
+  padding: clamp(18px, 2.6vw, 28px);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+/* The shell's rule for every section's top border (`public-dark-atlas.css`, TASK-149) loads later; a tile keeps one border colour. */
+main.baby-names.atlas-v1 section.bn-tile {
+  border-top-color: var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-hero {
+  background: linear-gradient(160deg, var(--color-bg-elevated), var(--color-bg-primary) 72%);
+}
+
+.baby-names.atlas-v1 .bn-tile-heading {
+  margin: 0 0 var(--space-sm);
+  font: 600 var(--type-body-sm) / 1.3 var(--font-ui, system-ui, sans-serif);
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-eyebrow {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-big {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 12px;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-big strong {
+  font: 500 clamp(3.5rem, 11vw, 6rem) / 0.95 var(--font-display, Georgia, serif);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-big-noun {
+  font-size: var(--type-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-share {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-rank {
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-rank-line {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-rank-line strong {
+  font: 500 var(--type-heading-md) / 1.1 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-rank-line span {
+  color: var(--color-text-secondary);
+}
+
+/* The rank track: a thin line, the marker at rank ÷ universe, the left end the most common. */
+.baby-names.atlas-v1 .bn-track {
+  position: relative;
+  height: 18px;
+  margin: var(--space-sm) 0 2px;
+}
+
+.baby-names.atlas-v1 .bn-track-line {
+  position: absolute;
+  inset: 50% 0 auto;
+  height: 1px;
+  background: var(--color-border-strong);
+}
+
+.baby-names.atlas-v1 .bn-track-mark {
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-signal-atlas) 22%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-track-labels {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin: 0;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.04em;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-one-in {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-one-in strong {
+  font: 500 clamp(2.25rem, 6vw, 3.25rem) / 1 var(--font-display, Georgia, serif);
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-one-in span {
+  color: var(--color-text-secondary);
+}
+
+/* The dot grid: one dot a child of the "1 na N", the one the name went to lit (the Atlas Point). */
+.baby-names.atlas-v1 .bn-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 22rem;
+  margin: var(--space-md) 0 0;
+}
+
+.baby-names.atlas-v1 .bn-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-surface-interactive);
+  border: 1px solid var(--color-border-default);
+}
+
+.baby-names.atlas-v1 .bn-dot-lit {
+  background: var(--color-signal-atlas);
+  border-color: transparent;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-signal-atlas) 24%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-caption {
+  margin: var(--space-md) 0 0;
+  font-size: var(--type-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-chip-line {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-chip {
+  font-size: var(--type-body-sm);
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-shares {
+  margin: var(--space-sm) 0;
+  font: 500 var(--type-data-md) / 1.5 var(--font-data, ui-monospace, monospace);
+  color: var(--color-text-primary);
+}
+
+/* Evidence lines: mono, source · dataset · date, at the floor of legibility. */
+.baby-names.atlas-v1 .baby-source,
+.baby-names.atlas-v1 .bn-evidence {
+  margin: var(--space-md) 0 0;
+  font: 500 var(--type-data-md) / 1.5 var(--font-data, ui-monospace, monospace);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .baby-basis {
+  margin-top: var(--space-sm);
+  font-size: var(--type-body-sm);
+}
+
+.baby-names.atlas-v1 .bn-register {
+  margin: 0;
+  padding-top: clamp(18px, 2.6vw, 28px);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-figures {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-figures dt {
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-figures dd {
+  margin: 0;
+  font: 500 var(--type-heading-md) / 1.1 var(--font-display, Georgia, serif);
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-meaning {
+  margin-top: var(--space-lg);
+}
+
+.baby-names.atlas-v1 .bn-works {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-work-facts {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-work-facts div {
+  display: grid;
+  grid-template-columns: minmax(84px, 0.4fr) 2fr;
+  gap: 12px;
+}
+
+.baby-names.atlas-v1 .bn-work-facts dt {
+  font: 500 var(--type-metadata) / 1.5 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-work-facts dd {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-translation {
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-assessment {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: var(--space-md) 0 0;
+}
+
+.baby-names.atlas-v1 .bn-assessment-word {
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-muted {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-absent {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* The locked card: the same facts and rule (8,99 zł · Wkrótce, no button), in the family's dress. */
+.baby-names.atlas-v1 .baby-locked {
+  margin-top: var(--space-lg);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .baby-locked h2 {
+  margin: 0 0 var(--space-sm);
+  font: 500 var(--type-heading-md) / 1.1 var(--font-display, Georgia, serif);
+}
+
+/* The shell gives `.baby-soon` an amber border (TASK-149); on this page amber is the peak bar's alone. */
+main.baby-names.atlas-v1 .baby-locked .baby-soon {
+  padding: 3px 10px;
+  color: var(--color-accent-text);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+}
+
+/* The paid view. */
+.baby-names.atlas-v1 .bn-full {
+  margin-top: var(--space-xl);
+}
+
+.baby-names.atlas-v1 .bn-full > h2 {
+  margin: 0 0 var(--space-sm);
+  font: 500 var(--type-heading-lg) / 1.05 var(--font-display, Georgia, serif);
+  letter-spacing: -0.02em;
+}
+
+.baby-names.atlas-v1 .bn-paid {
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+}
+
+.baby-names.atlas-v1 .bn-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.baby-names.atlas-v1 .bn-chart-axis {
+  stroke: var(--chart-grid);
+}
+
+.baby-names.atlas-v1 .bn-chart-bar-year {
+  fill: var(--chart-context);
+}
+
+.baby-names.atlas-v1 .bn-chart-bar-edge {
+  fill: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-chart-bar-peak {
+  fill: var(--color-signal-amber);
+}
+
+.baby-names.atlas-v1 .bn-chart-cutoff {
+  stroke: var(--color-text-tertiary);
+  stroke-width: 2;
+  stroke-dasharray: 2 2;
+}
+
+.baby-names.atlas-v1 .bn-chart-label {
+  fill: var(--chart-text);
+  font: 500 13px var(--font-data, ui-monospace, monospace);
+}
+
+.baby-names.atlas-v1 .bn-times {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-times strong {
+  font: 500 clamp(2.5rem, 7vw, 3.5rem) / 1 var(--font-display, Georgia, serif);
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-times span {
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-callouts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+
+@media (max-width: 540px) {
+  .baby-names.atlas-v1 .bn-callouts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.baby-names.atlas-v1 .bn-callout {
+  min-width: 0;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-callout strong {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.baby-names.atlas-v1 .bn-callout small {
+  font-size: var(--type-metadata);
+}
+
+.baby-names.atlas-v1 .bn-ladder {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-rung {
+  display: grid;
+  gap: 2px;
+  padding: 8px 0;
+  text-align: center;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-rung-year {
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-rung-rank {
+  font: 500 1.25rem/1 var(--font-display, Georgia, serif);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-rung[aria-current="true"] {
+  border-top: 2px solid var(--color-accent-primary);
+}
+
+.baby-names.atlas-v1 .bn-rung[aria-current="true"] .bn-rung-rank {
+  font-size: 1.5rem;
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-top-years {
+  margin: var(--space-sm) 0 0;
+  font-size: var(--type-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-names.atlas-v1 .bn-table caption {
+  padding: var(--space-sm) 0;
+  text-align: left;
+  font-weight: 600;
+}
+
+.baby-names.atlas-v1 .bn-table th,
+.baby-names.atlas-v1 .bn-table td {
+  padding: var(--space-sm) var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-details {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-details summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 0;
+  font-weight: 600;
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-sources {
+  margin: var(--space-sm) 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
 /* --- the baby-names list (TASK-146) --- */
 
 .baby-list-link {
