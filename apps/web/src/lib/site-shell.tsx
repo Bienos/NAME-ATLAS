@@ -6,6 +6,7 @@ import type { WorldMode } from "./dusk-world.js";
 import { SiteNav } from "./site-nav.js";
 import type { NavPlace } from "./site-nav.js";
 import { SiteFooter } from "./site-footer.js";
+import { AtlasGrid, AtlasPoint, ContourField } from "../design-system/graphics/index.js";
 
 /**
  * Every page's frame (TASK-052, ADR-0021): the dusk world behind it, the
@@ -44,6 +45,18 @@ export function SiteShell({
   return (
     <div className={`site site-${world.mode}`}>
       <DuskWorld mode={world.mode} weights={world.weights} lit={world.lit ?? null} />
+      <div className="atlas-shell-graphics" aria-hidden="true">
+        <ContourField
+          seed={world.mode === "hero" ? 149 : world.mode === "journey" ? 53 : 21}
+          density={world.mode === "hero" ? 8 : 5}
+          intensity={world.mode === "hero" ? 1.15 : 0.72}
+          focusPoint={world.mode === "hero" ? { x: 74, y: 42 } : { x: 84, y: 24 }}
+          opacity={world.mode === "hero" ? 0.42 : 0.16}
+          variant="amber"
+        />
+        <AtlasGrid />
+        {world.mode === "hero" ? <AtlasPoint size={12} glow className="atlas-shell-point" /> : null}
+      </div>
       <SiteNav lang={lang} otherPath={otherPath} current={current} search={search} />
       <main lang={htmlLang(lang)} className={mainClassName}>
         {children}

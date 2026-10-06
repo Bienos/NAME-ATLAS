@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { TOKENS } from "./design-tokens.js";
 import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
@@ -194,7 +193,7 @@ function paint(
       ctx.shadowBlur = spark ? 5 : 0;
       dot(ctx, x, y, spark ? 1.3 : 0.6 + rnd() * 0.5, colour, 0.45 + bright * 0.55);
     } else {
-      dot(ctx, x, y, 0.75, TOKENS["dusk-map-dim"], 0.6);
+      dot(ctx, x, y, 0.75, TOKENS["atlas-aubergine-500"], 0.5);
       const weight = weights[region] ?? 0;
       if (largest > 0 && weight > 0 && rnd() < (weight / largest) * 0.9) {
         const lit = weight === largest;
@@ -203,7 +202,7 @@ function paint(
           x,
           y,
           lit ? 1.3 : 1,
-          lit ? TOKENS["dusk-map-glow"] : TOKENS["dusk-amber"],
+          lit ? TOKENS["atlas-blue-300"] : TOKENS["atlas-blue-500"],
           0.55 + weight,
         );
       }
@@ -230,7 +229,7 @@ function paint(
  * Poland as a landmass of points behind the journey.
  *
  * In `hero` mode the land lies on the horizon under the landing's search
- * field, its edge lit, in the owner's reference-derived background. A
+ * field, its edge lit, in the abstract code-driven Dark Atlas terrain. A
  * submitted search sets `data-dusk-zoom` on `<html>`
  * (`dusk-zoom.tsx`) and the stylesheet brings the camera down to the map and
  * draws the sixteen voivodeship borders. In `journey` mode — a surname's
@@ -301,13 +300,10 @@ export function DuskWorld({
     >
       {mode === "hero" ? (
         <div className="dusk-horizon">
-          <Image
-            src="/images/landing-dusk.png"
-            alt=""
-            fill
-            preload
-            sizes="(max-width: 760px) 100vh, 100vw"
-          />
+          <div className="dusk-terrain dusk-terrain-far" />
+          <div className="dusk-terrain dusk-terrain-mid" />
+          <div className="dusk-terrain dusk-terrain-near" />
+          <span className="dusk-terrain-point" />
         </div>
       ) : null}
       <div className="dusk-deep" />

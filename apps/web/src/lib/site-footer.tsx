@@ -1,3 +1,4 @@
+import { EvolvedContourMark } from "../design-system/graphics/index.js";
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { legalPath } from "./legal-text.js";
@@ -68,8 +69,9 @@ export function SiteFooter({ lang }: { readonly lang: Lang }) {
       </a>
       <div className="footer-grid">
         <div className="footer-brand">
-          <a className="footer-wordmark" href={homePath(lang)}>
-            {t.title}
+          <a className="footer-wordmark" href={homePath(lang)} aria-label={t.title}>
+            <EvolvedContourMark className="footer-wordmark-mark" />
+            <span>{t.title}</span>
           </a>
           <p className="footer-tagline">{t.tagline}</p>
           <p className="footer-note">{t.footer}</p>

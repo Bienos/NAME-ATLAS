@@ -16,8 +16,8 @@ import { VOIVODESHIP_VIEWBOX, VOIVODESHIPS } from "./voivodeship-geometry.js";
  * count per partition, `1 in X` where commensurable, the dataset date — and
  * adds nothing but the brand: the dusk ground, cream type, Fraunces for the
  * surname, Instrument Sans for the wordmark and the figures, IBM Plex Mono for
- * the dataset line, and the thread (point → tick → point → ring) in the one
- * light, amber.
+ * the dataset line, and the thread (point → tick → point → ring) in the primary
+ * digital signal, Atlas Blue.
  *
  * Deterministic for a given projection: the fonts are files in this app
  * (`assets/fonts/`, see its README), read once per process. If they are
@@ -30,18 +30,18 @@ const C = {
   ground: TOKENS["dusk-surface"],
   ink: TOKENS["dusk-ink"],
   secondary: TOKENS["dusk-ink-muted"],
-  light: TOKENS["dusk-amber"],
+  light: TOKENS["atlas-blue-500"],
   rule: TOKENS["dusk-line-control"],
   tile: TOKENS["dusk-tile"],
   tileLine: TOKENS["dusk-tile-line"],
   soft: TOKENS["dusk-ink-soft"],
   noData: TOKENS["dusk-map-no-data"],
   map: [
-    TOKENS["dusk-map-0"],
-    TOKENS["dusk-map-1"],
-    TOKENS["dusk-map-2"],
-    TOKENS["dusk-map-3"],
-    TOKENS["dusk-map-4"],
+    TOKENS["atlas-aubergine-500"],
+    TOKENS["atlas-blue-700"],
+    TOKENS["atlas-blue-600"],
+    TOKENS["atlas-blue-500"],
+    TOKENS["atlas-blue-300"],
   ],
 } as const;
 

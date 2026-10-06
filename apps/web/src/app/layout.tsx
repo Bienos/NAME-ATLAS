@@ -8,6 +8,7 @@ import { SITE_COPY, SITE_PREVIEW_IMAGE } from "../lib/site-metadata.js";
 import { siteOrigin } from "../lib/surname-page.js";
 import "./globals.css";
 import "../design-system/brand-system.css";
+import "../design-system/public-dark-atlas.css";
 
 /**
  * The three type voices of the brand (ADR-0021, TASK-052): Fraunces for the
@@ -76,7 +77,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Every page renders in the dusk scope (ADR-0021): the body carries `.dusk`,
+ * Every page renders in the Dark Atlas scope (TASK-149, ADR-0046): the body carries `.dusk.atlas-v1`,
  * which re-points the system's token names at the dusk values, and each page
  * draws its own world behind it (`site-shell.tsx`). Vercel Web Analytics (#58)
  * and Vercel Speed Insights follow the page, with the surname kept out of
@@ -91,7 +92,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <script async src={GA_SCRIPT_URL} />
       </head>
-      <body className="dusk">
+      <body className="dusk atlas-v1">
         {children}
         <SiteAnalytics />
         <SiteSpeedInsights />
