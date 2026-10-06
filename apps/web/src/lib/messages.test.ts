@@ -712,7 +712,7 @@ describe("changeSentence and its notes (TASK-051, ADR-0020)", () => {
   });
 });
 
-describe("otherSpellingParts (TASK-125)", () => {
+describe("otherSpellingParts (TASK-131)", () => {
   // SYNTHETIC counts, to reach each Polish plural form; the name is a placeholder.
   const other = (count: number, group: string): OtherSpelling => ({
     surname: { id: "01a0f034-0000-7000-8000-000000000001", display_name: "ŁĄCKI", script: "Latn" },

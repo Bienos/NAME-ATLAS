@@ -1871,7 +1871,7 @@ describe("TASK-073: the known people's chapter", () => {
   });
 });
 
-describe("TASK-125: the other spelling, under the answer", () => {
+describe("TASK-131: the other spelling, under the answer", () => {
   const MALE = "pesel_2026_national_male";
   const FEMALE = "pesel_2026_national_female";
   const NBSP = " ";

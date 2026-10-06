@@ -4,7 +4,7 @@ import type { DB } from "@name-atlas/db";
 import { escapeLike, outranksTypedSpelling, polishDiacriticFold } from "@name-atlas/resolver";
 
 /**
- * The surname's other spelling (TASK-125): a surname whose canonical key has the
+ * The surname's other spelling (TASK-131): a surname whose canonical key has the
  * same Polish-diacritic fold and that is much more common, so that a reader on
  * WISNIEWSKI's page, who may have typed without diacritics, is shown WIŚNIEWSKI.
  *

@@ -138,7 +138,7 @@ function emptyNeighbours(
 
 /**
  * The deck's neighbours and other grammatical form (TASK-055, ADR-0025), and
- * the page's other spelling (TASK-125). All three are read from rank claims on
+ * the page's other spelling (TASK-131). All three are read from rank claims on
  * the same national lists as the rarity section, so they are shown exactly when
  * rarity is, on rarity's rights.
  */

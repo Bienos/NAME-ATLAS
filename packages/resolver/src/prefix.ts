@@ -10,7 +10,7 @@
  * finds WIŚNIEWSKI (`docs/canonical/13` §6.1: the fold is for retrieval, never
  * identity). Surnames whose key starts with the input *as typed*, diacritics
  * included, come first, unless one found only through the fold is at least
- * {@link OTHER_SPELLING_RATIO} times as common (TASK-125,
+ * {@link OTHER_SPELLING_RATIO} times as common (TASK-131,
  * {@link orderPrefixMatches}); then the more common; then alphabetical.
  *
  * "More common" is the larger of a surname's national counts, used **only to
@@ -20,7 +20,7 @@
  * Cost is linear in the number of surnames the prefix matches, since all of
  * them are ordered before the first eight of each kind are kept: measured
  * 4.4 µs a match on a 408,182-surname database (111,111 matches, 490 ms;
- * 8 matches, 20 ms) before TASK-125 added the window. A real two-letter prefix
+ * 8 matches, 20 ms) before TASK-131 added the window. A real two-letter prefix
  * matches tens of thousands, so ~100–200 ms; three letters and more are fast.
  * The client waits for a pause in typing.
  *
@@ -49,10 +49,10 @@ export interface PrefixSuggestion {
 
 /**
  * How many times as common a surname found only through the diacritic fold must
- * be before it is put ahead of one spelled as typed (TASK-125). The surname page
+ * be before it is put ahead of one spelled as typed (TASK-131). The surname page
  * uses the same figure to say "Szukasz WIŚNIEWSKI?" on WISNIEWSKI's page.
  *
- * A product choice, recorded in `tasks/125-diacritic-spelling-hint.md`: an
+ * A product choice, recorded in `tasks/131-diacritic-spelling-hint.md`: an
  * ASCII spelling typed by a reader who dropped the diacritics competes with the
  * diacritic form only in the share of readers who type that way, so a form
  * five times as common is the likelier meaning unless fewer than one reader in
@@ -81,7 +81,7 @@ export interface PrefixMatch extends PrefixSuggestion {
 }
 
 /**
- * The list's order (TASK-125). `typed` holds the matches whose key starts with
+ * The list's order (TASK-131). `typed` holds the matches whose key starts with
  * the input as typed and `folded` those found only through the fold, each
  * already most common first. They are merged, and a folded match goes ahead of
  * a typed one only when {@link outranksTypedSpelling} says so. Since each list

@@ -30,7 +30,7 @@ import { z } from "zod";
  * so 1.9 is the first version on `main` that carries both. 1.10 adds
  * `neighbours` and `other_form` (TASK-055, ADR-0025). 1.11 adds `localities`
  * (TASK-090, ADR-0025 §2.7). 1.12 adds `bearers` (TASK-073, ADR-0030). 1.13
- * adds `other_spelling` (TASK-125).
+ * adds `other_spelling` (TASK-131).
  */
 export const SURNAME_RESULT_SCHEMA_VERSION = "1.13";
 
@@ -903,7 +903,7 @@ export const otherFormSchema = z.object({
 
 /**
  * The same surname key with other Polish diacritics, much more common than this
- * one (TASK-125): WIŚNIEWSKI on WISNIEWSKI's page. Its largest count on one
+ * one (TASK-131): WIŚNIEWSKI on WISNIEWSKI's page. Its largest count on one
  * list, with that list and its date, from its rank claim. Two register entries,
  * and nothing here relates the people who bear them.
  */
@@ -1050,7 +1050,7 @@ export const surnameResultResponseSchema = z
     /** Added in 1.11 (TASK-090). Present exactly when RESOLVED. */
     localities: localitiesSectionSchema.nullable(),
     /**
-     * Added in 1.13 (TASK-125). Null unless RESOLVED, and null unless a surname
+     * Added in 1.13 (TASK-131). Null unless RESOLVED, and null unless a surname
      * with the same diacritic-folded key is much more common than this one.
      */
     other_spelling: otherSpellingSchema.nullable(),

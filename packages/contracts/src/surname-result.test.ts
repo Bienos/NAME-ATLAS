@@ -1149,7 +1149,7 @@ describe("neighbours and the other form (TASK-055, ADR-0025; schema 1.10)", () =
   });
 
   it("carries an other spelling on a resolved surname only, and never the surname itself (1.13)", () => {
-    // WIŚNIEWSKI's men's count on the 2026-01-20 register, on WISNIEWSKI's page (TASK-125).
+    // WIŚNIEWSKI's men's count on the 2026-01-20 register, on WISNIEWSKI's page (TASK-131).
     const spelling = {
       surname: {
         id: "01a0b9e3-34f3-7633-a239-2b8596dfc0ff",

@@ -8,7 +8,7 @@ import {
 import type { PrefixMatch } from "./prefix.js";
 
 /**
- * The pure half of the prefix order (TASK-125). No database: the query hands
+ * The pure half of the prefix order (TASK-131). No database: the query hands
  * this each kind of match already most common first.
  *
  * Counts are each surname's larger national count on the 2026-01-20 register,

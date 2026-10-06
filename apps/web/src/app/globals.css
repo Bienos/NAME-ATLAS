@@ -579,7 +579,7 @@ footer {
   color: var(--text-secondary);
 }
 
-/* The other spelling (TASK-125): one line under the answer, its name a link. */
+/* The other spelling (TASK-131): one line under the answer, its name a link. */
 .other-spelling {
   margin: var(--space-3) 0 var(--space-5);
   max-inline-size: 40rem;
@@ -4533,6 +4533,73 @@ body.dusk {
 .legal-updated {
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.875rem;
+}
+
+/* --- the surname directory (TASK-129): letters, then plain links, then pages --- */
+
+.site > main.directory {
+  max-width: 64rem;
+}
+
+.directory .breadcrumbs {
+  margin-bottom: var(--space-6);
+  color: var(--dusk-ink-muted);
+}
+
+.directory-letters ul,
+.directory-pages ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-7);
+  padding: 0;
+  list-style: none;
+}
+
+.directory-letters a,
+.directory-pages a,
+.directory-pages [aria-current] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  text-decoration: none;
+}
+
+.directory-letters a[aria-current],
+.directory-pages [aria-current] {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+}
+
+.directory-pages a,
+.directory-pages [aria-current] {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.9375rem;
+}
+
+.directory-pages ol {
+  margin: var(--space-7) 0 0;
+}
+
+.reading .directory-list {
+  columns: 14rem auto;
+  column-gap: var(--space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reading .directory-list li {
+  break-inside: avoid;
+  line-height: 1.9;
 }
 
 /* --- the report preview (TASK-120): a stored internal test report as a dusk dossier --- */

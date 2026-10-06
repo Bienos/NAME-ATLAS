@@ -22,20 +22,21 @@
 
 ## 2. Decision
 
-1. **Five tiers, prices in PLN including whatever VAT applies, each a one-time payment:**
+1. **Five tiers, and a sixth since 2026-10-06 (D-044), prices in PLN including whatever VAT applies, each a one-time payment:**
 
    | Tier | Price | Holds (confirmed) |
    |---|---|---|
-   | Free, with an account | 0 | the cards, a share card per answer, the full page and the comparison; famous bearers; a family tree of up to 5 people; connecting trees, with matches up to second cousins |
+   | Free, with an account | 0 | the cards, a share card per answer, the full page and the comparison; famous bearers; a family tree of up to 5 people; connecting trees, with matches up to second cousins; the basic view of first names given to children (D-044), once it is built |
+   | "baby names" | 5,99 zł | the full figures of first names given to children, for every name, once they are built (amended 2026-10-06, D-044). No tree unlock |
    | "smaller research" | 28,99 zł | the tree unlock; the full-name report (ADR-0032), once it is built (amended 2026-10-05, D-043) |
    | "couple" | 89,99 zł | the couple report (ADR-0035), and the tree unlock |
    | "family review" | 199 zł | the tree unlock |
    | "genealogist research" | 800 zł | research by a partner genealogist with DNA analysis, paid to Name Atlas, "coming soon"; and the tree unlock |
 
-   **The tree unlock** is the same in every paid tier: a tree of more than 5 people, and matches beyond second cousins.
+   **The tree unlock** is the same in every tier from 28,99 zł up: a tree of more than 5 people, and matches beyond second cousins. **Amended 2026-10-06 (D-044):** the 5,99 zł tier does not hold it, and every tier from 28,99 zł up also holds the 5,99 zł tier's figures.
 
 2. **Only what is confirmed is shown.** What else the 28,99 zł and 199 zł tiers hold was drafted in the owner's 2026-10-01 chat and is not confirmed. The offer page lists the tree unlock for them and nothing more until the owner confirms more. A later ADR, or an amendment to this one, adds it. **Amended 2026-10-05 (D-043):** the owner confirmed the full-name report for the 28,99 zł tier. The offer page names it only once the report exists; until then it lists the tree unlock alone. Whether the higher tiers include the report is not decided.
-3. **Names.** The owner's names are working names in English. The English page uses them ("Smaller research", "Couple", "Family review", "Genealogist research"). The Polish page uses this session's renderings, which the owner may change without a new ADR: "Małe poszukiwania", "Para", "Przegląd rodziny", "Badanie genealogiczne".
+3. **Names.** The owner's names are working names in English. The English page uses them ("Smaller research", "Couple", "Family review", "Genealogist research"). The Polish page uses this session's renderings, which the owner may change without a new ADR: "Małe poszukiwania", "Para", "Przegląd rodziny", "Badanie genealogiczne". The 5,99 zł tier's working names (D-044), likewise changeable: "Baby names" and "Imiona dla dziecka".
 4. **The 800 zł tier** keeps ADR-0026 §2.4's description of the service (archival research, a tree with its documents, help choosing a DNA test and analysis of one already taken, a written report) and its two rules: the partner is not named, and the page asks readers not to send DNA results or health data by email. The reader pays Name Atlas, which pays the partner (D-024). That makes Name Atlas the seller of the partner's service, which the consumer terms and invoicing (ADR-0023 §2.5) must cover before it is sold.
 5. **The way to ask.** Each of the 28,99, 89,99 and 199 zł tiers has the waiting-list email, naming the tier and its price in the subject. The 800 zł tier keeps the enquiry email. Nothing is stored (ADR-0026 §2.3).
 6. **Not yet built, and not built by the offer page:** the 5-person cap, the matches limit, the unlock, an entitlement, checkout. Until they are, the free tier's tree is "coming soon" with the account, and every paid tier is "Wkrótce".
@@ -49,8 +50,8 @@
 
 ## 4. Consequences
 
-- `PRODUCT.md` §6 lists the five tiers; §8's line on non-goal 11 records that it holds.
+- `PRODUCT.md` §6 lists the tiers (six since D-044); §8's line on non-goal 11 records that it holds.
 - D-025 and D-024 are closed by this ADR once it is accepted.
 - Open, for the owner: what else the 28,99 zł and 199 zł tiers hold.
-- Later tasks: the tree's 5-person cap and the second-cousin limit; an entitlement that lifts both for any paid tier; checkout in test mode (ADR-0023 §2.4) with one-time prices; the couple report's link from the offer page once it can be sold.
+- Later tasks: the tree's 5-person cap and the second-cousin limit; an entitlement that lifts both for any tier from 28,99 zł up (D-044); checkout in test mode (ADR-0023 §2.4) with one-time prices; the couple report's link from the offer page once it can be sold.
 - Two strings outside the offer page still name the tier that no longer exists: the tree landing's eyebrow and line "Część pakietu Nazwisko i rodzina" (`tree-text.ts`, already untrue since D-034; the tree pages are dark), and the bearers chapter's "Pozostałe osoby ({n}) pokażemy w raporcie „Nazwisko i rodzina”" (`messages.ts`; no bearers are loaded in production). They are left for their own task: which tier, if any, shows the remaining bearers is not decided.

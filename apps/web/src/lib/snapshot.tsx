@@ -103,7 +103,7 @@ export function Snapshot({
   response: SurnameResultResponse & { status: "RESOLVED" };
   /** The journey's first step, linked at the foot of the first screen (TASK-053). */
   next?: Step | null;
-  /** A line under the answer: the other spelling (TASK-125). */
+  /** A line under the answer: the other spelling (TASK-131). */
   notice?: ReactNode;
   lang: Lang;
 }) {

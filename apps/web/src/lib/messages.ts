@@ -437,7 +437,7 @@ export function otherFormSentence(other: OtherForm, lang: Lang): string {
 }
 
 /**
- * The other spelling's line (TASK-125), as a question: "Szukasz WIŚNIEWSKI?"
+ * The other spelling's line (TASK-131), as a question: "Szukasz WIŚNIEWSKI?"
  * then its count on its own list, with the list's date. In three parts, so the
  * page can link the name. It asks; it never says the reader misspelled, and it
  * states no relation between the two surnames' bearers.

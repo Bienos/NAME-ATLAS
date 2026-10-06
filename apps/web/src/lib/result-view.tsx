@@ -264,7 +264,7 @@ function OtherFormNote({ other, lang }: { other: OtherForm; lang: Lang }) {
 }
 
 /**
- * WIŚNIEWSKI on WISNIEWSKI's page (TASK-125): a question with a link, under the
+ * WIŚNIEWSKI on WISNIEWSKI's page (TASK-131): a question with a link, under the
  * answer, for a reader who may have typed without diacritics. A plain line;
  * the two are separate register entries and it says nothing about kinship.
  */

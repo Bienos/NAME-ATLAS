@@ -29,7 +29,8 @@ export function pageCount(total: number): number {
 
 /**
  * The sitemap index. 598,476 surnames cannot be one sitemap — the protocol caps
- * a file at 50,000 URLs — so the root document names the pages.
+ * a file at 50,000 URLs, and this site at 10,000 so the CDN can store each one
+ * (`SITEMAP_PAGE_SIZE`, TASK-128) — so the root document names the pages.
  *
  * An index with no pages is valid and is what an alpha correctly serves.
  *
@@ -94,6 +95,30 @@ export function sitemapPageXml(
     "",
   ].join("\n");
 }
+
+/**
+ * Vercel's CDN caching for the sitemaps that read the database (TASK-127):
+ * `/sitemap.xml` and `/sitemap/{n}.xml`, on a 200 only.
+ *
+ * Each took 7–14 s on production (TASK-126's merged PR) and listed the same
+ * claims for hours or months at a time, so a crawler should not wait for the
+ * database on every fetch. Fresh for 6 hours; for a further 24 the stale copy
+ * is served at once while the CDN rebuilds it in the background. Vercel's CDN
+ * reads `s-maxage` and `stale-while-revalidate`; a browser or crawler does not
+ * keep a copy of its own.
+ *
+ * Errors and 404s carry no such header, so a failure is never cached, and the
+ * responses with nothing to read (no `SITE_ORIGIN`, `SEO_INDEXING_ENABLED`
+ * unset) are not cached either: switching the flag is a redeployment and must
+ * take effect at once, as `robots.txt`'s five minutes do.
+ */
+export const SITEMAP_CACHE_CONTROL = "public, s-maxage=21600, stale-while-revalidate=86400";
+
+/** The headers of a sitemap read from the database. */
+export const CACHED_SITEMAP_HEADERS = {
+  "content-type": "application/xml; charset=utf-8",
+  "cache-control": SITEMAP_CACHE_CONTROL,
+} as const;
 
 /** Where the blog's sitemap is served (TASK-071). */
 export const BLOG_SITEMAP_PATH = "/sitemap-blog.xml";

@@ -89,3 +89,47 @@ export async function seoGatesFor(db: Kysely<DB>, surnameId: string): Promise<Se
     profiles: profiles.length,
   };
 }
+
+/**
+ * The rights profiles whose own terms block the SEO surface (TASK-126), for the
+ * sitemap's rights gate.
+ *
+ * The same rule as `seoGatesFor`, applied to each profile alone: every
+ * permission column is `NOT NULL`, the fold is most-restrictive-wins, and
+ * `evaluateSurface(…, "SEO")` only tightens as a dimension does, so a surname's
+ * fold is allowed exactly when none of its claims cites a profile listed here.
+ * The table holds one row per source posture, so this reads a handful of rows.
+ */
+export async function seoBlockedProfileIds(db: Kysely<DB>): Promise<readonly string[]> {
+  const profiles = await db
+    .selectFrom("rights_profiles")
+    .select([
+      "rights_profile_id",
+      "metadata_rights",
+      "transcription_rights",
+      "image_rights",
+      "database_rights",
+      "automated_access",
+      "commercial_use",
+      "redistribution",
+      "review_status",
+    ])
+    .execute();
+  return profiles
+    .filter((profile) => {
+      const complete = completeRights(resolveEffectiveRights(profile));
+      return (
+        evaluateSurface(
+          {
+            automated_access: complete.automated_access,
+            commercial_use: complete.commercial_use,
+            redistribution: complete.redistribution,
+            metadata_rights: complete.metadata_rights,
+            review_status: complete.review_status,
+          },
+          "SEO",
+        ).decision !== "ALLOWED"
+      );
+    })
+    .map((profile) => profile.rights_profile_id);
+}

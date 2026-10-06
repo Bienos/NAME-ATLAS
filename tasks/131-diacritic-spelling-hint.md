@@ -1,10 +1,10 @@
-# TASK-125 — Leading a reader who typed without diacritics to the surname they most likely meant
+# TASK-131 — Leading a reader who typed without diacritics to the surname they most likely meant
 
 - **Status:** IMPLEMENTED 2026-10-05 on `claude/compassionate-cerf-h2dyuj` (`docs/progress/2026-10-05-diacritic-spelling-hint.md`).
 - **Requested by:** the project owner, 2026-10-05, from what production showed: a reader who types a surname without Polish letters lands on a near-empty page for a rare ASCII spelling, and nothing points to the form they almost certainly meant.
 - **Specification:** `docs/canonical/13` §6.1 (the Polish diacritic fold is for retrieval, never identity); `docs/contracts/surname-result.md` (1.12 → 1.13); `docs/contracts/surname-prefix.md` (its order; the response is unchanged).
 - **Depends on:** TASK-055 (rank claims read beside a surname, `other_form`), the suggest-as-you-type route (`prefix.ts`, migration 0020's trigram index on the folded key).
-- **Number:** 124 is #149's (open when this began, merged as `4aa1c04` before this change's pull request); 125 was free on `main` @ `93db9a1` and in the open pull requests. No ADR, decision or migration number is taken.
+- **Number:** 124 is #149's (open when this began, merged as `4aa1c04` before this change's pull request); 125 was free on `main` @ `93db9a1` and in the open pull requests, but #150 (opened earlier) also took 125 and merged first. Renumbered 131 at merge on 2026-10-06, the next number free on `main` (#156 holds 129, #157 130). No ADR, decision or migration number is taken.
 - **Model guidance:** implementation session.
 
 ## 1. What production showed (2026-10-05, public API on name-atlas.pl)

@@ -16,7 +16,7 @@ import { deriveCurrentPopulation, querySurnameResult, readOtherSpelling } from "
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 
 /**
- * TASK-125: the surname page's other spelling, read from `CURRENT_RANK` claims
+ * TASK-131: the surname page's other spelling, read from `CURRENT_RANK` claims
  * in a real PostgreSQL.
  *
  * GENUINE: the national excerpts, and WIŚNIEWSKI's population claim derived from

@@ -23,7 +23,7 @@ import { seedTestSurname } from "@name-atlas/resolver/testing";
  * and one script-confusable surname, seeded to reach the cases the excerpts do
  * not contain. The seeded national counts are each surname's larger count on the
  * 2026-01-20 register, as name-atlas.pl's API returned them on 2026-10-05
- * (TASK-125), attached by cloning an imported national snapshot.
+ * (TASK-131), attached by cloning an imported national snapshot.
  */
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -115,7 +115,7 @@ describe("prefix suggestions", () => {
   });
 
   it("finds diacritic surnames from input typed without diacritics, and puts the far more common first", async () => {
-    // TASK-125: WISNIEWSKI (105) matches `wisn` as typed, but WIŚNIEWSKA (54,177) and
+    // TASK-131: WISNIEWSKI (105) matches `wisn` as typed, but WIŚNIEWSKA (54,177) and
     // WIŚNIEWSKI (53,079) are more than five times as common. WISNIEWSKIX has no count.
     expect(await names("wisn")).toEqual(["WIŚNIEWSKA", "WIŚNIEWSKI", "WISNIEWSKI", "WISNIEWSKIX"]);
     expect(await names("dabrowa")).toEqual(["DĄBROWA", "DABROWA"]);

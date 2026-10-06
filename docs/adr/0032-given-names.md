@@ -47,3 +47,4 @@
 - A later page that shows a given name reads claims, not this table (ADR-0001, `ARCHITECTURE.md` §6).
 - §6 is carried out by TASK-122 (2026-10-05): migration 0038 adds the two claim types and a `BASIC_GIVEN_NAME` run type; ranks are refused unless the stored names are the complete official list.
 - The full-name report (TASK-124, ADR-0041) is the first surface to read the given-name claims. §4 and §7 hold there: a flagged form gets no report, and the two names are never combined into a count.
+- D-044 (2026-10-06) gives births by year (dataset 219) a use: a signed-in section for parents, with a free basic view and the full figures in a 5,99 zł tier (ADR-0037, amended). Its import, and where its voivodeship and half-year files sit beside these tables, are for that build's own ADR. Its lists left out names given fewer than 5 times up to 2012 and fewer than 2 from 2013, so an absent name is never a zero.

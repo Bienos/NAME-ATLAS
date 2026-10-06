@@ -1,6 +1,6 @@
-# 2026-10-05 — TASK-125: leading a reader who typed without diacritics to the surname they most likely meant
+# 2026-10-05 — TASK-131: leading a reader who typed without diacritics to the surname they most likely meant
 
-Branch `claude/compassionate-cerf-h2dyuj`, from `origin/main` at `93db9a1` (TASK-123), rebased onto `4aa1c04` (TASK-124, #149, merged meanwhile) before the pull request. Task: `tasks/125-diacritic-spelling-hint.md`. Numbered 125 because #149 holds 124. Requested by the owner from what production showed.
+Branch `claude/compassionate-cerf-h2dyuj`, from `origin/main` at `93db9a1` (TASK-123), rebased onto `4aa1c04` (TASK-124, #149, merged meanwhile) before the pull request. Task: `tasks/131-diacritic-spelling-hint.md`. Numbered 125 because #149 holds 124; renumbered 131 on 2026-10-06, when it was merged after #150 had taken 125. Requested by the owner from what production showed.
 
 ## Observed before the change
 
@@ -44,3 +44,14 @@ PostgreSQL 16.14 with PostGIS installed in the session container; the integratio
 - How many readers type without diacritics: the ratio of five rests on an assumption, not a measurement (task file §2).
 - `pnpm test:e2e`: not run.
 - A report version frozen under 1.12 no longer parses as 1.13, and the report preview shows its "frozen under an earlier data contract" notice, as after every earlier bump. Whether production holds any such version was not checked.
+
+## Landed
+
+On 2026-10-06, at the owner's request, `origin/main` @ `2d5c29b` (#150, TASK-125) was merged into `claude/compassionate-cerf-h2dyuj`. The change was renumbered TASK-131 (the task file, this record, `STATUS.md`, `docs/CODEMAP.md`, the contracts' notes and the code comments); #150's TASK-125 references are untouched. Only `STATUS.md` conflicted: "Last rewritten" names this change, and the other-spelling line follows `main`'s search-head line. `main`'s surname-result contract was still 1.12, so 1.13 stands. Run on the merged tree, with dependencies from `pnpm install --frozen-lockfile`:
+
+- `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm check:ids`: exit 0.
+- `pnpm test`: exit 0 (web 951, truth 395, contracts 146, resolver 112, among the rest).
+- `pnpm build`: exit 0.
+- `pnpm test:integration` with `TEST_DATABASE_URL` on a local PostgreSQL 16 with PostGIS 3: exit 0, 42 files, 489 tests, `other-spelling.test.ts` and `surname-prefix.test.ts` among them.
+- `pnpm test:golden`, the same server: exit 0, 364 tests.
+- Not run: `pnpm test:e2e`. GitHub Actions starts no jobs on this account, so there is no CI result.
