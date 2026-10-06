@@ -17,9 +17,9 @@ Brand System: **Evolved Contour — Dark Atlas**.
 
 These are clean SVG geometry with no embedded raster, gradients or filters.
 
-The old `apps/web/assets/brand/name-print*` files are legacy assets and are intentionally not deleted in TASK-147.
+The old `apps/web/assets/brand/name-print*` files are legacy assets and are intentionally not deleted in TASK-148.
 
-Raster exports are not checked in by TASK-147 because the SVG is the production master and no current consumer requires duplicate PNGs. Generate raster derivatives only for a concrete platform/export requirement.
+Raster exports are not checked in by TASK-148 because the SVG is the production master and no current consumer requires duplicate PNGs. Generate raster derivatives only for a concrete platform/export requirement.
 
 ## Other assets
 
