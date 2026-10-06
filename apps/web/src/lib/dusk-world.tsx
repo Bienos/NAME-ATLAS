@@ -193,7 +193,7 @@ function paint(
       ctx.shadowBlur = spark ? 5 : 0;
       dot(ctx, x, y, spark ? 1.3 : 0.6 + rnd() * 0.5, colour, 0.45 + bright * 0.55);
     } else {
-      dot(ctx, x, y, 0.75, TOKENS["dusk-map-dim"], 0.6);
+      dot(ctx, x, y, 0.75, TOKENS["atlas-aubergine-500"], 0.5);
       const weight = weights[region] ?? 0;
       if (largest > 0 && weight > 0 && rnd() < (weight / largest) * 0.9) {
         const lit = weight === largest;
@@ -202,7 +202,7 @@ function paint(
           x,
           y,
           lit ? 1.3 : 1,
-          lit ? TOKENS["dusk-map-glow"] : TOKENS["dusk-amber"],
+          lit ? TOKENS["atlas-blue-300"] : TOKENS["atlas-blue-500"],
           0.55 + weight,
         );
       }
