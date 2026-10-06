@@ -26,7 +26,7 @@ The owner asked to "start the first-name meaning source search", after TASK-124 
 Brückner's figures are upper bounds: the automatic head-of-line match also catches common words that are listed names (BABA, DOM).
 
 **Web searches** found:
-- that Bystroń 1938 and Taszycki 1926 are still in copyright, by their authors' deaths in 1964 and 1979;
+- that Bystroń 1938 and Taszycki 1926 are still in copyright. The 1938 *Księga imion w Polsce używanych* (Rój, Warszawa) is J. S. Bystroń's, who died on 18 November 1964, not the linguist Jan Bystroń (died 1902). Taszycki died on 8 August 1979.
 - that the IJP PAN *Słownik etymologiczno-motywacyjny* on RCIN is "Copyright-protected";
 - the existence and publishers of Grzenia's *Nasze imiona* (2002; 2010 edition of the 200 most-given names), Bubak's *Księga naszych imion* (Ossolineum, 1993) and Fros and Sowa's *Twoje imię* (1982).
 
