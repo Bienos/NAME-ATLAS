@@ -869,3 +869,16 @@ body.dusk.atlas-v1 .tree-map-arc,
 body.dusk.atlas-v1 .baby-soon {
   border-color: var(--color-signal-amber);
 }
+
+
+body.dusk.atlas-v1 .evolved-contour-mark path {
+  fill: none;
+  stroke: var(--color-text-primary);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.dusk.atlas-v1 .evolved-contour-mark circle {
+  fill: var(--color-signal-atlas);
+}
