@@ -1,4 +1,4 @@
-import { createDb, createPool, loadDbConfig } from "@name-atlas/db";
+import { createDb, createPool, loadDbConfig, queueCheckouts } from "@name-atlas/db";
 import type { DB } from "@name-atlas/db";
 import type { Kysely } from "kysely";
 
@@ -49,6 +49,16 @@ const IDLE_TIMEOUT_MS = 10_000;
 /** Fail a request rather than hanging it when the database is unreachable. */
 const CONNECTION_TIMEOUT_MS = 5_000;
 
+/**
+ * How long a query waits for one of the instance's connections while others
+ * are busy (TASK-132). `pg-pool` used `CONNECTION_TIMEOUT_MS` for this wait as
+ * well, and on production a directory page's third query gave up after 5 s
+ * behind two slow ones (TASK-130). 30 s is longer than the slowest directory
+ * page took in all (27 s, its queries in turn), and a request that still finds
+ * no connection free then fails rather than hanging.
+ */
+const CHECKOUT_WAIT_MS = 30_000;
+
 let cached: Kysely<DB> | undefined;
 
 /**
@@ -57,11 +67,14 @@ let cached: Kysely<DB> | undefined;
  */
 export function db(): Kysely<DB> {
   cached ??= createDb(
-    createPool(loadDbConfig(), {
-      max: MAX_CONNECTIONS_PER_INSTANCE,
-      idleTimeoutMillis: IDLE_TIMEOUT_MS,
-      connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
-    }),
+    queueCheckouts(
+      createPool(loadDbConfig(), {
+        max: MAX_CONNECTIONS_PER_INSTANCE,
+        idleTimeoutMillis: IDLE_TIMEOUT_MS,
+        connectionTimeoutMillis: CONNECTION_TIMEOUT_MS,
+      }),
+      { max: MAX_CONNECTIONS_PER_INSTANCE, waitMillis: CHECKOUT_WAIT_MS },
+    ),
   );
   return cached;
 }
@@ -71,4 +84,4 @@ export function resetDbForTests(): void {
   cached = undefined;
 }
 
-export { MAX_CONNECTIONS_PER_INSTANCE };
+export { CHECKOUT_WAIT_MS, CONNECTION_TIMEOUT_MS, MAX_CONNECTIONS_PER_INSTANCE };

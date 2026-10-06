@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { db, MAX_CONNECTIONS_PER_INSTANCE, resetDbForTests } from "./db.js";
+import {
+  CHECKOUT_WAIT_MS,
+  CONNECTION_TIMEOUT_MS,
+  db,
+  MAX_CONNECTIONS_PER_INSTANCE,
+  resetDbForTests,
+} from "./db.js";
 
 /**
  * TASK-029 — one pool per process.
@@ -44,6 +50,14 @@ describe("the shared database handle", () => {
     // instances at the default would exhaust a 100-connection database alone.
     expect(MAX_CONNECTIONS_PER_INSTANCE).toBeLessThanOrEqual(2);
     expect(MAX_CONNECTIONS_PER_INSTANCE).toBeGreaterThan(0);
+  });
+
+  it("waits longer for a busy connection than for a new one to open (TASK-132)", () => {
+    // Opening fails fast when the database is unreachable; a query behind two
+    // slow ones on the instance's connections waits its turn instead of failing
+    // at the opening's limit, as a directory page did on production (TASK-130).
+    expect(CONNECTION_TIMEOUT_MS).toBe(5_000);
+    expect(CHECKOUT_WAIT_MS).toBeGreaterThan(CONNECTION_TIMEOUT_MS);
   });
 
   it("builds nothing until it is asked, so a build needs no DATABASE_URL", () => {
