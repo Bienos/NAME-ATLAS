@@ -2,7 +2,7 @@ import { db as sharedDb } from "../../../lib/db.js";
 import { SITEMAP_PAGE_SIZE, sitemapEntries } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled, siteOrigin } from "../../../lib/seo.js";
-import { sitemapPageXml } from "../../../lib/sitemap-xml.js";
+import { CACHED_SITEMAP_HEADERS, sitemapPageXml } from "../../../lib/sitemap-xml.js";
 import { seoBlockedProfileIds } from "../../../lib/seo-surface.js";
 
 /**
@@ -15,8 +15,6 @@ import { seoBlockedProfileIds } from "../../../lib/seo-surface.js";
  */
 
 export const dynamic = "force-dynamic";
-
-const XML = { "content-type": "application/xml; charset=utf-8" } as const;
 
 export async function GET(
   _request: Request,
@@ -43,7 +41,11 @@ export async function GET(
       seoBlockedProfileIds: await seoBlockedProfileIds(db),
     });
     if (entries.length === 0) return new Response("not found", { status: 404 });
-    return new Response(sitemapPageXml(origin, "pl", entries), { status: 200, headers: XML });
+    // Cached at the CDN (TASK-127); a 404 or an error above is not.
+    return new Response(sitemapPageXml(origin, "pl", entries), {
+      status: 200,
+      headers: CACHED_SITEMAP_HEADERS,
+    });
   } catch (cause: unknown) {
     log.error("sitemap_page_failed", { page: index, cause });
     return new Response("sitemap unavailable", { status: 500 });

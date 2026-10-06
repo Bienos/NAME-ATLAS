@@ -3,7 +3,12 @@ import { sitemapCount } from "@name-atlas/seo";
 import { createLogger } from "@name-atlas/logging";
 import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
 import { seoBlockedProfileIds } from "../../lib/seo-surface.js";
-import { BLOG_SITEMAP_PATH, pageCount, sitemapIndexXml } from "../../lib/sitemap-xml.js";
+import {
+  BLOG_SITEMAP_PATH,
+  CACHED_SITEMAP_HEADERS,
+  pageCount,
+  sitemapIndexXml,
+} from "../../lib/sitemap-xml.js";
 import { blogPosts } from "../../lib/blog-posts.js";
 
 /**
@@ -36,9 +41,10 @@ export async function GET(): Promise<Response> {
     });
     // The blog's sitemap (TASK-071), only when it has a post to list.
     const extra = blogPosts().length > 0 ? [BLOG_SITEMAP_PATH] : [];
+    // Cached at the CDN (TASK-127): only this response reads the database.
     return new Response(sitemapIndexXml(origin, pageCount(total), extra), {
       status: 200,
-      headers: XML,
+      headers: CACHED_SITEMAP_HEADERS,
     });
   } catch (cause: unknown) {
     log.error("sitemap_index_failed", { cause });
