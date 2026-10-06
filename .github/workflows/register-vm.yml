@@ -25,14 +25,16 @@ name: Register VM
 #   meanings       ops/vm/meanings.sh (TASK-081): migrate, import the current Buryan 1933 file, derive its meanings, the gate
 #   given-names    ops/vm/given-names.sh (TASK-133): migrate, download and import the PESEL first-name lists, derive every
 #                  name's count and rank on each list, the gate
+#   given-name-births  ops/vm/given-name-births.sh (TASK-142): migrate, download and import the first names given to
+#                  children (dataset 219), derive each name's count, rank and trend, the gate
 #   backup         ops/vm/backup.sh (TASK-049): encrypted off-host copy, including accounts and family
 #   accounts       ops/vm/accounts.sh (TASK-063): migrate, the role nameatlas_app and its password, PgBouncer's user list, the isolation checks; repeatable
 #   staging        ops/vm/staging.sh refresh (ADR-0039): copies production into name_atlas_staging without the rows of accounts and
 #                  family, then migrates the copy to the pushed commit; the role nameatlas_staging_web and its password, PgBouncer
 #   staging-migrate  ops/vm/staging.sh migrate: migrates the staging copy to the pushed commit; production is not touched
 #
-# provision, status, finalize, editions, extras, shift-finish, archive, bearers, meanings and given-names end by connecting the way the
-# web app does;
+# provision, status, finalize, editions, extras, shift-finish, archive, bearers, meanings, given-names and given-name-births end by
+# connecting the way the web app does;
 # accounts ends by connecting the way the accounts connection does (nameatlas_app, with its own secret);
 # staging and staging-migrate end by connecting the way staging.name-atlas.pl does (nameatlas_staging_web).
 
@@ -61,6 +63,7 @@ on:
             bearers,
             meanings,
             given-names,
+            given-name-births,
             accounts,
             backup,
             staging,
@@ -116,7 +119,7 @@ jobs:
           fi
           case "$step" in
             "") echo "::notice::ops/vm/request names no step; nothing to do" ;;
-            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | meanings | given-names | accounts | backup | staging | staging-migrate) echo "::notice::step: $step" ;;
+            check | provision | build | status | finalize | editions | extras | shift | shift-finish | archive | bearers | meanings | given-names | given-name-births | accounts | backup | staging | staging-migrate) echo "::notice::step: $step" ;;
             *) echo "::error::unknown step '$step'"; exit 1 ;;
           esac
           echo "step=$step" >> "$GITHUB_OUTPUT"
@@ -323,6 +326,15 @@ jobs:
           scp -q ops/vm/given-names.sh vm:name-atlas-ops/given-names.sh
           ssh vm 'sudo bash ~/name-atlas-ops/given-names.sh ~/name-atlas-ops/app.tar.gz'
 
+      - name: given-name-births
+        if: steps.step.outputs.step == 'given-name-births'
+        run: |
+          # The pushed commit's tree: the registry the files are checked against, the
+          # metadata, the importer and the derivation, and migrations 0040 and 0041.
+          git archive --format=tar.gz HEAD | ssh vm 'cat > ~/name-atlas-ops/app.tar.gz'
+          scp -q ops/vm/given-name-births.sh vm:name-atlas-ops/given-name-births.sh
+          ssh vm 'sudo bash ~/name-atlas-ops/given-name-births.sh ~/name-atlas-ops/app.tar.gz'
+
       - name: accounts
         if: steps.step.outputs.step == 'accounts'
         env:
@@ -401,7 +413,8 @@ jobs:
           steps.step.outputs.step == 'finalize' || steps.step.outputs.step == 'editions' ||
           steps.step.outputs.step == 'extras' || steps.step.outputs.step == 'shift-finish' ||
           steps.step.outputs.step == 'archive' || steps.step.outputs.step == 'bearers' ||
-          steps.step.outputs.step == 'meanings' || steps.step.outputs.step == 'given-names'
+          steps.step.outputs.step == 'meanings' || steps.step.outputs.step == 'given-names' ||
+          steps.step.outputs.step == 'given-name-births'
         env:
           PGPASSWORD: ${{ secrets.VM_DB_WEB_PASSWORD }}
         run: |
@@ -430,6 +443,9 @@ jobs:
                   WHERE claim_type::text = 'NOTABLE_BEARERS' AND claim_status = 'ACTIVE'"
             p -c "SELECT claim_type::text || ' claims ' || count(*) FROM claims
                   WHERE claim_type::text IN ('GIVEN_NAME_POPULATION', 'GIVEN_NAME_RANK')
+                    AND claim_status = 'ACTIVE' GROUP BY claim_type::text ORDER BY 1"
+            p -c "SELECT claim_type::text || ' claims ' || count(*) FROM claims
+                  WHERE claim_type::text IN ('GIVEN_NAME_BIRTH_COUNT', 'GIVEN_NAME_BIRTH_RANK', 'GIVEN_NAME_BIRTH_TREND')
                     AND claim_status = 'ACTIVE' GROUP BY claim_type::text ORDER BY 1"
           fi
           if p -c 'CREATE TABLE public.web_role_must_not_write (x int)' 2> write.err; then
