@@ -35,7 +35,10 @@ const SWATCHES = [
 ] as const;
 
 export default function BrandLabPage() {
-  if (process.env.VERCEL_ENV === "production") notFound();
+  const production =
+    process.env.VERCEL_ENV === "production" ||
+    (process.env.VERCEL_ENV === undefined && process.env.NODE_ENV === "production");
+  if (production) notFound();
 
   return (
     <div className="atlas-v1 brand-lab">
