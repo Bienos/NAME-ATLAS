@@ -1,6 +1,6 @@
 # TASK-147 — Name Atlas Brand System v1.0
 
-- **Status:** IN PROGRESS on `task-147-brand-system-v1`.
+- **Status:** IMPLEMENTED 2026-10-06 on `task-147-brand-system-v1`; draft PR #177 is awaiting repository CI/local verification before merge.
 - **Requested by:** the project owner, 2026-10-06. The approved visual direction is **Evolved Contour — Dark Atlas** and the request is to turn it into the production brand/design foundation before any full-page frontend migration.
 - **Decision:** ADR-0045.
 - **Milestone:** brand/design foundation; no product/data contract change.
