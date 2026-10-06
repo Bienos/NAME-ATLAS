@@ -1,9 +1,9 @@
-# TASK-132 — First names given to children, by year, imported (2000–2025, national)
+# TASK-134 — First names given to children, by year, imported (2000–2025, national)
 
 - **Status:** IMPLEMENTED 2026-10-06 (`docs/progress/2026-10-06-given-names-by-birth-year.md`). Not on staging or production.
 - **Requested by:** the project owner, 2026-10-06: the first build step of D-044.
 - **Decision:** ADR-0042 (proposed with this task), extending ADR-0032.
-- **Number:** 132, ADR-0042 and migration 0040: free on `origin/main` (`015b788`) and with no pull request open on 2026-10-06.
+- **Number:** 134. Drafted as 132; while #162 was open `main` gave 132 to #160 and 133 to #159. ADR-0042 and migration 0040 stay free on `main` (`fb83fbf`).
 - **Model guidance:** implementation session.
 
 ## 1. Goal

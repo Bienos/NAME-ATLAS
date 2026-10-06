@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 /**
- * Import CLI for first names given to children, by year (TASK-132, ADR-0042).
+ * Import CLI for first names given to children, by year (TASK-134, ADR-0042).
  *
  *   pnpm import:given-name-births --resource 21457 --file names.csv --metadata resource.json [--sha256 <hex>]
  *

@@ -1,6 +1,6 @@
-# 2026-10-06 — TASK-132: first names given to children, by year, imported (2000–2025, national)
+# 2026-10-06 — TASK-134: first names given to children, by year, imported (2000–2025, national)
 
-Branch `claude/task-132-given-names-by-birth-year`, from `origin/main` at `015b788` (TASK-131). Task: `tasks/132-given-names-by-birth-year.md`. Decision: ADR-0042 (proposed). TASK-132, ADR-0042 and migration 0040 were free on `origin/main`, and no pull request was open (read from GitHub on 2026-10-06). The first build step of D-044.
+Branch `claude/task-132-given-names-by-birth-year`, from `origin/main` at `015b788` (TASK-131), rebased onto `fb83fbf` (TASK-133, #159) before review. Task: `tasks/134-given-names-by-birth-year.md`. Decision: ADR-0042 (proposed). Drafted as TASK-132; while #162 was open `main` gave 132 to #160 and 133 to #159, so it is 134 (the branch keeps its first name). ADR-0042 and migration 0040 stay free on `main`. The first build step of D-044.
 
 ## Observed before the change
 
