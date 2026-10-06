@@ -8,6 +8,7 @@ import type { TestDatabase } from "@name-atlas/testing";
 import {
   GIVEN_NAMES_FIRST_FEMALE_2026,
   GIVEN_NAMES_FIRST_MALE_2026,
+  importGivenNameMeanings,
   importGivenNameResource,
   importPeselResource,
   PESEL_NATIONAL_MALE_2026,
@@ -16,6 +17,7 @@ import {
 import {
   buildFullNameReport,
   buildReport,
+  deriveAllGivenNameMeanings,
   deriveCurrentPopulation,
   deriveGivenName,
   FULL_NAME_SECTION_TYPES,
@@ -108,7 +110,7 @@ describe("the full-name report (TASK-124)", () => {
           rank: "NO_ACTIVE_CLAIM",
         },
       ],
-      meaning: { availability: "NOT_RETRIEVED", reason_code: "NO_ADMISSIBLE_SOURCE" },
+      meaning: { state: "NO_SOURCE" },
     });
     expect(given?.claims.map((c) => c.presentation_role)).toEqual(["HERO", "HERO"]);
     expect(given?.section_confidence_summary).toEqual({ VERIFIED: 2 });
@@ -153,7 +155,7 @@ describe("the full-name report (TASK-124)", () => {
     `.execute(db());
     expect(stored.rows.map((r) => [r.report_type, r.given])).toEqual([["FULL_NAME", "JAN"]]);
     const payload = stored.rows[0]?.payload as Record<string, unknown>;
-    expect(payload["report_schema_version"]).toBe("full_name_report@0");
+    expect(payload["report_schema_version"]).toBe("full_name_report@1");
     expect(
       (payload["response"] as { surname: { display_name: string } }).surname.display_name,
     ).toBe("NOWAK");
@@ -161,8 +163,10 @@ describe("the full-name report (TASK-124)", () => {
     expect(Object.keys(payload["given_name"] as object).sort()).toEqual([
       "given_name",
       "lists",
+      "meaning",
       "state",
     ]);
+    expect(facts?.meaning).toEqual({ state: "NO_SOURCE" });
     expect(facts?.given_name.display_name).toBe("JAN");
     expect(facts?.lists.map((l) => [l.comparability_group, l.count.count, l.rank])).toEqual([
       ["pesel_given_names_2026_first_female", 14, null],
@@ -186,7 +190,7 @@ describe("the full-name report (TASK-124)", () => {
 
     const read = await readReportVersion(db(), again.report_version_id);
     expect(read?.report_type).toBe("FULL_NAME");
-    expect(read?.report_schema_version).toBe("full_name_report@0");
+    expect(read?.report_schema_version).toBe("full_name_report@1");
     expect(read?.sections.map((s) => s.section_type)).toEqual([...FULL_NAME_SECTION_TYPES]);
     expect((await readReportVersion(db(), surnameOnly.report_version_id))?.report_type).toBe(
       "NAME_ATLAS",
@@ -281,5 +285,75 @@ describe("the full-name report (TASK-124)", () => {
         db(),
       );
     }
+  });
+
+  it("freezes each work's origin and meaning, cited first, and says when no work explains a name (TASK-147 AC-4)", async () => {
+    for (const file of ["buryan-1933.json", "yonge-1884.json"]) {
+      const imported = await importGivenNameMeanings(db(), {
+        bytes: read(`sources/given-name-meanings/${file}`),
+      });
+      if (imported.kind !== "IMPORTED") throw new Error(`${file}: ${imported.kind}`);
+    }
+    await deriveAllGivenNameMeanings(db());
+    await deriveGivenName(db(), "MAŁGORZATA");
+    await deriveGivenName(db(), "KRZYSZTOF");
+
+    const built = await buildFullNameReport(db(), { givenName: "Małgorzata", surname: "Nowak" });
+    if (built.kind !== "BUILT") throw new Error(built.kind);
+    const given = section(built.sections, "GIVEN_NAME");
+    expect(given?.body_payload).toMatchObject({ meaning: { state: "READY", works: 2 } });
+    const meaningClaim = await sql<{ id: string }>`
+      SELECT c.claim_id::text AS id FROM claims c
+        JOIN given_names g ON g.given_name_id = c.subject_entity_id
+       WHERE g.canonical_display = 'MAŁGORZATA' AND c.claim_type::text = 'GIVEN_NAME_MEANING'
+         AND c.claim_status = 'ACTIVE'
+    `.execute(db());
+    const meaningId = meaningClaim.rows[0]?.id;
+    expect(given?.claims).toContainEqual({ claim_id: meaningId, presentation_role: "SUPPORT" });
+    expect(given?.section_confidence_summary).toEqual({ VERIFIED: 1, LIKELY: 1 });
+    const gaps = (section(built.sections, "LIMITATIONS")?.body_payload as { given_name: unknown[] })
+      .given_name;
+    expect(gaps).not.toContainEqual(expect.objectContaining({ topic: "MEANING" }));
+
+    const stored = await readReportVersion(db(), built.report_version_id);
+    const facts = parseGivenNameFacts((stored?.payload as Record<string, unknown>)["given_name"]);
+    if (facts?.meaning.state !== "READY") throw new Error(String(facts?.meaning.state));
+    expect(facts.meaning.claim_id).toBe(meaningId);
+    expect(facts.meaning.confidence.status).toBe("LIKELY");
+    expect(
+      facts.meaning.works.map((w) => [
+        w.work.author_or_publisher,
+        w.origin,
+        w.literal_gloss,
+        w.translation,
+      ]),
+    ).toEqual([
+      [
+        "Charlotte M. Yonge",
+        { code: "grc", as_printed: "Gr." },
+        "pearl",
+        { language: "pl", text: "perła", by: "Name Atlas" },
+      ],
+      ["ks. Józef Buryan", { code: "grc", as_printed: "z greckich" }, null, null],
+    ]);
+
+    // The first name's citations, the count's and then the two works', lead the bibliography.
+    const ids = (section(built.sections, "SOURCES")?.body_payload as { citation_ids: string[] })
+      .citation_ids;
+    const first = [
+      facts.lists[0]?.count.citation.id,
+      ...facts.meaning.works.map((w) => w.citation.id),
+    ];
+    expect(ids.slice(0, 3)).toEqual(first);
+    expect(ids.length).toBeGreaterThan(3);
+
+    const none = await buildFullNameReport(db(), { givenName: "KRZYSZTOF", surname: "NOWAK" });
+    if (none.kind !== "BUILT") throw new Error(none.kind);
+    expect(section(none.sections, "GIVEN_NAME")?.body_payload).toMatchObject({
+      meaning: { state: "NO_SOURCE" },
+    });
+    expect(
+      (section(none.sections, "LIMITATIONS")?.body_payload as { given_name: unknown[] }).given_name,
+    ).toContainEqual({ topic: "MEANING", reason_code: "NO_ADMISSIBLE_SOURCE" });
   });
 });

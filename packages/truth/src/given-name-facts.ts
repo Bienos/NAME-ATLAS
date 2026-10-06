@@ -1,7 +1,8 @@
 /**
  * A first name's facts for the full-name report (TASK-124, ADR-0041): its
  * active `GIVEN_NAME_POPULATION` and `GIVEN_NAME_RANK` claims (TASK-122), each
- * with its confidence and citation, per list, on one surface.
+ * with its confidence and citation, per list, on one surface; and its
+ * `GIVEN_NAME_MEANING` claim (TASK-147), each work's entry with its citation.
  *
  * It reads claims only, never `given_name_counts`: a page or a report shows a
  * given name through its claims (ADR-0032, consequences; ADR-0001). The two
@@ -47,6 +48,45 @@ export interface GivenNameListFacts {
   readonly rank: GivenNameRankFact | null;
 }
 
+/** What one work states about the name (TASK-147): its own words, and D-046's two additions. */
+export interface GivenNameMeaningWork {
+  readonly work: {
+    readonly title: string;
+    readonly author_or_publisher: string;
+    readonly year: number;
+  };
+  /** The name as the work prints it. */
+  readonly printed_form: string;
+  /** The language of origin: a code to compare by, and the work's own words. */
+  readonly origin: { readonly code: string; readonly as_printed: string } | null;
+  /** The work's meaning, verbatim, in the work's language. */
+  readonly literal_gloss: string | null;
+  /** A literal Polish translation of the gloss, by Name Atlas (D-046 §2). */
+  readonly translation: {
+    readonly language: string;
+    readonly text: string;
+    readonly by: string;
+  } | null;
+  readonly locator: string;
+  /** The work's sentence or line, verbatim. */
+  readonly quotation: string;
+  readonly citation: CitationDto;
+}
+
+/**
+ * The name's origin and meaning: READY with each work's entry; NO_SOURCE when
+ * no admissible work explains the name; RIGHTS_BLOCKED when the surface may
+ * not show the claim it has.
+ */
+export type GivenNameMeaningFacts =
+  | {
+      readonly state: "READY";
+      readonly claim_id: string;
+      readonly confidence: GivenNameConfidence;
+      readonly works: readonly GivenNameMeaningWork[];
+    }
+  | { readonly state: "NO_SOURCE" | "RIGHTS_BLOCKED" };
+
 export interface GivenNameFacts {
   readonly given_name: { readonly id: string; readonly display_name: string };
   /**
@@ -56,6 +96,16 @@ export interface GivenNameFacts {
    */
   readonly state: "READY" | "UNAVAILABLE" | "RIGHTS_BLOCKED";
   readonly lists: readonly GivenNameListFacts[];
+}
+
+/** The first name's facts a full-name report freezes: the counts, and the meaning (TASK-147). */
+export interface GivenNameReportFacts extends GivenNameFacts {
+  /**
+   * The name's origin and meaning, apart from the counts' state. A version
+   * frozen under `full_name_report@0` has none, and reads as NO_SOURCE: no
+   * work could be quoted then.
+   */
+  readonly meaning: GivenNameMeaningFacts;
 }
 
 /** `structured_value` of the two claim types, as TASK-122 writes them. */
@@ -195,6 +245,87 @@ export async function readGivenNameFacts(
   return { given_name: givenName, state: "READY", lists };
 }
 
+interface MeaningRow extends FactRow {
+  citation_source_record_id: string | null;
+}
+
+/**
+ * The name's active `GIVEN_NAME_MEANING` claim as `surface` may show it: each
+ * work's entry from the claim, with that work's citation. Compared as text,
+ * so a database without migration 0044 finds none.
+ */
+export async function readGivenNameMeaning(
+  db: Kysely<DB>,
+  givenNameId: string,
+  surface: Surface,
+): Promise<GivenNameMeaningFacts> {
+  const result = await sql<MeaningRow>`
+    SELECT
+      c.claim_id::text                 AS claim_id,
+      c.claim_type::text               AS claim_type,
+      c.structured_value::text         AS payload,
+      ca.status::text                  AS confidence_status,
+      ca.assessment_method             AS assessment_method,
+      ca.assessment_version            AS assessment_version,
+      cit.citation_id::text            AS citation_id,
+      cit.source_record_id::text       AS citation_source_record_id,
+      cit.title                        AS citation_title,
+      cit.publisher                    AS citation_publisher,
+      cit.publication_date             AS citation_publication_date,
+      cit.url_or_reference             AS citation_url,
+      cit.supporting_locator           AS citation_locator,
+      to_char(cit.accessed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                       AS citation_retrieved_at,
+      src.homepage_or_reference_url    AS citation_source_page_url,
+      src.source_type::text            AS source_type,
+      rp.attribution_text              AS attribution_text,
+      rp.terms_version                 AS terms_version,
+      rp.automated_access::text        AS automated_access,
+      rp.commercial_use::text          AS commercial_use,
+      rp.redistribution::text          AS redistribution,
+      rp.metadata_rights::text         AS metadata_rights,
+      rp.review_status::text           AS review_status
+    FROM claims c
+    JOIN LATERAL (
+      SELECT * FROM confidence_assessments a
+       WHERE a.claim_id = c.claim_id ORDER BY a.assessed_at DESC LIMIT 1
+    ) ca ON true
+    JOIN citations cit             ON cit.claim_id = c.claim_id
+    JOIN sources src               ON src.source_id = cit.source_id
+    JOIN rights_profiles rp        ON rp.rights_profile_id = cit.rights_profile_id
+    WHERE c.subject_entity_id = ${givenNameId}::uuid
+      AND c.claim_type::text = 'GIVEN_NAME_MEANING'
+      AND c.claim_status = 'ACTIVE'
+    ORDER BY cit.citation_id
+  `.execute(db);
+  const [first] = result.rows;
+  if (first === undefined) return { state: "NO_SOURCE" };
+  const rights: EffectiveRights[] = result.rows.map((r) => ({
+    automated_access: r.automated_access,
+    commercial_use: r.commercial_use,
+    redistribution: r.redistribution,
+    metadata_rights: r.metadata_rights,
+    review_status: r.review_status,
+  }));
+  const eligibility = sectionEligibility(evaluateSurface(rights[0]!, surface), rights, surface);
+  if (eligibility.decision === "BLOCKED") return { state: "RIGHTS_BLOCKED" };
+
+  const citations = new Map(
+    result.rows.map((r) => [r.citation_source_record_id ?? "", citationOf(r)] as const),
+  );
+  const value = record(JSON.parse(first.payload));
+  const entries = Array.isArray(value?.["interpretations"]) ? value["interpretations"] : [];
+  const works = entries.flatMap((entry): GivenNameMeaningWork[] => {
+    const x = record(entry);
+    const citation = citations.get(String(x?.["source_record_id"] ?? ""));
+    if (x === null || citation === undefined) return [];
+    const work = workFrom({ ...x, citation });
+    return work === null ? [] : [work];
+  });
+  if (works.length === 0) return { state: "NO_SOURCE" };
+  return { state: "READY", claim_id: first.claim_id, confidence: confidenceOf(first), works };
+}
+
 function confidenceOf(row: FactRow): GivenNameConfidence {
   return {
     status: row.confidence_status,
@@ -295,12 +426,88 @@ function listFrom(v: unknown): GivenNameListFacts | null {
   };
 }
 
+const isText = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+
+/** One work's entry, checked field by field; null when it is not one. */
+function workFrom(v: unknown): GivenNameMeaningWork | null {
+  const x = record(v);
+  const work = record(x?.["work"]);
+  const citation = citationFrom(x?.["citation"]);
+  if (
+    x === null ||
+    work === null ||
+    citation === null ||
+    !isText(work["title"]) ||
+    !isText(work["author_or_publisher"]) ||
+    !Number.isInteger(work["year"]) ||
+    !isText(x["printed_form"]) ||
+    !isText(x["locator"]) ||
+    !isText(x["quotation"])
+  ) {
+    return null;
+  }
+  let origin: GivenNameMeaningWork["origin"] = null;
+  if (x["origin"] !== null && x["origin"] !== undefined) {
+    const o = record(x["origin"]);
+    if (o === null || !isText(o["code"]) || !isText(o["as_printed"])) return null;
+    origin = { code: o["code"], as_printed: o["as_printed"] };
+  }
+  const gloss = x["literal_gloss"];
+  if (gloss !== null && gloss !== undefined && !isText(gloss)) return null;
+  let translation: GivenNameMeaningWork["translation"] = null;
+  if (x["translation"] !== null && x["translation"] !== undefined) {
+    const t = record(x["translation"]);
+    if (t === null || !isText(t["language"]) || !isText(t["text"]) || !isText(t["by"])) {
+      return null;
+    }
+    translation = { language: t["language"], text: t["text"], by: t["by"] };
+  }
+  if (origin === null && !isText(gloss)) return null;
+  return {
+    work: {
+      title: work["title"],
+      author_or_publisher: work["author_or_publisher"],
+      year: work["year"] as number,
+    },
+    printed_form: x["printed_form"],
+    origin,
+    literal_gloss: isText(gloss) ? gloss : null,
+    translation,
+    locator: x["locator"],
+    quotation: x["quotation"],
+    citation,
+  };
+}
+
+/** A frozen meaning; absent (a `full_name_report@0` version) reads as NO_SOURCE. */
+function meaningFrom(v: unknown): GivenNameMeaningFacts | null {
+  if (v === undefined) return { state: "NO_SOURCE" };
+  const x = record(v);
+  const state = x?.["state"];
+  if (x === null) return null;
+  if (state === "NO_SOURCE" || state === "RIGHTS_BLOCKED") return { state };
+  const confidence = confidenceFrom(x["confidence"]);
+  const works = x["works"];
+  if (
+    state !== "READY" ||
+    !isString(x["claim_id"]) ||
+    confidence === null ||
+    !Array.isArray(works) ||
+    works.length === 0
+  ) {
+    return null;
+  }
+  const parsed = works.map(workFrom);
+  if (!parsed.every((w): w is GivenNameMeaningWork => w !== null)) return null;
+  return { state, claim_id: x["claim_id"], confidence, works: parsed };
+}
+
 /**
  * A frozen report's first-name facts, checked field by field; null when the
- * value is not what {@link readGivenNameFacts} writes. A page renders only
- * what this returns.
+ * value is not what {@link readGivenNameFacts} and {@link readGivenNameMeaning}
+ * write. A page renders only what this returns.
  */
-export function parseGivenNameFacts(value: unknown): GivenNameFacts | null {
+export function parseGivenNameFacts(value: unknown): GivenNameReportFacts | null {
   const x = record(value);
   const name = record(x?.["given_name"]);
   const state = x?.["state"];
@@ -318,9 +525,12 @@ export function parseGivenNameFacts(value: unknown): GivenNameFacts | null {
   const parsed = lists.map(listFrom);
   if (!parsed.every((l): l is GivenNameListFacts => l !== null)) return null;
   if ((state === "READY") !== parsed.length > 0) return null;
+  const meaning = meaningFrom(x["meaning"]);
+  if (meaning === null) return null;
   return {
     given_name: { id: name["id"], display_name: name["display_name"] },
     state,
     lists: parsed,
+    meaning,
   };
 }

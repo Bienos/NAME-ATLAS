@@ -274,3 +274,60 @@ export function assessSurnameMeaning(inputs: MeaningConfidenceInputs): Confidenc
     human_review_required: false,
   };
 }
+
+export interface GivenNameMeaningConfidenceInputs {
+  /** Distinct works that state anything about the name. */
+  readonly supportingWorks: number;
+  /** Distinct works that state its language of origin. */
+  readonly worksStatingOrigin: number;
+  /** Distinct languages of origin those works state. */
+  readonly distinctOrigins: number;
+}
+
+/**
+ * The confidence rule for a first name's origin and meaning (TASK-147,
+ * ADR-0045), ADR-0008 §5's table applied to the stated origin: one work is
+ * POSSIBLE; two or more stating the same origin, and none another, LIKELY;
+ * two different origins CONFLICTING. Never VERIFIED.
+ */
+export function assessGivenNameMeaning(
+  inputs: GivenNameMeaningConfidenceInputs,
+): ConfidenceVerdict {
+  const epistemic_type: EpistemicType = "INTERPRETATION";
+  if (inputs.supportingWorks <= 0) {
+    return {
+      status: "INSUFFICIENT_DATA",
+      epistemic_type,
+      rationale: "no admissible work states an origin or a meaning for this first name",
+      human_review_required: false,
+    };
+  }
+  if (inputs.distinctOrigins >= 2) {
+    return {
+      status: "CONFLICTING",
+      epistemic_type,
+      rationale:
+        `${inputs.worksStatingOrigin} admissible works state ${inputs.distinctOrigins} different ` +
+        "languages of origin for this first name; each is kept and neither is preferred",
+      human_review_required: true,
+    };
+  }
+  if (inputs.worksStatingOrigin >= 2) {
+    return {
+      status: "LIKELY",
+      epistemic_type,
+      rationale:
+        `${inputs.worksStatingOrigin} admissible works independently state the same language ` +
+        "of origin for this first name",
+      human_review_required: false,
+    };
+  }
+  return {
+    status: "POSSIBLE",
+    epistemic_type,
+    rationale:
+      "no two admissible works state the same language of origin for this first name; " +
+      "a single work is a single opinion",
+    human_review_required: false,
+  };
+}

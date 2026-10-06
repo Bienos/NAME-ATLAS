@@ -51,6 +51,7 @@ describe("MIGRATIONS_DIR", () => {
       "0040_given_name_birth_years.ts", // TASK-136 / ADR-0042 — first names given to children, by year
       "0041_given_name_birth_claims.ts", // TASK-137 / ADR-0043 — their count, rank and trend as claims
       "0042_purchases_babynames_tier.ts", // TASK-144 / D-045 — the 8,99 zł baby-names product's tier
+      "0044_given_name_meaning.ts", // TASK-147 / ADR-0045 — first-name origins and meanings as claims
     ]);
   });
 });

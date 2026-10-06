@@ -153,7 +153,11 @@ function parseLicenceBasis(value: unknown, problems: string[]): LicenceBasis | n
   }
 }
 
-function parseWork(value: unknown, problems: string[]): OnomasticWork | null {
+/**
+ * Parses a work block, adding every problem to `problems`. Shared with the
+ * first-name meaning files (TASK-147), which cite works the same way.
+ */
+export function parseOnomasticWork(value: unknown, problems: string[]): OnomasticWork | null {
   if (!isRecord(value)) {
     problems.push("work is missing");
     return null;
@@ -259,7 +263,7 @@ export function parseOnomasticSource(raw: unknown): ParseOutcome {
     problems.push("synthetic must be stated explicitly, true or false (ADR-0008 §6)");
   }
 
-  const work = parseWork(raw["work"], problems);
+  const work = parseOnomasticWork(raw["work"], problems);
   const rawEntries = raw["entries"];
   const entries: OnomasticEntry[] = [];
 
@@ -323,13 +327,31 @@ export type ImportOnomasticOutcome =
       readonly problems: readonly string[];
     };
 
-async function ensureWork(trx: Transaction<DB>, work: OnomasticWork): Promise<string> {
+/**
+ * The work's source row, created on first import. `granularity` is what the
+ * file explains: surnames, or first names (TASK-147). A work imported for
+ * both becomes `MIXED`.
+ */
+export async function ensureOnomasticWork(
+  trx: Transaction<DB>,
+  work: OnomasticWork,
+  granularity: "SURNAME" | "GIVEN_NAME" = "SURNAME",
+): Promise<string> {
   const existing = await trx
     .selectFrom("sources")
-    .select(["source_id"])
+    .select(["source_id", "granularity"])
     .where("source_key", "=", work.source_key)
     .executeTakeFirst();
-  if (existing) return existing.source_id;
+  if (existing) {
+    if (existing.granularity !== granularity && existing.granularity !== "MIXED") {
+      await trx
+        .updateTable("sources")
+        .set({ granularity: "MIXED" })
+        .where("source_id", "=", existing.source_id)
+        .execute();
+    }
+    return existing.source_id;
+  }
 
   const rightsProfileId = uuidv7();
   const r = work.rights;
@@ -371,7 +393,7 @@ async function ensureWork(trx: Transaction<DB>, work: OnomasticWork): Promise<st
       publisher: work.author_or_publisher,
       // A dictionary or scholarly work, not an official dataset.
       source_type: "DICTIONARY",
-      granularity: "SURNAME",
+      granularity,
       geographic_scope: ["PL"],
       temporal_from: null,
       temporal_to: null,
@@ -467,73 +489,102 @@ export async function importOnomasticSource(
   const retrievedAt = options.retrievedAt ?? new Date();
 
   return db.transaction().execute(async (trx) => {
-    const sourceId = await ensureWork(trx, parsed.file.work);
-
-    const existing = await trx
-      .selectFrom("source_records")
-      .select(["source_record_id"])
-      .where("source_id", "=", sourceId)
-      .where("content_hash", "=", contentHash)
-      .executeTakeFirst();
-    if (existing) {
-      return {
-        kind: "ALREADY_IMPORTED" as const,
-        source_id: sourceId,
-        source_record_id: existing.source_record_id,
-      };
-    }
-
-    const externalRecordId = `${parsed.file.work.source_key}:${parsed.file.work.year}`;
-    const previous = await trx
-      .selectFrom("source_records")
-      .select(["source_record_id"])
-      .where("source_id", "=", sourceId)
-      .where("external_record_id", "=", externalRecordId)
-      .where("record_status", "=", "ACTIVE")
-      .orderBy("created_at", "desc")
-      .execute();
-    if (previous.length > 0) {
-      await trx
-        .updateTable("source_records")
-        .set({ record_status: "UPDATED" })
-        .where(
-          "source_record_id",
-          "in",
-          previous.map((r) => r.source_record_id),
-        )
-        .execute();
-    }
-    const supersedes = previous[0]?.source_record_id ?? null;
-
-    const sourceRecordId = uuidv7();
-    await trx
-      .insertInto("source_records")
-      .values({
-        source_record_id: sourceRecordId,
-        source_id: sourceId,
-        external_record_id: externalRecordId,
-        external_parent_id: null,
-        record_type: "ARTICLE",
-        source_url: options.sourceUrl ?? parsed.file.work.reference_url,
-        // The file itself is the payload: every entry the claims rest on is
-        // here verbatim, so a claim can always be traced to the exact text.
-        raw_payload: raw as never,
-        raw_text_ref: null,
-        content_hash: contentHash,
-        retrieved_at: retrievedAt,
-        source_modified_at: null,
-        rights_profile_id: null,
-        record_status: "ACTIVE",
-        supersedes_source_record_id: supersedes,
-      })
-      .execute();
-
-    return {
-      kind: "IMPORTED" as const,
-      source_id: sourceId,
-      source_record_id: sourceRecordId,
+    const sourceId = await ensureOnomasticWork(trx, parsed.file.work);
+    return storeOnomasticRecord(trx, {
+      sourceId,
+      externalRecordId: `${parsed.file.work.source_key}:${parsed.file.work.year}`,
+      raw,
+      contentHash,
+      sourceUrl: options.sourceUrl ?? parsed.file.work.reference_url,
+      retrievedAt,
       entries: parsed.file.entries.length,
-      supersedes_source_record_id: supersedes,
-    };
+    });
   });
+}
+
+/**
+ * Stores one version of a work's file as a source record, in the caller's
+ * transaction: `ALREADY_IMPORTED` on identical bytes, and an earlier `ACTIVE`
+ * record with the same `externalRecordId` becomes `UPDATED`. A work's surname
+ * file and its first-name file (TASK-147) have different ids, so neither
+ * replaces the other.
+ */
+export async function storeOnomasticRecord(
+  trx: Transaction<DB>,
+  input: {
+    readonly sourceId: string;
+    readonly externalRecordId: string;
+    readonly raw: unknown;
+    readonly contentHash: string;
+    readonly sourceUrl: string | null;
+    readonly retrievedAt: Date;
+    readonly entries: number;
+  },
+): Promise<Exclude<ImportOnomasticOutcome, { kind: "REFUSED" }>> {
+  const { sourceId, externalRecordId, contentHash } = input;
+  const existing = await trx
+    .selectFrom("source_records")
+    .select(["source_record_id"])
+    .where("source_id", "=", sourceId)
+    .where("content_hash", "=", contentHash)
+    .executeTakeFirst();
+  if (existing) {
+    return {
+      kind: "ALREADY_IMPORTED" as const,
+      source_id: sourceId,
+      source_record_id: existing.source_record_id,
+    };
+  }
+
+  const previous = await trx
+    .selectFrom("source_records")
+    .select(["source_record_id"])
+    .where("source_id", "=", sourceId)
+    .where("external_record_id", "=", externalRecordId)
+    .where("record_status", "=", "ACTIVE")
+    .orderBy("created_at", "desc")
+    .execute();
+  if (previous.length > 0) {
+    await trx
+      .updateTable("source_records")
+      .set({ record_status: "UPDATED" })
+      .where(
+        "source_record_id",
+        "in",
+        previous.map((r) => r.source_record_id),
+      )
+      .execute();
+  }
+  const supersedes = previous[0]?.source_record_id ?? null;
+
+  const sourceRecordId = uuidv7();
+  await trx
+    .insertInto("source_records")
+    .values({
+      source_record_id: sourceRecordId,
+      source_id: sourceId,
+      external_record_id: externalRecordId,
+      external_parent_id: null,
+      record_type: "ARTICLE",
+      source_url: input.sourceUrl,
+      // The file itself is the payload: every entry the claims rest on is
+      // here verbatim, so a claim can always be traced to the exact text.
+      raw_payload: input.raw as never,
+      raw_text_ref: null,
+      content_hash: contentHash,
+      retrieved_at: input.retrievedAt,
+      source_modified_at: null,
+      rights_profile_id: null,
+      record_status: "ACTIVE",
+      supersedes_source_record_id: supersedes,
+    })
+    .execute();
+
+  return {
+    kind: "IMPORTED" as const,
+    source_id: sourceId,
+    source_record_id: sourceRecordId,
+    entries: input.entries,
+    supersedes_source_record_id: supersedes,
+  };
 }
