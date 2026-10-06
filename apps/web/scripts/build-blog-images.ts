@@ -506,6 +506,46 @@ function skadNazwiska(): string {
   );
 }
 
+/**
+ * nazwiska-odmiejscowe: dusk ground with scattered clusters of small lights,
+ * like settlements; thin threads run from one bright point near the viewer to
+ * several clusters, and none of them is picked out.
+ */
+function odmiejscowe(): string {
+  const rnd = random(134);
+  const horizon = 410;
+  const clusters: { x: number; y: number; near: number }[] = [];
+  const lights: string[] = [];
+  for (let k = 0; k < 13; k += 1) {
+    const y = horizon + 40 + rnd() * (H - horizon - 150);
+    const near = (y - horizon) / (H - horizon);
+    const x = 80 + rnd() * (W - 160);
+    clusters.push({ x, y, near });
+    const count = 5 + Math.floor(rnd() * 7);
+    for (let i = 0; i < count; i += 1) {
+      const dx = (rnd() - 0.5) * (40 + near * 70);
+      const dy = (rnd() - 0.5) * (14 + near * 24);
+      lights.push(
+        `<circle cx="${f(x + dx)}" cy="${f(y + dy)}" r="${f(1.4 + near * 2.4)}" fill="${C.amber}" opacity="${f(0.35 + rnd() * 0.45)}"/>`,
+      );
+    }
+  }
+  const origin = { x: W * 0.5, y: 780 };
+  const threads = clusters
+    .filter((_, i) => i % 2 === 0)
+    .map(
+      (c) =>
+        `<path d="M${f(origin.x)} ${f(origin.y)} Q ${f((origin.x + c.x) / 2)} ${f(Math.min(origin.y, c.y) - 60)} ${f(c.x)} ${f(c.y)}" fill="none" stroke="${C.inkSoft}" stroke-opacity="0.22" stroke-width="1.2"/>`,
+    );
+  const home = `<circle cx="${f(origin.x)}" cy="${f(origin.y)}" r="8" fill="${C.sun}"/>`;
+  return scene(
+    134,
+    horizon,
+    "",
+    `<g>${threads.join("")}</g><g filter="url(#glow)">${lights.join("")}${home}</g>`,
+  );
+}
+
 const IMAGES: Record<string, () => string> = {
   genealogia,
   "koncowki-nazwisk": koncowki,
@@ -518,6 +558,7 @@ const IMAGES: Record<string, () => string> = {
   "czy-to-samo-nazwisko-to-rodzina": tenSam,
   "mapa-nazwiska-a-mapa-rodziny": mapaNazwiska,
   "skad-wziely-sie-nazwiska-w-polsce": skadNazwiska,
+  "nazwiska-odmiejscowe": odmiejscowe,
 };
 
 const out = resolve(process.argv[2] ?? join(import.meta.dirname, "..", "public", "images", "blog"));
