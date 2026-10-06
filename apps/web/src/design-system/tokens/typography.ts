@@ -1,0 +1,16 @@
+export const typographyTokens = {
+  display: "var(--font-display)",
+  interface: "var(--font-ui)",
+  data: "var(--font-data)",
+  displayHero: "var(--type-display-hero)",
+  displayXl: "var(--type-display-xl)",
+  displayLg: "var(--type-display-lg)",
+  headingXl: "var(--type-heading-xl)",
+  headingLg: "var(--type-heading-lg)",
+  headingMd: "var(--type-heading-md)",
+  bodyLg: "var(--type-body-lg)",
+  bodyMd: "var(--type-body-md)",
+  bodySm: "var(--type-body-sm)",
+  dataMd: "var(--type-data-md)",
+  metadata: "var(--type-metadata)",
+} as const;
