@@ -1,0 +1,422 @@
+{
+  "format_version": 1,
+  "kind": "GIVEN_NAME_MEANINGS",
+  "synthetic": false,
+  "work": {
+    "source_key": "bruckner_1927_slownik_etymologiczny",
+    "title": "Słownik etymologiczny języka polskiego",
+    "author_or_publisher": "Aleksander Brückner",
+    "year": 1927,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "PUBLIC_DOMAIN",
+      "reason": "Author Aleksander Brückner (1856–1939) died in 1939 (Wielkopolska Biblioteka Cyfrowa, which marks its scan of the 1927 edition, publication 510848, \"Prawa: domena publiczna\"). Economic rights expire 70 years after the author's death, counted from the end of that year (Polish Copyright Act, art. 36), so the work has been in the public domain since 2010-01-01. The text was read from the page images of Internet Archive item slownik_etymologiczny_jezyka_polskiego (licence URL: CC0 1.0), the same copy as the owner's package (docs/sources/bruckner-buryan-package.md)."
+    },
+    "reference_url": "https://archive.org/details/slownik_etymologiczny_jezyka_polskiego",
+    "rights": {
+      "terms_version": "PUBLIC_DOMAIN_ART36",
+      "terms_hash": null,
+      "checked_at": "2026-10-06T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "ALLOWED",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": true,
+      "attribution_text": "Aleksander Brückner, „Słownik etymologiczny języka polskiego”, Kraków: Krakowska Spółka Wydawnicza, 1927",
+      "source_owner": "public domain (author d. 1939); scan: Internet Archive item slownik_etymologiczny_jezyka_polskiego",
+      "rights_url": "https://archive.org/details/slownik_etymologiczny_jezyka_polskiego",
+      "contact_required": false,
+      "review_status": "LEGAL_REVIEW_REQUIRED",
+      "valid_from": "2010-01-01",
+      "valid_to": null,
+      "notes": "Public domain by the author's death date; no lawyer has reviewed it, hence LEGAL_REVIEW_REQUIRED, as for Buryan 1933 and Yonge 1884. Attribution required because authors' moral rights do not expire in Polish law. image_rights UNKNOWN: no image is reproduced. Every quotation was read from the page images, never taken from the OCR (D-046 §3). Reliability tier C, the tier of the other first-name works, though this is a linguist's dictionary; the product shows author and year beside every reading."
+    }
+  },
+  "entries": [
+    {
+      "given_name": "PIOTR",
+      "printed_form": "Piotr",
+      "origin": {
+        "code": "la",
+        "as_printed": "z łac."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 415, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n440)",
+      "quotation": "Piotr, imię, przed 12. wiekiem z łac. Petrus przejęte, więc ulega przegłosowi ie w io przed twardemi (ale wołacz: Pietrze!)"
+    },
+    {
+      "given_name": "KATARZYNA",
+      "printed_form": "Katarzyna",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z grec."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 677, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n702)",
+      "quotation": "Katarzyna (str. 222). Ruskie Jekatierina z grec. Aikaterina (wedle wymowy nowej), a to z Hagia Katherina."
+    },
+    {
+      "given_name": "MAŁGORZATA",
+      "printed_form": "Małgorzata",
+      "origin": {
+        "code": "grc",
+        "as_printed": "greckie"
+      },
+      "literal_gloss": "‘perła’",
+      "translation": null,
+      "locator": "s. 320, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n339)",
+      "quotation": "Małgorzata z Margaretha, z stałem rozpodobnieniem r-r w l-r, jak w kamlarz, ludwisarz, molderz, mularz; […] łac. margarita, greckie margarites, ‘perła’, co samo ze Wschodu pochodzi, chociaż źródło nieznane"
+    },
+    {
+      "given_name": "PAWEŁ",
+      "printed_form": "Paweł",
+      "origin": {
+        "code": "la",
+        "as_printed": "z łac."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 400, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n425)",
+      "quotation": "Paweł, imię, przeróbka Słowian, nieznoszących dwójgłosów, z łac. Paulus"
+    },
+    {
+      "given_name": "MICHAŁ",
+      "printed_form": "Michał",
+      "origin": {
+        "code": "he",
+        "as_printed": "imię hebrajskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 331, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n350)",
+      "quotation": "Michał, imię hebrajskie"
+    },
+    {
+      "given_name": "JAN",
+      "printed_form": "Jan",
+      "origin": {
+        "code": "he",
+        "as_printed": "z hebraj."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 198, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n217)",
+      "quotation": "Jan, jasiek (nazwa żartobliwa ‘poduszeczki’), Jaś, Jaksa (jak Boksa); […] czeskie ściągnięcie z łac. grec. Joan(nes), z hebraj. Jehochanan."
+    },
+    {
+      "given_name": "STANISŁAW",
+      "printed_form": "Stanisław",
+      "origin": null,
+      "literal_gloss": "Wiele imion jest wojowniczych, odpowiednio do czasów, więc wszystkie z woj-, bor-, stan-, stoj-",
+      "translation": null,
+      "locator": "s. 191, łamy 1–2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n210)",
+      "quotation": "Wiele imion jest wojowniczych, odpowiednio do czasów, więc wszystkie z woj-, bor-, stan-, stoj-; […] Stach, Staś, Stan, Stanko. Stachnik z Stanisława."
+    },
+    {
+      "given_name": "WOJCIECH",
+      "printed_form": "Wojciech",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "od *ciecha w pociecha, uciecha",
+      "translation": null,
+      "locator": "s. 63, łamy 1–2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n82)",
+      "quotation": "cieszyć, pocieszać, od *ciecha w pociecha, uciecha, po- i ucieszny, cieszyciel, dziś pocieszyciel, w imiennictwie: Wojciech, Sieciech z Szwieciech-Wszeciech, Ciechocinek, Cieszyn; prasłowo"
+    },
+    {
+      "given_name": "ZBIGNIEW",
+      "printed_form": "Zbygniew",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": "o ‘złości jadowitej dla pomsty wroga’",
+      "translation": null,
+      "locator": "s. 147, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n166)",
+      "quotation": "gniew, gniewać się, rozgniewać, gniewny i gniewliwy, gniewnik (w 15. i 16. wieku), ‘pobudzający mnie do gniewu’, ‘winowajca’. Prasłowo, w tem znaczeniu, przenośnem, od gni-ć; […] Częste w imionach: Zbygniew, Jarogniew, Gniewomir, Gniewosz, o ‘złości jadowitej dla pomsty wroga’."
+    },
+    {
+      "given_name": "JACEK",
+      "printed_form": "Jacek",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z grec. hyakinthos przez łacinę"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 171, łam 2 – s. 172, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karty n190–n191)",
+      "quotation": "Hiacynt, jako imię osobowe Jacęty i Jacek, nazwa rośliny i kamienia (jacynkt, jachant), z grec. hyakinthos przez łacinę; słowo greckie przedgreckiego początku."
+    },
+    {
+      "given_name": "JADWIGA",
+      "printed_form": "Jadwiga",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z niem."
+      },
+      "literal_gloss": "oba pnie: hadu- i wig-, znaczą ‘wojnę’",
+      "translation": null,
+      "locator": "s. 197, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n216)",
+      "quotation": "Jadwiga, z niem. Hedwig (oba pnie: hadu- i wig-, znaczą ‘wojnę’)"
+    },
+    {
+      "given_name": "BARTOSZ",
+      "printed_form": "bartosz",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "od bartodzieja",
+      "translation": null,
+      "locator": "s. 15, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n34)",
+      "quotation": "barć, prasłowo; u wszystkich Słowian ‘ul pszczół leśnych po sosnach i innych drzewach’; bartnik, bartodziej […]; od bartodzieja i bartosz, bartek, co już w 14. w. z Bartłomiejem pomieszano, najniesłuszniej"
+    },
+    {
+      "given_name": "JAROSŁAW",
+      "printed_form": "Jarosław",
+      "origin": null,
+      "literal_gloss": "‘silną (wielką) sławę mający’ (Jarosław to samo)",
+      "translation": null,
+      "locator": "s. 191, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n210)",
+      "quotation": "Złożenia były dzierżawcze: Świętosław znaczy ‘silną (wielką) sławę mający’ (Jarosław to samo)"
+    },
+    {
+      "given_name": "HELENA",
+      "printed_form": "Helena",
+      "origin": {
+        "code": "grc",
+        "as_printed": "grec."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 115, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n134)",
+      "quotation": "ależ niem. Helga, t. j. w wymowie ruskiej Jelga (Elga u Konstantyna Porfirogenity w r. 950), w Olgę w 10. wieku się odmieniła, a grec. Helena, Jelena, w Olenę; wieszczy Oleg kijowski, to niem. Helgi."
+    },
+    {
+      "given_name": "MIKOŁAJ",
+      "printed_form": "Mikołaj",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z grec."
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 336, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n355)",
+      "quotation": "Mikołaj z grec. Nikolaos; Nikora w 12. wieku, Mikora (ta sama osoba) w 13. wieku"
+    },
+    {
+      "given_name": "LESZEK",
+      "printed_form": "Leszek",
+      "origin": {
+        "code": "gem",
+        "as_printed": "uchodzi powszechnie za pożyczkę z goc."
+      },
+      "literal_gloss": "‘zdrady’, ‘obłudy’",
+      "translation": null,
+      "locator": "s. 296, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n315)",
+      "quotation": "leść, lści; lściwy, lściwość, powszechne w 14. i 15. wieku dla ‘zdrady’, ‘obłudy’, […] uchodzi powszechnie za pożyczkę z goc. lists, ‘chytrość’, […] Ocalało w imieniu Lstek, Lestka, z czego Lestek, Leszek, u Piastów."
+    },
+    {
+      "given_name": "OLGA",
+      "printed_form": "Olga",
+      "origin": {
+        "code": "gem",
+        "as_printed": "niem. Helga"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 115, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n134)",
+      "quotation": "ależ niem. Helga, t. j. w wymowie ruskiej Jelga (Elga u Konstantyna Porfirogenity w r. 950), w Olgę w 10. wieku się odmieniła, a grec. Helena, Jelena, w Olenę; wieszczy Oleg kijowski, to niem. Helgi."
+    },
+    {
+      "given_name": "WACŁAW",
+      "printed_form": "Wacław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "polskie Więcław z *Więce-sław"
+      },
+      "literal_gloss": "to samo więc co Bolesław lub Uniesław",
+      "translation": null,
+      "locator": "s. 598, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n623)",
+      "quotation": "Wacław, imię, niepolskie; czes. Wáclaw; ale w 10. wieku jeszcze łac. Venceslaus, polskie Więcław z *Więce-sław, to samo więc co Bolesław lub Uniesław."
+    },
+    {
+      "given_name": "BOLESŁAW",
+      "printed_form": "Bolesław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": "*boli, *więcy, *uni, *lepi są wyższe stopnie, bez niższych, do: wielki, dobry",
+      "translation": null,
+      "locator": "s. 35, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n54)",
+      "quotation": "Bolesław, imię, to samo co Więcesław (czes. Wacław) lub Uniesław; *boli, *więcy, *uni, *lepi są wyższe stopnie, bez niższych, do: wielki, dobry. U nas i u Czechów ocalało *boli w nazwach. Prasłowo; cerk. bolij, żeńs. bolszi, nijak. i przysłówek bolje, ‘większy’"
+    },
+    {
+      "given_name": "OLEG",
+      "printed_form": "Oleg",
+      "origin": {
+        "code": "gem",
+        "as_printed": "to niem. Helgi"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 115, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n134)",
+      "quotation": "ależ niem. Helga, t. j. w wymowie ruskiej Jelga (Elga u Konstantyna Porfirogenity w r. 950), w Olgę w 10. wieku się odmieniła, a grec. Helena, Jelena, w Olenę; wieszczy Oleg kijowski, to niem. Helgi."
+    },
+    {
+      "given_name": "MIESZKO",
+      "printed_form": "Mieszka",
+      "origin": null,
+      "literal_gloss": "‘niedźwiedź’",
+      "translation": null,
+      "locator": "s. 335, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n354)",
+      "quotation": "Mieszka, ‘niedźwiedź’, pierwszy Piast, nie Mieszko, jak go nasi historycy ochrzcili; najdawniejsze źródła nazywają go Miseca, nie Miseco"
+    },
+    {
+      "given_name": "ZIEMOWIT",
+      "printed_form": "Ziemowit",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "*siemia, ‘rodzina’",
+      "translation": null,
+      "locator": "s. 489, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n514)",
+      "quotation": "*siemia, ‘rodzina’; prasłowo; u nas tylko w nazwach, Siemirad (Siemiradzki), Siemowit, Siemomysł (mylnie odnoszone do ziemi: Ziemowit)."
+    },
+    {
+      "given_name": "JACENTY",
+      "printed_form": "Jacęty",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z grec. hyakinthos przez łacinę"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 171, łam 2 – s. 172, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karty n190–n191)",
+      "quotation": "Hiacynt, jako imię osobowe Jacęty i Jacek, nazwa rośliny i kamienia (jacynkt, jachant), z grec. hyakinthos przez łacinę; słowo greckie przedgreckiego początku."
+    },
+    {
+      "given_name": "GNIEWOMIR",
+      "printed_form": "Gniewomir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": "o ‘złości jadowitej dla pomsty wroga’",
+      "translation": null,
+      "locator": "s. 147, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n166)",
+      "quotation": "gniew, gniewać się, rozgniewać, gniewny i gniewliwy, gniewnik (w 15. i 16. wieku), ‘pobudzający mnie do gniewu’, ‘winowajca’. Prasłowo, w tem znaczeniu, przenośnem, od gni-ć; […] Częste w imionach: Zbygniew, Jarogniew, Gniewomir, Gniewosz, o ‘złości jadowitej dla pomsty wroga’."
+    },
+    {
+      "given_name": "BARTEK",
+      "printed_form": "bartek",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "od bartodzieja",
+      "translation": null,
+      "locator": "s. 15, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n34)",
+      "quotation": "barć, prasłowo; u wszystkich Słowian ‘ul pszczół leśnych po sosnach i innych drzewach’; bartnik, bartodziej […]; od bartodzieja i bartosz, bartek, co już w 14. w. z Bartłomiejem pomieszano, najniesłuszniej"
+    },
+    {
+      "given_name": "LUBOMIR",
+      "printed_form": "Lubomir(ski)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 302, łamy 1–2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n321)",
+      "quotation": "luby, lubić […] Prasłowo; tak samo u wszystkich Słowian; […] Nader rozpowszechnione w całem imiennictwie: Lubomir(ski), Luboradz(ki), herb Lubicz i Lubrza"
+    },
+    {
+      "given_name": "GNIEWOSZ",
+      "printed_form": "Gniewosz",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": "o ‘złości jadowitej dla pomsty wroga’",
+      "translation": null,
+      "locator": "s. 147, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n166)",
+      "quotation": "gniew, gniewać się, rozgniewać, gniewny i gniewliwy, gniewnik (w 15. i 16. wieku), ‘pobudzający mnie do gniewu’, ‘winowajca’. Prasłowo, w tem znaczeniu, przenośnem, od gni-ć; […] Częste w imionach: Zbygniew, Jarogniew, Gniewomir, Gniewosz, o ‘złości jadowitej dla pomsty wroga’."
+    },
+    {
+      "given_name": "DOBIESŁAW",
+      "printed_form": "Dobiesław",
+      "origin": null,
+      "literal_gloss": "‘dobry’",
+      "translation": null,
+      "locator": "s. 91, łamy 1–2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n110)",
+      "quotation": "dob’, ‘dobry’, u nas już tylko w imionach, Dobiesław, Dobiegniew; skrócone, jednopniowe w Dobku, Dobczycach"
+    },
+    {
+      "given_name": "BORYSŁAW",
+      "printed_form": "Borysław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "bróć się, ‘walczyć’",
+      "translation": null,
+      "locator": "s. 36, łam 2 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n55)",
+      "quotation": "borykać się, borba, borbifaks, borytel, z rus., narzeczowe bróć się, ‘walczyć’, bródło, ‘palisada’; zupełnie zapomniane prasłowo, ocalałe w broń i w imionach Borzywój, Borysław (rus.), Barnim pomorski i marchijski"
+    },
+    {
+      "given_name": "JAROGNIEW",
+      "printed_form": "Jarogniew",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Prasłowo"
+      },
+      "literal_gloss": "o ‘złości jadowitej dla pomsty wroga’",
+      "translation": null,
+      "locator": "s. 147, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n166)",
+      "quotation": "gniew, gniewać się, rozgniewać, gniewny i gniewliwy, gniewnik (w 15. i 16. wieku), ‘pobudzający mnie do gniewu’, ‘winowajca’. Prasłowo, w tem znaczeniu, przenośnem, od gni-ć; […] Częste w imionach: Zbygniew, Jarogniew, Gniewomir, Gniewosz, o ‘złości jadowitej dla pomsty wroga’."
+    },
+    {
+      "given_name": "SIEMOWIT",
+      "printed_form": "Siemowit",
+      "origin": {
+        "code": "sla",
+        "as_printed": "prasłowo"
+      },
+      "literal_gloss": "*siemia, ‘rodzina’",
+      "translation": null,
+      "locator": "s. 489, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n514)",
+      "quotation": "*siemia, ‘rodzina’; prasłowo; u nas tylko w nazwach, Siemirad (Siemiradzki), Siemowit, Siemomysł (mylnie odnoszone do ziemi: Ziemowit)."
+    },
+    {
+      "given_name": "ŚWIĘTOSŁAW",
+      "printed_form": "Świętosław",
+      "origin": null,
+      "literal_gloss": "‘silną (wielką) sławę mający’",
+      "translation": null,
+      "locator": "s. 191, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karta n210)",
+      "quotation": "Złożenia były dzierżawcze: Świętosław znaczy ‘silną (wielką) sławę mający’ (Jarosław to samo)"
+    },
+    {
+      "given_name": "HIACYNT",
+      "printed_form": "Hiacynt",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z grec. hyakinthos przez łacinę"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 171, łam 2 – s. 172, łam 1 (skan Internet Archive slownik_etymologiczny_jezyka_polskiego, karty n190–n191)",
+      "quotation": "Hiacynt, jako imię osobowe Jacęty i Jacek, nazwa rośliny i kamienia (jacynkt, jachant), z grec. hyakinthos przez łacinę; słowo greckie przedgreckiego początku."
+    }
+  ]
+}

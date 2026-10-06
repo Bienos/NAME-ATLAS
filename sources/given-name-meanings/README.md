@@ -1,6 +1,6 @@
 # `sources/given-name-meanings/` — first-name origins and meanings from public-domain works
 
-What two public-domain works state about the first names on the PESEL lists (TASK-147,
+What three public-domain works state about the first names on the PESEL lists (TASK-147,
 ADR-0045, D-046). Each file cites its work as `sources/onomastics/` does (ADR-0008 §4) and
 holds one entry per name: the name as the lists spell it, the work's printed form, the
 language of origin as a code and in the work's own words, the work's meaning where it gives
@@ -11,6 +11,7 @@ tests read these files as they are.
 |---|---|---:|---|
 | `buryan-1933.json` | ks. Józef Buryan, *Skąd pochodzi twoje imię i nazwisko…*, Warszawa 1933, chapter A "Imiona", printed pp. 4–6 | 112 | Public domain: author died 1950 (art. 36) |
 | `yonge-1884.json` | Charlotte M. Yonge, *History of Christian Names*, new edition, revised, London 1884, the Glossary's lines marked *Pol.* | 86 | Public domain: author died 1901 (art. 36) |
+| `bruckner-1927.json` | Aleksander Brückner, *Słownik etymologiczny języka polskiego*, Kraków 1927, the entries that explain a listed first name (TASK-150) | 33 | Public domain: author died 1939 (art. 36) |
 
 How the entries were made:
 
@@ -28,7 +29,18 @@ How the entries were made:
   translation beside it, which is Name Atlas's and is marked `"by": "Name Atlas"`; for a
   woman's name it takes the feminine form.
 
+- **Brückner:** read from the page images of Internet Archive item
+  `slownik_etymologiczny_jezyka_polskiego` (D-046 §3); the OCR was used only to find the
+  passages, through the work's index and the headwords. An entry is kept only where Brückner
+  says where the name comes from or what it means. A name he only lists, gives diminutives
+  for, or traces through a neighbouring language's form (Jerzy "z czes. Jirzí", Karol "wedle
+  łaciny") is left out. The origin is the earliest language he names for the name itself:
+  Piotr "z łac. Petrus przejęte" is Latin, beside Buryan's and Yonge's Greek. One passage
+  often explains several names (*gniew* for Zbigniew, Gniewomir, Gniewosz, Jarogniew), and
+  each gets the passage. The locator gives the printed page, the column (*łam*) and the scan's
+  leaf.
+
 Import with `pnpm import:given-name-meanings --file sources/given-name-meanings/buryan-1933.json
---file sources/given-name-meanings/yonge-1884.json`, then derive with
-`pnpm truth:derive-given-name-meanings`. A changed file imports as a new version and the
+--file sources/given-name-meanings/yonge-1884.json --file sources/given-name-meanings/bruckner-1927.json`,
+then derive with `pnpm truth:derive-given-name-meanings`. A changed file imports as a new version and the
 earlier one becomes `UPDATED`; deriving again replaces a name's claim whose works changed.
