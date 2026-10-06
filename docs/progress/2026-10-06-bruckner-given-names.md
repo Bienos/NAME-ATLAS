@@ -45,7 +45,7 @@ Run on the working tree, PostgreSQL 16.14. Unit tests used a new empty database,
 |---|---|
 | `pnpm format:check`, `check:ids`, `check:vm` | exit 0 |
 | `pnpm test` | exit 0, 2,467 tests |
-| `pnpm test:integration` | INTEGRATION_RESULT |
+| `pnpm test:integration` | exit 0: 49 files, 536 tests |
 
 `check:ids` was run again after renumbering from TASK-149 to TASK-150 (#178 took 149): exit 0.
 
