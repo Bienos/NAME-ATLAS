@@ -78,7 +78,7 @@ const list = (year: number, sex: "MALE" | "FEMALE") => ({
   people_sum: PEOPLE_SUM[year] ?? 100_000,
 });
 
-/** A count claim with its share and "1 in N" as the reader computes them (TASK-150). */
+/** A count claim with its share and "1 in N" as the reader computes them (TASK-151). */
 const countOf = (
   year: number,
   sex: "MALE" | "FEMALE",
@@ -669,7 +669,7 @@ describe("loadBabyNames", () => {
   });
 });
 
-describe("the redesigned page (TASK-150, ADR-0046)", () => {
+describe("the redesigned page (TASK-151, ADR-0046)", () => {
   const field = { pl: "imie", en: "name" } as const;
 
   /** One sex's section: from its `data-sex` to the next sex's or the meaning tile. */

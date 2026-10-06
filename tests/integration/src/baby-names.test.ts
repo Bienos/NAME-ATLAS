@@ -135,7 +135,7 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(girls.history).toBeNull();
   });
 
-  it("gives the list's people_sum, each count's share and 1 in N, and the trend's two shares (TASK-150)", async () => {
+  it("gives the list's people_sum, each count's share and 1 in N, and the trend's two shares (TASK-151)", async () => {
     const zofia = await facts("Zofia", true);
     const girls = sex(zofia, "FEMALE");
     const latest = girls.latest;

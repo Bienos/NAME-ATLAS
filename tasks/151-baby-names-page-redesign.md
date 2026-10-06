@@ -1,9 +1,9 @@
-# TASK-150 — The baby-names page redesigned in Brand System v1: tiles, the share, "1 na N", the year chart
+# TASK-151 — The baby-names page redesigned in Brand System v1: tiles, the share, "1 na N", the year chart
 
 - **Status:** IMPLEMENTED 2026-10-06 (`docs/progress/2026-10-06-baby-names-page-redesign.md`). Dark behind the same flag as before.
 - **Requested by:** the project owner, 2026-10-06: a redesign of the baby-names result page from two mockups (the free view and the view after paying), "build it".
 - **Decision:** ADR-0046 (Brand System v1, the build follows it rather than the mockups' amber accent), ADR-0043 §4 (the share's definition; one amendment line in its Consequences), ADR-0045 (what a meaning may show), ADR-0023 §2.5 (no buy button), D-044, D-045, D-047. No new ADR, no migration, no D- number.
-- **Numbers:** TASK 150. 148 was the last on `main` (`3d12f1a`, #177); open draft #178 holds TASK-149.
+- **Numbers:** TASK 151. 148 was the last on `main` (`3d12f1a`, #177); #178 holds TASK-149 and open #179 took TASK-150 while this session was in preflight, so the number moved from 150 to 151 before the pull request.
 - **Model guidance:** implementation session.
 
 ## 1. Goal

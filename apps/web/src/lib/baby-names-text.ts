@@ -7,7 +7,7 @@ import type { Lang } from "./messages.js";
  * a direction. No kinship, no "popular" or "rare". Every number the functions
  * below put in a sentence comes from a claim or from a list's stored cut-off or
  * `people_sum`; none is written here. A meaning is shown only in a work's own
- * words (TASK-150, ADR-0045).
+ * words (TASK-151, ADR-0045).
  */
 
 export type BirthDirection = "RISING" | "STEADY" | "FALLING";
@@ -59,7 +59,7 @@ export interface BabyNamesText {
   /** The link to the whole list (TASK-146), on the page and in the locked card. */
   readonly listLink: string;
   readonly lockedListNote: string;
-  // --- TASK-150: the redesigned page. Every number comes in as a formatted string. ---
+  // --- TASK-151: the redesigned page. Every number comes in as a formatted string. ---
   /** The sex tabs' accessible name. */
   readonly tabsLabel: string;
   /** The hero tile's eyebrow: "W 2025 TO IMIĘ DOSTAŁO". */

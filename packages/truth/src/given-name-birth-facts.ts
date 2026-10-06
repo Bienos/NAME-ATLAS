@@ -51,7 +51,7 @@ export interface BirthCountFigure {
   /**
    * The name's share of the children on its list, in parts per million,
    * rounded down: count × 1 000 000 ÷ the list's `people_sum`, the definition
-   * the trend claim uses (ADR-0043 §4; TASK-150). Null only when the stored
+   * the trend claim uses (ADR-0043 §4; TASK-151). Null only when the stored
    * figures contradict each other (a count above the list's sum, or a sum
    * below 1), never 0.
    */
@@ -87,7 +87,7 @@ export interface BirthTrendFigure {
   /**
    * The two shares the direction was decided on, as the claim states them
    * (`structured_value.latest.share_per_million`, `earlier.share_per_million`;
-   * TASK-150). The earlier is null when the name was absent from the earlier
+   * TASK-151). The earlier is null when the name was absent from the earlier
    * list, below its cut-off; either is null when the claim does not carry it.
    */
   readonly latest_share_per_million: number | null;

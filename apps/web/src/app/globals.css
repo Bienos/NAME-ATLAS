@@ -7118,7 +7118,7 @@ a.tree-card:hover {
   color: var(--dusk-ink-muted);
 }
 
-/* --- the baby-names page in Brand System v1 (TASK-150, ADR-0046) ---
+/* --- the baby-names page in Brand System v1 (TASK-151, ADR-0046) ---
    The single-name page family lives in the `.atlas-v1` scope: semantic tokens
    only, Atlas Blue for action, focus and the lit point, amber for the peak
    year's bar alone. The rules above stay for the list page (TASK-146), which

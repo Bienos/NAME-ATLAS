@@ -198,7 +198,7 @@ describe("assembleBirthNameFacts (TASK-141)", () => {
     });
   });
 
-  it("gives each count claim its share of its own list's children and its 1 in N (TASK-150)", () => {
+  it("gives each count claim its share of its own list's children and its 1 in N (TASK-151)", () => {
     // 4 415 of 119 788 girls: 36 857 per million rounded down (3.7%), one in 27.
     const rows = [count("f2025", 4415), count("f2020", 7073), count("m2025", 3)];
     const lists = [
@@ -309,7 +309,7 @@ describe("stockListOfSex (TASK-145)", () => {
   });
 });
 
-describe("birthShare (TASK-150)", () => {
+describe("birthShare (TASK-151)", () => {
   it("is the trend claim's definition: parts per million rounded down, and 1 in N rounded", () => {
     expect(birthShare(4415, 119_788)).toEqual({ share_per_million: 36856, one_in: 27 });
     expect(birthShare(7073, 176_829)).toEqual({ share_per_million: 39999, one_in: 25 });

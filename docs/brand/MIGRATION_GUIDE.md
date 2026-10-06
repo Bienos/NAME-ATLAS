@@ -65,7 +65,7 @@ Deck, share studio, report/PDF, account/tree, couple, baby names.
 
 These are high-risk because visual components interact with download/session/data behavior.
 
-Migrated: the baby-names single-name page family (TASK-150, 2026-10-06; `apps/web/src/lib/baby-names-page.tsx`, rules under `.baby-names.atlas-v1`). The baby-names list page is not.
+Migrated: the baby-names single-name page family (TASK-151, 2026-10-06; `apps/web/src/lib/baby-names-page.tsx`, rules under `.baby-names.atlas-v1`). The baby-names list page is not.
 
 ## Phase 7 — cleanup
 

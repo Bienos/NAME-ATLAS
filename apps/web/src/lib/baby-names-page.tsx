@@ -61,7 +61,7 @@ import { SiteShell } from "./site-shell.js";
  * two lists are never summed, and never added to a birth-year figure. To move
  * the register block into the 8,99 zł view, render it only when `full` is true.
  *
- * TASK-150 (ADR-0046, Brand System v1): the result is a family of tiles in
+ * TASK-151 (ADR-0046, Brand System v1): the result is a family of tiles in
  * the `.atlas-v1` scope. Free, per sex: the hero (the count as the one big
  * number, its share of the list's children, the rank with a track), "1 na N"
  * with a dot grid, the direction with the two shares the claim was decided on,
