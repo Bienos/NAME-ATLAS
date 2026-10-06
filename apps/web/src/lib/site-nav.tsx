@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { EvolvedContourMark } from "../design-system/graphics/index.js";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
 import { BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
@@ -109,15 +109,7 @@ export function SiteNav({
   return (
     <header className="site-nav" lang={htmlLang(lang)}>
       <a className="wordmark" href={homePath(lang)} aria-label={t.title}>
-        <Image
-          className="wordmark-mark"
-          src="/brand/logo/name-atlas-mark-dark.svg"
-          alt=""
-          width={42}
-          height={42}
-          aria-hidden="true"
-          priority
-        />
+        <EvolvedContourMark className="wordmark-mark" />
         <span className="wordmark-type">{t.title}</span>
       </a>
       {search === null ? null : <SearchForm lang={lang} query={search.query} variant="compact" />}
