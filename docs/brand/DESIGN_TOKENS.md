@@ -6,7 +6,7 @@ Brand System v1 uses two layers.
 
 Values live in `apps/web/src/lib/design-tokens.ts` and are mirrored in the single `:root` block of `globals.css`. Existing tests enforce exact parity.
 
-Families added by TASK-147:
+Families added by TASK-148:
 - `atlas-plum-*`
 - `atlas-aubergine-*`
 - `atlas-dusk-*`
