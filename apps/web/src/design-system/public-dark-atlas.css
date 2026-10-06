@@ -1,0 +1,666 @@
+/*
+ * TASK-149 — public migration to Evolved Contour — Dark Atlas.
+ *
+ * This file is loaded after the legacy stylesheet and Brand System v1.
+ * It intentionally adapts existing product classes instead of rewriting
+ * feature components. Product facts, contracts and behavior stay untouched.
+ */
+
+body.dusk.atlas-v1 {
+  --surface-primary: var(--color-bg-primary);
+  --surface-elevated: var(--color-bg-secondary);
+  --surface-inverse: var(--color-text-primary);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-tertiary: var(--color-text-tertiary);
+  --text-inverse: var(--color-text-inverse);
+  --border-soft: var(--color-border-subtle);
+  --border-default: var(--color-border-default);
+  --border-strong: var(--color-border-strong);
+  --accent: var(--color-accent-primary);
+  --on-accent: var(--atlas-ivory-50);
+  --hover-light: var(--color-bg-elevated);
+  --hover-blue: var(--color-accent-hover);
+  --focus-ring: var(--atlas-blue-300);
+  --confidence-verified: var(--color-confidence-verified);
+  --confidence-likely: var(--color-confidence-likely);
+  --confidence-possible: var(--color-confidence-possible);
+  --confidence-unconfirmed: var(--color-confidence-unconfirmed);
+  --map-0: var(--map-density-lowest);
+  --map-1: var(--map-density-low);
+  --map-2: var(--map-density-mid);
+  --map-3: var(--map-density-high);
+  --map-4: var(--map-density-peak);
+  --map-no-data: var(--map-no-data);
+  background:
+    radial-gradient(
+      90rem 60rem at 78% -12%,
+      color-mix(in srgb, var(--atlas-aubergine-500) 28%, transparent),
+      transparent 58%
+    ),
+    var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+body.dusk.atlas-v1 a {
+  color: var(--color-accent-text);
+}
+
+body.dusk.atlas-v1 ::selection {
+  color: var(--atlas-ivory-50);
+  background: var(--atlas-blue-600);
+}
+
+/* Shared field: one restrained cartographic atmosphere behind every route. */
+body.dusk.atlas-v1 .site {
+  overflow: clip;
+}
+
+body.dusk.atlas-v1 .dusk-world {
+  z-index: -3;
+  background:
+    radial-gradient(
+      60rem 32rem at 77% 14%,
+      color-mix(in srgb, var(--atlas-dusk-400) 38%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      55rem 34rem at 14% 84%,
+      color-mix(in srgb, var(--atlas-aubergine-600) 35%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(
+      150deg,
+      var(--atlas-plum-950) 0%,
+      var(--atlas-plum-850) 44%,
+      var(--atlas-plum-800) 100%
+    );
+}
+
+body.dusk.atlas-v1 .atlas-shell-graphics {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body.dusk.atlas-v1 .atlas-shell-graphics > .contour-field {
+  inset: auto -18vw -8vh 34vw;
+  width: 88vw;
+  height: 58vh;
+  transform: rotate(-7deg);
+}
+
+body.dusk.atlas-v1 .atlas-shell-graphics > .atlas-grid {
+  inset: 0 0 auto auto;
+  width: min(52vw, 760px);
+  height: 48vh;
+  mask-image: linear-gradient(135deg, transparent 12%, black 58%, transparent 100%);
+  opacity: 0.08;
+}
+
+body.dusk.atlas-v1 .atlas-shell-point {
+  position: fixed;
+  top: 39vh;
+  right: min(19vw, 290px);
+}
+
+body.dusk.atlas-v1 .site-quiet .atlas-shell-graphics > .contour-field {
+  opacity: 0.11 !important;
+}
+
+body.dusk.atlas-v1 .site-quiet .atlas-shell-graphics > .atlas-grid {
+  opacity: 0.04;
+}
+
+/* Abstract terrain: no scenic photo is required for the approved hero. */
+body.dusk.atlas-v1 .dusk-world-hero {
+  background:
+    radial-gradient(
+      44rem 28rem at 76% 32%,
+      color-mix(in srgb, var(--atlas-amber-500) 16%, transparent),
+      transparent 72%
+    ),
+    linear-gradient(155deg, var(--atlas-plum-950), var(--atlas-plum-850) 58%, var(--atlas-plum-700));
+}
+
+body.dusk.atlas-v1 .dusk-horizon {
+  inset: 10% -8% -12% 38%;
+  transform: none;
+  opacity: 0.95;
+  filter: none;
+}
+
+body.dusk.atlas-v1 .dusk-horizon::after {
+  background:
+    repeating-radial-gradient(
+      ellipse at 58% 56%,
+      transparent 0 17px,
+      color-mix(in srgb, var(--atlas-amber-400) 18%, transparent) 18px 19px,
+      transparent 20px 34px
+    );
+  mask-image: linear-gradient(180deg, transparent 2%, black 30%, black 82%, transparent);
+  opacity: 0.7;
+}
+
+body.dusk.atlas-v1 .dusk-terrain {
+  position: absolute;
+  inset: auto 0 0;
+  transform-origin: bottom;
+}
+
+body.dusk.atlas-v1 .dusk-terrain-far {
+  height: 58%;
+  background: color-mix(in srgb, var(--atlas-dusk-500) 52%, var(--atlas-plum-700));
+  clip-path: polygon(0 100%, 0 78%, 14% 69%, 27% 76%, 42% 48%, 51% 58%, 66% 32%, 78% 52%, 92% 35%, 100% 42%, 100% 100%);
+  opacity: 0.42;
+}
+
+body.dusk.atlas-v1 .dusk-terrain-mid {
+  height: 52%;
+  background: color-mix(in srgb, var(--atlas-plum-700) 82%, var(--atlas-amber-700));
+  clip-path: polygon(0 100%, 0 88%, 12% 71%, 26% 80%, 39% 52%, 53% 68%, 65% 29%, 75% 42%, 87% 62%, 100% 48%, 100% 100%);
+  opacity: 0.84;
+}
+
+body.dusk.atlas-v1 .dusk-terrain-near {
+  height: 45%;
+  background: var(--atlas-plum-950);
+  clip-path: polygon(0 100%, 0 90%, 11% 84%, 20% 94%, 33% 64%, 46% 74%, 56% 55%, 66% 70%, 77% 46%, 88% 67%, 100% 58%, 100% 100%);
+}
+
+body.dusk.atlas-v1 .dusk-terrain-point {
+  position: absolute;
+  top: 48%;
+  left: 69%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--color-signal-atlas);
+  box-shadow:
+    0 0 0 5px color-mix(in srgb, var(--color-signal-atlas) 18%, transparent),
+    0 0 28px color-mix(in srgb, var(--color-signal-atlas) 42%, transparent);
+}
+
+:root[data-dusk-zoom] body.dusk.atlas-v1 .dusk-horizon {
+  opacity: 0;
+  transform: scale(1.08);
+}
+
+/* Navigation: editorial lockup, blue action hierarchy, very little chrome. */
+body.dusk.atlas-v1 .site-nav {
+  position: relative;
+  z-index: 20;
+  min-height: 88px;
+  padding-block: 18px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border-subtle) 72%, transparent);
+}
+
+body.dusk.atlas-v1 .site-nav .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-primary);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+body.dusk.atlas-v1 .wordmark-mark {
+  width: 38px;
+  height: 38px;
+}
+
+body.dusk.atlas-v1 .wordmark-type {
+  white-space: nowrap;
+}
+
+body.dusk.atlas-v1 .site-links a,
+body.dusk.atlas-v1 .nav-menu nav a,
+body.dusk.atlas-v1 .lang-switch a {
+  color: var(--color-text-secondary);
+}
+
+body.dusk.atlas-v1 .site-links a:hover,
+body.dusk.atlas-v1 .nav-menu nav a:hover,
+body.dusk.atlas-v1 .lang-switch a:hover {
+  color: var(--color-text-primary);
+}
+
+body.dusk.atlas-v1 .site-links a[aria-current="page"],
+body.dusk.atlas-v1 .nav-menu nav a[aria-current="page"] {
+  color: var(--color-text-primary);
+  text-decoration-color: var(--color-signal-atlas);
+}
+
+body.dusk.atlas-v1 .site-links a.nav-account {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .site-links a.nav-account:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+body.dusk.atlas-v1 .lang-switch [aria-current] {
+  color: var(--atlas-blue-300);
+}
+
+/* Hero: one framed atlas field and one rare ivory search surface. */
+body.dusk.atlas-v1 .landing-stage {
+  position: relative;
+  isolation: isolate;
+  min-height: min(82svh, 860px);
+  margin-top: 10px;
+  padding:
+    clamp(42px, 8vh, 90px)
+    clamp(22px, 5vw, 66px)
+    clamp(28px, 5vh, 52px);
+  overflow: hidden;
+  background:
+    linear-gradient(
+      105deg,
+      color-mix(in srgb, var(--atlas-plum-950) 82%, transparent) 0%,
+      color-mix(in srgb, var(--atlas-plum-850) 62%, transparent) 54%,
+      transparent 100%
+    );
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 58%, transparent);
+  border-radius: 22px;
+  box-shadow: var(--atlas-shadow-soft);
+}
+
+body.dusk.atlas-v1 .landing-eyebrow {
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+}
+
+body.dusk.atlas-v1 .landing-headline {
+  max-width: 13ch;
+  color: var(--color-text-primary);
+  font-size: clamp(4rem, 7.4vw, 7.6rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.042em;
+  font-optical-sizing: auto;
+}
+
+body.dusk.atlas-v1 .landing-lede {
+  max-width: 34rem;
+  color: var(--color-text-secondary);
+}
+
+body.dusk.atlas-v1 .landing-stage .search-hero {
+  max-width: 54rem;
+  min-height: 74px;
+  padding: 6px 6px 6px 22px;
+  color: var(--atlas-ink-950);
+  background: var(--atlas-ivory-50);
+  border: 1px solid color-mix(in srgb, var(--atlas-ivory-300) 64%, transparent);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--atlas-plum-950) 28%, transparent);
+  backdrop-filter: none;
+}
+
+body.dusk.atlas-v1 .landing-stage .search-icon {
+  stroke: var(--atlas-ink-950);
+  opacity: 0.72;
+}
+
+body.dusk.atlas-v1 .landing-stage .search input,
+body.dusk.atlas-v1 .landing-stage .combobox-mirror {
+  color: var(--atlas-ink-950);
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  font-weight: 400;
+}
+
+body.dusk.atlas-v1 .landing-stage .search input {
+  border-bottom: 0;
+}
+
+body.dusk.atlas-v1 .landing-stage .search input::placeholder {
+  color: color-mix(in srgb, var(--atlas-ink-950) 55%, transparent);
+}
+
+body.dusk.atlas-v1 .landing-stage .combobox::before,
+body.dusk.atlas-v1 .landing-stage .combobox::after {
+  display: none;
+}
+
+body.dusk.atlas-v1 .landing-stage .search button {
+  min-width: 66px;
+  min-height: 62px;
+  padding-inline: 21px;
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+
+body.dusk.atlas-v1 .landing-stage .search button:hover {
+  background: var(--color-accent-hover);
+}
+
+body.dusk.atlas-v1 .landing-trust {
+  color: var(--color-text-tertiary);
+}
+
+body.dusk.atlas-v1 .landing-atlas {
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in srgb, var(--atlas-plum-900) 78%, transparent) 18rem,
+      var(--atlas-plum-900) 100%
+    );
+}
+
+body.dusk.atlas-v1 .landing-atlas section,
+body.dusk.atlas-v1 main:not(.landing) section {
+  border-top-color: color-mix(in srgb, var(--color-border-subtle) 82%, transparent);
+}
+
+body.dusk.atlas-v1 .landing-try a {
+  color: var(--color-text-primary);
+  background: transparent;
+  border-color: var(--color-border-default);
+}
+
+body.dusk.atlas-v1 .landing-try a:hover,
+body.dusk.atlas-v1 .landing-try a:focus-visible {
+  color: var(--atlas-blue-300);
+  border-color: var(--color-accent-primary);
+}
+
+/* Core result language: surname as editorial object, blue points, quiet evidence. */
+body.dusk.atlas-v1 .snapshot .surname,
+body.dusk.atlas-v1 .result .snapshot .surname {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  font-optical-sizing: auto;
+}
+
+body.dusk.atlas-v1 .result .hero-figure {
+  border-top-color: var(--color-border-strong);
+}
+
+body.dusk.atlas-v1 .result .hero-figure::before,
+body.dusk.atlas-v1 .result .snapshot > .tally::before,
+body.dusk.atlas-v1 .atlas-thread-point,
+body.dusk.atlas-v1 .timeline-event::before {
+  background: var(--color-signal-atlas);
+}
+
+body.dusk.atlas-v1 .warning {
+  background: color-mix(in srgb, var(--color-signal-amber) 7%, var(--color-bg-secondary));
+  border-color: color-mix(in srgb, var(--color-signal-amber) 58%, var(--color-border-subtle));
+}
+
+body.dusk.atlas-v1 .sources,
+body.dusk.atlas-v1 .provenance,
+body.dusk.atlas-v1 .source-line,
+body.dusk.atlas-v1 .archive-where,
+body.dusk.atlas-v1 .share-url {
+  color: var(--color-text-tertiary);
+  font-family: var(--font-data, ui-monospace, monospace);
+}
+
+body.dusk.atlas-v1 .archive-example blockquote {
+  border-left-color: var(--color-signal-amber);
+}
+
+body.dusk.atlas-v1 table {
+  background: transparent;
+}
+
+body.dusk.atlas-v1 th,
+body.dusk.atlas-v1 td {
+  border-color: var(--color-border-subtle);
+}
+
+/* Factual maps: same geometry and band logic, new semantic palette. */
+body.dusk.atlas-v1 .map-region,
+body.dusk.atlas-v1 .voivodeship-map path {
+  transition:
+    fill var(--motion-quick) var(--ease-resolve),
+    stroke var(--motion-quick) var(--ease-resolve);
+}
+
+body.dusk.atlas-v1 .map-region:focus-visible,
+body.dusk.atlas-v1 .voivodeship-map path:focus-visible {
+  outline: none;
+  stroke: var(--map-focus);
+  stroke-width: 2.5;
+}
+
+/* Buttons and controls: blue is action; amber stays contextual. */
+body.dusk.atlas-v1 .search button,
+body.dusk.atlas-v1 button[type="submit"],
+body.dusk.atlas-v1 .primary-action,
+body.dusk.atlas-v1 .deck-open {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .search button:hover,
+body.dusk.atlas-v1 button[type="submit"]:hover,
+body.dusk.atlas-v1 .primary-action:hover,
+body.dusk.atlas-v1 .deck-open:hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+body.dusk.atlas-v1 .deck-open-stack i {
+  background: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .deck {
+  background:
+    radial-gradient(
+      80% 50% at 75% 110%,
+      color-mix(in srgb, var(--color-signal-amber) 11%, transparent),
+      transparent 72%
+    ),
+    color-mix(in srgb, var(--atlas-plum-900) 94%, transparent);
+}
+
+body.dusk.atlas-v1 .deck-progress li::after {
+  background: var(--color-signal-atlas);
+}
+
+body.dusk.atlas-v1 .deck-full,
+body.dusk.atlas-v1 .deck-share,
+body.dusk.atlas-v1 .share button,
+body.dusk.atlas-v1 .again a {
+  color: var(--color-text-primary);
+  background: var(--color-bg-subtle);
+  border-color: var(--color-border-default);
+}
+
+body.dusk.atlas-v1 .deck-full:hover,
+body.dusk.atlas-v1 .deck-share:hover,
+body.dusk.atlas-v1 .share button:hover,
+body.dusk.atlas-v1 .again a:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--atlas-blue-300);
+}
+
+/* Surfaces: dark regions, not a wall of cards. */
+body.dusk.atlas-v1 :is(
+  .offer-card,
+  .account-card,
+  .tree-card,
+  .compare-card,
+  .directory-card,
+  .report-card,
+  .studio-panel,
+  .deck-card,
+  .landing-card
+) {
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-surface-primary) 86%, transparent);
+  border-color: var(--color-border-subtle);
+  box-shadow: none;
+}
+
+body.dusk.atlas-v1 :is(
+  .offer-card,
+  .account-card,
+  .tree-card,
+  .compare-card,
+  .directory-card,
+  .report-card,
+  .studio-panel,
+  .deck-card,
+  .landing-card
+):hover {
+  border-color: color-mix(in srgb, var(--atlas-blue-300) 46%, var(--color-border-subtle));
+}
+
+/* Inputs outside the landing stay dark and precise. */
+body.dusk.atlas-v1 :is(input, textarea, select) {
+  color-scheme: dark;
+}
+
+body.dusk.atlas-v1 :is(input, textarea, select):not(.landing-stage *) {
+  color: var(--color-text-primary);
+  background-color: color-mix(in srgb, var(--color-surface-interactive) 82%, transparent);
+  border-color: var(--color-border-default);
+}
+
+body.dusk.atlas-v1 :is(input, textarea, select):focus-visible {
+  border-color: var(--atlas-blue-300);
+}
+
+/* Footer: continuous dark environment and one blue call to action. */
+body.dusk.atlas-v1 .site-footer::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-signal-amber) 58%, transparent) 50%,
+    transparent
+  );
+}
+
+body.dusk.atlas-v1 .footer-cta {
+  background:
+    radial-gradient(
+      90% 140% at 100% 0%,
+      color-mix(in srgb, var(--color-signal-amber) 9%, transparent),
+      transparent 62%
+    ),
+    var(--color-bg-secondary);
+  border-color: var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+body.dusk.atlas-v1 .footer-cta:hover,
+body.dusk.atlas-v1 .footer-cta:focus-visible {
+  border-color: var(--atlas-blue-300);
+  box-shadow: none;
+}
+
+body.dusk.atlas-v1 .footer-cta-action {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .footer-group h2 {
+  color: var(--color-text-tertiary);
+}
+
+body.dusk.atlas-v1 .footer-group a,
+body.dusk.atlas-v1 .footer-wordmark,
+body.dusk.atlas-v1 .footer-top {
+  color: var(--color-text-secondary);
+}
+
+body.dusk.atlas-v1 .footer-group a:hover,
+body.dusk.atlas-v1 .footer-wordmark:hover,
+body.dusk.atlas-v1 .footer-top:hover {
+  color: var(--color-text-primary);
+}
+
+/* Mobile is a vertical atlas, not a scaled desktop composition. */
+@media (max-width: 760px) {
+  body.dusk.atlas-v1 {
+    --gutter: 16px;
+  }
+
+  body.dusk.atlas-v1 .site-nav {
+    min-height: 72px;
+    padding-block: 12px;
+  }
+
+  body.dusk.atlas-v1 .wordmark-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  body.dusk.atlas-v1 .wordmark-type {
+    font-size: 1.15rem;
+  }
+
+  body.dusk.atlas-v1 .landing-stage {
+    min-height: calc(100svh - 86px);
+    margin-top: 4px;
+    padding: 44px 18px 24px;
+    border-radius: 16px;
+  }
+
+  body.dusk.atlas-v1 .landing-headline {
+    max-width: 9.5ch;
+    font-size: clamp(3.2rem, 15.5vw, 5.4rem);
+  }
+
+  body.dusk.atlas-v1 .landing-stage .search-hero {
+    min-height: 62px;
+    gap: 8px;
+    padding: 5px 5px 5px 16px;
+  }
+
+  body.dusk.atlas-v1 .landing-stage .search button {
+    min-width: 54px;
+    min-height: 52px;
+    padding-inline: 16px;
+  }
+
+  body.dusk.atlas-v1 .dusk-horizon {
+    inset: 24% -45% -8% 8%;
+    opacity: 0.72;
+  }
+
+  body.dusk.atlas-v1 .atlas-shell-graphics > .contour-field {
+    inset: auto -62vw 0 16vw;
+    width: 142vw;
+    height: 44vh;
+  }
+
+  body.dusk.atlas-v1 .atlas-shell-point {
+    top: 47vh;
+    right: 19vw;
+  }
+
+  body.dusk.atlas-v1 .snapshot .surname,
+  body.dusk.atlas-v1 .result .snapshot .surname {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    font-size: max(2.75rem, min(5rem, calc(92vw / var(--surname-em, 1))));
+    line-height: 0.94;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.dusk.atlas-v1 .atlas-shell-graphics,
+  body.dusk.atlas-v1 .dusk-terrain-point {
+    transform: none !important;
+    transition: none !important;
+  }
+}
