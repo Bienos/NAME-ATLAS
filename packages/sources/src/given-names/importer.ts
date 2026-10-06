@@ -24,10 +24,9 @@ import {
   GIVEN_NAME_PLACEHOLDERS,
   GIVEN_NAMES_RIGHTS_PROFILE,
   GIVEN_NAMES_SOURCE,
-  GIVEN_NAMES_SOURCE_KEY,
   needsFormReview,
 } from "./registry.js";
-import type { GivenNameResourceDescriptor } from "./registry.js";
+import type { GivenNameResourceDescriptor, GivenNameSourceSeed } from "./registry.js";
 
 export interface ImportGivenNamesOptions {
   readonly resource: GivenNameResourceDescriptor;
@@ -71,14 +70,16 @@ export type GivenNameImportOutcome =
       readonly message: string;
     };
 
-async function ensureGivenNameSource(
+/** The source row for `source`, created with its rights profile on first use. */
+export async function ensureGivenNameSource(
   trx: Transaction<DB>,
   profile: RightsProfileSeed,
+  source: GivenNameSourceSeed = GIVEN_NAMES_SOURCE,
 ): Promise<string> {
   const existing = await trx
     .selectFrom("sources")
     .select("source_id")
-    .where("source_key", "=", GIVEN_NAMES_SOURCE_KEY)
+    .where("source_key", "=", source.source_key)
     .executeTakeFirst();
   if (existing) return existing.source_id;
   const rightsProfileId = uuidv7();
@@ -114,22 +115,69 @@ async function ensureGivenNameSource(
     .values({
       source_id: sourceId,
       parent_source_id: null,
-      source_key: GIVEN_NAMES_SOURCE.source_key,
-      name: GIVEN_NAMES_SOURCE.name,
-      publisher: GIVEN_NAMES_SOURCE.publisher,
-      source_type: GIVEN_NAMES_SOURCE.source_type,
-      granularity: GIVEN_NAMES_SOURCE.granularity,
-      geographic_scope: [...GIVEN_NAMES_SOURCE.geographic_scope],
-      temporal_from: GIVEN_NAMES_SOURCE.temporal_from,
-      temporal_to: GIVEN_NAMES_SOURCE.temporal_to,
-      methodology_notes: GIVEN_NAMES_SOURCE.methodology_notes,
-      authority_tier: GIVEN_NAMES_SOURCE.authority_tier,
+      source_key: source.source_key,
+      name: source.name,
+      publisher: source.publisher,
+      source_type: source.source_type,
+      granularity: source.granularity,
+      geographic_scope: [...source.geographic_scope],
+      temporal_from: source.temporal_from,
+      temporal_to: source.temporal_to,
+      methodology_notes: source.methodology_notes,
+      authority_tier: source.authority_tier,
       default_rights_profile_id: rightsProfileId,
-      production_status: GIVEN_NAMES_SOURCE.production_status,
-      homepage_or_reference_url: GIVEN_NAMES_SOURCE.homepage_or_reference_url,
+      production_status: source.production_status,
+      homepage_or_reference_url: source.homepage_or_reference_url,
     })
     .execute();
   return sourceId;
+}
+
+/**
+ * The identity of every name: reused by canonical key when it exists, created
+ * otherwise (ADR-0032 §1). A key given twice is created once, from its first
+ * spelling. Returns each key's id and how many identities were created.
+ */
+export async function ensureGivenNames(
+  trx: Transaction<DB>,
+  names: readonly { readonly name: string; readonly key: string; readonly flagged: boolean }[],
+): Promise<{ ids: Map<string, string>; created: number }> {
+  const ids = new Map<string, string>();
+  const keys = [...new Set(names.map((n) => n.key))];
+  for (let i = 0; i < keys.length; i += 1000) {
+    const found = await trx
+      .selectFrom("given_names")
+      .select(["given_name_id", "canonical_key"])
+      .where("canonical_key", "in", keys.slice(i, i + 1000))
+      .execute();
+    for (const f of found) ids.set(f.canonical_key, f.given_name_id);
+  }
+  const entities: Insertable<DB["knowledge_entities"]>[] = [];
+  const created: Insertable<DB["given_names"]>[] = [];
+  for (const n of names) {
+    if (ids.has(n.key)) continue;
+    const id = uuidv7();
+    ids.set(n.key, id);
+    entities.push({
+      entity_id: id,
+      entity_type: "GIVEN_NAME",
+      scope: "SHARED",
+      privacy_class: "PUBLIC",
+      lifecycle_status: "ACTIVE",
+    });
+    created.push({
+      given_name_id: id,
+      // The register's own spelling, verbatim (NFC only, as surnames are stored).
+      canonical_display: toNfc(n.name),
+      canonical_key: n.key,
+      canonical_key_version: CANONICAL_KEY_VERSION,
+      primary_script: detectScripts(n.name).primary_script,
+      form_review: n.flagged ? "INITIAL_OR_ABBREVIATION" : null,
+    });
+  }
+  await insertChunked(trx, "knowledge_entities", entities);
+  await insertChunked(trx, "given_names", created);
+  return { ids, created: created.length };
 }
 
 export async function importGivenNameResource(
@@ -257,56 +305,19 @@ export async function importGivenNameResource(
         .execute();
     }
 
-    // Identity: reuse what exists, create the rest.
-    const existing = new Map<string, string>();
-    const keys = names.map((n) => n.key);
-    for (let i = 0; i < keys.length; i += 1000) {
-      const found = await trx
-        .selectFrom("given_names")
-        .select(["given_name_id", "canonical_key"])
-        .where("canonical_key", "in", keys.slice(i, i + 1000))
-        .execute();
-      for (const f of found) existing.set(f.canonical_key, f.given_name_id);
-    }
-    const entities: Insertable<DB["knowledge_entities"]>[] = [];
-    const created: Insertable<DB["given_names"]>[] = [];
-    const counts: Insertable<DB["given_name_counts"]>[] = [];
-    for (const n of names) {
-      let id = existing.get(n.key);
-      if (id === undefined) {
-        id = uuidv7();
-        entities.push({
-          entity_id: id,
-          entity_type: "GIVEN_NAME",
-          scope: "SHARED",
-          privacy_class: "PUBLIC",
-          lifecycle_status: "ACTIVE",
-        });
-        created.push({
-          given_name_id: id,
-          // The register's own spelling, verbatim (NFC only, as surnames are stored).
-          canonical_display: toNfc(n.name),
-          canonical_key: n.key,
-          canonical_key_version: CANONICAL_KEY_VERSION,
-          primary_script: detectScripts(n.name).primary_script,
-          form_review: n.flagged ? "INITIAL_OR_ABBREVIATION" : null,
-        });
-      }
-      counts.push({
-        given_name_count_id: uuidv7(),
-        given_name_id: id,
-        source_record_id: sourceRecordId,
-        count: n.count,
-      });
-    }
-    await insertChunked(trx, "knowledge_entities", entities);
-    await insertChunked(trx, "given_names", created);
+    const { ids, created } = await ensureGivenNames(trx, names);
+    const counts: Insertable<DB["given_name_counts"]>[] = names.map((n) => ({
+      given_name_count_id: uuidv7(),
+      given_name_id: ids.get(n.key) as string,
+      source_record_id: sourceRecordId,
+      count: n.count,
+    }));
     await insertChunked(trx, "given_name_counts", counts);
 
     return {
       kind: "IMPORTED" as const,
       sourceRecordId,
-      report: report(created.length, names.length - created.length),
+      report: report(created, names.length - created),
     };
   });
 }

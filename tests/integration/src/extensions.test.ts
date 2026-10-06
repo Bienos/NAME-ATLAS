@@ -89,6 +89,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0037_reports",
       "0038_given_name_claims",
       "0039_full_name_reports",
+      "0040_given_name_birth_years",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -108,6 +109,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
     // from surnames. TASK-119 added `reports`, `report_versions`,
     // `report_sections` and `report_claim_references`: the frozen report.
+    // TASK-136 added `given_name_birth_lists` and `given_name_birth_counts`
+    // (ADR-0042): first names given to children, by year.
     //
     // Anything beyond this set is an accidental table. TASK-009 added
     // `evidence_dependencies`, which TASK-005 had excluded: D-011 resolved
@@ -128,6 +131,8 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "evidence_items", table_type: "BASE TABLE" },
       { table_name: "geography_columns", table_type: "VIEW" },
       { table_name: "geometry_columns", table_type: "VIEW" },
+      { table_name: "given_name_birth_counts", table_type: "BASE TABLE" },
+      { table_name: "given_name_birth_lists", table_type: "BASE TABLE" },
       { table_name: "given_name_counts", table_type: "BASE TABLE" },
       { table_name: "given_names", table_type: "BASE TABLE" },
       { table_name: "knowledge_entities", table_type: "BASE TABLE" },
