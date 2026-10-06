@@ -139,3 +139,90 @@
 .atlas-v1 :is(a,button,input,summary,[tabindex]):focus-visible { outline: 2px solid var(--atlas-blue-300); outline-offset: 3px; }
 @keyframes atlas-resolve { from { border-radius: 35% 65% 60% 40%; transform: scale(.88) rotate(-5deg); } to { border-radius: 55% 45% 40% 60%; transform: scale(1) rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) { .atlas-v1 *, .atlas-v1 *::before, .atlas-v1 *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; } }
+
+
+/* Living brand lab: private visual-regression reference, not product UI. */
+.brand-lab {
+  min-height: 100svh;
+  padding: clamp(20px, 4vw, 56px);
+}
+.brand-lab-head {
+  width: min(100%, 76rem);
+  margin: 0 auto clamp(40px, 7vw, 88px);
+}
+.brand-lab-head h1 {
+  max-width: 12ch;
+  margin: 10px 0 16px;
+  font: 500 clamp(2.75rem, 6vw, 6.75rem)/.95 var(--font-display, Georgia, serif);
+  letter-spacing: -.035em;
+  font-optical-sizing: auto;
+}
+.brand-lab-head > p:last-child,
+.brand-lab-lede {
+  color: var(--color-text-secondary);
+  font-size: var(--type-body-lg);
+}
+.brand-lab > .atlas-hero,
+.brand-lab-section {
+  width: min(100%, 86rem);
+  margin-inline: auto;
+}
+.brand-lab-section {
+  position: relative;
+  margin-block: var(--space-section);
+}
+.brand-lab-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+.brand-lab-row > img {
+  display: block;
+  width: 112px;
+  height: 112px;
+}
+.brand-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 24px);
+}
+.brand-lab-grid > *:first-child {
+  grid-column: span 3;
+}
+.brand-lab-grid > *:nth-child(2) {
+  grid-column: span 5;
+}
+.brand-lab-grid > *:nth-child(3) {
+  grid-column: span 4;
+}
+.brand-lab-serif {
+  margin: 20px 0;
+  font: 500 clamp(2.25rem, 5vw, 5.25rem)/1 var(--font-display, Georgia, serif);
+  letter-spacing: -.025em;
+  font-optical-sizing: auto;
+}
+.brand-lab-topography {
+  min-height: 360px;
+  overflow: hidden;
+  border-block: 1px solid var(--color-border-subtle);
+}
+.brand-lab-topography > .topographic-crop {
+  position: absolute;
+  inset: 15% 4% 8% 48%;
+  min-height: 0;
+}
+@media (max-width: 760px) {
+  .brand-lab {
+    padding-inline: 16px;
+  }
+  .brand-lab-grid {
+    grid-template-columns: 1fr;
+  }
+  .brand-lab-grid > * {
+    grid-column: auto !important;
+  }
+  .brand-lab-topography > .topographic-crop {
+    inset: 36% -22% 0 24%;
+  }
+}
