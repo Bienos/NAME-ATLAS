@@ -178,6 +178,7 @@ export default function BrandLabPage() {
         <div className="brand-lab-data-viz">
           <div className="brand-lab-map-ramp" aria-label="Map density token ramp">
             <span data-band="no-data">NO DATA</span>
+            <span data-band="lowest">LOWEST</span>
             <span data-band="low">LOW</span>
             <span data-band="mid">MID</span>
             <span data-band="high">HIGH</span>
