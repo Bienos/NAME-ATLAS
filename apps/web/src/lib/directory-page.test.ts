@@ -85,6 +85,34 @@ describe("loadDirectoryLetter", () => {
     expect(data.pages).toBe(3);
     expect(data.letters).toEqual(["k", "ł", "inne"]);
   });
+
+  it("asks the database one query at a time (TASK-130)", async () => {
+    // The pool has two connections per instance and waits 5 s for one; on
+    // production three at once timed out on `inne`.
+    let open = 0;
+    let most = 0;
+    const query =
+      <T>(value: T) =>
+      async (): Promise<T> => {
+        open += 1;
+        most = Math.max(most, open);
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        open -= 1;
+        return value;
+      };
+    vi.mocked(directoryLetters).mockImplementationOnce(query(["k" as const]));
+    vi.mocked(directoryCount).mockImplementationOnce(query(1201));
+    vi.mocked(directoryEntries).mockImplementationOnce(query([]));
+    await loadDirectoryLetter("k", 1);
+    expect(vi.mocked(directoryEntries)).toHaveBeenCalledTimes(1);
+    expect(most).toBe(1);
+  });
+
+  it("does not read entries for a page past the last", async () => {
+    const data = await loadDirectoryLetter("k", 4);
+    expect(vi.mocked(directoryEntries)).not.toHaveBeenCalled();
+    expect(data).toMatchObject({ count: 1201, pages: 3, entries: [] });
+  });
 });
 
 describe("directoryMetadata", () => {
@@ -119,7 +147,6 @@ describe("directoryMetadata", () => {
   });
 
   it("names nothing for a page past the last, which the page answers with a 404", async () => {
-    vi.mocked(directoryEntries).mockResolvedValueOnce([]);
     expect(await directoryMetadata({ kind: "LETTER", letter: "k", page: 9 })).toEqual({});
   });
 });

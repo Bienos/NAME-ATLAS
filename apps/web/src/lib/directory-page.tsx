@@ -85,18 +85,27 @@ export const loadDirectoryLetters = cache(async (): Promise<readonly DirectoryLe
   directoryLetters(db(), "pl", { seoBlockedProfileIds: await blockedProfiles() }),
 );
 
+/**
+ * One query at a time (TASK-130). The pool holds two connections per instance
+ * and waits at most 5 s for one (`db.ts`). Three at once left the third waiting
+ * while the other two ran, and on production `inne`'s count, which reads every
+ * listed surname, outlasted that wait: the page answered 500.
+ */
 export const loadDirectoryLetter = cache(
   async (letter: DirectoryLetter, page: number): Promise<LetterPage> => {
     const options = { seoBlockedProfileIds: await blockedProfiles() };
-    const [letters, count, entries] = await Promise.all([
-      loadDirectoryLetters(),
-      directoryCount(db(), "pl", letter, options),
-      directoryEntries(db(), "pl", letter, {
-        ...options,
-        limit: DIRECTORY_PAGE_SIZE,
-        offset: (page - 1) * DIRECTORY_PAGE_SIZE,
-      }),
-    ]);
+    const letters = await loadDirectoryLetters();
+    const count = await directoryCount(db(), "pl", letter, options);
+    const offset = (page - 1) * DIRECTORY_PAGE_SIZE;
+    // A page past the last lists nothing, and is a 404 without asking.
+    const entries =
+      offset < count
+        ? await directoryEntries(db(), "pl", letter, {
+            ...options,
+            limit: DIRECTORY_PAGE_SIZE,
+            offset,
+          })
+        : [];
     return { letters, count, pages: Math.ceil(count / DIRECTORY_PAGE_SIZE), entries };
   },
 );
