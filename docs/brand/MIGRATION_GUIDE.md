@@ -1,6 +1,6 @@
 # Migration Guide — current dusk site → Brand System v1.0
 
-TASK-147 establishes the foundation. It does not claim the site migration is finished.
+TASK-148 establishes the foundation. It does not claim the site migration is finished.
 
 ## Mapping
 
@@ -19,7 +19,7 @@ TASK-147 establishes the foundation. It does not claim the site migration is fin
 
 ## Phase 1 — foundation
 
-TASK-147:
+TASK-148:
 - docs;
 - semantic tokens;
 - SVG masters;
