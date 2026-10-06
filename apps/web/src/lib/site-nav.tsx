@@ -1,3 +1,4 @@
+import { EvolvedContourMark } from "../design-system/graphics/index.js";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
 import { BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
@@ -107,8 +108,9 @@ export function SiteNav({
   const t = UI[lang];
   return (
     <header className="site-nav" lang={htmlLang(lang)}>
-      <a className="wordmark" href={homePath(lang)}>
-        {t.title}
+      <a className="wordmark" href={homePath(lang)} aria-label={t.title}>
+        <EvolvedContourMark className="wordmark-mark" />
+        <span className="wordmark-type">{t.title}</span>
       </a>
       {search === null ? null : <SearchForm lang={lang} query={search.query} variant="compact" />}
       <nav className="site-links" aria-label={t.siteNavLabel}>

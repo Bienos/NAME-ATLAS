@@ -13,6 +13,24 @@ type ContourVariant = "amber" | "ivory" | "blue";
 type ContourOrientation = "rising" | "falling";
 type HeroVariant = "homepage" | "surname" | "editorial" | "share";
 
+export function EvolvedContourMark({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={`evolved-contour-mark ${className}`}
+      viewBox="0 0 96 96"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M16 82 C16 58 17 34 23 14 C35 20 40 39 49 54 C57 68 64 80 73 82 C78 63 79 39 82 14" />
+      <path d="M22 82 C22 60 23 39 28 21 C38 27 43 43 50 56 C57 68 63 76 70 78 C74 61 75 42 77 21" />
+      <path d="M28 78 C28 60 29 43 33 28 C41 33 45 46 51 57 C56 67 61 73 67 74 C70 60 71 45 73 28" />
+      <path d="M34 73 C34 59 35 47 38 35 C44 39 47 49 52 58 C56 65 60 69 64 70 C66 59 67 48 68 35" />
+      <path d="M40 67 C40 57 41 50 43 43 C47 46 49 52 53 58 C56 63 58 66 61 66 C62 58 63 51 63 43" />
+      <circle cx="69" cy="57" r="4.5" />
+    </svg>
+  );
+}
+
 export function AtlasPoint({
   size = 10,
   glow = false,
