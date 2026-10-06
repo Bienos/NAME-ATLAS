@@ -1,0 +1,1414 @@
+{
+  "format_version": 1,
+  "kind": "GIVEN_NAME_MEANINGS",
+  "synthetic": false,
+  "work": {
+    "source_key": "yonge_1884_history_of_christian_names",
+    "title": "History of Christian Names",
+    "author_or_publisher": "Charlotte M. Yonge",
+    "year": 1884,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "PUBLIC_DOMAIN",
+      "reason": "Author Charlotte Mary Yonge (1823–1901) died in 1901. Economic rights expire 70 years after the author's death, counted from the end of that year (Polish Copyright Act, art. 36), so the work has been in the public domain since 1972-01-01. The text was read from Project Gutenberg eBook #70419 (released 2023-03-30), a proofread transcription of the new, revised edition (London: Macmillan and Co., 1884)."
+    },
+    "reference_url": "https://www.gutenberg.org/ebooks/70419",
+    "rights": {
+      "terms_version": "PUBLIC_DOMAIN_ART36",
+      "terms_hash": null,
+      "checked_at": "2026-10-06T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "ALLOWED",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": true,
+      "attribution_text": "Charlotte M. Yonge, „History of Christian Names”, new edition, revised, London: Macmillan and Co., 1884",
+      "source_owner": "public domain (author d. 1901); transcription: Project Gutenberg eBook #70419",
+      "rights_url": "https://www.gutenberg.org/ebooks/70419",
+      "contact_required": false,
+      "review_status": "LEGAL_REVIEW_REQUIRED",
+      "valid_from": "1972-01-01",
+      "valid_to": null,
+      "notes": "Public domain by the author's death date; no lawyer has reviewed it, hence LEGAL_REVIEW_REQUIRED. Attribution required because authors' moral rights do not expire in Polish law. Name Atlas quotes the 1884 text and cites the edition; the Project Gutenberg licence governs the eBook file and the Project Gutenberg name, neither of which is reproduced. image_rights UNKNOWN: no image is reproduced. The meanings are in English; D-046 §2 allows a literal Polish translation beside each, marked as Name Atlas's. Reliability tier C is this session's classification of a Victorian survey by a novelist, the lowest tier ADR-0008 admits; the product always shows author and year beside the reading."
+    }
+  },
+  "entries": [
+    {
+      "given_name": "ANASTAZY",
+      "printed_form": "Anastazy",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "who shall rise again",
+      "translation": {
+        "language": "pl",
+        "text": "ten, który powstanie na nowo",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Anastazy, which refers to p. 110",
+      "quotation": "Anastazy, m. Pol. Gr. who shall rise again, 110"
+    },
+    {
+      "given_name": "ANTEK",
+      "printed_form": "Antek",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "inestimable",
+      "translation": {
+        "language": "pl",
+        "text": "nieoceniony",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Antek, which refers to p. 142",
+      "quotation": "Antek, m. Pol. Lat. inestimable, 142"
+    },
+    {
+      "given_name": "ANTONI",
+      "printed_form": "Antoni",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "inestimable",
+      "translation": {
+        "language": "pl",
+        "text": "nieoceniony",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Antoni, which refers to p. 142",
+      "quotation": "Antoni, m. Pol. Lat. inestimable, 142"
+    },
+    {
+      "given_name": "ANTOS",
+      "printed_form": "Antos",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "inestimable",
+      "translation": {
+        "language": "pl",
+        "text": "nieoceniony",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Antos, which refers to p. 142",
+      "quotation": "Antos, m. Pol. Lat. inestimable, 142"
+    },
+    {
+      "given_name": "AUGUSTYN",
+      "printed_form": "Augustyn",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "venerable",
+      "translation": {
+        "language": "pl",
+        "text": "czcigodny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Augustyn, which refers to p. 158",
+      "quotation": "Augustyn, m. Pol. Lat. venerable, 158"
+    },
+    {
+      "given_name": "BARTEK",
+      "printed_form": "Bartek",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "son of furrows",
+      "translation": {
+        "language": "pl",
+        "text": "syn bruzd",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Bartek, which refers to p. 25",
+      "quotation": "Bartek, m. Pol. Heb. son of furrows, 25"
+    },
+    {
+      "given_name": "BARTŁOMIEJ",
+      "printed_form": "Bartlomiej",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "son of furrows",
+      "translation": {
+        "language": "pl",
+        "text": "syn bruzd",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Bartlomiej, which refers to p. 25",
+      "quotation": "Bartlomiej, m. Pol. Heb. son of furrows, 25"
+    },
+    {
+      "given_name": "BAZYLI",
+      "printed_form": "Bazyli",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "kingly",
+      "translation": {
+        "language": "pl",
+        "text": "królewski",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Bazyli, which refers to p. 112",
+      "quotation": "Bazyli, m. Pol. Gr. kingly, 112"
+    },
+    {
+      "given_name": "BENEDYKT",
+      "printed_form": "Benedykt",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "blessed",
+      "translation": {
+        "language": "pl",
+        "text": "błogosławiony",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Benedykt, which refers to p. 184",
+      "quotation": "Benedykt, m. Pol. Lat. blessed, 184"
+    },
+    {
+      "given_name": "BONIFACY",
+      "printed_form": "Bonifacy",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "well doer",
+      "translation": {
+        "language": "pl",
+        "text": "dobroczyńca",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Bonifacy, which refers to p. 185",
+      "quotation": "Bonifacy, m. Pol. Lat. well doer, 185"
+    },
+    {
+      "given_name": "DOBROGOST",
+      "printed_form": "DOBROGOST",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Slav."
+      },
+      "literal_gloss": "good guest",
+      "translation": {
+        "language": "pl",
+        "text": "dobry gość",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. DOBROGOST, which refers to p. 443",
+      "quotation": "DOBROGOST, m. Pol. Slav. good guest, 443"
+    },
+    {
+      "given_name": "DOROTA",
+      "printed_form": "Dorota",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "gift of God",
+      "translation": {
+        "language": "pl",
+        "text": "dar Boga",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Dorota, which refers to p. 102",
+      "quotation": "Dorota, f. Pol. Bohm. Gr. gift of God, 102"
+    },
+    {
+      "given_name": "DYONIZY",
+      "printed_form": "Dyonizy",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "of Dionysos",
+      "translation": {
+        "language": "pl",
+        "text": "Dionizosa",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Dyonizy, which refers to p. 70",
+      "quotation": "Dyonizy, m. Pol. Gr. of Dionysos, 70"
+    },
+    {
+      "given_name": "ELŻBIETA",
+      "printed_form": "Elzbieta",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "God’s oath",
+      "translation": {
+        "language": "pl",
+        "text": "przysięga Boga",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Elzbieta, which refers to p. 35",
+      "quotation": "Elzbieta, f. Pol. Heb. God’s oath, 35"
+    },
+    {
+      "given_name": "ERYK",
+      "printed_form": "Eryk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "ever king",
+      "translation": {
+        "language": "pl",
+        "text": "zawsze król",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Eryk, which refers to p. 400",
+      "quotation": "Eryk, m. Pol. Teu. ever king, 400"
+    },
+    {
+      "given_name": "EUGENIUSZ",
+      "printed_form": "Eugeniusz",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "well born",
+      "translation": {
+        "language": "pl",
+        "text": "dobrze urodzony",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Eugeniusz, which refers to p. 88",
+      "quotation": "Eugeniusz, m. Pol. Gr. well born, 88"
+    },
+    {
+      "given_name": "FERDYNAND",
+      "printed_form": "Ferdynand",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "adventuring life",
+      "translation": {
+        "language": "pl",
+        "text": "ryzykujące życie",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ferdynand, which refers to p. 433",
+      "quotation": "Ferdynand, m. Pol. Teu. adventuring life, 433"
+    },
+    {
+      "given_name": "FRANCISZEK",
+      "printed_form": "Franciszek",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "free",
+      "translation": {
+        "language": "pl",
+        "text": "wolny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Franciszek, which refers to p. 300",
+      "quotation": "Franciszek, m. Pol. Teu. free, 300"
+    },
+    {
+      "given_name": "FRANCK",
+      "printed_form": "Franck",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "free",
+      "translation": {
+        "language": "pl",
+        "text": "wolny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Franck, which refers to p. 300",
+      "quotation": "Franck, m. Pol. Teu. free, 300"
+    },
+    {
+      "given_name": "FRANCISZKA",
+      "printed_form": "Franciszka",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "free",
+      "translation": {
+        "language": "pl",
+        "text": "wolna",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Franciszka, which refers to p. 300",
+      "quotation": "Franciszka, f. Pol. Teu. free, 300"
+    },
+    {
+      "given_name": "FRANEK",
+      "printed_form": "Franek",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "free",
+      "translation": {
+        "language": "pl",
+        "text": "wolny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Franek, which refers to p. 300",
+      "quotation": "Franek, m. Pol. Teu. free, 300"
+    },
+    {
+      "given_name": "FRYC",
+      "printed_form": "Fryc",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "peace ruler",
+      "translation": {
+        "language": "pl",
+        "text": "władca pokoju",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Fryc, which refers to p. 296",
+      "quotation": "Fryc, m. Pol. Teu. peace ruler, 296"
+    },
+    {
+      "given_name": "FRYDERYK",
+      "printed_form": "Fryderyk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "peace ruler",
+      "translation": {
+        "language": "pl",
+        "text": "władca pokoju",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Fryderyk, which refers to p. 296",
+      "quotation": "Fryderyk, m. Pol. Teu. peace ruler, 296"
+    },
+    {
+      "given_name": "FRYDRYKA",
+      "printed_form": "Frydryka",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "peace ruler",
+      "translation": {
+        "language": "pl",
+        "text": "władczyni pokoju",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Frydryka, which refers to p. 296",
+      "quotation": "Frydryka, f. Pol. Teu. peace ruler, 296"
+    },
+    {
+      "given_name": "GIERTRUDA",
+      "printed_form": "Giertruda",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "spear maid",
+      "translation": {
+        "language": "pl",
+        "text": "dziewczyna włóczni",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Giertruda, which refers to p. 368",
+      "quotation": "Giertruda, f. Pol. Teu. spear maid, 368"
+    },
+    {
+      "given_name": "GOTFRYD",
+      "printed_form": "Gotfryd",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "God’s peace",
+      "translation": {
+        "language": "pl",
+        "text": "Boży pokój",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Gotfryd, which refers to p. 288",
+      "quotation": "Gotfryd, m. Pol. Teu. God’s peace, 288"
+    },
+    {
+      "given_name": "GRZEGORZ",
+      "printed_form": "Grzegorz",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "watchman",
+      "translation": {
+        "language": "pl",
+        "text": "stróż",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Grzegorz, which refers to p. 114",
+      "quotation": "Grzegorz, m. Pol. Gr. watchman, 114"
+    },
+    {
+      "given_name": "HANUSIA",
+      "printed_form": "Hanusia",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "grace of the Lord",
+      "translation": {
+        "language": "pl",
+        "text": "łaska Pana",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Hanusia, which refers to p. 46",
+      "quotation": "Hanusia, f. Pol. Heb. grace of the Lord, 46"
+    },
+    {
+      "given_name": "HENRYK",
+      "printed_form": "Henryk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "home ruler",
+      "translation": {
+        "language": "pl",
+        "text": "władca domu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Henryk, which refers to p. 310",
+      "quotation": "Henryk, m. Pol. Teu. home ruler, 310"
+    },
+    {
+      "given_name": "HIERONIM",
+      "printed_form": "Hieronim",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "holy name",
+      "translation": {
+        "language": "pl",
+        "text": "święte imię",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Hieronim, which refers to p. 89",
+      "quotation": "Hieronim, m. Pol. Gr. holy name, 89"
+    },
+    {
+      "given_name": "IGNACY",
+      "printed_form": "Ignacy",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "fiery",
+      "translation": {
+        "language": "pl",
+        "text": "ognisty",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ignacy, which refers to p. 194",
+      "quotation": "Ignacy, m. Pol. Lat. fiery, 194"
+    },
+    {
+      "given_name": "IZABELA",
+      "printed_form": "Izabela",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "oath of Baal",
+      "translation": {
+        "language": "pl",
+        "text": "przysięga Baala",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Izabela, which refers to p. 35",
+      "quotation": "Izabela, f. Pol. Heb. oath of Baal, 35"
+    },
+    {
+      "given_name": "IZYDOR",
+      "printed_form": "Izydor",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "strong gift",
+      "translation": {
+        "language": "pl",
+        "text": "mocny dar",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Izydor, which refers to p. 103",
+      "quotation": "Izydor, m. Pol. Gr. strong gift, 103"
+    },
+    {
+      "given_name": "JADWIGA",
+      "printed_form": "Jadwiga",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "war refuge",
+      "translation": {
+        "language": "pl",
+        "text": "wojenne schronienie",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jadwiga, which refers to p. 305",
+      "quotation": "Jadwiga, f. Pol. Teu. war refuge, 305"
+    },
+    {
+      "given_name": "JĘDRZEJ",
+      "printed_form": "Jedrzej",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "manly",
+      "translation": {
+        "language": "pl",
+        "text": "męski",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jedrzej, which refers to p. 86",
+      "quotation": "Jedrzej, m. Pol. Gr. manly, 86"
+    },
+    {
+      "given_name": "JERZY",
+      "printed_form": "Jerzy",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "husbandman",
+      "translation": {
+        "language": "pl",
+        "text": "rolnik",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jerzy, which refers to p. 115",
+      "quotation": "Jerzy, m. Pol. Gr. husbandman, 115"
+    },
+    {
+      "given_name": "JITKA",
+      "printed_form": "Jitka",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "praise",
+      "translation": {
+        "language": "pl",
+        "text": "chwała",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jitka, which refers to p. 20",
+      "quotation": "Jitka, f. Pol. Heb. praise, 20"
+    },
+    {
+      "given_name": "JÓZEF",
+      "printed_form": "Jozef",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "addition",
+      "translation": {
+        "language": "pl",
+        "text": "dodanie",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jozef, which refers to p. 23",
+      "quotation": "Jozef, m. Pol. Slav. Heb. addition, 23"
+    },
+    {
+      "given_name": "JÓZEFA",
+      "printed_form": "Jozefa",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "addition",
+      "translation": {
+        "language": "pl",
+        "text": "dodanie",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Jozefa, which refers to p. 23",
+      "quotation": "Jozefa, f. Pol. Heb. addition, 23"
+    },
+    {
+      "given_name": "JULKA",
+      "printed_form": "Julka",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "downy bearded",
+      "translation": {
+        "language": "pl",
+        "text": "o puszystej brodzie",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Julka, which refers to p. 149",
+      "quotation": "Julka, f. Pol. Lat. downy bearded, 149"
+    },
+    {
+      "given_name": "JUSTYN",
+      "printed_form": "Justyn",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "just",
+      "translation": {
+        "language": "pl",
+        "text": "sprawiedliwy",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Justyn, which refers to p. 193",
+      "quotation": "Justyn, m. Pol. Lat. just, 193"
+    },
+    {
+      "given_name": "KAROL",
+      "printed_form": "Karol",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "man",
+      "translation": {
+        "language": "pl",
+        "text": "mężczyzna",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Karol, which refers to p. 386",
+      "quotation": "Karol, m. Pol. Slov. Teu. man, 386"
+    },
+    {
+      "given_name": "KASIA",
+      "printed_form": "Kasia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "pure",
+      "translation": {
+        "language": "pl",
+        "text": "czysta",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Kasia, which refers to p. 123",
+      "quotation": "Kasia, f. Pol. Gr. pure, 123"
+    },
+    {
+      "given_name": "KAZIMIERZ",
+      "printed_form": "Kazimierz",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Slav."
+      },
+      "literal_gloss": "show forth peace",
+      "translation": {
+        "language": "pl",
+        "text": "okazywać pokój",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Kazimierz, which refers to p. 211",
+      "quotation": "Kazimierz, m. Pol. Slav. show forth peace, 211"
+    },
+    {
+      "given_name": "KUBA",
+      "printed_form": "Kuba",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "supplanter",
+      "translation": {
+        "language": "pl",
+        "text": "ten, który wypiera",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Kuba, which refers to p. 17",
+      "quotation": "Kuba, m. Pol. Heb. supplanter, 17"
+    },
+    {
+      "given_name": "ŁAZARZ",
+      "printed_form": "Lazarz",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "God will help",
+      "translation": {
+        "language": "pl",
+        "text": "Bóg pomoże",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Lazarz, which refers to p. 33",
+      "quotation": "Lazarz, m. Pol. Heb. God will help, 33"
+    },
+    {
+      "given_name": "LESZEK",
+      "printed_form": "Leszek",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "helper of men",
+      "translation": {
+        "language": "pl",
+        "text": "pomocnik ludzi",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Leszek, which refers to p. 85",
+      "quotation": "Leszek, m. Pol. Gr. helper of men, 85"
+    },
+    {
+      "given_name": "LUCYA",
+      "printed_form": "Lucya",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "light",
+      "translation": {
+        "language": "pl",
+        "text": "światło",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Lucya, which refers to p. 132",
+      "quotation": "Lucya, f. Pol. Lat. light, 132"
+    },
+    {
+      "given_name": "MACIEJ",
+      "printed_form": "Maciej",
+      "origin": {
+        "code": "arc",
+        "as_printed": "Aram."
+      },
+      "literal_gloss": "gift of the Lord",
+      "translation": {
+        "language": "pl",
+        "text": "dar Pana",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Maciej, which refers to p. 15",
+      "quotation": "Maciej, m. Pol. Aram. gift of the Lord, 15"
+    },
+    {
+      "given_name": "MAKSYMILIAN",
+      "printed_form": "Maksymilian",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "greatest Æmilian",
+      "translation": {
+        "language": "pl",
+        "text": "największy Emiliusz",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Maksymilian, which refers to p. 166",
+      "quotation": "Maksymilian, m. Pol. Lat. greatest Æmilian, 166"
+    },
+    {
+      "given_name": "MAŁGORZATA",
+      "printed_form": "Malgorzata",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "pearl",
+      "translation": {
+        "language": "pl",
+        "text": "perła",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Malgorzata, which refers to p. 121",
+      "quotation": "Malgorzata, f. Pol. Gr. pearl, 121"
+    },
+    {
+      "given_name": "MALGOSIA",
+      "printed_form": "Malgosia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "pearl",
+      "translation": {
+        "language": "pl",
+        "text": "perła",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Malgosia, which refers to p. 121",
+      "quotation": "Malgosia, f. Pol. Gr. pearl, 121"
+    },
+    {
+      "given_name": "MARCIN",
+      "printed_form": "Marcin",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "of Mars",
+      "translation": {
+        "language": "pl",
+        "text": "Marsa",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Marcin, which refers to p. 135",
+      "quotation": "Marcin, m. Pol. Lat. of Mars, 135"
+    },
+    {
+      "given_name": "MARYA",
+      "printed_form": "Marya",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "bitter",
+      "translation": {
+        "language": "pl",
+        "text": "gorzka",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Marya, which refers to p. 29",
+      "quotation": "Marya, f. Pol. Heb. bitter, 29"
+    },
+    {
+      "given_name": "MARYSIA",
+      "printed_form": "Marysia",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "bitter",
+      "translation": {
+        "language": "pl",
+        "text": "gorzka",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Marysia, which refers to p. 29",
+      "quotation": "Marysia, f. Pol. Heb. bitter, 29"
+    },
+    {
+      "given_name": "MATEUSZ",
+      "printed_form": "Mateusz",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "gift of the Lord",
+      "translation": {
+        "language": "pl",
+        "text": "dar Pana",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Mateusz, which refers to p. 15",
+      "quotation": "Mateusz, m. Pol. Heb. gift of the Lord, 15"
+    },
+    {
+      "given_name": "MATYAS",
+      "printed_form": "Matyas",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "gift of the Lord",
+      "translation": {
+        "language": "pl",
+        "text": "dar Pana",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Matyas, which refers to p. 15",
+      "quotation": "Matyas, m. Pol. Hung. Heb. gift of the Lord, 15"
+    },
+    {
+      "given_name": "MIKOŁAJ",
+      "printed_form": "Mikolaj",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "people’s victory",
+      "translation": {
+        "language": "pl",
+        "text": "zwycięstwo ludu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Mikolaj, which refers to p. 90",
+      "quotation": "Mikolaj, m. Pol. Gr. people’s victory, 90"
+    },
+    {
+      "given_name": "MINKA",
+      "printed_form": "Minka",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "helmet of resolution",
+      "translation": {
+        "language": "pl",
+        "text": "hełm postanowienia",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Minka, which refers to p. 315",
+      "quotation": "Minka, f. Pol. Teu. helmet of resolution, 315"
+    },
+    {
+      "given_name": "MOJŻESZ",
+      "printed_form": "Mojzesz",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "drawn out",
+      "translation": {
+        "language": "pl",
+        "text": "wyciągnięty",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Mojzesz, which refers to p. 27",
+      "quotation": "Mojzesz, m. Pol. Heb. drawn out, 27"
+    },
+    {
+      "given_name": "OLBRACHT",
+      "printed_form": "Olbracht",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "noble brightness",
+      "translation": {
+        "language": "pl",
+        "text": "szlachetna jasność",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Olbracht, which refers to p. 411",
+      "quotation": "Olbracht, m. Pol. Teu. noble brightness, 411"
+    },
+    {
+      "given_name": "PAWEŁ",
+      "printed_form": "Pawel",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "little",
+      "translation": {
+        "language": "pl",
+        "text": "mały",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Pawel, which refers to p. 165",
+      "quotation": "Pawel, m. Pol. Lat. little, 165"
+    },
+    {
+      "given_name": "PIOTR",
+      "printed_form": "Piotr",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "stone",
+      "translation": {
+        "language": "pl",
+        "text": "kamień",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Piotr, which refers to p. 108",
+      "quotation": "Piotr, m. Pol. Gr. stone, 108"
+    },
+    {
+      "given_name": "RAHEL",
+      "printed_form": "Rahel",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "ewe",
+      "translation": {
+        "language": "pl",
+        "text": "owca",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Rahel, which refers to p. 15",
+      "quotation": "Rahel, f. Pol. Heb. ewe, 15"
+    },
+    {
+      "given_name": "RAJNOLD",
+      "printed_form": "Rajnold",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "power of judgment",
+      "translation": {
+        "language": "pl",
+        "text": "moc osądu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Rajnold, which refers to p. 396",
+      "quotation": "Rajnold, m. Pol. Teu. power of judgment, 396"
+    },
+    {
+      "given_name": "RASIA",
+      "printed_form": "Rasia",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "queen",
+      "translation": {
+        "language": "pl",
+        "text": "królowa",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Rasia, which refers to p. 31",
+      "quotation": "Rasia, f. Pol. Lat. queen, 31"
+    },
+    {
+      "given_name": "RÓŻA",
+      "printed_form": "Roza",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "rose",
+      "translation": {
+        "language": "pl",
+        "text": "róża",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Roza, which refers to p. 204",
+      "quotation": "Roza, f. Pol. Lat. rose, 204"
+    },
+    {
+      "given_name": "ROZALIA",
+      "printed_form": "Rozalia",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "rose",
+      "translation": {
+        "language": "pl",
+        "text": "róża",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Rozalia, which refers to p. 204",
+      "quotation": "Rozalia, f. Pol. Lat. rose, 204"
+    },
+    {
+      "given_name": "ROZYNA",
+      "printed_form": "Rozyna",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "rose",
+      "translation": {
+        "language": "pl",
+        "text": "róża",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Rozyna, which refers to p. 204",
+      "quotation": "Rozyna, f. Pol. Lat. rose, 204"
+    },
+    {
+      "given_name": "RYSZARD",
+      "printed_form": "Ryszard",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "stern king",
+      "translation": {
+        "language": "pl",
+        "text": "surowy król",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ryszard, which refers to p. 399",
+      "quotation": "Ryszard, m. Pol. Teu. stern king, 399"
+    },
+    {
+      "given_name": "SALOMEA",
+      "printed_form": "Salomea",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "peaceful",
+      "translation": {
+        "language": "pl",
+        "text": "spokojna",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Salomea, which refers to p. 47",
+      "quotation": "Salomea, f. Pol. Heb. peaceful, 47"
+    },
+    {
+      "given_name": "SEBASTYAN",
+      "printed_form": "Sebastyan",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "venerable",
+      "translation": {
+        "language": "pl",
+        "text": "czcigodny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Sebastyan, which refers to p. 111",
+      "quotation": "Sebastyan, m. Pol. Gr. venerable, 111"
+    },
+    {
+      "given_name": "STACH",
+      "printed_form": "Stach",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Slav."
+      },
+      "literal_gloss": "camp glory",
+      "translation": {
+        "language": "pl",
+        "text": "sława obozu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Stach, which refers to p. 44",
+      "quotation": "Stach, m. Pol. Slav. camp glory, 44"
+    },
+    {
+      "given_name": "STAS",
+      "printed_form": "Stas",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Slav."
+      },
+      "literal_gloss": "camp glory",
+      "translation": {
+        "language": "pl",
+        "text": "sława obozu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Stas, which refers to p. 440",
+      "quotation": "Stas, m. Pol. Slav. camp glory, 440"
+    },
+    {
+      "given_name": "SZYMON",
+      "printed_form": "Szymon",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "obedient",
+      "translation": {
+        "language": "pl",
+        "text": "posłuszny",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Szymon, which refers to p. 18",
+      "quotation": "Szymon, m. Pol. Heb. obedient, 18"
+    },
+    {
+      "given_name": "TEOBALD",
+      "printed_form": "Teobald",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "people’s valour",
+      "translation": {
+        "language": "pl",
+        "text": "męstwo ludu",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Teobald, which refers to p. 374",
+      "quotation": "Teobald, m. Pol. Teu. people’s valour, 374"
+    },
+    {
+      "given_name": "TEODOR",
+      "printed_form": "Teodor",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "divine gift",
+      "translation": {
+        "language": "pl",
+        "text": "boski dar",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Teodor, which refers to p. 101",
+      "quotation": "Teodor, m. Pol. Slov. Gr. divine gift, 101"
+    },
+    {
+      "given_name": "TOBIASZ",
+      "printed_form": "Tobiasz",
+      "origin": {
+        "code": "he",
+        "as_printed": "Heb."
+      },
+      "literal_gloss": "goodness of the Lord",
+      "translation": {
+        "language": "pl",
+        "text": "dobroć Pana",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Tobiasz, which refers to p. 49",
+      "quotation": "Tobiasz, m. Pol. Heb. goodness of the Lord, 49"
+    },
+    {
+      "given_name": "TOMASZ",
+      "printed_form": "Tomasz",
+      "origin": {
+        "code": "arc",
+        "as_printed": "Aram."
+      },
+      "literal_gloss": "twin",
+      "translation": {
+        "language": "pl",
+        "text": "bliźniak",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Tomasz, which refers to p. 21",
+      "quotation": "Tomasz, m. Pol. Aram. twin, 21"
+    },
+    {
+      "given_name": "ULRYK",
+      "printed_form": "Ulryk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "noble rule",
+      "translation": {
+        "language": "pl",
+        "text": "szlachetna władza",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ulryk, which refers to p. 409",
+      "quotation": "Ulryk, m. Pol. Teu. noble rule, 409"
+    },
+    {
+      "given_name": "ULRYKA",
+      "printed_form": "Ulryka",
+      "origin": {
+        "code": "gem",
+        "as_printed": "Teu."
+      },
+      "literal_gloss": "noble rule",
+      "translation": {
+        "language": "pl",
+        "text": "szlachetna władza",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ulryka, which refers to p. 409",
+      "quotation": "Ulryka, f. Pol. Teu. noble rule, 409"
+    },
+    {
+      "given_name": "URSYN",
+      "printed_form": "Ursyn",
+      "origin": null,
+      "literal_gloss": "bear",
+      "translation": {
+        "language": "pl",
+        "text": "niedźwiedź",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Ursyn, which refers to p. 199",
+      "quotation": "Ursyn, m. Pol. bear, 199"
+    },
+    {
+      "given_name": "URSZULA",
+      "printed_form": "Urszula",
+      "origin": {
+        "code": "la",
+        "as_printed": "Lat."
+      },
+      "literal_gloss": "bear",
+      "translation": {
+        "language": "pl",
+        "text": "niedźwiedź",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Urszula, which refers to p. 199",
+      "quotation": "Urszula, f. Pol. Lat. bear, 199"
+    },
+    {
+      "given_name": "WŁADIMIR",
+      "printed_form": "Wladimir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "Slav."
+      },
+      "literal_gloss": "ruling peace",
+      "translation": {
+        "language": "pl",
+        "text": "rządzący pokój",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Wladimir, which refers to p. 442",
+      "quotation": "Wladimir, m. Pol. Slav. ruling peace, 442"
+    },
+    {
+      "given_name": "ZOFIA",
+      "printed_form": "Zofia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "wisdom",
+      "translation": {
+        "language": "pl",
+        "text": "mądrość",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Zofia, which refers to p. 107",
+      "quotation": "Zofia, f. Pol. Gr. wisdom, 107"
+    },
+    {
+      "given_name": "ZOSIA",
+      "printed_form": "Zosia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "Gr."
+      },
+      "literal_gloss": "wisdom",
+      "translation": {
+        "language": "pl",
+        "text": "mądrość",
+        "by": "Name Atlas"
+      },
+      "locator": "Glossary of Christian Names (pp. xviii–cxliii), s.v. Zosia, which refers to p. 107",
+      "quotation": "Zosia, f. Pol. Gr. wisdom, 107"
+    }
+  ]
+}

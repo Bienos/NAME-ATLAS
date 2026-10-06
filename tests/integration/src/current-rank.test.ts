@@ -403,6 +403,7 @@ describe("CURRENT_RANK: the completeness gate over real ingested data", () => {
       "GIVEN_NAME_BIRTH_COUNT", // 0041
       "GIVEN_NAME_BIRTH_RANK", // 0041
       "GIVEN_NAME_BIRTH_TREND", // 0041
+      "GIVEN_NAME_MEANING", // 0044
     ]);
   });
 

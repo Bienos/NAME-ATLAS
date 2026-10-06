@@ -41,3 +41,19 @@ export type {
   BirthNameListReport,
   ImportBirthNamesOptions,
 } from "./births-importer.js";
+export {
+  GIVEN_NAME_MEANINGS_KIND,
+  GIVEN_NAME_ORIGIN_CODES,
+  GIVEN_NAME_TRANSLATOR,
+  givenNameMeaningRecordId,
+  importGivenNameMeanings,
+  parseGivenNameMeaningFile,
+} from "./meanings.js";
+export type {
+  GivenNameMeaningEntry,
+  GivenNameMeaningFile,
+  GivenNameMeaningParseOutcome,
+  GivenNameOrigin,
+  GivenNameOriginCode,
+  GivenNameTranslation,
+} from "./meanings.js";

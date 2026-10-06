@@ -1,0 +1,1385 @@
+{
+  "format_version": 1,
+  "kind": "GIVEN_NAME_MEANINGS",
+  "synthetic": false,
+  "work": {
+    "source_key": "buryan_1933_skad_pochodzi",
+    "title": "Skąd pochodzi twoje imię i nazwisko i nazwa miejscowości rodzinnej? (Zwięzły zarys imiennictwa polskiego)",
+    "author_or_publisher": "ks. Józef Buryan",
+    "year": 1933,
+    "reliability_tier": "C_SCHOLARLY_SECONDARY",
+    "licence_basis": {
+      "kind": "PUBLIC_DOMAIN",
+      "reason": "Author Józef Buryan (1883–1950) died in 1950 (Zielonogórska Biblioteka Cyfrowa record oai:zbc.uz.zgora.pl:82526). Economic rights expire 70 years after the author's death, counted from the end of that year (Polish Copyright Act, art. 36), so the work has been in the public domain since 2021-01-01. The 1933 notice 'Wszelkie prawa zastrzeżone' lapsed with those rights."
+    },
+    "reference_url": "https://www.zbc.uz.zgora.pl/publication/91798",
+    "rights": {
+      "terms_version": "PUBLIC_DOMAIN_ART36",
+      "terms_hash": null,
+      "checked_at": "2026-09-23T00:00:00Z",
+      "metadata_rights": "ALLOWED",
+      "image_rights": "UNKNOWN",
+      "transcription_rights": "ALLOWED",
+      "database_rights": "ALLOWED",
+      "automated_access": "ALLOWED",
+      "commercial_use": "ALLOWED",
+      "redistribution": "ALLOWED",
+      "local_cache": "ALLOWED",
+      "attribution_required": true,
+      "attribution_text": "ks. Józef Buryan, „Skąd pochodzi twoje imię i nazwisko i nazwa miejscowości rodzinnej?”, Warszawa 1933",
+      "source_owner": "public domain (author d. 1950); scan: Biblioteka Uniwersytetu Zielonogórskiego",
+      "rights_url": "https://www.zbc.uz.zgora.pl/publication/91798",
+      "contact_required": false,
+      "review_status": "LEGAL_REVIEW_REQUIRED",
+      "valid_from": "2021-01-01",
+      "valid_to": null,
+      "notes": "Public domain by the author's death date; no lawyer has reviewed it, hence LEGAL_REVIEW_REQUIRED. Attribution required because authors' moral rights do not expire in Polish law. image_rights UNKNOWN: the scan's own status is not claimed and no image is reproduced. Reliability tier C is this session's classification of a 1933 popular outline by a non-linguist, flagged to the project owner for confirmation; the product always shows author and year beside the reading."
+    }
+  },
+  "entries": [
+    {
+      "given_name": "LUBOMIR",
+      "printed_form": "Lubomir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. Przeważają nazwy na -sław i na -mir (mierz): Stanisław, Bolesław, Lubomir."
+    },
+    {
+      "given_name": "WIELISŁAW",
+      "printed_form": "Wielisław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Powtarzają się ciągle przymiotniki: drogi, luby, miły, i rzeczowniki: cześć, chwała, uciecha-niega (por. czeskie: něha, něžny): Niegosław, Wielisław, Miłosław, Wszemił, Radosław, Milodrag, Drogomił, Dobromił (dobro = dobrze), Luborad i t. d."
+    },
+    {
+      "given_name": "MIŁOSŁAW",
+      "printed_form": "Miłosław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Powtarzają się ciągle przymiotniki: drogi, luby, miły, i rzeczowniki: cześć, chwała, uciecha-niega (por. czeskie: něha, něžny): Niegosław, Wielisław, Miłosław, Wszemił, Radosław, Milodrag, Drogomił, Dobromił (dobro = dobrze), Luborad i t. d."
+    },
+    {
+      "given_name": "RADOSŁAW",
+      "printed_form": "Radosław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Powtarzają się ciągle przymiotniki: drogi, luby, miły, i rzeczowniki: cześć, chwała, uciecha-niega (por. czeskie: něha, něžny): Niegosław, Wielisław, Miłosław, Wszemił, Radosław, Milodrag, Drogomił, Dobromił (dobro = dobrze), Luborad i t. d."
+    },
+    {
+      "given_name": "DOBROMIŁ",
+      "printed_form": "Dobromił (dobro = dobrze)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "dobro = dobrze",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Powtarzają się ciągle przymiotniki: drogi, luby, miły, i rzeczowniki: cześć, chwała, uciecha-niega (por. czeskie: něha, něžny): Niegosław, Wielisław, Miłosław, Wszemił, Radosław, Milodrag, Drogomił, Dobromił (dobro = dobrze), Luborad i t. d."
+    },
+    {
+      "given_name": "WOJBOR",
+      "printed_form": "Wojbor",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy od wojowniczości",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy od wojowniczości, złożenia z bor(u) (walka), woj, rać: Racibor, Wojbor i Borzywoj, Borysław, Wojsław, Wojciech i inne. Słowiańskie rat(i) = wojna."
+    },
+    {
+      "given_name": "BORYSŁAW",
+      "printed_form": "Borysław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy od wojowniczości",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy od wojowniczości, złożenia z bor(u) (walka), woj, rać: Racibor, Wojbor i Borzywoj, Borysław, Wojsław, Wojciech i inne. Słowiańskie rat(i) = wojna."
+    },
+    {
+      "given_name": "WOJSŁAW",
+      "printed_form": "Wojsław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy od wojowniczości",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy od wojowniczości, złożenia z bor(u) (walka), woj, rać: Racibor, Wojbor i Borzywoj, Borysław, Wojsław, Wojciech i inne. Słowiańskie rat(i) = wojna."
+    },
+    {
+      "given_name": "WOJCIECH",
+      "printed_form": "Wojciech",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy od wojowniczości",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy od wojowniczości, złożenia z bor(u) (walka), woj, rać: Racibor, Wojbor i Borzywoj, Borysław, Wojsław, Wojciech i inne. Słowiańskie rat(i) = wojna."
+    },
+    {
+      "given_name": "BRATUMIŁ",
+      "printed_form": "Bratumił",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy rodzinne",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy rodzinne, złożenia z dziad, stryj, brat, siostra, cio-ta (-cia), rzadziej wuj: Milbrat, Bratumił, Bratosław-Bracław, Siostromiła, Sulidziad, Bratumiła."
+    },
+    {
+      "given_name": "BRATUMIŁA",
+      "printed_form": "Bratumiła",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "nazwy rodzinne",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Częste są nazwy rodzinne, złożenia z dziad, stryj, brat, siostra, cio-ta (-cia), rzadziej wuj: Milbrat, Bratumił, Bratosław-Bracław, Siostromiła, Sulidziad, Bratumiła."
+    },
+    {
+      "given_name": "MIŁOGOST",
+      "printed_form": "Miłogost",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "RADOGOST",
+      "printed_form": "Radogost",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "DOBROGOST",
+      "printed_form": "Dobrogost",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "PRZEMYSŁ",
+      "printed_form": "Przemysł",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "DOBROSŁAWA",
+      "printed_form": "Dobrosława",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "DOBRONIEGA",
+      "printed_form": "Dobroniega",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Spotykamy również w imionach życzenia bogactwa, gościnności, wiedzy, siły, odwagi, piękności i cierpliwości: Miłogost, Gościrad, Radogost, Dobrogost, Przemysł, Chociemysł, Dobromyśl, Cierpimysł, Dobrosława, Dobroniega, Miłoniega i t. d."
+    },
+    {
+      "given_name": "STANISŁAW",
+      "printed_form": "Stanisław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "SOBIESŁAW",
+      "printed_form": "Sobiesław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "DOBROSŁAW",
+      "printed_form": "Dobrosław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "LUTOSŁAW",
+      "printed_form": "Lutosław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "JAROSŁAW",
+      "printed_form": "Jarosław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "ŚWIĘTOSŁAW",
+      "printed_form": "Świętosław (w pierwotnem znaczeniu silny)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "w pierwotnem znaczeniu silny",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "BOLESŁAW",
+      "printed_form": "Bolesław",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "życzenia tęgiej sławy",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "WACŁAW",
+      "printed_form": "Wacław (väc, więc-ej)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "väc, więc-ej",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "SULISŁAW",
+      "printed_form": "Sulisław (sulej = silniej)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "sulej = silniej",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "UNISŁAW",
+      "printed_form": "Unisław (uniej = lepiej)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "pochodzenia słowiańskiego"
+      },
+      "literal_gloss": "uniej = lepiej",
+      "translation": null,
+      "locator": "s. 4 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 6)",
+      "quotation": "Liczne są imiona osobowe pochodzenia słowiańskiego wogóle, a polskiego w szczególności. […] W języku słowiańskim tworzono nazwy według sposobu aryjskiego, t. j. złożone, dwupniowe, zawierające dobrą wróżbę, życzenia pomyślności i sławy. […] Życzenia tęgiej sławy zawierają narówni imiona: Stanisław, Sobiesław, Dobrosław, Lutosław, Jarosław, Świętosław (w pierwotnem znaczeniu silny), Bolesław, Wacław (väc, więc-ej), Sulisław (sulej = silniej), Unisław (uniej = lepiej), Pako (plurime) -sław i inne."
+    },
+    {
+      "given_name": "GNIEWOMIR",
+      "printed_form": "Mirogniew i Gniewomir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "starosłowiańskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 5 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 7)",
+      "quotation": "Co do dwupniowych starosłowiańskich imion osobowych, trzeba zaznaczyć, że nieraz trudno każdej z obu części podkładać osobne jakieś znaczenie. […] dodawano pewnie według innych imion końcówki: -sław, -mir, -bor, i inne i zmieniano dowolnie, Mirogniew i Gniewomir, Mirosław i Sławomir."
+    },
+    {
+      "given_name": "MIROSŁAW",
+      "printed_form": "Mirosław i Sławomir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "starosłowiańskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 5 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 7)",
+      "quotation": "Co do dwupniowych starosłowiańskich imion osobowych, trzeba zaznaczyć, że nieraz trudno każdej z obu części podkładać osobne jakieś znaczenie. […] dodawano pewnie według innych imion końcówki: -sław, -mir, -bor, i inne i zmieniano dowolnie, Mirogniew i Gniewomir, Mirosław i Sławomir."
+    },
+    {
+      "given_name": "SŁAWOMIR",
+      "printed_form": "Mirosław i Sławomir",
+      "origin": {
+        "code": "sla",
+        "as_printed": "starosłowiańskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 5 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 7)",
+      "quotation": "Co do dwupniowych starosłowiańskich imion osobowych, trzeba zaznaczyć, że nieraz trudno każdej z obu części podkładać osobne jakieś znaczenie. […] dodawano pewnie według innych imion końcówki: -sław, -mir, -bor, i inne i zmieniano dowolnie, Mirogniew i Gniewomir, Mirosław i Sławomir."
+    },
+    {
+      "given_name": "RADOMIŁ",
+      "printed_form": "Radomił",
+      "origin": {
+        "code": "sla",
+        "as_printed": "starosłowiańskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 5 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 7)",
+      "quotation": "Co do dwupniowych starosłowiańskich imion osobowych, trzeba zaznaczyć, że nieraz trudno każdej z obu części podkładać osobne jakieś znaczenie. […] Nieraz obie części oznaczają to samo np.: Lubomił, Radomił, Racibor (rać — wojna, bor — walka, według dotychczasowych znanych mi tłumaczeń)."
+    },
+    {
+      "given_name": "RACIBOR",
+      "printed_form": "Racibor (rać — wojna, bor — walka, według dotychczasowych znanych mi tłumaczeń)",
+      "origin": {
+        "code": "sla",
+        "as_printed": "starosłowiańskie"
+      },
+      "literal_gloss": "rać — wojna, bor — walka",
+      "translation": null,
+      "locator": "s. 5 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 7)",
+      "quotation": "Co do dwupniowych starosłowiańskich imion osobowych, trzeba zaznaczyć, że nieraz trudno każdej z obu części podkładać osobne jakieś znaczenie. […] Nieraz obie części oznaczają to samo np.: Lubomił, Radomił, Racibor (rać — wojna, bor — walka, według dotychczasowych znanych mi tłumaczeń)."
+    },
+    {
+      "given_name": "ADAM",
+      "printed_form": "Adam",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "MARIA",
+      "printed_form": "Marja",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "JÓZEF",
+      "printed_form": "Józef (tyle co Crescens)",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": "tyle co Crescens",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "JAN",
+      "printed_form": "Jan",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "MICHAŁ",
+      "printed_form": "Michał",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "ANNA",
+      "printed_form": "Anna",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "ELŻBIETA",
+      "printed_form": "Elżbieta",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "EWA",
+      "printed_form": "Ewa",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "ZUZANNA",
+      "printed_form": "Zuzanna",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "MAGDALENA",
+      "printed_form": "Magdalena",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "MARTA",
+      "printed_form": "Marta",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "JAKUB",
+      "printed_form": "Jakób",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "TADEUSZ",
+      "printed_form": "nasz narodowy Tadeusz",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "MACIEJ",
+      "printed_form": "Maciej",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "TOMASZ",
+      "printed_form": "Tomasz",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "BARTŁOMIEJ",
+      "printed_form": "Bartłomiej",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "RAFAŁ",
+      "printed_form": "Rafał",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "GABRIEL",
+      "printed_form": "Gabrjel",
+      "origin": {
+        "code": "he",
+        "as_printed": "hebrajskiego pochodzenia"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z przyjęciem chrześcijaństwa zyskały zupełne prawo obywatelstwa we wszystkich językach imiona hebrajskie, greckie i łacińskie. Wymienię tylko niektóre; hebrajskiego pochodzenia są: Adam, Marja, Józef (tyle co Crescens), Jan, Michał, Anna, Elżbieta, Ewa, Zuzanna, Magdalena, Marta, Jakób, nasz narodowy Tadeusz, Maciej, Tomasz, Bartłomiej, Rafał, Gabrjel i wiele innych."
+    },
+    {
+      "given_name": "AGNIESZKA",
+      "printed_form": "Agnieszka",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "JERZY",
+      "printed_form": "Jerzy",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "HELENA",
+      "printed_form": "Helena",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "KATARZYNA",
+      "printed_form": "Katarzyna",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "PIOTR",
+      "printed_form": "Piotr",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "STEFAN",
+      "printed_form": "Stefan",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "SZCZEPAN",
+      "printed_form": "Szczepan",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "FILIP",
+      "printed_form": "Filip",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "JĘDRZEJ",
+      "printed_form": "Jędrzej",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "IZYDOR",
+      "printed_form": "Izydor",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "NIKODEM",
+      "printed_form": "Nikodem",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "ZOFIA",
+      "printed_form": "Zofja-Zosia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "ZOSIA",
+      "printed_form": "Zofja-Zosia",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "TEOFIL",
+      "printed_form": "Teofil",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "AGATA",
+      "printed_form": "Agata",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "ADOLF",
+      "printed_form": "Adolf",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "MAŁGORZATA",
+      "printed_form": "Małgorzata",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "TEODOR",
+      "printed_form": "Teodor",
+      "origin": {
+        "code": "grc",
+        "as_printed": "z greckich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z greckich przyjęły się: Agnieszka, Jerzy, Helena, Katarzyna, Piotr, Stefan, Szczepan, Filip, Jędrzej, Izydor, Nikodem, Zofja-Zosia, Teofil, Agata, Adolf, Małgorzata, Teodor i dalsze."
+    },
+    {
+      "given_name": "FELIKS",
+      "printed_form": "Feliks (Szczęsny-Szczęsna)",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": "Szczęsny-Szczęsna",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "PAWEŁ",
+      "printed_form": "Paweł",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "AUGUSTYN",
+      "printed_form": "Augustyn",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "IGNACY",
+      "printed_form": "Ignacy",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "BENEDYKT",
+      "printed_form": "Benedykt",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "BARBARA",
+      "printed_form": "Barbara",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "LAURENCJUSZ",
+      "printed_form": "Laurencjusz-Wawrzyniec (laur=Wawrzyn)",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": "laur=Wawrzyn",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "WAWRZYNIEC",
+      "printed_form": "Laurencjusz-Wawrzyniec (laur=Wawrzyn)",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": "laur=Wawrzyn",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "WINCENTY",
+      "printed_form": "Wincenty",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "WALENTY",
+      "printed_form": "Walenty",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "LEON",
+      "printed_form": "Leon",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "MARCIN",
+      "printed_form": "Marcin",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "ŁUCJA",
+      "printed_form": "Łucja",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "ROMAN",
+      "printed_form": "Roman",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "KLEMENS",
+      "printed_form": "Klemens",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "KONSTANTY",
+      "printed_form": "Konstanty",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "URBAN",
+      "printed_form": "Urban",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "FLORIAN",
+      "printed_form": "Florjan",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "ANTONI",
+      "printed_form": "Antoni (znaczenie nie ustalone)",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": "znaczenie nie ustalone",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "URSYN",
+      "printed_form": "Ursyn",
+      "origin": {
+        "code": "la",
+        "as_printed": "łacińskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Łacińskie są imiona: Feliks (Szczęsny-Szczęsna), Paweł, Augustyn, Ignacy, Benedykt, Barbara, Laurencjusz-Wawrzyniec (laur=Wawrzyn), Wincenty, Walenty, Leon, Marcin, Łucja, Roman, Klemens, Konstanty, Urban, Florjan, Agrikola (rolnik), Antoni (znaczenie nie ustalone), Ursyn."
+    },
+    {
+      "given_name": "KAROL",
+      "printed_form": "Karol",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "FRANCISZEK",
+      "printed_form": "Franciszek",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "FRANEK",
+      "printed_form": "Franek",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ERNEST",
+      "printed_form": "Ernest",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "RUDOLF",
+      "printed_form": "Rudolf",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "JADWIGA",
+      "printed_form": "Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą)",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": "Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą",
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "KUNEGUNDA",
+      "printed_form": "Kunegunda",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ULRYK",
+      "printed_form": "Ulryk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "WITOLD",
+      "printed_form": "Witołd",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "FERDYNAND",
+      "printed_form": "Ferdynand",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ALBRECHT",
+      "printed_form": "Albrecht-Olbracht",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "OLBRACHT",
+      "printed_form": "Albrecht-Olbracht",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ALBERT",
+      "printed_form": "Albert",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "HUGON",
+      "printed_form": "Hugon",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "LEOPOLD",
+      "printed_form": "Leopold",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "LUDWIK",
+      "printed_form": "Ludwik",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "FRYDERYK",
+      "printed_form": "Fryderyk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "BERNARD",
+      "printed_form": "Bernard-Biernat",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "NORBERT",
+      "printed_form": "Norbert",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "MEDARD",
+      "printed_form": "Medard",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "HENRYK",
+      "printed_form": "Henryk",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ZYGMUNT",
+      "printed_form": "Zygmunt",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "ROGER",
+      "printed_form": "Roger",
+      "origin": {
+        "code": "gem",
+        "as_printed": "z germańskich"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Z germańskich imion zaznaczam: Karol, Franciszek, Franek, Ernest, Rudolf, Jadwiga (Hadu-wig, obie części oznaczają wojnę, Haderkampf; nowsi przeczą), Kunegunda, Ulryk, Witołd, Ferdynand, Albrecht-Olbracht, Albert, Hugon, Leopold, Ludwik, Fryderyk, Bernard-Biernat, Norbert, Medard, Henryk, Zygmunt, Roger."
+    },
+    {
+      "given_name": "OLGIERD",
+      "printed_form": "Olgierd",
+      "origin": {
+        "code": "lt",
+        "as_printed": "litewskie"
+      },
+      "literal_gloss": null,
+      "translation": null,
+      "locator": "s. 6 (skan ZBC oai:zbc.uz.zgora.pl:82526, str. PDF 8)",
+      "quotation": "Litewskie: Olgierd."
+    }
+  ]
+}

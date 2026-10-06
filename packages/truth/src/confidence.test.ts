@@ -1,6 +1,11 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { assessCurrentPopulation, evidenceSetHash, isValidCombination } from "./confidence.js";
+import {
+  assessCurrentPopulation,
+  assessGivenNameMeaning,
+  evidenceSetHash,
+  isValidCombination,
+} from "./confidence.js";
 import type { ConfidenceInputs } from "./confidence.js";
 
 /**
@@ -140,5 +145,34 @@ describe("confidence takes no rights input", () => {
       "noMaterialConflict",
       "sourceScopePreserved",
     ]);
+  });
+});
+
+describe("a first name's origin and meaning (TASK-147, ADR-0045)", () => {
+  const status = (supportingWorks: number, worksStatingOrigin: number, distinctOrigins: number) =>
+    assessGivenNameMeaning({ supportingWorks, worksStatingOrigin, distinctOrigins }).status;
+
+  it("is POSSIBLE from one work, LIKELY when two state one origin, CONFLICTING on two", () => {
+    expect(status(1, 1, 1)).toBe("POSSIBLE");
+    expect(status(1, 0, 0)).toBe("POSSIBLE");
+    expect(status(2, 2, 1)).toBe("LIKELY");
+    expect(status(2, 1, 1)).toBe("POSSIBLE");
+    expect(status(2, 2, 2)).toBe("CONFLICTING");
+    expect(status(0, 0, 0)).toBe("INSUFFICIENT_DATA");
+  });
+
+  it("is an interpretation, never VERIFIED", () => {
+    fc.assert(
+      fc.property(fc.nat(5), fc.nat(5), fc.nat(5), (works, stating, origins) => {
+        const verdict = assessGivenNameMeaning({
+          supportingWorks: works,
+          worksStatingOrigin: Math.min(stating, works),
+          distinctOrigins: Math.min(origins, stating, works),
+        });
+        expect(verdict.epistemic_type).toBe("INTERPRETATION");
+        expect(verdict.status).not.toBe("VERIFIED");
+        expect(isValidCombination(verdict.epistemic_type, verdict.status)).toBe(true);
+      }),
+    );
   });
 });
