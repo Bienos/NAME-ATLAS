@@ -49,13 +49,8 @@ export default function BrandLabPage() {
       </header>
 
       <AtlasHero surname="Wiśniewski" eyebrow="NAZWISKO">
-        <p className="brand-lab-lede">
-          Pochodzenie. Znaczenie. Występowanie. Zawsze ze źródłami.
-        </p>
-        <SearchInput
-          aria-label="Wpisz nazwisko"
-          placeholder="Wpisz nazwisko, np. Kowalski"
-        />
+        <p className="brand-lab-lede">Pochodzenie. Znaczenie. Występowanie. Zawsze ze źródłami.</p>
+        <SearchInput aria-label="Wpisz nazwisko" placeholder="Wpisz nazwisko, np. Kowalski" />
       </AtlasHero>
 
       <section className="brand-lab-section">
@@ -148,11 +143,7 @@ export default function BrandLabPage() {
       <section className="brand-lab-section brand-lab-grid">
         <Panel level={2}>
           <p className="atlas-eyebrow">DATA</p>
-          <DataStat
-            value="[COUNT]"
-            label="osób w Polsce"
-            meta="[DATASET, DATE]"
-          />
+          <DataStat value="[COUNT]" label="osób w Polsce" meta="[DATASET, DATE]" />
         </Panel>
         <EvidenceCard
           status="VERIFIED"
@@ -178,17 +169,13 @@ export default function BrandLabPage() {
       </section>
 
       <section className="brand-lab-section brand-lab-topography">
-        <p className="atlas-eyebrow">
-          GRAPHIC PRIMITIVES · DETERMINISTIC TOPOGRAPHY
-        </p>
+        <p className="atlas-eyebrow">GRAPHIC PRIMITIVES · DETERMINISTIC TOPOGRAPHY</p>
         <ContourField seed={47} density={8} />
         <TopographicCrop seed={21} />
       </section>
 
       <section className="brand-lab-section">
-        <p className="atlas-eyebrow">
-          MAP · CHART TOKENS · PLACEHOLDER DATA ONLY
-        </p>
+        <p className="atlas-eyebrow">MAP · CHART TOKENS · PLACEHOLDER DATA ONLY</p>
         <div className="brand-lab-data-viz">
           <div className="brand-lab-map-ramp" aria-label="Map density token ramp">
             <span data-band="no-data">NO DATA</span>
@@ -261,9 +248,7 @@ export default function BrandLabPage() {
         <p className="atlas-eyebrow">RESPONSIVE PRINCIPLE</p>
         <div>
           <strong>Desktop</strong>
-          <p>
-            Editorial spatial composition, deliberate asymmetry, larger map/data relationships.
-          </p>
+          <p>Editorial spatial composition, deliberate asymmetry, larger map/data relationships.</p>
         </div>
         <div>
           <strong>Mobile</strong>

@@ -1,9 +1,4 @@
-import type {
-  ButtonHTMLAttributes,
-  HTMLAttributes,
-  InputHTMLAttributes,
-  ReactNode,
-} from "react";
+import type { ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
 type Size = "sm" | "md" | "lg";
 type ButtonVariant = "primary" | "secondary" | "ghost" | "amber";
@@ -32,10 +27,7 @@ export function IconButton({
   return <Button className="atlas-icon-button" aria-label={label} {...props} />;
 }
 
-export function TextInput({
-  className = "",
-  ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+export function TextInput({ className = "", ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={`atlas-input ${className}`} {...props} />;
 }
 
@@ -59,26 +51,14 @@ export function Navigation({ children, label }: { children: ReactNode; label: st
   );
 }
 
-export function Badge({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+export function Badge({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <span className={`atlas-badge ${className}`}>{children}</span>;
 }
 
 export function ConfidenceBadge({
   level,
 }: {
-  level:
-    | "VERIFIED"
-    | "LIKELY"
-    | "POSSIBLE"
-    | "UNCONFIRMED"
-    | "CONFLICTING"
-    | "INSUFFICIENT_DATA";
+  level: "VERIFIED" | "LIKELY" | "POSSIBLE" | "UNCONFIRMED" | "CONFLICTING" | "INSUFFICIENT_DATA";
 }) {
   return (
     <span className="atlas-confidence" data-confidence={level}>
@@ -101,9 +81,7 @@ export function Panel({
   level?: 1 | 2 | 3 | "paper";
   className?: string;
 }) {
-  return (
-    <section className={`atlas-panel atlas-panel-${level} ${className}`}>{children}</section>
-  );
+  return <section className={`atlas-panel atlas-panel-${level} ${className}`}>{children}</section>;
 }
 
 export function SourceCard({
@@ -244,13 +222,7 @@ export function Drawer({
   ) : null;
 }
 
-export function Accordion({
-  summary,
-  children,
-}: {
-  summary: ReactNode;
-  children: ReactNode;
-}) {
+export function Accordion({ summary, children }: { summary: ReactNode; children: ReactNode }) {
   return (
     <details className="atlas-accordion">
       <summary>{summary}</summary>
@@ -263,13 +235,7 @@ export function Timeline({ children }: { children: ReactNode }) {
   return <ol className="atlas-timeline">{children}</ol>;
 }
 
-export function TimelineEvent({
-  date,
-  children,
-}: {
-  date: ReactNode;
-  children: ReactNode;
-}) {
+export function TimelineEvent({ date, children }: { date: ReactNode; children: ReactNode }) {
   return (
     <li className="atlas-timeline-event">
       <time>{date}</time>
@@ -319,24 +285,14 @@ export function LoadingState({
   variant?: "inline" | "page";
 }) {
   return (
-    <div
-      className={`atlas-loading atlas-loading-${variant}`}
-      role="status"
-      aria-live="polite"
-    >
+    <div className={`atlas-loading atlas-loading-${variant}`} role="status" aria-live="polite">
       <span className="atlas-loader-contours" aria-hidden="true" />
       <span>{label}</span>
     </div>
   );
 }
 
-export function EmptyState({
-  title,
-  children,
-}: {
-  title: string;
-  children?: ReactNode;
-}) {
+export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="atlas-state">
       <h3>{title}</h3>
@@ -345,13 +301,7 @@ export function EmptyState({
   );
 }
 
-export function ErrorState({
-  title,
-  children,
-}: {
-  title: string;
-  children?: ReactNode;
-}) {
+export function ErrorState({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="atlas-state atlas-state-error" role="alert">
       <h3>{title}</h3>
