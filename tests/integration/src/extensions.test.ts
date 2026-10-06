@@ -109,7 +109,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
     // `given_names` and `given_name_counts` (ADR-0030): given names kept apart
     // from surnames. TASK-119 added `reports`, `report_versions`,
     // `report_sections` and `report_claim_references`: the frozen report.
-    // TASK-134 added `given_name_birth_lists` and `given_name_birth_counts`
+    // TASK-135 added `given_name_birth_lists` and `given_name_birth_counts`
     // (ADR-0042): first names given to children, by year.
     //
     // Anything beyond this set is an accidental table. TASK-009 added

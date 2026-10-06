@@ -19,7 +19,7 @@ import {
 import type { BirthNameResourceDescriptor } from "@name-atlas/sources";
 
 /**
- * TASK-134 (ADR-0042): first names given to children, by year, into a real
+ * TASK-135 (ADR-0042): first names given to children, by year, into a real
  * PostgreSQL.
  *
  * GENUINE data: `fixtures/pesel-given-name-births/` holds whole lines of four
@@ -40,7 +40,7 @@ const payload = (id: string): unknown =>
     ).toString("utf8"),
   );
 
-describe("given names by year of birth (TASK-134)", () => {
+describe("given names by year of birth (TASK-135)", () => {
   let database: TestDatabase | undefined;
   const db = (): TestDatabase["db"] => {
     if (!database) throw new Error("test database was not started");

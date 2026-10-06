@@ -1,5 +1,5 @@
 {
-  "$comment": "TASK-134 (ADR-0042). GENUINE excerpts of four files of dane.gov.pl dataset 219: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. first-2000-2019.csv keeps each (year, sex) list's two first rows, every NIKOLA row (on the girls' lists every year and on the boys' in 2007 and 2019) and ABDUL in 2012 (5, the cut-off) and 2013 (3). The yearly files keep their three first rows and, where present, NIKOLA. The full files were downloaded by the TASK-134 session on 2026-10-06 (the XLSX resources from their CSV endpoint); their checksums are the registry's official_sha256.",
+  "$comment": "TASK-135 (ADR-0042). GENUINE excerpts of four files of dane.gov.pl dataset 219: whole lines copied byte for byte, in the file's own order, with the header and CRLF endings. first-2000-2019.csv keeps each (year, sex) list's two first rows, every NIKOLA row (on the girls' lists every year and on the boys' in 2007 and 2019) and ABDUL in 2012 (5, the cut-off) and 2013 (3). The yearly files keep their three first rows and, where present, NIKOLA. The full files were downloaded by the TASK-135 session on 2026-10-06 (the XLSX resources from their CSV endpoint); their checksums are the registry's official_sha256.",
   "dataset": {
     "dataset_id": "219",
     "dataset_title": "Imiona nadawane dzieciom w Polsce",

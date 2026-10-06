@@ -1,6 +1,6 @@
 /**
  * Imports one resource of first names given to children, by year of birth
- * (ADR-0042, TASK-134), with TASK-078's posture:
+ * (ADR-0042, TASK-135), with TASK-078's posture:
  *
  *   rights gate → checksum → decode → parse fail-closed → classify
  *   → [one transaction] source record → lists → given names → counts

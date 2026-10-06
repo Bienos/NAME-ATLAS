@@ -2,7 +2,7 @@ import { sql } from "kysely";
 import type { Kysely } from "kysely";
 
 /**
- * First names given to children, by year of birth (ADR-0042, TASK-134),
+ * First names given to children, by year of birth (ADR-0042, TASK-135),
  * beside ADR-0032's tables and with the same `given_names` identity.
  *
  * - `given_name_birth_lists`: one published list, a year of birth and a sex,

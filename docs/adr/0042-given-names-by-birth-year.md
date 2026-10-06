@@ -1,6 +1,6 @@
 # ADR-0042 — First names given to children, by year: stored beside ADR-0032's tables
 
-- **Status:** Proposed 2026-10-06. The first build (TASK-134) is internal: no page, no contract and no claim reads it.
+- **Status:** Proposed 2026-10-06. The first build (TASK-135) is internal: no page, no contract and no claim reads it.
 - **Deciders:** the project owner decided the section on 2026-10-06 (D-044) and asked for its import as the first build step. This ADR records the storage and the ingest rules. The product rules (who sees what, the 5,99 zł tier) are D-044's and ADR-0037's and are not changed here.
 - **Supersedes:** nothing. It extends ADR-0032, whose rules hold unchanged.
 
