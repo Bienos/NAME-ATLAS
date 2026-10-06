@@ -41,6 +41,18 @@ export function blogPostPath(lang: Lang, slug: string): string {
 }
 
 /**
+ * The alphabetical surname directory (TASK-129; `docs/canonical/21` §112–§113).
+ * Polish only: `/pl/` is the indexed locale (§20).
+ */
+export const DIRECTORY_PATH = "/pl/nazwiska";
+
+/** A letter's page: `/pl/nazwiska/k`, then `/pl/nazwiska/k/2` onwards. */
+export function directoryLetterPath(letter: string, page = 1): string {
+  const base = `${DIRECTORY_PATH}/${encodeURIComponent(letter)}`;
+  return page > 1 ? `${base}/${String(page)}` : base;
+}
+
+/**
  * The footer's blog and social links (TASK-057, TASK-071). The blog leads to
  * its own index. The owner asked for the three social links to lead to the
  * home page until each has an address of its own; when one does, its address

@@ -22,3 +22,13 @@ export { currentSlugFor, currentSlugsFor, lookupSlug } from "./lookup.js";
 export type { SlugLookup } from "./lookup.js";
 export { SITEMAP_PAGE_SIZE, sitemapCount, sitemapEntries } from "./sitemap.js";
 export type { SitemapEntry, SitemapQueryOptions } from "./sitemap.js";
+export {
+  DIRECTORY_LETTERS,
+  DIRECTORY_OTHER,
+  DIRECTORY_PAGE_SIZE,
+  directoryCount,
+  directoryEntries,
+  directoryLetters,
+  isDirectoryLetter,
+} from "./directory.js";
+export type { DirectoryEntry, DirectoryLetter } from "./directory.js";
