@@ -81,9 +81,39 @@ export interface LetterPage {
 // `cache`: the metadata and the page read the same rows once per render.
 const blockedProfiles = cache(() => seoBlockedProfileIds(db()));
 
-export const loadDirectoryLetters = cache(async (): Promise<readonly DirectoryLetter[]> =>
-  directoryLetters(db(), "pl", { seoBlockedProfileIds: await blockedProfiles() }),
-);
+/** How long an instance keeps the letter list: as long as a rendered page is kept (`revalidate`). */
+export const LETTERS_TTL_MS = 21_600_000;
+
+let kept: { readonly at: number; readonly value: Promise<readonly DirectoryLetter[]> } | undefined;
+
+/**
+ * The letters that list a surname, read once per instance every 6 hours and
+ * shared by every render on it (TASK-134).
+ *
+ * Every directory page draws the letters, and reading them is one of its
+ * slowest queries: on production eight pages rendered at once shared an
+ * instance's two connections, and one waited past the 30 s limit (TASK-132).
+ * The promise itself is kept, so renders that start together wait for the one
+ * query rather than each asking. A failed read is not kept: the next render
+ * asks again.
+ */
+export function loadDirectoryLetters(now = Date.now()): Promise<readonly DirectoryLetter[]> {
+  if (kept === undefined || now - kept.at >= LETTERS_TTL_MS) {
+    const value = blockedProfiles().then((ids) =>
+      directoryLetters(db(), "pl", { seoBlockedProfileIds: ids }),
+    );
+    kept = { at: now, value };
+    value.catch(() => {
+      if (kept?.value === value) kept = undefined;
+    });
+  }
+  return kept.value;
+}
+
+/** Test-only: forget the kept letter list. */
+export function forgetDirectoryLettersForTests(): void {
+  kept = undefined;
+}
 
 /**
  * One query at a time (TASK-130). The pool holds two connections per instance
