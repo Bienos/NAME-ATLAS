@@ -675,3 +675,163 @@ body.dusk.atlas-v1 .footer-top:hover {
     transition: none !important;
   }
 }
+
+
+/* Product-wide action/state cleanup: old dusk used amber for almost every
+   interactive state. Brand System v1 reserves amber for history/geography and
+   uses Atlas Blue for action, focus, selection and discovery. */
+body.dusk.atlas-v1 .directory-pages [aria-current],
+body.dusk.atlas-v1 .tree-seg a[aria-current="page"],
+body.dusk.atlas-v1 .contact-chip input:checked + span,
+body.dusk.atlas-v1 .studio-gate .studio-primary,
+body.dusk.atlas-v1 .dk-actions .share button,
+body.dusk.atlas-v1 .dk-actions a.dk-finish,
+body.dusk.atlas-v1 a.deck-nav.deck-finish {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 :is(
+    .directory-pages [aria-current],
+    .tree-seg a[aria-current="page"],
+    .contact-chip input:checked + span,
+    .studio-gate .studio-primary,
+    .dk-actions .share button,
+    .dk-actions a.dk-finish,
+    a.deck-nav.deck-finish
+  ):hover {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+body.dusk.atlas-v1 :is(
+    .offer-form,
+    .account-google,
+    .blog-card,
+    .tree-card,
+    .tree-seg a,
+    .tree-rail-item,
+    .contact-form,
+    .contact-chip input + span,
+    .studio-choice input + span,
+    .studio-cards a,
+    .deck-nav,
+    .deck-full,
+    .deck-share
+  ):focus-visible,
+body.dusk.atlas-v1 .studio-choice input:focus-visible + span,
+body.dusk.atlas-v1 .contact-chip input:focus-visible + span {
+  outline-color: var(--atlas-blue-300);
+  border-color: var(--atlas-blue-300);
+}
+
+body.dusk.atlas-v1 .blog-card:hover,
+body.dusk.atlas-v1 .blog-card:focus-within,
+body.dusk.atlas-v1 a.tree-card:hover,
+body.dusk.atlas-v1 .tree-rail-item[aria-current="true"],
+body.dusk.atlas-v1 .studio-cards a[aria-current="page"],
+body.dusk.atlas-v1 .studio-choice input:checked + span {
+  color: var(--color-text-primary);
+  border-color: var(--atlas-blue-300);
+}
+
+body.dusk.atlas-v1 .offer-free {
+  border-color: color-mix(in srgb, var(--color-accent-primary) 68%, var(--color-border-subtle));
+}
+
+body.dusk.atlas-v1 .offer-price,
+body.dusk.atlas-v1 .offer-status,
+body.dusk.atlas-v1 .strip-price,
+body.dusk.atlas-v1 .strip-status,
+body.dusk.atlas-v1 .baby-sign-in,
+body.dusk.atlas-v1 .chapter-next a,
+body.dusk.atlas-v1 .landing-tree-line a,
+body.dusk.atlas-v1 .dk-accent,
+body.dusk.atlas-v1 .dk-source b,
+body.dusk.atlas-v1 .dk-ladder li.me .dk-n,
+body.dusk.atlas-v1 .studio-eyebrow {
+  color: var(--atlas-blue-300);
+}
+
+body.dusk.atlas-v1 .offer-status {
+  background: color-mix(in srgb, var(--color-accent-primary) 10%, transparent);
+}
+
+body.dusk.atlas-v1 .blog-cta {
+  border-color: color-mix(in srgb, var(--color-accent-primary) 56%, var(--color-border-subtle));
+  background: color-mix(in srgb, var(--color-accent-primary) 8%, var(--color-bg-secondary));
+}
+
+body.dusk.atlas-v1 .analysis-steps li::after,
+body.dusk.atlas-v1 .landing-how li::before,
+body.dusk.atlas-v1 .pitch-answers li::before,
+body.dusk.atlas-v1 .pitch-eyebrow::before,
+body.dusk.atlas-v1 .offer-strip li::after,
+body.dusk.atlas-v1 .dk-dots i.on {
+  color: var(--atlas-blue-300);
+  background-color: var(--color-signal-atlas);
+}
+
+body.dusk.atlas-v1 .offer-strip .is-now {
+  border-top-color: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .summary-card {
+  box-shadow: 0 24px 60px -36px color-mix(in srgb, var(--color-accent-primary) 38%, transparent);
+}
+
+body.dusk.atlas-v1 .deck-share {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+body.dusk.atlas-v1 .deck-share:hover:not(:disabled) {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+body.dusk.atlas-v1 .deck-full:hover,
+body.dusk.atlas-v1 .deck-nav:hover:not(:disabled),
+body.dusk.atlas-v1 .deck-toc button[aria-current] span {
+  color: var(--atlas-blue-300);
+  border-color: var(--atlas-blue-300);
+}
+
+body.dusk.atlas-v1 .dk-line,
+body.dusk.atlas-v1 .dk-pt {
+  stroke: var(--color-signal-atlas);
+}
+
+body.dusk.atlas-v1 .dk-dots i.on {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-signal-atlas) 48%, transparent);
+}
+
+body.dusk.atlas-v1 .contact-status .contact-status-sent {
+  border-color: var(--color-confidence-verified);
+  background: color-mix(in srgb, var(--color-confidence-verified) 8%, transparent);
+}
+
+body.dusk.atlas-v1 .dusk-world-journey .dusk-borders path {
+  stroke: color-mix(in srgb, var(--atlas-blue-300) 60%, transparent);
+}
+
+body.dusk.atlas-v1 .dusk-world-journey .dusk-borders path.is-lit {
+  fill: color-mix(in srgb, var(--color-signal-atlas) 20%, transparent);
+  stroke: var(--atlas-blue-300);
+}
+
+/* Amber remains deliberate: archive quotation rules, history/temporal
+   annotations, warning states and warm terrain light. */
+body.dusk.atlas-v1 .report-title::after,
+body.dusk.atlas-v1 .report-stamp,
+body.dusk.atlas-v1 .archive-example blockquote,
+body.dusk.atlas-v1 .tree-chip-deceased,
+body.dusk.atlas-v1 .tree-chip-source,
+body.dusk.atlas-v1 .tree-swatch-source,
+body.dusk.atlas-v1 .tree-map-arc,
+body.dusk.atlas-v1 .baby-soon {
+  border-color: var(--color-signal-amber);
+}
