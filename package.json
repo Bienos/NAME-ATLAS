@@ -47,6 +47,7 @@
     "seed:sources": "pnpm --filter @name-atlas/sources run seed-sources",
     "import:teryt": "pnpm --filter @name-atlas/sources run import-teryt",
     "import:given-names": "pnpm --filter @name-atlas/sources run import-given-names",
+    "import:given-name-births": "pnpm --filter @name-atlas/sources run import-given-name-births",
     "demo:surname-candidates": "pnpm --filter @name-atlas/resolver run demo:surname-candidates",
     "measure:fuzzy-recall": "pnpm --filter @name-atlas/resolver run measure:fuzzy-recall",
     "enqueue:derive": "pnpm --filter @name-atlas/queue run enqueue:derive",

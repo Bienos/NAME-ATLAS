@@ -244,6 +244,26 @@ export interface GeometryColumns {
   type: string | null;
 }
 
+export interface GivenNameBirthCounts {
+  count: number;
+  created_at: Generated<Timestamp>;
+  given_name_birth_count_id: string;
+  given_name_birth_list_id: string;
+  given_name_id: string;
+}
+
+export interface GivenNameBirthLists {
+  birth_year: number;
+  comparability_group: string;
+  created_at: Generated<Timestamp>;
+  given_name_birth_list_id: string;
+  people_sum: number;
+  publication_threshold: number;
+  row_count: number;
+  sex: string;
+  source_record_id: string;
+}
+
 export interface GivenNameCounts {
   count: number;
   created_at: Generated<Timestamp>;
@@ -513,6 +533,8 @@ export interface DB {
   evidence_items: EvidenceItems;
   geography_columns: GeographyColumns;
   geometry_columns: GeometryColumns;
+  given_name_birth_counts: GivenNameBirthCounts;
+  given_name_birth_lists: GivenNameBirthLists;
   given_name_counts: GivenNameCounts;
   given_names: GivenNames;
   knowledge_entities: KnowledgeEntities;
