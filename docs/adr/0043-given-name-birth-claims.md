@@ -1,7 +1,7 @@
 # ADR-0043 — First names given to children: count, rank and trend as claims
 
 - **Status:** Proposed 2026-10-06. The first build (TASK-137) is internal: no page, no contract and no API field reads these claims. **Amended 2026-10-06 (TASK-139):** the trend compares shares of the children on each list, not counts (D-044 §6, amended; Decision 4 below).
-- **Deciders:** the project owner decided the section (D-044) and its trend rule (D-044 §6) on 2026-10-06, and asked for this as the second build step. This ADR records how the claims are derived. The product rules (who sees what, the 5,99 zł tier) are D-044's and ADR-0037's and are not changed here.
+- **Deciders:** the project owner decided the section (D-044) and its trend rule (D-044 §6) on 2026-10-06, and asked for this as the second build step. This ADR records how the claims are derived. The product rules (who sees what, the paid tier) are D-044's and ADR-0037's and are not changed here.
 - **Supersedes:** nothing. It extends ADR-0042 (the stored lists) and follows ADR-0032 §6's chain.
 
 ## Context

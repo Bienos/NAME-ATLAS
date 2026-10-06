@@ -4046,6 +4046,10 @@ body.dusk {
   text-decoration: none;
 }
 
+.site-links a {
+  white-space: nowrap;
+}
+
 .site-links a:hover,
 .nav-menu nav a:hover {
   color: var(--dusk-amber);
@@ -8418,6 +8422,24 @@ a.tree-card:hover {
   background: var(--dusk-surface);
   box-shadow: 0 0 0 100vmax var(--dusk-surface);
   clip-path: inset(0 -100vmax);
+}
+
+/* --- tablets: the header's places fold into the menu (TASK-143) ---
+   With the baby-names link the header holds seven places, which need about
+   1200px on one line, the landing's larger masthead included. */
+
+@media (min-width: 761px) and (max-width: 1199px) {
+  .site-links {
+    display: none;
+  }
+
+  .nav-menu {
+    display: block;
+  }
+
+  .lang-switch {
+    margin-left: auto;
+  }
 }
 
 /* --- phones --- */

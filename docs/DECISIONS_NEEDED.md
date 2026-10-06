@@ -8,9 +8,29 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-045 — RESOLVED (2026-10-06): the baby-names page is in the header, and its paid full figures cost 8,99 zł, not 5,99 zł
+
+**Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032, `PRODUCT.md` §6 and TASK-143. It amends D-044 §2 and §3 and nothing else of D-044.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-06, in a Claude Code session, once the page was live in production and Google sign-in worked: "działa ale to powinno byc dostepne tez z gornego panelu jakos i potem cala lista dostepna za 8.99 PLN".
+
+What was decided, in this session's reading of those words (the owner may correct it):
+
+1. **The header:** the page is reachable from the site's header, in both languages: "Imiona dla dziecka" / "Baby names", between the offer and the trees. It is drawn for every visitor, signed in or not, only while the page exists (the flag on and accounts on), and leads to the page, which asks a signed-out visitor to sign in. TASK-143.
+2. **The price:** the paid view D-044 §2 describes (every year since 2000 with the rank in each, and the rest of D-044 §2's list) costs **8,99 zł**, one payment, for every name. 8,99 zł replaces 5,99 zł. The text "5,99 zł" in D-044 is the decision as first made.
+
+**What it does not change:**
+- Everything else in D-044: the free basic view, signed-in only, every tier from 28,99 zł up including the full figures, and the paid tier not unlocking the tree (D-044 §5). TASK-114's code still lifts the tree cap for any recorded purchase, so the 8,99 zł product must not exist before that is changed.
+- The payment gates (ADR-0023 §2.5): there is still no product, no checkout and no buy button for it. The page keeps showing it as "Wkrótce".
+
+**Not decided:** whether "cała lista" ("the whole list") means more than D-044's paid view, for example a browsable list of all names for a year, ranked, with their direction. This record reads it as the paid view D-044 already describes, which is every name's figures; a list that can be browsed without typing a name is a new feature and needs its own answer.
+
+---
+
 ## D-044 — RESOLVED (2026-10-06): first names given to children by year, for parents: signed-in only, a free basic view, the full numbers for 5,99 zł
 
 **Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6; §6 below, and its amendment of 2026-10-06, in ADR-0043 §4.
+**Amended later the same day by D-045:** the price is 8,99 zł, not 5,99 zł, and the page is in the header. The 5,99 zł below is the decision as first made.
 **Owner:** project owner.
 **Raised by:** the owner, 2026-10-06, in a Claude Code session: a section where mothers and fathers can see how many children were given a first name in each year, to choose a more or a less common name.
 

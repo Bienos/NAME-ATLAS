@@ -1,10 +1,10 @@
 /**
  * Whether the baby-names page exists (TASK-141, D-044): first names given to
  * children by year, signed-in only, with a paid view that cannot be sold yet
- * (ADR-0023 §2.5), so it stays dark.
+ * (ADR-0023 §2.5).
  *
  * On only when `BABY_NAMES_ENABLED` is exactly `1`. Otherwise both pages
- * answer 404 and nothing links to them. Production does not set the variable.
+ * answer 404 and the header does not link to them (TASK-143).
  *
  * Reads the variable by name and imports nothing that reaches the database,
  * so the middleware and the pages can both use it.

@@ -49,8 +49,8 @@ export interface Purchases {
  * The tiers that hold the full figures of first names given to children
  * (D-044 §4, ADR-0037 §2.1): every tier from 28,99 zł up. The 800 zł tier holds
  * them too but has no `PurchaseTier` (it is not sold through checkout), and
- * the 5,99 zł "baby names" product does not exist yet; when it does, it joins
- * this list.
+ * the 8,99 zł "baby names" product (D-045) does not exist yet; when it does, it
+ * joins this list.
  */
 export const BABY_NAMES_FULL_TIERS: readonly PurchaseTier[] = ["smaller", "couple", "family"];
 

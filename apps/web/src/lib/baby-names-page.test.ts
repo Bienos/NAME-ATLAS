@@ -189,6 +189,22 @@ describe("the baby-names pages (TASK-141)", () => {
     }
   });
 
+  it("marks its own header link as the current page (TASK-143)", async () => {
+    vi.stubEnv("BABY_NAMES_ENABLED", "1");
+    vi.stubEnv("ACCOUNTS_DATABASE_URL", "postgres://app:pw@127.0.0.1:1/db");
+    vi.stubEnv("RESEND_API_KEY", "re_key");
+    vi.stubEnv("ACCOUNTS_MAIL_FROM", "Name Atlas <konto@example.test>");
+    vi.stubEnv("SITE_ORIGIN", "https://atlas.example.test");
+    vi.stubEnv("CRON_SECRET", "cron-secret");
+    for (const [lang, href] of [
+      ["pl", "/pl/imiona-dla-dziecka"],
+      ["en", "/en/baby-names"],
+    ] as const) {
+      const html = await render(lang, {}, null);
+      expect(html, lang).toContain(`class="nav-babyNames" href="${href}" aria-current="page"`);
+    }
+  });
+
   it("signed in, no purchase: the latest year by sex, the trend and its basis, and the locked card (AC-3, AC-4)", async () => {
     const html = await render("pl", { imie: "zofia" }, { userId: "u1" });
     const t = BABY_NAMES_TEXT.pl;
@@ -206,9 +222,9 @@ describe("the baby-names pages (TASK-141)", () => {
     // Boys: not on the 2025 list, below its cut-off of 2, never 0.
     expect(html).toContain(t.belowCutoff(2025, "2"));
     expect(html).not.toMatch(/data-figure="count">0</u);
-    // The paid view is locked: the 5,99 zł tier, "Wkrótce", no button or link to buy.
+    // The paid view is locked: the 8,99 zł tier, "Wkrótce", no button or link to buy.
     expect(html).toContain(t.lockedTier);
-    expect(html).toContain("5,99 zł");
+    expect(html).toContain("8,99 zł");
     expect(html).toContain(t.soon);
     expect(html).not.toContain(t.historyHeading + "<");
     const locked = html.slice(
