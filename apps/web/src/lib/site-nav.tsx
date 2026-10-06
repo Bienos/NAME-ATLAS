@@ -1,5 +1,6 @@
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
+import { BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
 import { familyTreeEnabled } from "./family-config.js";
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -8,7 +9,8 @@ import { treeLandingPath } from "./tree-paths.js";
 import { SearchForm } from "./search-form.js";
 
 /** Which of the header's places the page is, for `aria-current`. */
-export type NavPlace = "atlas" | "compare" | "how" | "offer" | "account" | "trees" | null;
+export type NavPlace =
+  "atlas" | "compare" | "how" | "offer" | "babyNames" | "account" | "trees" | null;
 
 function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
   const t = UI[lang];
@@ -17,6 +19,11 @@ function Links({ lang, current }: { lang: Lang; current: NavPlace }) {
     ["compare", comparePagePath(lang), t.navCompare],
     ["how", howPath(lang), t.navHow],
     ["offer", offerPath(lang), t.navOffer],
+    // The baby-names page (TASK-143, D-045), only when it exists: its flag is on
+    // and accounts are on. The page itself asks a signed-out reader to sign in.
+    ...(babyNamesEnabled() && accountsEnabled()
+      ? ([["babyNames", BABY_NAMES_PATHS[lang], t.navBabyNames]] as const)
+      : []),
     // The tree's landing page, only when the family tree is on (TASK-076): the
     // pages themselves need a session, the landing says why.
     ...(familyTreeEnabled() ? ([["trees", treeLandingPath(lang), t.navTrees]] as const) : []),

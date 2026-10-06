@@ -93,7 +93,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     rankColumn: "Miejsce",
     lockedHeading: "Rok po roku od 2000",
     lockedTier: "Imiona dla dziecka",
-    lockedPrice: "5,99 zł",
+    lockedPrice: "8,99 zł",
     soon: "Wkrótce",
     lockedBody:
       "Liczba dzieci i miejsce na liście w każdym roku od 2000, osobno dla chłopców i dziewczynek.",
@@ -139,7 +139,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     rankColumn: "Place",
     lockedHeading: "Year by year since 2000",
     lockedTier: "Baby names",
-    lockedPrice: "5,99 zł",
+    lockedPrice: "8,99 zł",
     soon: "Coming soon",
     lockedBody:
       "The number of children and the place on the list in every year since 2000, for boys and girls separately.",

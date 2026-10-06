@@ -30,7 +30,7 @@ import { SiteShell } from "./site-shell.js";
  * (`readBirthNameFacts`): the latest year's count, rank and direction for
  * everyone, and every year since 2000 for an account holding a tier that
  * includes it (`BABY_NAMES_FULL_TIERS`). Nobody else is offered a way to pay:
- * the 5,99 zł tier is "Wkrótce", with no button (ADR-0023 §2.5).
+ * the 8,99 zł tier is "Wkrótce", with no button (ADR-0023 §2.5).
  *
  * A 404 unless `BABY_NAMES_ENABLED` is `1` and accounts are on; `noindex`;
  * `private, no-store` from the middleware.
@@ -328,6 +328,7 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
       lang={lang}
       otherPath={BABY_NAMES_PATHS[other]}
       world={{ mode: "quiet" }}
+      current="babyNames"
       mainClassName="baby-names"
     >
       <h1 className="page-title">{t.title}</h1>

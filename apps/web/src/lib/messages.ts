@@ -847,6 +847,8 @@ export const UI = {
     navHow: "Jak to działa",
     navOffer: "Oferta",
     navAccount: "Konto",
+    // Only when the baby-names page is on (TASK-143).
+    navBabyNames: "Imiona dla dziecka",
     // Only when the family tree is on (TASK-076).
     navTrees: "Drzewa",
     // The deck's last card, to the offer (TASK-057).
@@ -1572,6 +1574,7 @@ export const UI = {
     navHow: "How it works",
     navOffer: "Offer",
     navAccount: "Account",
+    navBabyNames: "Baby names",
     navTrees: "Trees",
     // The deck's last card, to the offer (TASK-057).
     deckOffer: "More: your family and DNA",
