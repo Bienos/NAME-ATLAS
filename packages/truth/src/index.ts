@@ -380,6 +380,7 @@ export {
   findBirthGivenName,
   readActiveBirthLists,
   readBirthNameFacts,
+  stockListOfSex,
 } from "./given-name-birth-facts.js";
 export type {
   BirthClaimRow,
