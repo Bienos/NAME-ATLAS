@@ -40,7 +40,15 @@ The answers, in the owner's words where they gave them:
 
 Nothing is built by this record.
 
-**Not decided:** the rule for "rising or falling"; one page with a search box, or a page per name (`PRODUCT.md` §8's non-goal 14 rules out thin pages generated at scale); second names and civil registry offices; the section's name and address.
+**Answered later the same day** (the owner accepted this session's three proposals: "go with your suggestions"):
+6. **Rising or falling:** the latest full year's count against the count five years earlier, on the same list (boys or girls). More than 10% higher is rising, more than 10% lower is falling, anything else is steady.
+   - Both years are from 2013 on, where the cut-off is 2. A name absent five years earlier but on the latest list is rising: its earlier count is below 2 and its latest at least 2.
+   - A name absent from the latest list has no free count, rank or direction; the page says it was given fewer than 2 times.
+   - Edge cases beyond these are for the claims task, which may not treat an absent count as zero.
+7. **One page or many:** one page with a search box, not a page per name (`PRODUCT.md` §8, non-goal 14).
+8. **The section's name:** "Imiona dla dziecka" in Polish and "Baby names" in English, the working names ADR-0037 §3 already uses.
+
+**Not decided:** second names and civil registry offices; the section's address.
 
 **Follow-ups, not decided here:** an ADR and task to import dataset 219, which also settle where its voivodeship and half-year files sit beside ADR-0032's tables; the yearly count and rank claims; the section's page; the 5,99 zł price in test-mode checkout (TASK-111) and its entitlement.
 
