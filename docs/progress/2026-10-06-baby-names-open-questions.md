@@ -15,7 +15,7 @@ Asked by the owner in a Claude Code session. Offered three proposals for the que
 
 ## Verification
 
-- `pnpm format:check`: exit 0, "All matched files use Prettier code style!". `pnpm check:ids`: exit 0, "check-unique-ids: every task, ADR, migration and decision number is used once". Both on `origin/main` @ `5103371` (#160) with this change.
+- `pnpm format:check`: exit 0, "All matched files use Prettier code style!". `pnpm check:ids`: exit 0, "check-unique-ids: every task, ADR, migration and decision number is used once". Both on `origin/main` @ `5103371` (#160) with this change, and again after merging `origin/main` @ `557451d` (#162, TASK-136) in.
 
 ## Not decided
 
