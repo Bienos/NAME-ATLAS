@@ -2,11 +2,13 @@ import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { legalPath } from "./legal-text.js";
 import { CONTACT_EMAIL } from "./contact.js";
+import { DIRECTORY_LINK } from "./directory-text.js";
 import {
   atlasPath,
   blogPath,
   comparePagePath,
   contactPath,
+  DIRECTORY_PATH,
   followLinks,
   homePath,
   howPath,
@@ -36,6 +38,8 @@ export function SiteFooter({ lang }: { readonly lang: Lang }) {
       links: [
         [atlasPath(lang), t.navAtlas],
         [comparePagePath(lang), t.navCompare],
+        // The surname directory is Polish only (TASK-129).
+        ...(lang === "pl" ? [[DIRECTORY_PATH, DIRECTORY_LINK] as const] : []),
         [howPath(lang), t.navHow],
         [offerPath(lang), t.navOffer],
       ],

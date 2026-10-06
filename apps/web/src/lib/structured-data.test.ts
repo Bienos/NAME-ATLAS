@@ -35,8 +35,10 @@ describe("surnamePageGraph", () => {
   it("is a WebPage and the BreadcrumbList of the visible crumbs", () => {
     const path = "/pl/nazwisko/%C5%82uczak";
     const crumbs = surnameCrumbs("ŁUCZAK", "pl", path);
+    // The Polish breadcrumb passes through the surname directory (TASK-129).
     expect(crumbs).toEqual([
       { name: "Name Atlas", path: "/" },
+      { name: "Nazwiska", path: "/pl/nazwiska" },
       { name: "Nazwisko ŁUCZAK", path },
     ]);
     const graph = surnamePageGraph({
@@ -58,18 +60,32 @@ describe("surnamePageGraph", () => {
       "@type": "BreadcrumbList",
       itemListElement: [
         { position: 1, name: "Name Atlas", item: `${ORIGIN}/` },
-        { position: 2, name: "Nazwisko ŁUCZAK", item: `${ORIGIN}${path}` },
+        { position: 2, name: "Nazwiska", item: `${ORIGIN}/pl/nazwiska` },
+        { position: 3, name: "Nazwisko ŁUCZAK", item: `${ORIGIN}${path}` },
       ],
     });
     // §76: a surname is not a person.
     expect(JSON.stringify(graph)).not.toContain('"Person"');
   });
 
-  it("starts the English breadcrumb at the English landing page", () => {
-    expect(surnameCrumbs("NOWAK", "en", "/en/surname/nowak")[0]).toEqual({
-      name: "Name Atlas",
-      path: "/?lang=en",
-    });
+  it("starts the English breadcrumb at the English landing page, with no directory step", () => {
+    expect(surnameCrumbs("NOWAK", "en", "/en/surname/nowak")).toEqual([
+      { name: "Name Atlas", path: "/?lang=en" },
+      { name: "Surname NOWAK", path: "/en/surname/nowak" },
+    ]);
+  });
+
+  it("names a directory page a CollectionPage when asked", () => {
+    const graph = surnamePageGraph({
+      origin: ORIGIN,
+      path: "/pl/nazwiska",
+      name: "Nazwiska od A do Ż",
+      description: "D",
+      lang: "pl",
+      crumbs: [{ name: "Name Atlas", path: "/" }],
+      type: "CollectionPage",
+    })["@graph"] as Record<string, unknown>[];
+    expect(graph[0]).toMatchObject({ "@type": "CollectionPage", url: `${ORIGIN}/pl/nazwiska` });
   });
 });
 

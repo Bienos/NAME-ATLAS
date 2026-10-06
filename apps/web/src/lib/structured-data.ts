@@ -76,6 +76,7 @@ export function surnamePageGraph({
   description,
   lang,
   crumbs,
+  type = "WebPage",
 }: {
   origin: string;
   path: string;
@@ -83,13 +84,15 @@ export function surnamePageGraph({
   description: string;
   lang: Lang;
   crumbs: readonly Crumb[];
+  /** A directory page is a `CollectionPage` (TASK-129). */
+  type?: "WebPage" | "CollectionPage";
 }): Record<string, unknown> {
   const url = `${origin}${path}`;
   return {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "WebPage",
+        "@type": type,
         "@id": `${url}#webpage`,
         url,
         name,
