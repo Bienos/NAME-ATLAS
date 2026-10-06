@@ -96,7 +96,7 @@ export const TOKENS = {
   "paper-accent": "#9a4f17",
   "paper-line": "#2a16102e",
 
-  // Brand System v1 foundations (TASK-147). These are additive during the
+  // Brand System v1 foundations (TASK-148). These are additive during the
   // migration: existing pages keep the legacy token names until a bounded
   // follow-up moves them onto the semantic layer in src/design-system.
   "atlas-plum-950": "#12040f",
