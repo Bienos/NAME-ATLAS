@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { EvolvedContourMark } from "../design-system/graphics/index.js";
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { legalPath } from "./legal-text.js";
@@ -70,14 +70,7 @@ export function SiteFooter({ lang }: { readonly lang: Lang }) {
       <div className="footer-grid">
         <div className="footer-brand">
           <a className="footer-wordmark" href={homePath(lang)} aria-label={t.title}>
-            <Image
-              className="footer-wordmark-mark"
-              src="/brand/logo/name-atlas-mark-dark.svg"
-              alt=""
-              width={46}
-              height={46}
-              aria-hidden="true"
-            />
+            <EvolvedContourMark className="footer-wordmark-mark" />
             <span>{t.title}</span>
           </a>
           <p className="footer-tagline">{t.tagline}</p>
