@@ -15,6 +15,7 @@ const LIST: BirthListInfo = {
   birth_year: 2025,
   sex: "FEMALE",
   publication_threshold: 2,
+  people_sum: 119788,
 };
 
 const row = (n: number, over: Partial<BirthListPageRowSql> = {}): BirthListPageRowSql => ({

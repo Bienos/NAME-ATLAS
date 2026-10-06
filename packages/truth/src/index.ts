@@ -377,6 +377,7 @@ export {
   BIRTH_HISTORY_FIRST_YEAR,
   BIRTH_NAME_MAX_LENGTH,
   BIRTH_SEXES,
+  birthShare,
   findBirthGivenName,
   readActiveBirthLists,
   readBirthNameFacts,

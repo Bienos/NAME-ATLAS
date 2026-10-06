@@ -253,7 +253,7 @@ const GIVEN_GAPS: Words = {
 };
 
 /** The language of origin a work states, by the code its file gives (TASK-147). */
-const ORIGINS: Words = {
+export const ORIGINS: Words = {
   he: { pl: "hebrajskie", en: "Hebrew" },
   arc: { pl: "aramejskie", en: "Aramaic" },
   grc: { pl: "greckie", en: "Greek" },
