@@ -38,13 +38,29 @@ describe("pageCount", () => {
     expect(pageCount(0)).toBe(0);
   });
 
-  it("splits at the protocol's 50,000 limit", () => {
-    expect(SITEMAP_PAGE_SIZE).toBe(50_000);
+  it("splits at 10,000 URLs, inside the protocol's 50,000 (TASK-128)", () => {
+    expect(SITEMAP_PAGE_SIZE).toBe(10_000);
+    expect(SITEMAP_PAGE_SIZE).toBeLessThanOrEqual(50_000);
     expect(pageCount(1)).toBe(1);
-    expect(pageCount(50_000)).toBe(1);
-    expect(pageCount(50_001)).toBe(2);
+    expect(pageCount(10_000)).toBe(1);
+    expect(pageCount(10_001)).toBe(2);
     // The register's size, which is why an index exists at all.
-    expect(pageCount(598_476)).toBe(12);
+    expect(pageCount(598_476)).toBe(60);
+  });
+
+  it("keeps a full file far below the 15.9 MB the CDN would not store (TASK-128)", () => {
+    // A long surname, percent-encoded in both locales' addresses, on every entry.
+    const slug = "szczepańska-wiśniewska-żółtkowska";
+    const entries = Array.from({ length: SITEMAP_PAGE_SIZE }, (_, i) => ({
+      surname_id: `01a0b9e3-34f3-7633-a239-${String(i).padStart(12, "0")}`,
+      slug,
+      display_name: "SZCZEPAŃSKA-WIŚNIEWSKA-ŻÓŁTKOWSKA",
+      last_modified: "2026-10-06T00:00:00Z",
+    }));
+    const xml = sitemapPageXml("https://name-atlas.pl", "pl", entries);
+    expect(xml.match(/<url>/gu)).toHaveLength(SITEMAP_PAGE_SIZE);
+    expect(xml).toContain("szczepa%C5%84ska");
+    expect(new TextEncoder().encode(xml).length).toBeLessThan(5_000_000);
   });
 });
 
