@@ -31,6 +31,8 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 3. **Brückner: yes.** His own entries for first names are transcribed from the page images (Wielkopolska Biblioteka Cyfrowa's copy, "domena publiczna"), never from the OCR, and quoted verbatim with the page.
 4. **Permission: yes.** A request is drafted for the owner to send: `docs/sources/given-name-permission-request.md`. It goes to Wydawnictwo Nomen Omen for Jan Grzenia's *Nasze imiona. 200 najczęściej nadawanych imion polskich w XX wieku* (2010). Nothing from that book is used unless written permission arrives.
 
+**Confirmed the same day:** another of the owner's sessions relayed the owner's words there, "go with your recommendations on D-046", which would have made answer 2 "English page only". Asked which should stand, the owner chose "Also translate to Polish" again, and chose to keep the drafted letter.
+
 **What it does not change:** D-043 otherwise; no Wiktionary, no paid licence. D-033: no count of people with both names.
 
 **Follow-ups, not decided here:** importing Buryan's chapter A, Brückner's name entries and Yonge's Polish index lines, and showing them in the full-name report's first-name chapter (a task); sending the letter (the owner).
