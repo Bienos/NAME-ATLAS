@@ -42,8 +42,9 @@ describe("checkout's gate (TASK-111)", () => {
 });
 
 describe("the tiers checkout sells", () => {
-  it("are ADR-0037's three sellable tiers at its prices, the 800 zł one not among them", () => {
+  it("are the 8,99 zł baby-names product and ADR-0037's three sellable tiers, the 800 zł one not among them", () => {
     expect(CHECKOUT_TIERS.map((t) => [t.key, t.amount])).toEqual([
+      ["babynames", 899],
       ["smaller", 2899],
       ["couple", 8999],
       ["family", 19900],
@@ -53,6 +54,8 @@ describe("the tiers checkout sells", () => {
   });
 
   it("writes prices as the offer page does", () => {
+    expect(formatPrice(899, "pl")).toBe("8,99 zł");
+    expect(formatPrice(899, "en")).toBe("PLN 8.99");
     expect(formatPrice(2899, "pl")).toBe("28,99 zł");
     expect(formatPrice(19900, "pl")).toBe("199 zł");
     expect(formatPrice(8999, "en")).toBe("PLN 89.99");

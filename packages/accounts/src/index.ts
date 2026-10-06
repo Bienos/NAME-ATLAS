@@ -30,7 +30,7 @@ export {
 export type { GoogleConfig, GoogleIdentity, GoogleProblem } from "./google.js";
 export { createAccountsDb } from "./schema.js";
 export type { AccountsDB, PurchaseTier } from "./schema.js";
-export { BABY_NAMES_FULL_TIERS, createPurchases } from "./purchases.js";
+export { BABY_NAMES_FULL_TIERS, createPurchases, TREE_UNLOCK_TIERS } from "./purchases.js";
 export type { PaidCheckout, Purchases, PurchaseView } from "./purchases.js";
 export {
   createAccounts,

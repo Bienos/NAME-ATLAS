@@ -56,7 +56,8 @@ export interface FamilyDeps {
   /**
    * Whether an account has a paid tier, which lifts the free tree's cap
    * (`FREE_TREE_PERSONS_MAX`). Defaults to `noPaidTier` (TASK-112); the web
-   * passes the accounts package's `hasPurchase` (TASK-114).
+   * passes `hasPurchaseOf(userId, TREE_UNLOCK_TIERS)` from the accounts
+   * package (TASK-114, TASK-144): the 8,99 zł baby-names product does not lift it.
    */
   readonly hasPaidTier?: (userId: string) => Promise<boolean>;
 }

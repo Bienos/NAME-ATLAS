@@ -33,6 +33,8 @@
    | "family review" | 199 zł | the tree unlock |
    | "genealogist research" | 800 zł | research by a partner genealogist with DNA analysis, paid to Name Atlas, "coming soon"; and the tree unlock |
 
+   **Key and status (TASK-144, 2026-10-06):** the "baby names" product's key is `babynames`; it is sold in test-mode checkout only, and the tree unlock checks `TREE_UNLOCK_TIERS` (the three tiers from 28,99 zł up), never "any purchase".
+
    **The tree unlock** is the same in every tier from 28,99 zł up: a tree of more than 5 people, and matches beyond second cousins. **Amended 2026-10-06 (D-044):** the "baby names" tier does not hold it, and every tier from 28,99 zł up also holds that tier's figures.
 
 2. **Only what is confirmed is shown.** What else the 28,99 zł and 199 zł tiers hold was drafted in the owner's 2026-10-01 chat and is not confirmed. The offer page lists the tree unlock for them and nothing more until the owner confirms more. A later ADR, or an amendment to this one, adds it. **Amended 2026-10-05 (D-043):** the owner confirmed the full-name report for the 28,99 zł tier. The offer page names it only once the report exists; until then it lists the tree unlock alone. Whether the higher tiers include the report is not decided.

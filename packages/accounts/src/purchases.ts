@@ -32,27 +32,33 @@ export interface Purchases {
   record(paid: PaidCheckout): Promise<boolean>;
   listForUser(userId: string): Promise<readonly PurchaseView[]>;
   /**
-   * Whether the account has any recorded purchase. Every sold tier unlocks the
-   * tree beyond 5 people (D-025, ADR-0037 §2.1), and a purchase is a one-time
-   * payment, so it never expires (TASK-114).
-   */
-  hasPurchase(userId: string): Promise<boolean>;
-  /**
-   * Whether the account has a recorded purchase of one of `tiers` (TASK-141):
-   * a product that holds only some tiers' contents checks the tier, never
-   * "any purchase".
+   * Whether the account has a recorded purchase of one of `tiers` (TASK-141,
+   * TASK-144). Every entitlement names its tiers, never "any purchase": the
+   * 8,99 zł baby-names product must not unlock the tree (D-044 §5). A purchase
+   * is a one-time payment, so it never expires.
    */
   hasPurchaseOf(userId: string, tiers: readonly PurchaseTier[]): Promise<boolean>;
 }
 
 /**
  * The tiers that hold the full figures of first names given to children
- * (D-044 §4, ADR-0037 §2.1): every tier from 28,99 zł up. The 800 zł tier holds
- * them too but has no `PurchaseTier` (it is not sold through checkout), and
- * the 8,99 zł "baby names" product (D-045) does not exist yet; when it does, it
- * joins this list.
+ * (D-044 §4, ADR-0037 §2.1): the 8,99 zł "baby names" product (D-045) and every
+ * tier from 28,99 zł up. The 800 zł tier holds them too but has no
+ * `PurchaseTier` (it is not sold through checkout).
  */
-export const BABY_NAMES_FULL_TIERS: readonly PurchaseTier[] = ["smaller", "couple", "family"];
+export const BABY_NAMES_FULL_TIERS: readonly PurchaseTier[] = [
+  "babynames",
+  "smaller",
+  "couple",
+  "family",
+];
+
+/**
+ * The tiers that lift the family tree's 5-person cap (D-025, ADR-0037 §2.1):
+ * every tier from 28,99 zł up. The 8,99 zł "baby names" product does not
+ * (D-044 §5).
+ */
+export const TREE_UNLOCK_TIERS: readonly PurchaseTier[] = ["smaller", "couple", "family"];
 
 export function createPurchases(deps: {
   readonly db: Kysely<AccountsDB>;
@@ -92,15 +98,6 @@ export function createPurchases(deps: {
         .orderBy("paid_at", "desc")
         .execute();
       return rows.map((r) => ({ tier: r.tier, amountTotal: r.amount_total, paidAt: r.paid_at }));
-    },
-    async hasPurchase(userId) {
-      const row = await deps.db
-        .selectFrom("purchases")
-        .select("purchase_id")
-        .where("user_id", "=", userId)
-        .limit(1)
-        .executeTakeFirst();
-      return row !== undefined;
     },
     async hasPurchaseOf(userId, tiers) {
       if (tiers.length === 0) return false;

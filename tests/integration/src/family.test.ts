@@ -6,7 +6,7 @@ import { sql } from "kysely";
 import { createMigrator, createPool } from "@name-atlas/db";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
-import { createAccountsDb, createPurchases } from "@name-atlas/accounts";
+import { createAccountsDb, createPurchases, TREE_UNLOCK_TIERS } from "@name-atlas/accounts";
 import { createFamily, createFamilyDb } from "@name-atlas/family";
 import type { Family } from "@name-atlas/family";
 
@@ -475,57 +475,66 @@ describe("family tree (TASK-066, ADR-0029)", () => {
     }
   });
 
-  it("lets an account with a recorded purchase add a 6th person, and one without not (TASK-114)", async () => {
+  it("lets a tree tier's purchase add a 6th person, and a baby-names purchase or none not (TASK-114, TASK-144)", async () => {
     // Wired as `apps/web/src/lib/family-runtime.ts` wires it: the purchases
     // store and the family service on one pool, logged in as `nameatlas_app`.
     const purchases = createPurchases({ db: createAccountsDb(app()) });
     const wired = createFamily({
       db: createFamilyDb(app()),
-      hasPaidTier: (userId) => purchases.hasPurchase(userId),
+      hasPaidTier: (userId) => purchases.hasPurchaseOf(userId, TREE_UNLOCK_TIERS),
     });
-    expect(
-      await purchases.record({
-        userId: OWNER,
-        tier: "smaller",
-        checkoutSessionId: "cs_test_tree_unlock",
-        amountTotal: 2899,
-        currency: "pln",
-        livemode: false,
-      }),
-    ).toBe(true);
+    const amounts = { babynames: 899, smaller: 2899, couple: 8999, family: 19900 } as const;
+    const cases = [
+      [null, "PERSON_LIMIT"],
+      ["babynames", "PERSON_LIMIT"],
+      ["smaller", "OK"],
+      ["couple", "OK"],
+      ["family", "OK"],
+    ] as const;
     const trees: string[] = [];
     try {
-      for (const [owner, expected] of [
-        [OWNER, "OK"],
-        [MEMBER, "PERSON_LIMIT"],
-      ] as const) {
-        const created = await wired.createTree({ userId: owner, title: "Paid tier fixture" });
+      for (const [tier, expected] of cases) {
+        // The other tests here expect OWNER to have no paid tier.
+        await sql`DELETE FROM accounts.purchases WHERE checkout_session_id LIKE 'cs_test_tree_unlock%'`.execute(
+          db().db,
+        );
+        if (tier !== null) {
+          expect(
+            await purchases.record({
+              userId: OWNER,
+              tier,
+              checkoutSessionId: `cs_test_tree_unlock_${tier}`,
+              amountTotal: amounts[tier],
+              currency: "pln",
+              livemode: false,
+            }),
+          ).toBe(true);
+        }
+        const created = await wired.createTree({ userId: OWNER, title: "Paid tier fixture" });
         if (created.kind !== "CREATED") throw new Error("fixture tree failed");
         trees.push(created.treeId);
         for (const givenNames of ["A", "B", "C", "D", "E"]) {
           const added = await wired.addPerson({
-            userId: owner,
+            userId: OWNER,
             treeId: created.treeId,
             person: { givenNames, surname: "Fixture", deathYear: 1900 },
           });
           expect(added.kind).toBe("OK");
         }
         const sixth = await wired.addPerson({
-          userId: owner,
+          userId: OWNER,
           treeId: created.treeId,
           person: { givenNames: "F", surname: "Fixture", deathYear: 1900 },
         });
-        expect(sixth.kind).toBe(expected);
+        expect(sixth.kind, String(tier)).toBe(expected);
         const count = await sql<{ n: number }>`
           SELECT count(*)::int AS n FROM family.persons WHERE tree_id = ${created.treeId}
         `.execute(db().db);
-        expect(count.rows[0]?.n).toBe(expected === "OK" ? 6 : 5);
+        expect(count.rows[0]?.n, String(tier)).toBe(expected === "OK" ? 6 : 5);
       }
     } finally {
-      for (const [i, treeId] of trees.entries())
-        await wired.deleteTree({ userId: i === 0 ? OWNER : MEMBER, treeId });
-      // The other tests here expect OWNER to have no paid tier.
-      await sql`DELETE FROM accounts.purchases WHERE checkout_session_id = 'cs_test_tree_unlock'`.execute(
+      for (const treeId of trees) await wired.deleteTree({ userId: OWNER, treeId });
+      await sql`DELETE FROM accounts.purchases WHERE checkout_session_id LIKE 'cs_test_tree_unlock%'`.execute(
         db().db,
       );
     }

@@ -8,6 +8,7 @@ import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import {
   BABY_NAMES_FULL_TIERS,
+  TREE_UNLOCK_TIERS,
   createAccounts,
   createAccountsDb,
   createPurchases,
@@ -1032,7 +1033,7 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       const purchases = createPurchases({ db: createAccountsDb(app()) });
       const none = await account("no.purchase@example.com");
       expect(await purchases.hasPurchaseOf(none, BABY_NAMES_FULL_TIERS)).toBe(false);
-      for (const tier of ["smaller", "couple", "family"] as const) {
+      for (const tier of ["babynames", "smaller", "couple", "family"] as const) {
         const userId = await account(`tier.${tier}@example.com`);
         await purchases.record({ ...paid(userId, `cs_test_tier_${tier}`), tier });
         expect(await purchases.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS), tier).toBe(true);
@@ -1040,6 +1041,10 @@ describe("accounts (TASK-061, ADR-0027)", () => {
         const others = BABY_NAMES_FULL_TIERS.filter((t) => t !== tier);
         expect(await purchases.hasPurchaseOf(userId, others), tier).toBe(false);
         expect(await purchases.hasPurchaseOf(userId, []), tier).toBe(false);
+        // The tree's cap is lifted by the three tiers from 28,99 zł up, not by `babynames` (D-044 §5).
+        expect(await purchases.hasPurchaseOf(userId, TREE_UNLOCK_TIERS), tier).toBe(
+          tier !== "babynames",
+        );
       }
       // One reader's purchase is never another's.
       expect(await purchases.hasPurchaseOf(none, BABY_NAMES_FULL_TIERS)).toBe(false);
@@ -1162,6 +1167,37 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
+    it("0042 allows the babynames tier, refuses an unknown one, and refuses to go down while one is stored (TASK-144)", async () => {
+      const migrator = createMigrator(db().db);
+      const refused = await migrator.migrateTo("0041_given_name_birth_claims");
+      expect(String(refused.error)).toMatch(/refusing to undo 0042/u);
+      expect(
+        await rows("SELECT 1 FROM accounts.purchases WHERE tier = 'babynames'"),
+      ).not.toHaveLength(0);
+
+      // Without a babynames purchase (deleted here only) it goes down, and the old check holds.
+      await db().pool.query("DELETE FROM accounts.purchases WHERE tier = 'babynames'");
+      const down = await migrator.migrateTo("0041_given_name_birth_claims");
+      expect(down.error).toBeUndefined();
+      const userId = await account("down.0042@example.com");
+      await expect(
+        db().pool.query(
+          `INSERT INTO accounts.purchases (purchase_id, user_id, tier, checkout_session_id, amount_total, currency, livemode, paid_at)
+           VALUES (gen_random_uuid(), $1, 'babynames', 'cs_test_down_0042', 899, 'pln', false, now())`,
+          [userId],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+      const up = await migrator.migrateToLatest();
+      expect(up.error).toBeUndefined();
+      await sql.raw(ROLES_SQL).execute(db().db);
+      await expect(
+        db().pool.query(
+          `INSERT INTO accounts.purchases (purchase_id, user_id, tier, checkout_session_id, amount_total, currency, livemode, paid_at)
+           VALUES (gen_random_uuid(), $1, 'unknown', 'cs_test_unknown_0042', 899, 'pln', false, now())`,
+          [userId],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+    });
     it("0036 refuses to go down while a purchase is stored (TASK-111)", async () => {
       const migrator = createMigrator(db().db);
       const refused = await migrator.migrateTo("0034_family_release_claims_on_account_deletion");
