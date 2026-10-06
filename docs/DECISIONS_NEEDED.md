@@ -8,6 +8,28 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-047 — RESOLVED as read in this session (2026-10-06): "the whole list" is a browsable, ranked list of a year's names; the top 10 of the latest year is free, everything else is the 8,99 zł view
+
+**Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Built by TASK-146. It answers the "Not decided" of D-045 and amends nothing else of D-044 or D-045.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-06, in a Claude Code session: the baby-names section should be reachable from the top panel (D-045 §1, done by TASK-143) "i potem cala lista dostepna za 8.99 PLN" ("and then the whole list available for 8.99 PLN"). D-045 read "cała lista" as the paid view D-044 already describes and left open whether it means a browsable list of all names for a year. The owner's request for this task says it does: parents choosing a name want to browse, not only to type one.
+
+What is decided, in this session's reading:
+
+1. **A list page.** One signed-in page per language, linked from the baby-names page: `/pl/imiona-dla-dziecka/lista` and `/en/baby-names/list`. A reader chooses a sex (boys and girls are separate lists, never merged or summed), a year of birth (2000–2025) and, for the latest year only, to see just rising or just falling names. It lists rank, name, number of children and, for the latest year, the direction; every name links to the single-name page. At most 100 rows a page.
+2. **Free and paid, the owner's rule applied to the list.** Free with an account is the basic view; the whole list and every year is the 8,99 zł product:
+   - **free, with an account:** the **top 10** of each sex's list for the **latest year**, with counts, ranks and directions;
+   - **8,99 zł, and every tier from 28,99 zł up** (the same entitlement, `BABY_NAMES_FULL_TIERS`, through `Purchases.hasPurchaseOf`): every name of the list, every year, the rising/falling filter and the pages.
+   A reader without it who asks for another year, a page beyond the free rows or the filter gets the locked card ("8,99 zł · Wkrótce", no button) and no data.
+3. **The way to change it:** the free rows are `BABY_NAMES_LIST_FREE_ROWS` in `apps/web/src/lib/baby-names-config.ts`: raise or lower it to change how many names of the latest list are free (the entitlement itself is `BABY_NAMES_FULL_TIERS`).
+4. **A second page beside D-044 §7's one page, and why that is consistent with `PRODUCT.md` §8 non-goal 14.** D-044 §7 chose "one page with a search box, not a page per name". The list is the second signed-in page of one section, not a page per name: two addresses per language, never one per name or per year, `noindex`, in no sitemap, so there are no thin pages at scale and nothing to be indexed. The single-name page stays the one page with a search box.
+
+**What it does not change:** the payment gates (ADR-0023 §2.5): there is no buy button, checkout link or "buy" call to action on either page; the product is test-mode checkout only (TASK-144). D-044 §5: the 8,99 zł purchase does not unlock the tree. ADR-0032 and ADR-0043: figures come from claims, boys and girls apart, a name below the cut-off is not on a list and is never 0.
+
+**Not decided:** the free cut: whether the top 10 is the right size (a smaller or larger free sample); whether the list should be sold on its own at another price; second names, voivodeships and half-years as lists.
+
+---
+
 ## D-046 — RESOLVED (2026-10-06): first-name meanings: Buryan's origins, Brückner's entries, Yonge's meanings in both languages, and a request for permission
 
 **Status:** RESOLVED. It amends D-043 §3 for one case only: a translation (see 2). Recorded in `docs/sources/given-name-meanings.md` §6.
@@ -56,7 +78,7 @@ What was decided, in this session's reading of those words (the owner may correc
 
 **Built (TASK-144, 2026-10-06):** the product's key is `babynames`, in test-mode checkout only; the tree cap is lifted by `TREE_UNLOCK_TIERS` (`smaller`, `couple`, `family`) alone, so a `babynames` purchase does not lift it. No buy button is on any public page.
 
-**Not decided:** whether "cała lista" ("the whole list") means more than D-044's paid view, for example a browsable list of all names for a year, ranked, with their direction. This record reads it as the paid view D-044 already describes, which is every name's figures; a list that can be browsed without typing a name is a new feature and needs its own answer.
+**Not decided:** whether "cała lista" ("the whole list") means more than D-044's paid view, for example a browsable list of all names for a year, ranked, with their direction. This record reads it as the paid view D-044 already describes, which is every name's figures; a list that can be browsed without typing a name is a new feature and needs its own answer. Answered by D-047 (2026-10-06), as this session's reading.
 
 ---
 

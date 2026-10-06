@@ -23,7 +23,12 @@ import type {
 } from "@name-atlas/truth";
 import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
-import { BABY_NAMES_FIELD, BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
+import {
+  BABY_NAMES_FIELD,
+  BABY_NAMES_LIST_PATHS,
+  BABY_NAMES_PATHS,
+  babyNamesEnabled,
+} from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { db } from "./db.js";
 import { formatDate, formatInteger } from "./messages.js";
@@ -171,7 +176,7 @@ export async function loadBabyNames(input: {
 // ---------------------------------------------------------------------------
 
 /** "Imiona nadawane dzieciom w Polsce, Ministerstwo Cyfryzacji, resource 1159538". */
-function Source({ citations, lang }: { citations: readonly CitationDto[]; lang: Lang }) {
+export function Source({ citations, lang }: { citations: readonly CitationDto[]; lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   return (
     <p className="baby-source note">
@@ -342,6 +347,7 @@ function Locked({ lang }: { lang: Lang }) {
     <section className="baby-locked" aria-labelledby="baby-locked-heading">
       <h2 id="baby-locked-heading">{t.lockedHeading}</h2>
       <p>{t.lockedBody}</p>
+      <p>{t.lockedListNote}</p>
       <p className="baby-tier">
         <span>{t.lockedTier}</span> <span>{t.lockedPrice}</span>{" "}
         <span className="baby-soon">{t.soon}</span>
@@ -519,6 +525,9 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
             />
             <button type="submit">{t.submit}</button>
           </form>
+          <p className="baby-list-link">
+            <a href={BABY_NAMES_LIST_PATHS[lang]}>{t.listLink}</a>
+          </p>
           <div className="baby-result" aria-live="polite">
             {data.result.kind === "INVALID" ? <p role="alert">{t.invalid}</p> : null}
             {data.result.kind === "NOT_FOUND" ? <p>{t.notFound(data.typed)}</p> : null}
@@ -553,7 +562,7 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
 let purchases: Purchases | undefined;
 
 /** The deps the running site uses: claims on the read pool, purchases on the accounts pool. */
-function runningDeps(pool: Parameters<typeof createAccountsDb>[0]): BabyNamesDeps {
+export function runningBabyNamesDeps(pool: Parameters<typeof createAccountsDb>[0]): BabyNamesDeps {
   purchases ??= createPurchases({ db: createAccountsDb(pool) });
   const store = purchases;
   return {
@@ -570,6 +579,19 @@ export function babyNamesMetadata(lang: Lang): Metadata {
   return babyNamesEnabled() ? BABY_NAMES_METADATA[lang] : {};
 }
 
+/** The signed-in account behind the session cookie, or null: no cookie, an expired one, a failed read. */
+export async function readBabyNamesSession(
+  accounts: NonNullable<ReturnType<typeof accountsRuntime>>,
+): Promise<{ userId: string } | null> {
+  const token = (await cookies()).get(sessionCookieName(accounts.secure))?.value;
+  try {
+    const found = token === undefined ? null : await accounts.accounts.sessionFromToken(token);
+    return found === null ? null : { userId: found.userId };
+  } catch {
+    return null;
+  }
+}
+
 /** The route's page: a 404 when off; reads the session cookie, loads, renders. */
 export async function BabyNamesRoute({
   lang,
@@ -582,14 +604,12 @@ export async function BabyNamesRoute({
   const accounts = accountsRuntime();
   if (accounts === null) notFound();
   const query = await searchParams;
-  let session: { userId: string } | null = null;
-  const token = (await cookies()).get(sessionCookieName(accounts.secure))?.value;
-  try {
-    const found = token === undefined ? null : await accounts.accounts.sessionFromToken(token);
-    if (found !== null) session = { userId: found.userId };
-  } catch {
-    session = null;
-  }
-  const data = await loadBabyNames({ lang, query, session, deps: runningDeps(accounts.pool) });
+  const session = await readBabyNamesSession(accounts);
+  const data = await loadBabyNames({
+    lang,
+    query,
+    session,
+    deps: runningBabyNamesDeps(accounts.pool),
+  });
   return <BabyNamesView data={data} />;
 }
