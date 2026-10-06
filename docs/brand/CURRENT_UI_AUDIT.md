@@ -338,7 +338,7 @@ Add a parallel Brand System v1 semantic layer first. Migrate page families in la
 
 ## 15. Deprecated after migration
 
-Do not delete these in TASK-147; mark them for later removal after all consumers move:
+Do not delete these in TASK-148; mark them for later removal after all consumers move:
 
 - `apps/web/assets/brand/name-print*.svg`
 - `apps/web/assets/brand/icon-512.png`
@@ -362,7 +362,7 @@ Do not delete these in TASK-147; mark them for later removal after all consumers
 
 ## 17. Recommended migration sequence
 
-1. **TASK-147 — foundation:** docs, tokens, assets, primitives, component foundation, brand lab, migration map.
+1. **TASK-148 — foundation:** docs, tokens, assets, primitives, component foundation, brand lab, migration map.
 2. **Shell migration:** body/surface/action semantic tokens, nav/footer, new Evolved Contour mark.
 3. **Homepage:** replace static scenic hero with reusable AtlasHero/topography system.
 4. **Surname result:** typography, section rhythm, evidence modules, map styling.
