@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { clientKey, evictExpired, rateLimit } from "./lib/rate-limit.js";
 import type { RateLimitStore } from "./lib/rate-limit.js";
 import { LONGEST_WINDOW_MS, policyFor } from "./lib/request-policy.js";
+import { BABY_NAMES_CACHE_CONTROL, isBabyNamesPath } from "./lib/baby-names-config.js";
 import { COUPLE_CACHE_CONTROL, isCouplePath } from "./lib/couple-config.js";
 import { isReportPath, REPORT_CACHE_CONTROL } from "./lib/report-config.js";
 
@@ -67,6 +68,8 @@ export function middleware(request: NextRequest): NextResponse {
   if (isCouplePath(pathname)) response.headers.set("cache-control", COUPLE_CACHE_CONTROL);
   // A report preview is an internal artifact: never kept by a browser or a cache (TASK-120).
   if (isReportPath(pathname)) response.headers.set("cache-control", REPORT_CACHE_CONTROL);
+  // The baby-names page is one signed-in reader's: never kept by a browser or a cache (TASK-141).
+  if (isBabyNamesPath(pathname)) response.headers.set("cache-control", BABY_NAMES_CACHE_CONTROL);
   return response;
 }
 
