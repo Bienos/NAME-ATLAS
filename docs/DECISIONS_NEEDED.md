@@ -8,6 +8,44 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-044 — RESOLVED (2026-10-06): first names given to children by year, for parents: signed-in only, a free basic view, the full numbers for 5,99 zł
+
+**Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-06, in a Claude Code session: a section where mothers and fathers can see how many children were given a first name in each year, to choose a more or a less common name.
+
+**The source** (read on 2026-10-06; nothing imported): dane.gov.pl dataset 219, "Imiona nadawane dzieciom w Polsce", from the PESEL register, published by the Ministry of Digital Affairs (institution 333), CC0 1.0, updated yearly. It holds 84 resources:
+- first names for 2000–2019 in one file (resource 21457; columns `Rok`, `Imię`, `Liczba`, `Płeć`; 24,461 rows);
+- for each year from 2019 to 2025, first and second names by sex, nationally and by voivodeship;
+- for 2024 and 2025, first names by civil registry office (USC);
+- half-year files, the latest for the first half of 2026 (resources 2474883 and 2474886, 2026-08-19).
+
+The dataset's note: names given fewer than 5 times were left off the lists up to 2012, and fewer than 2 times from 2013 ("Do roku 2012 imiona z liczbą wystąpień poniżej 5 nie były umieszczane na liście, od 2013 r. granicą tą jest liczba 2"). The 2000–2019 file agrees: its smallest count is 5 in every year to 2012 and 2 from 2013.
+
+The answers, in the owner's words where they gave them:
+
+1. **Who sees it:** signed-in readers only ("only for signed in").
+2. **Free and paid:** "there should be some accesible easy data but for more numbers it would cost 5.99pln to access". Then, by multiple choice:
+   - **free, with an account:** a name's count and rank in the latest full year, and whether it is rising or falling;
+   - **for 5,99 zł:** every year since 2000 with the rank in each, the voivodeships, the current year's half-year figures, and comparing names.
+3. **What 5,99 zł buys:** by multiple choice, every name, in one one-time payment.
+4. **The other paid tiers:** by multiple choice, every tier from 28,99 zł up (28,99, 89,99, 199 and 800 zł) includes it.
+5. **The tree:** by multiple choice, the 5,99 zł purchase does not unlock the tree. The tree unlock stays with the tiers from 28,99 zł up. This narrows D-025 §3's "any paid tier".
+
+**What it does not change:**
+- A name missing from a year means fewer than 5 (to 2012) or fewer than 2 (from 2013), never zero (`AGENTS.md` §10).
+- ADR-0032 still holds: two lists are never summed, a placeholder is never a name, and a doubtful form is not shown until reviewed.
+- The payment gates (ADR-0023 §2.5) still hold: the tier stays "Wkrótce" until it can lawfully be sold. Being signed-in only, the section also waits for accounts in production.
+- TASK-114's code lifts the tree cap for any recorded purchase. That is still true of every product checkout sells today (28,99, 89,99 and 199 zł). Before a 5,99 zł product exists, the entitlement must leave it out.
+
+Nothing is built by this record.
+
+**Not decided:** the rule for "rising or falling"; one page with a search box, or a page per name (`PRODUCT.md` §8's non-goal 14 rules out thin pages generated at scale); second names and civil registry offices; the section's name and address.
+
+**Follow-ups, not decided here:** an ADR and task to import dataset 219, which also settle where its voivodeship and half-year files sit beside ADR-0032's tables; the yearly count and rank claims; the section's page; the 5,99 zł price in test-mode checkout (TASK-111) and its entitlement.
+
+---
+
 ## D-043 — RESOLVED (2026-10-05): the full-name report: paid in the 28,99 zł tier, every listed name, meanings only from a free permission or the public domain
 
 **Status:** RESOLVED. Recorded in ADR-0037 (amended), ADR-0032 and `PRODUCT.md` §6.
