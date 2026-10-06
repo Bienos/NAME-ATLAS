@@ -6,5 +6,11 @@ import { mapTokens } from "../tokens/maps.js";
  */
 export const atlasMapTheme = {
   ...mapTokens,
-  bands: [mapTokens.low, mapTokens.mid, mapTokens.high, mapTokens.peak] as const,
+  bands: [
+    mapTokens.lowest,
+    mapTokens.low,
+    mapTokens.mid,
+    mapTokens.high,
+    mapTokens.peak,
+  ] as const,
 } as const;
