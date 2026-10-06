@@ -1,5 +1,7 @@
 import { cache } from "react";
 import type { Metadata } from "next";
+import { MissingDatabaseUrlError } from "@name-atlas/db";
+import { createLogger } from "@name-atlas/logging";
 import {
   DIRECTORY_PAGE_SIZE,
   directoryCount,
@@ -81,10 +83,38 @@ export interface LetterPage {
 // `cache`: the metadata and the page read the same rows once per render.
 const blockedProfiles = cache(() => seoBlockedProfileIds(db()));
 
-/** How long an instance keeps the letter list: as long as a rendered page is kept (`revalidate`). */
-export const LETTERS_TTL_MS = 21_600_000;
+/** How long an instance keeps what it read: as long as a rendered page is kept (`revalidate`). */
+export const KEPT_FOR_MS = 21_600_000;
 
-let kept: { readonly at: number; readonly value: Promise<readonly DirectoryLetter[]> } | undefined;
+interface Kept<T> {
+  readonly at: number;
+  readonly value: Promise<T>;
+}
+
+/**
+ * A read kept on the instance for `KEPT_FOR_MS`. The promise itself is kept,
+ * so renders that start together wait for the one query rather than each
+ * asking. A failed read is not kept: the next render asks again.
+ */
+function keep<T>(
+  store: Map<string, Kept<T>>,
+  key: string,
+  now: number,
+  read: () => Promise<T>,
+): Promise<T> {
+  const held = store.get(key);
+  if (held !== undefined && now - held.at < KEPT_FOR_MS) return held.value;
+  const value = read();
+  const entry = { at: now, value };
+  store.set(key, entry);
+  value.catch(() => {
+    if (store.get(key) === entry) store.delete(key);
+  });
+  return value;
+}
+
+const keptLetters = new Map<string, Kept<readonly DirectoryLetter[]>>();
+const keptCounts = new Map<string, Kept<number>>();
 
 /**
  * The letters that list a surname, read once per instance every 6 hours and
@@ -93,26 +123,31 @@ let kept: { readonly at: number; readonly value: Promise<readonly DirectoryLette
  * Every directory page draws the letters, and reading them is one of its
  * slowest queries: on production eight pages rendered at once shared an
  * instance's two connections, and one waited past the 30 s limit (TASK-132).
- * The promise itself is kept, so renders that start together wait for the one
- * query rather than each asking. A failed read is not kept: the next render
- * asks again.
  */
 export function loadDirectoryLetters(now = Date.now()): Promise<readonly DirectoryLetter[]> {
-  if (kept === undefined || now - kept.at >= LETTERS_TTL_MS) {
-    const value = blockedProfiles().then((ids) =>
-      directoryLetters(db(), "pl", { seoBlockedProfileIds: ids }),
-    );
-    kept = { at: now, value };
-    value.catch(() => {
-      if (kept?.value === value) kept = undefined;
-    });
-  }
-  return kept.value;
+  return keep(keptLetters, "pl", now, () =>
+    blockedProfiles().then((ids) => directoryLetters(db(), "pl", { seoBlockedProfileIds: ids })),
+  );
 }
 
-/** Test-only: forget the kept letter list. */
-export function forgetDirectoryLettersForTests(): void {
-  kept = undefined;
+/**
+ * How many surnames a letter lists, read once per instance every 6 hours
+ * (TASK-138). Every page of a letter counts the whole letter, so the build,
+ * which renders them all, read K's 27,925 surnames once for each of its 56
+ * pages without it.
+ */
+export function loadDirectoryCount(letter: DirectoryLetter, now = Date.now()): Promise<number> {
+  return keep(keptCounts, letter, now, () =>
+    blockedProfiles().then((ids) =>
+      directoryCount(db(), "pl", letter, { seoBlockedProfileIds: ids }),
+    ),
+  );
+}
+
+/** Test-only: forget what the instance has kept. */
+export function forgetDirectoryReadsForTests(): void {
+  keptLetters.clear();
+  keptCounts.clear();
 }
 
 /**
@@ -125,7 +160,7 @@ export const loadDirectoryLetter = cache(
   async (letter: DirectoryLetter, page: number): Promise<LetterPage> => {
     const options = { seoBlockedProfileIds: await blockedProfiles() };
     const letters = await loadDirectoryLetters();
-    const count = await directoryCount(db(), "pl", letter, options);
+    const count = await loadDirectoryCount(letter);
     const offset = (page - 1) * DIRECTORY_PAGE_SIZE;
     // A page past the last lists nothing, and is a 404 without asking.
     const entries =
@@ -139,6 +174,41 @@ export const loadDirectoryLetter = cache(
     return { letters, count, pages: Math.ceil(count / DIRECTORY_PAGE_SIZE), entries };
   },
 );
+
+/**
+ * Every directory address, for the build to render before the deployment goes
+ * live (TASK-138): the root, each letter, and each of its pages from 2.
+ *
+ * After a deployment every page used to be rendered on its first request, at
+ * 10 to 80 s on production when several came at once (TASK-132, TASK-134), so
+ * the build renders them all and a deployment starts with the directory kept.
+ * Next then keeps each one fresh as before (`revalidate`).
+ *
+ * Without a database, as in CI, or when reading the list fails, it names none
+ * and every page is rendered on its first request, as before. A page that
+ * fails while the build renders it fails that build, as any page would, and
+ * the deployment before it stays live.
+ */
+export async function directoryStaticPaths(): Promise<string[][]> {
+  try {
+    const paths: string[][] = [[]];
+    for (const letter of await loadDirectoryLetters()) {
+      const pages = Math.ceil((await loadDirectoryCount(letter)) / DIRECTORY_PAGE_SIZE);
+      for (let page = 1; page <= pages; page += 1) {
+        paths.push(page === 1 ? [letter] : [letter, String(page)]);
+      }
+    }
+    return paths;
+  } catch (error) {
+    if (!(error instanceof MissingDatabaseUrlError)) {
+      createLogger({ service: "web", base: { route: DIRECTORY_PATH } }).warn(
+        "directory_prerender_skipped",
+        { reason: error instanceof Error ? error.name : "unknown" },
+      );
+    }
+    return [];
+  }
+}
 
 /** A directory page's own canonical, and `index` only when indexing is on and it lists something. */
 function directoryPageMetadata(

@@ -7,14 +7,18 @@ import {
   DirectoryLetterView,
   directoryMetadata,
   DirectoryRootView,
-  forgetDirectoryLettersForTests,
-  LETTERS_TTL_MS,
+  directoryStaticPaths,
+  forgetDirectoryReadsForTests,
+  KEPT_FOR_MS,
+  loadDirectoryCount,
   loadDirectoryLetter,
   loadDirectoryLetters,
   parseDirectoryPath,
 } from "./directory-page.js";
 import type { LetterPage } from "./directory-page.js";
 import { SiteFooter } from "./site-footer.js";
+import { db } from "./db.js";
+import { MissingDatabaseUrlError } from "@name-atlas/db";
 
 /** TASK-129: the alphabetical surname directory. */
 
@@ -33,7 +37,7 @@ vi.mock("@name-atlas/seo", async (importOriginal) => ({
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.clearAllMocks();
-  forgetDirectoryLettersForTests();
+  forgetDirectoryReadsForTests();
 });
 
 describe("parseDirectoryPath", () => {
@@ -88,11 +92,11 @@ describe("loadDirectoryLetters (TASK-134)", () => {
   it("reads them again once they are as old as a kept page", async () => {
     const start = Date.now();
     await loadDirectoryLetters(start);
-    await loadDirectoryLetters(start + LETTERS_TTL_MS - 1);
+    await loadDirectoryLetters(start + KEPT_FOR_MS - 1);
     expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(1);
-    await loadDirectoryLetters(start + LETTERS_TTL_MS);
+    await loadDirectoryLetters(start + KEPT_FOR_MS);
     expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(2);
-    expect(LETTERS_TTL_MS).toBe(21_600_000);
+    expect(KEPT_FOR_MS).toBe(21_600_000);
   });
 
   it("does not keep a failed read: the next render asks again", async () => {
@@ -108,6 +112,57 @@ describe("loadDirectoryLetters (TASK-134)", () => {
     await directoryMetadata({ kind: "ROOT" });
     expect(vi.mocked(directoryLetters)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("loadDirectoryCount and the build's addresses (TASK-138)", () => {
+  it("counts a letter once for all its pages", async () => {
+    await loadDirectoryLetter("k", 1);
+    await loadDirectoryLetter("k", 2);
+    await loadDirectoryLetter("k", 3);
+    expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(1);
+    expect(await loadDirectoryCount("k")).toBe(1201);
+    expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(1);
+  });
+
+  it("names the root, every letter and every page from 2 for the build", async () => {
+    // Three letters of 1,201 surnames each: three pages each.
+    expect(await directoryStaticPaths()).toEqual([
+      [],
+      ["k"],
+      ["k", "2"],
+      ["k", "3"],
+      ["ł"],
+      ["ł", "2"],
+      ["ł", "3"],
+      ["inne"],
+      ["inne", "2"],
+      ["inne", "3"],
+    ]);
+    // One count per letter, and the build's pages then count nothing again.
+    expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(3);
+    await loadDirectoryLetter("ł", 2);
+    expect(vi.mocked(directoryCount)).toHaveBeenCalledTimes(3);
+  });
+
+  it("names none, silently, when the build has no database", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.mocked(db).mockImplementationOnce(() => {
+      throw new MissingDatabaseUrlError();
+    });
+    expect(await directoryStaticPaths()).toEqual([]);
+    expect(log).not.toHaveBeenCalled();
+    log.mockRestore();
+  });
+
+  it("names none, and says so, when reading the list fails", async () => {
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    vi.mocked(directoryLetters).mockRejectedValueOnce(new Error("Connection terminated"));
+    expect(await directoryStaticPaths()).toEqual([]);
+    expect(log.mock.calls.map(([line]) => String(line)).join("\n")).toContain(
+      '"event":"directory_prerender_skipped"',
+    );
+    log.mockRestore();
   });
 });
 
@@ -180,7 +235,7 @@ describe("directoryMetadata", () => {
     });
     vi.stubEnv("SEO_INDEXING_ENABLED", "true");
     // A fresh instance, whose first read finds no letters.
-    forgetDirectoryLettersForTests();
+    forgetDirectoryReadsForTests();
     vi.mocked(directoryLetters).mockResolvedValueOnce([]);
     expect((await directoryMetadata({ kind: "ROOT" })).robots).toEqual({
       index: false,
