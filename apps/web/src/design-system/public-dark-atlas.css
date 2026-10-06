@@ -133,13 +133,12 @@ body.dusk.atlas-v1 .dusk-horizon {
 }
 
 body.dusk.atlas-v1 .dusk-horizon::after {
-  background:
-    repeating-radial-gradient(
-      ellipse at 58% 56%,
-      transparent 0 17px,
-      color-mix(in srgb, var(--atlas-amber-400) 18%, transparent) 18px 19px,
-      transparent 20px 34px
-    );
+  background: repeating-radial-gradient(
+    ellipse at 58% 56%,
+    transparent 0 17px,
+    color-mix(in srgb, var(--atlas-amber-400) 18%, transparent) 18px 19px,
+    transparent 20px 34px
+  );
   mask-image: linear-gradient(180deg, transparent 2%, black 30%, black 82%, transparent);
   opacity: 0.7;
 }
@@ -153,21 +152,58 @@ body.dusk.atlas-v1 .dusk-terrain {
 body.dusk.atlas-v1 .dusk-terrain-far {
   height: 58%;
   background: color-mix(in srgb, var(--atlas-dusk-500) 52%, var(--atlas-plum-700));
-  clip-path: polygon(0 100%, 0 78%, 14% 69%, 27% 76%, 42% 48%, 51% 58%, 66% 32%, 78% 52%, 92% 35%, 100% 42%, 100% 100%);
+  clip-path: polygon(
+    0 100%,
+    0 78%,
+    14% 69%,
+    27% 76%,
+    42% 48%,
+    51% 58%,
+    66% 32%,
+    78% 52%,
+    92% 35%,
+    100% 42%,
+    100% 100%
+  );
   opacity: 0.42;
 }
 
 body.dusk.atlas-v1 .dusk-terrain-mid {
   height: 52%;
   background: color-mix(in srgb, var(--atlas-plum-700) 82%, var(--atlas-amber-700));
-  clip-path: polygon(0 100%, 0 88%, 12% 71%, 26% 80%, 39% 52%, 53% 68%, 65% 29%, 75% 42%, 87% 62%, 100% 48%, 100% 100%);
+  clip-path: polygon(
+    0 100%,
+    0 88%,
+    12% 71%,
+    26% 80%,
+    39% 52%,
+    53% 68%,
+    65% 29%,
+    75% 42%,
+    87% 62%,
+    100% 48%,
+    100% 100%
+  );
   opacity: 0.84;
 }
 
 body.dusk.atlas-v1 .dusk-terrain-near {
   height: 45%;
   background: var(--atlas-plum-950);
-  clip-path: polygon(0 100%, 0 90%, 11% 84%, 20% 94%, 33% 64%, 46% 74%, 56% 55%, 66% 70%, 77% 46%, 88% 67%, 100% 58%, 100% 100%);
+  clip-path: polygon(
+    0 100%,
+    0 90%,
+    11% 84%,
+    20% 94%,
+    33% 64%,
+    46% 74%,
+    56% 55%,
+    66% 70%,
+    77% 46%,
+    88% 67%,
+    100% 58%,
+    100% 100%
+  );
 }
 
 body.dusk.atlas-v1 .dusk-terrain-point {
@@ -256,18 +292,14 @@ body.dusk.atlas-v1 .landing-stage {
   isolation: isolate;
   min-height: min(82svh, 860px);
   margin-top: 10px;
-  padding:
-    clamp(42px, 8vh, 90px)
-    clamp(22px, 5vw, 66px)
-    clamp(28px, 5vh, 52px);
+  padding: clamp(42px, 8vh, 90px) clamp(22px, 5vw, 66px) clamp(28px, 5vh, 52px);
   overflow: hidden;
-  background:
-    linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--atlas-plum-950) 82%, transparent) 0%,
-      color-mix(in srgb, var(--atlas-plum-850) 62%, transparent) 54%,
-      transparent 100%
-    );
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--atlas-plum-950) 82%, transparent) 0%,
+    color-mix(in srgb, var(--atlas-plum-850) 62%, transparent) 54%,
+    transparent 100%
+  );
   border: 1px solid color-mix(in srgb, var(--color-border-default) 58%, transparent);
   border-radius: 22px;
   box-shadow: var(--atlas-shadow-soft);
@@ -351,13 +383,12 @@ body.dusk.atlas-v1 .landing-trust {
 }
 
 body.dusk.atlas-v1 .landing-atlas {
-  background:
-    linear-gradient(
-      180deg,
-      transparent,
-      color-mix(in srgb, var(--atlas-plum-900) 78%, transparent) 18rem,
-      var(--atlas-plum-900) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--atlas-plum-900) 78%, transparent) 18rem,
+    var(--atlas-plum-900) 100%
+  );
 }
 
 body.dusk.atlas-v1 .landing-atlas section,
@@ -493,34 +524,36 @@ body.dusk.atlas-v1 .again a:hover {
 }
 
 /* Surfaces: dark regions, not a wall of cards. */
-body.dusk.atlas-v1 :is(
-  .offer-card,
-  .account-card,
-  .tree-card,
-  .compare-card,
-  .directory-card,
-  .report-card,
-  .studio-panel,
-  .deck-card,
-  .landing-card
-) {
+body.dusk.atlas-v1
+  :is(
+    .offer-card,
+    .account-card,
+    .tree-card,
+    .compare-card,
+    .directory-card,
+    .report-card,
+    .studio-panel,
+    .deck-card,
+    .landing-card
+  ) {
   color: var(--color-text-primary);
   background: color-mix(in srgb, var(--color-surface-primary) 86%, transparent);
   border-color: var(--color-border-subtle);
   box-shadow: none;
 }
 
-body.dusk.atlas-v1 :is(
-  .offer-card,
-  .account-card,
-  .tree-card,
-  .compare-card,
-  .directory-card,
-  .report-card,
-  .studio-panel,
-  .deck-card,
-  .landing-card
-):hover {
+body.dusk.atlas-v1
+  :is(
+    .offer-card,
+    .account-card,
+    .tree-card,
+    .compare-card,
+    .directory-card,
+    .report-card,
+    .studio-panel,
+    .deck-card,
+    .landing-card
+  ):hover {
   border-color: color-mix(in srgb, var(--atlas-blue-300) 46%, var(--color-border-subtle));
 }
 
@@ -676,7 +709,6 @@ body.dusk.atlas-v1 .footer-top:hover {
   }
 }
 
-
 /* Product-wide action/state cleanup: old dusk used amber for almost every
    interactive state. Brand System v1 reserves amber for history/geography and
    uses Atlas Blue for action, focus, selection and discovery. */
@@ -692,7 +724,8 @@ body.dusk.atlas-v1 a.deck-nav.deck-finish {
   border-color: var(--color-accent-primary);
 }
 
-body.dusk.atlas-v1 :is(
+body.dusk.atlas-v1
+  :is(
     .directory-pages [aria-current],
     .tree-seg a[aria-current="page"],
     .contact-chip input:checked + span,
@@ -705,7 +738,8 @@ body.dusk.atlas-v1 :is(
   border-color: var(--color-accent-hover);
 }
 
-body.dusk.atlas-v1 :is(
+body.dusk.atlas-v1
+  :is(
     .offer-form,
     .account-google,
     .blog-card,
