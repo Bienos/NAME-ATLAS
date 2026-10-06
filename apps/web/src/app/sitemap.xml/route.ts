@@ -16,7 +16,7 @@ import { blogPosts } from "../../lib/blog-posts.js";
  *
  * Empty while `SEO_INDEXING_ENABLED` is unset: an empty sitemap index is valid
  * XML and an honest statement that nothing has been cleared for indexing. With
- * the flag on, it names one page per 50,000 surnames that `@name-atlas/seo`'s
+ * the flag on, it names one page per 10,000 surnames that `@name-atlas/seo`'s
  * query lists (only pages that serve `index`, TASK-126) and the blog's sitemap.
  */
 

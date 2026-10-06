@@ -6,7 +6,8 @@ import { CACHED_SITEMAP_HEADERS, sitemapPageXml } from "../../../lib/sitemap-xml
 import { seoBlockedProfileIds } from "../../../lib/seo-surface.js";
 
 /**
- * `/sitemap/{n}.xml` — one page of at most 50,000 URLs (TASK-027, ADR-0010 §3).
+ * `/sitemap/{n}.xml` — one page of at most `SITEMAP_PAGE_SIZE` (10,000) URLs
+ * (TASK-027, ADR-0010 §3; TASK-128).
  *
  * The page number is 1-based, matching what the index emits. Anything else is a
  * 404 rather than an empty sitemap: a crawler asking for page 9,000 should be

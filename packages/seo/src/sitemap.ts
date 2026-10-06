@@ -34,8 +34,16 @@ export interface SitemapEntry {
   readonly last_modified: string;
 }
 
-/** Largest number of URLs in one sitemap file. The sitemap protocol's limit. */
-export const SITEMAP_PAGE_SIZE = 50_000;
+/**
+ * Largest number of URLs in one sitemap file.
+ *
+ * The sitemap protocol allows 50,000. At that size a file was 15.9 MB, and
+ * Vercel's CDN never stored it (every fetch a `MISS`, TASK-127's merged PR),
+ * while the 533-byte index, served the same way, was a `HIT`. A size limit
+ * on what the CDN caches is the likely reason; Vercel does not document it.
+ * 10,000 URLs make a file of about 3.2 MB (TASK-128).
+ */
+export const SITEMAP_PAGE_SIZE = 10_000;
 
 /**
  * The rights gate's input: the rights profiles whose own terms block the SEO

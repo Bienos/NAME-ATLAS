@@ -29,7 +29,8 @@ export function pageCount(total: number): number {
 
 /**
  * The sitemap index. 598,476 surnames cannot be one sitemap — the protocol caps
- * a file at 50,000 URLs — so the root document names the pages.
+ * a file at 50,000 URLs, and this site at 10,000 so the CDN can store each one
+ * (`SITEMAP_PAGE_SIZE`, TASK-128) — so the root document names the pages.
  *
  * An index with no pages is valid and is what an alpha correctly serves.
  *
