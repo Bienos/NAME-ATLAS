@@ -15,7 +15,7 @@ import { deriveCurrentPopulation, querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import { backfillSlugs, sitemapCount, sitemapEntries, SITEMAP_PAGE_SIZE } from "@name-atlas/seo";
 import { assessIndexability } from "../../../apps/web/src/lib/seo.js";
-import { seoGatesFor } from "../../../apps/web/src/lib/seo-surface.js";
+import { seoBlockedProfileIds, seoGatesFor } from "../../../apps/web/src/lib/seo-surface.js";
 
 /**
  * TASK-027 AC-9/AC-10 — the sitemap and the page must agree.
@@ -122,7 +122,11 @@ describe("the sitemap lists exactly what the page says is indexable", () => {
 
   it("never lists a surname the page would serve as noindex", async () => {
     const assessments = await assessEach();
-    const listed = await sitemapEntries(db(), "pl", { limit: SITEMAP_PAGE_SIZE, offset: 0 });
+    const listed = await sitemapEntries(db(), "pl", {
+      limit: SITEMAP_PAGE_SIZE,
+      offset: 0,
+      seoBlockedProfileIds: await seoBlockedProfileIds(db()),
+    });
     const disagreements = listed
       .map((entry) => ({ entry, assessed: assessments.get(entry.surname_id) }))
       .filter((x) => x.assessed?.indexability !== "INDEX")
@@ -135,9 +139,13 @@ describe("the sitemap lists exactly what the page says is indexable", () => {
   it("never omits a surname the page would serve as index", async () => {
     const assessments = await assessEach();
     const listed = new Set(
-      (await sitemapEntries(db(), "pl", { limit: SITEMAP_PAGE_SIZE, offset: 0 })).map(
-        (e) => e.surname_id,
-      ),
+      (
+        await sitemapEntries(db(), "pl", {
+          limit: SITEMAP_PAGE_SIZE,
+          offset: 0,
+          seoBlockedProfileIds: await seoBlockedProfileIds(db()),
+        })
+      ).map((e) => e.surname_id),
     );
     const missing = [...assessments.entries()]
       .filter(([id, a]) => a.indexability === "INDEX" && !listed.has(id))
@@ -170,7 +178,10 @@ describe("the sitemap lists exactly what the page says is indexable", () => {
     expect(assessments.size).toBeGreaterThan(10);
     const reasons = new Set([...assessments.values()].map((a) => a.reason_code));
     expect([...reasons]).toEqual(["SINGLE_VALUE_FAMILY"]);
-    expect(await sitemapCount(db(), "pl")).toBe(0);
-    expect(await sitemapEntries(db(), "pl", { limit: 10, offset: 0 })).toEqual([]);
+    const seoBlocked = await seoBlockedProfileIds(db());
+    expect(await sitemapCount(db(), "pl", { seoBlockedProfileIds: seoBlocked })).toBe(0);
+    expect(
+      await sitemapEntries(db(), "pl", { limit: 10, offset: 0, seoBlockedProfileIds: seoBlocked }),
+    ).toEqual([]);
   });
 });

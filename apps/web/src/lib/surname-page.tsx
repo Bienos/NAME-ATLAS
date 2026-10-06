@@ -19,7 +19,9 @@ import { ShareButton } from "./share-button.js";
 import { ReportLink } from "./report-link.js";
 import { SiteShell } from "./site-shell.js";
 import { SUMMARY_ANCHOR } from "./sections.js";
-import { comparePagePath } from "./site-links.js";
+import { comparePagePath, DIRECTORY_PATH } from "./site-links.js";
+import { Breadcrumbs } from "./breadcrumbs.js";
+import { DIRECTORY_NAME } from "./directory-text.js";
 import { EMPTY_WORLD, worldInput } from "./dusk-world-input.js";
 import { deckCards, deckFinish } from "./deck.js";
 import { SurnameDeck } from "./deck-client.js";
@@ -295,33 +297,20 @@ export function metadataFor(answer: PageAnswer, lang: Lang, slug: string): Metad
 
 /**
  * The visible breadcrumb (`docs/canonical/21` §62, §73), and so the JSON-LD's.
- * Two steps until a surname directory exists to stand between them.
+ * In Polish the surname directory stands between the site and the surname
+ * (TASK-129); the English pages have no directory (§20), so two steps there.
  */
 export function surnameCrumbs(display: string, lang: Lang, path: string): readonly Crumb[] {
-  return [
-    { name: "Name Atlas", path: lang === "en" ? "/?lang=en" : "/" },
-    { name: surnameHeading(display, lang), path },
-  ];
-}
-
-function Breadcrumbs({ crumbs, lang }: { crumbs: readonly Crumb[]; lang: Lang }) {
-  return (
-    <nav className="breadcrumbs" aria-label={UI[lang].breadcrumbLabel}>
-      <ol>
-        {crumbs.map((crumb, index) =>
-          index === crumbs.length - 1 ? (
-            <li key={crumb.path} aria-current="page">
-              {crumb.name}
-            </li>
-          ) : (
-            <li key={crumb.path}>
-              <a href={crumb.path}>{crumb.name}</a>
-            </li>
-          ),
-        )}
-      </ol>
-    </nav>
-  );
+  return lang === "en"
+    ? [
+        { name: "Name Atlas", path: "/?lang=en" },
+        { name: surnameHeading(display, lang), path },
+      ]
+    : [
+        { name: "Name Atlas", path: "/" },
+        { name: DIRECTORY_NAME, path: DIRECTORY_PATH },
+        { name: surnameHeading(display, lang), path },
+      ];
 }
 
 export function CanonicalSurnamePage({

@@ -176,7 +176,7 @@ describe("TASK-123: the surname page's breadcrumb and JSON-LD", () => {
     vi.stubEnv("SITE_ORIGIN", "https://a.test");
     const html = render();
     expect(html).toMatch(
-      /<nav class="breadcrumbs" aria-label="Ścieżka nawigacyjna"><ol><li><a href="\/">Name Atlas<\/a><\/li><li aria-current="page">Nazwisko NOWAK<\/li><\/ol><\/nav>/u,
+      /<nav class="breadcrumbs" aria-label="Ścieżka nawigacyjna"><ol><li><a href="\/">Name Atlas<\/a><\/li><li><a href="\/pl\/nazwiska">Nazwiska<\/a><\/li><li aria-current="page">Nazwisko NOWAK<\/li><\/ol><\/nav>/u,
     );
     const scripts = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gu)];
     expect(scripts).toHaveLength(1);
@@ -185,9 +185,10 @@ describe("TASK-123: the surname page's breadcrumb and JSON-LD", () => {
     )["@graph"];
     expect(graph[1]?.itemListElement).toEqual([
       { "@type": "ListItem", position: 1, name: "Name Atlas", item: "https://a.test/" },
+      { "@type": "ListItem", position: 2, name: "Nazwiska", item: "https://a.test/pl/nazwiska" },
       {
         "@type": "ListItem",
-        position: 2,
+        position: 3,
         name: "Nazwisko NOWAK",
         item: "https://a.test/pl/nazwisko/nowak",
       },
