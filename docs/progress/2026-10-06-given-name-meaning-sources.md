@@ -5,7 +5,7 @@ The owner asked to "start the first-name meaning source search", after TASK-124 
 ## What changed
 
 - `docs/sources/given-name-meanings.md` (new): the candidates, their rights basis, their coverage of the 2026-01-20 lists, and the modern dictionaries that need permission.
-- `docs/DECISIONS_NEEDED.md`: D-046, with four questions and a recommendation.
+- `docs/DECISIONS_NEEDED.md`: D-046, raised with four questions and a recommendation, then resolved with the owner's answers (below).
 - `docs/CODEMAP.md`: one row. `STATUS.md`: the full-name report line and "Last rewritten".
 
 ## What was done (commands and results)
@@ -33,6 +33,14 @@ Brückner's figures are upper bounds: the automatic head-of-line match also catc
 A first guess at a "Słownik etymologiczny imion" by Maria Malec was not confirmed and is not listed.
 
 `pnpm format:check`: exit 0. `pnpm check:ids`: exit 0, "every task, ADR, migration and decision number is used once".
+
+## The owner's answers (D-046), the same day
+
+The owner answered D-046's four questions in this session. They chose the recommendation on 1, 3 and 4, and "also translate to Polish" on 2. The changes:
+- D-046 is rewritten as RESOLVED, and `given-name-meanings.md` §6 records the decision.
+- `docs/sources/given-name-permission-request.md` (new) holds the drafted request to Wydawnictwo Nomen Omen, in Polish.
+
+The publisher's address was not found online, so the draft says where to take it from. The letter is not sent: sending is the owner's act.
 
 ## Not verified
 

@@ -8,37 +8,32 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
-## D-046 — first-name meanings: which of the sources D-043 allows to use
+## D-046 — RESOLVED (2026-10-06): first-name meanings: Buryan's origins, Brückner's entries, Yonge's meanings in both languages, and a request for permission
 
-**Status:** NON-BLOCKING NOW (the full-name report shows no meaning until this is decided). **Owner:** project owner. **Raised by:** the search of 2026-10-06, `docs/sources/given-name-meanings.md`, which D-043 asked for.
+**Status:** RESOLVED. It amends D-043 §3 for one case only: a translation (see 2). Recorded in `docs/sources/given-name-meanings.md` §6.
+**Owner:** project owner.
+**Raised by:** the search of 2026-10-06, `docs/sources/given-name-meanings.md`, which D-043 asked for. The owner answered the four questions the same day in a Claude Code session.
 
 **Facts** (measured on the 2026-01-20 lists, shares of people):
 - No public-domain Polish dictionary of first names was found.
 - Three public-domain works cover part of the lists:
-  - **Buryan 1933**, already cleared for surnames: the language of origin of about 120 names, and a meaning for a few. Men 35.3%, women 24.7%.
-  - **Brückner 1927**: its own entries for some names, sometimes with a meaning. At most men 15.9% and women 4.0%; the OCR is unusable, so entries must be transcribed from page images.
-  - **Yonge 1884**: a meaning, **in English**, for about 100 Polish forms. Men 25.7%, women 10.0%.
-- All three together reach men 48.1% and women 33.5%, and nothing for Krzysztof, Łukasz, Marek, Mariusz, Dariusz, Joanna, Aleksandra, Krystyna, Monika, Natalia, Julia, Teresa, Karolina or Danuta.
-- Full coverage needs a modern dictionary, and so a publisher's free permission (D-043).
+  - **Buryan 1933**: origins. Men 35.3%, women 24.7%.
+  - **Brückner 1927**: some entries. At most men 15.9% and women 4.0%.
+  - **Yonge 1884**: meanings in English. Men 25.7%, women 10.0%.
+- Together they reach men 48.1% and women 33.5%.
 
-**Questions:**
-1. **Buryan's origin.** May the report show a name's language of origin from Buryan ("imię pochodzenia hebrajskiego", with the page), where it has no meaning? D-043 speaks of meanings; an origin is a narrower sourced fact.
-2. **Yonge in English.** Use his meanings:
-   - (a) on the English page only, verbatim;
-   - (b) also translated into Polish, marked as the project's translation;
-   - (c) not at all.
+**The answers:**
+1. **Buryan's origin: yes.** Where no meaning exists, the report may show a name's language of origin as Buryan 1933 states it, quoted, with the page.
+2. **Yonge: also translated into Polish.** Offered "English page only", "also translated into Polish" or "not at all", the owner chose the translation. Yonge's meaning is quoted verbatim on the English page, and on the Polish page it is shown translated.
+   - The translation is a literal rendering of his words only, marked as Name Atlas's translation, beside the original and the citation.
+   - It adds nothing Yonge does not say.
+   - This is the one exception to D-043's "nothing written by the project". No meaning is still guessed or composed.
+3. **Brückner: yes.** His own entries for first names are transcribed from the page images (Wielkopolska Biblioteka Cyfrowa's copy, "domena publiczna"), never from the OCR, and quoted verbatim with the page.
+4. **Permission: yes.** A request is drafted for the owner to send: `docs/sources/given-name-permission-request.md`. It goes to Wydawnictwo Nomen Omen for Jan Grzenia's *Nasze imiona. 200 najczęściej nadawanych imion polskich w XX wieku* (2010). Nothing from that book is used unless written permission arrives.
 
-   D-043 says no meaning is "written by the project", which (b) may breach.
-3. **Brückner.** Transcribe his name entries from page images and quote them verbatim?
-4. **Permission.** Ask one or more publishers for free permission to quote short explanations with attribution. Candidates: Jan Grzenia, *Nasze imiona. 200 najczęściej nadawanych imion polskich w XX wieku* (Nomen Omen, 2010); Józef Bubak, *Księga naszych imion* (Ossolineum, 1993); Fros and Sowa, *Twoje imię* (Wydawnictwo Apostolstwa Modlitwy, 1982). Sending is the owner's act; a draft letter can be prepared.
+**What it does not change:** D-043 otherwise; no Wiktionary, no paid licence. D-033: no count of people with both names.
 
-**Recommendation:**
-1. **Yes:** Buryan's origin, quoted with the page.
-2. **(a):** Yonge on the English page only, verbatim.
-3. **Yes:** Brückner's entries, from page images.
-4. **Ask Nomen Omen first:** Grzenia's 200 names cover the commonest names, which the public-domain works miss.
-
-Steps 1–3 are imports on the TASK-081 pattern. Step 4 decides whether the report can ever explain Krzysztof or Julia.
+**Follow-ups, not decided here:** importing Buryan's chapter A, Brückner's name entries and Yonge's Polish index lines, and showing them in the full-name report's first-name chapter (a task); sending the letter (the owner).
 
 ---
 
