@@ -13,12 +13,19 @@ import {
   PESEL_NATIONAL_MALE_2026,
   sha256Hex,
   storeWikidataBearers,
+  summariseWikidataBearers,
   WIKIDATA_SOURCE_KEY,
   WikidataPacer,
+  WikidataRequestError,
 } from "@name-atlas/sources";
-import type { FetchedWikidataBearers, WikidataFetchDeps } from "@name-atlas/sources";
+import type {
+  FetchedWikidataBearers,
+  WikidataBatchOutcome,
+  WikidataFetchDeps,
+} from "@name-atlas/sources";
 import {
   deriveNotableBearers,
+  loadBearersInBatches,
   notableBearersClaimKey,
   querySurnameResult,
   selectBearersCandidates,
@@ -299,6 +306,70 @@ describe("NOTABLE_BEARERS against a real PostgreSQL", () => {
     expect(bearers?.total).toBeNull();
     expect(bearers?.people).toEqual([]);
     expect(JSON.stringify(bearers)).not.toContain("wikidata.org/wiki/Q");
+  });
+
+  it("loads a selection in batches, stores and derives each surname as one, and leaves a failure for the next run", async () => {
+    // TASK-140 (ADR-0044). The batch fetcher is replaced by one that answers
+    // each surname with ZAREMBA's real answers, renamed, and fails WIŚNIEWSKI.
+    await giveRank("NOWAK", 1, "male");
+    await giveRank("KOWALSKI", 2, "male");
+    await giveRank("WIŚNIEWSKI", 3, "male");
+    const candidates = await selectBearersCandidates(db(), { topRank: 2000, refreshDays: 30 });
+    const asked: string[][] = [];
+    const fetchBatch = (surnames: readonly string[]): Promise<readonly WikidataBatchOutcome[]> => {
+      asked.push([...surnames]);
+      return Promise.resolve(
+        surnames.map((surname): WikidataBatchOutcome => {
+          if (surname === "WIŚNIEWSKI") {
+            return {
+              surname,
+              error: new WikidataRequestError("bearers", 503, "bearers: HTTP 503"),
+            };
+          }
+          const name = surname.charAt(0) + surname.slice(1).toLowerCase();
+          return {
+            surname,
+            fetched: {
+              bearers: summariseWikidataBearers(
+                surname,
+                ZAREMBA_BEARERS.replaceAll(" Zaremba", ` ${name}`),
+                ZAREMBA_DETAILS,
+              ),
+              retrieved_at: new Date().toISOString(),
+              response_sha256: { bearers_batch: "x", details_batch: "y" },
+            },
+          };
+        }),
+      );
+    };
+    const { tally, stopped } = await loadBearersInBatches(db(), {
+      sourceId: await ensureWikidataSource(db()),
+      candidates,
+      fetchBatch,
+      sizeFor: () => 2,
+    });
+    expect(stopped).toBe(false);
+    expect(asked).toEqual([["NOWAK", "KOWALSKI"], ["WIŚNIEWSKI"]]);
+    expect(tally).toEqual({ stored: 2, unchanged: 0, derived: 2, failed: 1 });
+    expect(
+      await count("claims", "claim_type = 'NOTABLE_BEARERS' AND claim_status = 'ACTIVE'"),
+    ).toBe(2);
+    const bearers = await bearersOn("FREE");
+    expect(bearers?.state).toBe("READY");
+    expect(bearers?.total).toBe(59);
+
+    // The failure is the next run's; the two loaded are not asked again.
+    const rest = await selectBearersCandidates(db(), { topRank: 2000, refreshDays: 30 });
+    expect(rest.map((c) => c.display_name)).toEqual(["WIŚNIEWSKI"]);
+
+    // Asked again with the same answers, nothing changes.
+    const again = await loadBearersInBatches(db(), {
+      sourceId: await ensureWikidataSource(db()),
+      candidates,
+      fetchBatch,
+      sizeFor: () => 2,
+    });
+    expect(again.tally).toEqual({ stored: 0, unchanged: 2, derived: 0, failed: 1 });
   });
 
   it("picks the best-ranked surnames first, and skips one looked up within the refresh window", async () => {
