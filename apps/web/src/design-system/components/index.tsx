@@ -23,6 +23,10 @@ export function Tabs({ children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return <div className="atlas-tabs" role="tablist" {...props}>{children}</div>;
 }
 
+export function Navigation({ children, label }: { children: ReactNode; label: string }) {
+  return <nav className="atlas-navigation" aria-label={label}>{children}</nav>;
+}
+
 export function Badge({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <span className={`atlas-badge ${className}`}>{children}</span>;
 }
@@ -64,8 +68,8 @@ export function SearchResult({ surname, meta }: { surname: string; meta?: ReactN
 export function Breadcrumb({ children }: { children: ReactNode }) { return <nav aria-label="Breadcrumb" className="atlas-breadcrumb">{children}</nav>; }
 export function Divider() { return <hr className="atlas-divider"/>; }
 
-export function LoadingState({ label = "Ładowanie…" }: { label?: string }) {
-  return <div className="atlas-loading" role="status" aria-live="polite"><span className="atlas-loader-contours" aria-hidden="true"/><span>{label}</span></div>;
+export function LoadingState({ label = "Ładowanie…", variant = "inline" }: { label?: string; variant?: "inline" | "page" }) {
+  return <div className={`atlas-loading atlas-loading-${variant}`} role="status" aria-live="polite"><span className="atlas-loader-contours" aria-hidden="true"/><span>{label}</span></div>;
 }
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) { return <div className="atlas-state"><h3>{title}</h3>{children}</div>; }
 export function ErrorState({ title, children }: { title: string; children?: ReactNode }) { return <div className="atlas-state atlas-state-error" role="alert"><h3>{title}</h3>{children}</div>; }
