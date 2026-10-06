@@ -49,6 +49,12 @@ export interface BabyNamesText {
   readonly lockedPrice: string;
   readonly soon: string;
   readonly lockedBody: string;
+  readonly registerDiffers: string;
+  readonly registerHeading: string;
+  readonly registerCount: string;
+  readonly registerRank: string;
+  readonly registerAsOf: (date: string) => string;
+  readonly registerNone: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -97,6 +103,13 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     soon: "Wkrótce",
     lockedBody:
       "Liczba dzieci i miejsce na liście w każdym roku od 2000, osobno dla chłopców i dziewczynek.",
+    registerDiffers:
+      "Liczby z roku to dzieci urodzone w tym roku. Liczba z rejestru PESEL to wszyscy, którzy w dniu listy mają to imię jako pierwsze, w każdym wieku. Nie dodajemy jej do liczb z roku.",
+    registerHeading: "W rejestrze PESEL",
+    registerCount: "Osób z tym imieniem jako pierwszym",
+    registerRank: "Miejsce na liście rejestru",
+    registerAsOf: (date) => `Stan na ${date}`,
+    registerNone: "Nie mamy liczby z listy rejestru PESEL dla tego imienia.",
   },
   en: {
     title: "Baby names",
@@ -143,5 +156,12 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     soon: "Coming soon",
     lockedBody:
       "The number of children and the place on the list in every year since 2000, for boys and girls separately.",
+    registerDiffers:
+      "Birth-year figures count children born in that year. The register figure counts everyone who has the name as their first name in the PESEL register on the list's date, of any age. It is never added to a birth-year figure.",
+    registerHeading: "In the PESEL register",
+    registerCount: "People with this first name",
+    registerRank: "Place on the register's list",
+    registerAsOf: (date) => `As of ${date}`,
+    registerNone: "We have no figure from the PESEL register's list for this name.",
   },
 };

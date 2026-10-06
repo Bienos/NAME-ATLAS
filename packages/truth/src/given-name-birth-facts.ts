@@ -19,6 +19,7 @@ import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import type { CitationDto } from "@name-atlas/contracts";
 import { canonicalKey } from "@name-atlas/resolver";
+import type { GivenNameListFacts } from "./given-name-facts.js";
 import { evaluateSurface, sectionEligibility } from "./rights.js";
 import type { EffectiveRights, Surface } from "./rights.js";
 import { GIVEN_NAME_BIRTH_TREND_METHOD_VERSION } from "./version.js";
@@ -396,4 +397,24 @@ export function assembleBirthNameFacts(
     };
   });
   return { given_name: givenName, state: "READY", sexes };
+}
+
+/**
+ * The register's first-name list of one sex among a name's stock facts
+ * (TASK-145): the PESEL register publishes separate lists of men and of women,
+ * named by the comparability group's suffix. Null when the name has no claim on
+ * that sex's list. If two dated lists of one sex stood, the latest date is
+ * taken, never both and never a sum.
+ */
+export function stockListOfSex(
+  lists: readonly GivenNameListFacts[],
+  sex: BirthSex,
+): GivenNameListFacts | null {
+  const suffix = sex === "MALE" ? "_first_male" : "_first_female";
+  return lists
+    .filter((l) => l.comparability_group.endsWith(suffix))
+    .reduce<GivenNameListFacts | null>(
+      (best, l) => (best === null || l.snapshot_date > best.snapshot_date ? l : best),
+      null,
+    );
 }

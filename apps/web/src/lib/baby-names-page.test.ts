@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -5,7 +6,13 @@ import { NextRequest } from "next/server";
 import { BABY_NAMES_FULL_TIERS } from "@name-atlas/accounts";
 import type { PurchaseTier } from "@name-atlas/accounts";
 import type { CitationDto } from "@name-atlas/contracts";
-import type { BirthNameFacts, BirthNameLookup, BirthSexFigures } from "@name-atlas/truth";
+import type {
+  BirthNameFacts,
+  BirthNameLookup,
+  BirthSexFigures,
+  GivenNameFacts,
+  GivenNameListFacts,
+} from "@name-atlas/truth";
 import PlPage, { generateMetadata as plMetadata } from "../app/pl/imiona-dla-dziecka/page.js";
 import EnPage, { generateMetadata as enMetadata } from "../app/en/baby-names/page.js";
 import { middleware } from "../middleware.js";
@@ -13,6 +20,7 @@ import { resetAccountsRuntimeForTests } from "./accounts-runtime.js";
 import { BabyNamesView, loadBabyNames } from "./baby-names-page.js";
 import type { BabyNamesDeps } from "./baby-names-page.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
+import { formatInteger } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -104,6 +112,64 @@ function zofia(history: boolean): BirthNameFacts {
   };
 }
 
+const registerCite = (resource: string): CitationDto => ({
+  ...cite(resource),
+  title: "Lista imion występujących w rejestrze PESEL",
+});
+
+const registerList = (
+  sex: "male" | "female",
+  people: number,
+  rank: number | null,
+  universe: number,
+): GivenNameListFacts => {
+  const resource = sex === "male" ? "1159669" : "1159670";
+  const conf = { status: "HIGH", methodology_code: "x@1" };
+  return {
+    comparability_group: `pesel_given_names_2026_first_${sex}`,
+    snapshot_date: "2026-01-20",
+    count: {
+      claim_id: `p-${sex}`,
+      count: people,
+      confidence: conf,
+      citation: registerCite(resource),
+    },
+    rank:
+      rank === null
+        ? null
+        : {
+            claim_id: `k-${sex}`,
+            rank,
+            universe_size: universe,
+            ties_policy: "shared",
+            confidence: conf,
+            citation: registerCite(resource),
+          },
+  };
+};
+
+/** Zofia in both register lists, with different counts so a sum would show. */
+const ZOFIA_STOCK: GivenNameFacts = {
+  given_name: { id: "zofia", display_name: "ZOFIA" },
+  state: "READY",
+  lists: [registerList("female", 321456, 12, 28781), registerList("male", 77, null, 46197)],
+};
+
+/** A rare name: one list only. */
+const RARA_STOCK: GivenNameFacts = {
+  given_name: { id: "rara", display_name: "RARA" },
+  state: "READY",
+  lists: [registerList("female", 5, 9000, 28781)],
+};
+
+const NO_STOCK = (id: string): GivenNameFacts => ({
+  given_name: { id, display_name: id.toUpperCase() },
+  state: "UNAVAILABLE",
+  lists: [],
+});
+
+const STORED_LISTS = [list(2024, "MALE"), list(2025, "MALE"), list(2025, "FEMALE")];
+
 /** Deps over a fake store of purchases: user id → tiers bought in test mode. */
 function deps(bought: Record<string, readonly PurchaseTier[]>): BabyNamesDeps {
   return {
@@ -115,10 +181,32 @@ function deps(bought: Record<string, readonly PurchaseTier[]>): BabyNamesDeps {
           given_name: { id: "zofia", display_name: "ZOFIA" },
         });
       }
+      for (const id of ["TYMON", "RARA", "NIKT"]) {
+        if (key === id) {
+          return Promise.resolve({
+            kind: "FOUND",
+            given_name: { id: id.toLowerCase(), display_name: id },
+          });
+        }
+      }
       if (key === "LENA") return Promise.resolve({ kind: "HELD" });
       return Promise.resolve({ kind: "NOT_FOUND" });
     },
-    readFacts: (_name, history) => Promise.resolve(zofia(history)),
+    readFacts: (name, history) => {
+      if (name.id === "rara" || name.id === "nikt") {
+        return Promise.resolve({
+          given_name: name,
+          state: "NOT_ON_ANY_LIST",
+          sexes: [],
+        } satisfies BirthNameFacts);
+      }
+      return Promise.resolve({ ...zofia(history), given_name: name });
+    },
+    readStock: (name) =>
+      Promise.resolve(
+        name.id === "zofia" ? ZOFIA_STOCK : name.id === "rara" ? RARA_STOCK : NO_STOCK(name.id),
+      ),
+    readLists: () => Promise.resolve(STORED_LISTS),
     hasFullView: (userId) =>
       Promise.resolve((bought[userId] ?? []).some((t) => BABY_NAMES_FULL_TIERS.includes(t))),
   };
@@ -272,6 +360,132 @@ describe("the baby-names pages (TASK-141)", () => {
     const empty = await render("pl", {}, { userId: "u" });
     expect(empty).toContain("<form");
     expect(empty).not.toContain("ZOFIA");
+  });
+});
+
+describe("the register's count beside the birth-year figures (TASK-145)", () => {
+  const field = { pl: "imie", en: "name" } as const;
+
+  /** The register block inside one sex's section. */
+  const block = (html: string, sex: "MALE" | "FEMALE"): string => {
+    const start = html.indexOf(`data-register="${sex}"`);
+    expect(start).toBeGreaterThan(-1);
+    return html.slice(start, html.indexOf("</section>", start));
+  };
+
+  const occurrences = (html: string, text: string): number => html.split(text).length - 1;
+
+  it("ZOFIA: each sex's own register list with its count, N of M, date and source; no sum (AC-1, AC-4)", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = await render(lang, { [field[lang]]: "zofia" }, { userId: "u" });
+      const t = BABY_NAMES_TEXT[lang];
+      const women = block(html, "FEMALE");
+      const men = block(html, "MALE");
+      const n = (v: number) => formatInteger(v, lang);
+      expect(women, lang).toContain(`data-figure="register-count">${n(321456)}<`);
+      expect(women, lang).toContain(`data-figure="register-rank">${t.rankOf("12", n(28781))}<`);
+      expect(women, lang).toContain(
+        t.registerAsOf(lang === "pl" ? "20 stycznia 2026 r." : "20 January 2026"),
+      );
+      expect(women, lang).toContain(lang === "pl" ? "zasób 1159670" : "resource 1159670");
+      expect(women, lang).toContain("Lista imion występujących w rejestrze PESEL");
+      expect(men, lang).toContain('data-figure="register-count">77<');
+      expect(men, lang).toContain(lang === "pl" ? "zasób 1159669" : "resource 1159669");
+      // No rank claim for the men's list: no rank figure, never a 0.
+      expect(men, lang).not.toContain("register-rank");
+      // The birth-year figure is as before, and no sum of any two figures appears.
+      expect(html, lang).toContain(`data-figure="count">${n(4415)}<`);
+      for (const sum of ["321533", "321 533", "321,533", "325871", "325 871", "325,871"]) {
+        expect(html, sum).not.toContain(sum);
+      }
+      expect(html, lang).toContain(t.registerDiffers);
+      expect(html, lang).toContain(t.apart);
+    }
+  });
+
+  it("a name on a birth list but on no register list: a plain line, never 0 (AC-2)", async () => {
+    const html = await render("pl", { imie: "tymon" }, { userId: "u" });
+    const t = BABY_NAMES_TEXT.pl;
+    expect(html).toContain(t.childrenIn(2025));
+    expect(occurrences(html, t.registerNone)).toBe(2);
+    expect(html).not.toContain("register-count");
+  });
+
+  it("a rare name in the register only: its list, the cut-off statement and no 0 (AC-2)", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = await render(lang, { [field[lang]]: "rara" }, { userId: "u" });
+      const t = BABY_NAMES_TEXT[lang];
+      const n = (v: number) => formatInteger(v, lang);
+      expect(html, lang).toContain("RARA");
+      expect(html, lang).not.toContain(t.notFound("rara"));
+      expect(block(html, "FEMALE"), lang).toContain('data-figure="register-count">5<');
+      expect(block(html, "FEMALE"), lang).toContain(t.rankOf(n(9000), n(28781)));
+      // The men's list holds no claim for it: a plain line, not a figure.
+      expect(block(html, "MALE"), lang).toContain(t.registerNone);
+      expect(block(html, "MALE"), lang).not.toContain("register-count");
+      // Each sex's latest stored list: 2025, cut-off 2.
+      expect(occurrences(html, t.belowCutoff(2025, "2")), lang).toBe(2);
+      expect(html, lang).not.toContain('data-figure="count"');
+      expect(html, lang).not.toMatch(/data-figure="[a-z-]*count">0</u);
+      expect(html, lang).toContain(t.registerDiffers);
+    }
+  });
+
+  it("a name in neither dataset: not found, as before (AC-2)", async () => {
+    const html = await render("pl", { imie: "nikt" }, { userId: "u" });
+    expect(html).toContain(BABY_NAMES_TEXT.pl.notFound("nikt"));
+    expect(html).not.toContain("data-register");
+  });
+
+  it("a held form shows neither dataset's figure", async () => {
+    const html = await render("pl", { imie: "lena" }, { userId: "u" });
+    expect(html).toContain(BABY_NAMES_TEXT.pl.held);
+    expect(html).not.toContain("data-register");
+  });
+
+  it("signed out: no figure at all; signed in, the locked card is unchanged (AC-3)", async () => {
+    const readStock = vi.fn();
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "zofia" },
+      session: null,
+      deps: { ...deps({}), readStock },
+    });
+    expect(readStock).not.toHaveBeenCalled();
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).not.toContain("data-register");
+    const signedIn = await render("pl", { imie: "zofia" }, { userId: "u" });
+    expect(signedIn).toContain("8,99 zł");
+    expect(signedIn).toContain(BABY_NAMES_TEXT.pl.soon);
+  });
+
+  it("a rights-blocked register shows no figure, only the plain refusal", async () => {
+    const data = await loadBabyNames({
+      lang: "en",
+      query: { name: "zofia" },
+      session: { userId: "u" },
+      deps: {
+        ...deps({}),
+        readStock: () => Promise.resolve({ ...ZOFIA_STOCK, state: "RIGHTS_BLOCKED", lists: [] }),
+      },
+    });
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).not.toContain("register-count");
+    expect(html).toContain("We cannot show these figures here.");
+  });
+
+  it("reaches the page through claims only: nothing reads given_name_counts (AC-4)", () => {
+    for (const file of ["baby-names-page.tsx", "baby-names-text.ts"]) {
+      const source = readFileSync(new URL(`./${file}`, import.meta.url), "utf8");
+      expect(source, file).not.toContain("given_name_counts");
+    }
+  });
+
+  it("is free: the register block does not depend on a purchase", async () => {
+    const free = await render("pl", { imie: "zofia" }, { userId: "u" });
+    const paid = await render("pl", { imie: "zofia" }, { userId: "u2" }, { u2: ["smaller"] });
+    expect(free).toContain('data-figure="register-count"');
+    expect(paid).toContain('data-figure="register-count"');
   });
 });
 
