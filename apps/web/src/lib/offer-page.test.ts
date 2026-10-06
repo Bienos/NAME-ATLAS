@@ -1,31 +1,37 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { CONTACT_EMAIL } from "./contact.js";
 import { legalDocument, LEGAL_UPDATED } from "./legal-text.js";
 import { htmlLang } from "./messages.js";
 import { OfferView, offerMetadata } from "./offer-page.js";
 import {
   ANSWER_MAX,
+  contactHref,
   EMPTY_ENQUIRY,
-  enquiryMailto,
-  mailtoHref,
+  enquiryHref,
   offerDocument,
-  waitlistMailto,
+  waitlistHref,
 } from "./offer-text.js";
 import { SiteFooter } from "./site-footer.js";
 import { SiteNav } from "./site-nav.js";
-import { followLinks, offerPath } from "./site-links.js";
+import { contactPath, followLinks, offerPath } from "./site-links.js";
 
 const LANGS = ["pl", "en"] as const;
 
-/** The subject and body a `mailto:` carries, decoded. */
-function mail(href: string): { to: string; subject: string; body: string } {
-  const url = new URL(href);
+/**
+ * What a form's link hands the contact form, decoded: the page, the topic, and
+ * the message as its first line (the subject) and the lines after the blank one.
+ */
+function mail(href: string): { page: string; topic: string; subject: string; body: string } {
+  const at = href.indexOf("#");
+  const params = new URLSearchParams(href.slice(at + 1));
+  const message = params.get("message") ?? "";
+  const [subject = "", ...rest] = message.split("\n");
   return {
-    to: url.pathname,
-    subject: url.searchParams.get("subject") ?? "",
-    body: url.searchParams.get("body") ?? "",
+    page: href.slice(0, at),
+    topic: params.get("topic") ?? "",
+    subject,
+    body: rest.slice(1).join("\n"),
   };
 }
 
@@ -66,33 +72,35 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
     }
   });
 
-  it("without script, offers each form as a prefilled email to the owner (AC-2)", () => {
+  it("without script, offers each form as a link to the contact form with the message prefilled, and shows no address (AC-2)", () => {
     for (const lang of LANGS) {
       const html = render(lang);
       const doc = offerDocument(lang);
       for (const tier of ["smaller", "couple", "family"] as const)
-        expect(html).toContain(`href="${waitlistMailto(tier, "", lang)}"`);
-      expect(html).toContain(`href="${enquiryMailto(EMPTY_ENQUIRY, lang)}"`);
+        expect(html).toContain(`href="${waitlistHref(tier, "", lang)}"`);
+      expect(html).toContain(`href="${enquiryHref(EMPTY_ENQUIRY, lang)}"`);
       expect(html).toContain(doc.waitlist.fallback);
       expect(html).toContain(doc.enquiry.fallback);
       expect(html).toContain(doc.noDna);
+      expect(html).toContain(`<a href="${contactPath(lang)}">${doc.writeYourself}</a>`);
+      expect(html).not.toContain("mailto:");
+      expect(html).not.toMatch(/[\w.+-]+@[\w-]+\.[\w.-]+/u);
     }
   });
 
-  it("puts the tier in the subject and the reader's words in the body (AC-2)", () => {
-    const w = mail(waitlistMailto("smaller", "  Zaremba ", "pl"));
-    expect(w.to).toBe(CONTACT_EMAIL);
+  it("puts the tier in the subject and the reader's words in the body, under the form's last topic (AC-2)", () => {
+    const w = mail(waitlistHref("smaller", "  Zaremba ", "pl"));
+    expect(w.page).toBe(contactPath("pl"));
+    expect(w.topic).toBe("Inne");
     expect(w.subject).toBe("Lista oczekujących: Małe poszukiwania (28,99 zł)");
-    expect(mail(waitlistMailto("couple", "", "en")).subject).toBe(
-      "Waiting list: Couple (PLN 89.99)",
-    );
-    expect(mail(waitlistMailto("family", "", "pl")).subject).toBe(
+    expect(mail(waitlistHref("couple", "", "en")).subject).toBe("Waiting list: Couple (PLN 89.99)");
+    expect(mail(waitlistHref("family", "", "pl")).subject).toBe(
       "Lista oczekujących: Przegląd rodziny (199 zł)",
     );
     expect(w.body.split("\n").at(-1)).toBe("Nazwisko, które Cię interesuje: Zaremba");
 
     const e = mail(
-      enquiryMailto(
+      enquiryHref(
         {
           name: "Anna Nowak",
           surnames: "Nowak, Żak",
@@ -103,7 +111,8 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
         "pl",
       ),
     );
-    expect(e.to).toBe(CONTACT_EMAIL);
+    expect(e.page).toBe(contactPath("pl"));
+    expect(e.topic).toBe("Inne");
     expect(e.subject).toBe("Zapytanie: Badanie genealogiczne (800 zł)");
     expect(e.body).toContain("Imię i nazwisko: Anna Nowak");
     expect(e.body).toContain("Nazwiska w rodzinie, których szukasz: Nowak, Żak");
@@ -111,15 +120,25 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
     expect(e.body).toContain("Co chcesz odkryć?: Kim był pradziadek?");
     expect(e.body).toContain("Czy masz test DNA? Tak, Y-DNA");
 
-    const en = mail(enquiryMailto(EMPTY_ENQUIRY, "en"));
+    const en = mail(enquiryHref(EMPTY_ENQUIRY, "en"));
+    expect(en.page).toBe(contactPath("en"));
+    expect(en.topic).toBe("Something else");
     expect(en.subject).toBe("Enquiry: Genealogist research (PLN 800)");
     expect(en.body.split("\n").at(-1)).toBe("Do you have a DNA test?");
   });
 
-  it("encodes a space as %20, never +, and caps each answer (AC-2)", () => {
-    const href = mailtoHref("a b+c", ["x y"]);
-    expect(href).toBe(`mailto:${CONTACT_EMAIL}?subject=a%20b%2Bc&body=x%20y`);
-    const long = mail(waitlistMailto("smaller", "x".repeat(ANSWER_MAX + 50), "en"));
+  it("hands the message over in one fragment, nothing for the server, and caps each answer (AC-2)", () => {
+    const href = contactHref("pl", "a b+c", ["x y"]);
+    expect(href.startsWith(`${contactPath("pl")}#`)).toBe(true);
+    expect(href.indexOf("#")).toBe(href.lastIndexOf("#"));
+    expect(href).not.toContain("?");
+    expect(mail(href)).toEqual({
+      page: "/pl/kontakt",
+      topic: "Inne",
+      subject: "a b+c",
+      body: "x y",
+    });
+    const long = mail(waitlistHref("smaller", "x".repeat(ANSWER_MAX + 50), "en"));
     expect(long.body).toContain(`: ${"x".repeat(ANSWER_MAX)}`);
     expect(long.body).not.toContain("x".repeat(ANSWER_MAX + 1));
   });
@@ -173,8 +192,9 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
   it("is matched by the privacy notice: the forms, the DNA request and a new date (AC-4)", () => {
     // 2026-10-01 for the offer's forms; later changes move it on (TASK-073: 2026-10-03).
     expect(LEGAL_UPDATED.privacy >= "2026-10-01").toBe(true);
-    // The offer did not change the terms; the legal review of 2026-10-04 did.
-    expect(LEGAL_UPDATED.terms).toBe("2026-10-04");
+    // The offer did not change the terms; the legal review of 2026-10-04 did, then the
+    // withdrawal of the controller's name, place and address on 2026-10-06.
+    expect(LEGAL_UPDATED.terms).toBe("2026-10-06");
     const pl = JSON.stringify(legalDocument("privacy", "pl"));
     expect(pl).toContain("Formularze na stronie oferty niczego nie wysyłają do serwisu");
     expect(pl).toContain("Nie wysyłaj nam wyników testu DNA");

@@ -1,10 +1,11 @@
-import { CONTACT_EMAIL } from "./contact.js";
+import { contactFormHref } from "./contact.js";
+import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The offer page's words (TASK-057, TASK-104, ADR-0037), and the two emails
- * its forms prepare. Pure: the server page and the form's client island both
- * read it.
+ * The offer page's words (TASK-057, TASK-104, ADR-0037), and the two messages
+ * its forms prepare for the contact form. Pure: the server page and the form's
+ * client island both read it.
  *
  * What the page may say is what ADR-0037 records: the free tier as it is
  * today, and the four paid tiers as coming, with their prices, what the owner
@@ -45,7 +46,7 @@ export const EMPTY_ENQUIRY: EnquiryAnswers = {
   dna: "",
 };
 
-/** The longest a typed answer may be: a `mailto:` address much past 2,000 characters fails in some mail programs. */
+/** The longest a typed answer may be: the answers travel in the contact page's address, which browsers cap. */
 export const ANSWER_MAX = 600;
 
 export interface OfferDocument {
@@ -153,15 +154,16 @@ const PL: OfferDocument = {
   ],
   nothingOnSale:
     "Nic płatnego nie jest jeszcze w sprzedaży. Zapis i pytanie nic nie kosztują i do niczego nie zobowiązują.",
-  howFormsWork: `Formularz przygotuje wiadomość e-mail w Twoim programie pocztowym. Wysyłasz ją sam, na adres ${CONTACT_EMAIL}. Strona niczego nie zapisuje.`,
+  howFormsWork:
+    "Formularz przygotuje treść wiadomości i otworzy ją w formularzu kontaktowym. Tam ją wysyłasz. Strona niczego nie zapisuje.",
   noDna:
     "Nie wysyłaj w wiadomości wyników testu DNA ani informacji o zdrowiu. Do pierwszej odpowiedzi nie są potrzebne.",
-  writeYourself: `Nie otwiera się program pocztowy? Napisz na ${CONTACT_EMAIL}.`,
+  writeYourself: "Wolisz napisać własnymi słowami? Napisz przez formularz kontaktowy.",
   waitlist: {
     heading: "Zapisz się na listę",
     intro: "Damy znać, gdy pakiet ruszy.",
     surname: "Nazwisko, które Cię interesuje (nieobowiązkowo)",
-    submit: "Zapisz się e-mailem",
+    submit: "Zapisz się",
     fallback: "Napisz, by zapisać się na listę",
     subject: "Lista oczekujących",
     body: "Proszę o wiadomość, gdy ten pakiet będzie dostępny.",
@@ -184,7 +186,7 @@ const PL: OfferDocument = {
       mt: "Tak, mtDNA",
       unsure: "Nie wiem",
     },
-    submit: "Wyślij zapytanie e-mailem",
+    submit: "Wyślij zapytanie",
     fallback: "Napisz, by zapytać o badanie",
     subject: "Zapytanie: Badanie genealogiczne (800 zł)",
     body: "Chcę zapytać o badanie genealogiczne z DNA.",
@@ -256,15 +258,16 @@ const EN: OfferDocument = {
   ],
   nothingOnSale:
     "Nothing paid is on sale yet. Signing up or asking costs nothing and commits you to nothing.",
-  howFormsWork: `The form prepares an email in your own mail program. You send it yourself, to ${CONTACT_EMAIL}. The site keeps nothing.`,
+  howFormsWork:
+    "The form prepares the message and opens it in the contact form. You send it from there. The site keeps nothing.",
   noDna:
     "Do not send DNA results or health information by email. They are not needed for a first reply.",
-  writeYourself: `No mail program opens? Write to ${CONTACT_EMAIL}.`,
+  writeYourself: "Prefer your own words? Write through the contact form.",
   waitlist: {
     heading: "Join the waiting list",
     intro: "We will let you know when it starts.",
     surname: "A surname you are interested in (optional)",
-    submit: "Join by email",
+    submit: "Join the list",
     fallback: "Write to join the waiting list",
     subject: "Waiting list",
     body: "Please let me know when this tier is available.",
@@ -287,7 +290,7 @@ const EN: OfferDocument = {
       mt: "Yes, mtDNA",
       unsure: "Not sure",
     },
-    submit: "Send the enquiry by email",
+    submit: "Send the enquiry",
     fallback: "Write to ask about research",
     subject: "Enquiry: Genealogist research (PLN 800)",
     body: "I would like to ask about genealogy research with DNA.",
@@ -298,13 +301,22 @@ export function offerDocument(lang: Lang): OfferDocument {
   return lang === "en" ? EN : PL;
 }
 
+/** The contact form's topic for both messages: its last, "Inne" / "Something else". */
+function offerTopic(lang: Lang): string {
+  const topics: readonly string[] = UI[lang].contactTopicOptions;
+  return topics[topics.length - 1]!;
+}
+
 /**
- * A `mailto:` to the owner. Subject and body are percent-encoded with
- * `encodeURIComponent`, which writes a space as `%20` as RFC 6068 requires
- * (the same rule as TASK-050's report link).
+ * The contact page with the form prefilled (`contactFormHref`): the subject as
+ * the message's first line, then the lines. Since 2026-10-06 the site publishes
+ * no address, so the contact form sends what a `mailto:` to the owner once did.
  */
-export function mailtoHref(subject: string, lines: readonly string[]): string {
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+export function contactHref(lang: Lang, subject: string, lines: readonly string[]): string {
+  return contactFormHref(lang, {
+    topic: offerTopic(lang),
+    message: [subject, "", ...lines].join("\n"),
+  });
 }
 
 function answer(value: string): string {
@@ -315,19 +327,19 @@ function answer(value: string): string {
 export type WaitlistTier = Exclude<TierKey, "free" | "genealogy">;
 
 /** A paid tier's waiting list: the tier and its price in the subject, the surname if given. */
-export function waitlistMailto(tier: WaitlistTier, surname: string, lang: Lang): string {
+export function waitlistHref(tier: WaitlistTier, surname: string, lang: Lang): string {
   const doc = offerDocument(lang);
   const w = doc.waitlist;
   const t = doc.tiers.find((x) => x.key === tier);
   const label = w.surname.replace(/ \(.*\)$/u, "");
   const subject = t === undefined ? w.subject : `${w.subject}: ${t.name} (${t.price})`;
-  return mailtoHref(subject, [w.body, "", `${label}: ${answer(surname)}`]);
+  return contactHref(lang, subject, [w.body, "", `${label}: ${answer(surname)}`]);
 }
 
 /** The 800 zł enquiry: each question with what the reader typed after it. */
-export function enquiryMailto(answers: EnquiryAnswers, lang: Lang): string {
+export function enquiryHref(answers: EnquiryAnswers, lang: Lang): string {
   const e = offerDocument(lang).enquiry;
-  return mailtoHref(e.subject, [
+  return contactHref(lang, e.subject, [
     e.body,
     "",
     `${e.fields.name}: ${answer(answers.name)}`,

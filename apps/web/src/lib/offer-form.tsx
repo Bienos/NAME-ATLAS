@@ -6,17 +6,18 @@ import {
   ANSWER_MAX,
   DNA_ANSWERS,
   EMPTY_ENQUIRY,
-  enquiryMailto,
+  enquiryHref,
   offerDocument,
-  waitlistMailto,
+  waitlistHref,
 } from "./offer-text.js";
 import type { DnaAnswer, EnquiryAnswers, WaitlistTier } from "./offer-text.js";
 
 /**
  * The offer page's two forms (TASK-057, TASK-104): a paid tier's waiting list
- * and the 800 zł enquiry. Each prepares an email to the owner and nothing else. The
- * link's address is rebuilt as the reader types, and the reader's own mail
- * program sends it. The web app writes nothing (ADR-0017 §2.3, ADR-0026 §2.3).
+ * and the 800 zł enquiry. Each prepares a message for the contact form and
+ * nothing else: the link's address (the contact page, the message in its
+ * fragment) is rebuilt as the reader types, and the reader sends it from
+ * there. This page writes nothing (ADR-0017 §2.3, ADR-0026 §2.3).
  *
  * Before the script runs, and without it, a link stands alone, prefilled with
  * the questions and empty answers. With it, the form's button (and Enter in a
@@ -57,7 +58,7 @@ export function OfferForm({
   );
 
   const href =
-    tier === "genealogy" ? enquiryMailto(answers, lang) : waitlistMailto(tier, surname, lang);
+    tier === "genealogy" ? enquiryHref(answers, lang) : waitlistHref(tier, surname, lang);
   const words = kind === "waitlist" ? doc.waitlist : doc.enquiry;
 
   if (!client) {

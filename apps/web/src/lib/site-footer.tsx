@@ -1,7 +1,6 @@
 import { htmlLang, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { legalPath } from "./legal-text.js";
-import { CONTACT_EMAIL } from "./contact.js";
 import { DIRECTORY_LINK } from "./directory-text.js";
 import {
   atlasPath,
@@ -15,7 +14,7 @@ import {
   offerPath,
 } from "./site-links.js";
 
-export { CONTACT_EMAIL, contactPath };
+export { contactPath };
 
 /** The year in the closing line, read at render (a static page bakes it at build). */
 function year(): number {

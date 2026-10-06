@@ -1,26 +1,27 @@
-import { CONTACT_EMAIL } from "./contact.js";
+import { contactFormHref } from "./contact.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
- * "Report a problem" (TASK-050, option A by the project owner's ruling of
- * 2026-09-30): a `mailto:` prefilled with the surname and the page's address.
- *
- * Nothing reaches the server: the reader's own mail program sends the message
- * to `CONTACT_EMAIL`, so the site stores and logs no free text and the privacy
- * notice (TASK-046) stays true. A report never changes a claim by itself
- * (`docs/canonical/19` §116): the source is checked first.
+ * "Report a problem" (TASK-050): the contact form, opened with the surname and
+ * the page's address already in the message. Until 2026-09-30's option A, a
+ * prefilled `mailto:`, lost its address (the owner withheld it on 2026-10-06),
+ * the reader's own mail program sent the report; now the contact form does,
+ * through `/api/contact`, which stores nothing. A report never changes a claim
+ * by itself (`docs/canonical/19` §116): the source is checked first.
  */
 
 /**
- * The `mailto:` address. Subject and body are percent-encoded with
- * `encodeURIComponent`, which writes a space as `%20`: RFC 6068 requires that,
- * and a `+` would reach the reader's mail program as a literal plus.
+ * The contact page's address with the report prefilled: the "error in the data"
+ * topic, and a message naming the surname(s) and the page, with room for what
+ * is wrong and for a source. It travels in the fragment (`contactFormHref`),
+ * which the browser never sends to the server.
  */
-export function reportMailto(surnames: readonly string[], pageUrl: string, lang: Lang): string {
+export function reportHref(surnames: readonly string[], pageUrl: string, lang: Lang): string {
   const t = UI[lang];
-  const subject = `${t.reportSubject}: ${surnames.join(" / ")}`;
-  const body = [
+  const message = [
+    `${t.reportSubject}: ${surnames.join(" / ")}`,
+    "",
     `${t.reportBodyPage}: ${pageUrl}`,
     "",
     `${t.reportBodyWhat}:`,
@@ -29,7 +30,7 @@ export function reportMailto(surnames: readonly string[], pageUrl: string, lang:
     `${t.reportBodySource}:`,
     "",
   ].join("\n");
-  return `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  return contactFormHref(lang, { topic: t.contactTopicOptions[0], message });
 }
 
 export function ReportLink({
@@ -44,7 +45,7 @@ export function ReportLink({
   if (surnames.length === 0) return null;
   return (
     <p className="report">
-      <a href={reportMailto(surnames, pageUrl, lang)}>{UI[lang].reportLink}</a>
+      <a href={reportHref(surnames, pageUrl, lang)}>{UI[lang].reportLink}</a>
     </p>
   );
 }

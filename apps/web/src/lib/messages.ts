@@ -1454,7 +1454,7 @@ export const UI = {
       "widzisz problem z bezpieczeństwem strony.",
     ],
     contactReportHint:
-      "Na każdej stronie nazwiska i na stronie porównania jest link „Zgłoś błąd”, który przygotowuje taką wiadomość z nazwiskiem i adresem strony.",
+      "Na każdej stronie nazwiska i na stronie porównania jest link „Zgłoś błąd”, który otwiera ten formularz z wpisanym nazwiskiem i adresem strony.",
     contactNoPromise:
       "Czytamy każdą wiadomość, ale nie obiecujemy terminu odpowiedzi. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.",
     // The contact form (sends through `/api/contact`) and the footer's groups.
@@ -1475,12 +1475,8 @@ export const UI = {
     contactSending: "Wysyłanie…",
     contactSent: "Dziękujemy, wiadomość wysłana. Odpowiemy na podany adres.",
     contactInvalid: "Podaj poprawny adres e-mail i wpisz wiadomość (do 5000 znaków).",
-    contactFailed:
-      "Nie udało się wysłać wiadomości. Spróbuj za chwilę albo wyślij ją ze swojej poczty.",
-    contactUnavailable:
-      "Wysyłka z formularza nie jest jeszcze włączona. Wyślij wiadomość ze swojej poczty.",
-    contactMailInstead: "Otwórz w programie pocztowym",
-    contactDirect: "Wolisz pisać bezpośrednio?",
+    contactFailed: "Nie udało się wysłać wiadomości. Spróbuj za chwilę.",
+    contactUnavailable: "Wysyłka z formularza nie jest jeszcze włączona. Spróbuj później.",
     contactPrivacyNote: "Serwis nie zapisuje wiadomości: trafia ona tylko na skrzynkę Name Atlas.",
     footerExplore: "Odkrywaj",
     footerRead: "Czytaj",
@@ -2137,7 +2133,7 @@ export const UI = {
       "you have found a security problem with the site.",
     ],
     contactReportHint:
-      "Every surname page and the comparison page has a “Report a problem” link that prepares such a message with the surname and the page address.",
+      "Every surname page and the comparison page has a “Report a problem” link that opens this form with the surname and the page address filled in.",
     contactNoPromise:
       "Every message is read, but no reply time is promised. A report of an error does not change the page at once: the source is checked first.",
     // The contact form (sends through `/api/contact`) and the footer's groups.
@@ -2158,12 +2154,8 @@ export const UI = {
     contactSending: "Sending…",
     contactSent: "Thank you, your message is sent. The reply will go to the address you gave.",
     contactInvalid: "Give a valid email address and write a message (up to 5,000 characters).",
-    contactFailed:
-      "The message could not be sent. Try again in a moment, or send it from your own mail.",
-    contactUnavailable:
-      "Sending from the form is not switched on yet. Send the message from your own mail.",
-    contactMailInstead: "Open in your mail program",
-    contactDirect: "Prefer to write directly?",
+    contactFailed: "The message could not be sent. Try again in a moment.",
+    contactUnavailable: "Sending from the form is not switched on yet. Try again later.",
     contactPrivacyNote:
       "The site does not store your message: it only reaches the Name Atlas inbox.",
     footerExplore: "Explore",

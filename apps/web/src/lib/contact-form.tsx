@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, useSyncExternalStore } from "react";
-import { CONTACT_EMAIL, CONTACT_MESSAGE_MAX as MESSAGE_MAX } from "./contact.js";
+import { CONTACT_MESSAGE_MAX as MESSAGE_MAX, readContactPrefill } from "./contact.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import type { ContactStatus } from "./contact-routes.js";
@@ -10,12 +10,15 @@ import type { ContactStatus } from "./contact-routes.js";
  * The contact page's form. It posts to `/api/contact`, which sends the message
  * to the owner's inbox and stores nothing. Without script it is a plain form
  * and the route sends the reader back with `?status=`, read here; with it, the outcome is
- * shown in place and the typed message is kept. When the message cannot be
- * sent, a link opens the same message in the reader's own mail program.
+ * shown in place and the typed message is kept.
+ *
+ * A link may bring the reader here with a topic and a message in the address's
+ * fragment (`contactFormHref`): the "report a problem" link and the offer's
+ * forms do. They stand in the fields until the reader types.
  */
 
-/** The browser member read, declared as `offer-form.tsx` does, rather than widening `lib`. */
-declare const location: { readonly search: string } | undefined;
+/** The browser members read, declared as `offer-form.tsx` does, rather than widening `lib`. */
+declare const location: { readonly search: string; readonly hash: string } | undefined;
 
 const STATUSES: readonly ContactStatus[] = ["sent", "invalid", "failed", "unavailable"];
 
@@ -28,13 +31,13 @@ function statusFromAddress(): ContactStatus | null {
   return STATUSES.find((known) => known === word) ?? null;
 }
 
-function valueOf(event: { readonly target: unknown }): string {
-  return (event.target as { readonly value: string }).value;
+/** The fragment as a string, so the snapshot is stable between reads; parsed where it is used. */
+function hashFromAddress(): string {
+  return location?.hash ?? "";
 }
 
-function mailto(topic: string, message: string): string {
-  const query = new URLSearchParams({ subject: `Name Atlas: ${topic}`, body: message });
-  return `mailto:${CONTACT_EMAIL}?${query.toString().replaceAll("+", "%20")}`;
+function valueOf(event: { readonly target: unknown }): string {
+  return (event.target as { readonly value: string }).value;
 }
 
 export function ContactForm({ lang }: { readonly lang: Lang }) {
@@ -42,8 +45,19 @@ export function ContactForm({ lang }: { readonly lang: Lang }) {
   const id = useId();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [topic, setTopic] = useState<string>(t.contactTopicOptions[0]);
-  const [message, setMessage] = useState("");
+  const prefill = readContactPrefill(
+    useSyncExternalStore(subscribeNever, hashFromAddress, () => ""),
+  );
+  const topics: readonly string[] = t.contactTopicOptions;
+  // What the reader chose or typed wins; before that, what the link brought; before that, the defaults.
+  const [chosen, setTopic] = useState<string | null>(null);
+  const topic =
+    chosen ??
+    (prefill?.topic !== undefined && topics.includes(prefill.topic)
+      ? prefill.topic
+      : t.contactTopicOptions[0]);
+  const [typed, setMessage] = useState<string | null>(null);
+  const message = typed ?? prefill?.message ?? "";
   const returned = useSyncExternalStore(subscribeNever, statusFromAddress, () => null);
   const [own, setStatus] = useState<ContactStatus | "sending" | null>(null);
   const status = own ?? returned;
@@ -150,17 +164,7 @@ export function ContactForm({ lang }: { readonly lang: Lang }) {
         <p className="contact-privacy">{t.contactPrivacyNote}</p>
       </div>
       <div className="contact-status" role="status" aria-live="polite">
-        {settled === null ? null : (
-          <p className={`contact-status-${settled}`}>
-            {words[settled]}
-            {settled === "failed" || settled === "unavailable" ? (
-              <>
-                {" "}
-                <a href={mailto(topic, message)}>{t.contactMailInstead}</a>
-              </>
-            ) : null}
-          </p>
-        )}
+        {settled === null ? null : <p className={`contact-status-${settled}`}>{words[settled]}</p>}
       </div>
     </form>
   );

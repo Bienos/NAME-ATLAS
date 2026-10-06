@@ -1,20 +1,28 @@
 import { checkEmail, createResendMailer, MailError } from "@name-atlas/accounts";
 import type { Mailer, OutgoingMail, ResendConfig } from "@name-atlas/accounts";
 import { isSameSiteRequest } from "./account-routes.js";
-import { CONTACT_EMAIL, CONTACT_MESSAGE_MAX } from "./contact.js";
+import { CONTACT_MESSAGE_MAX } from "./contact.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { contactPath } from "./site-links.js";
 
 /**
  * `POST /api/contact` — the contact page's form. It sends the message to
- * `CONTACT_EMAIL` through Resend, with the writer's address as the reply-to,
+ * `CONTACT_INBOX` through Resend, with the writer's address as the reply-to,
  * and stores nothing. The page answers each outcome with a status word:
  * `sent`, `invalid`, `failed` or `unavailable` (no mail configuration).
  *
  * A form posted without script gets a 303 back to the contact page with
  * `?status=`; the form's script asks for JSON and gets `{ status }`.
  */
+
+/**
+ * The inbox the form delivers to, given by the project owner on 2026-09-30.
+ * Server-side only: since 2026-10-06 the site shows no address anywhere, at
+ * the owner's request, so nothing a browser receives may import this module
+ * for it (`contact-form.tsx` imports only a type from here).
+ */
+export const CONTACT_INBOX = "cihypatryk@gmail.com";
 
 export type ContactStatus = "sent" | "invalid" | "failed" | "unavailable";
 
@@ -96,7 +104,7 @@ export function contactMail(input: ContactMessage): OutgoingMail {
     input.message,
   ];
   return {
-    to: CONTACT_EMAIL,
+    to: CONTACT_INBOX,
     replyTo: input.email,
     subject: `Name Atlas, kontakt: ${input.topic}`,
     text: lines.join("\n"),

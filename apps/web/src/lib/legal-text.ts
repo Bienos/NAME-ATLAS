@@ -1,8 +1,8 @@
-import { CONTACT_EMAIL } from "./contact.js";
 import { accountsVariant } from "./legal-accounts.js";
 import { googleVariant } from "./legal-google.js";
 import { treeVariant } from "./legal-tree.js";
 import type { Lang } from "./messages.js";
+import { contactPath } from "./site-links.js";
 
 /**
  * The privacy notice and the terms of use (TASK-046), in both languages.
@@ -13,12 +13,10 @@ import type { Lang } from "./messages.js";
  * doing something new with data — a form, analytics, a cookie — this text
  * changes in the same change, or it stops being true.
  *
- * The controller's name and place are the project owner's, given for
- * publication on 2026-09-30.
+ * The controller is described, not named: on 2026-10-06 the project owner
+ * asked for the name, the place and the address to be withheld from the site
+ * for now. Both documents point to the contact form instead.
  */
-
-export const CONTROLLER_NAME = "Patryk Cicbowski";
-export const CONTROLLER_PLACE = "Iława";
 
 /**
  * The date each document was last changed, ISO. The privacy notice changed for
@@ -27,11 +25,13 @@ export const CONTROLLER_PLACE = "Iława";
  * the consent banner (TASK-109), and for the legal review of 2026-10-04
  * (`docs/progress/2026-10-04-legal-review.md`), which also added the terms'
  * ban on unlawful content, then for Google Analytics on every page, its
- * cookies only with consent (TASK-115), and for Vercel Speed Insights.
+ * cookies only with consent (TASK-115), and for Vercel Speed Insights. Both
+ * changed on 2026-10-06, when the controller's name, place and address were
+ * withdrawn and every way of writing became the contact form.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
-  privacy: "2026-10-05",
-  terms: "2026-10-04",
+  privacy: "2026-10-06",
+  terms: "2026-10-06",
 };
 
 /**
@@ -71,7 +71,8 @@ export interface LegalDocument {
 
 export type LegalKind = "privacy" | "terms";
 
-const who = `${CONTROLLER_NAME}, ${CONTROLLER_PLACE}`;
+/** The one way to write: the contact page's form, named by its address. */
+const form = { pl: contactPath("pl"), en: contactPath("en") } as const;
 
 const PRIVACY: Record<Lang, LegalDocument> = {
   pl: {
@@ -81,13 +82,13 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Kto jest administratorem",
         paragraphs: [
-          `Administratorem danych osobowych w serwisie Name Atlas jest ${who}. Kontakt: ${CONTACT_EMAIL}.`,
+          `Administratorem danych osobowych w serwisie Name Atlas jest osoba fizyczna prowadząca serwis. Kontakt: formularz na stronie ${form.pl}.`,
         ],
       },
       {
         heading: "Czego nie robimy",
         paragraphs: [
-          "Name Atlas nie ma kont ani reklam. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej), a szybkość ładowania stron mierzy, też bez nazwiska i bez plików cookie, Vercel Speed Insights (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują wiadomość e-mail w Twoim programie pocztowym, a wysyłasz ją sam. Bez Twojej zgody serwis nie zapisuje w przeglądarce plików cookie; zapamiętuje tylko Twój wybór w sprawie Google Analytics (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
+          "Name Atlas nie ma kont ani reklam. Statystyki odwiedzin zbierają, bez nazwiska w adresie, Vercel Web Analytics (bez plików cookie) i Google Analytics (niżej), a szybkość ładowania stron mierzy, też bez nazwiska i bez plików cookie, Vercel Speed Insights (niżej). Formularze na stronie oferty niczego nie wysyłają do serwisu: przygotowują treść wiadomości i otwierają z nią formularz kontaktowy (niżej); wysyłasz ją stamtąd sam. Bez Twojej zgody serwis nie zapisuje w przeglądarce plików cookie; zapamiętuje tylko Twój wybór w sprawie Google Analytics (niżej). Nie profilujemy nikogo i nie podejmujemy zautomatyzowanych decyzji.",
         ],
       },
       {
@@ -105,7 +106,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Po co i na jakiej podstawie",
         paragraphs: [
           "Te dane są potrzebne, żeby wyświetlić stronę, chronić serwis przed nadużyciami (limit zapytań z jednego adresu) i wykrywać błędy. Podstawą jest nasz prawnie uzasadniony interes w działaniu i bezpieczeństwie serwisu (art. 6 ust. 1 lit. f RODO).",
-          "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz), wybrany temat, treść wiadomości i język strony, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę. Link „Zgłoś błąd” przygotowuje wiadomość w Twoim programie pocztowym z adresem strony i nazwiskiem, którego dotyczy; wysyłasz ją sam.",
+          "Jeśli napiszesz do nas e-mail albo przez formularz kontaktowy, przetwarzamy Twój adres, imię (jeśli je podasz), wybrany temat, treść wiadomości i język strony, żeby odpowiedzieć i załatwić sprawę, na tej samej podstawie. Formularz nie zapisuje wiadomości w serwisie: przekazuje ją przez Resend na naszą skrzynkę. Link „Zgłoś błąd” otwiera formularz kontaktowy z wpisanym adresem strony i nazwiskiem, którego dotyczy; wysyłasz go sam.",
           "Statystyki odwiedzin (które strony są oglądane, ile razy i skąd) prowadzimy na tej samej podstawie. Zbiera je Vercel Web Analytics: bez plików cookie; odwiedzający są rozróżniani skrótem obliczonym z żądania, kasowanym po 24 godzinach. Dla każdej odsłony zapisuje czas, adres strony, stronę odsyłającą, kraj, region i miasto, system, przeglądarkę i typ urządzenia. Zanim adres trafi do statystyk, nasz kod zastępuje w nim nazwisko oznaczeniem [slug] i usuwa parametry zapytania, więc statystyki nie zawierają wyszukiwanego nazwiska.",
           "Szybkość ładowania stron mierzymy na tej samej podstawie, żeby wiedzieć, które strony ładują się za wolno. Mierzy ją Vercel Speed Insights: bez plików cookie, a pomiary, jak deklaruje Vercel, nie są wiązane z odwiedzającym ani z adresem IP. Przy każdym pomiarze zapisuje adres strony i jej wzorzec (np. /pl/nazwisko/[slug]), wynik pomiaru (np. czas wyświetlenia głównej treści) z opisem elementu strony, którego dotyczy, czas, rodzaj połączenia (np. 4g), przeglądarkę, typ urządzenia, system i kraj. Tak jak w statystykach odwiedzin, nasz kod zastępuje w adresie i we wzorcu nazwisko oznaczeniem [slug] i usuwa parametry zapytania.",
           "Korzystamy też z Google Analytics, żeby lepiej wiedzieć, jak serwis jest czytany. Skrypt Google jest wczytywany na każdej stronie, a przy każdej odsłonie Google otrzymuje adres IP urządzenia, adres strony, stronę odsyłającą, przybliżoną lokalizację, dane o urządzeniu i przeglądarce oraz zdarzenia na stronie. Bez Twojej zgody (baner na dole strony) Google nie zapisuje w przeglądarce plików cookie; podstawą jest wtedy nasz prawnie uzasadniony interes w wiedzy, które strony są czytane (art. 6 ust. 1 lit. f RODO). Jeśli się zgodzisz, Google zapisuje też pliki cookie _ga i _ga_<identyfikator>, które rozpoznają powracające urządzenie; ich podstawą jest Twoja zgoda (art. 6 ust. 1 lit. a RODO). Możesz ją wycofać w każdej chwili przyciskiem na końcu tej strony: usuwamy wtedy te pliki cookie, a odsłony są dalej liczone bez nich. Wycofanie nie wpływa na zgodność z prawem tego, co działo się wcześniej. Tak jak w statystykach Vercel, nasz kod zastępuje w adresie i tytule strony nazwisko oznaczeniem [slug] i usuwa parametry zapytania. Sygnały Google służące reklamie są wyłączone. Twój wybór zapamiętujemy w pamięci przeglądarki (localStorage), żeby nie pytać o niego na każdej stronie.",
@@ -164,13 +165,13 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Who is responsible",
         paragraphs: [
-          `The controller of personal data on Name Atlas is ${who}, Poland. Contact: ${CONTACT_EMAIL}.`,
+          `The controller of personal data on Name Atlas is the natural person who runs the service, in Poland. Contact: the form at ${form.en}.`,
         ],
       },
       {
         heading: "What we do not do",
         paragraphs: [
-          "Name Atlas has no accounts or advertising. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below), and page loading speed is measured, also without the surname and without cookies, by Vercel Speed Insights (below). The forms on the offer page send nothing to the site: they prepare an email in your own mail program, and you send it yourself. Without your consent the site stores no cookies in your browser; it only remembers your choice about Google Analytics (below). We do not profile anyone and make no automated decisions.",
+          "Name Atlas has no accounts or advertising. Visit statistics are collected, without the surname in the address, by Vercel Web Analytics (without cookies) and Google Analytics (below), and page loading speed is measured, also without the surname and without cookies, by Vercel Speed Insights (below). The forms on the offer page send nothing to the site: they prepare the message and open the contact form (below) with it; you send it from there yourself. Without your consent the site stores no cookies in your browser; it only remembers your choice about Google Analytics (below). We do not profile anyone and make no automated decisions.",
         ],
       },
       {
@@ -186,7 +187,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
         heading: "Why, and on what basis",
         paragraphs: [
           "This data is needed to show the page, to protect the site from abuse (a limit on requests from one address) and to find errors. The basis is our legitimate interest in running the site and keeping it secure (Article 6(1)(f) GDPR).",
-          "If you email us or write through the contact form, we process your address, your name (if you give it), the topic you choose, your message and the page's language to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox. The “Report a problem” link prepares an email in your own mail program with the page's address and the surname it concerns; you send it yourself.",
+          "If you email us or write through the contact form, we process your address, your name (if you give it), the topic you choose, your message and the page's language to reply and deal with the matter, on the same basis. The form does not store the message on the site: it passes it through Resend to our mailbox. The “Report a problem” link opens the contact form with the page's address and the surname it concerns filled in; you send it yourself.",
           "Visit statistics (which pages are viewed, how often and from where) rest on the same basis. Vercel Web Analytics collects them: no cookies; visitors are told apart by a hash computed from the request, discarded after 24 hours. For each page view it records the time, the page address, the referring page, the country, region and city, the operating system, the browser and the device type. Before the address reaches the statistics, our code replaces the surname in it with [slug] and removes the query parameters, so the statistics never contain the surname searched for.",
           "Page loading speed is measured on the same basis, to know which pages load too slowly. Vercel Speed Insights measures it: no cookies, and, as Vercel states, the measurements are not tied to any visitor or IP address. With each measurement it records the page address and its pattern (such as /pl/nazwisko/[slug]), the result (such as how long the main content took to appear) with a description of the page element it concerns, the time, the connection type (such as 4g), the browser, the device type, the operating system and the country. As with the visit statistics, our code replaces the surname in the address and in the pattern with [slug] and removes the query parameters.",
           "We also use Google Analytics, to understand better how the site is read. Google's script is loaded on every page, and with each page view Google receives the device's IP address, the page address, the referring page, an approximate location, details of the device and browser, and events on the page. Without your consent (the banner at the bottom of the page) Google stores no cookies in your browser; the basis is then our legitimate interest in knowing which pages are read (Article 6(1)(f) GDPR). If you agree, Google also stores the cookies _ga and _ga_<id>, which recognise a returning device; their basis is your consent (Article 6(1)(a) GDPR). You can withdraw it at any time with the button at the end of this page: we then delete those cookies, and page views go on being counted without them. Withdrawing does not affect what happened before. As with the Vercel statistics, our code replaces the surname in the page's address and title with [slug] and removes the query parameters. Google's advertising signals are switched off. We remember your choice in your browser's storage (localStorage), so as not to ask on every page.",
@@ -248,7 +249,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Usługa",
         paragraphs: [
-          `Name Atlas to bezpłatny serwis z informacjami o polskich nazwiskach, prowadzony przez: ${who}, ${CONTACT_EMAIL}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
+          `Name Atlas to bezpłatny serwis z informacjami o polskich nazwiskach, prowadzony przez osobę fizyczną. Kontakt: formularz na stronie ${form.pl}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
         ],
       },
       {
@@ -290,7 +291,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Zgłoszenia i reklamacje",
         paragraphs: [
-          `Błędy w danych, reklamacje i inne sprawy prosimy zgłaszać na adres ${CONTACT_EMAIL}. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.`,
+          `Błędy w danych, reklamacje i inne sprawy prosimy zgłaszać przez formularz na stronie ${form.pl}. Zgłoszenie błędu nie zmienia strony od razu: najpierw sprawdzamy źródło.`,
         ],
       },
       {
@@ -308,7 +309,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "The service",
         paragraphs: [
-          `Name Atlas is a free information service about Polish surnames, run by ${who}, Poland, ${CONTACT_EMAIL}. No registration is needed. You need an internet-connected device and a current browser.`,
+          `Name Atlas is a free information service about Polish surnames, run by a natural person in Poland. Contact: the form at ${form.en}. No registration is needed. You need an internet-connected device and a current browser.`,
         ],
       },
       {
@@ -350,7 +351,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Reports and complaints",
         paragraphs: [
-          `Please send errors in the data, complaints and other matters to ${CONTACT_EMAIL}. A report of an error does not change the page at once: the source is checked first.`,
+          `Please send errors in the data, complaints and other matters through the form at ${form.en}. A report of an error does not change the page at once: the source is checked first.`,
         ],
       },
       {

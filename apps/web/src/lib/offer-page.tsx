@@ -4,7 +4,7 @@ import { OfferForm } from "./offer-form.js";
 import { offerDocument } from "./offer-text.js";
 import type { Tier } from "./offer-text.js";
 import { SiteShell } from "./site-shell.js";
-import { homePath, offerPath } from "./site-links.js";
+import { contactPath, homePath, offerPath } from "./site-links.js";
 
 /**
  * `/pl/oferta` and `/en/offer` (TASK-057, TASK-104, ADR-0037): the free tier
@@ -77,7 +77,9 @@ export function OfferView({ lang }: { readonly lang: Lang }) {
         <p>{doc.nothingOnSale}</p>
         <p>{doc.howFormsWork}</p>
         <p>{doc.noDna}</p>
-        <p>{doc.writeYourself}</p>
+        <p>
+          <a href={contactPath(lang)}>{doc.writeYourself}</a>
+        </p>
       </section>
     </SiteShell>
   );

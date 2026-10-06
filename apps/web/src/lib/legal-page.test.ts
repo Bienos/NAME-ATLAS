@@ -2,16 +2,10 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { LegalView, legalMetadata } from "./legal-page.js";
-import {
-  CONTROLLER_NAME,
-  CONTROLLER_PLACE,
-  LEGAL_UPDATED,
-  legalDocument,
-  legalPath,
-} from "./legal-text.js";
+import { LEGAL_UPDATED, legalDocument, legalPath } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
-import { CONTACT_EMAIL } from "./contact.js";
 import { SiteFooter } from "./site-footer.js";
+import { contactPath } from "./site-links.js";
 import { htmlLang } from "./messages.js";
 
 const KINDS: readonly LegalKind[] = ["privacy", "terms"];
@@ -54,13 +48,16 @@ describe("legal pages (TASK-046)", () => {
     expect(terms.en).toContain("unlawful content");
   });
 
-  it("name the controller and the contact in both documents and languages", () => {
+  it("describe the controller without a name, a place or an address, and point to the contact form (the owner's request, 2026-10-06)", () => {
+    const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/u;
     for (const kind of KINDS) {
       for (const lang of LANGS) {
         const text = JSON.stringify(legalDocument(kind, lang));
-        expect(text).toContain(CONTROLLER_NAME);
-        expect(text).toContain(CONTROLLER_PLACE);
-        expect(text).toContain(CONTACT_EMAIL);
+        expect(text).toContain(contactPath(lang));
+        expect(text).toMatch(lang === "pl" ? /osob[ęa] fizyczn/u : /natural person/u);
+        expect(text).not.toMatch(EMAIL);
+        expect(text).not.toContain("mailto:");
+        expect(text).not.toContain("Iława");
       }
     }
   });

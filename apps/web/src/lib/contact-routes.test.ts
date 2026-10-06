@@ -1,8 +1,7 @@
 import { createMemoryMailer } from "@name-atlas/accounts";
 import type { Mailer } from "@name-atlas/accounts";
 import { describe, expect, it } from "vitest";
-import { CONTACT_EMAIL } from "./contact.js";
-import { contactMailConfig, handleContactPost } from "./contact-routes.js";
+import { CONTACT_INBOX, contactMailConfig, handleContactPost } from "./contact-routes.js";
 import { CONTACT_POLICY, policyFor } from "./request-policy.js";
 
 const HOST = "name-atlas.test";
@@ -44,7 +43,7 @@ describe("POST /api/contact", () => {
     expect(response.headers.get("location")).toBe("/pl/kontakt?status=sent#form");
     expect(mailer.sent).toHaveLength(1);
     const [mail] = mailer.sent;
-    expect(mail?.to).toBe(CONTACT_EMAIL);
+    expect(mail?.to).toBe(CONTACT_INBOX);
     expect(mail?.replyTo).toBe("ewa@example.com");
     expect(mail?.subject).toBe("Name Atlas, kontakt: Błąd w danych");
     expect(mail?.text).toContain("Od: Ewa <ewa@example.com>");
