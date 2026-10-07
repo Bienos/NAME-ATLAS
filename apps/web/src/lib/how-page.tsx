@@ -15,7 +15,7 @@ import type { HowDocument, HowSection, HowVisual } from "./how-text.js";
 
 export function howMetadata(lang: Lang): Metadata {
   return {
-    title: `${howDocument(lang).title} — Name Atlas`,
+    title: `${howDocument(lang).title} | Name Atlas`,
     alternates: {
       canonical: howPath(lang),
       languages: { pl: howPath("pl"), en: howPath("en") },

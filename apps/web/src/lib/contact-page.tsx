@@ -13,7 +13,7 @@ import { SiteShell } from "./site-shell.js";
 
 export function contactMetadata(lang: Lang): Metadata {
   return {
-    title: `${UI[lang].contactHeading} — Name Atlas`,
+    title: `${UI[lang].contactHeading} | Name Atlas`,
     alternates: {
       canonical: contactPath(lang),
       languages: { pl: contactPath("pl"), en: contactPath("en") },

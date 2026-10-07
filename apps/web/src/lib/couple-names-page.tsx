@@ -46,11 +46,11 @@ import type { Lang } from "./messages.js";
 
 export const COUPLE_NAMES_METADATA: Readonly<Record<Lang, Metadata>> = {
   pl: {
-    title: "Co mówią Wasze imiona razem — Name Atlas",
+    title: "Co mówią Wasze imiona razem | Name Atlas",
     robots: { index: false, follow: false },
   },
   en: {
-    title: "What your names say together — Name Atlas",
+    title: "What your names say together | Name Atlas",
     robots: { index: false, follow: false },
   },
 };
