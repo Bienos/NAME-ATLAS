@@ -530,10 +530,10 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
   });
 });
 
-/** The full report's announcement on the last card (TASK-163). */
+/** The full report's announcement on the last card (TASK-166). */
 const TEASER = /<section class="rt rt-card"[\s\S]*?<\/section>/u;
 
-describe("the full report announced on the last card (TASK-163)", () => {
+describe("the full report announced on the last card (TASK-166)", () => {
   const mail = (href: string) => {
     const url = new URL(href.replaceAll("&amp;", "&"));
     return {
@@ -590,7 +590,7 @@ describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
   for (const lang of ["pl", "en"] as const) {
     it(`holds in ${lang === "pl" ? "Polish" : "English"}`, () => {
       const page = text(renderToStaticMarkup(createElement(Result, { response: FULL, lang })));
-      // The full report's announcement (TASK-163) states its tier's price, not a fact
+      // The full report's announcement (TASK-166) states its tier's price, not a fact
       // about the surname; its own test below holds it to that.
       const deck = text(faces(deckCards(FULL, lang, LINKS)).replace(TEASER, ""));
       const figures = [...new Set(deck.match(FIGURE) ?? [])];

@@ -662,7 +662,7 @@ export async function renderShareCard(
  * only those, on a transparent ground, in the same places. `intro` is the
  * clip's opening plate without the surname, `intro-name` the surname alone.
  * Hiding uses opacity, so every layer keeps the full card's layout. `outro`
- * is the clip's closing plate announcing the full report (TASK-163).
+ * is the clip's closing plate announcing the full report (TASK-166).
  */
 export const CARD_LAYERS = ["base", "reveal", "intro", "intro-name", "outro"] as const;
 export type CardLayer = (typeof CARD_LAYERS)[number];
@@ -860,7 +860,7 @@ function ground(paper: boolean) {
   };
 }
 
-/** The closing plate's words (TASK-163), from `REPORT_TEASER_TEXT`. */
+/** The closing plate's words (TASK-166), from `REPORT_TEASER_TEXT`. */
 export interface OutroText {
   readonly eyebrow: string;
   readonly heading: string;
@@ -869,7 +869,7 @@ export interface OutroText {
 }
 
 /**
- * The clip's closing plate (TASK-163): the full report announced, with the
+ * The clip's closing plate (TASK-166): the full report announced, with the
  * surname in its line and "wkrótce". It states no fact, as the opening does not.
  */
 function outroFace(host: string | null, text: OutroText): ReactElement {

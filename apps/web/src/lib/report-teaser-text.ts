@@ -2,7 +2,7 @@ import { offerDocument, waitlistMailto } from "./offer-text.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The full-name report's announcement (TASK-163, ADR-0037 §2 as amended): on
+ * The full-name report's announcement (TASK-166, ADR-0037 §2 as amended): on
  * the deck's last card, in the share studio and its video, and on the page
  * that says what the report holds. The report is the 28,99 zł tier's
  * (D-043); it cannot be bought yet, so every place says "Wkrótce" and its one

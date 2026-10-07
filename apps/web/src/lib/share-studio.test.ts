@@ -94,7 +94,7 @@ describe("the share studio (TASK-093)", () => {
     expect(html).toContain('href="/en/surname/kowalski/share?card=rarity"');
   });
 
-  it("announces the full report under the card, whatever the gate (TASK-163)", () => {
+  it("announces the full report under the card, whatever the gate (TASK-166)", () => {
     for (const gate of ["off", "open", "sign-in"] as const) {
       const html = unescape(studio(gate));
       const block = /<section class="rt rt-studio"[\s\S]*?<\/section>/u.exec(html)?.[0] ?? "";

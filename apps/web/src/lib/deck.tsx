@@ -803,7 +803,7 @@ function end(
             ))}
           </dl>
         ) : null}
-        {/* The full-name report, announced where the free cards end (TASK-163). */}
+        {/* The full-name report, announced where the free cards end (TASK-166). */}
         <DeckReportTeaser surname={surname} path={links.path} lang={lang} />
         {studio === null ? (
           <div className="dk-actions">

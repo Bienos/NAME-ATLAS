@@ -2,7 +2,7 @@
  * The share video (TASK-097, TASK-108, ADR-0034 §2.6): a short vertical MP4
  * made in the browser from the surname's own share-card images, with no audio.
  * The server draws the images (each card in two layers, an opening plate and,
- * when the reader keeps it, a closing plate announcing the full report, TASK-163);
+ * when the reader keeps it, a closing plate announcing the full report, TASK-166);
  * the clip is put together in the browser and nothing is stored. The muxer (`mediabunny`) is
  * loaded only when a reader asks for a video.
  */
@@ -73,7 +73,7 @@ export const VIDEO = {
   /** The full clip ends on the summary again. */
   closing: 1.5,
   /**
-   * The full report's plate (TASK-163). It replaces the full clip's closing
+   * The full report's plate (TASK-166). It replaces the full clip's closing
    * summary, and the short clip takes one card fewer, so neither runs longer.
    */
   outro: 1.8,
@@ -91,7 +91,7 @@ export type VideoMotion = "up" | "side";
 export interface VideoOptions {
   readonly length: VideoLength;
   readonly motion: VideoMotion;
-  /** End on the full report's plate (TASK-163); off when not given. */
+  /** End on the full report's plate (TASK-166); off when not given. */
   readonly outro?: boolean;
 }
 export const DEFAULT_VIDEO: VideoOptions = { length: "full", motion: "up" };
@@ -194,7 +194,7 @@ export function videoSchedule(count: number, options: VideoOptions = DEFAULT_VID
   };
 }
 
-/** The full report's closing plate (TASK-163), drawn from the summary's address; null with no cards. */
+/** The full report's closing plate (TASK-166), drawn from the summary's address; null with no cards. */
 export function outroUrl(cardUrls: readonly string[]): string | null {
   const first = cardUrls[0];
   return first === undefined ? null : `${first}${first.includes("?") ? "&" : "?"}layer=outro`;

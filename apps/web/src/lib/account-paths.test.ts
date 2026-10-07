@@ -267,7 +267,7 @@ describe("the couple first-names page as a return address (TASK-156)", () => {
   });
 });
 
-describe("the full report's page as a return address (TASK-163)", () => {
+describe("the full report's page as a return address (TASK-166)", () => {
   it("is accepted without its query, in both languages", () => {
     expect(safeNext("/pl/nazwisko/kowalski/pelny-raport")).toBe(
       "/pl/nazwisko/kowalski/pelny-raport",

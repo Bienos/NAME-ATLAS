@@ -93,7 +93,7 @@ describe("the clip's timeline (TASK-108 AC-1)", () => {
   });
 });
 
-describe("the full report's closing plate (TASK-163)", () => {
+describe("the full report's closing plate (TASK-166)", () => {
   it("replaces the full clip's closing summary, and runs no longer than without it", () => {
     for (const n of [2, 3, 7]) {
       const segments = videoSchedule(n, { ...FULL, outro: true }).segments;

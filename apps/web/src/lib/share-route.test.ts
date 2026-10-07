@@ -165,7 +165,7 @@ describe("the video's layers (TASK-108)", () => {
     expect(answerSlug).not.toHaveBeenCalled();
   });
 
-  it("draws the full report's closing plate with its words and the surname (TASK-163)", async () => {
+  it("draws the full report's closing plate with its words and the surname (TASK-166)", async () => {
     shareFacts.mockReturnValueOnce({ card: "summary", surname: "KOWALSKI" });
     const response = await shareCardResponse(
       "kowalski",

@@ -1,11 +1,13 @@
-# 2026-10-07 — The full report announced on the deck's last card, in the share studio and on a page of what it holds (TASK-163)
+# 2026-10-07 — The full report announced on the deck's last card, in the share studio and on a page of what it holds (TASK-166)
 
 **Request.** The owner asked for mockups of a glowing announcement of the paid report. It was to appear on the deck's last card and again where the share cards and the video are. Then, on the mockups' teaser page: "can you make it go live". Asked, the owner chose:
 - all three mockups;
 - a new branch and pull request;
 - a merge after local checks.
 
-The authority is ADR-0037 §2, amended here; the task file is `tasks/163-full-report-teaser.md`.
+The authority is ADR-0037 §2, amended here; the task file is `tasks/166-full-report-teaser.md`.
+
+**Numbering.** Built as TASK-163. While it was built, `main` took TASK-163 (#195, the logo) and TASK-164 (#197), and the open pull requests #196 and #199 hold TASK-165. So this change is TASK-166, and `main` @ `fd0d75b` is merged in.
 
 **Where it stands.**
 - **Base:** built on `main` @ `f753f4e`.

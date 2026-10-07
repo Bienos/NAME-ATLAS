@@ -66,7 +66,7 @@ export async function shareCardResponse(
   );
 }
 
-/** The video's closing plate's words (TASK-163): the full report, announced for this surname. */
+/** The video's closing plate's words (TASK-166): the full report, announced for this surname. */
 function outroText(surname: string, lang: Lang): OutroText {
   const t = REPORT_TEASER_TEXT[lang];
   return {

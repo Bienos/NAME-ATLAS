@@ -13,7 +13,7 @@ import type { SampleDeps, SampleFacts, SampleState } from "./report-inside-page.
 import type { Lang } from "./messages.js";
 
 /**
- * TASK-163: the page of what the full report holds, with the first chapter
+ * TASK-166: the page of what the full report holds, with the first chapter
  * for a typed first name read from claims. PIOTR's figures are those the
  * 2026-01-20 register lists and the 2025 boys' list give, as seen on real data
  * in TASK-159; the works are the three that explain the name.
@@ -164,7 +164,7 @@ const ready: SampleState = {
   facts: FACTS,
 };
 
-describe("the full report's page (TASK-163)", () => {
+describe("the full report's page (TASK-166)", () => {
   it("is never indexed", () => {
     expect(REPORT_INSIDE_METADATA.robots).toEqual({ index: false, follow: false });
   });
@@ -284,7 +284,7 @@ describe("the full report's page (TASK-163)", () => {
   });
 });
 
-describe("what the sample shows for the typed name (TASK-163)", () => {
+describe("what the sample shows for the typed name (TASK-166)", () => {
   const deps = (over: Partial<SampleDeps> = {}): SampleDeps => ({
     findGivenName: vi.fn(async () => ({
       kind: "FOUND" as const,

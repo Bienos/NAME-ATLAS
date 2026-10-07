@@ -8,7 +8,7 @@ import {
 } from "./report-teaser-text.js";
 
 /**
- * The full-name report's announcement (TASK-163): a glowing block on the
+ * The full-name report's announcement (TASK-166): a glowing block on the
  * deck's last card, and a larger one in the share studio. Both say what the
  * report holds, link to the page with a sample, give the price and
  * "Wkrótce", and offer the tier's waiting-list email. No buy button: the

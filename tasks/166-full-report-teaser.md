@@ -1,9 +1,9 @@
-# TASK-163 — The full report, announced on the deck's last card, in the share studio and on a page of what it holds
+# TASK-166 — The full report, announced on the deck's last card, in the share studio and on a page of what it holds
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-full-report-teaser.md`).
 - **Requested by:** the project owner, 2026-10-07. Mockups first: "is premium report ready it should show on the last card for free with information that there is paid premium pdf showing what other information is available it should be glowing and then the next should be on the card where you have share cards and video telling about this again do mock ups". Then, on the mockups' teaser page ("Zapowiedź w aplikacji"): "can you make it go live". Asked, the owner chose "Everything in the 3 mockups", a new branch and pull request, and a merge after local checks.
 - **Decision:** ADR-0037 §2, amended in this change: the full-name report is announced as "Wkrótce" before it can be bought. ADR-0026 §2.2 and ADR-0023 §2.5 still hold: no buy button, and the waiting-list email is the one way to ask.
-- **Numbers:** TASK-163 (162 is on `main`, #194; #190 holds TASK-159). `pnpm check:ids` exit 0.
+- **Numbers:** TASK-166. Built as TASK-163; while it was built, `main` took 163 (#195) and 164 (#197), and the open pull requests #196 and #199 hold 165. `pnpm check:ids` exit 0.
 
 ## In scope
 

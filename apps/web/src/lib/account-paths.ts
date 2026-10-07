@@ -155,7 +155,7 @@ export function isTreeNext(next: string | null): boolean {
  * `/en/surname/{slug}`, with `?view=cards` if the deck was open, or its share
  * studio (TASK-093), `/pl/nazwisko/{slug}/udostepnij` or `/en/surname/{slug}/share`,
  * with `?card={card}` naming one of the studio's cards, or the page of what
- * the full report holds (TASK-163), `/pl/nazwisko/{slug}/pelny-raport` or
+ * the full report holds (TASK-166), `/pl/nazwisko/{slug}/pelny-raport` or
  * `/en/surname/{slug}/full-report`, without its query. The slug is
  * one path segment as `canonicalSlug` writes it (letters percent-encoded, the
  * apostrophe and hyphen kept); an encoded slash, backslash, dot or control

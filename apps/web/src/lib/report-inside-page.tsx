@@ -40,7 +40,7 @@ import { pageSlug } from "./slug.js";
 import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
 
 /**
- * What the full report holds (TASK-163): `/pl/nazwisko/{slug}/pelny-raport`
+ * What the full report holds (TASK-166): `/pl/nazwisko/{slug}/pelny-raport`
  * and `/en/surname/{slug}/full-report`, reached from the deck's last card and
  * the share studio.
  *

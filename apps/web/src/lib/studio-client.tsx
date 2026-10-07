@@ -123,7 +123,7 @@ export interface VideoLabels {
   readonly motion: string;
   readonly up: string;
   readonly side: string;
-  /** "Na końcu: zapowiedź pełnego raportu" (TASK-163). */
+  /** "Na końcu: zapowiedź pełnego raportu" (TASK-166). */
   readonly outro: string;
 }
 
@@ -151,7 +151,7 @@ export function StudioVideo({
   const [failure, setFailure] = useState<"failed" | "sign-in" | null>(null);
   const [length, setLength] = useState<VideoLength>(DEFAULT_VIDEO.length);
   const [motion, setMotion] = useState<VideoMotion>(DEFAULT_VIDEO.motion);
-  // The report's closing plate is on unless the reader takes it off (TASK-163).
+  // The report's closing plate is on unless the reader takes it off (TASK-166).
   const [outro, setOutro] = useState(true);
   const cancelled = useRef(false);
 
