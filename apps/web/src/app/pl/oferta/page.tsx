@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { OfferView, offerMetadata } from "../../../lib/offer-page.js";
+import { OfferRoute, offerMetadata } from "../../../lib/offer-page.js";
 
-/** `/pl/oferta` — the offer: free now, two tiers coming (TASK-057). */
+/**
+ * `/pl/oferta` — the offer (TASK-057, TASK-167). Dynamic: it reads the session
+ * cookie for the free plan's links and a tester's test-mode purchases.
+ */
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = offerMetadata("pl");
 
 export default function Page() {
-  return <OfferView lang="pl" />;
+  return <OfferRoute lang="pl" />;
 }
