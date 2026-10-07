@@ -30,6 +30,7 @@ import type {
 import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
 import {
+  BABY_NAMES_COMPARE_PATHS,
   BABY_NAMES_FIELD,
   BABY_NAMES_LIST_PATHS,
   BABY_NAMES_PATHS,
@@ -972,8 +973,27 @@ function YearTable({ figures, lang }: { figures: BirthSexFigures; lang: Lang }) 
   );
 }
 
-/** One sex's paid view: the chart, the "×" headline, the callouts, the ladder, the table. */
-function History({ figures, lang }: { figures: BirthSexFigures; lang: Lang }) {
+/**
+ * "Porównaj z innym imieniem" (TASK-154): the way to the comparison from a
+ * sex's paid view, with this name as the first; the second is typed there.
+ */
+function CompareEntry({ name, sex, lang }: { name: string; sex: BirthSex; lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  const href = `${BABY_NAMES_COMPARE_PATHS[lang]}?${new URLSearchParams({
+    a: name,
+    [BABY_NAMES_SEX_FIELD]: SEX_PARAM[sex],
+  }).toString()}`;
+  return (
+    <p className="bn-compare-entry">
+      <a className="bn-compare-link" href={href} data-compare={sex}>
+        {t.compareEntry}
+      </a>
+    </p>
+  );
+}
+
+/** One sex's paid view: the chart, the "×" headline, the callouts, the ladder, the table, the way to the comparison. */
+function History({ figures, name, lang }: { figures: BirthSexFigures; name: string; lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   const history = figures.history ?? [];
   const first = history[0];
@@ -999,11 +1019,13 @@ function History({ figures, lang }: { figures: BirthSexFigures; lang: Lang }) {
       <Callouts history={history} lang={lang} />
       <Ladder history={history} lang={lang} />
       <YearTable figures={figures} lang={lang} />
+      <CompareEntry name={name} sex={figures.sex} lang={lang} />
     </section>
   );
 }
 
-function Locked({ lang }: { lang: Lang }) {
+/** The locked card: the 8,99 zł view named and priced, "Wkrótce", nothing to buy. The comparison (TASK-154) shows the same one. */
+export function BabyLocked({ lang }: { lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   // ADR-0023 §2.5: no buy button until the tier can lawfully be sold.
   return (
@@ -1174,13 +1196,18 @@ function Facts({
           <div className="bn-sexes">
             {sexes.map((figures) =>
               figures.history === null || figures.history.length === 0 ? null : (
-                <History key={figures.sex} figures={figures} lang={lang} />
+                <History
+                  key={figures.sex}
+                  figures={figures}
+                  name={facts.given_name.display_name}
+                  lang={lang}
+                />
               ),
             )}
           </div>
         </section>
       ) : (
-        <Locked lang={lang} />
+        <BabyLocked lang={lang} />
       )}
     </>
   );

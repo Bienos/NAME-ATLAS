@@ -227,6 +227,60 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(history.filter((y) => y.list !== null && y.count === null).length).toBeGreaterThan(0);
   });
 
+  it("gives the comparison its inputs (TASK-154): ZOFIA against JULIA on the girls' lists, one sex, nothing summed, no 0", async () => {
+    // Both on the PAID surface with the history, as the comparison reads them, one sex at a time.
+    const zofia = sex(await facts("Zofia", true), "FEMALE");
+    const julia = sex(await facts("Julia", true), "FEMALE");
+    expect(zofia.latest).toMatchObject({
+      birth_year: 2025,
+      count: { count: 4415 },
+      rank: { rank: 1 },
+    });
+    expect(julia.latest).toMatchObject({ birth_year: 2025, count: { count: 3207 } });
+    const zh = zofia.history ?? [];
+    const jh = julia.history ?? [];
+    expect(zh).toHaveLength(26);
+    expect(jh).toHaveLength(26);
+    // The same stored lists for both names, year by year: the comparison never mixes lists.
+    expect(zh.map((y) => y.list?.list_id ?? null)).toEqual(jh.map((y) => y.list?.list_id ?? null));
+    // ZOFIA is not in the 2000–2019 excerpt: every excerpt year is a stored list she is below, a cut-off tick, never 0.
+    for (const year of [2000, 2005, 2010, 2015]) {
+      expect(
+        zh.find((y) => y.birth_year === year),
+        String(year),
+      ).toMatchObject({
+        list: { publication_threshold: year <= 2012 ? 5 : 2 },
+        count: null,
+        rank: null,
+      });
+    }
+    // JULIA has the excerpt's counts in 2005 and 2010 (their ranks refused: "—"), and no 2015 row.
+    expect(jh.find((y) => y.birth_year === 2005)).toMatchObject({
+      count: { count: 14232 },
+      rank: null,
+    });
+    expect(jh.find((y) => y.birth_year === 2010)).toMatchObject({
+      count: { count: 15445 },
+      rank: null,
+    });
+    expect(jh.find((y) => y.birth_year === 2015)).toMatchObject({ count: null, rank: null });
+    expect(jh.find((y) => y.birth_year === 2015)?.list).not.toBeNull();
+    // 2021–2024 are not imported: no list for either, which reads "—", never 0.
+    expect(zh.find((y) => y.birth_year === 2022)?.list).toBeNull();
+    expect(jh.find((y) => y.birth_year === 2022)?.list).toBeNull();
+    expect([...zh, ...jh].every((y) => y.count === null || y.count.count > 0)).toBe(true);
+    // The direction with both shares for ZOFIA; JULIA's 2020 and 2025 shares as the claim carries them.
+    expect(zofia.trend).toMatchObject({
+      earlier_share_per_million: 39999,
+      latest_share_per_million: 36856,
+    });
+    expect(julia.trend).toMatchObject({
+      direction: "FALLING",
+      earlier_year: 2020,
+      latest_year: 2025,
+    });
+  });
+
   it("reads a name on the 2020 list and absent from 2025 as below 2025's cut-off", async () => {
     const kasandra = await facts("Kasandra", false);
     expect(kasandra.state).toBe("READY");
