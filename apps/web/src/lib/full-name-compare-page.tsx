@@ -19,6 +19,7 @@ import type {
   BirthSex,
   GivenNameFacts,
   GivenNameMeaningFacts,
+  Surface,
 } from "@name-atlas/truth";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
@@ -50,6 +51,7 @@ import { db } from "./db.js";
 import {
   FULL_NAME_COMPARE_MAX_PEOPLE,
   FULL_NAME_COMPARE_PATHS,
+  fullNameCompareFree,
   fullNameCompareEnabled,
 } from "./full-name-compare-config.js";
 import { fullNameQuery, fullNameRequest } from "./full-name-compare-request.js";
@@ -107,10 +109,11 @@ export interface FullNameCompareDeps {
   /** Whether the account holds a tier that includes the comparison. */
   readonly hasFullView: (userId: string) => Promise<boolean>;
   readonly findGivenName: (typed: string) => Promise<BirthNameLookup>;
-  readonly readGivenName: (givenName: {
-    readonly id: string;
-    readonly display_name: string;
-  }) => Promise<GivenNameAll>;
+  /** PAID for an account that bought it; FREE while the comparison is free (D-053). */
+  readonly readGivenName: (
+    givenName: { readonly id: string; readonly display_name: string },
+    surface: Surface,
+  ) => Promise<GivenNameAll>;
   /** A typed surname to its side: resolved, or with no response. */
   readonly loadSurname: (typed: string) => Promise<ComparisonSide>;
 }
@@ -148,6 +151,8 @@ export async function loadFullNameCompare(input: {
   readonly query: Query;
   readonly session: { readonly userId: string; readonly tester?: boolean } | null;
   readonly deps: FullNameCompareDeps;
+  /** Free for every signed-in reader (D-053): no purchase is looked up, claims are FREE. */
+  readonly free?: boolean;
 }): Promise<FullNameCompareData> {
   const { lang, session, deps } = input;
   if (session === null) {
@@ -158,7 +163,9 @@ export async function loadFullNameCompare(input: {
     };
   }
   const request = fullNameRequest(input.query);
-  const full = await deps.hasFullView(session.userId);
+  const free = input.free === true;
+  const full = free || (await deps.hasFullView(session.userId));
+  const surface: Surface = free ? "FREE" : "PAID";
   if (!full || request.error !== null || request.people.length < 2) {
     return {
       kind: "signed-in",
@@ -178,7 +185,7 @@ export async function loadFullNameCompare(input: {
         ? {
             kind: "FOUND",
             name: lookup.given_name,
-            facts: await deps.readGivenName(lookup.given_name),
+            facts: await deps.readGivenName(lookup.given_name, surface),
           }
         : { kind: lookup.kind };
     people.push({ typed, given, surname: await deps.loadSurname(typed.surname) });
@@ -1228,11 +1235,11 @@ export function runningFullNameCompareDeps(
   return {
     hasFullView: (userId) => store.hasPurchaseOf(userId, FULL_NAME_COMPARE_TIERS),
     findGivenName: (typed) => findBirthGivenName(db(), typed),
-    readGivenName: async (givenName) => {
+    readGivenName: async (givenName, surface) => {
       const [stock, births, meaning] = await Promise.all([
-        readGivenNameFacts(db(), givenName, "PAID"),
-        readBirthNameFacts(db(), givenName, { surface: "PAID", history: false }),
-        readGivenNameMeaning(db(), givenName.id, "PAID"),
+        readGivenNameFacts(db(), givenName, surface),
+        readBirthNameFacts(db(), givenName, { surface, history: false }),
+        readGivenNameMeaning(db(), givenName.id, surface),
       ]);
       return { stock, births, meaning };
     },
@@ -1294,6 +1301,7 @@ export async function FullNameCompareRoute({
     query,
     session,
     deps: runningFullNameCompareDeps(accounts.pool, lang),
+    free: fullNameCompareFree(),
   });
   return <FullNameCompareView data={data} />;
 }

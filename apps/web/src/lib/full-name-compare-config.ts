@@ -32,6 +32,18 @@ export function fullNameCompareEnabled(env: Env = process.env): boolean {
   return env[FULL_NAME_COMPARE_ENV] === "1";
 }
 
+/**
+ * The variable that ends the free comparison (D-053): exactly `0` ends it, and
+ * the 15,99 zł product is needed again. Any other value, or none, keeps it free
+ * for every signed-in reader, read on the FREE surface.
+ */
+export const FULL_NAME_COMPARE_FREE_ENV = "FULL_NAME_COMPARE_FREE";
+
+/** Whether the comparison is free for signed-in readers now (D-053). */
+export function fullNameCompareFree(env: Env = process.env): boolean {
+  return env[FULL_NAME_COMPARE_FREE_ENV] !== "0";
+}
+
 /** Whether a request path is one of the page's two addresses. */
 export function isFullNameComparePath(pathname: string): boolean {
   return pathname === FULL_NAME_COMPARE_PATHS.pl || pathname === FULL_NAME_COMPARE_PATHS.en;
