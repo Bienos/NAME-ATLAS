@@ -38,11 +38,12 @@ import {
   babyNamesEnabled,
 } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
+import { COUPLE_NAMES_PATHS, coupleNamesEnabled } from "./couple-names-config.js";
 import { db } from "./db.js";
 import { ConfidenceBadge, Tabs } from "../design-system/components/index.js";
 import { formatDate, formatDecimal, formatInteger, formatPercent } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { ORIGINS } from "./report-view.js";
+import { ORIGINS } from "./given-name-meaning-view.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
 
@@ -1282,6 +1283,14 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
           </form>
           <p className="baby-list-link">
             <a href={BABY_NAMES_LIST_PATHS[lang]}>{t.listLink}</a>
+            {coupleNamesEnabled() ? (
+              <>
+                {" · "}
+                <a className="baby-couple-link" href={COUPLE_NAMES_PATHS[lang]}>
+                  {t.coupleLink}
+                </a>
+              </>
+            ) : null}
           </p>
           <div className="baby-result" aria-live="polite">
             {data.result.kind === "INVALID" ? <p role="alert">{t.invalid}</p> : null}

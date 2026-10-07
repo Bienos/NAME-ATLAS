@@ -54,7 +54,7 @@ import type { FullNameRequest, TypedPerson } from "./full-name-compare-request.j
 import { FULL_NAME_COMPARE_TEXT } from "./full-name-compare-text.js";
 import { formatDate, formatInteger, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
-import { ORIGINS } from "./report-view.js";
+import { ORIGINS } from "./given-name-meaning-view.js";
 import { SiteShell } from "./site-shell.js";
 
 /**

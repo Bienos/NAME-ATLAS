@@ -135,6 +135,9 @@ const FULL_NAME_COMPARE_HOMES: ReadonlySet<string> = new Set([
   "/en/compare/full-name",
 ]);
 
+/** The couple first-names page (TASK-156), signed-in only: a sign-in comes back to it, without its query. */
+const COUPLE_NAMES_HOMES: ReadonlySet<string> = new Set(["/pl/imiona-pary", "/en/couple-names"]);
+
 /** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
 export function isTreeNext(next: string | null): boolean {
   return next !== null && (TREE_HOMES.has(next) || TREE_INVITATION.test(next));
@@ -143,8 +146,8 @@ export function isTreeNext(next: string | null): boolean {
 /**
  * Where a sign-in may send the reader on (TASK-064): the surname page they came
  * from, which the deck's prompt names, the family tree's page (TASK-084),
- * an invitation to a tree with its token (TASK-094), or the baby-names page
- * (TASK-141), and nothing else. It is checked again
+ * an invitation to a tree with its token (TASK-094), the baby-names page
+ * (TASK-141) or the couple first-names page (TASK-156), and nothing else. It is checked again
  * by the sign-in action, because a form field can say anything, and a redirect
  * to an address a stranger chose is how a sign-in page is turned into a trap.
  *
@@ -172,6 +175,7 @@ export function safeNext(value: unknown): string | null {
   if (TREE_HOMES.has(value) || TREE_INVITATION.test(value)) return value;
   if (BABY_NAMES_HOMES.has(value)) return value;
   if (FULL_NAME_COMPARE_HOMES.has(value)) return value;
+  if (COUPLE_NAMES_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;
   const segment = match[1] ?? match[2] ?? "";

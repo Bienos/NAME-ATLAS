@@ -14,6 +14,7 @@
     "@name-atlas/contracts": "workspace:*",
     "@name-atlas/db": "workspace:*",
     "@name-atlas/family": "workspace:*",
+    "@name-atlas/llm": "workspace:*",
     "@name-atlas/logging": "workspace:*",
     "@name-atlas/resolver": "workspace:*",
     "@name-atlas/seo": "workspace:*",

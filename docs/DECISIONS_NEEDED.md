@@ -8,6 +8,57 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-050 — RESOLVED as read in this session (2026-10-06): "imiona pary": a reading of two first names' meanings for a couple, written by a model, with shared motifs; the meanings free; the reading free for now, 15,99 zł later
+
+**Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Recorded as ADR-0047 (proposed); built by TASK-156 (planned), then the motifs and the price as the next two tasks.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-06, in a Claude Code session: "chciałbym też zrobić kompatybilność imion. Że pary mogą sprawdzić, czy ich imiona pasują do siebie na bazie właśnie ich znaczenia. I każdy może sprawdzić swoje własne, ale jeżeli chce sprawdzić do pary i dostać na przykład tłumaczenie od AI, wyjaśnienie tego na podstawie jakiegoś sposobu, wymyślimy coś razem, musi za to zapłacić. Wymyśl jakąś cenę." (Name compatibility: couples check whether their first names suit each other from the names' meanings; one's own name is free; the pair, with an AI explanation by some method, is paid; propose a price.) This record offers the method, the free/paid line and a price; the owner decides.
+
+**The answers (the owner, 2026-10-06, the same session):**
+
+1. **"B czyli a i b"** — framing B: the reading of the two sourced meanings with no verdict (A), plus shared motifs (B).
+2. **"tak i gdzieś jeszcze"** — yes, each name's own meaning free on the baby-names page, "and somewhere else too". Read here as: also on the couple page itself, for both names, before anything is generated. The owner may name another place.
+3. **"narazie darmowe ale bedzie kosztowac 15.99 PLN i w kazdym pakiecie drozszym"** — free for now; later 15,99 zł, one-time, and held by every dearer package (28,99, 89,99, 199 and 800 zł). The 14,99 zł proposed below is superseded.
+4. Not answered in words. "Na razie darmowe" is read as: build now, free with an account, dark behind a flag until the meanings are on production.
+
+What follows is the record as it was put to the owner.
+
+**Facts** (checked on `main` @ `3d12f1a`, 2026-10-06):
+
+1. **The couple report exists for surnames** (ADR-0035, TASK-100): two surnames' facts side by side, dark behind `COUPLE_REPORT_ENABLED`, in the `couple` tier (89,99 zł). On 2026-10-04 the owner was offered A (facts, no score), B (one overlap figure) and C (a playful compatibility percentage) and chose **A**. ADR-0035 §2.3: no score, percentage, verdict or prediction about the couple, playful wording included; §2.4: no given names. TASK-100 §3.4 bans "pasujecie", "dopasowanie", "zgodność", "match", "compatible" from the page's messages, and a test asserts it.
+2. **First-name meanings exist as claims** (ADR-0045, TASK-147, D-046): one `GIVEN_NAME_MEANING` claim per name from two public-domain works, Buryan 1933 and Yonge 1884. Measured on the committed files `sources/given-name-meanings/*.json`: **168 names** have a claim; **107** carry a meaning (a quoted gloss, 86 from Yonge and 24 from Buryan), **61** only a language of origin (among them Adam, Anna, Ewa, Agnieszka, Barbara, Filip). The claim is shown only in the full-name report (`smaller` tier, 28,99 zł); the free baby-names page shows no meaning.
+3. **Coverage by share of people** (`docs/sources/given-name-meanings.md` §2, measured on the 2026-01-20 lists): any entry in any of the three works, men 48.1% and women 33.5% (Buryan alone 35.3% / 24.7%); a *meaning* from Yonge or Brückner, men 32.8% / women 13.1%, and Brückner is not yet imported. Common modern names (Krzysztof, Łukasz, Joanna, Julia, Natalia, Karolina) have nothing. **Estimate, not measured** (the full lists are not in the repository; independence of the two partners' names assumed): a man–woman couple in which *both* names have a meaning is about **3–4 in 100**; both with at least an origin, about **1 in 10**. The same holds for any two names: nothing in the method depends on sex.
+4. **An LLM may be used, within limits** (ARCHITECTURE.md §4, ADR-0013): OpenAI is the provider, the key is supplied, the model may "structure or synthesise evidence" and never sets a confidence, a count or any claim value. No LLM code exists; the first use needs its own task, which also picks the model and the cost limit.
+5. **Rules that bind every option:** PRODUCT.md §7.1 (every published fact traces to a source), §7.7 (`INSUFFICIENT_DATA` over a generated guess), §5 (the free part answers the first question; not a teaser followed by a lock), §8 non-goal 11 (one-time payments only); AGENTS.md §9 (never invent values); ADR-0023 §2.5 (no real payments before the legal and tax gates; every paid thing shows "Wkrótce").
+
+**The conflict to decide.** "Czy ich imiona pasują do siebie" asks for a verdict. No source measures whether two names suit each other, so a verdict or a percentage is a figure nothing measures: ADR-0035 §2.3 forbids it and the owner chose that on 2026-10-04. What the data *can* carry is what each name means, from whom, and what the two meanings say next to each other.
+
+**Options:**
+
+- **A — "Co mówią Wasze imiona razem" / "What your names say together" (recommended).** A reading written by the model from the two names' `GIVEN_NAME_MEANING` claims and nothing else. The page shows, from the claims and never from the model: each name, each work's origin and meaning verbatim with author, year and page, the Polish translation marked as Name Atlas's, and the assessment. Below it, 150–250 words of prose on what the two meanings share and where they differ (the same language of origin; "pearl" beside "gift of God"), headed **"Odczytanie Name Atlas — interpretacja, nie fakt"** with the model named. No percentage, no verdict, no word from TASK-100 §3.4's list; a test asserts it on the generated text too, and a reading that fails the test is regenerated or refused, never shown. The prompt gets the two claims' payloads only (no account, no surname); the output is stored once per purchase as an immutable artifact, cached per unordered pair, and never re-derived without a new ADR. It needs one new ADR: it extends ADR-0035 to given names and is the first LLM use under ADR-0013. PRODUCT.md §7 is unchanged.
+- **B — A, plus shared motifs.** At derive time the model tags each meaning with motifs from a fixed list (light, strength, God, nature, peace, victory, …), stored beside the claim as structured model output, marked as such, never a claim value. The page then shows "Wasze imiona łączy: …" as a list, with no count. More to build and a second ADR; it can follow A.
+- **C — a verdict or a percentage ("pasujecie w 87%").** Needs an ADR superseding ADR-0035 §2.3 and amending PRODUCT.md §7.1 and §7.7. Advised against, as on 2026-10-04: it puts on a paid page the kind of number the product promises never to show, and the product is sold on sourced facts.
+
+**Free and paid, proposed:**
+
+- **Free, with an account** (the owner's "każdy może sprawdzić swoje własne"): each name's own sourced meaning, or the stated absence, on the free baby-names single-name page (today the meaning is only in the 28,99 zł report); and, for a pair, the honest answer *before* any payment: both names have a sourced meaning, or which one has none and so no reading can be written. Nobody pays for a reading that cannot exist (PRODUCT.md §5).
+- **Paid:** the reading for the pair (A or B).
+
+**Price, proposed: 14,99 zł, one-time, a product of its own (`couplenames`, name open),** held also by `couple` (89,99 zł) and every tier above it, as `babynames` is held by the tiers above it. Why: it sits between the 8,99 zł data product and the 28,99 zł report; the marginal cost is one model call; it is an impulse, shareable purchase for a couple, not research; a one-time payment keeps non-goal 11. The alternative, selling it only inside `couple` at 89,99 zł, adds no product and no migration, but prices out the impulse that is the whole point; not recommended. Like every paid thing it shows "Wkrótce" with no button until ADR-0023 §2.5's gates pass, and it exists in test-mode checkout first (as TASK-144 did for `babynames`).
+
+**The gate that decides whether to build now: coverage** (fact 3). With Buryan and Yonge, roughly 3–4 couples in 100 would get a reading; the rest get the free "no source" answer, which is honest and sells nothing. The way to raise it is already decided: import Brückner's entries (D-046 §3, transcription from page images) and send the Grzenia permission letter (D-046 §4, drafted, waits on the owner). Recommendation: decide A now, build it dark behind a flag as TASK-100 was, and open it when the Brückner import or Grzenia's permission makes a reading the common answer rather than the rare one.
+
+**Questions for the owner:**
+
+1. A, B or C?
+2. The free part: show each name's sourced meaning on the free baby-names page, yes or no?
+3. 14,99 zł as a product of its own held by `couple` and above, or inside `couple` only?
+4. Build now behind a flag, or after Brückner / Grzenia?
+
+**Not decided here:** the model, the prompt and the cost cap (the task that builds it); an English page; a share card of the reading (ADR-0034's rules would apply); whether the free comparison or the surname couple report links to it.
+
+---
+
 ## D-049 — RESOLVED as read in this session (2026-10-06): the surname comparison stays free and is redesigned; comparing first names and surnames, of up to four people, is a 15,99 zł product
 
 **Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Built by TASK-155.
