@@ -453,3 +453,214 @@ describe("the first name's origin and meaning (TASK-147)", () => {
     ).toBeNull();
   });
 });
+
+/**
+ * TASK-159: PIOTR as a first name given to children. GENUINE counts and ranks:
+ * the boys' lists of 2020 and 2025 (`fixtures/pesel-given-name-births/`, the
+ * full files of resources 28020 and 1159536), and their sums and cut-offs. The
+ * history is shortened to three years, the citations' ids and dates and the
+ * trend claim are SYNTHETIC; the trend's shares are the two years' own, and
+ * its change_percent is the rule's threshold (TASK-139), as derived.
+ */
+const birthCitation = (id: string, resource: string, year: string) => ({
+  id,
+  title: "Imiona nadawane dzieciom w Polsce",
+  publisher: "Ministerstwo Cyfryzacji",
+  publication_date: year,
+  source_type: "OFFICIAL_DATASET",
+  locator: `resource:${resource}`,
+  url: `https://api.dane.gov.pl/resources/${resource}/file`,
+  attribution: null,
+  terms: "CC0 1.0",
+  retrieved_at: "2026-10-06T10:00:00Z",
+  source_page_url: "https://dane.gov.pl/pl/dataset/219",
+});
+const boysList = (year: number, people_sum: number) => ({
+  list_id: `list-m-${year}`,
+  birth_year: year,
+  sex: "MALE",
+  publication_threshold: 2,
+  people_sum,
+});
+const BOYS_2020 = {
+  birth_year: 2020,
+  list: boysList(2020, 186590),
+  count: {
+    claim_id: "bc-2020",
+    count: 2839,
+    share_per_million: 15215,
+    one_in: 66,
+    citation: birthCitation("b-2020", "28020", "2020"),
+  },
+  rank: {
+    claim_id: "br-2020",
+    rank: 23,
+    universe_size: 799,
+    citation: birthCitation("b-2020-r", "28020", "2020"),
+  },
+};
+const BOYS_2025 = {
+  birth_year: 2025,
+  list: boysList(2025, 126404),
+  count: {
+    claim_id: "bc-2025",
+    count: 1146,
+    share_per_million: 9066,
+    one_in: 110,
+    citation: birthCitation("b-2025", "1159536", "2025"),
+  },
+  rank: {
+    claim_id: "br-2025",
+    rank: 29,
+    universe_size: 965,
+    citation: birthCitation("b-2025-r", "1159536", "2025"),
+  },
+};
+const girlsYear = (year: number) => ({
+  birth_year: year,
+  list: { ...boysList(year, 1), list_id: `list-f-${year}`, sex: "FEMALE" },
+  count: null,
+  rank: null,
+});
+const BIRTHS = {
+  given_name: PIOTR.given_name,
+  state: "READY",
+  sexes: [
+    {
+      sex: "MALE",
+      on_any_list: true,
+      latest: BOYS_2025,
+      trend: {
+        claim_id: "bt-2025",
+        direction: "FALLING",
+        latest_year: 2025,
+        earlier_year: 2020,
+        window_years: 5,
+        change_percent: 10,
+        latest_share_per_million: 9066,
+        earlier_share_per_million: 15215,
+        citations: [BOYS_2025.count.citation, BOYS_2020.count.citation],
+      },
+      history: [BOYS_2020, { birth_year: 2021, list: null, count: null, rank: null }, BOYS_2025],
+    },
+    {
+      sex: "FEMALE",
+      on_any_list: false,
+      latest: girlsYear(2025),
+      trend: null,
+      history: [girlsYear(2020), girlsYear(2025)],
+    },
+  ],
+};
+
+function withBirths(births: unknown = BIRTHS): StoredReportVersion {
+  const base = fullName({ ...PIOTR, meaning: { state: "NO_SOURCE" }, births });
+  return {
+    ...base,
+    report_schema_version: "full_name_report@2",
+    sections: base.sections.map((s) =>
+      s.section_type === "SOURCES"
+        ? {
+            ...s,
+            body_payload: { citation_ids: ["gn-f", "gn-rf", "gn-m", "b-2020", "b-2025", "cit-1"] },
+          }
+        : s,
+    ),
+  };
+}
+
+describe("the name given to children (TASK-159)", () => {
+  it("shows each boys' year, oldest first, a year without a list, and the trend in words", () => {
+    const page = html(preview(withBirths()));
+    expect(page).toContain("<h3>Imię nadawane dzieciom</h3>");
+    expect(page).toContain("<h4>Chłopcy</h4>");
+    expect(page.indexOf("<td>2020</td>")).toBeLessThan(page.indexOf("<td>2025</td>"));
+    expect(page).toContain("2\u00a0839");
+    expect(page).toContain("23 z 799");
+    expect(page).toContain("1\u00a0146");
+    expect(page).toContain("29 z 965");
+    expect(page).toContain("<td>brak listy z tego roku</td>");
+    expect(page).toContain("Udział wśród dzieci: 2020 r. 1,5%, 2025 r. 0,9% — spada.");
+    expect(page).toContain("udział zmienił się o ponad 10%");
+    // The chapter's order: the register's lists, the children's lists, then the meaning.
+    expect(page.indexOf("Imię nadawane dzieciom")).toBeLessThan(
+      page.indexOf("<h3>Pochodzenie i znaczenie</h3>"),
+    );
+  });
+
+  it("says the girls' lists never had the name, never zero", () => {
+    const page = html(preview(withBirths()));
+    expect(page).toContain(
+      "Dziewczynki: imienia nie ma na żadnej z list z lat 2020–2025; nadano je mniej razy, niż wynosi próg listy.",
+    );
+    expect(page).not.toContain("<h4>Dziewczynki</h4>");
+  });
+
+  it("reads a year below the cut-off as below it, with the list's threshold", () => {
+    const below = {
+      ...BIRTHS,
+      sexes: [
+        {
+          ...BIRTHS.sexes[0],
+          history: [BOYS_2020, { ...BOYS_2025, count: null, rank: null }],
+          latest: { ...BOYS_2025, count: null, rank: null },
+          trend: null,
+        },
+      ],
+    };
+    const page = html(preview(withBirths(below)));
+    expect(page).toContain("<td>poniżej progu listy (mniej niż 2)</td>");
+    expect(html(preview(withBirths(below)), "en")).toContain(
+      "<td>below the list&#x27;s cut-off (fewer than 2)</td>",
+    );
+  });
+
+  it("lists each year's file once in the bibliography, the count's and the rank's citations alike", () => {
+    const page = html(preview(withBirths()));
+    const bibliography = page.slice(page.indexOf('<ol class="report-bib">'));
+    expect(bibliography.match(/<li /g)).toHaveLength(6);
+    expect(bibliography).toContain("Imiona nadawane dzieciom w Polsce");
+    // The 2020 row: the count's mark [4], and no second mark for its rank.
+    const row2020 = page.slice(page.indexOf("<td>2020</td>"), page.indexOf("<td>2021</td>"));
+    expect(row2020.match(/href="#zrodlo-4"/g)).toHaveLength(1);
+    // The trend cites both years' files.
+    const trend = page.slice(page.indexOf("Udział wśród dzieci"));
+    expect(trend).toContain('href="#zrodlo-5"');
+    expect(trend).toContain('href="#zrodlo-4"');
+  });
+
+  it("speaks English on the English page", () => {
+    const en = html(preview(withBirths()), "en");
+    expect(en).toContain("<h3>Given to children</h3>");
+    expect(en).toContain("<h4>Boys</h4>");
+    expect(en).toContain("Share among children: 2020 1.5%, 2025 0.9% — falling.");
+    expect(en).toContain("Girls: the name is on none of the lists of 2020–2025");
+  });
+
+  it("says when the name is on no list, and shows nothing for a version frozen before @2", () => {
+    const none = { given_name: PIOTR.given_name, state: "NOT_ON_ANY_LIST", sexes: [] };
+    expect(html(preview(withBirths(none)))).toContain(
+      "Imię u dzieci: nie ma go na żadnej liście imion nadanych dzieciom od 2000 r.",
+    );
+    const old = preview(withMeaning());
+    expect(old.givenName?.births).toBeNull();
+    expect(html(old)).not.toContain("Imię nadawane dzieciom");
+  });
+
+  it("refuses figures that do not check", () => {
+    const [sex] = BIRTHS.sexes;
+    if (sex === undefined) throw new Error("no boys' figures");
+    const broken = (patch: object) => toReportPreview(withBirths({ ...BIRTHS, ...patch }));
+    expect(broken({ state: "MAYBE" })).toBeNull();
+    expect(broken({ given_name: { id: "someone-else", display_name: "PAWEŁ" } })).toBeNull();
+    expect(broken({ sexes: [] })).toBeNull();
+    // A count with no list to stand on.
+    expect(broken({ sexes: [{ ...sex, history: [{ ...BOYS_2020, list: null }] }] })).toBeNull();
+    // A boys' figure on a girls' list.
+    expect(
+      broken({ sexes: [{ ...sex, history: [{ ...BOYS_2020, list: girlsYear(2020).list }] }] }),
+    ).toBeNull();
+    expect(broken({ sexes: [{ ...sex, trend: { ...sex.trend, direction: "UP" } }] })).toBeNull();
+    expect(broken({ sexes: [{ ...sex, trend: { ...sex.trend, citations: [] } }] })).toBeNull();
+  });
+});

@@ -6,8 +6,10 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import {
+  BIRTH_NAME_RESOURCES,
   GIVEN_NAMES_FIRST_FEMALE_2026,
   GIVEN_NAMES_FIRST_MALE_2026,
+  importBirthNameResource,
   importGivenNameMeanings,
   importGivenNameResource,
   importPeselResource,
@@ -17,6 +19,7 @@ import {
 import {
   buildFullNameReport,
   buildReport,
+  deriveAllBirthNames,
   deriveAllGivenNameMeanings,
   deriveCurrentPopulation,
   deriveGivenName,
@@ -111,6 +114,7 @@ describe("the full-name report (TASK-124)", () => {
         },
       ],
       meaning: { state: "NO_SOURCE" },
+      births: { state: "NOT_ON_ANY_LIST" },
     });
     expect(given?.claims.map((c) => c.presentation_role)).toEqual(["HERO", "HERO"]);
     expect(given?.section_confidence_summary).toEqual({ VERIFIED: 2 });
@@ -130,6 +134,7 @@ describe("the full-name report (TASK-124)", () => {
     expect(section(built.sections, "LIMITATIONS")?.body_payload).toMatchObject({
       given_name: [
         { topic: "MEANING", reason_code: "NO_ADMISSIBLE_SOURCE" },
+        { topic: "BIRTHS", reason_code: "NOT_ON_ANY_LIST" },
         { topic: "FULL_NAME_COUNT", reason_code: "NO_SOURCE_PAIRS_NAMES" },
         {
           topic: "RANK",
@@ -155,18 +160,20 @@ describe("the full-name report (TASK-124)", () => {
     `.execute(db());
     expect(stored.rows.map((r) => [r.report_type, r.given])).toEqual([["FULL_NAME", "JAN"]]);
     const payload = stored.rows[0]?.payload as Record<string, unknown>;
-    expect(payload["report_schema_version"]).toBe("full_name_report@1");
+    expect(payload["report_schema_version"]).toBe("full_name_report@2");
     expect(
       (payload["response"] as { surname: { display_name: string } }).surname.display_name,
     ).toBe("NOWAK");
     const facts = parseGivenNameFacts(payload["given_name"]);
     expect(Object.keys(payload["given_name"] as object).sort()).toEqual([
+      "births",
       "given_name",
       "lists",
       "meaning",
       "state",
     ]);
     expect(facts?.meaning).toEqual({ state: "NO_SOURCE" });
+    expect(facts?.births).toMatchObject({ state: "NOT_ON_ANY_LIST", sexes: [] });
     expect(facts?.given_name.display_name).toBe("JAN");
     expect(facts?.lists.map((l) => [l.comparability_group, l.count.count, l.rank])).toEqual([
       ["pesel_given_names_2026_first_female", 14, null],
@@ -190,7 +197,7 @@ describe("the full-name report (TASK-124)", () => {
 
     const read = await readReportVersion(db(), again.report_version_id);
     expect(read?.report_type).toBe("FULL_NAME");
-    expect(read?.report_schema_version).toBe("full_name_report@1");
+    expect(read?.report_schema_version).toBe("full_name_report@2");
     expect(read?.sections.map((s) => s.section_type)).toEqual([...FULL_NAME_SECTION_TYPES]);
     expect((await readReportVersion(db(), surnameOnly.report_version_id))?.report_type).toBe(
       "NAME_ATLAS",
@@ -242,6 +249,7 @@ describe("the full-name report (TASK-124)", () => {
     expect(section(bare.sections, "LIMITATIONS")?.body_payload).toMatchObject({
       given_name: [
         { topic: "MEANING" },
+        { topic: "BIRTHS" },
         { topic: "FULL_NAME_COUNT" },
         { topic: "COUNT", reason_code: "UNAVAILABLE" },
       ],
@@ -355,5 +363,86 @@ describe("the full-name report (TASK-124)", () => {
     expect(
       (section(none.sections, "LIMITATIONS")?.body_payload as { given_name: unknown[] }).given_name,
     ).toContainEqual({ topic: "MEANING", reason_code: "NO_ADMISSIBLE_SOURCE" });
+  });
+
+  it("freezes the name as given to children, every year, boys and girls apart (TASK-159)", async () => {
+    // GENUINE: the full lists of 2020 and 2025, boys and girls (dataset 219).
+    const files: Record<string, string> = {
+      "28020": "full-first-male-2020.csv",
+      "28021": "full-first-female-2020.csv",
+      "1159536": "full-first-male-2025.csv",
+      "1159538": "full-first-female-2025.csv",
+    };
+    for (const [id, file] of Object.entries(files)) {
+      const resource = BIRTH_NAME_RESOURCES.find((r) => r.resource_id === id);
+      if (resource === undefined) throw new Error(`no resource ${id}`);
+      const bytes = read(`fixtures/pesel-given-name-births/${file}`);
+      const imported = await importBirthNameResource(db(), {
+        resource,
+        bytes,
+        expectedSha256: sha256Hex(bytes),
+        rawPayload: json(
+          `docs/sources/acquisition/2026-10-06/metadata/pesel_birth_given_names_first_${id}.official_resource.json`,
+        ),
+      });
+      if (imported.kind !== "IMPORTED") throw new Error(`${id}: ${imported.kind}`);
+    }
+    await deriveAllBirthNames(db(), { concurrency: 3, batchSize: 250 });
+
+    const built = await buildFullNameReport(db(), { givenName: "Jan", surname: "Nowak" });
+    if (built.kind !== "BUILT") throw new Error(built.kind);
+    const given = section(built.sections, "GIVEN_NAME");
+    expect(given?.body_payload).toMatchObject({
+      births: {
+        state: "READY",
+        sexes: [
+          { sex: "MALE", latest_year: 2025, years_on_lists: 2 },
+          { sex: "FEMALE", latest_year: 2025, years_on_lists: 0 },
+        ],
+      },
+    });
+    // Every active birth claim of the name is behind the chapter, shown.
+    const births = await sql<{ id: string; locator: string }>`
+      SELECT c.claim_id::text AS id, cit.supporting_locator AS locator FROM claims c
+        JOIN given_names g ON g.given_name_id = c.subject_entity_id
+        JOIN citations cit ON cit.claim_id = c.claim_id
+       WHERE g.canonical_display = 'JAN' AND c.claim_status = 'ACTIVE'
+         AND c.claim_type::text IN ('GIVEN_NAME_BIRTH_COUNT', 'GIVEN_NAME_BIRTH_RANK', 'GIVEN_NAME_BIRTH_TREND')
+    `.execute(db());
+    expect(births.rows.length).toBeGreaterThanOrEqual(4);
+    for (const { id } of births.rows) {
+      expect(given?.claims).toContainEqual({ claim_id: id, presentation_role: "SUPPORT" });
+    }
+    const gaps = (section(built.sections, "LIMITATIONS")?.body_payload as { given_name: unknown[] })
+      .given_name;
+    expect(gaps).not.toContainEqual(expect.objectContaining({ topic: "BIRTHS" }));
+
+    // The bibliography names each year's file once, however many figures cite it.
+    const ids = (section(built.sections, "SOURCES")?.body_payload as { citation_ids: string[] })
+      .citation_ids;
+    const cited = await sql<{ id: string; locator: string }>`
+      SELECT cit.citation_id::text AS id, cit.supporting_locator AS locator FROM citations cit
+       WHERE cit.citation_id::text = ANY(${ids}::text[])
+    `.execute(db());
+    expect(
+      cited.rows
+        .map((r) => r.locator)
+        .filter((l) => l === "resource:28020" || l === "resource:1159536")
+        .sort(),
+    ).toEqual(["resource:1159536", "resource:28020"]);
+
+    const stored = await readReportVersion(db(), built.report_version_id);
+    expect(stored?.report_schema_version).toBe("full_name_report@2");
+    const facts = parseGivenNameFacts((stored?.payload as Record<string, unknown>)["given_name"]);
+    const boys = facts?.births?.sexes.find((s) => s.sex === "MALE");
+    expect(
+      boys?.history?.filter((y) => y.count !== null).map((y) => [y.birth_year, y.count?.count]),
+    ).toEqual([
+      [2020, 7658],
+      [2025, 5054],
+    ]);
+    // 2000 has no stored list: no figure, never 0.
+    expect(boys?.history?.[0]).toMatchObject({ birth_year: 2000, list: null, count: null });
+    expect(boys?.trend).toMatchObject({ latest_year: 2025, earlier_year: 2020 });
   });
 });
