@@ -54,8 +54,6 @@ export interface BabyNamesText {
   readonly freeCta: string;
   /** "dziś 0 zł": beside the struck price. */
   readonly freeToday: string;
-  /** When the window ends, its date and time in Warsaw already formatted. */
-  readonly freeUntil: (when: string) => string;
   readonly lockedBody: string;
   readonly registerDiffers: string;
   readonly registerHeading: string;
@@ -187,7 +185,6 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     soon: "Wkrótce",
     freeCta: "Sprawdź dziś za darmo",
     freeToday: "dziś 0 zł",
-    freeUntil: (when) => `Za darmo dla zalogowanych do ${when}.`,
     lockedBody:
       "Liczba dzieci i miejsce na liście w każdym roku od 2000, osobno dla chłopców i dziewczynek.",
     registerDiffers:
@@ -296,7 +293,6 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     soon: "Coming soon",
     freeCta: "See it free today",
     freeToday: "0 zł today",
-    freeUntil: (when) => `Free for signed-in readers until ${when}.`,
     lockedBody:
       "The number of children and the place on the list in every year since 2000, for boys and girls separately.",
     registerDiffers:

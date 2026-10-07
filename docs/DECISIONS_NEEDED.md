@@ -22,6 +22,8 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 **Read here as:** the window opens the whole 8,99 zł view (the years since 2000, the whole list, the comparison, the paid share card), signed in only; claims are read on the FREE surface for a reader who did not buy (ADR-0001), so rights restricted to the paid surface stay closed to them; the price is shown struck, never removed. The owner sets and ends the window.
 
+**Amended (2026-10-07, TASK-162):** the owner asked the card to say the window ends tomorrow while keeping it open longer. Not built: a false deadline is a prohibited practice under the unfair commercial practices rules. The owner chose instead to show no end date; the card keeps the struck price, "dziś 0 zł" and "Sprawdź dziś za darmo". The window is set to end 2026-11-07, 23:59 Warsaw time.
+
 ---
 
 ## D-050 — RESOLVED as read in this session (2026-10-06): "imiona pary": a reading of two first names' meanings for a couple, written by a model, with shared motifs; the meanings free; the reading free for now, 15,99 zł later
