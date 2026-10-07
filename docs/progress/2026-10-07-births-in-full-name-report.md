@@ -64,7 +64,7 @@
 
 All passed.
 
-**After merging `main` @ `ecfd4a8`** (TASK-160 to TASK-166), the whole sequence was run again from a new empty `name_atlas`, and every step exited 0:
+**After merging `main` @ `ecfd4a8`** (TASK-160 to TASK-166), and again after `d752a2a` (TASK-168, on `fcc319e`), the whole sequence was run from a new empty `name_atlas`. Every step exited 0 both times, with the same counts:
 - `pnpm test`: 2,708 tests (web 1,240, truth 433);
 - `pnpm test:integration`: 547 tests;
 - `pnpm test:golden`: 364 tests;
