@@ -38,7 +38,7 @@ import type { Lang } from "./messages.js";
 import { SiteShell } from "./site-shell.js";
 
 /**
- * The comparison (TASK-156, D-044): `/pl/imiona-dla-dziecka/porownaj` and
+ * The comparison (TASK-158, D-044): `/pl/imiona-dla-dziecka/porownaj` and
  * `/en/baby-names/compare`, `?a=<name>&b=<name>&sex=boys|girls`. Two first
  * names of one sex side by side, part of the 8,99 zł view.
  *

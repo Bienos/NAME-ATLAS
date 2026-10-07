@@ -248,7 +248,7 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(history.filter((y) => y.list !== null && y.count === null).length).toBeGreaterThan(0);
   });
 
-  it("gives the comparison its inputs (TASK-156): ZOFIA against JULIA on the girls' lists, one sex, nothing summed, no 0", async () => {
+  it("gives the comparison its inputs (TASK-158): ZOFIA against JULIA on the girls' lists, one sex, nothing summed, no 0", async () => {
     // Both on the PAID surface with the history, as the comparison reads them, one sex at a time.
     const zofia = sex(await facts("Zofia", true), "FEMALE");
     const julia = sex(await facts("Julia", true), "FEMALE");

@@ -3,7 +3,7 @@ import { BabyCompareRoute, babyCompareMetadata } from "../../../../lib/baby-name
 
 /**
  * `/en/baby-names/compare?a={first name}&b={first name}&sex=boys|girls` — two
- * first names of one sex side by side, part of the 8,99 zł view (TASK-156,
+ * first names of one sex side by side, part of the 8,99 zł view (TASK-158,
  * D-044). A 404 unless `BABY_NAMES_ENABLED` is `1` and accounts are on. Never
  * indexed; `private, no-store` is set by the middleware.
  */

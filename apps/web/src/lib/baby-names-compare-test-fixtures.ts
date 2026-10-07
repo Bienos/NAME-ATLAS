@@ -2,7 +2,7 @@ import type { BirthNameFacts, BirthSexFigures, GivenNameFacts } from "@name-atla
 import { cite, list, registerList, year } from "./baby-names-share-test-fixtures.js";
 
 /**
- * JULIA's girls' fixtures for the comparison's tests (TASK-156), built from
+ * JULIA's girls' fixtures for the comparison's tests (TASK-158), built from
  * TASK-152's helpers: on every girls' list from 2000, no rank claim in 2010,
  * below the 2020 list's cut-off in the trend claim, on no boys' list. Not
  * imported by the app.
@@ -45,6 +45,7 @@ function juliaGirls(): BirthSexFigures {
   const history = JULIA_COUNTS.map((count, i) => year(2000 + i, count, JULIA_RANKS[i] ?? null));
   return {
     sex: "FEMALE",
+    on_any_list: true,
     latest: year(2025, 3207, 6),
     trend: {
       claim_id: "t-julia",
@@ -68,6 +69,7 @@ export function julia(): BirthNameFacts {
     sexes: [
       {
         sex: "MALE",
+        on_any_list: false,
         latest: { birth_year: 2025, list: list(2025, "MALE"), count: null, rank: null },
         trend: null,
         history: Array.from({ length: 26 }, (_, i) => ({

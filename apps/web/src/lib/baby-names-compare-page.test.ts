@@ -21,7 +21,7 @@ import { formatInteger } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
- * TASK-156 AC-2 to AC-4: the comparison's gating (404 when off, sign-in when
+ * TASK-158 AC-2 to AC-4: the comparison's gating (404 when off, sign-in when
  * signed out, the locked card and no figure without the entitlement, the full
  * view with it), its markup (no checkout link, the form's one button, the two
  * columns, `aria-current` on the tabs), the way in from the page, the

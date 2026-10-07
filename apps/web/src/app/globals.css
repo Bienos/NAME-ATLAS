@@ -9043,7 +9043,7 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   color: var(--color-text-tertiary);
 }
 
-/* --- the comparison of two first names (TASK-156) ---
+/* --- the comparison of two first names (TASK-158) ---
    A page in the same `.baby-names.atlas-v1` scope: two value columns that fit
    390 px without horizontal overflow (a long name wraps), the two series in
    the Brand System's chart colours (`--chart-current`, `--chart-context`),
@@ -9376,7 +9376,7 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   border-top: 1px solid var(--color-border-subtle);
 }
 
-/* The way in from the page's paid view (TASK-156): a link, Atlas Blue as the share entry. */
+/* The way in from the page's paid view (TASK-158): a link, Atlas Blue as the share entry. */
 .baby-names.atlas-v1 .bn-compare-entry {
   margin: var(--space-sm) 0 0;
 }

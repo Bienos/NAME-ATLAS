@@ -1,7 +1,7 @@
 import type { Lang } from "./messages.js";
 
 /**
- * The comparison's words (TASK-156, D-044): two first names of one sex side by
+ * The comparison's words (TASK-158, D-044): two first names of one sex side by
  * side, in Polish and English.
  *
  * Plain, and nothing beyond the data: a count, a share, a rank on one year's

@@ -127,7 +127,7 @@ export interface BabyNamesText {
   readonly shareEntry: string;
   /** "Karta z tymi liczbami, do wysłania bliskim." */
   readonly shareEntryNote: string;
-  // --- TASK-156: the way to the comparison, in the paid view. ---
+  // --- TASK-158: the way to the comparison, in the paid view. ---
   /** "Porównaj z innym imieniem": the link to the comparison with this name as the first. */
   readonly compareEntry: string;
 }

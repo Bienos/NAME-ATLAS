@@ -980,7 +980,7 @@ function YearTable({ figures, lang }: { figures: BirthSexFigures; lang: Lang }) 
 }
 
 /**
- * "Porównaj z innym imieniem" (TASK-156): the way to the comparison from a
+ * "Porównaj z innym imieniem" (TASK-158): the way to the comparison from a
  * sex's paid view, with this name as the first; the second is typed there.
  */
 function CompareEntry({ name, sex, lang }: { name: string; sex: BirthSex; lang: Lang }) {
@@ -1030,7 +1030,7 @@ function History({ figures, name, lang }: { figures: BirthSexFigures; name: stri
   );
 }
 
-/** The locked card: the 8,99 zł view named and priced, "Wkrótce", nothing to buy. The comparison (TASK-156) shows the same one. */
+/** The locked card: the 8,99 zł view named and priced, "Wkrótce", nothing to buy. The comparison (TASK-158) shows the same one. */
 export function BabyLocked({ lang }: { lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   // ADR-0023 §2.5: no buy button until the tier can lawfully be sold.
