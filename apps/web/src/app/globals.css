@@ -5520,7 +5520,9 @@ body.dusk {
   border-color: var(--dusk-amber);
 }
 
-.offer-tier h2 {
+.offer-tier h3,
+.offer-free h2,
+.offer-genealogy h2 {
   margin: 0;
   font-family: var(--font-display, Georgia, serif);
   font-size: 1.875rem;
@@ -5661,6 +5663,270 @@ body.dusk {
 
 .offer-fallback {
   margin: 0;
+}
+
+/* --- the offer redesigned (TASK-163): a hero, the free plan as a band, the
+   products and packs as cards, the 800 zł research, a table, steps, questions --- */
+
+.offer-hero {
+  margin-bottom: var(--space-7);
+}
+
+.offer-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--dusk-ink-soft);
+}
+
+.offer-facts li::before {
+  content: "✓ ";
+  color: var(--dusk-amber);
+}
+
+.offer-free,
+.offer-genealogy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border-radius: 22px;
+}
+
+.offer-free {
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-amber);
+}
+
+.offer-genealogy {
+  background: var(--dusk-surface-sunk);
+  border: 1px solid var(--dusk-tile-line);
+}
+
+.offer-free > div,
+.offer-genealogy > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.offer-free ul,
+.offer-genealogy ul {
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--dusk-ink-soft);
+  line-height: 1.55;
+}
+
+.offer-free li + li,
+.offer-genealogy li + li {
+  margin-top: var(--space-2);
+}
+
+.offer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin: var(--space-2) 0 0;
+}
+
+.dusk a.offer-plain {
+  color: var(--dusk-ink);
+}
+
+.offer-section {
+  min-width: 0;
+  margin-top: var(--space-8);
+}
+
+.offer-section > h2,
+.offer-section-head h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.125rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--dusk-ink);
+}
+
+.offer-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.offer-section-head p {
+  margin: 0;
+  max-width: 48ch;
+  color: var(--dusk-ink-muted);
+}
+
+.offer-once {
+  margin: calc(var(--space-2) * -1) 0 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.offer-price s {
+  margin-right: var(--space-2);
+  font-size: 0.6em;
+  color: var(--dusk-ink-muted);
+}
+
+.offer-status.is-free {
+  color: var(--dusk-on-amber);
+  background: var(--dusk-amber);
+}
+
+.offer-status.is-test {
+  color: var(--dusk-ink);
+  background: var(--dusk-glass);
+  border: 1px dashed var(--dusk-line-control);
+}
+
+.offer-ask h4 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--dusk-ink);
+}
+
+.offer-buy {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.offer-buy .offer-send {
+  justify-self: start;
+}
+
+.offer-test-note {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.offer-table-box {
+  /* Holds the cells' visually-hidden labels, which would otherwise widen the page. */
+  position: relative;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 18px;
+}
+
+.offer-table {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.offer-table th,
+.offer-table td {
+  padding: var(--space-3);
+  text-align: center;
+  border-bottom: 1px solid var(--dusk-tile-line);
+}
+
+.offer-table tbody th {
+  text-align: left;
+  font-weight: 400;
+  color: var(--dusk-ink-soft);
+}
+
+.offer-table thead th {
+  font-weight: 600;
+  color: var(--dusk-ink);
+  vertical-align: bottom;
+  background: var(--dusk-surface-raised);
+}
+
+.offer-table thead td {
+  background: var(--dusk-surface-raised);
+}
+
+.offer-table thead th span {
+  display: block;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--dusk-amber);
+}
+
+.offer-table .is-yes {
+  font-weight: 600;
+  color: var(--dusk-amber);
+}
+
+.offer-table .is-no,
+.offer-table .is-text {
+  font-size: 0.875rem;
+  color: var(--dusk-ink-muted);
+}
+
+.offer-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.offer-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: offer-step;
+}
+
+.offer-steps li {
+  padding-top: var(--space-4);
+  color: var(--dusk-ink-soft);
+  border-top: 1px solid var(--dusk-line);
+  counter-increment: offer-step;
+}
+
+.offer-steps li::before {
+  content: counter(offer-step);
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-data, ui-monospace, monospace);
+  color: var(--dusk-amber);
+}
+
+.offer-faq details {
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--dusk-tile-line);
+}
+
+.offer-faq summary {
+  font-weight: 600;
+  color: var(--dusk-ink);
+  cursor: pointer;
+}
+
+.offer-faq details p {
+  max-width: 70ch;
+  margin: var(--space-2) 0 0;
+  color: var(--dusk-ink-soft);
+}
+
+@media (max-width: 760px) {
+  .offer-free,
+  .offer-genealogy {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* The account's pages (TASK-062): the offer's form, with the messages and the

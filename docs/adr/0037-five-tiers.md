@@ -35,7 +35,7 @@
 
    **Key and status (TASK-144, 2026-10-06):** the "baby names" product's key is `babynames`; it is sold in test-mode checkout only, and the tree unlock checks `TREE_UNLOCK_TIERS` (the three tiers from 28,99 zł up), never "any purchase".
 
-   **Amended 2026-10-06 (D-049, TASK-155):** a seventh product, "full-name comparison" / "Porównanie imion i nazwisk", 15,99 zł, key `fullnames`: first names and surnames of two to four people side by side. Every tier from 28,99 zł up also holds it; it holds no tree unlock and not the "baby names" figures. Test-mode checkout only; not yet on the offer page.
+   **Amended 2026-10-06 (D-049, TASK-155):** a seventh product, "full-name comparison" / "Porównanie imion i nazwisk", 15,99 zł, key `fullnames`: first names and surnames of two to four people side by side. Every tier from 28,99 zł up also holds it; it holds no tree unlock and not the "baby names" figures. Test-mode checkout only. **Amended 2026-10-07 (TASK-167):** on the offer page, with the 8,99 zł product, as "coming" (in the free window, D-051, the 8,99 zł view shows its price struck); a reader on `CHECKOUT_TESTERS` with test-mode checkout on gets a test purchase per product there, as on the account page (TASK-111, TASK-154); nobody else gets a buy button.
 
    **The tree unlock** is the same in every tier from 28,99 zł up: a tree of more than 5 people, and matches beyond second cousins. **Amended 2026-10-06 (D-044):** the "baby names" tier does not hold it, and every tier from 28,99 zł up also holds that tier's figures.
 
