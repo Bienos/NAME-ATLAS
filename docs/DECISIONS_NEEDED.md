@@ -10,7 +10,7 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ## D-052 — RESOLVED (2026-10-07): the full-name report as a PDF, free for every signed-in reader until the owner ends it
 
-**Status:** RESOLVED by the owner in a Claude Code session; built by TASK-173.
+**Status:** RESOLVED by the owner in a Claude Code session; built by TASK-176.
 **Owner:** project owner.
 **Raised by:** the owner, 2026-10-07: "PDF raportu" as the next step, and, asked who gets the real PDF, "Zalogowani, na razie za darmo".
 

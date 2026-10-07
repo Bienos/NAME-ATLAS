@@ -13,7 +13,7 @@
  * The only entitlement written is INTERNAL_TEST: an operator builds a report with
  * `pnpm report:build`, for any resolved surname, eligible or not (the owner's
  * decisions of 2026-10-05). Nothing is offered or sold, and the frozen
- * eligibility says whether it could be. While the report is free (TASK-173,
+ * eligibility says whether it could be. While the report is free (TASK-176,
  * D-052), a signed-in reader's full-name report is composed the same way on
  * the FREE surface and never written (`composeReaderReport`).
  *
@@ -151,7 +151,7 @@ export interface ReportSection {
  * Who a report is composed for, and the surface it is read on (ADR-0001):
  * `INTERNAL_TEST`, an operator's frozen version, on the PAID surface; and
  * `FREE_SIGNED_IN`, a signed-in reader's copy while the report is free
- * (TASK-173, D-052), on the FREE surface, as the baby-names view reads it for
+ * (TASK-176, D-052), on the FREE surface, as the baby-names view reads it for
  * a reader who did not buy (D-051). Only `INTERNAL_TEST` is ever stored.
  */
 export const REPORT_ENTITLEMENT_SURFACES = {
@@ -755,7 +755,7 @@ export type ComposeReaderReportOutcome =
   | Exclude<BuildFullNameReportOutcome, { kind: "BUILT" }>;
 
 /**
- * A signed-in reader's full-name report while it is free (TASK-173, D-052):
+ * A signed-in reader's full-name report while it is free (TASK-176, D-052):
  * composed as {@link buildFullNameReport} composes it, but on the FREE
  * surface, and never written. It comes back in a stored version's shape, as
  * the database would return it, so the preview's parser and the PDF read it

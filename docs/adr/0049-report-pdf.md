@@ -6,8 +6,8 @@
   - the sample on the site, marked as invented;
   - an invented name not on the PESEL lists.
 - **Relates to:** ADR-0041 (the full-name report), ADR-0037 §2 (the report announced, TASK-166), TASK-107/TASK-118 (the one-page surname PDF, `pdf-lib`).
-- **Implemented by:** TASK-172; §4 by TASK-173.
-- **Amended:** 2026-10-07, §4 added (TASK-173, D-052).
+- **Implemented by:** TASK-172; §4 by TASK-176.
+- **Amended:** 2026-10-07, §4 added (TASK-176, D-052).
 
 ## Context
 
@@ -32,7 +32,7 @@ The full-name report exists as a stored, immutable version (ADR-0041) and as an 
    - **No person, list neighbour or place-list entry is named.** Famous bearers, neighbours and localities are given the states that show none.
    - **Every page is marked:** a band, "PRZYKŁAD · imię, nazwisko i wszystkie dane są zmyślone", a diagonal "PRZYKŁAD", a note on the cover, and the document's title ends in "PRZYKŁAD".
    - **It is public, cached and `noindex`.** It is linked from the report's announcement with the line that its data are invented.
-4. **A reader's own report (TASK-173, D-052).** While the report is free, a signed-in reader gets it from the page of what the report holds, for the typed first name and that page's surname.
+4. **A reader's own report (TASK-176, D-052).** While the report is free, a signed-in reader gets it from the page of what the report holds, for the typed first name and that page's surname.
    - **Composed when asked, never stored:** `composeReaderReport` reads both names as an operator's build does, on the FREE surface (ADR-0001, as D-051 reads the baby-names view), and returns a stored version's shape, with no id and version 0. Its coverage, index and eligibility are the assessments an operator's build freezes. Its cover and its foot then say only the date of the data. No row is written, so a reader's report is not an entitlement and cannot be fetched again by an id.
    - **The same PDF:** it goes through `toReportPreview` and §1–§2's PDF, without the sample's marks.
    - **Who gets it:** a reader with a session. Anything the page explains sends the reader back to it with the name: no session, accounts off, a name not on the lists or held for review, the free report ended.
@@ -42,5 +42,5 @@ The full-name report exists as a stored, immutable version (ADR-0041) and as an 
 ## Consequences
 
 - `apps/web` depends on `@react-pdf/renderer`. The PDF routes need the fonts in their trace (`next.config.ts`).
-- The real report as a PDF for a reader (TASK-173) renders through the same component, from a report composed for that reader (§4). Each download composes the report again: two reads of the query service, the coverage, the index and the eligibility, then the render. Nothing is cached, because the file is one reader's.
+- The real report as a PDF for a reader (TASK-176) renders through the same component, from a report composed for that reader (§4). Each download composes the report again: two reads of the query service, the coverage, the index and the eligibility, then the render. Nothing is cached, because the file is one reader's.
 - A change to the preview's words changes the PDF's too. A new chapter type needs a body in both.

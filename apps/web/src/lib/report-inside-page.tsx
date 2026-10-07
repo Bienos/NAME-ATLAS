@@ -60,7 +60,7 @@ import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
  * page; never indexed, never in a sitemap. The report cannot be bought yet:
  * "Wkrótce" and the waiting-list email, no buy button (ADR-0037 §2 as amended).
  *
- * While the report is free for signed-in readers (TASK-173, D-052), the price
+ * While the report is free for signed-in readers (TASK-176, D-052), the price
  * is struck with "dziś 0 zł", and a reader with a session gets a button under
  * the sample that downloads their own report as a PDF
  * (`report-reader-pdf.ts`).

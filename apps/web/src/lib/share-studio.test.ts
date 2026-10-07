@@ -99,7 +99,7 @@ describe("the share studio (TASK-093)", () => {
   });
 
   it("announces the full report under the card, whatever the gate (TASK-166)", () => {
-    // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-173).
+    // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-176).
     vi.stubEnv("FULL_REPORT_FREE", "0");
     for (const gate of ["off", "open", "sign-in"] as const) {
       const html = unescape(studio(gate));
@@ -125,7 +125,7 @@ describe("the share studio (TASK-093)", () => {
     expect(en).toContain("PLN 28.99");
   });
 
-  it("while free, strikes the price and says 0 zł instead of the waiting list (TASK-173)", () => {
+  it("while free, strikes the price and says 0 zł instead of the waiting list (TASK-176)", () => {
     const html = unescape(studio("open"));
     const block = /<section class="rt rt-studio"[\s\S]*?<\/section>/u.exec(html)?.[0] ?? "";
     expect(block).toContain("<s>28,99 zł</s>");

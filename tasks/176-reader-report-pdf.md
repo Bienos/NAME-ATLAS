@@ -1,4 +1,4 @@
-# TASK-173 — A signed-in reader's full report as a PDF, free for now
+# TASK-176 — A signed-in reader's full report as a PDF, free for now
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-reader-report-pdf.md`).
 - **Requested by:** the project owner, 2026-10-07. They chose "PDF raportu" after TASK-166, and "Zalogowani, na razie za darmo" for who gets it. TASK-172 built the PDF and an invented sample; this task gives a reader their own. Asked on 2026-10-07, they chose:
@@ -6,7 +6,7 @@
   - **Wording:** "28,99 zł" struck with "dziś 0 zł" beside it, in place of "Wkrótce", on that page, the deck's last card, the studio and the video's closing plate. They were told that a struck price never charged reads as a false reduction (the Omnibus rules) and chose it all the same, as D-051 did for the baby-names view.
   - **Until when:** no end date; the owner ends it.
 - **Decision:** D-052; ADR-0049 §4 and ADR-0037 §2, amended.
-- **Numbers:** TASK-173 and D-052, free on `main` @ `6e2fb72` and in open pull requests. No migration.
+- **Numbers:** TASK-176 and D-052. It was built as TASK-173, which `main` then gave to the offer page (#208); TASK-174 (#209) and TASK-175 (#206, open) were taken too. No migration.
 
 ## In scope
 

@@ -447,7 +447,7 @@ describe("the full-name report (TASK-124)", () => {
     expect(boys?.trend).toMatchObject({ latest_year: 2025, earlier_year: 2020 });
   });
 
-  it("composes a signed-in reader's copy on the FREE surface and writes nothing (TASK-173)", async () => {
+  it("composes a signed-in reader's copy on the FREE surface and writes nothing (TASK-176)", async () => {
     const counts = async () => [
       await n(sql`SELECT count(*)::text AS n FROM reports`),
       await n(sql`SELECT count(*)::text AS n FROM report_versions`),
@@ -485,7 +485,7 @@ describe("the full-name report (TASK-124)", () => {
     expect(facts?.births?.sexes.find((s) => s.sex === "MALE")?.history?.length).toBeGreaterThan(2);
   });
 
-  it("composes nothing for an unknown name, a form held for review, or an unknown surname (TASK-173)", async () => {
+  it("composes nothing for an unknown name, a form held for review, or an unknown surname (TASK-176)", async () => {
     expect(
       (await composeReaderReport(db(), { givenName: "BRAK DANYCH", surname: "NOWAK" })).kind,
     ).toBe("GIVEN_NAME_NOT_FOUND");

@@ -1,4 +1,4 @@
-# 2026-10-07 — A signed-in reader's full report as a PDF, free for now (TASK-173)
+# 2026-10-07 — A signed-in reader's full report as a PDF, free for now (TASK-176)
 
 **Request.** The owner chose "PDF raportu" after TASK-166, and "Zalogowani, na razie za darmo" for who gets it. TASK-172 built the PDF and an invented sample. Asked on 2026-10-07, the owner chose:
 - **where:** the page of what the report holds, under the sample;

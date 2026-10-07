@@ -866,14 +866,14 @@ export interface OutroText {
   readonly heading: string;
   readonly line: string;
   readonly soon: string;
-  /** The price, struck before `soon`, while the report is free (TASK-173, D-052); else null. */
+  /** The price, struck before `soon`, while the report is free (TASK-176, D-052); else null. */
   readonly struck: string | null;
 }
 
 /**
  * The clip's closing plate (TASK-166): the full report announced, with the
  * surname in its line and "wkrótce". It states no fact, as the opening does not.
- * While the report is free (TASK-173), the price struck and "dziś 0 zł".
+ * While the report is free (TASK-176), the price struck and "dziś 0 zł".
  */
 function outroFace(host: string | null, text: OutroText): ReactElement {
   return (

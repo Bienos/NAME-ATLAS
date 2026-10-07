@@ -9,7 +9,7 @@ import { SAMPLE_REPORT, SAMPLE_RESPONSE } from "./report-sample.js";
 import type { PageAnswer } from "./surname-page.js";
 
 /**
- * TASK-173: a signed-in reader's own report as a PDF, while it is free. The
+ * TASK-176: a signed-in reader's own report as a PDF, while it is free. The
  * composed report here is the invented sample's, in the shape
  * `composeReaderReport` returns: never stored, no id, version 0.
  */
@@ -46,7 +46,7 @@ const url = (query: string, lang: "pl" | "en" = "pl") =>
 
 const BACK = "/pl/nazwisko/wrzosowiecka/pelny-raport?imie=Wielimira";
 
-describe("a signed-in reader's report as a PDF (TASK-173)", () => {
+describe("a signed-in reader's report as a PDF (TASK-176)", () => {
   it("gives a reader with a session their report, composed for the typed name, private and never indexed", async () => {
     const d = deps();
     const response = await readerReportPdfResponse(

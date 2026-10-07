@@ -184,7 +184,7 @@ describe("the video's layers (TASK-108)", () => {
         eyebrow: "Pełny raport · PDF",
         heading: "Imię i nazwisko w 10 rozdziałach",
         line: "KOWALSKI i Twoje imię, z przypisem przy każdym fakcie.",
-        // While the report is free for signed-in readers (TASK-173, D-052).
+        // While the report is free for signed-in readers (TASK-176, D-052).
         soon: "Pełny raport PDF · dziś 0 zł",
         struck: "28,99 zł",
       },
@@ -196,7 +196,7 @@ describe("the video's layers (TASK-108)", () => {
     ).toBe(401);
   });
 
-  it('says "wkrótce" on the closing plate once the free report ends (TASK-173)', () => {
+  it('says "wkrótce" on the closing plate once the free report ends (TASK-176)', () => {
     expect(outroText("KOWALSKI", "pl", false)).toMatchObject({
       soon: "Pełny raport PDF · wkrótce",
       struck: null,

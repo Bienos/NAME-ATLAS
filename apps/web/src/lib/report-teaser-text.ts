@@ -9,7 +9,7 @@ import type { Lang } from "./messages.js";
  * way to ask is the tier's waiting-list email (ADR-0037 §2.5), never a buy
  * button (ADR-0026 §2.2, ADR-0023 §2.5).
  *
- * Since TASK-173 (D-052) the report is free for signed-in readers until the
+ * Since TASK-176 (D-052) the report is free for signed-in readers until the
  * owner ends it: every place shows the price struck and "dziś 0 zł" instead of
  * "Wkrótce", and the page of what the report holds gives a signed-in reader
  * their own report as a PDF. `FULL_REPORT_FREE=0` ends it; any other value,
@@ -37,7 +37,7 @@ export const SAMPLE_REPORT_PATHS = {
 /** The variable that ends the free report (D-052): exactly `0` ends it. */
 export const REPORT_FREE_ENV = "FULL_REPORT_FREE";
 
-/** Whether the report is free for signed-in readers now (TASK-173, D-052). */
+/** Whether the report is free for signed-in readers now (TASK-176, D-052). */
 export function reportFree(
   env: Readonly<Record<string, string | undefined>> = process.env,
 ): boolean {
@@ -82,7 +82,7 @@ export const REPORT_TEASER_TEXT = {
     soon: "Wkrótce.",
     notify: "Powiadom mnie",
     notifyHint: "Otworzy się e-mail do nas. Odpiszemy, gdy raport będzie gotowy.",
-    // TASK-173 (D-052): while the report is free for signed-in readers.
+    // TASK-176 (D-052): while the report is free for signed-in readers.
     freeToday: "dziś 0 zł",
     freeNow: "Na razie za darmo dla zalogowanych.",
     freeHint: "Wpisz imię i pobierz swój raport jako PDF.",

@@ -16,7 +16,7 @@ import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
 import type { PageAnswer } from "./surname-page.js";
 
 /**
- * A signed-in reader's own full-name report as a PDF (TASK-173, D-052):
+ * A signed-in reader's own full-name report as a PDF (TASK-176, D-052):
  * `/pl/nazwisko/{slug}/pelny-raport/pdf?imie={imię}` and
  * `/en/surname/{slug}/full-report/pdf?name={name}`, the button under the
  * sample on the page of what the report holds.

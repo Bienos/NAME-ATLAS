@@ -175,7 +175,7 @@ const TEXT = {
     lede: (n: number) =>
       `${n} rozdziałów, przypis przy każdym fakcie. Każda liczba pochodzi ze źródła, które podajemy; brak danych mówimy wprost.`,
     stateOn: (date: string) => `Stan danych na ${date}`,
-    // A reader's copy (TASK-173) is composed when asked and never stored: version 0.
+    // A reader's copy (TASK-176) is composed when asked and never stored: version 0.
     version: (v: number, date: string) =>
       v === 0 ? `Stan danych ${date}` : `Wersja ${v} · stan danych ${date}`,
     page: (n: number, of: number) => `${n} / ${of}`,
@@ -798,7 +798,7 @@ function InShort({ p, lang }: { p: ReportPreview; lang: Lang }) {
         cards.push({
           key: `births-${s.sex}`,
           figure: formatInteger(latest.count.count, lang),
-          // The sentence ends itself: the Polish one ends in "r." (TASK-173).
+          // The sentence ends itself: the Polish one ends in "r." (TASK-176).
           line: x.births(s.sex, latest.birth_year),
           chapter: chapterOf("GIVEN_NAME"),
         });

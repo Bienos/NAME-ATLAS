@@ -548,7 +548,7 @@ describe("the full report announced on the last card (TASK-166)", () => {
 
   for (const lang of ["pl", "en"] as const) {
     it(`says what the report holds, its price and "soon", in ${lang}, once the free report ends`, () => {
-      // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-173).
+      // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-176).
       vi.stubEnv("FULL_REPORT_FREE", "0");
       const path = lang === "en" ? "/en/surname/kowalski" : "/pl/nazwisko/kowalski";
       const end = deckCards(FULL, lang, { path, shareUrl: null }).at(-1);
@@ -585,7 +585,7 @@ describe("the full report announced on the last card (TASK-166)", () => {
     });
   }
 
-  it("while free, strikes the price, says 0 zł for signed-in readers, and offers no waiting list (TASK-173)", () => {
+  it("while free, strikes the price, says 0 zł for signed-in readers, and offers no waiting list (TASK-176)", () => {
     const end = deckCards(FULL, "pl", { path: "/pl/nazwisko/kowalski", shareUrl: null }).at(-1);
     const block = TEASER.exec(faces(end === undefined ? [] : [end]))?.[0] ?? "";
     const words = text(block);

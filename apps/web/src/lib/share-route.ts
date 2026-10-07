@@ -68,7 +68,7 @@ export async function shareCardResponse(
 
 /**
  * The video's closing plate's words (TASK-166): the full report, announced for
- * this surname; while it is free (TASK-173, D-052), its price struck and "dziś 0 zł".
+ * this surname; while it is free (TASK-176, D-052), its price struck and "dziś 0 zł".
  */
 export function outroText(surname: string, lang: Lang, free: boolean = reportFree()): OutroText {
   const t = REPORT_TEASER_TEXT[lang];

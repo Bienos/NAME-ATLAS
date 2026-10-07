@@ -14628,7 +14628,7 @@ a.ri-notify {
   font-size: 0.8125rem;
 }
 
-/* The report free for signed-in readers (TASK-173, D-052): the price struck,
+/* The report free for signed-in readers (TASK-176, D-052): the price struck,
    "dziś 0 zł" beside it, and the reader's own PDF under the sample. */
 .rt-price s,
 .rt-split s,

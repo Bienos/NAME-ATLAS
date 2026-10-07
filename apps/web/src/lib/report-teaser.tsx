@@ -19,7 +19,7 @@ import {
  * They state no fact about any name: what the report holds, never what it
  * says. The sample page reads the claims.
  *
- * While the report is free for signed-in readers (TASK-173, D-052), the price
+ * While the report is free for signed-in readers (TASK-176, D-052), the price
  * is struck with "dziś 0 zł" beside it, and "Wkrótce" and the waiting-list
  * email give way to that line; the reader's PDF is on the sample page.
  */

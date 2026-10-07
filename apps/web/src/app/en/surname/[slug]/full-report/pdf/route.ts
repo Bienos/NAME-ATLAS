@@ -4,7 +4,7 @@ import { readerReportPdfResponse } from "../../../../../../lib/report-reader-pdf
 
 /**
  * `/en/surname/{slug}/full-report/pdf?name={name}`: a signed-in reader's own
- * full report as a PDF, free for now (TASK-173, D-052). Private, never indexed.
+ * full report as a PDF, free for now (TASK-176, D-052). Private, never indexed.
  */
 
 export const dynamic = "force-dynamic";

@@ -409,7 +409,7 @@ export type {
   BirthListRow,
 } from "./given-name-birth-list.js";
 // The frozen surname report — TASK-119, RPT-001: internal test versions only.
-// A signed-in reader's copy while the report is free — TASK-173, D-052: composed, never stored.
+// A signed-in reader's copy while the report is free — TASK-176, D-052: composed, never stored.
 export {
   buildFullNameReport,
   buildReport,
