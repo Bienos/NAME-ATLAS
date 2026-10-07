@@ -1,4 +1,5 @@
 import { htmlLang, UI } from "./messages.js";
+import { BrandMark } from "./brand-mark.js";
 import type { Lang } from "./messages.js";
 import { legalPath } from "./legal-text.js";
 import { CONTACT_EMAIL } from "./contact.js";
@@ -69,6 +70,7 @@ export function SiteFooter({ lang }: { readonly lang: Lang }) {
       <div className="footer-grid">
         <div className="footer-brand">
           <a className="footer-wordmark" href={homePath(lang)}>
+            <BrandMark />
             {t.title}
           </a>
           <p className="footer-tagline">{t.tagline}</p>

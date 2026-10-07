@@ -4064,6 +4064,9 @@ body.dusk {
 }
 
 .site-nav .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
   flex: none;
   font-family: var(--font-ui, system-ui, sans-serif);
   font-size: 1.625rem;
@@ -4071,6 +4074,18 @@ body.dusk {
   letter-spacing: -0.01em;
   color: var(--dusk-ink);
   text-decoration: none;
+}
+
+/* The Evolved Contour mark beside the wordmark (ADR-0046); it takes the text colour. */
+.wordmark .brand-mark,
+.footer-wordmark .brand-mark {
+  flex: none;
+  width: 1.35em;
+  height: 1.35em;
+}
+
+.brand-mark-point {
+  fill: var(--atlas-blue-500);
 }
 
 .site-links {
@@ -10266,6 +10281,9 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
 }
 
 .dusk .footer-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
   font-family: var(--font-display, Georgia, serif);
   font-size: 2rem;
   font-weight: 500;
