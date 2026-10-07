@@ -13,12 +13,11 @@ import type { Lang } from "./messages.js";
  * doing something new with data — a form, analytics, a cookie — this text
  * changes in the same change, or it stops being true.
  *
- * The controller's name and place are the project owner's, given for
- * publication on 2026-09-30.
+ * The controller's name is the project owner's, given for publication on
+ * 2026-09-30; at the owner's request the town was taken out on 2026-10-07.
  */
 
 export const CONTROLLER_NAME = "Patryk Cicbowski";
-export const CONTROLLER_PLACE = "Iława";
 
 /**
  * The date each document was last changed, ISO. The privacy notice changed for
@@ -27,11 +26,13 @@ export const CONTROLLER_PLACE = "Iława";
  * the consent banner (TASK-109), and for the legal review of 2026-10-04
  * (`docs/progress/2026-10-04-legal-review.md`), which also added the terms'
  * ban on unlawful content, then for Google Analytics on every page, its
- * cookies only with consent (TASK-115), and for Vercel Speed Insights.
+ * cookies only with consent (TASK-115), and for Vercel Speed Insights. Both
+ * changed on 2026-10-07: the controller without the town, and the contact
+ * address on the site's domain.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
-  privacy: "2026-10-05",
-  terms: "2026-10-04",
+  privacy: "2026-10-07",
+  terms: "2026-10-07",
 };
 
 /**
@@ -71,7 +72,7 @@ export interface LegalDocument {
 
 export type LegalKind = "privacy" | "terms";
 
-const who = `${CONTROLLER_NAME}, ${CONTROLLER_PLACE}`;
+const who = CONTROLLER_NAME;
 
 const PRIVACY: Record<Lang, LegalDocument> = {
   pl: {

@@ -1,14 +1,14 @@
 import { checkEmail, createResendMailer, MailError } from "@name-atlas/accounts";
 import type { Mailer, OutgoingMail, ResendConfig } from "@name-atlas/accounts";
 import { isSameSiteRequest } from "./account-routes.js";
-import { CONTACT_EMAIL, CONTACT_MESSAGE_MAX } from "./contact.js";
+import { CONTACT_INBOX, CONTACT_MESSAGE_MAX } from "./contact.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { contactPath } from "./site-links.js";
 
 /**
  * `POST /api/contact` — the contact page's form. It sends the message to
- * `CONTACT_EMAIL` through Resend, with the writer's address as the reply-to,
+ * `CONTACT_INBOX` through Resend, with the writer's address as the reply-to,
  * and stores nothing. The page answers each outcome with a status word:
  * `sent`, `invalid`, `failed` or `unavailable` (no mail configuration).
  *
@@ -96,7 +96,7 @@ export function contactMail(input: ContactMessage): OutgoingMail {
     input.message,
   ];
   return {
-    to: CONTACT_EMAIL,
+    to: CONTACT_INBOX,
     replyTo: input.email,
     subject: `Name Atlas, kontakt: ${input.topic}`,
     text: lines.join("\n"),

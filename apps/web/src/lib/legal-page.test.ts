@@ -2,15 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { LegalView, legalMetadata } from "./legal-page.js";
-import {
-  CONTROLLER_NAME,
-  CONTROLLER_PLACE,
-  LEGAL_UPDATED,
-  legalDocument,
-  legalPath,
-} from "./legal-text.js";
+import { CONTROLLER_NAME, LEGAL_UPDATED, legalDocument, legalPath } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
-import { CONTACT_EMAIL } from "./contact.js";
+import { CONTACT_EMAIL, CONTACT_INBOX } from "./contact.js";
 import { SiteFooter } from "./site-footer.js";
 import { htmlLang } from "./messages.js";
 
@@ -59,7 +53,8 @@ describe("legal pages (TASK-046)", () => {
       for (const lang of LANGS) {
         const text = JSON.stringify(legalDocument(kind, lang));
         expect(text).toContain(CONTROLLER_NAME);
-        expect(text).toContain(CONTROLLER_PLACE);
+        expect(text).not.toContain("Iława");
+        expect(text).not.toContain(CONTACT_INBOX);
         expect(text).toContain(CONTACT_EMAIL);
       }
     }
