@@ -155,6 +155,23 @@ describe("assembleBirthNameFacts (TASK-141)", () => {
     expect(girls?.trend).toBeNull();
   });
 
+  it("says per sex whether the name is on any of its lists, in any year, without a history (TASK-157)", () => {
+    // A girls' name: on the 2011 girls' list only, so absent from both latest lists.
+    const girlsOnly = assembleBirthNameFacts(NAME, LISTS, [count("f2011", 40)], FREE);
+    expect(girlsOnly.sexes.map((s) => [s.sex, s.on_any_list])).toEqual([
+      ["MALE", false],
+      ["FEMALE", true],
+    ]);
+    expect(girlsOnly.sexes[1]?.latest?.count).toBeNull();
+    // Both sexes: the boys on their 2020 list only.
+    const both = assembleBirthNameFacts(NAME, LISTS, [count("f2025", 4), count("m2020", 2)], FREE);
+    expect(both.sexes.map((s) => s.on_any_list)).toEqual([true, true]);
+    // No list of a sex stored: not on any of its lists.
+    const girlsLists = LISTS.filter((l) => l.sex === "FEMALE");
+    const noBoysList = assembleBirthNameFacts(NAME, girlsLists, [count("f2025", 4)], FREE);
+    expect(noBoysList.sexes[0]).toMatchObject({ sex: "MALE", on_any_list: false, latest: null });
+  });
+
   it("says a name is on no list when no count claim stands on a current list", () => {
     expect(assembleBirthNameFacts(NAME, LISTS, [], FREE).state).toBe("NOT_ON_ANY_LIST");
     // A claim on a list no longer active (a superseded resource) is not read.

@@ -145,6 +145,7 @@ export function boysHistory(): BirthYearFigures[] {
 export function zofiaGirls(history: boolean): BirthSexFigures {
   return {
     sex: "FEMALE",
+    on_any_list: true,
     latest: year(2025, 4415, 1),
     trend: {
       claim_id: "t25",
@@ -164,6 +165,7 @@ export function zofiaGirls(history: boolean): BirthSexFigures {
 export function zofia(history: boolean): BirthNameFacts {
   const boys: BirthSexFigures = {
     sex: "MALE",
+    on_any_list: false,
     latest: { birth_year: 2025, list: list(2025, "MALE"), count: null, rank: null },
     trend: null,
     history: history ? boysHistory() : null,

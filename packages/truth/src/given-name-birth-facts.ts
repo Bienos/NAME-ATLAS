@@ -97,6 +97,12 @@ export interface BirthTrendFigure {
 
 export interface BirthSexFigures {
   readonly sex: BirthSex;
+  /**
+   * True when a count claim stands for the name on at least one stored list of
+   * this sex, in any year (TASK-157). False says only that it is on none of
+   * them, never that it was given 0 times.
+   */
+  readonly on_any_list: boolean;
   /** The latest year's figures; null when no list of this sex is stored. */
   readonly latest: BirthYearFigures | null;
   /** Null when no trend claim stands on the current latest list. */
@@ -432,7 +438,9 @@ export function assembleBirthNameFacts(
       (best, l) => (best === null || l.birth_year > best.birth_year ? l : best),
       null,
     );
-    if (latestList === null) return { sex, latest: null, trend: null, history: null };
+    if (latestList === null) {
+      return { sex, on_any_list: false, latest: null, trend: null, history: null };
+    }
     const trend = trends.get(latestList.list_id);
     const trendValue = trend === undefined ? null : (JSON.parse(trend.row.payload) as TrendValue);
     let history: BirthYearFigures[] | null = null;
@@ -444,6 +452,7 @@ export function assembleBirthNameFacts(
     }
     return {
       sex,
+      on_any_list: ofSex.some((l) => counts.has(l.list_id)),
       latest: yearOf(latestList, latestList.birth_year),
       trend:
         trend === undefined || trendValue === null
