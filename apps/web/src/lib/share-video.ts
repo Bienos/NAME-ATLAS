@@ -1,7 +1,8 @@
 /**
  * The share video (TASK-097, TASK-108, ADR-0034 §2.6): a short vertical MP4
  * made in the browser from the surname's own share-card images, with no audio.
- * The server draws the images (each card in two layers, and an opening plate);
+ * The server draws the images (each card in two layers, an opening plate and,
+ * when the reader keeps it, a closing plate announcing the full report, TASK-166);
  * the clip is put together in the browser and nothing is stored. The muxer (`mediabunny`) is
  * loaded only when a reader asks for a video.
  */
@@ -71,6 +72,11 @@ export const VIDEO = {
   transition: 0.45,
   /** The full clip ends on the summary again. */
   closing: 1.5,
+  /**
+   * The full report's plate (TASK-166). It replaces the full clip's closing
+   * summary, and the short clip takes one card fewer, so neither runs longer.
+   */
+  outro: 1.8,
   /** The shortest clip: cards are held longer rather than make a three-second video. */
   minDuration: 7,
   maxCards: 7,
@@ -85,13 +91,16 @@ export type VideoMotion = "up" | "side";
 export interface VideoOptions {
   readonly length: VideoLength;
   readonly motion: VideoMotion;
+  /** End on the full report's plate (TASK-166); off when not given. */
+  readonly outro?: boolean;
 }
 export const DEFAULT_VIDEO: VideoOptions = { length: "full", motion: "up" };
 
-/** One plate of the clip: the opening, or a card (the closing summary is a card again). */
+/** One plate of the clip: the opening, a card (the closing summary is a card again) or the report's. */
 export type Segment =
   | { readonly kind: "intro" }
-  | { readonly kind: "card"; readonly card: number; readonly closing: boolean };
+  | { readonly kind: "card"; readonly card: number; readonly closing: boolean }
+  | { readonly kind: "outro" };
 
 /**
  * What to draw at one moment: a plate, and the next pushing in over it by
@@ -128,25 +137,36 @@ function ease(x: number): number {
  * tested without a browser.
  */
 export function videoSchedule(count: number, options: VideoOptions = DEFAULT_VIDEO): Schedule {
-  const n = Math.max(1, Math.min(VIDEO.cards[options.length], Math.floor(count)));
-  const closing = options.length === "full" && n > 1;
+  const outro = options.outro === true;
+  const most = VIDEO.cards[options.length] - (outro && options.length === "short" ? 1 : 0);
+  const n = Math.max(1, Math.min(most, Math.floor(count)));
+  const closing = options.length === "full" && n > 1 && !outro;
   const segments: Segment[] = [{ kind: "intro" }];
   for (let i = 0; i < n; i++) segments.push({ kind: "card", card: i, closing: false });
   if (closing) segments.push({ kind: "card", card: 0, closing: true });
+  if (outro) segments.push({ kind: "outro" });
   const tr = VIDEO.transition;
-  const fixed = VIDEO.intro + (segments.length - 1) * tr + (closing ? VIDEO.closing : 0);
+  const fixed =
+    VIDEO.intro +
+    (segments.length - 1) * tr +
+    (closing ? VIDEO.closing : 0) +
+    (outro ? VIDEO.outro : 0);
   const hold = Math.max(VIDEO.hold[options.length], (VIDEO.minDuration - fixed) / n);
   const holds = segments.map((s) =>
-    s.kind === "intro" ? VIDEO.intro : s.closing ? VIDEO.closing : hold,
+    s.kind === "intro"
+      ? VIDEO.intro
+      : s.kind === "outro"
+        ? VIDEO.outro
+        : s.closing
+          ? VIDEO.closing
+          : hold,
   );
   const duration = fixed + n * hold;
 
   const revealAt = (segment: Segment, since: number) =>
-    segment.kind === "intro"
+    segment.kind !== "card" || segment.closing
       ? 1
-      : segment.closing
-        ? 1
-        : ease((since - VIDEO.revealStart) / VIDEO.reveal);
+      : ease((since - VIDEO.revealStart) / VIDEO.reveal);
   const wipeAt = (segment: Segment, since: number) =>
     segment.kind === "intro" ? ease((since - VIDEO.wipeStart) / VIDEO.wipe) : 1;
 
@@ -172,6 +192,12 @@ export function videoSchedule(count: number, options: VideoOptions = DEFAULT_VID
       return { segment: segments[0] as Segment, next: null, mix: 0, reveal: 1, wipe: 1 };
     },
   };
+}
+
+/** The full report's closing plate (TASK-166), drawn from the summary's address; null with no cards. */
+export function outroUrl(cardUrls: readonly string[]): string | null {
+  const first = cardUrls[0];
+  return first === undefined ? null : `${first}${first.includes("?") ? "&" : "?"}layer=outro`;
 }
 
 /** Each card's two layers, and the opening's (TASK-108): the addresses the clip reads. */
@@ -241,6 +267,7 @@ function canvas(): CanvasLike {
 interface Plates {
   readonly intro: { readonly plate: ImageLike; readonly name: ImageLike };
   readonly cards: readonly { readonly base: ImageLike; readonly reveal: ImageLike }[];
+  readonly outro: ImageLike | null;
 }
 
 /** One plate at an offset, with its figures and the opening's surname as far in as the frame says. */
@@ -263,6 +290,10 @@ function drawSegment(
     ctx.clip();
     ctx.drawImage(plates.intro.name, x, y, w, h);
     ctx.restore();
+    return;
+  }
+  if (segment.kind === "outro") {
+    if (plates.outro !== null) ctx.drawImage(plates.outro, x, y, w, h);
     return;
   }
   const card = plates.cards[segment.card];
@@ -316,6 +347,7 @@ export async function makeCardVideo(
   const count = schedule.segments.filter((s) => s.kind === "card" && !s.closing).length;
   const wanted = layerUrls(urls, count);
   if (wanted.intro === null || wanted.cards.length === 0) throw new VideoRefused("failed");
+  const outro = options.outro === true ? outroUrl(urls) : null;
   const loaded: ImageLike[] = [];
   const keep = async (url: string) => {
     const image = await bitmap(url);
@@ -323,16 +355,21 @@ export async function makeCardVideo(
     return image;
   };
   try {
-    const [plate, name, ...layers] = await Promise.all([
+    const [plate, name, closer, ...layers] = await Promise.all([
       keep(wanted.intro.plate),
       keep(wanted.intro.name),
+      outro === null ? Promise.resolve(null) : keep(outro),
       ...wanted.cards.flatMap((c) => [keep(c.base), keep(c.reveal)]),
     ]);
     const cards = wanted.cards.map((_, i) => ({
       base: layers[2 * i] as ImageLike,
       reveal: layers[2 * i + 1] as ImageLike,
     }));
-    const plates: Plates = { intro: { plate: plate as ImageLike, name: name as ImageLike }, cards };
+    const plates: Plates = {
+      intro: { plate: plate as ImageLike, name: name as ImageLike },
+      cards,
+      outro: closer ?? null,
+    };
     const mb = await import("mediabunny");
     const surface = canvas();
     const ctx = surface.getContext("2d");

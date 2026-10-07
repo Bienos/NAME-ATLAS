@@ -72,3 +72,47 @@ export function isBabyNamesPath(pathname: string): boolean {
     (base) => pathname === base || pathname.startsWith(`${base}/`),
   );
 }
+
+/**
+ * The free window (TASK-160, D-051): until this instant every signed-in reader
+ * sees the 8,99 zł view (the years since 2000, the whole list, the comparison,
+ * the paid share card) without buying it. An ISO 8601 instant with its offset,
+ * e.g. `2026-10-08T23:59:59+02:00`. Unset, malformed or past: no window.
+ */
+export const BABY_NAMES_FREE_UNTIL_ENV = "BABY_NAMES_FREE_UNTIL";
+
+const INSTANT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+/** The end of the free window while it is open at `now`, else null. */
+export function babyNamesFreeUntil(env: Env = process.env, now: Date = new Date()): Date | null {
+  const raw = env[BABY_NAMES_FREE_UNTIL_ENV]?.trim() ?? "";
+  if (!INSTANT.test(raw)) return null;
+  const until = new Date(raw);
+  if (Number.isNaN(until.getTime())) return null;
+  return now.getTime() < until.getTime() ? until : null;
+}
+
+/**
+ * What a signed-in reader may see. `paid`: the account holds a tier that
+ * includes the view; claims are read on the PAID surface only then. `full`:
+ * paid, or the free window is open; the view is shown, read on the FREE
+ * surface, so the rights decide as for any free reader (ADR-0001).
+ */
+export interface BabyNamesAccess {
+  readonly paid: boolean;
+  readonly full: boolean;
+  /** The window's end when `full` comes from it alone, else null. */
+  readonly freeUntil: Date | null;
+}
+
+export async function readBabyNamesAccess(
+  deps: {
+    readonly hasFullView: (userId: string) => Promise<boolean>;
+    readonly freeUntil?: () => Date | null;
+  },
+  userId: string,
+): Promise<BabyNamesAccess> {
+  const paid = await deps.hasFullView(userId);
+  const freeUntil = paid ? null : (deps.freeUntil?.() ?? null);
+  return { paid, full: paid || freeUntil !== null, freeUntil };
+}

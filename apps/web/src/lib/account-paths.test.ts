@@ -266,3 +266,28 @@ describe("the couple first-names page as a return address (TASK-156)", () => {
     }
   });
 });
+
+describe("the full report's page as a return address (TASK-166)", () => {
+  it("is accepted without its query, in both languages", () => {
+    expect(safeNext("/pl/nazwisko/kowalski/pelny-raport")).toBe(
+      "/pl/nazwisko/kowalski/pelny-raport",
+    );
+    expect(safeNext("/en/surname/%C5%82uczak/full-report")).toBe(
+      "/en/surname/%C5%82uczak/full-report",
+    );
+  });
+
+  it("refuses its query, the other language's segment and anything after it", () => {
+    for (const next of [
+      "/pl/nazwisko/kowalski/pelny-raport?imie=Piotr",
+      "/en/surname/kowalski/pelny-raport",
+      "/pl/nazwisko/kowalski/full-report",
+      "/pl/nazwisko/kowalski/pelny-raport/",
+      "/pl/nazwisko/kowalski/pelny-raport/x",
+      "/pl/nazwisko/../pelny-raport",
+      "//evil.test/pl/nazwisko/kowalski/pelny-raport",
+    ]) {
+      expect(safeNext(next), next).toBeNull();
+    }
+  });
+});

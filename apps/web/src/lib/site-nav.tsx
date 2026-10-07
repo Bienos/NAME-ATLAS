@@ -1,4 +1,5 @@
 import { accountPath } from "./account-paths.js";
+import { BrandMark } from "./brand-mark.js";
 import { accountsEnabled } from "./accounts-config.js";
 import { BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
 import { familyTreeEnabled } from "./family-config.js";
@@ -82,9 +83,9 @@ function LangSwitch({ lang, otherPath }: { lang: Lang; otherPath: string }) {
 }
 
 /**
- * The header every page opens with (TASK-052, ADR-0021): the wordmark in plain
- * type, the four places — the atlas, the comparison, how it works and the
- * offer (TASK-057) — and the language switch. A page that answers a surname
+ * The header every page opens with (TASK-052, ADR-0021): the Evolved Contour
+ * mark beside the wordmark in plain type, the four places — the atlas, the
+ * comparison, how it works and the offer (TASK-057) — and the language switch. A page that answers a surname
  * also carries the search here, compact, so a second search is one keystroke
  * away (TASK-023 §2.6).
  *
@@ -108,6 +109,7 @@ export function SiteNav({
   return (
     <header className="site-nav" lang={htmlLang(lang)}>
       <a className="wordmark" href={homePath(lang)}>
+        <BrandMark />
         {t.title}
       </a>
       {search === null ? null : <SearchForm lang={lang} query={search.query} variant="compact" />}

@@ -36,6 +36,8 @@ import {
   BABY_NAMES_PATHS,
   BABY_NAMES_SHARE_PATHS,
   babyNamesEnabled,
+  babyNamesFreeUntil,
+  readBabyNamesAccess,
 } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { COUPLE_NAMES_PATHS, coupleNamesEnabled } from "./couple-names-config.js";
@@ -91,6 +93,8 @@ export interface BabyNamesDeps {
   readonly readFacts: (
     givenName: { readonly id: string; readonly display_name: string },
     history: boolean,
+    /** Read on the PAID surface: true only for an account holding the view (TASK-160). */
+    paid?: boolean,
   ) => Promise<BirthNameFacts>;
   /** The name's register (stock) facts, claims only (TASK-145). */
   readonly readStock: (givenName: {
@@ -101,14 +105,16 @@ export interface BabyNamesDeps {
   readonly readLists: () => Promise<readonly BirthListInfo[]>;
   /** Whether the account holds a tier that includes the full figures. */
   readonly hasFullView: (userId: string) => Promise<boolean>;
+  /** The free window's end while it is open (TASK-160, D-051); absent or null: no window. */
+  readonly freeUntil?: () => Date | null;
   /**
    * The name's origin and meaning as the works state them (TASK-147,
-   * ADR-0045), on the PAID surface for an entitled reader and FREE otherwise;
-   * the rights decide what each may see.
+   * ADR-0045), on the PAID surface for an account holding the view and FREE
+   * otherwise, the free window included; the rights decide what each may see.
    */
   readonly readMeaning: (
     givenName: { readonly id: string; readonly display_name: string },
-    full: boolean,
+    paid: boolean,
   ) => Promise<GivenNameMeaningFacts>;
 }
 
@@ -120,6 +126,8 @@ export type BabyNamesData =
       /** What was typed, as typed (trimmed); "" before a search. */
       readonly typed: string;
       readonly full: boolean;
+      /** The free window's end (ISO) when `full` comes from it alone (TASK-160), else null. */
+      readonly freeUntil: string | null;
       /** The sex whose section comes first and whose tab is current (`?sex=boys|girls`). */
       readonly focus: BirthSex;
       readonly result:
@@ -199,15 +207,22 @@ export async function loadBabyNames(input: {
   }
   const typed = first(input.query, BABY_NAMES_FIELD[lang]).trim();
   const asked = SEX_VALUES[first(input.query, BABY_NAMES_SEX_FIELD)] ?? null;
-  const full = await deps.hasFullView(session.userId);
-  const base = { kind: "signed-in", lang, typed, full, focus: asked ?? "MALE" } as const;
+  const { full, paid, freeUntil } = await readBabyNamesAccess(deps, session.userId);
+  const base = {
+    kind: "signed-in",
+    lang,
+    typed,
+    full,
+    freeUntil: freeUntil?.toISOString() ?? null,
+    focus: asked ?? "MALE",
+  } as const;
   if (typed === "") return { ...base, result: { kind: "NONE" } };
   const lookup = await deps.findName(typed);
   if (lookup.kind !== "FOUND") return { ...base, result: { kind: lookup.kind } };
   const [facts, stock, meaning] = await Promise.all([
-    deps.readFacts(lookup.given_name, full),
+    deps.readFacts(lookup.given_name, full, paid),
     deps.readStock(lookup.given_name),
-    deps.readMeaning(lookup.given_name, full),
+    deps.readMeaning(lookup.given_name, paid),
   ]);
   if (facts.state === "NOT_ON_ANY_LIST") {
     if (stock.state === "UNAVAILABLE") return { ...base, result: { kind: "NOT_FOUND" } };
@@ -1183,6 +1198,7 @@ function Facts({
   stock,
   meaning,
   full,
+  freeUntil,
   focus,
   typed,
   lang,
@@ -1191,6 +1207,7 @@ function Facts({
   stock: GivenNameFacts;
   meaning: GivenNameMeaningFacts;
   full: boolean;
+  freeUntil: string | null;
   focus: BirthSex;
   typed: string;
   lang: Lang;
@@ -1218,26 +1235,71 @@ function Facts({
       </div>
       <Meaning meaning={meaning} lang={lang} />
       {full ? (
-        <section className="baby-full bn-full" aria-labelledby="baby-full-heading">
-          <h2 id="baby-full-heading">{t.historyHeading}</h2>
-          <p className="note">{t.historyNote}</p>
-          <div className="bn-sexes">
-            {sexes.map((figures) =>
-              figures.history === null || figures.history.length === 0 ? null : (
-                <History
-                  key={figures.sex}
-                  figures={figures}
-                  name={facts.given_name.display_name}
-                  lang={lang}
-                />
-              ),
-            )}
-          </div>
-        </section>
+        freeUntil === null ? (
+          <FullView sexes={sexes} name={facts.given_name.display_name} lang={lang} />
+        ) : (
+          <BabyFreeWindow lang={lang}>
+            <FullView sexes={sexes} name={facts.given_name.display_name} lang={lang} />
+          </BabyFreeWindow>
+        )
       ) : (
         <BabyLocked lang={lang} />
       )}
     </>
+  );
+}
+
+/** The 8,99 zł view: every year since 2000 per sex (TASK-151). */
+function FullView({
+  sexes,
+  name,
+  lang,
+}: {
+  sexes: readonly BirthSexFigures[];
+  name: string;
+  lang: Lang;
+}) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <section className="baby-full bn-full" aria-labelledby="baby-full-heading">
+      <h2 id="baby-full-heading">{t.historyHeading}</h2>
+      <p className="note">{t.historyNote}</p>
+      <div className="bn-sexes">
+        {sexes.map((figures) =>
+          figures.history === null || figures.history.length === 0 ? null : (
+            <History key={figures.sex} figures={figures} name={name} lang={lang} />
+          ),
+        )}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The locked card while the free window is open (TASK-160, D-051): the same
+ * words and price, the price struck, and a button that opens the view. A
+ * `<details>`, so it works without script. No end date is shown (TASK-162):
+ * the owner may keep the window open past any date the card could name.
+ */
+function BabyFreeWindow({ lang, children }: { lang: Lang; children: ReactNode }) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <section
+      className="baby-locked bn-tile bn-locked bn-free"
+      aria-labelledby="baby-locked-heading"
+    >
+      <h2 id="baby-locked-heading">{t.lockedHeading}</h2>
+      <p>{t.lockedBody}</p>
+      <p>{t.lockedListNote}</p>
+      <p className="baby-tier">
+        <span>{t.lockedTier}</span> <s>{t.lockedPrice}</s>{" "}
+        <span className="bn-free-pill">{t.freeToday}</span>
+      </p>
+      <details className="bn-free-open">
+        <summary className="bn-free-cta">{t.freeCta}</summary>
+        {children}
+      </details>
+    </section>
   );
 }
 
@@ -1302,6 +1364,7 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
                 stock={data.result.stock}
                 meaning={data.result.meaning}
                 full={data.full}
+                freeUntil={data.freeUntil}
                 focus={data.focus}
                 typed={data.typed}
                 lang={lang}
@@ -1337,13 +1400,14 @@ export function runningBabyNamesDeps(pool: Parameters<typeof createAccountsDb>[0
   const store = purchases;
   return {
     findName: (typed) => findBirthGivenName(db(), typed),
-    readFacts: (givenName, history) =>
-      readBirthNameFacts(db(), givenName, { surface: history ? "PAID" : "FREE", history }),
+    readFacts: (givenName, history, paid = history) =>
+      readBirthNameFacts(db(), givenName, { surface: history && paid ? "PAID" : "FREE", history }),
     readStock: (givenName) => readGivenNameFacts(db(), givenName, "FREE"),
     readLists: () => readActiveBirthLists(db()),
     hasFullView: (userId) => store.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS),
-    readMeaning: (givenName, full) =>
-      readGivenNameMeaning(db(), givenName.id, full ? "PAID" : "FREE"),
+    freeUntil: () => babyNamesFreeUntil(),
+    readMeaning: (givenName, paid) =>
+      readGivenNameMeaning(db(), givenName.id, paid ? "PAID" : "FREE"),
   };
 }
 

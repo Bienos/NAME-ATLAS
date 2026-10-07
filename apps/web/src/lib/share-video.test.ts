@@ -3,6 +3,7 @@ import {
   VIDEO,
   canMakeVideo,
   layerUrls,
+  outroUrl,
   resetVideoAbilityForTests,
   videoSchedule,
 } from "./share-video.js";
@@ -89,6 +90,55 @@ describe("the clip's timeline (TASK-108 AC-1)", () => {
       ],
     });
     expect(layerUrls([], 3)).toEqual({ intro: null, cards: [] });
+  });
+});
+
+describe("the full report's closing plate (TASK-166)", () => {
+  it("replaces the full clip's closing summary, and runs no longer than without it", () => {
+    for (const n of [2, 3, 7]) {
+      const segments = videoSchedule(n, { ...FULL, outro: true }).segments;
+      expect(segments.at(-1), String(n)).toEqual({ kind: "outro" });
+      expect(segments.some((s) => s.kind === "card" && s.closing)).toBe(false);
+    }
+    for (let n = 1; n <= 7; n++) {
+      const full = videoSchedule(n, { ...FULL, outro: true }).duration;
+      expect(full, String(n)).toBeGreaterThanOrEqual(7);
+      expect(full, String(n)).toBeLessThanOrEqual(20);
+    }
+  });
+
+  it("keeps the short clip at about 7 seconds by taking one card fewer", () => {
+    expect(
+      videoSchedule(7, { ...SHORT, outro: true }).segments.map((s) =>
+        s.kind === "card" ? s.card : s.kind,
+      ),
+    ).toEqual(["intro", 0, 1, "outro"]);
+    for (let n = 1; n <= 7; n++) {
+      const short = videoSchedule(n, { ...SHORT, outro: true }).duration;
+      expect(short, String(n)).toBeGreaterThanOrEqual(7);
+      expect(short, String(n)).toBeLessThanOrEqual(8);
+    }
+  });
+
+  it("holds the plate to the end, whole, after a push from the last card", () => {
+    const s = videoSchedule(2, { ...FULL, outro: true });
+    expect(s.frameAt(s.duration - 0.01)).toMatchObject({
+      segment: { kind: "outro" },
+      next: null,
+      reveal: 1,
+    });
+    expect(s.frameAt(s.duration - VIDEO.outro - VIDEO.transition / 2)).toMatchObject({
+      segment: { kind: "card", card: 1 },
+      next: { kind: "outro" },
+    });
+  });
+
+  it("is off unless asked for, and is drawn from the summary's address", () => {
+    expect(videoSchedule(3, FULL).segments.some((s) => s.kind === "outro")).toBe(false);
+    expect(outroUrl(["/pl/nazwisko/nowak/karta/summary", "/x"])).toBe(
+      "/pl/nazwisko/nowak/karta/summary?layer=outro",
+    );
+    expect(outroUrl([])).toBeNull();
   });
 });
 

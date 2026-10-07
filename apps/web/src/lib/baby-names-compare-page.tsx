@@ -10,6 +10,7 @@ import {
   BABY_NAMES_COMPARE_PATHS,
   BABY_NAMES_PATHS,
   babyNamesEnabled,
+  readBabyNamesAccess,
 } from "./baby-names-config.js";
 import {
   BABY_COMPARE_FIELDS,
@@ -114,7 +115,7 @@ export async function loadBabyCompare(input: {
   const sex = parsed.sex ?? "MALE";
   const base = { kind: "signed-in", lang, a: parsed.a, b: parsed.b, sex } as const;
   // The entitlement first: without it nothing below is read.
-  const full = await deps.hasFullView(session.userId);
+  const { full, paid } = await readBabyNamesAccess(deps, session.userId);
   if (!full) return { ...base, result: { kind: "LOCKED" } };
   if (parsed.a === "" || parsed.b === "") return { ...base, result: { kind: "NONE" } };
   const [lookupA, lookupB] = await Promise.all([deps.findName(parsed.a), deps.findName(parsed.b)]);
@@ -134,9 +135,9 @@ export async function loadBabyCompare(input: {
     return { ...base, result: { kind: "PROBLEM", problem: { reason: "SAME" } } };
   }
   const [factsA, stockA, factsB, stockB] = await Promise.all([
-    deps.readFacts(lookupA.given_name, true),
+    deps.readFacts(lookupA.given_name, true, paid),
     deps.readStock(lookupA.given_name),
-    deps.readFacts(lookupB.given_name, true),
+    deps.readFacts(lookupB.given_name, true, paid),
     deps.readStock(lookupB.given_name),
   ]);
   for (const [facts, name] of [

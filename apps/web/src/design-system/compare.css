@@ -475,8 +475,6 @@ main.cmp.atlas-v1 .cmp-again {
 
 main.cmp.atlas-v1 .cmp-again h2,
 main.cmp.atlas-v1 .cmp-upsell h2,
-main.cmp.atlas-v1 .cmp-locked h2,
-main.cmp.atlas-v1 .cmp-together h2,
 main.cmp.atlas-v1 .cmp-gives h2 {
   margin: 0 0 var(--space-2);
   font-family: var(--font-display, Georgia, serif);
@@ -531,9 +529,7 @@ main.cmp.atlas-v1 .cmp-field {
   min-width: 0;
 }
 
-main.cmp.atlas-v1 .cmp-field label,
-main.cmp.atlas-v1 .cmp-person label,
-main.cmp.atlas-v1 .cmp-person legend {
+main.cmp.atlas-v1 .cmp-field label {
   font-family: var(--font-data, ui-monospace, monospace);
   font-size: 0.8125rem;
   letter-spacing: 0.04em;
@@ -542,7 +538,7 @@ main.cmp.atlas-v1 .cmp-person legend {
 
 /* `.site` outranks the shell's dark input rule, so each field keeps its person's edge. */
 main.cmp.atlas-v1 .cmp-field input,
-main.cmp.atlas-v1 .cmp-person input {
+main.cmp.atlas-v1 .fnc-row input {
   width: 100%;
   min-height: 56px;
   padding: 0 var(--space-5);
@@ -561,18 +557,18 @@ main.cmp.atlas-v1 .cmp-duel-compact input {
 }
 
 main.cmp.atlas-v1 .cmp-field input:focus-visible,
-main.cmp.atlas-v1 .cmp-person input:focus-visible {
+main.cmp.atlas-v1 .fnc-row input:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 main.cmp.atlas-v1 .cmp-field input::placeholder,
-main.cmp.atlas-v1 .cmp-person input::placeholder {
+main.cmp.atlas-v1 .fnc-row input::placeholder {
   color: var(--color-text-tertiary);
 }
 
 main.cmp.atlas-v1 .cmp-duel button,
-main.cmp.atlas-v1 .cmp-people button {
+main.cmp.atlas-v1 .fnc-submit button {
   justify-self: start;
   min-height: 52px;
   padding: 0 var(--space-8);
@@ -586,12 +582,12 @@ main.cmp.atlas-v1 .cmp-people button {
 }
 
 main.cmp.atlas-v1 .cmp-duel button:hover,
-main.cmp.atlas-v1 .cmp-people button:hover {
+main.cmp.atlas-v1 .fnc-submit button:hover {
   background: var(--color-accent-hover);
 }
 
 main.cmp.atlas-v1 .cmp-duel button:focus-visible,
-main.cmp.atlas-v1 .cmp-people button:focus-visible {
+main.cmp.atlas-v1 .fnc-submit button:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 3px;
 }
@@ -672,7 +668,7 @@ main.cmp.atlas-v1 .cmp-gives p {
 /* --- the full-name card, the locked card, the "together" note --------------- */
 
 main.cmp.atlas-v1 .cmp-upsell,
-main.cmp.atlas-v1 .cmp-locked {
+main.cmp.atlas-v1 .fnc-locked {
   margin: 0 0 var(--space-6);
   padding: var(--space-6);
   background:
@@ -687,7 +683,7 @@ main.cmp.atlas-v1 .cmp-locked {
 }
 
 main.cmp.atlas-v1 .cmp-upsell > p,
-main.cmp.atlas-v1 .cmp-locked > p {
+main.cmp.atlas-v1 .fnc-locked > p {
   max-width: var(--measure);
 }
 
@@ -718,73 +714,6 @@ main.cmp.atlas-v1 .cmp-soon {
 
 main.cmp.atlas-v1 .cmp-upsell-link {
   font-weight: 600;
-}
-
-main.cmp.atlas-v1 .cmp-together {
-  max-width: var(--measure);
-  margin: 0 0 var(--space-6);
-  padding: var(--space-5);
-  background: var(--cmp-panel);
-  border: 1px solid var(--cmp-line);
-  border-left: 3px solid var(--color-accent-text);
-  border-radius: var(--radius-control);
-}
-
-main.cmp.atlas-v1 .cmp-together h2 {
-  font-size: 1.25rem;
-}
-
-main.cmp.atlas-v1 .cmp-together p {
-  margin: 0;
-  color: var(--color-text-secondary);
-}
-
-/* --- the full-name form: four people ---------------------------------------- */
-
-main.cmp.atlas-v1 .cmp-people {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
-  gap: var(--space-4);
-  margin: var(--space-6) 0;
-}
-
-main.cmp.atlas-v1 .cmp-person {
-  display: grid;
-  gap: var(--space-2);
-  min-width: 0;
-  margin: 0;
-  padding: var(--space-6) var(--space-4) var(--space-4);
-  background: var(--cmp-panel);
-  border: 1px solid var(--cmp-line);
-  border-top: 3px solid var(--side);
-  border-radius: var(--radius-panel);
-}
-
-main.cmp.atlas-v1 .cmp-person legend {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  float: left;
-  width: 100%;
-  margin-bottom: var(--space-2);
-}
-
-main.cmp.atlas-v1 .cmp-person legend .cmp-plate-letter {
-  position: static;
-}
-
-main.cmp.atlas-v1 .cmp-person input {
-  min-height: 48px;
-  font-size: 1.125rem;
-}
-
-main.cmp.atlas-v1 .cmp-optional {
-  color: var(--color-text-tertiary);
-}
-
-main.cmp.atlas-v1 .cmp-people > .compare-error,
-main.cmp.atlas-v1 .cmp-people > button {
-  grid-column: 1 / -1;
 }
 
 main.cmp.atlas-v1 .cmp-change {
@@ -865,4 +794,654 @@ main.cmp.atlas-v1 .cmp-unresolved ul {
 
 main.cmp.atlas-v1 .cmp-free-link {
   margin: var(--space-6) 0;
+}
+
+/*
+ * TASK-164 — the full-name comparison's layout, from the owner's design canvas:
+ * the steps, a row per person, the locked card beside the form, the tiles, and
+ * on the result the chapter bar and the overview table. Scoped to
+ * `main.cmp-full.atlas-v1`; the free comparison is untouched.
+ */
+
+main.cmp-full.atlas-v1 {
+  --fnc-gap: var(--space-6);
+}
+
+main.cmp-full.atlas-v1 .fnc-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5) var(--space-8);
+  margin: var(--space-6) 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-top-main {
+  flex: 999 1 32rem;
+  min-width: 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-top-main .page-title {
+  margin-top: 0;
+}
+
+/* --- the steps -------------------------------------------------------------- */
+
+main.cmp-full.atlas-v1 .fnc-steps {
+  flex: 1 1 16rem;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.cmp-full.atlas-v1 .fnc-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+main.cmp-full.atlas-v1 .fnc-steps li[data-state="current"] {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+main.cmp-full.atlas-v1 .fnc-step-dot {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}
+
+main.cmp-full.atlas-v1 [data-state="current"] .fnc-step-dot {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+main.cmp-full.atlas-v1 [data-state="done"] .fnc-step-dot {
+  color: var(--color-accent-text);
+  border-color: var(--color-accent-text);
+}
+
+main.cmp-full.atlas-v1 .fnc-step-now {
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+}
+
+/* --- the form beside the locked card ---------------------------------------- */
+
+main.cmp-full.atlas-v1 .fnc-split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--fnc-gap);
+  margin: 0 0 var(--space-7);
+}
+
+main.cmp-full.atlas-v1 .fnc-split > * {
+  flex: 1 1 20rem;
+  min-width: 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-split > .fnc-form,
+main.cmp-full.atlas-v1 .fnc-split > .fnc-split-main {
+  flex: 999 1 34rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-form {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp-full.atlas-v1 .cmp-change .fnc-form {
+  margin-top: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-form-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+main.cmp-full.atlas-v1 .fnc-form-head h2 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+}
+
+main.cmp-full.atlas-v1 .fnc-form-hint {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp-full.atlas-v1 .fnc-cols,
+main.cmp-full.atlas-v1 .fnc-row {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+main.cmp-full.atlas-v1 .fnc-cols {
+  padding-bottom: var(--space-2);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-row .cmp-plate-letter,
+main.cmp-full.atlas-v1 .fnc-glance .cmp-plate-letter,
+main.cmp-full.atlas-v1 .fnc-preview .cmp-plate-letter {
+  position: static;
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-row input {
+  min-height: 52px;
+  font-size: 1.125rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-more {
+  display: grid;
+  gap: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-more[open] {
+  gap: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  font-weight: 600;
+  color: var(--color-accent-text);
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  cursor: pointer;
+  list-style: none;
+}
+
+main.cmp-full.atlas-v1 .fnc-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+main.cmp-full.atlas-v1 .fnc-more > summary::before {
+  content: "+";
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+main.cmp-full.atlas-v1 .fnc-more[open] > summary::before {
+  content: "−";
+}
+
+main.cmp-full.atlas-v1 .fnc-more > summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+main.cmp-full.atlas-v1 .fnc-more > .fnc-row + .fnc-row,
+main.cmp-full.atlas-v1 .fnc-more > summary + .fnc-row {
+  margin-top: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-disclaimer {
+  margin: 0;
+  padding-top: var(--space-4);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-submit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-submit-hint {
+  font-size: 0.9375rem;
+  color: var(--color-text-tertiary);
+}
+
+/* --- the locked card --------------------------------------------------------- */
+
+main.cmp-full.atlas-v1 .fnc-locked {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-locked h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.625rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+main.cmp-full.atlas-v1 .fnc-locked > p {
+  margin: 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-locked .cmp-price {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+main.cmp-full.atlas-v1 .fnc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  margin: 0;
+  padding: 0.35em 0.7em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: var(--radius-control);
+}
+
+main.cmp-full.atlas-v1 .fnc-chip[data-state="locked"] {
+  color: var(--atlas-amber-300);
+  border: 1px solid var(--color-signal-amber);
+}
+
+main.cmp-full.atlas-v1 .fnc-chip[data-state="unlocked"] {
+  margin-bottom: var(--space-3);
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+}
+
+main.cmp-full.atlas-v1 .fnc-benefits {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) 0;
+  list-style: none;
+  border-top: 1px solid var(--cmp-line);
+  border-bottom: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.9375rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-benefits svg {
+  flex: none;
+  margin-top: 0.2em;
+  color: var(--color-accent-text);
+}
+
+main.cmp-full.atlas-v1 .fnc-locked-free a,
+main.cmp-full.atlas-v1 .fnc-free,
+main.cmp-full.atlas-v1 .fnc-change-link a {
+  color: var(--color-accent-text);
+}
+
+/* --- signed out ---------------------------------------------------------------- */
+
+main.cmp-full.atlas-v1 .fnc-split-main > p {
+  max-width: var(--measure);
+}
+
+main.cmp-full.atlas-v1 .fnc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+}
+
+main.cmp-full.atlas-v1 .fnc-actions .cmp-sign-in {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 var(--space-7);
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+  text-decoration: none;
+  background: var(--color-accent-primary);
+  border-radius: 999px;
+}
+
+main.cmp-full.atlas-v1 .fnc-actions .cmp-sign-in:hover {
+  background: var(--color-accent-hover);
+}
+
+main.cmp-full.atlas-v1 .fnc-preview {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp-full.atlas-v1 .fnc-preview p {
+  margin: 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-preview-label {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp-full.atlas-v1 .fnc-preview-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+main.cmp-full.atlas-v1 .fnc-preview-bar {
+  height: 12px;
+  background: var(--side);
+  border-radius: var(--radius-control);
+}
+
+main.cmp-full.atlas-v1 .fnc-preview-note {
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+/* --- what the comparison holds: four tiles -------------------------------------- */
+
+main.cmp-full.atlas-v1 .fnc-gives {
+  margin: 0 0 var(--space-7);
+}
+
+main.cmp-full.atlas-v1 .fnc-gives > h2,
+main.cmp-full.atlas-v1 .fnc-together h2,
+main.cmp-full.atlas-v1 .fnc-section-head h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+main.cmp-full.atlas-v1 .fnc-gives ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-4);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.cmp-full.atlas-v1 .fnc-gives li {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp-full.atlas-v1 .fnc-gives-drawing {
+  display: grid;
+  place-items: center;
+  height: 5rem;
+  margin-bottom: var(--space-2);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-control);
+}
+
+main.cmp-full.atlas-v1 .fnc-gives-drawing svg {
+  width: 7.5rem;
+  height: 3rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-gives-drawing [data-side] {
+  fill: var(--side);
+}
+
+main.cmp-full.atlas-v1 .fnc-draw-muted {
+  fill: var(--color-border-default);
+}
+
+main.cmp-full.atlas-v1 .fnc-draw-quote {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 22px;
+  fill: var(--color-accent-text);
+}
+
+main.cmp-full.atlas-v1 .fnc-gives h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+}
+
+main.cmp-full.atlas-v1 .fnc-gives p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+/* --- "how many people have exactly this name" ------------------------------------ */
+
+main.cmp-full.atlas-v1 .fnc-together {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-8);
+  margin: 0 0 var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-together h2 {
+  flex: 1 1 16rem;
+  font-size: 1.5rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-together p {
+  flex: 999 1 26rem;
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* --- the result: notice, chapter bar, overview ------------------------------------ */
+
+main.cmp-full.atlas-v1 .fnc-top .cmp-plate-line {
+  overflow-wrap: break-word;
+}
+
+main.cmp-full.atlas-v1 .fnc-top .cmp-plates {
+  font-size: clamp(1.375rem, 4vw, 2.25rem);
+  padding: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-change-link {
+  margin: var(--space-3) 0 0;
+  font-weight: 600;
+}
+
+main.cmp-full.atlas-v1 .fnc-notice {
+  margin: 0 0 var(--space-5);
+}
+
+main.cmp-full.atlas-v1 .fnc-notice .cmp-disclaimer {
+  margin: 0 0 var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-notice .fnc-together {
+  margin: 0;
+  padding: var(--space-4) 0 0;
+}
+
+main.cmp-full.atlas-v1 .fnc-notice .fnc-together h2 {
+  font-size: 1.125rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-chapters {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-3) 0;
+  overflow-x: auto;
+  background: var(--color-bg-primary);
+  border-top: 1px solid var(--cmp-line);
+  border-bottom: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-chapters a {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}
+
+main.cmp-full.atlas-v1 .fnc-chapters a:hover {
+  border-color: var(--color-accent-text);
+}
+
+main.cmp-full.atlas-v1 .fnc-chapters a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+main.cmp-full.atlas-v1 :is(#fnc-glance, .cmp-chapter, .cmp-change) {
+  scroll-margin-top: 5rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance {
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 var(--space-7);
+}
+
+main.cmp-full.atlas-v1 .fnc-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+main.cmp-full.atlas-v1 .fnc-section-head p {
+  margin: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-scroll {
+  width: 100%;
+  max-width: calc(100vw - 2 * var(--space-4));
+  overflow-x: auto;
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance table {
+  width: 100%;
+  min-width: 54rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance th,
+main.cmp-full.atlas-v1 .fnc-glance td {
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  vertical-align: top;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance thead th {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance tbody tr + tr > * {
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance tbody th {
+  font-weight: 600;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance tbody th > span:last-child {
+  display: inline-block;
+  margin-left: var(--space-2);
+  vertical-align: middle;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-line {
+  display: block;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-line + .fnc-glance-line {
+  margin-top: var(--space-2);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-figure {
+  font-variant-numeric: tabular-nums;
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-line small {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-line[data-mark] small {
+  color: var(--color-accent-text);
+}
+
+main.cmp-full.atlas-v1 .fnc-glance-none {
+  font-style: italic;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp-full.atlas-v1 .fnc-off-list {
+  margin-top: var(--space-3);
 }
