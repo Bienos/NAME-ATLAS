@@ -2,7 +2,7 @@
 
 The current state on one page: what is live, what is next, what is blocked. **Rewrite the lines your change makes untrue; never append a log here.** "Last rewritten" names the latest change only. The record of each change goes to `docs/progress/` (`AGENTS.md` §8). `PROGRESS.md` is the frozen log up to 2026-09-24.
 
-**Last rewritten:** 2026-10-07, by TASK-174, the blog in Brand System v1 (`docs/progress/2026-10-07-blog-redesign.md`).
+**Last rewritten:** 2026-10-07, by the landing horizon transition (`docs/progress/2026-10-07-landing-horizon-transition.md`).
 
 ## Production
 
