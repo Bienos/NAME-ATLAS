@@ -388,3 +388,22 @@ describe("the comparison's routes (AC-3)", () => {
     }
   });
 });
+
+describe("the free window (TASK-160, D-051)", () => {
+  it("open, no purchase: the comparison, read on the FREE surface", async () => {
+    const surfaces: (boolean | undefined)[] = [];
+    const base = compareDeps();
+    const deps: BabyNamesDeps = {
+      ...base,
+      hasFullView: () => Promise.resolve(false),
+      freeUntil: () => new Date("2026-10-08T21:59:00Z"),
+      readFacts: (name, history, paid) => {
+        surfaces.push(paid);
+        return base.readFacts(name, history, paid);
+      },
+    };
+    const html = await render("pl", GIRLS, { userId: "free" }, deps);
+    expect(html).toContain("bnc-columns");
+    expect(surfaces).toEqual([false, false]);
+  });
+});

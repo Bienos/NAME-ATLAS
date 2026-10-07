@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 import type { BirthSex } from "@name-atlas/truth";
 import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
-import { BABY_NAMES_PATHS, BABY_NAMES_SHARE_PATHS, babyNamesEnabled } from "./baby-names-config.js";
+import {
+  BABY_NAMES_PATHS,
+  BABY_NAMES_SHARE_PATHS,
+  babyNamesEnabled,
+  readBabyNamesAccess,
+} from "./baby-names-config.js";
 import { readBabyNamesSession, runningBabyNamesDeps } from "./baby-names-page.js";
 import type { BabyNamesDeps } from "./baby-names-page.js";
 import { BabyShareActions } from "./baby-names-share-client.js";
@@ -92,9 +97,9 @@ export async function loadBabyShare(input: {
   if (typed === "" || sex === null) return { kind: "no-name", lang };
   const lookup = await deps.findName(typed);
   if (lookup.kind !== "FOUND") return { kind: "no-card", lang, typed, sex };
-  const full = await deps.hasFullView(session.userId);
+  const { full, paid } = await readBabyNamesAccess(deps, session.userId);
   const [facts, stock] = await Promise.all([
-    deps.readFacts(lookup.given_name, full),
+    deps.readFacts(lookup.given_name, full, paid),
     deps.readStock(lookup.given_name),
   ]);
   const free = babyFreeCardFacts({ facts, stock, sex, lang, host: null });

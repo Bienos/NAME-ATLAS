@@ -95,6 +95,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       "0043_given_name_birth_list_index",
       "0044_given_name_meaning",
       "0046_purchases_fullnames_tier",
+      "0047_given_name_readings",
     ]);
     for (const migration of migrations) {
       expect(migration.executedAt).toBeInstanceOf(Date);
@@ -139,6 +140,7 @@ describe("bootstrap migration against a real PostgreSQL container", () => {
       { table_name: "given_name_birth_counts", table_type: "BASE TABLE" },
       { table_name: "given_name_birth_lists", table_type: "BASE TABLE" },
       { table_name: "given_name_counts", table_type: "BASE TABLE" },
+      { table_name: "given_name_readings", table_type: "BASE TABLE" },
       { table_name: "given_names", table_type: "BASE TABLE" },
       { table_name: "knowledge_entities", table_type: "BASE TABLE" },
       { table_name: "kysely_migration", table_type: "BASE TABLE" },
