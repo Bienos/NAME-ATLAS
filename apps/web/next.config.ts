@@ -3,10 +3,11 @@ import { SECURITY_HEADERS } from "./src/lib/security-headers";
 
 /**
  * pdfkit's built-in fonts as `require` loads them (`#standard-fonts/*` →
- * `js/standard-fonts/*.cjs`), from the workspace's store, any version.
+ * `js/standard-fonts/*.cjs`, and the `chunks/` they require), from the
+ * workspace's store, any version.
  */
 const PDFKIT_STANDARD_FONTS =
-  "../../node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/*.cjs";
+  "../../node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**/*.cjs";
 
 const nextConfig: NextConfig = {
   /**
