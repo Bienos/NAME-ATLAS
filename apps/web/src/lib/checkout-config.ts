@@ -26,6 +26,13 @@ export const CHECKOUT_ENV = "CHECKOUT_ENABLED";
 export const STRIPE_KEY_ENV = "STRIPE_SECRET_KEY";
 export const STRIPE_WEBHOOK_ENV = "STRIPE_WEBHOOK_SECRET";
 export const STRIPE_TAX_ENV = "STRIPE_AUTOMATIC_TAX";
+/**
+ * The accounts that may use test-mode checkout (TASK-154): email addresses,
+ * comma-separated, compared without case. Unset or empty: nobody. A test-mode
+ * purchase is recorded like any other and unlocks what its tier holds, so the
+ * test card must not be offered to every signed-in reader.
+ */
+export const CHECKOUT_TESTERS_ENV = "CHECKOUT_TESTERS";
 
 /** The API version every call pins, so a Dashboard upgrade changes nothing here. */
 export const STRIPE_API_VERSION = "2026-09-30.endive";
@@ -104,6 +111,21 @@ export function checkoutEnabled(env: Env = process.env): boolean {
     isTestKey(value(env, STRIPE_KEY_ENV)) &&
     value(env, STRIPE_WEBHOOK_ENV).startsWith("whsec_")
   );
+}
+
+/** The listed testers' addresses, trimmed and lower-cased; empty when none is listed. */
+export function checkoutTesters(env: Env = process.env): ReadonlySet<string> {
+  return new Set(
+    value(env, CHECKOUT_TESTERS_ENV)
+      .split(",")
+      .map((address) => address.trim().toLowerCase())
+      .filter((address) => address !== ""),
+  );
+}
+
+/** Whether an account's address is on the testers' list. */
+export function isCheckoutTester(email: string, testers: ReadonlySet<string>): boolean {
+  return testers.has(email.trim().toLowerCase());
 }
 
 export function automaticTaxEnabled(env: Env = process.env): boolean {

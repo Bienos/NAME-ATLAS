@@ -47,6 +47,7 @@ function checkoutFakes(stripeStatus = 200) {
     secure: true,
     fetch: stripe as unknown as typeof fetch,
     log: l,
+    mayBuy: (email) => email === "reader@example.com",
   };
   return { deps, stripe, logged };
 }
@@ -94,6 +95,19 @@ describe("POST /api/checkout (TASK-111)", () => {
     const response = await handleCheckoutPost(buy({ tier: "smaller" }, { cookie: "" }), deps);
     expect(response.headers.get("location")).toBe("/pl/konto/zaloguj");
     expect(stripe).not.toHaveBeenCalled();
+  });
+
+  it("answers 404 to a signed-in account not on the testers' list, and calls nobody (TASK-154)", async () => {
+    const { deps, stripe, logged } = checkoutFakes();
+    const response = await handleCheckoutPost(buy({ tier: "babynames" }), {
+      ...deps,
+      mayBuy: () => false,
+    });
+    expect(response.status).toBe(404);
+    expect(response.headers.get("location")).toBeNull();
+    expect(stripe).not.toHaveBeenCalled();
+    expect(logged).toEqual([{ event: "checkout_refused", fields: { reason: "not_tester" } }]);
+    expect(JSON.stringify(logged)).not.toContain("reader@example.com");
   });
 
   it("refuses another site's form", async () => {

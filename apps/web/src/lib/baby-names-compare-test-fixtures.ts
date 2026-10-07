@@ -2,7 +2,7 @@ import type { BirthNameFacts, BirthSexFigures, GivenNameFacts } from "@name-atla
 import { cite, list, registerList, year } from "./baby-names-share-test-fixtures.js";
 
 /**
- * JULIA's girls' fixtures for the comparison's tests (TASK-154), built from
+ * JULIA's girls' fixtures for the comparison's tests (TASK-156), built from
  * TASK-152's helpers: on every girls' list from 2000, no rank claim in 2010,
  * below the 2020 list's cut-off in the trend claim, on no boys' list. Not
  * imported by the app.

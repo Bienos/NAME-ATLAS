@@ -16,7 +16,7 @@ import {
 } from "./baby-names-share-test-fixtures.js";
 
 /**
- * TASK-154 AC-1: the comparison's view model from two names' page facts,
+ * TASK-156 AC-1: the comparison's view model from two names' page facts,
  * pure. ZOFIA's girls' fixtures are TASK-152's; JULIA's
  * (`baby-names-compare-test-fixtures.ts`) are built from the same helpers.
  */

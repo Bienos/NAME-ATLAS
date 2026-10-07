@@ -185,6 +185,7 @@ function boysHistory(): BirthYearFigures[] {
 function zofia(history: boolean): BirthNameFacts {
   const boys: BirthSexFigures = {
     sex: "MALE",
+    on_any_list: false,
     latest: { birth_year: 2025, list: list(2025, "MALE"), count: null, rank: null },
     trend: null,
     history: history ? boysHistory() : null,
@@ -192,6 +193,7 @@ function zofia(history: boolean): BirthNameFacts {
   const latest = year(2025, 4415, 1);
   const girls: BirthSexFigures = {
     sex: "FEMALE",
+    on_any_list: true,
     latest,
     trend: {
       claim_id: "t25",
@@ -213,6 +215,65 @@ function zofia(history: boolean): BirthNameFacts {
     sexes: [boys, girls],
   };
 }
+
+/** ZOFIA's figures under another name, with one sex's figures changed (TASK-157). */
+function variant(
+  history: boolean,
+  name: string,
+  change: { readonly MALE?: Partial<BirthSexFigures>; readonly FEMALE?: Partial<BirthSexFigures> },
+): BirthNameFacts {
+  const facts = zofia(history);
+  return {
+    ...facts,
+    given_name: { id: name.toLowerCase(), display_name: name },
+    sexes: facts.sexes.map((s) => ({ ...s, ...change[s.sex] })),
+  };
+}
+
+/** The girls' lists, and the boys' 2022 list only (2 boys): a stray earlier record. */
+const nikola = (history: boolean): BirthNameFacts =>
+  variant(history, "NIKOLA", {
+    MALE: {
+      on_any_list: true,
+      history: history
+        ? boysHistory().map((y) =>
+            y.birth_year === 2022 ? { ...y, count: countOf(2022, "MALE", 2, "21457") } : y,
+          )
+        : null,
+    },
+  });
+
+/** On both sexes' 2025 lists: 3 boys beside ZOFIA's girls. */
+const noa = (history: boolean): BirthNameFacts =>
+  variant(history, "NOA", {
+    MALE: {
+      on_any_list: true,
+      latest: {
+        birth_year: 2025,
+        list: list(2025, "MALE"),
+        count: countOf(2025, "MALE", 3, "1159536"),
+        rank: null,
+      },
+      history: null,
+    },
+  });
+
+/** On earlier lists of both sexes, on neither 2025 list. */
+const ariel = (history: boolean): BirthNameFacts =>
+  variant(history, "ARIEL", {
+    MALE: { on_any_list: true, history: null },
+    FEMALE: {
+      latest: { birth_year: 2025, list: list(2025, "FEMALE"), count: null, rank: null },
+      trend: null,
+      history: null,
+    },
+  });
+
+const VARIANTS: Readonly<Record<string, (history: boolean) => BirthNameFacts>> = {
+  nikola,
+  noa,
+  ariel,
+};
 
 /** Yonge's and Buryan's entries for a name, as `readGivenNameMeaning` gives them (TASK-147). */
 const MEANING_READY: GivenNameMeaningFacts = {
@@ -325,7 +386,7 @@ function deps(bought: Record<string, readonly PurchaseTier[]>): BabyNamesDeps {
           given_name: { id: "zofia", display_name: "ZOFIA" },
         });
       }
-      for (const id of ["TYMON", "RARA", "NIKT"]) {
+      for (const id of ["TYMON", "RARA", "NIKT", "NIKOLA", "NOA", "ARIEL"]) {
         if (key === id) {
           return Promise.resolve({
             kind: "FOUND",
@@ -344,11 +405,17 @@ function deps(bought: Record<string, readonly PurchaseTier[]>): BabyNamesDeps {
           sexes: [],
         } satisfies BirthNameFacts);
       }
+      const variantOf = VARIANTS[name.id];
+      if (variantOf !== undefined) return Promise.resolve(variantOf(history));
       return Promise.resolve({ ...zofia(history), given_name: name });
     },
     readStock: (name) =>
       Promise.resolve(
-        name.id === "zofia" ? ZOFIA_STOCK : name.id === "rara" ? RARA_STOCK : NO_STOCK(name.id),
+        name.id === "zofia" || VARIANTS[name.id] !== undefined
+          ? ZOFIA_STOCK
+          : name.id === "rara"
+            ? RARA_STOCK
+            : NO_STOCK(name.id),
       ),
     readLists: () => Promise.resolve(STORED_LISTS),
     hasFullView: (userId) =>
@@ -454,8 +521,9 @@ describe("the baby-names pages (TASK-141)", () => {
     expect(html).toContain(t.trendBasis(2025, 2020, 10));
     expect(html).toContain("zasób 1159538");
     expect(html).toContain("zasób 28021");
-    // Boys: not on the 2025 list, below its cut-off of 2, never 0.
-    expect(html).toContain(t.belowCutoff(2025, "2"));
+    // ZOFIA is on no boys' list: no boys' section and no cut-off line for them (TASK-157).
+    expect(html).not.toContain('data-sex="MALE"');
+    expect(html).not.toContain(t.belowCutoff(2025, "2"));
     expect(html).not.toMatch(/data-figure="count">0</u);
     // The paid view is locked: the 8,99 zł tier, "Wkrótce", no button or link to buy.
     expect(html).toContain(t.lockedTier);
@@ -523,9 +591,9 @@ describe("the register's count beside the birth-year figures (TASK-145)", () => 
 
   const occurrences = (html: string, text: string): number => html.split(text).length - 1;
 
-  it("ZOFIA: each sex's own register list with its count, N of M, date and source; no sum (AC-1, AC-4)", async () => {
+  it("a name of both sexes: each sex's own register list with its count, N of M, date and source; no sum (AC-1, AC-4)", async () => {
     for (const lang of ["pl", "en"] as const) {
-      const html = await render(lang, { [field[lang]]: "zofia" }, { userId: "u" });
+      const html = await render(lang, { [field[lang]]: "noa" }, { userId: "u" });
       const t = BABY_NAMES_TEXT[lang];
       const women = block(html, "FEMALE");
       const men = block(html, "MALE");
@@ -555,7 +623,8 @@ describe("the register's count beside the birth-year figures (TASK-145)", () => 
     const html = await render("pl", { imie: "tymon" }, { userId: "u" });
     const t = BABY_NAMES_TEXT.pl;
     expect(html).toContain(t.childrenIn(2025));
-    expect(occurrences(html, t.registerNone)).toBe(2);
+    // One section: the name is on the girls' lists only (TASK-157).
+    expect(occurrences(html, t.registerNone)).toBe(1);
     expect(html).not.toContain("register-count");
   });
 
@@ -568,11 +637,12 @@ describe("the register's count beside the birth-year figures (TASK-145)", () => 
       expect(html, lang).not.toContain(t.notFound("rara"));
       expect(block(html, "FEMALE"), lang).toContain('data-figure="register-count">5<');
       expect(block(html, "FEMALE"), lang).toContain(t.rankOf(n(9000), n(28781)));
-      // The men's list holds no claim for it: a plain line, not a figure.
-      expect(block(html, "MALE"), lang).toContain(t.registerNone);
-      expect(block(html, "MALE"), lang).not.toContain("register-count");
-      // Each sex's latest stored list: 2025, cut-off 2.
-      expect(occurrences(html, t.belowCutoff(2025, "2")), lang).toBe(2);
+      // The men's list holds no claim for it: no men's section at all (TASK-157).
+      expect(html, lang).not.toContain('data-register="MALE"');
+      expect(html, lang).not.toContain('data-sex="MALE"');
+      expect(html, lang).not.toContain("bn-tabs");
+      // The women's latest stored list: 2025, cut-off 2.
+      expect(occurrences(html, t.belowCutoff(2025, "2")), lang).toBe(1);
       expect(html, lang).not.toContain('data-figure="count"');
       expect(html, lang).not.toMatch(/data-figure="[a-z-]*count">0</u);
       expect(html, lang).toContain(t.registerDiffers);
@@ -690,26 +760,26 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
   const count = (html: string, text: string): number => html.split(text).length - 1;
 
   it("is in the Brand System scope, with the sex tabs marking the current one (AC-4, D)", async () => {
-    const html = await render("pl", { imie: "Zofia" }, { userId: "u" });
+    // NOA is on both sexes' 2025 lists: both have a count, so the boys come first.
+    const html = await render("pl", { imie: "Noa" }, { userId: "u" });
     expect(html).toContain('class="baby-names atlas-v1"');
     expect(html).toContain('class="atlas-tabs bn-tabs" role="tablist" aria-label="Płeć"');
-    // Girls have the count on the latest list, so they come first and are current.
     expect(html).toMatch(
-      /<a role="tab" class="bn-tab" href="\/pl\/imiona-dla-dziecka\?imie=Zofia&sex=girls#sex-girls" aria-selected="true" aria-current="true" data-sex="FEMALE">Dziewczynki<\/a>/u,
+      /<a role="tab" class="bn-tab" href="\/pl\/imiona-dla-dziecka\?imie=Noa&sex=boys#sex-boys" aria-selected="true" aria-current="true" data-sex="MALE">Chłopcy<\/a>/u,
     );
     expect(html).toMatch(
-      /<a role="tab" class="bn-tab" href="[^"]*sex=boys#sex-boys" aria-selected="false" data-sex="MALE">Chłopcy<\/a>/u,
+      /<a role="tab" class="bn-tab" href="[^"]*sex=girls#sex-girls" aria-selected="false" data-sex="FEMALE">Dziewczynki<\/a>/u,
     );
     expect(
-      html.indexOf('class="baby-sex bn-sex" data-sex="FEMALE" data-current="true"'),
-    ).toBeLessThan(html.indexOf('class="baby-sex bn-sex" data-sex="MALE"'));
-    // Asked for the boys, the boys' tab is current and their section first.
-    const boys = await render("pl", { imie: "Zofia", sex: "boys" }, { userId: "u" });
-    expect(boys).toMatch(/sex=boys#sex-boys" aria-selected="true" aria-current="true"/u);
+      html.indexOf('class="baby-sex bn-sex" data-sex="MALE" data-current="true"'),
+    ).toBeLessThan(html.indexOf('class="baby-sex bn-sex" data-sex="FEMALE"'));
+    // Asked for the girls, the girls' tab is current and their section first.
+    const girls = await render("pl", { imie: "Noa", sex: "girls" }, { userId: "u" });
+    expect(girls).toMatch(/sex=girls#sex-girls" aria-selected="true" aria-current="true"/u);
     expect(
-      boys.indexOf('class="baby-sex bn-sex" data-sex="MALE" data-current="true"'),
-    ).toBeLessThan(boys.indexOf('class="baby-sex bn-sex" data-sex="FEMALE"'));
-    expect(boys).not.toMatch(/sex=girls#sex-girls" aria-selected="true"/u);
+      girls.indexOf('class="baby-sex bn-sex" data-sex="FEMALE" data-current="true"'),
+    ).toBeLessThan(girls.indexOf('class="baby-sex bn-sex" data-sex="MALE"'));
+    expect(girls).not.toMatch(/sex=boys#sex-boys" aria-selected="true"/u);
   });
 
   it("free, the hero tile: the count, its share of the list, the rank with its track, the source (AC-1, AC-3)", async () => {
@@ -731,12 +801,14 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
       expect(hero, lang).toContain(t.trackMost);
       expect(hero, lang).toContain(t.trackRarest);
       expect(hero, lang).toContain(lang === "pl" ? "zasób 1159538" : "resource 1159538");
-      // The boys: absent from the latest list, no hero, no share, never 0.
-      const boys = section(html, "MALE");
-      expect(boys, lang).not.toContain("bn-hero");
-      expect(boys, lang).toContain(t.belowCutoff(2025, "2"));
       expect(html, lang).not.toMatch(/data-figure="[a-z-]*">0</u);
       expect(html, lang).not.toMatch(/[^0-9,.]0[,.]0%/u);
+      // A name on neither 2025 list: each sex absent from it, no hero, no share, never 0.
+      const both = await render(lang, { [field[lang]]: "ariel" }, { userId: "u" });
+      const boys = section(both, "MALE");
+      expect(boys, lang).not.toContain("bn-hero");
+      expect(boys, lang).toContain(t.belowCutoff(2025, "2"));
+      expect(both, lang).not.toMatch(/data-figure="[a-z-]*">0</u);
     }
   });
 
@@ -974,12 +1046,10 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
     expect(paid.match(/<text class="bn-chart-label"/gu)).toHaveLength(3);
     for (const y of [2000, 2017, 2025]) expect(paid).toContain(`>${y}</text>`);
     expect(html).not.toContain("baby-locked");
-    // The boys: on no list in any year, one line, no chart.
-    expect(html).toContain(t.noneSince("MALE", 2000));
+    // ZOFIA is on no boys' list in any year: no boys' line and no boys' chart (TASK-157).
+    expect(html).not.toContain(t.noneSince("MALE", 2000));
+    expect(html).not.toContain('data-paid="MALE"');
     expect(html.match(/<svg class="bn-chart"/gu)).toHaveLength(1);
-    expect(
-      html.slice(html.indexOf('data-paid="MALE"'), html.indexOf('data-paid="FEMALE"')),
-    ).not.toContain("bn-chart");
   });
 
   it("paid: the ×, the callouts, the ladder and the folded table (AC-2)", async () => {
@@ -1092,5 +1162,96 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
     expect(out).not.toContain("bn-tile");
     expect(out).not.toContain("4 415");
     expect(out).not.toContain("wisdom");
+  });
+});
+
+describe("a name shows only the sexes it is on (TASK-157)", () => {
+  const field = { pl: "imie", en: "name" } as const;
+
+  it("ZOFIA, a girls' name: no boys' section, tab, cut-off line, register figure or two-lists note", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const t = BABY_NAMES_TEXT[lang];
+      for (const query of [{ [field[lang]]: "zofia" }, { [field[lang]]: "zofia", sex: "boys" }]) {
+        const html = await render(lang, query, { userId: "u" });
+        expect(html, lang).toContain('data-sex="FEMALE" data-current="true"');
+        expect(html, lang).not.toContain('data-sex="MALE"');
+        expect(html, lang).not.toContain('data-register="MALE"');
+        expect(html, lang).not.toContain(`>${t.sex.MALE}<`);
+        expect(html, lang).not.toContain("bn-tabs");
+        expect(html, lang).not.toContain(t.apart);
+        expect(html, lang).not.toContain(t.belowCutoff(2025, "2"));
+        // The register's 77 men of this first name are not shown on a girls' name.
+        expect(html, lang).not.toContain('data-figure="register-count">77<');
+        expect(html, lang).toContain(t.registerDiffers);
+      }
+      const paid = await render(
+        lang,
+        { [field[lang]]: "zofia" },
+        { userId: "p" },
+        { p: ["babynames"] },
+      );
+      expect(paid, lang).not.toContain('data-paid="MALE"');
+      expect(paid, lang).not.toContain(t.noneSince("MALE", 2000));
+    }
+  });
+
+  it("asked for a sex the name is not on, the focus is the sex it is on", async () => {
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "zofia", sex: "boys" },
+      session: { userId: "u" },
+      deps: deps({}),
+    });
+    expect(data.kind === "signed-in" && data.focus).toBe("FEMALE");
+  });
+
+  it("NIKOLA, on the girls' lists and once on an earlier boys' list: the girls only", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const queries: Record<string, string>[] = [{ imie: "nikola" }, { imie: "nikola", sex: "boys" }];
+    for (const query of queries) {
+      const html = await render("pl", query, { userId: "u" });
+      expect(html).toContain('data-sex="FEMALE" data-current="true"');
+      expect(html).not.toContain('data-sex="MALE"');
+      expect(html).not.toContain("bn-tabs");
+      expect(html).not.toContain(t.belowCutoff(2025, "2"));
+    }
+  });
+
+  it("NOA, on both sexes' latest lists: both sections, the tabs and the two-lists note", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const html = await render("pl", { imie: "noa" }, { userId: "u" });
+    expect(html).toContain('class="baby-sex bn-sex" data-sex="MALE" data-current="true"');
+    expect(html).toContain('class="baby-sex bn-sex" data-sex="FEMALE"');
+    expect(html).toContain("bn-tabs");
+    expect(html).toContain(t.apart);
+    expect(html).toContain('data-figure="count">3<');
+    expect(html).not.toContain(t.belowCutoff(2025, "2"));
+  });
+
+  it("ARIEL, on earlier lists of both sexes and on neither 2025 list: both, below each cut-off, never 0", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const html = await render("pl", { imie: "ariel" }, { userId: "u" });
+    expect(html).toContain('data-sex="MALE"');
+    expect(html).toContain('data-sex="FEMALE"');
+    expect(html).toContain("bn-tabs");
+    expect(html.split(t.belowCutoff(2025, "2")).length - 1).toBe(2);
+    expect(html).not.toContain("bn-hero");
+    expect(html).not.toMatch(/data-figure="[a-z-]*count">0</u);
+  });
+
+  it("a name on no birth list whose register lists neither sex keeps both sections", async () => {
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "rara" },
+      session: { userId: "u" },
+      deps: {
+        ...deps({}),
+        readStock: () => Promise.resolve({ ...RARA_STOCK, state: "RIGHTS_BLOCKED", lists: [] }),
+      },
+    });
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).toContain('data-sex="MALE"');
+    expect(html).toContain('data-sex="FEMALE"');
+    expect(html).toContain("bn-tabs");
   });
 });

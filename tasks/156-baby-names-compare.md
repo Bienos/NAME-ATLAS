@@ -1,9 +1,9 @@
-# TASK-154 — Comparing two first names, part of the baby-names 8,99 zł view, in Brand System v1
+# TASK-156 — Comparing two first names, part of the baby-names 8,99 zł view, in Brand System v1
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-baby-names-compare.md`). Dark behind the same flag as the page; the comparison belongs to the 8,99 zł view, which cannot be sold yet.
 - **Requested by:** the project owner's design canvas, the board `project/Paid-Compare.dc.html` (390 px): two first names of one sex side by side, with the counts, shares, direction, years at no. 1, the register's count, a grouped bar chart every five years, a rank ladder, "Zamień drugie imię" and the footer line. D-044 puts "comparing names" in the paid view.
 - **Decision:** D-044 (comparing names is paid), D-045 (8,99 zł), ADR-0023 §2.5 (no buy button, no checkout link; the locked card reads "Wkrótce"), ADR-0043 §4 (the shares), ADR-0046 (Brand System v1: Atlas Blue for action and focus; the two chart series in the Brand System's chart colours `--chart-current` and `--chart-context`; amber nowhere, since no peak is marked). No new ADR, no migration, no D- number: nothing here needed a decision the owner has not made.
-- **Numbers:** TASK 154. 153 is the last on `main` (`3a82803`, #184); open #181 takes no number. `pnpm check:ids` exit 0.
+- **Numbers:** TASK 156. Started as TASK-154 on `main` @ `3a82803` (#184, where 153 was the last); while the session worked, `main` took 154 (#186, the test-mode checkout for listed testers) and 157 (#188), and the open #185 and #187 both name TASK-155, so this task took 156, the next number free on `main` and in the open pull requests. `pnpm check:ids` exit 0.
 - **Model guidance:** implementation session.
 
 ## 1. Goal

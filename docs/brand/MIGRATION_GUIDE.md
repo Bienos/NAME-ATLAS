@@ -69,7 +69,7 @@ Migrated: the baby-names single-name page family (TASK-151, 2026-10-06; `apps/we
 
 Migrated: the account's pages, sign-in steps and account dashboard (TASK-153, 2026-10-07; `apps/web/src/lib/account-page.tsx`, `account-dashboard.tsx`, rules under `.account-shell.atlas-v1`). The tree's pages are not; they keep the shared `.account…` rules.
 
-Migrated: the baby-names comparison of two first names (TASK-154, 2026-10-07; `apps/web/src/lib/baby-names-compare-page.tsx`, rules under `.baby-names.atlas-v1 .bnc-…`): Atlas Blue for the submit and the focus ring, the two chart series in `--chart-current` and `--chart-context`, no amber on the page.
+Migrated: the baby-names comparison of two first names (TASK-156, 2026-10-07; `apps/web/src/lib/baby-names-compare-page.tsx`, rules under `.baby-names.atlas-v1 .bnc-…`): Atlas Blue for the submit and the focus ring, the two chart series in `--chart-current` and `--chart-context`, no amber on the page.
 
 ## Phase 7 — cleanup
 

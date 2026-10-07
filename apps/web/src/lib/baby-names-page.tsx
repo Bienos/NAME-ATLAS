@@ -218,11 +218,17 @@ export async function loadBabyNames(input: {
       cutoffs,
       meaning,
     } as const;
-    return { ...base, result };
+    const sexes = stockSexes(stock);
+    return { ...base, focus: sexes.find((s) => s === asked) ?? sexes[0] ?? "MALE", result };
   }
-  // Unasked, the sex with a count on its latest list comes first; boys when both or neither have one.
+  // Only the sexes the name is on (TASK-157). Unasked, the one with a count on its
+  // latest list comes first; boys when both or neither have one.
+  const shown = shownSexes(facts);
   const focus =
-    asked ?? facts.sexes.find((s) => s.latest?.count !== null && s.latest !== null)?.sex ?? "MALE";
+    shown.find((s) => s.sex === asked)?.sex ??
+    shown.find((s) => s.latest?.count !== null && s.latest !== null)?.sex ??
+    shown[0]?.sex ??
+    "MALE";
   return { ...base, focus, result: { kind: "FACTS", facts, stock, meaning } };
 }
 
@@ -974,7 +980,7 @@ function YearTable({ figures, lang }: { figures: BirthSexFigures; lang: Lang }) 
 }
 
 /**
- * "Porównaj z innym imieniem" (TASK-154): the way to the comparison from a
+ * "Porównaj z innym imieniem" (TASK-156): the way to the comparison from a
  * sex's paid view, with this name as the first; the second is typed there.
  */
 function CompareEntry({ name, sex, lang }: { name: string; sex: BirthSex; lang: Lang }) {
@@ -1024,7 +1030,7 @@ function History({ figures, name, lang }: { figures: BirthSexFigures; name: stri
   );
 }
 
-/** The locked card: the 8,99 zł view named and priced, "Wkrótce", nothing to buy. The comparison (TASK-154) shows the same one. */
+/** The locked card: the 8,99 zł view named and priced, "Wkrótce", nothing to buy. The comparison (TASK-156) shows the same one. */
 export function BabyLocked({ lang }: { lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   // ADR-0023 §2.5: no buy button until the tier can lawfully be sold.
@@ -1090,6 +1096,26 @@ function ordered<T extends { readonly sex: BirthSex }>(items: readonly T[], focu
   return [...items].sort((a, b) => (a.sex === focus ? -1 : b.sex === focus ? 1 : 0));
 }
 
+/**
+ * The sexes the page shows (TASK-157): those with a count on their latest list;
+ * when neither has one, those whose lists hold the name in some year. A girls'
+ * name gets no boys' section, tab or "below the cut-off" line, even where an
+ * earlier boys' list holds it a few times.
+ */
+function shownSexes(facts: BirthNameFacts): BirthSexFigures[] {
+  const current = facts.sexes.filter((s) => s.latest !== null && s.latest.count !== null);
+  return current.length > 0 ? current : facts.sexes.filter((s) => s.on_any_list);
+}
+
+/** A name on no birth list: the sexes the register lists it for; both when it lists neither. */
+function stockSexes(stock: GivenNameFacts): BirthSex[] {
+  const found =
+    stock.state === "READY"
+      ? BIRTH_SEXES.filter((sex) => stockListOfSex(stock.lists, sex) !== null)
+      : [];
+  return found.length === 0 ? [...BIRTH_SEXES] : found;
+}
+
 /** A rare name: on no birth list, held by the register. */
 function StockOnly({
   name,
@@ -1109,15 +1135,16 @@ function StockOnly({
   lang: Lang;
 }) {
   const t = BABY_NAMES_TEXT[lang];
+  const sexes = stockSexes(stock);
   return (
     <>
       <h2 className="baby-name bn-name">{name.display_name}</h2>
-      <p className="note">{t.apart}</p>
+      {sexes.length > 1 ? <p className="note">{t.apart}</p> : null}
       <p className="note baby-differs">{t.registerDiffers}</p>
-      <SexTabs lang={lang} typed={typed} focus={focus} />
+      {sexes.length > 1 ? <SexTabs lang={lang} typed={typed} focus={focus} /> : null}
       <div className="baby-sexes bn-sexes">
         {ordered(
-          BIRTH_SEXES.map((sex) => ({ sex })),
+          sexes.map((sex) => ({ sex })),
           focus,
         ).map(({ sex }) => {
           const cutoff = cutoffs.find((c) => c.sex === sex);
@@ -1169,13 +1196,13 @@ function Facts({
 }) {
   const t = BABY_NAMES_TEXT[lang];
   if (facts.state === "RIGHTS_BLOCKED") return <p className="note">{t.rightsBlocked}</p>;
-  const sexes = ordered(facts.sexes, focus);
+  const sexes = ordered(shownSexes(facts), focus);
   return (
     <>
       <h2 className="baby-name bn-name">{facts.given_name.display_name}</h2>
-      <p className="note">{t.apart}</p>
+      {sexes.length > 1 ? <p className="note">{t.apart}</p> : null}
       <p className="note baby-differs">{t.registerDiffers}</p>
-      <SexTabs lang={lang} typed={typed} focus={focus} />
+      {sexes.length > 1 ? <SexTabs lang={lang} typed={typed} focus={focus} /> : null}
       <div className="baby-sexes bn-sexes">
         {sexes.map((figures) => (
           <SexSection

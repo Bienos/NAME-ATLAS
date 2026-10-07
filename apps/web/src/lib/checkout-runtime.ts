@@ -4,6 +4,7 @@ import { accountsRuntime } from "./accounts-runtime.js";
 import {
   automaticTaxEnabled,
   checkoutEnabled,
+  checkoutTesters,
   STRIPE_KEY_ENV,
   STRIPE_WEBHOOK_ENV,
 } from "./checkout-config.js";
@@ -24,6 +25,8 @@ export interface CheckoutRuntime {
   readonly secretKey: string;
   readonly webhookSecret: string;
   readonly automaticTax: boolean;
+  /** The accounts that may buy in test mode (`CHECKOUT_TESTERS`, TASK-154); empty: nobody. */
+  readonly testers: ReadonlySet<string>;
   /** `SITE_ORIGIN`, without a trailing slash. */
   readonly origin: string;
   readonly secure: boolean;
@@ -42,6 +45,7 @@ export function checkoutRuntime(env: NodeJS.ProcessEnv = process.env): CheckoutR
     secretKey: (env[STRIPE_KEY_ENV] ?? "").trim(),
     webhookSecret: (env[STRIPE_WEBHOOK_ENV] ?? "").trim(),
     automaticTax: automaticTaxEnabled(env),
+    testers: checkoutTesters(env),
     origin: accounts.origin,
     secure: accounts.secure,
   };

@@ -1,6 +1,6 @@
-# 2026-10-07 — TASK-154: comparing two first names in the baby-names 8,99 zł view (Brand System v1)
+# 2026-10-07 — TASK-156: comparing two first names in the baby-names 8,99 zł view (Brand System v1)
 
-Task: `tasks/154-baby-names-compare.md`. Decisions: D-044 (comparing names is in the paid view), D-045 (8,99 zł), ADR-0023 §2.5 (no buy button, no checkout link; the locked card reads "Wkrótce"), ADR-0043 §4 (the shares), ADR-0046 (Brand System v1). Built on `main` @ `3a82803` (#184, TASK-153). Numbers taken: TASK-154 (153 is the last on `main`; open #181 takes none). No ADR, no migration, no D- number.
+Task: `tasks/154-baby-names-compare.md`. Decisions: D-044 (comparing names is in the paid view), D-045 (8,99 zł), ADR-0023 §2.5 (no buy button, no checkout link; the locked card reads "Wkrótce"), ADR-0043 §4 (the shares), ADR-0046 (Brand System v1). Built on `main` @ `3a82803` (#184, TASK-153). Numbers taken: TASK-156 (153 is the last on `main`; open #181 takes none). No ADR, no migration, no D- number.
 
 ## What changed
 

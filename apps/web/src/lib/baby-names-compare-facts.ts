@@ -20,7 +20,7 @@ import { formatDate, formatInteger, formatPercent } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
- * What the comparison says (TASK-154, D-044): two first names of one sex,
+ * What the comparison says (TASK-156, D-044): two first names of one sex,
  * each from its own page facts, formatted and set side by side. Pure: no
  * database, no rendering. `baby-names-compare-page.tsx` decides only how it
  * looks.

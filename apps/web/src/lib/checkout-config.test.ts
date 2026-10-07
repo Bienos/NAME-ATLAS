@@ -3,7 +3,9 @@ import {
   automaticTaxEnabled,
   CHECKOUT_TIERS,
   checkoutEnabled,
+  checkoutTesters,
   formatPrice,
+  isCheckoutTester,
   isTestKey,
   tierOffer,
 } from "./checkout-config.js";
@@ -60,5 +62,23 @@ describe("the tiers checkout sells", () => {
     expect(formatPrice(19900, "pl")).toBe("199 zł");
     expect(formatPrice(8999, "en")).toBe("PLN 89.99");
     expect(formatPrice(19900, "en")).toBe("PLN 199");
+  });
+});
+
+describe("who may buy in test mode (TASK-154)", () => {
+  it("is nobody while CHECKOUT_TESTERS is unset or empty", () => {
+    expect(checkoutTesters({}).size).toBe(0);
+    expect(checkoutTesters({ CHECKOUT_TESTERS: " , " }).size).toBe(0);
+    expect(isCheckoutTester("owner@example.com", checkoutTesters({}))).toBe(false);
+  });
+
+  it("is each listed address, trimmed and compared without case", () => {
+    const testers = checkoutTesters({ CHECKOUT_TESTERS: " Owner@Example.com ,second@example.pl," });
+    expect([...testers]).toEqual(["owner@example.com", "second@example.pl"]);
+    expect(isCheckoutTester("OWNER@example.COM", testers)).toBe(true);
+    expect(isCheckoutTester(" second@example.pl ", testers)).toBe(true);
+    expect(isCheckoutTester("reader@example.com", testers)).toBe(false);
+    // A listed address is matched whole, never as a part of another.
+    expect(isCheckoutTester("owner@example.com.evil", testers)).toBe(false);
   });
 });

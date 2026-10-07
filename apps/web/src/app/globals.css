@@ -8352,6 +8352,11 @@ a.tree-card:hover {
   .baby-names.atlas-v1 .bn-sexes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* A name of one sex (TASK-157): its section takes the whole width. */
+  .baby-names.atlas-v1 .bn-sexes > :only-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .baby-names.atlas-v1 .bn-sex {
@@ -9038,7 +9043,7 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   color: var(--color-text-tertiary);
 }
 
-/* --- the comparison of two first names (TASK-154) ---
+/* --- the comparison of two first names (TASK-156) ---
    A page in the same `.baby-names.atlas-v1` scope: two value columns that fit
    390 px without horizontal overflow (a long name wraps), the two series in
    the Brand System's chart colours (`--chart-current`, `--chart-context`),
@@ -9371,7 +9376,7 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   border-top: 1px solid var(--color-border-subtle);
 }
 
-/* The way in from the page's paid view (TASK-154): a link, Atlas Blue as the share entry. */
+/* The way in from the page's paid view (TASK-156): a link, Atlas Blue as the share entry. */
 .baby-names.atlas-v1 .bn-compare-entry {
   margin: var(--space-sm) 0 0;
 }
