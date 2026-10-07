@@ -8648,6 +8648,76 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   border-radius: var(--radius-pill);
 }
 
+/* The free window (TASK-160, D-051): the card's button opens the view. Atlas Blue for action (ADR-0046). */
+.baby-names.atlas-v1 .bn-free {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-free p {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-free-open > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: fit-content;
+  padding: 12px 22px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-free-open > summary::-webkit-details-marker {
+  display: none;
+}
+
+.baby-names.atlas-v1 .bn-free-open > summary::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.baby-names.atlas-v1 .bn-free-open[open] > summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+.baby-names.atlas-v1 .bn-free-open > summary:hover {
+  background: var(--color-accent-hover);
+}
+
+.baby-names.atlas-v1 .bn-free-open > summary:focus-visible {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+
+.baby-names.atlas-v1 .bn-free-open[open] > .bn-full {
+  margin-top: var(--space-lg);
+}
+
+.baby-names.atlas-v1 .bn-free .baby-tier s {
+  font-weight: 400;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-free-pill {
+  padding: 3px 10px;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-confidence-verified);
+  border: 1px solid var(--color-confidence-verified);
+  border-radius: var(--radius-pill);
+}
+
 /* The paid view. */
 .baby-names.atlas-v1 .bn-full {
   margin-top: var(--space-xl);
