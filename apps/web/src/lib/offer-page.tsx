@@ -48,6 +48,17 @@ export interface OfferReader {
   readonly freeWindow: { readonly until: string; readonly lastWeek: boolean } | null;
 }
 
+/** The hero's price row, cheapest first: every card on the page. */
+const LADDER = [
+  "free",
+  "babynames",
+  "fullnames",
+  "smaller",
+  "couple",
+  "family",
+  "genealogy",
+] as const;
+
 export const GUEST: OfferReader = {
   accounts: false,
   signedIn: false,
@@ -124,11 +135,11 @@ function BuyForm({ tier, lang }: { readonly tier: CheckoutTier; readonly lang: L
 function Waitlist({ tier, lang }: { readonly tier: WaitlistTier; readonly lang: Lang }) {
   const words = offerDocument(lang).waitlist;
   return (
-    <div className="offer-ask">
-      <h4>{words.heading}</h4>
+    <details className="offer-ask">
+      <summary className="offer-ask-toggle">{words.heading}</summary>
       <p>{words.intro}</p>
       <OfferForm tier={tier} lang={lang} />
-    </div>
+    </details>
   );
 }
 
@@ -156,7 +167,10 @@ function PaidCard({
     ? BABY_NAMES_PATHS[lang]
     : accountPath(lang, "sign-in", { next: BABY_NAMES_PATHS[lang] });
   return (
-    <article className={`offer-tier offer-${key}`} aria-labelledby={`tier-${key}`}>
+    <article
+      className={`offer-tier offer-${key}${free ? " is-free" : ""}${key === "couple" ? " is-featured" : ""}`}
+      aria-labelledby={`tier-${key}`}
+    >
       <p className={`offer-status${test ? " is-test" : free ? " is-free" : ""}`}>{status}</p>
       <h3 id={`tier-${key}`}>{item.name}</h3>
       {free ? (
@@ -263,6 +277,9 @@ function Table({ lang }: { readonly lang: Lang }) {
   return (
     <section className="offer-section" aria-labelledby="offer-table">
       <h2 id="offer-table">{doc.table.heading}</h2>
+      <p className="offer-swipe" aria-hidden="true">
+        {doc.tableHint} →
+      </p>
       <div className="offer-table-box">
         <table className="offer-table">
           <thead>
@@ -336,6 +353,17 @@ export function OfferView({
             <li key={fact}>{fact}</li>
           ))}
         </ul>
+        <nav className="offer-ladder" aria-label={doc.ladder}>
+          {LADDER.map((key) => {
+            const item = [...doc.tiers, ...doc.products].find((x) => x.key === key);
+            return item === undefined ? null : (
+              <a key={key} href={`#tier-${key}`}>
+                <span>{item.name}</span>
+                <b>{item.price}</b>
+              </a>
+            );
+          })}
+        </nav>
       </header>
 
       <FreePlan lang={lang} reader={reader} />
@@ -357,11 +385,14 @@ export function OfferView({
           <h2 id="offer-packs">{doc.packsHeading}</h2>
           <p>{doc.packsLede}</p>
         </div>
-        <div className="offer-tiers">
+        <div className="offer-tiers offer-carousel">
           {packs.map((tier) => (
             <PaidCard key={tier.key} item={tier} lang={lang} reader={reader} />
           ))}
         </div>
+        <p className="offer-swipe" aria-hidden="true">
+          {doc.swipeHint} →
+        </p>
       </section>
 
       {genealogy === undefined ? null : (
@@ -377,11 +408,11 @@ export function OfferView({
               ))}
             </ul>
           </div>
-          <div className="offer-ask">
-            <h3>{doc.enquiry.heading}</h3>
+          <details className="offer-ask">
+            <summary className="offer-ask-toggle">{doc.enquiry.heading}</summary>
             <p>{doc.enquiry.intro}</p>
             <OfferForm tier="genealogy" lang={lang} />
-          </div>
+          </details>
         </section>
       )}
 

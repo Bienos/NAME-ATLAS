@@ -22,6 +22,7 @@ import {
   BlogPostView,
   blogPostMetadata,
   keepSuffixes,
+  readingMinutes,
 } from "./blog-page.js";
 import { formatDate, htmlLang, UI } from "./messages.js";
 import { SiteFooter } from "./site-footer.js";
@@ -487,7 +488,7 @@ describe("the post page's layout (TASK-075)", () => {
       const html = renderToStaticMarkup(
         createElement(BlogPostView, { post: p, pair: null, origin: null }),
       );
-      expect(html.match(/<section class="blog-section">/gu)?.length).toBe(2);
+      expect(html.match(/<section class="blog-section"( id="[a-z]+-1")?>/gu)?.length).toBe(2);
       expect(html).toContain('<section class="blog-section blog-faq">');
       expect(html).toContain('<section class="blog-section blog-sources">');
     }
@@ -543,5 +544,54 @@ describe("emphasis inside a link's text (TASK-075)", () => {
     expect(html).not.toContain("*Names*");
     expect(html).toContain("<strong>bold</strong> link");
     expect(html).not.toContain("javascript:");
+  });
+});
+
+describe("the blog in Brand System v1 (TASK-174)", () => {
+  it("renders both pages in the atlas-v1 scope", () => {
+    const index = renderToStaticMarkup(
+      createElement(BlogIndexView, { lang: "pl", posts: [post("a", "pl", "2026-10-03")] }),
+    );
+    expect(index).toContain('<main lang="pl" class="blog blog-index atlas-v1">');
+    const page = renderToStaticMarkup(
+      createElement(BlogPostView, { post: ok(), pair: null, origin: null }),
+    );
+    expect(page).toContain('<main lang="pl" class="blog blog-article atlas-v1">');
+  });
+
+  it("makes the newest post the feature card and numbers the rest", () => {
+    const posts = sortPosts([
+      post("a", "pl", "2026-10-03"),
+      post("b", "pl", "2026-10-02"),
+      post("c", "pl", "2026-10-01"),
+    ]);
+    const html = renderToStaticMarkup(createElement(BlogIndexView, { lang: "pl", posts }));
+    expect(html.match(/blog-card-feature/gu)?.length).toBe(1);
+    expect(html.indexOf("blog-card-feature")).toBeLessThan(html.indexOf("/pl/blog/a"));
+    expect(html).toContain(UI.pl.blogFeatured);
+    expect(html).toContain("<span>03</span>");
+  });
+
+  it("numbers the sections in a contents list, leaving out the FAQ and sources", () => {
+    const p = ok(
+      "Intro.\n\n## One\n\nA.\n\n## Two\n\nB.\n\n## Najczęstsze pytania\n\n### Q?\n\nA.\n\n## Źródła\n\n- S",
+    );
+    const html = renderToStaticMarkup(
+      createElement(BlogPostView, { post: p, pair: null, origin: null }),
+    );
+    expect(html).toContain('<section class="blog-section" id="sekcja-1"><h2>One</h2>');
+    expect(html).toContain('<section class="blog-section" id="sekcja-2"><h2>Two</h2>');
+    expect(html).toContain('href="#sekcja-2"><span class="blog-toc-n">02</span><span>Two</span>');
+    expect(html).not.toContain("sekcja-3");
+    const single = renderToStaticMarkup(
+      createElement(BlogPostView, { post: ok("## Only\n\nA."), pair: null, origin: null }),
+    );
+    expect(single).not.toContain("blog-toc");
+  });
+
+  it("counts the minutes to read at 200 words a minute, at least one", () => {
+    expect(readingMinutes(ok("Short."))).toBe(1);
+    const words = Array.from({ length: 450 }, () => "word").join(" ");
+    expect(readingMinutes(ok(words))).toBe(3);
   });
 });

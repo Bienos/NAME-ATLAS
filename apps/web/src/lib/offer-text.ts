@@ -88,6 +88,12 @@ export interface OfferDocument {
   readonly title: string;
   readonly lede: string;
   readonly facts: readonly string[];
+  /** The hero's row of prices, each a link to its card (TASK-173). */
+  readonly ladder: string;
+  /** Under the packs on a phone, where they scroll sideways. */
+  readonly swipeHint: string;
+  /** Above the table on a phone. */
+  readonly tableHint: string;
   readonly now: string;
   readonly soon: string;
   readonly freeToday: string;
@@ -172,8 +178,11 @@ const COUPLE_NAMES_EN =
 
 const PL: OfferDocument = {
   title: "Oferta",
-  lede: "Odpowiedzi o nazwisku są za darmo, a z darmowym kontem także drzewo rodziny do 5 osób. Płatne produkty otworzą więcej danych o imionach i większe drzewo. Każdy kupisz jednorazowo: bez abonamentu i bez odnawiania.",
-  facts: ["Ceny brutto, z VAT", "Jedna płatność, bez abonamentu", "Bez automatycznego odnawiania"],
+  lede: "Wszystko o nazwisku jest za darmo. Płacisz raz, tylko za to, czego potrzebujesz: bez abonamentu i bez odnawiania.",
+  facts: ["Ceny brutto, z VAT", "Zakup nie wygasa", "Konto za darmo"],
+  ladder: "Ceny",
+  swipeHint: "Przesuń w bok, aby zobaczyć pozostałe pakiety",
+  tableHint: "Przesuń tabelę w bok",
   now: "Działa teraz",
   soon: "Wkrótce",
   freeToday: "Dziś za darmo",
@@ -368,8 +377,11 @@ const PL: OfferDocument = {
 
 const EN: OfferDocument = {
   title: "Offer",
-  lede: "The answers about a surname are free, and with a free account so is a family tree of up to 5 people. The paid products will open more first-name figures and a bigger tree. Each is a one-time payment: no subscription and no renewal.",
-  facts: ["Prices include VAT", "One payment, no subscription", "No automatic renewal"],
+  lede: "Everything about a surname is free. You pay once, only for what you need: no subscription and no renewal.",
+  facts: ["Prices include VAT", "A purchase never expires", "The account is free"],
+  ladder: "Prices",
+  swipeHint: "Swipe to see the other packs",
+  tableHint: "Swipe the table sideways",
   now: "Available now",
   soon: "Coming soon",
   freeToday: "Free today",

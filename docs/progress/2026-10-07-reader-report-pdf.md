@@ -5,10 +5,12 @@
 - **the wording:** "28,99 zł" struck with "dziś 0 zł" instead of "Wkrótce";
 - **until when:** no end date.
 
-They were told that a struck price never charged reads as a false reduction (the Omnibus rules), and chose it as D-051 did. D-052 records the answers and keeps that risk open. The task file is `tasks/173-reader-report-pdf.md`.
+They were told that a struck price never charged reads as a false reduction (the Omnibus rules), and chose it as D-051 did. D-052 records the answers and keeps that risk open. The task file is `tasks/176-reader-report-pdf.md`.
+
+**Numbering.** Built as TASK-173. `main` then gave TASK-173 to the offer page (#208), and TASK-174 and TASK-175 were taken by #209 and #206, so this change is TASK-176.
 
 **Where it stands.**
-- **Base:** built on `main` @ `6e2fb72` (TASK-172 merged).
+- **Base:** built on `main` @ `6e2fb72` (TASK-172 merged); `main` @ `0356a33` (#208, #209, #207 and the sample PDF's trace fix, #210) merged in.
 - **No migration, no new dependency.** No reader's report is stored: `reports` still allows only `INTERNAL_TEST`.
 
 ## What changed
@@ -24,7 +26,7 @@ They were told that a struck price never charged reads as a false reduction (the
     - 308 for a moved address;
     - 404 for an unknown surname;
     - 503 when the database cannot answer, the claims moved, or the composed report names another surname.
-  - **Fonts:** `next.config.ts` traces them for both routes.
+  - **Fonts:** `next.config.ts` traces them for both routes, with pdfkit's built-in fonts' `.cjs` files, as #210 does for the sample. Without those, the sample's route answered 500 on Vercel.
 - **`report-inside-page.tsx`:**
   - **The button:** "Pobierz pełny raport (PDF)" under the sample, with "Raport dla imienia i nazwiska ANNA NOWAK, 10 rozdziałów, z przypisami.", for a reader with a session while the report is free.
   - **The price block:** "28,99 zł" struck, "dziś 0 zł", and "Na razie za darmo dla zalogowanych.", with no waiting-list email.
