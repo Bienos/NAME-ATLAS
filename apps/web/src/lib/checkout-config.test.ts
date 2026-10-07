@@ -44,9 +44,10 @@ describe("checkout's gate (TASK-111)", () => {
 });
 
 describe("the tiers checkout sells", () => {
-  it("are the 8,99 zł baby-names product and ADR-0037's three sellable tiers, the 800 zł one not among them", () => {
+  it("are the 8,99 zł and 15,99 zł products and ADR-0037's three sellable tiers, the 800 zł one not among them", () => {
     expect(CHECKOUT_TIERS.map((t) => [t.key, t.amount])).toEqual([
       ["babynames", 899],
+      ["fullnames", 1599],
       ["smaller", 2899],
       ["couple", 8999],
       ["family", 19900],

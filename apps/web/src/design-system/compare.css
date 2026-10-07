@@ -1,0 +1,868 @@
+/*
+ * TASK-155 — the comparison, redesigned in Brand System v1 (ADR-0046), page by
+ * page in the `.atlas-v1` scope (`docs/brand/MIGRATION_GUIDE.md`; the global
+ * migration, TASK-149, is reverted). Every rule is scoped to `main.cmp.atlas-v1`:
+ * the free surname comparison (`compare-view.tsx`), its picker, and the
+ * full-name comparison (`full-name-compare-page.tsx`). Shared pieces live in
+ * `compare-figures.tsx`.
+ *
+ * A person's colour is its place in the order (`data-side`), never a meaning:
+ * Atlas Blue, amber, ivory, terracotta. A bar is drawn only from figures a
+ * gate has allowed side by side; an absent figure is words, never a bar.
+ */
+
+main.cmp.atlas-v1 {
+  /* The shell's world shows through, as on the baby-names page (TASK-151). */
+  background: transparent;
+  --cmp-side-0: var(--atlas-blue-400);
+  --cmp-side-1: var(--atlas-amber-500);
+  --cmp-side-2: var(--atlas-ivory-200);
+  --cmp-side-3: var(--atlas-dusk-400);
+  --cmp-panel: color-mix(in srgb, var(--color-surface-primary) 72%, transparent);
+  --cmp-line: var(--color-border-subtle);
+  /* The maps on the brand's density scale (brand-system.css), not the dusk amber. */
+  --map-0: var(--map-density-lowest);
+  --map-1: var(--map-density-low);
+  --map-2: var(--map-density-mid);
+  --map-3: var(--map-density-high);
+  --map-4: var(--map-density-peak);
+}
+
+/* Links in Atlas Blue, as on the baby-names page; the surname pills keep their own. */
+main.cmp.atlas-v1 :is(.cmp-upsell a, .cmp-free-link a, .cmp-sign-in, .report a, .cmp-pages-pair) {
+  color: var(--color-accent-text);
+}
+
+main.cmp.atlas-v1 [data-side="0"] {
+  --side: var(--cmp-side-0);
+}
+main.cmp.atlas-v1 [data-side="1"] {
+  --side: var(--cmp-side-1);
+}
+main.cmp.atlas-v1 [data-side="2"] {
+  --side: var(--cmp-side-2);
+}
+main.cmp.atlas-v1 [data-side="3"] {
+  --side: var(--cmp-side-3);
+}
+
+@media (min-width: 900px) {
+  main.cmp-full.atlas-v1,
+  main.cmp-full.atlas-v1 + footer {
+    max-width: 72rem;
+  }
+}
+
+/* --- the head: eyebrow, plates, the mark ---------------------------------- */
+
+main.cmp.atlas-v1 .cmp-eyebrow {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+}
+
+main.cmp.atlas-v1 .cmp-head {
+  margin: var(--space-6) 0 var(--space-6);
+}
+
+main.cmp.atlas-v1 .cmp-plates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space-3);
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.75rem, 6vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+main.cmp.atlas-v1 .cmp-plates[data-count="3"],
+main.cmp.atlas-v1 .cmp-plates[data-count="4"] {
+  font-size: clamp(1.375rem, 2.6vw, 2.125rem);
+}
+
+main.cmp.atlas-v1 .cmp-plate-wrap {
+  display: flex;
+  flex: 1 1 15rem;
+  align-items: stretch;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+main.cmp.atlas-v1 .cmp-plate {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  min-height: 6.5rem;
+  padding: calc(var(--space-7) + var(--space-3)) var(--space-5) var(--space-4);
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--side) 14%, transparent), transparent 70%),
+    var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-bottom: 3px solid var(--side);
+  border-radius: var(--radius-panel);
+  overflow-wrap: break-word;
+}
+
+main.cmp.atlas-v1 .cmp-plate-line {
+  display: block;
+}
+
+/* A full name: the first name above, smaller, the surname as the plate's word. */
+main.cmp.atlas-v1 .cmp-plate-line:has(+ .cmp-plate-line) {
+  margin-bottom: 0.15em;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.42em;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+main.cmp.atlas-v1 .cmp-plate-letter {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-4);
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--atlas-plum-950);
+  background: var(--side);
+  border-radius: 999px;
+}
+
+main.cmp.atlas-v1 .cmp-vs {
+  display: inline-grid;
+  flex: none;
+  align-self: center;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}
+
+/* A phone: the plates stack, and the mark sits on the seam between two. */
+@media (max-width: 639px) {
+  main.cmp.atlas-v1 .cmp-plates {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  main.cmp.atlas-v1 .cmp-plate-wrap {
+    flex: none;
+    flex-direction: column;
+    gap: 0;
+  }
+  main.cmp.atlas-v1 .cmp-plate-wrap .cmp-vs {
+    position: relative;
+    z-index: 1;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: calc(-1 * var(--space-5)) auto calc(-1 * var(--space-3));
+  }
+  main.cmp.atlas-v1 .cmp-plate {
+    min-height: 5rem;
+  }
+}
+
+main.cmp.atlas-v1 .cmp-disclaimer {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  border-left: 2px solid var(--color-signal-amber);
+  border-radius: 0;
+}
+
+main.cmp.atlas-v1 .cmp-intro {
+  margin-top: var(--space-6);
+}
+
+/* --- chapters and panels --------------------------------------------------- */
+
+main.cmp.atlas-v1 .cmp-chapter {
+  margin: var(--space-8) 0 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp.atlas-v1 .cmp-chapter-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+main.cmp.atlas-v1 .cmp-chapter-head h2,
+main.cmp.atlas-v1 .cmp-chapter > h2 {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.5rem, 3.2vw, 2rem);
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+main.cmp.atlas-v1 .cmp-chapter-no {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  color: var(--color-accent-text);
+}
+
+main.cmp.atlas-v1 .cmp-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--space-4);
+}
+
+main.cmp.atlas-v1 .cmp-panel {
+  margin: 0;
+  padding: var(--space-5);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp.atlas-v1 .cmp-panel .compare-group small {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.8125rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-panel .note:last-child,
+main.cmp.atlas-v1 .cmp-panel .baby-source:last-child {
+  margin-bottom: 0;
+}
+
+/* --- bars on one scale ----------------------------------------------------- */
+
+main.cmp.atlas-v1 .cmp-bars {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+main.cmp.atlas-v1 .cmp-bar {
+  display: grid;
+  grid-template-areas:
+    "name value"
+    "track track";
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+}
+
+main.cmp.atlas-v1 .cmp-bar-name {
+  grid-area: name;
+  min-width: 0;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+}
+
+main.cmp.atlas-v1 .cmp-bar-name::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: 0.5rem;
+  background: var(--side);
+  border-radius: 999px;
+  vertical-align: 0.1em;
+}
+
+main.cmp.atlas-v1 .cmp-bar-value {
+  grid-area: value;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 1.125rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+main.cmp.atlas-v1 .cmp-bar-value small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-bar-track {
+  grid-area: track;
+  display: block;
+  height: 0.625rem;
+  background: color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+main.cmp.atlas-v1 .cmp-bar-fill {
+  display: block;
+  width: calc(var(--share, 0) * 100%);
+  min-width: 3px;
+  height: 100%;
+  background: var(--side);
+  border-radius: 999px;
+  transform-origin: left center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main.cmp.atlas-v1 .cmp-bar-fill {
+    animation: cmp-grow var(--atlas-duration-unfold, 520ms) var(--atlas-ease-unfold, ease-out) both;
+  }
+  @keyframes cmp-grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
+
+main.cmp.atlas-v1 .cmp-bar-absent {
+  grid-area: value;
+  font-size: 0.875rem;
+  font-style: italic;
+  text-align: right;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-bars-plain .cmp-bar {
+  grid-template-areas: "name value";
+}
+
+@media (min-width: 640px) {
+  main.cmp.atlas-v1 .cmp-bar {
+    grid-template-areas: "name track value";
+    grid-template-columns: minmax(6rem, 10rem) minmax(0, 1fr) minmax(5.5rem, auto);
+    align-items: center;
+  }
+  main.cmp.atlas-v1 .cmp-bar-absent {
+    grid-column: 2 / -1;
+    text-align: left;
+  }
+  main.cmp.atlas-v1 .cmp-bars-plain .cmp-bar {
+    grid-template-areas: "name value";
+    grid-template-columns: minmax(6rem, 1fr) auto;
+  }
+}
+
+/* --- "1 in X" figures ------------------------------------------------------- */
+
+main.cmp.atlas-v1 .cmp-odds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+
+main.cmp.atlas-v1 .cmp-odds > div {
+  padding-top: var(--space-3);
+  border-top: 3px solid var(--side);
+}
+
+main.cmp.atlas-v1 .cmp-odds dt {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+main.cmp.atlas-v1 .cmp-odds dd {
+  margin: var(--space-2) 0 0;
+}
+
+main.cmp.atlas-v1 .cmp-odds-lead {
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: 0.875rem;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-odds-figure {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+main.cmp.atlas-v1 .cmp-verdict {
+  display: inline-block;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-accent-primary) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--atlas-blue-300) 45%, transparent);
+  border-radius: var(--radius-control);
+}
+
+/* --- maps ------------------------------------------------------------------- */
+
+main.cmp.atlas-v1 .cmp-maps {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  margin-bottom: var(--space-3);
+}
+
+main.cmp.atlas-v1 .cmp-map h3 {
+  margin: var(--space-3) 0 var(--space-2);
+  padding-bottom: var(--space-2);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  border-bottom: 2px solid var(--side);
+  overflow-wrap: anywhere;
+}
+
+/* --- the foot: surname pages, another comparison, the full-name card -------- */
+
+main.cmp.atlas-v1 .cmp-pages {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-top: var(--space-8);
+}
+
+main.cmp.atlas-v1 .cmp-pages-label {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-next {
+  display: grid;
+  gap: var(--space-5);
+  margin: var(--space-7) 0 var(--space-5);
+}
+
+@media (min-width: 900px) {
+  main.cmp.atlas-v1 .cmp-next:has(> :nth-child(2)) {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}
+
+main.cmp.atlas-v1 .cmp-again {
+  padding: var(--space-5);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp.atlas-v1 .cmp-again h2,
+main.cmp.atlas-v1 .cmp-upsell h2,
+main.cmp.atlas-v1 .cmp-locked h2,
+main.cmp.atlas-v1 .cmp-together h2,
+main.cmp.atlas-v1 .cmp-gives h2 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* --- the picker: two fields and the mark between them ---------------------- */
+
+main.cmp.atlas-v1 .cmp-duel {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: stretch;
+  gap: var(--space-3);
+  max-width: 52rem;
+  margin: var(--space-6) 0 var(--space-6);
+}
+
+main.cmp.atlas-v1 .cmp-duel .cmp-vs {
+  justify-self: center;
+}
+
+@media (min-width: 760px) {
+  main.cmp.atlas-v1 .cmp-duel {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--space-4);
+  }
+  main.cmp.atlas-v1 .cmp-duel .cmp-vs {
+    margin-bottom: 0.4rem;
+  }
+  main.cmp.atlas-v1 .cmp-duel > .compare-error,
+  main.cmp.atlas-v1 .cmp-duel > button {
+    grid-column: 1 / -1;
+  }
+}
+
+/* The second comparison at a result's foot: always stacked, in a half-width panel. */
+main.cmp.atlas-v1 .cmp-duel-compact {
+  grid-template-columns: 1fr;
+  margin: var(--space-4) 0 0;
+}
+
+main.cmp.atlas-v1 .cmp-duel-compact .cmp-vs {
+  display: none;
+}
+
+main.cmp.atlas-v1 .cmp-field {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+main.cmp.atlas-v1 .cmp-field label,
+main.cmp.atlas-v1 .cmp-person label,
+main.cmp.atlas-v1 .cmp-person legend {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+/* `.site` outranks the shell's dark input rule, so each field keeps its person's edge. */
+main.cmp.atlas-v1 .cmp-field input,
+main.cmp.atlas-v1 .cmp-person input {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 var(--space-5);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.375rem;
+  color: var(--color-text-primary);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-left: 3px solid var(--side);
+  border-radius: var(--radius-control);
+}
+
+main.cmp.atlas-v1 .cmp-duel-compact input {
+  min-height: 48px;
+  font-size: 1.125rem;
+}
+
+main.cmp.atlas-v1 .cmp-field input:focus-visible,
+main.cmp.atlas-v1 .cmp-person input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+main.cmp.atlas-v1 .cmp-field input::placeholder,
+main.cmp.atlas-v1 .cmp-person input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-duel button,
+main.cmp.atlas-v1 .cmp-people button {
+  justify-self: start;
+  min-height: 52px;
+  padding: 0 var(--space-8);
+  font: inherit;
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+main.cmp.atlas-v1 .cmp-duel button:hover,
+main.cmp.atlas-v1 .cmp-people button:hover {
+  background: var(--color-accent-hover);
+}
+
+main.cmp.atlas-v1 .cmp-duel button:focus-visible,
+main.cmp.atlas-v1 .cmp-people button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+main.cmp.atlas-v1 .cmp-try {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-8);
+}
+
+main.cmp.atlas-v1 .cmp-try-label {
+  margin-right: var(--space-2);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-try a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+}
+
+main.cmp.atlas-v1 .cmp-try a:hover {
+  border-color: var(--atlas-blue-300);
+}
+
+main.cmp.atlas-v1 .cmp-try-vs {
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-gives {
+  margin: 0 0 var(--space-7);
+}
+
+main.cmp.atlas-v1 .cmp-gives ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-5);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.cmp.atlas-v1 .cmp-gives li {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp.atlas-v1 .cmp-gives h3 {
+  margin: var(--space-2) 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+main.cmp.atlas-v1 .cmp-gives p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+/* --- the full-name card, the locked card, the "together" note --------------- */
+
+main.cmp.atlas-v1 .cmp-upsell,
+main.cmp.atlas-v1 .cmp-locked {
+  margin: 0 0 var(--space-6);
+  padding: var(--space-6);
+  background:
+    radial-gradient(
+      30rem 14rem at 100% 0%,
+      color-mix(in srgb, var(--atlas-amber-500) 12%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--atlas-aubergine-700) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--atlas-amber-500) 38%, transparent);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp.atlas-v1 .cmp-upsell > p,
+main.cmp.atlas-v1 .cmp-locked > p {
+  max-width: var(--measure);
+}
+
+main.cmp.atlas-v1 .cmp-upsell-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  color: var(--color-text-secondary);
+}
+
+main.cmp.atlas-v1 .cmp-price {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  color: var(--atlas-amber-400);
+}
+
+main.cmp.atlas-v1 .cmp-soon {
+  padding: 0.15em 0.7em;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--atlas-amber-300);
+  border: 1px solid var(--color-signal-amber);
+  border-radius: 999px;
+}
+
+main.cmp.atlas-v1 .cmp-upsell-link {
+  font-weight: 600;
+}
+
+main.cmp.atlas-v1 .cmp-together {
+  max-width: var(--measure);
+  margin: 0 0 var(--space-6);
+  padding: var(--space-5);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-left: 3px solid var(--color-accent-text);
+  border-radius: var(--radius-control);
+}
+
+main.cmp.atlas-v1 .cmp-together h2 {
+  font-size: 1.25rem;
+}
+
+main.cmp.atlas-v1 .cmp-together p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+/* --- the full-name form: four people ---------------------------------------- */
+
+main.cmp.atlas-v1 .cmp-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+}
+
+main.cmp.atlas-v1 .cmp-person {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+  margin: 0;
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-top: 3px solid var(--side);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp.atlas-v1 .cmp-person legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+main.cmp.atlas-v1 .cmp-person legend .cmp-plate-letter {
+  position: static;
+}
+
+main.cmp.atlas-v1 .cmp-person input {
+  min-height: 48px;
+  font-size: 1.125rem;
+}
+
+main.cmp.atlas-v1 .cmp-optional {
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-people > .compare-error,
+main.cmp.atlas-v1 .cmp-people > button {
+  grid-column: 1 / -1;
+}
+
+main.cmp.atlas-v1 .cmp-change {
+  margin: var(--space-6) 0;
+}
+
+main.cmp.atlas-v1 .cmp-change > summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  font-weight: 600;
+  color: var(--color-accent-text);
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+main.cmp.atlas-v1 .cmp-change > summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* --- first-name meanings, one card per person ------------------------------- */
+
+main.cmp.atlas-v1 .cmp-meanings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-4);
+}
+
+main.cmp.atlas-v1 .cmp-meaning {
+  padding: var(--space-5);
+  background: var(--cmp-panel);
+  border: 1px solid var(--cmp-line);
+  border-top: 3px solid var(--side);
+  border-radius: var(--radius-panel);
+}
+
+main.cmp.atlas-v1 .cmp-meaning h3 {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+main.cmp.atlas-v1 .cmp-meaning ul {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.cmp.atlas-v1 .cmp-meaning li + li {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--cmp-line);
+}
+
+main.cmp.atlas-v1 .cmp-meaning p {
+  margin: 0 0 var(--space-2);
+}
+
+main.cmp.atlas-v1 .cmp-meaning-label {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.cmp.atlas-v1 .cmp-unresolved ul {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-5);
+  color: var(--color-text-secondary);
+}
+
+main.cmp.atlas-v1 .cmp-free-link {
+  margin: var(--space-6) 0;
+}

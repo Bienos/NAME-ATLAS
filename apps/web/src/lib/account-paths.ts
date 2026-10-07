@@ -129,6 +129,12 @@ const BABY_NAMES_HOMES: ReadonlySet<string> = new Set([
   "/en/baby-names/list",
 ]);
 
+/** The full-name comparison (TASK-155), signed-in only: a sign-in comes back to it, without its query. */
+const FULL_NAME_COMPARE_HOMES: ReadonlySet<string> = new Set([
+  "/pl/porownaj/imie-i-nazwisko",
+  "/en/compare/full-name",
+]);
+
 /** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
 export function isTreeNext(next: string | null): boolean {
   return next !== null && (TREE_HOMES.has(next) || TREE_INVITATION.test(next));
@@ -165,6 +171,7 @@ export function safeNext(value: unknown): string | null {
   if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
   if (TREE_HOMES.has(value) || TREE_INVITATION.test(value)) return value;
   if (BABY_NAMES_HOMES.has(value)) return value;
+  if (FULL_NAME_COMPARE_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;
   const segment = match[1] ?? match[2] ?? "";

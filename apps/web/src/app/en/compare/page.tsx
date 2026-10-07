@@ -7,6 +7,7 @@ import {
   loadComparison,
 } from "../../../lib/compare-page.js";
 import { comparisonRequest } from "../../../lib/compare-request.js";
+import { fullNameCompareHref } from "../../../lib/full-name-compare-page.js";
 import { siteOrigin } from "../../../lib/surname-page.js";
 
 /** `/en/compare?a={slug}&b={slug}` — surname comparison (TASK-025). Never indexed. */
@@ -30,9 +31,18 @@ export default async function Page({ searchParams }: Props) {
         first={request.first}
         second={request.second}
         error={request.error}
+        fullNamesHref={fullNameCompareHref("en")}
       />
     );
   }
   const { a, b } = await loadComparison(request.a, request.b, "en");
-  return <ComparisonView a={a} b={b} lang="en" origin={siteOrigin()} />;
+  return (
+    <ComparisonView
+      a={a}
+      b={b}
+      lang="en"
+      origin={siteOrigin()}
+      fullNamesHref={fullNameCompareHref("en")}
+    />
+  );
 }

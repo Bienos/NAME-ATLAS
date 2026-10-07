@@ -8,6 +8,7 @@ import { SITE_COPY, SITE_PREVIEW_IMAGE } from "../lib/site-metadata.js";
 import { siteOrigin } from "../lib/surname-page.js";
 import "./globals.css";
 import "../design-system/brand-system.css";
+import "../design-system/compare.css";
 
 /**
  * The three type voices of the brand (ADR-0021, TASK-052): Fraunces for the

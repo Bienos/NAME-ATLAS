@@ -186,7 +186,7 @@ describe("two maps on one scale", () => {
     const html = render(A, B);
     // Shared scale over 0.9 max → 20-point bands. 0.5 is band 2 on BETA's map;
     // on its own scale (max 0.5 → 10-point bands) it would have been band 4.
-    const beta = html.slice(html.indexOf("<h4>BETA</h4>"));
+    const beta = html.slice(html.indexOf("<h3>BETA</h3>"));
     expect(beta).toMatch(/class="vmap-region vmap-b2"[^>]*aria-label="WIELKOPOLSKIE: 50,0%/u);
     expect(html).toContain("0%–20%");
   });

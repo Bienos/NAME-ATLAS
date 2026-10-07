@@ -8,6 +8,7 @@ import { migrateTestDatabase, startTestDatabase } from "@name-atlas/testing";
 import type { TestDatabase } from "@name-atlas/testing";
 import {
   BABY_NAMES_FULL_TIERS,
+  FULL_NAME_COMPARE_TIERS,
   TREE_UNLOCK_TIERS,
   createAccounts,
   createAccountsDb,
@@ -1097,6 +1098,26 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       expect(await purchases.hasPurchaseOf(none, BABY_NAMES_FULL_TIERS)).toBe(false);
     });
 
+    it("answers by tier: the full-name comparison needs fullnames or a tier from 28,99 zł (TASK-155)", async () => {
+      const purchases = createPurchases({ db: createAccountsDb(app()) });
+      const fullnames = await account("tier.fullnames@example.com");
+      expect(await purchases.hasPurchaseOf(fullnames, FULL_NAME_COMPARE_TIERS)).toBe(false);
+      await purchases.record({
+        ...paid(fullnames, "cs_test_tier_fullnames"),
+        tier: "fullnames",
+        amountTotal: 1599,
+      });
+      expect(await purchases.hasPurchaseOf(fullnames, FULL_NAME_COMPARE_TIERS)).toBe(true);
+      // It opens neither the tree's cap nor the baby-names figures (D-049).
+      expect(await purchases.hasPurchaseOf(fullnames, TREE_UNLOCK_TIERS)).toBe(false);
+      expect(await purchases.hasPurchaseOf(fullnames, BABY_NAMES_FULL_TIERS)).toBe(false);
+      // The 8,99 zł product does not open it; each tier from 28,99 zł up does.
+      expect(FULL_NAME_COMPARE_TIERS).not.toContain("babynames");
+      for (const tier of ["smaller", "couple", "family"] as const) {
+        expect(FULL_NAME_COMPARE_TIERS).toContain(tier);
+      }
+    });
+
     it("refuses a live purchase, an unknown tier and another currency", async () => {
       const userId = await account("refused.buyer@example.com");
       const purchases = createPurchases({ db: createAccountsDb(app()) });
@@ -1214,6 +1235,31 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
+    it("0046 allows the fullnames tier and refuses to go down while one is stored (TASK-155)", async () => {
+      const migrator = createMigrator(db().db);
+      expect(
+        await rows("SELECT 1 FROM accounts.purchases WHERE tier = 'fullnames'"),
+      ).not.toHaveLength(0);
+      const refused = await migrator.migrateTo("0044_given_name_meaning");
+      expect(String(refused.error)).toMatch(/refusing to undo 0046/u);
+
+      // Without a fullnames purchase (deleted here only) it goes down, and the old check holds.
+      await db().pool.query("DELETE FROM accounts.purchases WHERE tier = 'fullnames'");
+      const down = await migrator.migrateTo("0044_given_name_meaning");
+      expect(down.error).toBeUndefined();
+      const userId = await account("down.0046@example.com");
+      await expect(
+        db().pool.query(
+          `INSERT INTO accounts.purchases (purchase_id, user_id, tier, checkout_session_id, amount_total, currency, livemode, paid_at)
+           VALUES (gen_random_uuid(), $1, 'fullnames', 'cs_test_down_0045', 1599, 'pln', false, now())`,
+          [userId],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+      const up = await migrator.migrateToLatest();
+      expect(up.error).toBeUndefined();
+      await sql.raw(ROLES_SQL).execute(db().db);
+    });
+
     it("0042 allows the babynames tier, refuses an unknown one, and refuses to go down while one is stored (TASK-144)", async () => {
       const migrator = createMigrator(db().db);
       const refused = await migrator.migrateTo("0041_given_name_birth_claims");

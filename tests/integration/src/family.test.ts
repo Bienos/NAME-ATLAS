@@ -483,10 +483,17 @@ describe("family tree (TASK-066, ADR-0029)", () => {
       db: createFamilyDb(app()),
       hasPaidTier: (userId) => purchases.hasPurchaseOf(userId, TREE_UNLOCK_TIERS),
     });
-    const amounts = { babynames: 899, smaller: 2899, couple: 8999, family: 19900 } as const;
+    const amounts = {
+      babynames: 899,
+      fullnames: 1599,
+      smaller: 2899,
+      couple: 8999,
+      family: 19900,
+    } as const;
     const cases = [
       [null, "PERSON_LIMIT"],
       ["babynames", "PERSON_LIMIT"],
+      ["fullnames", "PERSON_LIMIT"],
       ["smaller", "OK"],
       ["couple", "OK"],
       ["family", "OK"],

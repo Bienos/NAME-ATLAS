@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { comparePopulation, compareRarity, rarerOf } from "./compare.js";
+import {
+  comparePopulation,
+  comparePopulationMany,
+  compareRarity,
+  compareRarityMany,
+  gateMany,
+  rarerOf,
+  rarestOf,
+} from "./compare.js";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 
 /** TASK-025 AC-1/AC-2 — comparability is a gate, not a preference. Synthetic fixtures. */
@@ -233,5 +241,112 @@ describe("rarerOf", () => {
     // A payload whose displayed X and share point opposite ways: the share is
     // the measured quantity and wins.
     expect(rarerOf(pairOf(100, 0.001, 200, 0.002))).toBe("a");
+  });
+});
+
+/** TASK-155 — the same gates for two to four people. */
+describe("comparePopulationMany", () => {
+  it("compares every person with a figure in the partition, and keeps the order", () => {
+    const [pairing] = comparePopulationMany([
+      side([observation(100, "g_male")]),
+      side([observation(50, "g_male")]),
+      side([observation(70, "g_male")]),
+    ]);
+    expect(pairing).toMatchObject({ comparable: true, group: "g_male", reason: null });
+    expect(pairing?.entries.map((e) => e?.value.value)).toEqual([100, 50, 70]);
+  });
+
+  it("leaves a person without a figure as null — absent, not zero — and compares the rest", () => {
+    const [pairing] = comparePopulationMany([
+      side([observation(100, "g_male")]),
+      side([]),
+      null,
+      side([observation(70, "g_male")]),
+    ]);
+    expect(pairing?.comparable).toBe(true);
+    expect(pairing?.entries.map((e) => e?.value.value ?? null)).toEqual([100, null, null, 70]);
+  });
+
+  it("reads a published null as no figure, never as a zero", () => {
+    const missing = observation(0, "g_male");
+    const nullValue = { ...missing, value: { ...missing.value, value: null } };
+    const [pairing] = comparePopulationMany([
+      side([observation(100, "g_male")]),
+      side([nullValue]),
+    ]);
+    expect(pairing).toMatchObject({ comparable: false, reason: "MISSING_ON_ONE_SIDE" });
+    expect(pairing?.entries[1]).toBeNull();
+  });
+
+  it("with two people, one figure is the pair's MISSING_ON_ONE_SIDE", () => {
+    const [pairing] = comparePopulationMany([side([observation(100, "g_male")]), side([])]);
+    expect(pairing).toMatchObject({ comparable: false, reason: "MISSING_ON_ONE_SIDE" });
+  });
+
+  it("refuses the whole partition when any present figure has another date", () => {
+    const [pairing] = comparePopulationMany([
+      side([observation(100, "g_male")]),
+      side([observation(50, "g_male")]),
+      side([observation(70, "g_male", "2025-01-20")]),
+    ]);
+    expect(pairing).toMatchObject({ comparable: false, reason: "DIFFERENT_SNAPSHOT_DATE" });
+  });
+
+  it("agrees with the pairwise gate for two people", () => {
+    const left = side([observation(100, "g_male"), observation(9, "g_female")]);
+    const right = side([observation(50, "g_male"), observation(9, "g_female", "2025-01-20")]);
+    const pairs = comparePopulation(left, right);
+    const many = comparePopulationMany([left, right]);
+    expect(many.map((p) => [p.group, p.comparable, p.reason])).toEqual(
+      pairs.map((p) => [p.group, p.comparable, p.comparable ? null : p.reason]),
+    );
+  });
+});
+
+describe("gateMany", () => {
+  it("checks in order and names the first difference", () => {
+    const pairing = gateMany(
+      "g",
+      [
+        { d: "2026", u: "A" },
+        { d: "2025", u: "B" },
+      ],
+      [
+        [(x) => x.d, "DIFFERENT_SNAPSHOT_DATE"],
+        [(x) => x.u, "DIFFERENT_PARTITION"],
+      ],
+    );
+    expect(pairing.reason).toBe("DIFFERENT_SNAPSHOT_DATE");
+  });
+});
+
+describe("rarestOf", () => {
+  function many(...entries: [number, number][]) {
+    const [pairing] = compareRarityMany(
+      entries.map(([x, share]) => side([], [{ ...rarity(x, "g"), share }])),
+    );
+    if (!pairing) throw new Error("expected a partition");
+    return pairing;
+  }
+
+  it("names the smallest share among four", () => {
+    expect(rarestOf(many([215, 0.00465], [4000, 0.00025], [900, 0.0011], [50, 0.02]))).toBe(1);
+  });
+
+  it("calls a shared smallest share a tie, never a ranking", () => {
+    expect(rarestOf(many([4000, 0.00025], [215, 0.00465], [4000, 0.00025]))).toBeNull();
+  });
+
+  it("refuses to separate two smallest shares that round to the same 1-in-X", () => {
+    expect(rarestOf(many([212, 0.0047081], [212, 0.0047269], [50, 0.02]))).toBe("TOO_CLOSE");
+  });
+
+  it("refuses across denominators", () => {
+    const [pairing] = compareRarityMany([
+      side([], [rarity(215, "g")]),
+      side([], [rarity(215, "g", 9_000_000)]),
+    ]);
+    expect(pairing).toMatchObject({ comparable: false, reason: "DIFFERENT_DENOMINATOR" });
+    expect(rarestOf(pairing!)).toBeNull();
   });
 });
