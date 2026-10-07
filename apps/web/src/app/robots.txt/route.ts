@@ -1,3 +1,4 @@
+import { aiSearchAgents, aiTrainingAgents } from "../../lib/ai-crawlers.js";
 import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
 
 /**
@@ -43,27 +44,6 @@ const previewRules = [
   "Allow: /?lang=en$",
   "",
 ].join("\n");
-
-/** Fetch a page to cite it in an AI answer: treated as a search engine. */
-export const aiSearchAgents = [
-  "OAI-SearchBot",
-  "ChatGPT-User",
-  "Claude-SearchBot",
-  "Claude-User",
-  "PerplexityBot",
-  "Perplexity-User",
-];
-
-/** Collect pages to train models: refused, whatever the flag says. */
-export const aiTrainingAgents = [
-  "GPTBot",
-  "ClaudeBot",
-  "Google-Extended",
-  "Applebot-Extended",
-  "CCBot",
-  "meta-externalagent",
-  "Bytespider",
-];
 
 /** What a search engine may read once indexing is enabled. */
 const searchRules = [

@@ -2,8 +2,9 @@
 
 ## What changed
 
+- `apps/web/src/lib/ai-crawlers.ts`: new `aiSearchAgents` and `aiTrainingAgents`. They live outside the route file because Next.js allows a route file to export only its handlers and route config; the first push exported them from the route, and `pnpm build` failed on that.
 - `apps/web/src/app/robots.txt/route.ts`:
-  - New `aiSearchAgents` and `aiTrainingAgents`, and the `*` rules factored into `searchRules`.
+  - The `*` rules are factored into `searchRules`.
   - With indexing enabled, the answer engines get a group of their own carrying `searchRules`.
   - In both postures, the training crawlers get a group with `Disallow: /`.
 - `apps/web/src/lib/llms-txt.ts` and `apps/web/src/app/llms.txt/route.ts`: `/llms.txt`.
@@ -20,6 +21,7 @@
 
 - `pnpm format:check`, `pnpm check:ids`, `pnpm lint`, `pnpm typecheck`: exit 0.
 - `pnpm test`: exit 0, every package passed; `apps/web` 114 files, 1334 tests.
+- `pnpm build` in `apps/web`: exit 0, with `/llms.txt` and `/robots.txt` listed as dynamic routes.
 - `pnpm exec vitest run src/app/robots.txt src/app/llms.txt` (in `apps/web`): 2 files, 11 tests passed.
 - Both routes' `GET` were run through `tsx` with `SITE_ORIGIN=https://name-atlas.pl`:
   - With `SEO_INDEXING_ENABLED` unset: `robots.txt` has the preview group, then `User-agent: *` / `Disallow: /`, then the seven training crawlers with `Disallow: /`. `/llms.txt` returns 404.
@@ -27,6 +29,6 @@
 
 ## Not verified
 
-- `pnpm build`, the integration, golden and e2e suites, and the routes behind a running Next server. The routes were called directly.
+- The integration, golden and e2e suites, and the routes behind a running Next server. The routes were called directly.
 - The routes on staging or production.
 - That each vendor honours its agent name as documented.

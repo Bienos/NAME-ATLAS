@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
-import { GET, aiSearchAgents, aiTrainingAgents } from "./route.js";
+import { aiSearchAgents, aiTrainingAgents } from "../../lib/ai-crawlers.js";
+import { GET } from "./route.js";
 
 vi.mock("../../lib/seo.js", () => ({
   indexingEnabled: vi.fn(),
