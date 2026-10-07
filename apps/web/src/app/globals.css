@@ -5153,6 +5153,1145 @@ body.dusk {
   border: 1px solid var(--dusk-line-control);
 }
 
+/* --- the account's pages on Brand System v1 (TASK-153, ADR-0046) ---------
+   The sign-in steps are one plate: a form card and an art panel, joined by a
+   perforation on a wide screen. The account step is a dashboard of panels.
+   Atlas Blue carries action and focus; amber is only the art's warm light.
+   `.atlas-v1` on the shell brings the brand's semantic tokens (the contour
+   field reads them); its own ground is taken off so the dusk sky shows. The
+   rules above for `.account` stay: the tree's pages still use them. */
+
+.site > main.reading.account-page {
+  max-width: 72rem;
+}
+
+.account-shell.atlas-v1 {
+  color: var(--atlas-ivory-50);
+  background: transparent;
+}
+
+.account-shell h2 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--atlas-ivory-50);
+}
+
+.account-shell p {
+  line-height: 1.55;
+  color: var(--atlas-ivory-200);
+}
+
+.dusk .account-shell a {
+  color: var(--atlas-blue-300);
+  text-underline-offset: 0.2em;
+}
+
+.dusk .account-shell a:hover {
+  color: var(--atlas-blue-200);
+}
+
+.account-shell :focus-visible {
+  outline: 2px solid var(--atlas-blue-300);
+  outline-offset: 3px;
+}
+
+.account-shell .account-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+  font: 500 0.75rem/1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-blue-200);
+}
+
+.account-shell .account-note {
+  font-size: 0.875rem;
+  color: var(--atlas-ivory-300);
+}
+
+/* Messages: Atlas Blue for news, the brand's red for a problem. */
+.account-shell .account-status {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  color: var(--atlas-ivory-50);
+  background: color-mix(in srgb, var(--atlas-blue-500) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--atlas-blue-300) 30%, transparent);
+  border-left: 3px solid var(--atlas-blue-300);
+  border-radius: 8px;
+}
+
+.account-shell .account-status-problem {
+  background: color-mix(in srgb, var(--atlas-red-500) 16%, transparent);
+  border-color: color-mix(in srgb, var(--atlas-red-400) 40%, transparent);
+  border-left-color: var(--atlas-red-400);
+}
+
+.account-shell .account-context {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-5);
+  color: var(--atlas-ivory-50);
+  background: color-mix(in srgb, var(--atlas-ivory-50) 6%, transparent);
+  border: 1px solid var(--dusk-line);
+  border-left: 3px solid var(--atlas-blue-400);
+  border-radius: 8px;
+}
+
+/* The fields: a sunk well that lights up in Atlas Blue when it has focus. */
+.account-shell .offer-form {
+  gap: var(--space-5);
+}
+
+.account-shell .offer-form label {
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--atlas-ivory-200);
+}
+
+.account-shell .offer-form input:not([type="checkbox"]) {
+  min-height: 52px;
+  padding: var(--space-4) var(--space-5);
+  color: var(--atlas-ivory-50);
+  background: color-mix(in srgb, var(--atlas-plum-950) 70%, transparent);
+  border: 1px solid var(--dusk-line-control);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.account-shell .offer-form input:not([type="checkbox"]):hover {
+  border-color: var(--atlas-ivory-300);
+}
+
+.account-shell .offer-form input:not([type="checkbox"]):focus-visible {
+  outline: none;
+  background: var(--atlas-plum-900);
+  border-color: var(--atlas-blue-300);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--atlas-blue-500) 30%, transparent),
+    0 0 32px color-mix(in srgb, var(--atlas-blue-500) 25%, transparent);
+}
+
+/* A browser's autofill keeps the well dark instead of painting it pale. */
+.account-shell .offer-form input:-webkit-autofill {
+  -webkit-text-fill-color: var(--atlas-ivory-50);
+  box-shadow: 0 0 0 100px var(--atlas-plum-900) inset;
+  caret-color: var(--atlas-ivory-50);
+}
+
+.account-shell .account-form small {
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shell .offer-form .account-check {
+  font-size: 0.9375rem;
+  color: var(--atlas-ivory-200);
+}
+
+.account-shell .offer-form .account-check input {
+  accent-color: var(--atlas-blue-500);
+}
+
+/* The one action: an Atlas Blue pill whose arrow leans forward on hover. */
+.account-shell .offer-send {
+  justify-self: stretch;
+  gap: var(--space-3);
+  min-height: 52px;
+  margin-top: var(--space-2);
+  color: var(--atlas-ivory-50);
+  background: linear-gradient(135deg, var(--atlas-blue-500), var(--atlas-blue-600));
+  border-radius: var(--atlas-radius-pill);
+  box-shadow:
+    0 10px 30px color-mix(in srgb, var(--atlas-blue-500) 35%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+
+.account-shell .offer-send:hover {
+  background: var(--atlas-blue-600);
+  box-shadow:
+    0 14px 44px color-mix(in srgb, var(--atlas-blue-500) 50%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.22);
+}
+
+.account-shell .offer-send:active {
+  background: var(--atlas-blue-700);
+  transform: translateY(1px);
+}
+
+.account-send-arrow path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.account-shell .offer-send.account-danger {
+  color: var(--atlas-red-400);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--atlas-red-400) 60%, transparent);
+  box-shadow: none;
+}
+
+.account-shell .offer-send.account-danger:hover {
+  background: color-mix(in srgb, var(--atlas-red-500) 16%, transparent);
+}
+
+/* "Continue with Google": Google's own white button, as its guidelines ask. */
+.dusk .account-shell a.account-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: none;
+  min-height: 52px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: #1f1f1f;
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid #747775;
+  border-radius: var(--atlas-radius-pill);
+}
+
+.dusk .account-shell a.account-google:hover {
+  color: #1f1f1f;
+  background: #f2f2f2;
+  box-shadow: 0 0 40px color-mix(in srgb, var(--atlas-blue-500) 35%, transparent);
+}
+
+.account-shell .account-google svg {
+  flex: none;
+}
+
+.account-shell .account-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: none;
+  margin: var(--space-5) 0;
+  font: 500 0.75rem/1 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shell .account-or::before,
+.account-shell .account-or::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed var(--dusk-line-control);
+}
+
+.account-shell .account-links {
+  margin: var(--space-5) 0 0;
+  font-size: 0.9375rem;
+  color: var(--atlas-ivory-300);
+}
+
+/* --- the plate: the form card beside the art --- */
+
+.account-shell.account-plate {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.account-shell .account-card {
+  position: relative;
+  display: grid;
+  align-content: center;
+  margin: 0;
+  padding: clamp(28px, 4.5vw, 60px);
+  background:
+    linear-gradient(180deg, rgb(255 250 243 / 0.06), rgb(255 250 243 / 0.015)),
+    var(--atlas-plum-800);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+/* A meridian across the card's top edge. */
+.account-shell .account-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 12% auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--atlas-blue-400), transparent);
+}
+
+/* The four crop marks of a printed atlas plate. */
+.account-card-ticks {
+  --tick: rgb(255 250 243 / 0.3);
+  position: absolute;
+  inset: 14px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--tick), var(--tick)) top left / 14px 1px,
+    linear-gradient(var(--tick), var(--tick)) top left / 1px 14px,
+    linear-gradient(var(--tick), var(--tick)) top right / 14px 1px,
+    linear-gradient(var(--tick), var(--tick)) top right / 1px 14px,
+    linear-gradient(var(--tick), var(--tick)) bottom left / 14px 1px,
+    linear-gradient(var(--tick), var(--tick)) bottom left / 1px 14px,
+    linear-gradient(var(--tick), var(--tick)) bottom right / 14px 1px,
+    linear-gradient(var(--tick), var(--tick)) bottom right / 1px 14px;
+  background-repeat: no-repeat;
+}
+
+.account-shell .account-card > .account-lede {
+  max-width: 34ch;
+  margin: 0 0 var(--space-6);
+}
+
+.account-shell .account-art {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  align-content: end;
+  min-height: 20rem;
+  padding: clamp(28px, 4.5vw, 60px);
+  background:
+    radial-gradient(
+      circle at 66% 36%,
+      color-mix(in srgb, var(--atlas-blue-500) 30%, transparent),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle at 12% 96%,
+      color-mix(in srgb, var(--atlas-amber-500) 14%, transparent),
+      transparent 38%
+    ),
+    linear-gradient(155deg, var(--atlas-aubergine-700), var(--atlas-plum-950) 78%);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.account-art-field,
+.account-hero-field {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.account-art-field .contour-field {
+  inset: -8% -24%;
+  width: 148%;
+  height: 116%;
+}
+
+.account-art-field .contour-field path {
+  stroke-width: 1;
+}
+
+.account-stamp {
+  position: absolute;
+  top: clamp(20px, 3vw, 36px);
+  right: clamp(20px, 3vw, 36px);
+  width: clamp(84px, 10vw, 124px);
+  height: auto;
+}
+
+.account-stamp circle {
+  fill: none;
+  stroke: color-mix(in srgb, var(--atlas-ivory-50) 32%, transparent);
+  stroke-width: 0.8;
+}
+
+.account-stamp circle + circle {
+  stroke-dasharray: 2 3;
+}
+
+.account-stamp text {
+  font: 500 7px var(--font-data, ui-monospace, monospace);
+  fill: var(--atlas-ivory-300);
+}
+
+.account-art-point {
+  position: absolute;
+  top: 40%;
+  left: 62%;
+  display: grid;
+  place-items: center;
+}
+
+/* The point's ring: drawn once here, pulsed below when motion is welcome. */
+.account-art-point::after {
+  content: "";
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--atlas-blue-300) 55%, transparent);
+  border-radius: 50%;
+}
+
+.account-shell .account-art-copy {
+  position: relative;
+}
+
+.account-shell .account-art-kicker,
+.account-shell .account-art-perks-heading {
+  margin: 0 0 var(--space-4);
+  font: 500 0.75rem/1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shell .account-art-title {
+  max-width: 13ch;
+  margin: 0 0 var(--space-7);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 1.5rem + 3.2vw, 4.25rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  color: var(--atlas-ivory-50);
+}
+
+.account-art-title em {
+  display: block;
+  font-style: italic;
+  color: var(--atlas-blue-200);
+}
+
+.account-art-perks {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-shell .account-art-perks li {
+  position: relative;
+  padding-left: var(--space-6);
+  line-height: 1.45;
+  color: var(--atlas-ivory-100);
+}
+
+.account-art-perks li::before {
+  content: "";
+  position: absolute;
+  top: 0.55em;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--atlas-blue-400);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--atlas-blue-500) 22%, transparent);
+}
+
+/* Wide: art left, card right, one plate cut by a perforation with a notch at
+   each end, the way a ticket tears. The shadow follows the cut shape. */
+@media (min-width: 900px) {
+  .account-shell.account-plate {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-areas: "art card";
+    gap: 0;
+    min-height: min(44rem, calc(100svh - 14rem));
+    filter: drop-shadow(0 24px 60px rgb(9 3 10 / 0.45));
+  }
+
+  .account-shell .account-art {
+    grid-area: art;
+    border-right: 0;
+    border-radius: var(--atlas-radius-lg) 0 0 var(--atlas-radius-lg);
+    -webkit-mask:
+      radial-gradient(circle at 100% 0, transparent 13px, #000 13.5px),
+      radial-gradient(circle at 100% 100%, transparent 13px, #000 13.5px);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle at 100% 0, transparent 13px, #000 13.5px),
+      radial-gradient(circle at 100% 100%, transparent 13px, #000 13.5px);
+    mask-composite: intersect;
+  }
+
+  .account-shell .account-card {
+    grid-area: card;
+    border-left: 2px dashed color-mix(in srgb, var(--atlas-ivory-50) 18%, transparent);
+    border-radius: 0 var(--atlas-radius-lg) var(--atlas-radius-lg) 0;
+    -webkit-mask:
+      radial-gradient(circle at 0 0, transparent 13px, #000 13.5px),
+      radial-gradient(circle at 0 100%, transparent 13px, #000 13.5px);
+    -webkit-mask-composite: source-in;
+    mask:
+      radial-gradient(circle at 0 0, transparent 13px, #000 13.5px),
+      radial-gradient(circle at 0 100%, transparent 13px, #000 13.5px);
+    mask-composite: intersect;
+  }
+}
+
+/* --- the dashboard --- */
+
+.account-shell.account-dash {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.account-shell .account-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(20px, 3vw, 40px);
+  padding: clamp(24px, 4vw, 52px);
+  background:
+    radial-gradient(
+      circle at 86% 30%,
+      color-mix(in srgb, var(--atlas-blue-500) 28%, transparent),
+      transparent 42%
+    ),
+    linear-gradient(140deg, var(--atlas-aubergine-700), var(--atlas-plum-950) 82%);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.account-hero-field .contour-field {
+  inset: -20% -10% -20% 20%;
+  width: 90%;
+  height: 140%;
+}
+
+.account-monogram {
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 9vw, 112px);
+  aspect-ratio: 1;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.25rem, 1.6rem + 2vw, 3.25rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--atlas-ivory-50);
+  background: radial-gradient(circle at 30% 25%, var(--atlas-blue-400), var(--atlas-blue-700) 72%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--atlas-blue-500) 20%, transparent),
+    0 0 0 7px color-mix(in srgb, var(--atlas-ivory-50) 18%, transparent),
+    0 18px 50px color-mix(in srgb, var(--atlas-blue-500) 40%, transparent);
+}
+
+.account-shell .account-hero h2 {
+  margin-bottom: var(--space-3);
+}
+
+.account-shell .account-hero-email {
+  margin: 0 0 var(--space-5);
+  overflow-wrap: anywhere;
+}
+
+.account-hero-email strong {
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+}
+
+.account-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-shell .account-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 30px;
+  padding: var(--space-2) var(--space-4);
+  font: 500 0.8125rem/1.2 var(--font-data, ui-monospace, monospace);
+  color: var(--atlas-ivory-100);
+  background: color-mix(in srgb, var(--atlas-ivory-50) 8%, transparent);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-pill);
+}
+
+.account-shell .account-chip-plan {
+  color: var(--atlas-ivory-50);
+  background: color-mix(in srgb, var(--atlas-blue-500) 30%, transparent);
+  border-color: color-mix(in srgb, var(--atlas-blue-300) 50%, transparent);
+}
+
+.account-chip-paid::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background: var(--atlas-blue-200);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--atlas-blue-300);
+}
+
+.account-shell .account-chip-unknown {
+  color: var(--atlas-ivory-300);
+  background: transparent;
+  border-style: dashed;
+}
+
+.account-shell .account-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+}
+
+.account-stat {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-5) var(--space-6);
+  background: color-mix(in srgb, var(--atlas-plum-800) 88%, transparent);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.account-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto var(--space-6);
+  width: 32px;
+  height: 2px;
+  background: var(--atlas-blue-400);
+}
+
+.account-stat dt {
+  font: 500 0.6875rem/1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-stat dd {
+  margin: var(--space-3) 0 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2.125rem);
+  font-weight: 500;
+  line-height: 1.1;
+  color: var(--atlas-ivory-50);
+  overflow-wrap: anywhere;
+}
+
+.account-shell .account-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.account-shell .account-panel {
+  position: relative;
+  max-width: none;
+  margin: 0;
+  padding: clamp(20px, 2.8vw, 34px);
+  background:
+    linear-gradient(180deg, rgb(255 250 243 / 0.05), rgb(255 250 243 / 0.015)),
+    color-mix(in srgb, var(--atlas-plum-800) 90%, transparent);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.account-shell .account-panel h3 {
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--atlas-ivory-50);
+}
+
+.account-shell .account-panel h4 {
+  margin: var(--space-6) 0 var(--space-3);
+  font: 500 0.75rem/1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shell .account-panel p {
+  margin: 0 0 var(--space-4);
+}
+
+.dusk .account-shell a.account-arrow-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.account-arrow-link::after {
+  content: "→";
+}
+
+/* The plan: the tiers held, then what each section allows. */
+.account-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.account-shell .account-tiers li {
+  padding: var(--space-2) var(--space-4);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+  background: color-mix(in srgb, var(--atlas-blue-500) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--atlas-blue-300) 40%, transparent);
+  border-radius: var(--atlas-radius-pill);
+}
+
+.account-shell .account-tiers li.account-tier-top {
+  box-shadow: 0 0 24px color-mix(in srgb, var(--atlas-blue-500) 40%, transparent);
+}
+
+.account-ents {
+  display: grid;
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--dusk-line);
+}
+
+.account-shell .account-ent {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  color: var(--atlas-ivory-100);
+  border-bottom: 1px solid var(--dusk-line);
+}
+
+.account-ent-mark circle,
+.account-ent-mark path {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.account-ent-mark circle {
+  stroke-width: 1.2;
+}
+
+.account-ent-mark path {
+  stroke-width: 1.7;
+}
+
+.account-ent-full .account-ent-mark,
+.account-ent-full .account-ent-value {
+  color: var(--atlas-green-400);
+}
+
+.account-ent-limited .account-ent-mark {
+  color: var(--atlas-ivory-300);
+}
+
+.account-ent-value {
+  font: 500 0.8125rem/1.3 var(--font-data, ui-monospace, monospace);
+  text-align: right;
+  color: var(--atlas-ivory-200);
+}
+
+/* The search: the site's own form, with the places one tap away. */
+.account-shell .account-search .search {
+  max-width: none;
+  margin: 0 0 var(--space-4);
+}
+
+.dusk .account-shell .account-search .search-compact {
+  max-width: none;
+}
+
+.account-shell .account-mini-heading {
+  margin: var(--space-5) 0 var(--space-3);
+  font: 500 0.75rem/1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dusk .account-shell .account-shortcuts a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-5);
+  font-size: 0.9375rem;
+  color: var(--atlas-ivory-50);
+  text-decoration: none;
+  border: 1px solid var(--dusk-line-control);
+  border-radius: var(--atlas-radius-pill);
+}
+
+.dusk .account-shell .account-shortcuts a:hover {
+  background: color-mix(in srgb, var(--atlas-blue-500) 18%, transparent);
+  border-color: var(--atlas-blue-300);
+}
+
+/* The trees: each a card, with the free tree's room as a bar. */
+.account-tree-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  list-style: none;
+}
+
+.dusk .account-shell a.account-tree {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-5);
+  color: var(--atlas-ivory-50);
+  text-decoration: none;
+  background: rgb(255 250 243 / 0.03);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-lg);
+}
+
+.dusk .account-shell a.account-tree:hover {
+  background: color-mix(in srgb, var(--atlas-blue-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--atlas-blue-300) 60%, transparent);
+}
+
+.account-tree-title {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.account-tree-meta {
+  font-size: 0.8125rem;
+  color: var(--atlas-ivory-300);
+}
+
+.account-tree-cap {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  font: 500 0.75rem/1.3 var(--font-data, ui-monospace, monospace);
+  color: var(--atlas-ivory-200);
+}
+
+.account-tree-bar {
+  position: relative;
+  display: block;
+  height: 4px;
+  overflow: hidden;
+  background: var(--dusk-track);
+  border-radius: var(--atlas-radius-pill);
+}
+
+.account-tree-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--fill, 0) * 100%);
+  background: linear-gradient(90deg, var(--atlas-blue-500), var(--atlas-blue-300));
+  border-radius: inherit;
+}
+
+/* The purchases: a receipt, perforated like the sign-in plate. */
+.account-receipts {
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  list-style: none;
+  border-top: 1px dashed var(--dusk-line-control);
+}
+
+.account-shell .account-receipts li {
+  display: grid;
+  grid-template-areas:
+    "name price"
+    "date price";
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2) var(--space-5);
+  padding: var(--space-4) 0;
+  border-bottom: 1px dashed var(--dusk-line-control);
+}
+
+.account-receipt-name {
+  grid-area: name;
+  font-weight: 600;
+  color: var(--atlas-ivory-50);
+}
+
+.account-receipt-date {
+  grid-area: date;
+  font: 400 0.75rem/1.3 var(--font-data, ui-monospace, monospace);
+  color: var(--atlas-ivory-300);
+}
+
+.account-receipt-price {
+  grid-area: price;
+  align-self: center;
+  font: 500 1rem/1 var(--font-data, ui-monospace, monospace);
+  color: var(--atlas-ivory-50);
+}
+
+.account-shell .account-receipt-total {
+  font: 500 0.875rem/1.3 var(--font-data, ui-monospace, monospace);
+  text-align: right;
+  color: var(--atlas-ivory-50);
+}
+
+/* Test-mode checkout's section, inside its panel: the buy buttons step back. */
+.account-shell .account-checkout .offer-form {
+  margin-bottom: var(--space-3);
+}
+
+.account-shell .account-checkout .offer-send {
+  min-height: 46px;
+  color: var(--atlas-ivory-50);
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--atlas-blue-300) 60%, transparent);
+  box-shadow: none;
+}
+
+.account-shell .account-checkout .offer-send:hover {
+  background: color-mix(in srgb, var(--atlas-blue-500) 20%, transparent);
+}
+
+.account-shell .account-checkout ul {
+  padding-left: var(--space-6);
+}
+
+/* Sign-in and security: a short ledger, then the sign-out. */
+.account-facts {
+  display: grid;
+  margin: 0 0 var(--space-5);
+  border-top: 1px solid var(--dusk-line);
+}
+
+.account-facts > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.8fr) minmax(0, 1.2fr);
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid var(--dusk-line);
+}
+
+.account-facts dt {
+  font: 500 0.75rem/1.5 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--atlas-ivory-300);
+}
+
+.account-facts dd {
+  margin: 0;
+  color: var(--atlas-ivory-50);
+}
+
+.account-unknown {
+  font-style: italic;
+  color: var(--atlas-ivory-300);
+}
+
+.account-shell .account-security .offer-send {
+  justify-self: start;
+  padding-inline: var(--space-7);
+  color: var(--atlas-ivory-50);
+  background: transparent;
+  border: 1px solid var(--dusk-line-control);
+  box-shadow: none;
+}
+
+.account-shell .account-security .offer-send:hover {
+  background: color-mix(in srgb, var(--atlas-ivory-50) 8%, transparent);
+  border-color: var(--atlas-ivory-300);
+}
+
+.account-shell .account-delete {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--atlas-red-500) 9%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--atlas-plum-800) 90%, transparent);
+  border-color: color-mix(in srgb, var(--atlas-red-400) 35%, transparent);
+}
+
+.account-shell .account-delete h3 {
+  color: var(--atlas-red-400);
+}
+
+.account-shell .account-delete .offer-form {
+  max-width: 28rem;
+}
+
+.account-shell .account-delete .offer-send.account-danger {
+  justify-self: start;
+}
+
+@media (min-width: 900px) {
+  .account-shell .account-grid {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+
+  /* Panels pair up by row; a last one without a partner takes the whole row. */
+  .account-shell .account-grid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .account-shell .account-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .account-shell .account-ent {
+    grid-template-columns: 20px minmax(0, 1fr);
+    row-gap: var(--space-2);
+  }
+
+  .account-ent-value {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .account-facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+}
+
+/* Motion (ADR-0046's verbs): the plate UNFOLDs, the contours RESOLVE from
+   west to east, the Atlas Point LOCATEs with a ring, the stamp turns slowly.
+   None of it runs for a reader who asks for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .account-shell .offer-send,
+  .account-shell .offer-form input,
+  .dusk .account-shell a.account-tree,
+  .dusk .account-shell .account-shortcuts a,
+  .account-send-arrow,
+  .account-arrow-link::after {
+    transition:
+      background var(--atlas-duration-quick) var(--atlas-ease-resolve),
+      border-color var(--atlas-duration-quick) var(--atlas-ease-resolve),
+      box-shadow var(--atlas-duration-base) var(--atlas-ease-resolve),
+      transform var(--atlas-duration-quick) var(--atlas-ease-resolve);
+  }
+
+  .account-shell .offer-send:hover .account-send-arrow,
+  .dusk .account-shell a.account-arrow-link:hover::after {
+    transform: translateX(4px);
+  }
+
+  .account-shell .account-card,
+  .account-shell .account-hero,
+  .account-shell .account-stat,
+  .account-shell .account-panel {
+    animation: account-unfold var(--atlas-duration-unfold) var(--atlas-ease-unfold) both;
+  }
+
+  .account-shell .account-art {
+    animation: account-unfold var(--atlas-duration-unfold) var(--atlas-ease-unfold) 80ms both;
+  }
+
+  .account-shell .account-stat:nth-child(2),
+  .account-shell .account-panel:nth-child(2) {
+    animation-delay: 60ms;
+  }
+
+  .account-shell .account-stat:nth-child(3),
+  .account-shell .account-panel:nth-child(3) {
+    animation-delay: 120ms;
+  }
+
+  .account-shell .account-stat:nth-child(4),
+  .account-shell .account-panel:nth-child(4) {
+    animation-delay: 180ms;
+  }
+
+  .account-shell .account-panel:nth-child(n + 5) {
+    animation-delay: 240ms;
+  }
+
+  .account-art-field .contour-field,
+  .account-hero-field .contour-field {
+    animation: account-resolve var(--atlas-duration-narrative) var(--atlas-ease-resolve) 200ms both;
+  }
+
+  .account-art-field .account-contour-b,
+  .account-hero-field .account-contour-b {
+    animation-delay: 420ms;
+  }
+
+  .account-art-point::after {
+    animation: account-locate 2.8s var(--atlas-ease-locate) 900ms infinite;
+  }
+
+  .account-stamp {
+    animation: account-turn 90s linear infinite;
+  }
+
+  .account-tree-bar::after {
+    animation: account-fill var(--atlas-duration-narrative) var(--atlas-ease-unfold) 300ms both;
+  }
+}
+
+@keyframes account-unfold {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes account-resolve {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes account-locate {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@keyframes account-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes account-fill {
+  from {
+    width: 0;
+  }
+}
+
 .offer-small {
   max-width: 46rem;
   margin-top: var(--space-7);

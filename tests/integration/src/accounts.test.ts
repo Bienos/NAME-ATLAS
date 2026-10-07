@@ -1008,6 +1008,53 @@ describe("accounts (TASK-061, ADR-0027)", () => {
     });
   });
 
+  describe("the dashboard's summary (TASK-153)", () => {
+    it("says when the account was made, whether Google is linked and how many sessions are live", async () => {
+      const userId = await account("Summary.Person@Example.com");
+      const signedOut = await accounts.accountSummary(userId);
+      expect(signedOut).toMatchObject({ googleLinked: false, activeSessions: 0 });
+      expect(signedOut?.createdAt).toBeInstanceOf(Date);
+
+      const byPassword = await accounts.signIn({
+        email: "summary.person@example.com",
+        password: GOOD,
+      });
+      const byGoogle = await accounts.signInWithGoogle({
+        identity: {
+          subject: "g-summary",
+          email: "summary.person@example.com",
+          emailVerified: true,
+        },
+        language: "pl",
+      });
+      expect(byPassword.kind).toBe("SIGNED_IN");
+      expect(byGoogle.kind).toBe("SIGNED_IN");
+      const signedIn = await accounts.accountSummary(userId);
+      expect(signedIn).toMatchObject({ googleLinked: true, activeSessions: 2 });
+      expect(signedIn?.lastSignInAt).toBeInstanceOf(Date);
+
+      // An expired session is not live. Both sessions are moved into the past by
+      // hand, so the shared clock stays put; expiry still follows creation.
+      await rows(
+        "UPDATE accounts.sessions SET created_at = $2, last_used_at = $2, expires_at = $3 WHERE user_id = $1",
+        [userId, new Date(clock.getTime() - 2 * DAY), new Date(clock.getTime() - MINUTE)],
+      );
+      expect(await accounts.accountSummary(userId)).toMatchObject({ activeSessions: 0 });
+    });
+
+    it("answers null for an id with no complete account", async () => {
+      expect(await accounts.accountSummary("00000000-0000-4000-8000-000000000000")).toBeNull();
+      expect(
+        (await accounts.signUp({ email: "summary.pending@example.com", language: "pl" })).kind,
+      ).toBe("CHECK_EMAIL");
+      const [pending] = await rows<{ user_id: string }>(
+        "SELECT user_id FROM accounts.users WHERE email_normalised = 'summary.pending@example.com'",
+      );
+      expect(pending).toBeDefined();
+      expect(await accounts.accountSummary(pending?.user_id ?? "")).toBeNull();
+    });
+  });
+
   describe("purchases (TASK-111)", () => {
     const paid = (userId: string, session: string) => ({
       userId,

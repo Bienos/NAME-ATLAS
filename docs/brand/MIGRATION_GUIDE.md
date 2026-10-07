@@ -67,6 +67,8 @@ These are high-risk because visual components interact with download/session/dat
 
 Migrated: the baby-names single-name page family (TASK-151, 2026-10-06; `apps/web/src/lib/baby-names-page.tsx`, rules under `.baby-names.atlas-v1`), and its share sheet and share cards (TASK-152, 2026-10-06; `baby-names-share-page.tsx` in the same scope; `baby-names-share-card.tsx` draws the cards with `next/og` from the semantic tokens' values, Atlas Blue for the lit point, amber for the peak bar alone). The baby-names list page is not.
 
+Migrated: the account's pages, sign-in steps and account dashboard (TASK-153, 2026-10-07; `apps/web/src/lib/account-page.tsx`, `account-dashboard.tsx`, rules under `.account-shell.atlas-v1`). The tree's pages are not; they keep the shared `.account…` rules.
+
 ## Phase 7 — cleanup
 
 Only after no consumer remains:

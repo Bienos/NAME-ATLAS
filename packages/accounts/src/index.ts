@@ -48,6 +48,7 @@ export {
 export type {
   Accounts,
   AccountLinks,
+  AccountSummary,
   AccountsDeps,
   CompleteProblem,
   CompleteResult,

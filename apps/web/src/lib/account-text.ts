@@ -67,6 +67,92 @@ export interface AccountText {
     readonly deleteSubmit: string;
   };
   readonly status: Readonly<Record<AccountStep, StatusMap>>;
+  /** The short line above each page's heading (TASK-153). */
+  readonly eyebrows: Readonly<Record<AccountStep, string>>;
+  /** The sign-in pages' art panel (TASK-153): what an account gives, one line per section that exists. */
+  readonly art: {
+    readonly label: string;
+    readonly kicker: string;
+    readonly title: readonly [string, string];
+    readonly perksHeading: string;
+    readonly perks: {
+      readonly cards: string;
+      readonly tree: (max: number) => string;
+      readonly babyNames: string;
+    };
+    /** Set around the stamp's ring; decoration, hidden from screen readers. */
+    readonly stamp: string;
+  };
+  /** The account's dashboard (TASK-153). */
+  readonly dashboard: {
+    readonly memberSince: (date: string) => string;
+    readonly planChip: {
+      readonly free: string;
+      readonly paid: (name: string) => string;
+      readonly unknown: string;
+    };
+    readonly stats: {
+      readonly label: string;
+      readonly plan: string;
+      readonly free: string;
+      readonly trees: string;
+      readonly purchases: string;
+      readonly sessions: string;
+      /** Read aloud for a figure that could not be read. */
+      readonly none: string;
+    };
+    readonly plan: {
+      readonly heading: string;
+      readonly free: string;
+      readonly paid: string;
+      readonly unknown: string;
+      readonly testMode: string;
+      readonly answers: string;
+      readonly answersValue: string;
+      readonly tree: string;
+      readonly treeFree: (max: number) => string;
+      readonly treeMore: (max: number) => string;
+      readonly babyNames: string;
+      readonly babyFree: string;
+      readonly babyFull: string;
+      /** Read aloud beside each row's mark. */
+      readonly included: string;
+      readonly limited: string;
+      readonly offer: string;
+    };
+    readonly search: {
+      readonly heading: string;
+      readonly lede: string;
+      readonly history: string;
+      readonly shortcuts: string;
+    };
+    readonly trees: {
+      readonly unreadable: string;
+      readonly all: string;
+      readonly start: string;
+      readonly freeCap: (n: number, max: number) => string;
+    };
+    readonly purchases: {
+      readonly heading: string;
+      readonly none: string;
+      readonly unreadable: string;
+      readonly total: (sum: string) => string;
+    };
+    readonly security: {
+      readonly heading: string;
+      readonly password: string;
+      readonly passwordSet: string;
+      readonly passwordUnset: string;
+      readonly changePassword: string;
+      readonly google: string;
+      readonly googleOn: string;
+      readonly googleOff: string;
+      readonly sessions: string;
+      readonly sessionsNote: string;
+      readonly lastSignIn: string;
+      readonly unknown: string;
+    };
+  };
 }
 
 const problem = (text: string): StatusWords => ({ text, tone: "problem" });
@@ -231,6 +317,95 @@ const PL: AccountText = {
       error: problem("Coś poszło nie tak po naszej stronie. Spróbuj za chwilę."),
     },
   },
+  eyebrows: {
+    account: "Twoje miejsce w atlasie",
+    "sign-in": "Powrót do atlasu",
+    "sign-up": "Nowe konto",
+    reset: "Odzyskiwanie dostępu",
+    confirm: "Ostatni krok",
+    "new-password": "Nowe hasło",
+    welcome: "Ostatni krok",
+  },
+  art: {
+    label: "Co daje konto",
+    kicker: "Name Atlas · konto",
+    title: ["Każde nazwisko", "ma swoją mapę."],
+    perksHeading: "Z kontem",
+    perks: {
+      cards: "Pobierasz karty z odpowiedzią o nazwisku.",
+      tree: (max) => `Budujesz drzewo rodzinne, do ${max} osób za darmo.`,
+      babyNames: "Sprawdzasz, ile dzieci dostało imię w ostatnim roku.",
+    },
+    stamp: "NAME ATLAS · KONTO · NAME ATLAS · KONTO · ",
+  },
+  dashboard: {
+    memberSince: (date) => `Konto od ${date}`,
+    planChip: {
+      free: "Konto darmowe",
+      paid: (name) => `Pakiet „${name}”`,
+      unknown: "Plan nieznany",
+    },
+    stats: {
+      label: "Konto w skrócie",
+      plan: "Plan",
+      free: "Darmowy",
+      trees: "Drzewa",
+      purchases: "Zakupy",
+      sessions: "Aktywne sesje",
+      none: "brak danych",
+    },
+    plan: {
+      heading: "Twój plan",
+      free: "Masz darmowe konto. Odpowiedzi o nazwiskach są dla wszystkich, a płatne pakiety poszerzają drzewo i dane o imionach.",
+      paid: "Pakiety to jednorazowe płatności i nie wygasają.",
+      unknown:
+        "Nie udało się teraz odczytać Twoich zakupów, więc nie pokazujemy planu. Odśwież stronę za chwilę.",
+      testMode: "Płatności działają na razie w trybie testowym.",
+      answers: "Odpowiedzi o nazwiskach i karty do pobrania",
+      answersValue: "w każdym koncie",
+      tree: "Drzewo rodzinne",
+      treeFree: (max) => `do ${max} osób`,
+      treeMore: (max) => `więcej niż ${max} osób`,
+      babyNames: "Imiona dla dziecka",
+      babyFree: "ostatni rok",
+      babyFull: "każdy rok od 2000 i cała lista",
+      included: "w planie",
+      limited: "z limitem",
+      offer: "Zobacz pakiety",
+    },
+    search: {
+      heading: "Szukaj",
+      lede: "Wpisz nazwisko: zobaczysz, ile osób je nosi i gdzie jest najczęstsze.",
+      history: "Konto nie przechowuje historii wyszukiwań.",
+      shortcuts: "Na skróty",
+    },
+    trees: {
+      unreadable: "Nie udało się teraz odczytać Twoich drzew. Odśwież stronę za chwilę.",
+      all: "Wszystkie drzewa",
+      start: "Zacznij drzewo",
+      freeCap: (n, max) => `Darmowy limit: ${n} z ${max} osób`,
+    },
+    purchases: {
+      heading: "Zakupy",
+      none: "Nie masz jeszcze zakupów.",
+      unreadable: "Nie udało się teraz odczytać Twoich zakupów. Odśwież stronę za chwilę.",
+      total: (sum) => `Razem ${sum}`,
+    },
+    security: {
+      heading: "Logowanie i bezpieczeństwo",
+      password: "Hasło",
+      passwordSet: "ustawione",
+      passwordUnset: "nieustawione",
+      changePassword: "Zmień hasło",
+      google: "Google",
+      googleOn: "połączone",
+      googleOff: "niepołączone",
+      sessions: "Aktywne sesje",
+      sessionsNote: "Wylogowanie kończy tę sesję. Zmiana hasła kończy wszystkie.",
+      lastSignIn: "Ostatnie logowanie",
+      unknown: "brak danych",
+    },
+  },
 };
 
 const EN: AccountText = {
@@ -375,6 +550,95 @@ const EN: AccountText = {
         "More than an hour has passed since you chose a Google account. Sign in with Google again.",
       ),
       error: problem("Something went wrong on our side. Try again in a moment."),
+    },
+  },
+  eyebrows: {
+    account: "Your place in the atlas",
+    "sign-in": "Back to the atlas",
+    "sign-up": "A new account",
+    reset: "Getting back in",
+    confirm: "The last step",
+    "new-password": "A new password",
+    welcome: "The last step",
+  },
+  art: {
+    label: "What an account gives you",
+    kicker: "Name Atlas · account",
+    title: ["Every surname", "has its own map."],
+    perksHeading: "With an account",
+    perks: {
+      cards: "Download the answer cards for a surname.",
+      tree: (max) => `Build a family tree, up to ${max} people free.`,
+      babyNames: "See how many children were given a first name in the latest year.",
+    },
+    stamp: "NAME ATLAS · ACCOUNT · NAME ATLAS · ACCOUNT · ",
+  },
+  dashboard: {
+    memberSince: (date) => `Member since ${date}`,
+    planChip: {
+      free: "Free account",
+      paid: (name) => `“${name}” plan`,
+      unknown: "Plan unknown",
+    },
+    stats: {
+      label: "Your account at a glance",
+      plan: "Plan",
+      free: "Free",
+      trees: "Trees",
+      purchases: "Purchases",
+      sessions: "Active sessions",
+      none: "not available",
+    },
+    plan: {
+      heading: "Your plan",
+      free: "You have a free account. Surname answers are open to everyone, and the paid plans widen the tree and the first-name figures.",
+      paid: "Plans are one-time payments and do not expire.",
+      unknown:
+        "Your purchases could not be read just now, so the plan is not shown. Reload the page in a moment.",
+      testMode: "Payments run in test mode for now.",
+      answers: "Surname answers and card downloads",
+      answersValue: "with every account",
+      tree: "Family tree",
+      treeFree: (max) => `up to ${max} people`,
+      treeMore: (max) => `more than ${max} people`,
+      babyNames: "Baby names",
+      babyFree: "the latest year",
+      babyFull: "every year since 2000 and the whole list",
+      included: "included",
+      limited: "limited",
+      offer: "See the plans",
+    },
+    search: {
+      heading: "Search",
+      lede: "Type a surname to see how many people bear it and where it is most common.",
+      history: "Your account keeps no search history.",
+      shortcuts: "Shortcuts",
+    },
+    trees: {
+      unreadable: "Your trees could not be read just now. Reload the page in a moment.",
+      all: "All trees",
+      start: "Start a tree",
+      freeCap: (n, max) => `Free limit: ${n} of ${max} people`,
+    },
+    purchases: {
+      heading: "Purchases",
+      none: "You have no purchases yet.",
+      unreadable: "Your purchases could not be read just now. Reload the page in a moment.",
+      total: (sum) => `Total ${sum}`,
+    },
+    security: {
+      heading: "Sign-in and security",
+      password: "Password",
+      passwordSet: "set",
+      passwordUnset: "not set",
+      changePassword: "Change the password",
+      google: "Google",
+      googleOn: "connected",
+      googleOff: "not connected",
+      sessions: "Active sessions",
+      sessionsNote: "Signing out ends this session. Changing the password ends them all.",
+      lastSignIn: "Last sign-in",
+      unknown: "not available",
     },
   },
 };
