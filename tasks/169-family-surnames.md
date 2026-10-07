@@ -1,6 +1,7 @@
-# DRAFT — Family surnames view (stateless)
+# TASK-169 — Family surnames view (stateless)
 
-- **Status:** APPROVED IN SCOPE, NOT SCHEDULED, not numbered. Written 2026-09-30 at the project owner's request. The project owner accepted all six §13 decisions the same day. It takes the next task number free on `origin/main` and in open pull requests (`AGENTS.md` §11) when the owner schedules it.
+- **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-family-surnames.md`). Written 2026-09-30 as an unnumbered draft (`tasks/drafts/family-surnames-stateless.md`) at the project owner's request. The owner accepted all six §13 decisions that day and confirmed the approval on 2026-10-07. The U-6 privacy sign-off was given by the owner on 2026-10-07.
+- **Numbers:** TASK-169. First numbered 163 on 2026-10-07; 163 was then taken on `main` by the logo change (#195), and 164–168 by `main` (164, 166, 168) and open pull requests (#196 TASK-165, #201 TASK-167), so it was renumbered to the next free number when rebased. `pnpm check:ids` exit 0.
 - **Milestone:** none. A free feature after M2 (U-1). Not on the paid-MVP critical path.
 - **Canonical epics:** none. New scope, approved under U-1.
 - **Depends on:** TASK-006 (the contract and `GET /api/v1/surname-results`), TASK-016 (every fact reachable through that contract), TASK-017 (the free result page and its view components), TASK-029 (the rate limit). All are implemented on `main`.

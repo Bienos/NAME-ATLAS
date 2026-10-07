@@ -79,6 +79,8 @@ If an expected element is unsupported, the free result compresses and says so. I
 
 The landing page may also show statistics about each whole published list: how many surnames and people are on it, how bearer counts are spread, and model figures such as how many people it takes before two share a surname. The male and female lists are always shown side by side and never summed. No named surname appears, and every figure carries its source and snapshot date (TASK-040, ADR-0015).
 
+A visitor may also look up to four surnames from their own family on one page (`/pl/nazwiska-w-rodzinie`, `/en/family-surnames`): each card is that surname's own free result, with nothing computed across them. Approved by the project owner on 2026-09-30 as a free feature after M2 (TASK-169 §13 U-1). The page is `noindex`, keeps nothing, and sends no label or combination to the server. The owner gave its privacy sign-off (U-6) on 2026-10-07.
+
 ## 6. Premium scope
 
 Premium sells **depth and synthesis**, never the answer already promised free.
