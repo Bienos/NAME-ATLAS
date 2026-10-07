@@ -257,7 +257,7 @@ function panel(html: string, attribute: string): string {
 async function render(
   lang: Lang,
   query: Record<string, string>,
-  session: { userId: string } | null,
+  session: { userId: string; tester?: boolean } | null,
   bought: Record<string, readonly PurchaseTier[]> = {},
   reads: string[] = [],
 ): Promise<string> {
@@ -337,6 +337,18 @@ describe("signed in without the product (AC-4)", () => {
       expect(html).not.toContain("checkout");
       expect(reads).toEqual([]);
     }
+  });
+
+  it("offers a listed tester a test-mode purchase of fullnames, and still reads no claim", async () => {
+    const reads: string[] = [];
+    const html = await render("pl", TWO, { userId: "u", tester: true }, {}, reads);
+    const t = FULL_NAME_COMPARE_TEXT.pl;
+    expect(html).toContain(t.lockedHeading);
+    expect(html).toContain('action="/api/checkout"');
+    expect(html).toContain('name="tier" value="fullnames"');
+    expect(html).not.toContain(t.soon);
+    expect(html).not.toContain("cmp-plates");
+    expect(reads).toEqual([]);
   });
 });
 
