@@ -52,7 +52,21 @@ The authority is ADR-0037 §2, amended here; the task file is `tasks/163-full-re
 
 ## Verification (commands run, results as returned)
 
-The local run of `.github/workflows/ci.yml`'s steps was still in progress at this commit; its results are added in the next.
+`.github/workflows/ci.yml`'s steps were run locally, in order, on the tree of `b4adeb7`. That tree differs from the commit only in this record. The database was PostgreSQL 16.14, and `DATABASE_URL` was a new empty `name_atlas`, so the unit tests met an empty database, as on GitHub. GitHub Actions has started no job in this repository since about 07:49 UTC.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | exit 0 |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0 |
+| `pnpm test` | exit 0, 2,696 tests (web 1,228 in 109 files, truth 433, sources 615) |
+| `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0, no diff |
+| `pnpm test:integration` | exit 0: 50 files, 546 tests |
+| `pnpm test:golden` | exit 0: 4 files, 364 tests |
+| `pnpm build` | exit 0 |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
+
+The first build of this change, before that run, failed Next's type check: `studio-client.tsx`'s checkbox read `event.target.checked`, which the repository's `lib: ["ES2022"]` does not type. It now toggles the state instead. `pnpm typecheck` had passed; only the build caught it.
 
 **On real data.** The database `gn163` is a copy of the local `gn_full`, which holds the 2026-01-20 first-name lists, NOWAK and the meaning files.
 - **Migrations:** migrated to `0047`, after its 0044 row was deleted and its check dropped. The original had 0044 without 0043.
