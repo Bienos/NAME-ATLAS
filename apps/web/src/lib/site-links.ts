@@ -53,16 +53,18 @@ export function directoryLetterPath(letter: string, page = 1): string {
 }
 
 /**
- * The footer's blog and social links (TASK-057, TASK-071). The blog leads to
- * its own index. The owner asked for the three social links to lead to the
- * home page until each has an address of its own; when one does, its address
- * replaces `homePath` here and nowhere else.
+ * The site's social accounts (TASK-168). The owner gave these three addresses;
+ * YouTube, which led to the home page as a placeholder, was dropped.
  */
+export const SOCIAL_LINKS: readonly { readonly label: string; readonly href: string }[] = [
+  { label: "Instagram", href: "https://www.instagram.com/nameatlas_/" },
+  { label: "TikTok", href: "https://www.tiktok.com/@nameatlas_" },
+  { label: "Facebook", href: "https://www.facebook.com/profile.php?id=61595400800918" },
+];
+
+/** The footer's blog and social links (TASK-057, TASK-071, TASK-168). */
 export function followLinks(
   lang: Lang,
 ): readonly { readonly label: string; readonly href: string }[] {
-  return [
-    { label: "Blog", href: blogPath(lang) },
-    ...["Instagram", "TikTok", "YouTube"].map((label) => ({ label, href: homePath(lang) })),
-  ];
+  return [{ label: "Blog", href: blogPath(lang) }, ...SOCIAL_LINKS];
 }

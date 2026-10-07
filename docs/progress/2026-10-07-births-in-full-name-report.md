@@ -2,7 +2,7 @@
 
 **Request.** The owner was shown mockups of the paid report and asked for this step first ("tak, zrób to zadanie"); the PDF export comes after it (`tasks/159-births-in-full-name-report.md`). The authority is D-044 as ADR-0037 records it: every tier from 28,99 zł up holds the baby-names figures.
 
-**Where it stands.** Built on `main` @ `461f024`. `main` was merged in at `2fd44be`, at `adef136` and at `ecfd4a8`. No migration is added. Nothing is deployed, built on production or sold.
+**Where it stands.** Built on `main` @ `461f024`. `main` was merged in at `2fd44be`, at `adef136`, at `ecfd4a8` and at `d752a2a`. No migration is added. Nothing is deployed, built on production or sold.
 
 **Numbering.** Built as TASK-155. The open pull request #185 then took TASK-155, and `main` gained TASK-157 (#188); #187 holds TASK-156 and #189 TASK-158. So this change is TASK-159. `main` was merged in, and with it TASK-157's `BirthSexFigures.on_any_list`, which the parser now reads.
 
