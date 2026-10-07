@@ -14,7 +14,7 @@ import { homePath, offerPath } from "./site-links.js";
 
 export function offerMetadata(lang: Lang): Metadata {
   return {
-    title: `${offerDocument(lang).title} — Name Atlas`,
+    title: `${offerDocument(lang).title} | Name Atlas`,
     alternates: {
       canonical: offerPath(lang),
       languages: { pl: offerPath("pl"), en: offerPath("en") },

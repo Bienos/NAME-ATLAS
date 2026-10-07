@@ -66,7 +66,7 @@ export function surnameTitle(
         ? topics.where
         : null;
   const name = lang === "pl" ? `Nazwisko ${display}` : `${display} surname`;
-  return topic === null ? `${name} | Name Atlas` : `${name} — ${topic} | Name Atlas`;
+  return topic === null ? `${name} | Name Atlas` : `${name} | ${topic} | Name Atlas`;
 }
 
 /** "A i B", "A, B i C"; "A and B". */

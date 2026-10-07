@@ -4,16 +4,16 @@ import type { Lang } from "./messages.js";
 /** Landing copy, not surname facts. No register access is needed by a crawler. */
 export const SITE_COPY = {
   pl: {
-    title: "Name Atlas — Każde nazwisko gdzieś się zaczęło.",
+    title: "Name Atlas | Każde nazwisko gdzieś się zaczęło.",
     description:
       "Sprawdź swoje nazwisko: liczby, rzadkość, miejsca i historia tam, gdzie potwierdzają ją źródła. " +
-      "Odkrywaj odpowiedzi w kartach — za darmo, bez konta.",
+      "Odkrywaj odpowiedzi w kartach | za darmo, bez konta.",
   },
   en: {
-    title: "Name Atlas — Every surname began somewhere.",
+    title: "Name Atlas | Every surname began somewhere.",
     description:
       "Explore your Polish surname: counts, rarity, places and history where sources support it. " +
-      "Discover the answers in cards — free, no account needed.",
+      "Discover the answers in cards | free, no account needed.",
   },
 } as const;
 
@@ -23,7 +23,7 @@ export const SITE_PREVIEW_IMAGE = {
   width: 1200,
   height: 630,
   type: "image/jpeg",
-  alt: "Name Atlas — Każde nazwisko gdzieś się zaczęło. Sprawdź swoje nazwisko.",
+  alt: "Name Atlas | Każde nazwisko gdzieś się zaczęło. Sprawdź swoje nazwisko.",
 } as const;
 
 export function landingMetadata(lang: Lang, origin: string | null): Metadata {

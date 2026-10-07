@@ -20,7 +20,7 @@ import type { LegalKind } from "./legal-text.js";
 
 export function legalMetadata(kind: LegalKind, lang: Lang): Metadata {
   return {
-    title: `${legalDocument(kind, lang).title} — Name Atlas`,
+    title: `${legalDocument(kind, lang).title} | Name Atlas`,
     alternates: {
       canonical: legalPath(kind, lang),
       languages: { pl: legalPath(kind, "pl"), en: legalPath(kind, "en") },
