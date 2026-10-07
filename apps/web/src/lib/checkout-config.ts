@@ -40,7 +40,7 @@ export const STRIPE_API_VERSION = "2026-09-30.endive";
 /** Tags this flow's sessions in the Dashboard (`integration_identifier`). */
 export const STRIPE_INTEGRATION_ID = "nameatlas-checkout-qhvbtmzk";
 
-export type CheckoutTier = "babynames" | "smaller" | "couple" | "family";
+export type CheckoutTier = "babynames" | "fullnames" | "smaller" | "couple" | "family";
 
 export interface TierOffer {
   readonly key: CheckoutTier;
@@ -58,7 +58,8 @@ export interface TierOffer {
 /**
  * The products that can be sold in test mode, cheapest first, ADR-0037 §2.1's
  * prices and §2.3's names, in one place (ADR-0023 §4). `babynames` is the
- * 8,99 zł product of D-045 (test mode only; it does not unlock the tree). The
+ * 8,99 zł product of D-045 and `fullnames` the 15,99 zł full-name comparison of
+ * D-049 (test mode only; neither unlocks the tree). The
  * 800 zł tier is not here: it sells a person's service, which waits on consumer
  * terms (ADR-0037 §2.4).
  */
@@ -67,6 +68,12 @@ export const CHECKOUT_TIERS: readonly TierOffer[] = [
     key: "babynames",
     amount: 899,
     name: { pl: "Imiona dla dziecka", en: "Baby names" },
+    taxCode: "txcd_10701411",
+  },
+  {
+    key: "fullnames",
+    amount: 1599,
+    name: { pl: "Porównanie imion i nazwisk", en: "Full-name comparison" },
     taxCode: "txcd_10701411",
   },
   {

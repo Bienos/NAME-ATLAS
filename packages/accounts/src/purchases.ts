@@ -54,9 +54,21 @@ export const BABY_NAMES_FULL_TIERS: readonly PurchaseTier[] = [
 ];
 
 /**
+ * The tiers that hold the full-name comparison (D-049, TASK-155): the 15,99 zł
+ * product and every tier from 28,99 zł up. Neither the 8,99 zł baby-names
+ * product nor anything else opens it.
+ */
+export const FULL_NAME_COMPARE_TIERS: readonly PurchaseTier[] = [
+  "fullnames",
+  "smaller",
+  "couple",
+  "family",
+];
+
+/**
  * The tiers that lift the family tree's 5-person cap (D-025, ADR-0037 §2.1):
  * every tier from 28,99 zł up. The 8,99 zł "baby names" product does not
- * (D-044 §5).
+ * (D-044 §5), nor does the 15,99 zł full-name comparison (D-049).
  */
 export const TREE_UNLOCK_TIERS: readonly PurchaseTier[] = ["smaller", "couple", "family"];
 

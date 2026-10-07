@@ -83,10 +83,11 @@ export interface PurchasesTable {
 }
 
 /**
- * What can be bought: the three tiers of ADR-0037 and the 8,99 zł baby-names
- * product (D-045, key `babynames`, test mode only). The 800 zł tier is not sold yet.
+ * What can be bought: the three tiers of ADR-0037, the 8,99 zł baby-names
+ * product (D-045, key `babynames`) and the 15,99 zł full-name comparison
+ * (D-049, key `fullnames`), test mode only. The 800 zł tier is not sold yet.
  */
-export type PurchaseTier = "babynames" | "smaller" | "couple" | "family";
+export type PurchaseTier = "babynames" | "fullnames" | "smaller" | "couple" | "family";
 
 export interface AccountsDB {
   identities: IdentitiesTable;
