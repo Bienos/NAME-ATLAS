@@ -137,6 +137,55 @@ export interface BabyNamesText {
   // --- TASK-158: the way to the comparison, in the paid view. ---
   /** "Porównaj z innym imieniem": the link to the comparison with this name as the first. */
   readonly compareEntry: string;
+  // --- TASK-170: the year-by-year dashboard. ---
+  readonly dashTotal: (first: number) => string;
+  readonly dashAtLeast: string;
+  readonly dashYearsOnList: string;
+  readonly dashOf: (n: string, m: string) => string;
+  readonly dashBest: string;
+  readonly dashBestYears: (years: string) => string;
+  readonly dashChange: (from: number, to: number) => string;
+  readonly dashNoChange: string;
+  readonly dashRisesFalls: string;
+  readonly dashRisesFallsValue: (rises: string, falls: string) => string;
+  readonly momentsHeading: string;
+  readonly momentFirst: (fromStart: boolean) => string;
+  readonly momentFirstDesc: (count: string, rank: string) => string;
+  readonly momentTopTen: string;
+  readonly momentTopTenDesc: (rank: string) => string;
+  readonly momentNumberOne: string;
+  readonly momentNumberOneDesc: (years: number) => string;
+  readonly momentPeak: string;
+  readonly momentPeakDesc: (count: string) => string;
+  readonly momentRise: string;
+  readonly momentRiseDesc: (change: string) => string;
+  readonly momentLast: string;
+  readonly momentLastDesc: string;
+  readonly yoyHeading: string;
+  readonly yoyNote: string;
+  readonly yoyRise: string;
+  readonly yoyFall: string;
+  readonly yoyNone: string;
+  readonly yoyBiggestRise: string;
+  readonly yoyBiggestFall: string;
+  readonly yoyTileLabel: (year: number, text: string) => string;
+  readonly decadesHeading: string;
+  readonly decadesNote: string;
+  readonly decadeFoot: (average: string | null, listed: string, stored: string) => string;
+  readonly metricLabel: string;
+  readonly metricCount: string;
+  readonly metricShare: string;
+  readonly shareChartLabel: (sex: "MALE" | "FEMALE", first: number, last: number) => string;
+  readonly gridHeading: string;
+  readonly gridNote: string;
+  readonly sortBy: string;
+  readonly sortYear: string;
+  readonly sortCount: string;
+  readonly sortRank: string;
+  readonly sortChange: string;
+  readonly gridShare: string;
+  readonly gridChange: string;
+  readonly gridBar: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -247,6 +296,59 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     shareEntry: "Udostępnij",
     shareEntryNote: "Karta z tymi liczbami, do wysłania bliskim.",
     compareEntry: "Porównaj z innym imieniem",
+    dashTotal: (first) => `Razem od ${first}`,
+    dashAtLeast: "co najmniej",
+    dashYearsOnList: "Lata na liście",
+    dashOf: (n, m) => `${n} z ${m}`,
+    dashBest: "Najlepsze miejsce",
+    dashBestYears: (years) => `w latach: ${years}`,
+    dashChange: (from, to) => `Zmiana ${from} → ${to}`,
+    dashNoChange: "brak porównania",
+    dashRisesFalls: "Lata wzrostu i spadku",
+    dashRisesFallsValue: (rises, falls) => `${rises} ↑ · ${falls} ↓`,
+    momentsHeading: "Najważniejsze momenty",
+    momentFirst: (fromStart) =>
+      fromStart ? "Na liście od początku danych" : "Pierwszy raz na liście",
+    momentFirstDesc: (count, rank) => `${count} dzieci, miejsce ${rank}`,
+    momentTopTen: "W pierwszej dziesiątce",
+    momentTopTenDesc: (rank) => `miejsce ${rank}`,
+    momentNumberOne: "Imię nr 1",
+    momentNumberOneDesc: (years) =>
+      `na pierwszym miejscu w ${years} ${years === 1 ? "roku" : "latach"}`,
+    momentPeak: "Najwięcej dzieci",
+    momentPeakDesc: (count) => `${count} dzieci`,
+    momentRise: "Największy skok",
+    momentRiseDesc: (change) => `${change} wobec roku wcześniej`,
+    momentLast: "Ostatni rok na liście",
+    momentLastDesc: "w kolejnych latach poniżej progu listy",
+    yoyHeading: "Zmiana rok do roku",
+    yoyNote:
+      "Każdy kafelek to rok. Kolor pokazuje, o ile liczba dzieci wzrosła lub spadła wobec roku wcześniej.",
+    yoyRise: "wzrost",
+    yoyFall: "spadek",
+    yoyNone: "bez porównania",
+    yoyBiggestRise: "Największy wzrost",
+    yoyBiggestFall: "Największy spadek",
+    yoyTileLabel: (year, text) => `${year}: ${text}`,
+    decadesHeading: "Dekady",
+    decadesNote: "Suma dzieci z lat, w których imię było na liście.",
+    decadeFoot: (average, listed, stored) =>
+      `${average === null ? "poza listą" : `średnie miejsce ${average}`} · ${listed} z ${stored} lat na liście`,
+    metricLabel: "Wykres",
+    metricCount: "Liczba dzieci",
+    metricShare: "Udział ‰",
+    shareChartLabel: (sex, first, last) =>
+      `Udział imienia wśród ${sex === "MALE" ? "chłopców" : "dziewczynek"} z listy, w promilach, rok po roku od ${first} do ${last}; rok bez imienia na liście ma kreskę progu zamiast słupka.`,
+    gridHeading: "Wszystkie lata",
+    gridNote: "Wybierz, jak ułożyć lata. Brak imienia na liście to nie zero.",
+    sortBy: "Sortuj",
+    sortYear: "rok",
+    sortCount: "liczba dzieci",
+    sortRank: "miejsce",
+    sortChange: "zmiana r/r",
+    gridShare: "Udział",
+    gridChange: "Zmiana r/r",
+    gridBar: "Na tle szczytu",
   },
   en: {
     title: "Baby names",
@@ -354,5 +456,57 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     shareEntry: "Share",
     shareEntryNote: "A card with these figures, to send to family.",
     compareEntry: "Compare with another name",
+    dashTotal: (first) => `Total since ${first}`,
+    dashAtLeast: "at least",
+    dashYearsOnList: "Years on the list",
+    dashOf: (n, m) => `${n} of ${m}`,
+    dashBest: "Best rank",
+    dashBestYears: (years) => `in ${years}`,
+    dashChange: (from, to) => `Change ${from} → ${to}`,
+    dashNoChange: "no comparison",
+    dashRisesFalls: "Years up and down",
+    dashRisesFallsValue: (rises, falls) => `${rises} ↑ · ${falls} ↓`,
+    momentsHeading: "Key moments",
+    momentFirst: (fromStart) =>
+      fromStart ? "On the list since the data begins" : "First on the list",
+    momentFirstDesc: (count, rank) => `${count} children, rank ${rank}`,
+    momentTopTen: "In the top ten",
+    momentTopTenDesc: (rank) => `rank ${rank}`,
+    momentNumberOne: "Name no. 1",
+    momentNumberOneDesc: (years) => `first place in ${years} ${years === 1 ? "year" : "years"}`,
+    momentPeak: "Most children",
+    momentPeakDesc: (count) => `${count} children`,
+    momentRise: "Biggest jump",
+    momentRiseDesc: (change) => `${change} on the year before`,
+    momentLast: "Last year on the list",
+    momentLastDesc: "below the list's cut-off in the years after",
+    yoyHeading: "Year on year",
+    yoyNote:
+      "Each tile is a year. The colour shows how much the number of children rose or fell on the year before.",
+    yoyRise: "up",
+    yoyFall: "down",
+    yoyNone: "no comparison",
+    yoyBiggestRise: "Biggest rise",
+    yoyBiggestFall: "Biggest fall",
+    yoyTileLabel: (year, text) => `${year}: ${text}`,
+    decadesHeading: "Decades",
+    decadesNote: "The sum of children in the years the name was on the list.",
+    decadeFoot: (average, listed, stored) =>
+      `${average === null ? "off the list" : `average rank ${average}`} · ${listed} of ${stored} years on the list`,
+    metricLabel: "Chart",
+    metricCount: "Children",
+    metricShare: "Share ‰",
+    shareChartLabel: (sex, first, last) =>
+      `The name's share of the ${sex === "MALE" ? "boys" : "girls"} on the list, per thousand, year by year from ${first} to ${last}; a year the name is not on the list has a cut-off tick instead of a bar.`,
+    gridHeading: "Every year",
+    gridNote: "Choose how to order the years. Not on the list does not mean zero.",
+    sortBy: "Sort by",
+    sortYear: "year",
+    sortCount: "children",
+    sortRank: "rank",
+    sortChange: "change",
+    gridShare: "Share",
+    gridChange: "Change",
+    gridBar: "Against the peak",
   },
 };

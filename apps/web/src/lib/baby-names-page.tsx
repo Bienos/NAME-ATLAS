@@ -39,6 +39,15 @@ import {
   babyNamesFreeUntil,
   readBabyNamesAccess,
 } from "./baby-names-config.js";
+import {
+  ChartSwitch,
+  DashSummary,
+  Decades,
+  Moments,
+  YearGrid,
+  YearOnYear,
+  buildDashboard,
+} from "./baby-names-dashboard-view.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { COUPLE_NAMES_PATHS, coupleNamesEnabled } from "./couple-names-config.js";
 import { db } from "./db.js";
@@ -1014,12 +1023,18 @@ function CompareEntry({ name, sex, lang }: { name: string; sex: BirthSex; lang: 
   );
 }
 
-/** One sex's paid view: the chart, the "×" headline, the callouts, the ladder, the table, the way to the comparison. */
+/**
+ * One sex's paid view: the summary tiles, the chart (children or share), the
+ * "×" headline, the callouts, the key moments, the ladder, the year-on-year
+ * tiles, the decades, the sortable grid (TASK-170), the sourced table, the way
+ * to the comparison.
+ */
 function History({ figures, name, lang }: { figures: BirthSexFigures; name: string; lang: Lang }) {
   const t = BABY_NAMES_TEXT[lang];
   const history = figures.history ?? [];
   const first = history[0];
   if (first === undefined) return null;
+  const dash = buildDashboard(history);
   if (counted(history).length === 0) {
     // The other sex's line, as before: on no list of this sex in any year.
     return (
@@ -1036,10 +1051,25 @@ function History({ figures, name, lang }: { figures: BirthSexFigures; name: stri
       aria-label={`${t.historyHeading}: ${t.sex[figures.sex]}`}
     >
       <h3 className="bn-sex-heading">{t.sex[figures.sex]}</h3>
-      <YearChart history={history} sex={figures.sex} lang={lang} />
+      {dash === null ? null : <DashSummary dash={dash} lang={lang} />}
+      {dash === null ? (
+        <YearChart history={history} sex={figures.sex} lang={lang} />
+      ) : (
+        <ChartSwitch dash={dash} sex={figures.sex} lang={lang}>
+          <YearChart history={history} sex={figures.sex} lang={lang} />
+        </ChartSwitch>
+      )}
       <TimesHeadline history={history} lang={lang} />
       <Callouts history={history} lang={lang} />
+      {dash === null ? null : <Moments dash={dash} lang={lang} />}
       <Ladder history={history} lang={lang} />
+      {dash === null ? null : (
+        <>
+          <YearOnYear dash={dash} lang={lang} />
+          <Decades dash={dash} lang={lang} />
+          <YearGrid dash={dash} sex={figures.sex} lang={lang} />
+        </>
+      )}
       <YearTable figures={figures} lang={lang} />
       <CompareEntry name={name} sex={figures.sex} lang={lang} />
     </section>
