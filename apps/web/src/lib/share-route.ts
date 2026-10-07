@@ -4,7 +4,7 @@ import { isShareCard, shareFacts } from "./share-facts.js";
 import type { ShareCardKey, ShareFacts } from "./share-facts.js";
 import { isCardLayer, renderShareCard } from "./share-card.js";
 import type { OutroText } from "./share-card.js";
-import { REPORT_TEASER_TEXT } from "./report-teaser-text.js";
+import { REPORT_TEASER_TEXT, reportFree, reportPrice } from "./report-teaser-text.js";
 import type { GateVerdict } from "./download-gate.js";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -66,14 +66,18 @@ export async function shareCardResponse(
   );
 }
 
-/** The video's closing plate's words (TASK-166): the full report, announced for this surname. */
-function outroText(surname: string, lang: Lang): OutroText {
+/**
+ * The video's closing plate's words (TASK-166): the full report, announced for
+ * this surname; while it is free (TASK-176, D-052), its price struck and "dziś 0 zł".
+ */
+export function outroText(surname: string, lang: Lang, free: boolean = reportFree()): OutroText {
   const t = REPORT_TEASER_TEXT[lang];
   return {
     eyebrow: t.eyebrow,
     heading: t.outroHeading,
     line: t.outroLine(surname),
-    soon: t.outroSoon,
+    soon: free ? t.outroFree : t.outroSoon,
+    struck: free ? reportPrice(lang) : null,
   };
 }
 

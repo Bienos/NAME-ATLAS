@@ -8,6 +8,25 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-052 — RESOLVED (2026-10-07): the full-name report as a PDF, free for every signed-in reader until the owner ends it
+
+**Status:** RESOLVED by the owner in a Claude Code session; built by TASK-176.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-07: "PDF raportu" as the next step, and, asked who gets the real PDF, "Zalogowani, na razie za darmo".
+
+**The questions put to the owner, and the answers:**
+
+1. **Where a reader gets it:** the page of what the report holds, under the sample of the first chapter, once a first name is typed (chosen). Not also on the deck's card and in the studio.
+2. **What replaces "Wkrótce":** "28,99 zł" struck with "dziś 0 zł" beside it (chosen). The other choices were "Na razie za darmo, później 28,99 zł" without a strike (recommended), and "za darmo" with no price. The owner was told that the report has never been sold at 28,99 zł, so a struck price reads as a reduction from a price never charged, which the Omnibus rules on price reductions treat as misleading. They chose the struck price as D-051 did. **This record keeps that risk open:** a lawyer's view before the report is sold, or before the struck price is used in advertising, is advised.
+3. **Until when:** no end date; the owner ends it (chosen). Not a date like D-051's.
+
+**Read here as:**
+- **The surface:** the report is composed for the reader on the FREE surface (ADR-0001), as the baby-names view is for a reader who did not buy (D-051), and is never stored. Only an operator's `INTERNAL_TEST` version is ever written.
+- **The off switch:** `FULL_REPORT_FREE=0` ends the free report; any other value, or none, keeps it open. Pages built ahead read it when they are built, so a change shows on the next deploy.
+- **The offer page:** it keeps "Wkrótce" for the 28,99 zł tier, which holds the tree unlock as well as the report.
+
+---
+
 ## D-051 — RESOLVED (2026-10-07): the baby-names 8,99 zł view free for every signed-in reader until a set date
 
 **Status:** RESOLVED by the owner in a Claude Code session; built by TASK-160.
