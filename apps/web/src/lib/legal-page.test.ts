@@ -2,9 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { LegalView, legalMetadata } from "./legal-page.js";
-import { CONTROLLER_NAME, LEGAL_UPDATED, legalDocument, legalPath } from "./legal-text.js";
+import { LEGAL_UPDATED, legalDocument, legalPath } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
-import { CONTACT_EMAIL, CONTACT_INBOX } from "./contact.js";
+import { CONTACT_EMAIL } from "./contact.js";
 import { SiteFooter } from "./site-footer.js";
 import { htmlLang } from "./messages.js";
 
@@ -48,13 +48,11 @@ describe("legal pages (TASK-046)", () => {
     expect(terms.en).toContain("unlawful content");
   });
 
-  it("name the controller and the contact in both documents and languages", () => {
+  it("give the contact address and no owner's name, place or mailbox, in both documents and languages", () => {
     for (const kind of KINDS) {
       for (const lang of LANGS) {
         const text = JSON.stringify(legalDocument(kind, lang));
-        expect(text).toContain(CONTROLLER_NAME);
-        expect(text).not.toContain("Iława");
-        expect(text).not.toContain(CONTACT_INBOX);
+        expect(text).not.toMatch(/Cicbowski|Iława|gmail/iu);
         expect(text).toContain(CONTACT_EMAIL);
       }
     }

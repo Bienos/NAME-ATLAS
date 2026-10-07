@@ -13,11 +13,10 @@ import type { Lang } from "./messages.js";
  * doing something new with data — a form, analytics, a cookie — this text
  * changes in the same change, or it stops being true.
  *
- * The controller's name is the project owner's, given for publication on
- * 2026-09-30; at the owner's request the town was taken out on 2026-10-07.
+ * At the owner's request (2026-10-07) neither document names the owner or a
+ * place: the controller is "the owner of the service", and the only contact is
+ * `CONTACT_EMAIL`.
  */
-
-export const CONTROLLER_NAME = "Patryk Cicbowski";
 
 /**
  * The date each document was last changed, ISO. The privacy notice changed for
@@ -27,8 +26,8 @@ export const CONTROLLER_NAME = "Patryk Cicbowski";
  * (`docs/progress/2026-10-04-legal-review.md`), which also added the terms'
  * ban on unlawful content, then for Google Analytics on every page, its
  * cookies only with consent (TASK-115), and for Vercel Speed Insights. Both
- * changed on 2026-10-07: the controller without the town, and the contact
- * address on the site's domain.
+ * changed on 2026-10-07: no owner's name or place, and the contact address on
+ * the site's domain.
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
   privacy: "2026-10-07",
@@ -72,8 +71,6 @@ export interface LegalDocument {
 
 export type LegalKind = "privacy" | "terms";
 
-const who = CONTROLLER_NAME;
-
 const PRIVACY: Record<Lang, LegalDocument> = {
   pl: {
     title: "Polityka prywatności",
@@ -82,7 +79,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Kto jest administratorem",
         paragraphs: [
-          `Administratorem danych osobowych w serwisie Name Atlas jest ${who}. Kontakt: ${CONTACT_EMAIL}.`,
+          `Administratorem danych osobowych w serwisie Name Atlas jest jego właściciel. Kontakt we wszystkich sprawach, także w sprawie danych osobowych: ${CONTACT_EMAIL}.`,
         ],
       },
       {
@@ -165,7 +162,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Who is responsible",
         paragraphs: [
-          `The controller of personal data on Name Atlas is ${who}, Poland. Contact: ${CONTACT_EMAIL}.`,
+          `The controller of personal data on Name Atlas is the owner of the service. Contact for everything, personal data included: ${CONTACT_EMAIL}.`,
         ],
       },
       {
@@ -249,7 +246,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Usługa",
         paragraphs: [
-          `Name Atlas to bezpłatny serwis z informacjami o polskich nazwiskach, prowadzony przez: ${who}, ${CONTACT_EMAIL}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
+          `Name Atlas to bezpłatny serwis z informacjami o polskich nazwiskach, Kontakt: ${CONTACT_EMAIL}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
         ],
       },
       {
@@ -309,7 +306,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "The service",
         paragraphs: [
-          `Name Atlas is a free information service about Polish surnames, run by ${who}, Poland, ${CONTACT_EMAIL}. No registration is needed. You need an internet-connected device and a current browser.`,
+          `Name Atlas is a free information service about Polish surnames. Contact: ${CONTACT_EMAIL}. No registration is needed. You need an internet-connected device and a current browser.`,
         ],
       },
       {
