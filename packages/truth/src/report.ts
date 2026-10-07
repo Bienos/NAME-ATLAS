@@ -30,11 +30,13 @@ import type { Kysely, Transaction } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { uuidv7 } from "@name-atlas/domain";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
-import type { SurnameResultResponse } from "@name-atlas/contracts";
+import type { CitationDto, SurnameResultResponse } from "@name-atlas/contracts";
 import { canonicalKey } from "@name-atlas/resolver";
 import type { CoverageAssessment } from "./coverage-assessment.js";
 import { buildDiscoveryIndex } from "./discovery-index.js";
 import type { DiscoveryIndex } from "./discovery-index.js";
+import { readBirthNameFacts } from "./given-name-birth-facts.js";
+import type { BirthNameFacts } from "./given-name-birth-facts.js";
 import { readGivenNameFacts, readGivenNameMeaning } from "./given-name-facts.js";
 import type { GivenNameReportFacts } from "./given-name-facts.js";
 import { assessPremiumEligibility } from "./premium-eligibility.js";
@@ -45,9 +47,10 @@ export const REPORT_SCHEMA_VERSION = "report@0";
 /**
  * The full-name report's payload: `report@0`'s, plus the first name's facts
  * (TASK-124). `@1` adds the name's origin and meaning (TASK-147); a version
- * frozen under `@0` has none.
+ * frozen under `@0` has none. `@2` adds the name as a first name given to
+ * children, every year from 2000 (TASK-155); a version frozen earlier has none.
  */
-export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@1";
+export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@2";
 
 /** `docs/canonical/11` §26.3's section types, in the report's order. */
 export const REPORT_SECTION_TYPES = [
@@ -91,13 +94,16 @@ const CLAIM_PLACEMENT: Readonly<
 
 /**
  * The first name's claims, all in the GIVEN_NAME chapter: the count leads, the
- * rank and the meaning support it. A claim the frozen facts do not show is a
- * LIMITATION.
+ * rank, the meaning and the figures as a name given to children support it. A
+ * claim the frozen facts do not show is a LIMITATION.
  */
 const GIVEN_NAME_ROLES: Readonly<Record<string, PresentationRole>> = {
   GIVEN_NAME_POPULATION: "HERO",
   GIVEN_NAME_RANK: "SUPPORT",
   GIVEN_NAME_MEANING: "SUPPORT",
+  GIVEN_NAME_BIRTH_COUNT: "SUPPORT",
+  GIVEN_NAME_BIRTH_RANK: "SUPPORT",
+  GIVEN_NAME_BIRTH_TREND: "SUPPORT",
 };
 
 /** The response fields each section presents. */
@@ -194,6 +200,66 @@ function citationsOf(value: unknown, out = new Map<string, unknown>()): Map<stri
   return out;
 }
 
+/**
+ * What a citation cites, apart from its id: two citations with the same key
+ * name the same publication, and the bibliography lists it once. Each birth
+ * claim has its own citation row of its list (TASK-137), so a name's yearly
+ * figures would otherwise list each year's file twice, once per figure.
+ */
+export function referenceKey(c: CitationDto): string {
+  return JSON.stringify([c.title, c.publisher, c.publication_date, c.url, c.locator]);
+}
+
+/**
+ * The claims and citations a READY births figure shows, in its chapter's
+ * order: each sex's years, oldest first, then the sex's trend.
+ */
+function birthsShown(births: BirthNameFacts | null): {
+  readonly claimIds: string[];
+  readonly citations: CitationDto[];
+} {
+  const claimIds: string[] = [];
+  const citations: CitationDto[] = [];
+  if (births?.state !== "READY") return { claimIds, citations };
+  for (const sex of births.sexes) {
+    for (const year of sex.history ?? (sex.latest === null ? [] : [sex.latest])) {
+      for (const figure of [year.count, year.rank]) {
+        if (figure === null) continue;
+        claimIds.push(figure.claim_id);
+        citations.push(figure.citation);
+      }
+    }
+    if (sex.trend !== null) {
+      claimIds.push(sex.trend.claim_id);
+      citations.push(...sex.trend.citations);
+    }
+  }
+  return { claimIds, citations };
+}
+
+/**
+ * A full-name report's bibliography: the first name's sources lead, in its
+ * chapter's order (the lists, the lists of names given to children, each
+ * publication once, then the works), and the surname's follow.
+ */
+function fullNameSourceIds(given: GivenNameReportFacts, response: SurnameResultResponse): string[] {
+  const ids = [...citationsOf(given.lists).keys()];
+  const seen = new Set(ids);
+  const references = new Set<string>();
+  for (const c of birthsShown(given.births).citations) {
+    if (seen.has(c.id) || references.has(referenceKey(c))) continue;
+    references.add(referenceKey(c));
+    seen.add(c.id);
+    ids.push(c.id);
+  }
+  for (const id of citationsOf([given.meaning, response]).keys()) {
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  return ids;
+}
+
 function countBy(values: readonly string[]): Record<string, number> {
   const out: Record<string, number> = {};
   for (const v of values) out[v] = (out[v] ?? 0) + 1;
@@ -214,6 +280,10 @@ function givenNameGaps(facts: GivenNameReportFacts): Record<string, unknown>[] {
               facts.meaning.state === "RIGHTS_BLOCKED" ? "RIGHTS_BLOCKED" : "NO_ADMISSIBLE_SOURCE",
           },
         ]),
+    // TASK-155: on no list of names given to children, or not to be shown.
+    ...(facts.births === null || facts.births.state === "READY"
+      ? []
+      : [{ topic: "BIRTHS", reason_code: facts.births.state }]),
     // D-033, ADR-0032 §7: no source pairs first names with surnames.
     { topic: "FULL_NAME_COUNT", reason_code: "NO_SOURCE_PAIRS_NAMES" },
     ...(facts.state === "READY"
@@ -246,6 +316,7 @@ export function reportSectionsOf(
       ...(l.rank === null ? [] : [l.rank.claim_id]),
     ]),
     ...(given?.meaning.state === "READY" ? [given.meaning.claim_id] : []),
+    ...birthsShown(given?.births ?? null).claimIds,
   ]);
 
   return types.map((type): ReportSection => {
@@ -285,6 +356,22 @@ export function reportSectionsOf(
           given.meaning.state === "READY"
             ? { state: "READY", works: given.meaning.works.length }
             : { state: given.meaning.state },
+        ...(given.births === null
+          ? {}
+          : {
+              births:
+                given.births.state === "READY"
+                  ? {
+                      state: "READY",
+                      sexes: given.births.sexes.map((s) => ({
+                        sex: s.sex,
+                        latest_year: s.latest?.birth_year ?? null,
+                        years_on_lists: (s.history ?? []).filter((y) => y.count !== null).length,
+                        trend: s.trend?.direction ?? null,
+                      })),
+                    }
+                  : { state: given.births.state },
+            }),
       };
       summary = countBy(confidences([given.lists, given.meaning]));
     } else if (fields.length > 0) {
@@ -296,9 +383,11 @@ export function reportSectionsOf(
       };
       summary = countBy(fields.flatMap((f) => confidences(response[f])));
     } else if (type === "SOURCES") {
-      // The first name's sources lead, as its chapter does.
       body = {
-        citation_ids: [...citationsOf(given === undefined ? response : [given, response]).keys()],
+        citation_ids:
+          given === undefined
+            ? [...citationsOf(response).keys()]
+            : fullNameSourceIds(given, response),
       };
     } else if (type === "LIMITATIONS") {
       body = {
@@ -562,13 +651,12 @@ export async function buildFullNameReport(
     return { kind: "GIVEN_NAME_UNREVIEWED", form_review: name.form_review };
   }
   const givenClaims = await activeClaims(db, name.given_name_id);
+  const subject = { id: name.given_name_id, display_name: name.canonical_display };
   const given: GivenNameReportFacts = {
-    ...(await readGivenNameFacts(
-      db,
-      { id: name.given_name_id, display_name: name.canonical_display },
-      "PAID",
-    )),
+    ...(await readGivenNameFacts(db, subject, "PAID")),
     meaning: await readGivenNameMeaning(db, name.given_name_id, "PAID"),
+    // D-044 as ADR-0037 records it: every tier from 28,99 zł holds the baby-names figures.
+    births: await readBirthNameFacts(db, subject, { surface: "PAID", history: true }),
   };
 
   const part = await readSurnamePart(db, input.surname);
