@@ -6,7 +6,7 @@
   - an invented name that is not on the PESEL lists;
   - the real PDF free for signed-in readers for now.
 
-  That last choice is TASK-173; this task does not build it.
+  That last choice is TASK-176; this task does not build it.
 - **Decision:** ADR-0049 (the PDF's rendering, and the sample's rules).
 - **Numbers:** TASK-172 and ADR-0049. It was built as TASK-171, which `main` then gave to the baby-names search (#205). TASK-169 (#198), TASK-170 (#203) and TASK-171 are on `main`; ADR-0048 is held by an open branch.
 
@@ -27,7 +27,7 @@
 
 ## Out of scope
 
-- The real report as a PDF for a reader, and the change of "Wkrótce" to a free download (TASK-173).
+- The real report as a PDF for a reader, and the change of "Wkrótce" to a free download (TASK-176).
 - Any change to the report's contract, claims or tiers.
 
 ## Acceptance

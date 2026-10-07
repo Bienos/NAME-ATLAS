@@ -85,6 +85,9 @@ const nextConfig: NextConfig = {
     // route answered 500 on Vercel ("Cannot find module …/Helvetica.cjs").
     "/pl/przykladowy-raport.pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
     "/en/sample-report.pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
+    // A reader's own report as a PDF (TASK-176): the same.
+    "/pl/nazwisko/**/pelny-raport/pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
+    "/en/surname/**/full-report/pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
     // The blog (TASK-071) reads its posts from `src/content/blog/` at run time.
     "/pl/blog": ["./src/content/blog/*.md"],
     "/en/blog": ["./src/content/blog/*.md"],

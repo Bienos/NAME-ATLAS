@@ -10,10 +10,12 @@
  * service, never a source call (`docs/canonical/23` §22). A section with
  * nothing to show says why; nothing is omitted and nothing reads as zero.
  *
- * The only entitlement is INTERNAL_TEST: an operator builds a report with
+ * The only entitlement written is INTERNAL_TEST: an operator builds a report with
  * `pnpm report:build`, for any resolved surname, eligible or not (the owner's
  * decisions of 2026-10-05). Nothing is offered or sold, and the frozen
- * eligibility says whether it could be.
+ * eligibility says whether it could be. While the report is free (TASK-176,
+ * D-052), a signed-in reader's full-name report is composed the same way on
+ * the FREE surface and never written (`composeReaderReport`).
  *
  * The query service resolves inside its own read-only transaction, which
  * cannot be nested in another, so the reads are bracketed instead: the
@@ -145,11 +147,24 @@ export interface ReportSection {
   readonly claims: readonly ReportClaimReference[];
 }
 
+/**
+ * Who a report is composed for, and the surface it is read on (ADR-0001):
+ * `INTERNAL_TEST`, an operator's frozen version, on the PAID surface; and
+ * `FREE_SIGNED_IN`, a signed-in reader's copy while the report is free
+ * (TASK-176, D-052), on the FREE surface, as the baby-names view reads it for
+ * a reader who did not buy (D-051). Only `INTERNAL_TEST` is ever stored.
+ */
+export const REPORT_ENTITLEMENT_SURFACES = {
+  INTERNAL_TEST: "PAID",
+  FREE_SIGNED_IN: "FREE",
+} as const;
+export type ReportEntitlement = keyof typeof REPORT_ENTITLEMENT_SURFACES;
+
 /** What a version freezes, beside its sections. */
 export interface ReportPayload {
   readonly report_schema_version: string;
-  readonly surface: "PAID";
-  readonly entitlement_kind: "INTERNAL_TEST";
+  readonly surface: (typeof REPORT_ENTITLEMENT_SURFACES)[ReportEntitlement];
+  readonly entitlement_kind: ReportEntitlement;
   readonly response: SurnameResultResponse;
   readonly coverage: CoverageAssessment;
   readonly discovery_index: DiscoveryIndex;
@@ -462,7 +477,7 @@ async function activeClaims(db: Kysely<DB>, entityId: string): Promise<ReportCla
 const sameClaims = (a: readonly ReportClaim[], b: readonly ReportClaim[]): boolean =>
   a.length === b.length && a.every((c, i) => c.claim_id === b[i]?.claim_id);
 
-/** The surname's part of a report: what the PAID surface says, and the claims it was read between. */
+/** The surname's part of a report: what its surface says, and the claims it was read between. */
 type SurnamePart =
   | {
       readonly kind: "READ";
@@ -472,17 +487,22 @@ type SurnamePart =
     }
   | Exclude<BuildReportOutcome, { kind: "BUILT" } | { kind: "CLAIMS_CHANGED" }>;
 
-async function readSurnamePart(db: Kysely<DB>, input: string): Promise<SurnamePart> {
-  const probe = await querySurnameResult(db, input, { surface: "PAID" });
+async function readSurnamePart(
+  db: Kysely<DB>,
+  input: string,
+  entitlement: ReportEntitlement = "INTERNAL_TEST",
+): Promise<SurnamePart> {
+  const surface = REPORT_ENTITLEMENT_SURFACES[entitlement];
+  const probe = await querySurnameResult(db, input, { surface });
   if (probe.kind === "UNAVAILABLE") return { kind: "UNAVAILABLE", reason: probe.reason };
   if (probe.kind !== "OK" || probe.response.surname === null) return { kind: "NOT_RESOLVED" };
   const surnameId = probe.response.surname.id;
   const claims = await activeClaims(db, surnameId);
 
-  const paid = await querySurnameResult(db, input, { surface: "PAID" });
-  if (paid.kind === "UNAVAILABLE") return { kind: "UNAVAILABLE", reason: paid.reason };
-  if (paid.kind !== "OK") return { kind: "NOT_RESOLVED" };
-  const response = surnameResultResponseSchema.parse(paid.response);
+  const read = await querySurnameResult(db, input, { surface });
+  if (read.kind === "UNAVAILABLE") return { kind: "UNAVAILABLE", reason: read.reason };
+  if (read.kind !== "OK") return { kind: "NOT_RESOLVED" };
+  const response = surnameResultResponseSchema.parse(read.response);
   if (response.status !== "RESOLVED" || response.surname?.id !== surnameId) {
     return { kind: "NOT_RESOLVED" };
   }
@@ -497,8 +517,8 @@ async function readSurnamePart(db: Kysely<DB>, input: string): Promise<SurnamePa
     claims,
     payload: {
       report_schema_version: REPORT_SCHEMA_VERSION,
-      surface: "PAID",
-      entitlement_kind: "INTERNAL_TEST",
+      surface,
+      entitlement_kind: entitlement,
       response,
       coverage: built.coverage,
       discovery_index: built.index,
@@ -629,18 +649,30 @@ export async function buildReport(db: Kysely<DB>, input: string): Promise<BuildR
   });
 }
 
+/** A full-name report composed and not yet written: what both names say, and their claims. */
+type FullNameComposition =
+  | {
+      readonly kind: "COMPOSED";
+      readonly surnameId: string;
+      readonly givenNameId: string;
+      readonly surnameClaims: readonly ReportClaim[];
+      readonly givenClaims: readonly ReportClaim[];
+      readonly payload: ReportPayload;
+      readonly sections: readonly ReportSection[];
+    }
+  | Exclude<BuildFullNameReportOutcome, { kind: "BUILT" } | { kind: "CLAIMS_CHANGED" }>;
+
 /**
- * Freezes the full-name report for a first name and a surname as its next
- * version (TASK-124, ADR-0041): the surname's part exactly as
- * {@link buildReport} reads it, and the first name's facts from its own
- * claims, on the PAID surface. Both names' claims are read before and again
- * in the transaction that writes. A first name not on the lists, or one held
- * for review, writes nothing.
+ * The full-name report for a first name and a surname, read and not written:
+ * the surname's part exactly as {@link buildReport} reads it, and the first
+ * name's facts from its own claims, both on the entitlement's surface.
  */
-export async function buildFullNameReport(
+async function composeFullNameReport(
   db: Kysely<DB>,
   input: { readonly givenName: string; readonly surname: string },
-): Promise<BuildFullNameReportOutcome> {
+  entitlement: ReportEntitlement,
+): Promise<FullNameComposition> {
+  const surface = REPORT_ENTITLEMENT_SURFACES[entitlement];
   const name = await db
     .selectFrom("given_names")
     .select(["given_name_id", "canonical_display", "form_review"])
@@ -653,35 +685,115 @@ export async function buildFullNameReport(
   const givenClaims = await activeClaims(db, name.given_name_id);
   const subject = { id: name.given_name_id, display_name: name.canonical_display };
   const given: GivenNameReportFacts = {
-    ...(await readGivenNameFacts(db, subject, "PAID")),
-    meaning: await readGivenNameMeaning(db, name.given_name_id, "PAID"),
+    ...(await readGivenNameFacts(db, subject, surface)),
+    meaning: await readGivenNameMeaning(db, name.given_name_id, surface),
     // D-044 as ADR-0037 records it: every tier from 28,99 zł holds the baby-names figures.
-    births: await readBirthNameFacts(db, subject, { surface: "PAID", history: true }),
+    births: await readBirthNameFacts(db, subject, { surface, history: true }),
   };
 
-  const part = await readSurnamePart(db, input.surname);
+  const part = await readSurnamePart(db, input.surname, entitlement);
   if (part.kind !== "READ") return part;
   const payload: ReportPayload = {
     ...part.payload,
     report_schema_version: FULL_NAME_REPORT_SCHEMA_VERSION,
     given_name: given,
   };
-  const sections = reportSectionsOf(payload, [...givenClaims, ...part.claims]);
+  return {
+    kind: "COMPOSED",
+    surnameId: part.surnameId,
+    givenNameId: name.given_name_id,
+    surnameClaims: part.claims,
+    givenClaims,
+    payload,
+    sections: reportSectionsOf(payload, [...givenClaims, ...part.claims]),
+  };
+}
+
+/** Whether both names' active claims are still the ones the composition was read between. */
+async function claimsUnchanged(
+  db: Kysely<DB>,
+  c: Extract<FullNameComposition, { kind: "COMPOSED" }>,
+): Promise<boolean> {
+  return (
+    sameClaims(c.surnameClaims, await activeClaims(db, c.surnameId)) &&
+    sameClaims(c.givenClaims, await activeClaims(db, c.givenNameId))
+  );
+}
+
+/**
+ * Freezes the full-name report for a first name and a surname as its next
+ * version (TASK-124, ADR-0041): the surname's part exactly as
+ * {@link buildReport} reads it, and the first name's facts from its own
+ * claims, on the PAID surface. Both names' claims are read before and again
+ * in the transaction that writes. A first name not on the lists, or one held
+ * for review, writes nothing.
+ */
+export async function buildFullNameReport(
+  db: Kysely<DB>,
+  input: { readonly givenName: string; readonly surname: string },
+): Promise<BuildFullNameReportOutcome> {
+  const composed = await composeFullNameReport(db, input, "INTERNAL_TEST");
+  if (composed.kind !== "COMPOSED") return composed;
 
   return db.transaction().execute(async (trx): Promise<BuildFullNameReportOutcome> => {
-    if (
-      !sameClaims(part.claims, await activeClaims(trx, part.surnameId)) ||
-      !sameClaims(givenClaims, await activeClaims(trx, name.given_name_id))
-    ) {
-      return { kind: "CLAIMS_CHANGED" };
-    }
+    if (!(await claimsUnchanged(trx, composed))) return { kind: "CLAIMS_CHANGED" };
     return writeVersion(
       trx,
-      { surnameId: part.surnameId, givenNameId: name.given_name_id, reportType: "FULL_NAME" },
-      payload,
-      sections,
+      {
+        surnameId: composed.surnameId,
+        givenNameId: composed.givenNameId,
+        reportType: "FULL_NAME",
+      },
+      composed.payload,
+      composed.sections,
     );
   });
+}
+
+export type ComposeReaderReportOutcome =
+  | { readonly kind: "COMPOSED"; readonly version: StoredReportVersion }
+  | Exclude<BuildFullNameReportOutcome, { kind: "BUILT" }>;
+
+/**
+ * A signed-in reader's full-name report while it is free (TASK-176, D-052):
+ * composed as {@link buildFullNameReport} composes it, but on the FREE
+ * surface, and never written. It comes back in a stored version's shape, as
+ * the database would return it, so the preview's parser and the PDF read it
+ * as they read a frozen one. It has no id and its version number is 0: there
+ * is no version to come back to. Both names' claims are read again after the
+ * reads; when they changed, nothing is returned.
+ */
+export async function composeReaderReport(
+  db: Kysely<DB>,
+  input: { readonly givenName: string; readonly surname: string },
+  now: Date = new Date(),
+): Promise<ComposeReaderReportOutcome> {
+  const composed = await composeFullNameReport(db, input, "FREE_SIGNED_IN");
+  if (composed.kind !== "COMPOSED") return composed;
+  if (!(await claimsUnchanged(db, composed))) return { kind: "CLAIMS_CHANGED" };
+  return {
+    kind: "COMPOSED",
+    version: {
+      report_version_id: "",
+      report_type: "FULL_NAME",
+      version_number: 0,
+      report_schema_version: composed.payload.report_schema_version,
+      eligibility_state: composed.payload.eligibility.state,
+      generated_at: `${now.toISOString().slice(0, 19)}Z`,
+      // Through JSON, as `rendered_payload` comes back from the database.
+      payload: JSON.parse(JSON.stringify(composed.payload)) as unknown,
+      sections: composed.sections.map((section, i) => ({
+        section_type: section.section_type,
+        sequence_number: i + 1,
+        title_payload: JSON.parse(JSON.stringify(section.title_payload)) as unknown,
+        body_payload: JSON.parse(JSON.stringify(section.body_payload)) as unknown,
+        section_confidence_summary: JSON.parse(
+          JSON.stringify(section.section_confidence_summary),
+        ) as unknown,
+        claims: section.claims,
+      })),
+    },
+  };
 }
 
 /** A stored version as written: its frozen payload is returned unparsed. */
