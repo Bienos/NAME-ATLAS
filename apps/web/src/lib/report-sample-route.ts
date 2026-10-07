@@ -4,7 +4,7 @@ import { SAMPLE_REPORT } from "./report-sample.js";
 import { toReportPreview } from "./report-view.js";
 
 /**
- * The invented sample report as a PDF (TASK-171): `/pl/przykladowy-raport.pdf`
+ * The invented sample report as a PDF (TASK-172): `/pl/przykladowy-raport.pdf`
  * and `/en/sample-report.pdf`, linked from the full report's announcement.
  * Public and cached: it holds no reader's data and the same bytes for everyone.
  * Never indexed: its figures are invented, and every page says so.

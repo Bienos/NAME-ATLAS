@@ -9,7 +9,7 @@ import { SAMPLE_GIVEN_NAME, SAMPLE_REPORT, SAMPLE_RESPONSE } from "./report-samp
 import { toReportPreview } from "./report-view.js";
 
 /**
- * TASK-171: the report as a PDF, and the invented sample it is shown with.
+ * TASK-172: the report as a PDF, and the invented sample it is shown with.
  * Set `REPORT_PDF_OUT` to a directory to keep the rendered files for a look.
  */
 
@@ -20,7 +20,7 @@ const preview = () => {
   return p;
 };
 
-describe("the invented sample report (TASK-171)", () => {
+describe("the invented sample report (TASK-172)", () => {
   it("is a full-name report the preview's parser accepts, every chapter filled", () => {
     expect(surnameResultResponseSchema.safeParse(SAMPLE_RESPONSE).success).toBe(true);
     const p = preview();
@@ -58,7 +58,7 @@ describe("the invented sample report (TASK-171)", () => {
   });
 });
 
-describe("the report as a PDF (TASK-171)", () => {
+describe("the report as a PDF (TASK-172)", () => {
   for (const lang of ["pl", "en"] as const) {
     it(`renders the sample in ${lang}: A4 pages, a cover, "in short" and the chapters`, async () => {
       const bytes = await renderReportPdf(preview(), lang, { sample: true });
@@ -93,7 +93,7 @@ describe("the report as a PDF (TASK-171)", () => {
   });
 });
 
-describe("the sample's address (TASK-171)", () => {
+describe("the sample's address (TASK-172)", () => {
   it("serves the PDF inline, cached and never indexed", async () => {
     const { SAMPLE_REPORT_PATHS, sampleReportResponse } = await import("./report-sample-route.js");
     expect(SAMPLE_REPORT_PATHS).toEqual({

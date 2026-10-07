@@ -262,7 +262,7 @@ describe("the full report's page (TASK-166)", () => {
     );
     expect(html).not.toMatch(/checkout|Kup raport/u);
     expect(html).not.toContain("data-report-sample");
-    // The invented sample as a PDF (TASK-171).
+    // The invented sample as a PDF (TASK-172).
     expect(html).toContain('href="/pl/przykladowy-raport.pdf"');
   });
 

@@ -54,7 +54,7 @@ function Sheet() {
   );
 }
 
-/** The invented sample report as a PDF (TASK-171), with the line that it is invented. */
+/** The invented sample report as a PDF (TASK-172), with the line that it is invented. */
 export function SampleReportLink({ lang }: { lang: Lang }) {
   const t = REPORT_TEASER_TEXT[lang];
   return (

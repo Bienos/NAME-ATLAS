@@ -932,7 +932,7 @@ export function contentsCount(section: ReportPreview["sections"][number], lang: 
 /** The dossier itself, without the site's shell. */
 /**
  * The report's citations by id, and each one's number in the bibliography.
- * Shared by the preview and the PDF (TASK-171).
+ * Shared by the preview and the PDF (TASK-172).
  */
 export function reportNumbers(preview: ReportPreview): {
   readonly citations: ReadonlyMap<string, CitationDto>;

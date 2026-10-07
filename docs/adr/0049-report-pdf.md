@@ -6,7 +6,7 @@
   - the sample on the site, marked as invented;
   - an invented name not on the PESEL lists.
 - **Relates to:** ADR-0041 (the full-name report), ADR-0037 §2 (the report announced, TASK-166), TASK-107/TASK-118 (the one-page surname PDF, `pdf-lib`).
-- **Implemented by:** TASK-171.
+- **Implemented by:** TASK-172.
 
 ## Context
 
@@ -35,5 +35,5 @@ The full-name report exists as a stored, immutable version (ADR-0041) and as an 
 ## Consequences
 
 - `apps/web` depends on `@react-pdf/renderer`. The PDF routes need the fonts in their trace (`next.config.ts`).
-- The real report as a PDF for a reader (TASK-172) renders through the same component, from a report composed for that reader.
+- The real report as a PDF for a reader (TASK-173) renders through the same component, from a report composed for that reader.
 - A change to the preview's words changes the PDF's too. A new chapter type needs a body in both.

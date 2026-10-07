@@ -34,7 +34,7 @@ import {
 import type { ReportPreview } from "./report-view.js";
 
 /**
- * The full report as a PDF (TASK-171): A4 pages in the design of the owner's
+ * The full report as a PDF (TASK-172): A4 pages in the design of the owner's
  * mockups — a dusk cover, "in short" with the contents, then the chapters with
  * a numbered note at each fact and the bibliography at the end, a running head
  * and the page numbers.

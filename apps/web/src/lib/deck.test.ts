@@ -569,7 +569,7 @@ describe("the full report announced on the last card (TASK-166)", () => {
       );
       expect(mail(href).body).toContain("KOWALSKI");
       expect(block).not.toMatch(/checkout|<button/u);
-      // The invented sample as a PDF (TASK-171), said to be invented.
+      // The invented sample as a PDF (TASK-172), said to be invented.
       expect(block).toContain(
         `href="${lang === "pl" ? "/pl/przykladowy-raport.pdf" : "/en/sample-report.pdf"}"`,
       );

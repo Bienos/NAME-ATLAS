@@ -1,4 +1,4 @@
-# TASK-171 — The report as a PDF, and an invented sample of it
+# TASK-172 — The report as a PDF, and an invented sample of it
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-report-pdf-and-sample.md`).
 - **Requested by:** the project owner, 2026-10-07. They chose "PDF raportu" as the next step after TASK-166, then asked for "przykład tego raportu … jakieś zmyślone imię i wypełnienie wszystkiego zmyślonymi wygenerowanymi rzeczami". Asked, they chose:
@@ -6,9 +6,9 @@
   - an invented name that is not on the PESEL lists;
   - the real PDF free for signed-in readers for now.
 
-  That last choice is TASK-172; this task does not build it.
+  That last choice is TASK-173; this task does not build it.
 - **Decision:** ADR-0049 (the PDF's rendering, and the sample's rules).
-- **Numbers:** TASK-171 and ADR-0049. `main` holds up to TASK-168 and ADR-0047. Open branches hold TASK-169 (#198), TASK-170 and ADR-0048.
+- **Numbers:** TASK-172 and ADR-0049. It was built as TASK-171, which `main` then gave to the baby-names search (#205). TASK-169 (#198), TASK-170 (#203) and TASK-171 are on `main`; ADR-0048 is held by an open branch.
 
 ## In scope
 
@@ -27,7 +27,7 @@
 
 ## Out of scope
 
-- The real report as a PDF for a reader, and the change of "Wkrótce" to a free download (TASK-172).
+- The real report as a PDF for a reader, and the change of "Wkrótce" to a free download (TASK-173).
 - Any change to the report's contract, claims or tiers.
 
 ## Acceptance

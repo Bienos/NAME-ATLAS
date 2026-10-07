@@ -8,7 +8,7 @@ import type {
 } from "@name-atlas/truth";
 
 /**
- * The sample report (TASK-171): WIELIMIRA WRZOSOWIECKA, an invented person,
+ * The sample report (TASK-172): WIELIMIRA WRZOSOWIECKA, an invented person,
  * with every chapter filled with invented figures, words and sources, so a
  * reader can see what the full report looks like before it can be bought.
  *

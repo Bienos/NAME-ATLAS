@@ -1,11 +1,13 @@
-# 2026-10-07 — The report as a PDF, and an invented sample of it (TASK-171)
+# 2026-10-07 — The report as a PDF, and an invented sample of it (TASK-172)
 
 **Request.** The owner chose "PDF raportu" as the next step after TASK-166. Then they asked for "przykład tego raportu … jakieś zmyślone imię i wypełnienie wszystkiego zmyślonymi wygenerowanymi rzeczami". Asked, they chose:
 - the sample on the site, marked as invented;
 - an invented name that is not on the PESEL lists;
-- the real PDF free for signed-in readers for now. That is TASK-172, not built here.
+- the real PDF free for signed-in readers for now. That is TASK-173, not built here.
 
-The task file is `tasks/171-report-pdf-and-sample.md`; the decision is ADR-0049.
+The task file is `tasks/172-report-pdf-and-sample.md`; the decision is ADR-0049.
+
+**Numbering.** Built as TASK-171. `main` then gave TASK-171 to the baby-names search (#205), so this change is TASK-172. The reader's own PDF, once TASK-172 in these documents, is TASK-173.
 
 **Where it stands.**
 - **Base:** built on `main` @ `7db2909`; `main` @ `faabc6a` and @ `ae14c98` merged in.
@@ -76,4 +78,4 @@ The first full run, on `a8673e1`, failed one unit test: `design-tokens.test.ts`,
 
 - **On production:** nothing here was checked there before the merge.
 - **On another reader:** the PDF was looked at in poppler only, not in a phone's PDF viewer.
-- **A real report as a PDF:** not rendered from the production database. TASK-172 builds that.
+- **A real report as a PDF:** not rendered from the production database. TASK-173 builds that.

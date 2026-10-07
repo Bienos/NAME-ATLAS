@@ -21,7 +21,7 @@ export function reportInsidePath(pagePath: string, lang: Lang): string {
   return `${pagePath}/${lang === "en" ? "full-report" : "pelny-raport"}`;
 }
 
-/** The invented sample of the report as a PDF (TASK-171): public, every page marked as such. */
+/** The invented sample of the report as a PDF (TASK-172): public, every page marked as such. */
 export const SAMPLE_REPORT_PATHS = {
   pl: "/pl/przykladowy-raport.pdf",
   en: "/en/sample-report.pdf",
