@@ -21,6 +21,11 @@ describe("siteGraph", () => {
       "@id": `${ORIGIN}/#organization`,
       url: `${ORIGIN}/`,
       logo: { url: `${ORIGIN}/apple-icon.png` },
+      sameAs: [
+        "https://www.instagram.com/nameatlas_/",
+        "https://www.tiktok.com/@nameatlas_",
+        "https://www.facebook.com/profile.php?id=61595400800918",
+      ],
     });
     expect(graph[1]).toMatchObject({
       "@id": websiteId(ORIGIN),

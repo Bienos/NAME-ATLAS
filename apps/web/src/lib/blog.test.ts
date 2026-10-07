@@ -327,7 +327,7 @@ describe("structured data (AC-7)", () => {
 });
 
 describe("the footer (AC-8)", () => {
-  it("leads Blog to the blog in the reader's language and leaves the socials as they were", () => {
+  it("leads Blog to the blog in the reader's language and the socials to the owner's accounts", () => {
     for (const lang of LANGS) {
       expect(followLinks(lang)[0]).toEqual({ label: "Blog", href: blogPath(lang) });
       const footer = renderToStaticMarkup(createElement(SiteFooter, { lang }));
@@ -335,16 +335,22 @@ describe("the footer (AC-8)", () => {
     }
     expect(blogPath("pl")).toBe("/pl/blog");
     expect(blogPath("en")).toBe("/en/blog");
+    // The socials lead to the owner's accounts, the same in both languages (TASK-168).
+    const socials = [
+      "https://www.instagram.com/nameatlas_/",
+      "https://www.tiktok.com/@nameatlas_",
+      "https://www.facebook.com/profile.php?id=61595400800918",
+    ];
     expect(
       followLinks("pl")
         .slice(1)
         .map((l) => l.href),
-    ).toEqual(["/", "/", "/"]);
+    ).toEqual(socials);
     expect(
       followLinks("en")
         .slice(1)
         .map((l) => l.href),
-    ).toEqual(["/?lang=en", "/?lang=en", "/?lang=en"]);
+    ).toEqual(socials);
   });
 });
 
