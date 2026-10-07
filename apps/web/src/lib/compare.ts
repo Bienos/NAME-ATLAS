@@ -155,3 +155,125 @@ export function rarerOf(pair: ComparablePair<RarityEntry>): RarityRelation {
   // A smaller share is rarer, and a larger `1 in X` says the same thing.
   return pair.a.share < pair.b.share ? "a" : "b";
 }
+
+// ---------------------------------------------------------------------------
+// Two to four people (TASK-155, D-049)
+// ---------------------------------------------------------------------------
+
+/**
+ * One partition's figures for every person compared, in their order (a person
+ * whose surname did not resolve is `null` and has no figure anywhere). `entries`
+ * holds one item per person, `null` where that person has no figure in the
+ * partition: an absent figure is said, never drawn as a zero.
+ *
+ * Comparable when at least two people have a figure and every present figure
+ * passes the same checks a pair does (date, then unit or denominator). A person
+ * without a figure does not stop the others being compared; with two people,
+ * that leaves one figure, so the outcome is the pair's `MISSING_ON_ONE_SIDE`.
+ */
+export interface ManyPairing<T> {
+  readonly comparable: boolean;
+  readonly group: string | null;
+  /** Why not, when not comparable; null when comparable. */
+  readonly reason: NotComparable | null;
+  readonly entries: readonly (T | null)[];
+}
+
+/** A check every present figure must pass, and the reason given when they differ. */
+type Check<T> = readonly [(item: T) => unknown, NotComparable];
+
+/** Gates one partition's figures, one per person (`null` for none). */
+export function gateMany<T>(
+  group: string | null,
+  entries: readonly (T | null)[],
+  checks: readonly Check<T>[],
+): ManyPairing<T> {
+  const present = entries.filter((e): e is T => e !== null);
+  if (present.length < 2) {
+    return { comparable: false, group, reason: "MISSING_ON_ONE_SIDE", entries };
+  }
+  for (const [of, reason] of checks) {
+    const first = of(present[0] as T);
+    if (present.some((item) => of(item) !== first)) {
+      return { comparable: false, group, reason, entries };
+    }
+  }
+  return { comparable: true, group, reason: null, entries };
+}
+
+function groupsOfMany<T extends { comparability_group: string | null }>(
+  maps: readonly Map<string | null, T>[],
+): (string | null)[] {
+  return groupsOf(new Set(maps.flatMap((m) => [...m.keys()])), new Set());
+}
+
+export function comparePopulationMany(
+  responses: readonly (SurnameResultResponse | null)[],
+): readonly ManyPairing<PopulationObservation>[] {
+  const maps = responses.map((r) =>
+    byGroup(r?.population?.state === "READY" ? r.population.observations : []),
+  );
+  return groupsOfMany(maps).map((group) =>
+    gateMany(
+      group,
+      // A figure published as null is no figure: never a zero.
+      maps.map((m) => {
+        const item = m.get(group);
+        return item === undefined || item.value.value === null ? null : item;
+      }),
+      [
+        [(x) => x.snapshot_date, "DIFFERENT_SNAPSHOT_DATE"],
+        [(x) => x.value.unit, "DIFFERENT_PARTITION"],
+      ],
+    ),
+  );
+}
+
+export function compareRarityMany(
+  responses: readonly (SurnameResultResponse | null)[],
+): readonly ManyPairing<RarityEntry>[] {
+  const maps = responses.map((r) => byGroup(r?.rarity?.state === "READY" ? r.rarity.entries : []));
+  return groupsOfMany(maps).map((group) =>
+    gateMany(
+      group,
+      maps.map((m) => m.get(group) ?? null),
+      [
+        [(x) => x.snapshot_date, "DIFFERENT_SNAPSHOT_DATE"],
+        [(x) => x.denominator, "DIFFERENT_DENOMINATOR"],
+      ],
+    ),
+  );
+}
+
+export function compareDistributionMany(
+  responses: readonly (SurnameResultResponse | null)[],
+): readonly ManyPairing<DistributionEntry>[] {
+  const maps = responses.map((r) =>
+    byGroup(r?.distribution?.state === "READY" ? r.distribution.entries : []),
+  );
+  return groupsOfMany(maps).map((group) =>
+    gateMany(
+      group,
+      maps.map((m) => m.get(group) ?? null),
+      [[(x) => x.snapshot_date, "DIFFERENT_SNAPSHOT_DATE"]],
+    ),
+  );
+}
+
+/**
+ * The rarest of a comparable partition, by the same rule as {@link rarerOf}:
+ * by the exact `share`, never the rounded `1 in X`. `null` when the smallest
+ * share is held by more than one person (a genuine tie); `TOO_CLOSE` when
+ * another person's figure rounds to the same displayed `1 in X`.
+ */
+export function rarestOf(pairing: ManyPairing<RarityEntry>): number | "TOO_CLOSE" | null {
+  const present = pairing.entries
+    .map((entry, index) => ({ entry, index }))
+    .filter((x): x is { entry: RarityEntry; index: number } => x.entry !== null);
+  if (!pairing.comparable || present.length < 2) return null;
+  const least = present.reduce((min, x) => (x.entry.share < min.entry.share ? x : min));
+  const others = present.filter((x) => x.index !== least.index);
+  if (others.some((x) => x.entry.share === least.entry.share)) return null;
+  if (others.some((x) => x.entry.primary.value === least.entry.primary.value)) return "TOO_CLOSE";
+  return least.index;
+}

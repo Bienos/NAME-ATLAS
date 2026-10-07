@@ -5,6 +5,10 @@ import type { RateLimitStore } from "./lib/rate-limit.js";
 import { LONGEST_WINDOW_MS, policyFor } from "./lib/request-policy.js";
 import { BABY_NAMES_CACHE_CONTROL, isBabyNamesPath } from "./lib/baby-names-config.js";
 import { COUPLE_CACHE_CONTROL, isCouplePath } from "./lib/couple-config.js";
+import {
+  FULL_NAME_COMPARE_CACHE_CONTROL,
+  isFullNameComparePath,
+} from "./lib/full-name-compare-config.js";
 import { isReportPath, REPORT_CACHE_CONTROL } from "./lib/report-config.js";
 
 /**
@@ -70,6 +74,10 @@ export function middleware(request: NextRequest): NextResponse {
   if (isReportPath(pathname)) response.headers.set("cache-control", REPORT_CACHE_CONTROL);
   // The baby-names page is one signed-in reader's: never kept by a browser or a cache (TASK-141).
   if (isBabyNamesPath(pathname)) response.headers.set("cache-control", BABY_NAMES_CACHE_CONTROL);
+  // The full-name comparison is one signed-in reader's: never kept by a browser or a cache (TASK-155).
+  if (isFullNameComparePath(pathname)) {
+    response.headers.set("cache-control", FULL_NAME_COMPARE_CACHE_CONTROL);
+  }
   return response;
 }
 

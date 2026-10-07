@@ -1246,24 +1246,10 @@ footer {
   .compare .compare-heading {
     font-size: clamp(2.75rem, 4.5vw, 3.75rem);
   }
+  /* The comparison's chapters lay out their own panels (TASK-155, `design-system/compare.css`). */
   .compare > .warning,
-  .compare .search,
-  .compare #where .table-scroll,
-  .compare #where .note {
+  .compare .search {
     max-width: var(--measure);
-  }
-  .compare #today-count,
-  .compare #rarity {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: var(--space-8);
-    align-items: start;
-  }
-  .compare #today-count > h3,
-  .compare #rarity > h3,
-  .compare #today-count > .absent,
-  .compare #rarity > .absent {
-    grid-column: 1 / -1;
   }
   .compare .compare-row {
     margin-bottom: var(--space-6);

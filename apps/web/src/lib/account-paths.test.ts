@@ -235,3 +235,19 @@ describe("the baby-names page as a return address (TASK-141)", () => {
     }
   });
 });
+
+describe("the full-name comparison as a return address (TASK-155)", () => {
+  it("takes the page's two bare addresses, and nothing more", () => {
+    expect(safeNext("/pl/porownaj/imie-i-nazwisko")).toBe("/pl/porownaj/imie-i-nazwisko");
+    expect(safeNext("/en/compare/full-name")).toBe("/en/compare/full-name");
+    for (const value of [
+      "/pl/porownaj/imie-i-nazwisko?f1=Jan&s1=Nowak",
+      "/pl/porownaj/imie-i-nazwisko/",
+      "/en/compare/full-name/x",
+      "/pl/compare/full-name",
+      "//evil.example/pl/porownaj/imie-i-nazwisko",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
+  });
+});
