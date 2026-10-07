@@ -7,6 +7,7 @@ import type { Purchases } from "@name-atlas/accounts";
 import type { CitationDto } from "@name-atlas/contracts";
 import {
   BIRTH_HISTORY_FIRST_YEAR,
+  BIRTH_NAME_MAX_LENGTH,
   BIRTH_SEXES,
   findBirthGivenName,
   readActiveBirthLists,
@@ -27,7 +28,7 @@ import type {
   GivenNameMeaningFacts,
   GivenNameMeaningWork,
 } from "@name-atlas/truth";
-import { accountPath } from "./account-paths.js";
+import { accountPath, safeNext } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
 import {
   BABY_NAMES_FIELD,
@@ -37,8 +38,10 @@ import {
   babyNamesEnabled,
 } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
+import type { BabyNamesFeature } from "./baby-names-text.js";
 import { db } from "./db.js";
 import { ConfidenceBadge, Tabs } from "../design-system/components/index.js";
+import { ContourField } from "../design-system/graphics/index.js";
 import { formatDate, formatDecimal, formatInteger, formatPercent } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ORIGINS } from "./report-view.js";
@@ -49,7 +52,10 @@ import { SiteShell } from "./site-shell.js";
  * The baby-names page (TASK-141, D-044): `/pl/imiona-dla-dziecka` and
  * `/en/baby-names`, one page with a search box (D-044 §7).
  *
- * Signed out, it explains and links to sign-in. Signed in, a typed first name's
+ * Signed out (TASK-159), the search box, a preview of the result with every
+ * number masked, what a signed-in reader gets, the free view beside the tier,
+ * and the source; a name typed there is carried round the sign-in, and nothing
+ * is read from the database. Signed in, a typed first name's
  * figures for boys and girls apart, read from its claims
  * (`readBirthNameFacts`): the latest year's count, rank and direction for
  * everyone, and every year since 2000 for an account holding a tier that
@@ -111,7 +117,19 @@ export interface BabyNamesDeps {
 }
 
 export type BabyNamesData =
-  | { readonly kind: "signed-out"; readonly lang: Lang; readonly signInHref: string }
+  | {
+      readonly kind: "signed-out";
+      readonly lang: Lang;
+      /** The name typed before signing in (TASK-159), trimmed; "" when none or too long. */
+      readonly typed: string;
+      /** A name was typed but is longer than a name may be. */
+      readonly invalid: boolean;
+      /** The typed name goes round the sign-in: `safeNext` took the address carrying it. */
+      readonly carried: boolean;
+      /** Back to the page, with the typed name when `safeNext` takes it. */
+      readonly signInHref: string;
+      readonly signUpHref: string;
+    }
   | {
       readonly kind: "signed-in";
       readonly lang: Lang;
@@ -188,14 +206,27 @@ export async function loadBabyNames(input: {
   readonly deps: BabyNamesDeps;
 }): Promise<BabyNamesData> {
   const { lang, session, deps } = input;
+  const typed = first(input.query, BABY_NAMES_FIELD[lang]).trim();
   if (session === null) {
+    // Nothing is read for a signed-out reader: the typed name only goes round the sign-in.
+    const invalid = [...typed].length > BIRTH_NAME_MAX_LENGTH;
+    const kept = invalid ? "" : typed;
+    const back =
+      kept === ""
+        ? null
+        : safeNext(
+            `${BABY_NAMES_PATHS[lang]}?${new URLSearchParams({ [BABY_NAMES_FIELD[lang]]: kept }).toString()}`,
+          );
     return {
       kind: "signed-out",
       lang,
-      signInHref: accountPath(lang, "sign-in", { next: BABY_NAMES_PATHS[lang] }),
+      typed: kept,
+      invalid,
+      carried: back !== null,
+      signInHref: accountPath(lang, "sign-in", { next: back ?? BABY_NAMES_PATHS[lang] }),
+      signUpHref: accountPath(lang, "sign-up"),
     };
   }
-  const typed = first(input.query, BABY_NAMES_FIELD[lang]).trim();
   const asked = SEX_VALUES[first(input.query, BABY_NAMES_SEX_FIELD)] ?? null;
   const full = await deps.hasFullView(session.userId);
   const base = { kind: "signed-in", lang, typed, full, focus: asked ?? "MALE" } as const;
@@ -1213,6 +1244,389 @@ function Facts({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Signed out (TASK-159)
+// ---------------------------------------------------------------------------
+
+type SignedOutData = Extract<BabyNamesData, { readonly kind: "signed-out" }>;
+
+/** The six cards of "what you see once signed in", in order. */
+const FEATURES: readonly BabyNamesFeature[] = [
+  "count",
+  "rank",
+  "direction",
+  "register",
+  "meaning",
+  "lists",
+];
+
+/** The preview's dot grid and the tier card's bars: shapes, never a figure. */
+const PREVIEW_DOTS = 16;
+const MASKED_BARS = 24;
+
+/** Where a number goes once signed in: a hatched block, with nothing behind it. */
+function Mask({ size }: { size: "big" | "line" | "word" | "small" }) {
+  return <span className={`bn-mask bn-mask-${size}`} aria-hidden="true" />;
+}
+
+function LockGlyph() {
+  return (
+    <svg
+      className="bn-out-lock-glyph"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+    </svg>
+  );
+}
+
+function CheckGlyph() {
+  return (
+    <svg
+      className="bn-out-check"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 12.5l4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+function TrendGlyph() {
+  return (
+    <svg
+      className="bn-out-trend"
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 16l5-5 4 3 7-7" />
+      <path d="M14 7h6v6" />
+    </svg>
+  );
+}
+
+/** Each card's glyph, drawn from the result's own marks: the lit point, the track, the trend. */
+function FeatureGlyph({ feature }: { feature: BabyNamesFeature }) {
+  const box = { className: "bn-out-glyph", width: 44, height: 44, viewBox: "0 0 44 44" } as const;
+  switch (feature) {
+    case "count":
+      return (
+        <svg {...box} aria-hidden="true">
+          {[12, 24, 36].flatMap((y) =>
+            [10, 22, 34].map((x) => (
+              <circle
+                key={`${x}-${y}`}
+                cx={x}
+                cy={y}
+                r="3"
+                className={x === 22 && y === 24 ? "is-lit" : "is-dim"}
+              />
+            )),
+          )}
+        </svg>
+      );
+    case "rank":
+      return (
+        <svg {...box} aria-hidden="true">
+          <path d="M4 22h36" className="is-line" />
+          <circle cx="14" cy="22" r="9" className="is-ring" />
+          <circle cx="14" cy="22" r="5" className="is-lit" />
+        </svg>
+      );
+    case "direction":
+      return (
+        <svg {...box} aria-hidden="true">
+          <path d="M8 38h28" className="is-line" />
+          <path d="M8 32l10-10 6 5 12-12" className="is-accent" />
+          <path d="M28 15h8v8" className="is-accent" />
+        </svg>
+      );
+    case "register":
+      return (
+        <svg {...box} aria-hidden="true">
+          <rect x="6" y="10" width="32" height="24" rx="3" className="is-line" />
+          <circle cx="16" cy="21" r="4" className="is-line" />
+          <path d="M24 18h9M24 23h9M11 29h22" className="is-line" />
+        </svg>
+      );
+    case "meaning":
+      return (
+        <svg {...box} aria-hidden="true">
+          <path
+            d="M10 30c0-6 2-10 7-13M22 30c0-6 2-10 7-13M10 30h5v-5h-5zM22 30h5v-5h-5z"
+            className="is-accent"
+          />
+        </svg>
+      );
+    case "lists":
+      return (
+        <svg {...box} aria-hidden="true">
+          <rect x="5" y="8" width="14" height="28" rx="2" className="is-line" />
+          <rect x="25" y="8" width="14" height="28" rx="2" className="is-line" />
+          <path d="M9 16h6M9 21h6M9 26h6M29 16h6M29 21h6M29 26h6" className="is-faint" />
+        </svg>
+      );
+  }
+}
+
+/**
+ * The result's own tiles with every number masked: nothing is read for a
+ * signed-out reader, and the noun is "dzieci", so no sex is implied.
+ */
+function SignedOutPreview({ name, lang }: { name: string; lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  const o = t.out;
+  return (
+    <figure className="bn-out-preview">
+      <figcaption className="bn-out-preview-top">
+        <span className="atlas-eyebrow">{o.previewCaption}</span>
+        <span className="bn-out-pill">
+          <LockGlyph />
+          {o.previewLocked}
+        </span>
+      </figcaption>
+      <p className="bn-out-preview-name" data-preview-name={name === "" ? "" : "typed"}>
+        {name === "" ? o.previewName : name}
+      </p>
+      <div className="bn-tile bn-hero" aria-hidden="true">
+        <p className="atlas-eyebrow bn-eyebrow">{o.previewEyebrow}</p>
+        <p className="bn-big">
+          <Mask size="big" /> <span className="bn-big-noun">{t.childrenWord}</span>
+        </p>
+        <Mask size="line" />
+        <div className="bn-rank">
+          <p className="bn-rank-line">
+            <strong>{o.previewPlace}</strong> <Mask size="small" />
+          </p>
+          <div className="bn-track">
+            <span className="bn-track-line" />
+            <span className="bn-track-mark bn-out-mark" />
+          </div>
+          <p className="bn-track-labels">
+            <span>{t.trackMost}</span>
+            <span>{t.trackRarest}</span>
+          </p>
+        </div>
+      </div>
+      <div className="bn-out-pair" aria-hidden="true">
+        <div className="bn-tile">
+          <p className="bn-tile-heading">{t.howCommonHeading}</p>
+          <p className="bn-out-oneline">
+            {o.previewOneIn} <Mask size="small" />
+          </p>
+          <div className="bn-dots bn-out-dots">
+            {Array.from({ length: PREVIEW_DOTS }, (_, i) => (
+              <span key={i} className={i === 0 ? "bn-dot bn-dot-lit" : "bn-dot"} />
+            ))}
+          </div>
+        </div>
+        <div className="bn-tile">
+          <p className="bn-tile-heading">{t.direction}</p>
+          <p className="bn-out-oneline">
+            <TrendGlyph /> <Mask size="word" />
+          </p>
+          <p className="bn-out-shares">
+            {o.previewShare} <Mask size="small" /> → <Mask size="small" />
+          </p>
+        </div>
+      </div>
+    </figure>
+  );
+}
+
+/**
+ * The page for a signed-out reader: the search box, the masked preview, what a
+ * signed-in reader gets, what is free and what the tier adds (ADR-0023 §2.5: no
+ * buy button), and the source. A typed name goes round the sign-in.
+ */
+function SignedOut({ data }: { data: SignedOutData }) {
+  const { lang, typed } = data;
+  const t = BABY_NAMES_TEXT[lang];
+  const o = t.out;
+  return (
+    <>
+      <div className="bn-out-hero">
+        <div className="bn-out-art" aria-hidden="true">
+          <ContourField
+            seed={19}
+            density={8}
+            variant="blue"
+            opacity={0.42}
+            focusPoint={{ x: 70, y: 38 }}
+          />
+          <ContourField seed={5} density={5} variant="ivory" opacity={0.14} orientation="falling" />
+        </div>
+        <div className="bn-out-intro">
+          <p className="atlas-eyebrow bn-out-eyebrow">{o.eyebrow}</p>
+          <h1 className="page-title bn-out-title">{t.title}</h1>
+          <p className="page-lede bn-out-lede">{t.lede}</p>
+          <form className="bn-out-form" action={BABY_NAMES_PATHS[lang]} method="get">
+            <label htmlFor="baby-name">{o.label}</label>
+            <div className="bn-out-field">
+              <input
+                id="baby-name"
+                name={BABY_NAMES_FIELD[lang]}
+                type="text"
+                defaultValue={typed}
+                placeholder={t.placeholder}
+                autoComplete="off"
+                spellCheck={false}
+                autoCapitalize="words"
+              />
+              <button type="submit">{t.submit}</button>
+            </div>
+          </form>
+          {data.invalid ? (
+            <p className="bn-out-alert" role="alert">
+              {t.invalid}
+            </p>
+          ) : null}
+          {typed === "" || !data.carried ? (
+            <div className="bn-out-hint">
+              <p className="bn-out-lock">
+                <LockGlyph />
+                <span>{o.hint}</span>
+              </p>
+              <p className="bn-out-links">
+                <a className="baby-sign-in" href={data.signInHref}>
+                  {t.signIn}
+                </a>{" "}
+                <span aria-hidden="true">·</span> {o.noAccount}{" "}
+                <a href={data.signUpHref}>{o.signUpShort}</a>
+              </p>
+            </div>
+          ) : (
+            <div className="bn-out-asked" role="status">
+              <p>{o.asked(typed)}</p>
+              <p className="bn-out-actions">
+                <a className="baby-sign-in bn-out-primary" href={data.signInHref}>
+                  {t.signIn}
+                </a>
+                <a className="bn-out-secondary" href={data.signUpHref}>
+                  {o.signUp}
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
+        {/* Only a name the return address took (no dot, so no address) is echoed in the preview. */}
+        <SignedOutPreview name={data.carried ? typed : ""} lang={lang} />
+      </div>
+
+      <section className="bn-out-section" aria-labelledby="bn-out-what">
+        <div className="bn-out-heading-row">
+          <h2 id="bn-out-what" className="bn-out-h2">
+            {o.whatHeading}
+          </h2>
+          <p className="bn-out-sub">{o.whatLede}</p>
+        </div>
+        <ul className="bn-out-features">
+          {FEATURES.map((f) => (
+            <li
+              key={f}
+              className={f === "lists" ? "bn-out-feature bn-out-feature-rule" : "bn-out-feature"}
+              data-feature={f}
+            >
+              <FeatureGlyph feature={f} />
+              <h3>{o.features[f].title}</h3>
+              <p>{o.features[f].body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="bn-out-section" aria-labelledby="bn-out-plans">
+        <h2 id="bn-out-plans" className="bn-out-h2">
+          {o.plansHeading}
+        </h2>
+        <div className="bn-out-plans">
+          <article className="bn-out-plan bn-out-plan-free" aria-labelledby="bn-out-free">
+            <p className="atlas-eyebrow bn-out-plan-eyebrow">{o.freeEyebrow}</p>
+            <h3 id="bn-out-free">{o.freeTitle}</h3>
+            <ul className="bn-out-checks">
+              {o.freeItems.map((item) => (
+                <li key={item}>
+                  <CheckGlyph />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="bn-out-actions">
+              <a className="bn-out-primary" href={data.signUpHref}>
+                {o.signUp}
+              </a>
+              <a className="bn-out-secondary" href={data.signInHref}>
+                {t.signIn}
+              </a>
+            </p>
+          </article>
+          {/* ADR-0023 §2.5: no buy button until the tier can lawfully be sold. */}
+          <article className="bn-out-plan bn-out-plan-tier" aria-labelledby="bn-out-tier">
+            <p className="bn-out-plan-top">
+              <span className="atlas-eyebrow bn-out-plan-eyebrow">
+                {o.tierEyebrow(t.lockedTier)}
+              </span>{" "}
+              <span className="baby-soon">{t.soon}</span>
+            </p>
+            <h3 id="bn-out-tier">{t.lockedHeading}</h3>
+            <p className="bn-out-price">
+              <strong>{t.lockedPrice}</strong> <span>{o.oneTime}</span>
+            </p>
+            <p>
+              {t.lockedBody} {t.lockedListNote}
+            </p>
+            <div className="bn-out-chart" aria-hidden="true">
+              <div className="bn-out-bars">
+                {Array.from({ length: MASKED_BARS }, (_, i) => (
+                  <span key={i} />
+                ))}
+              </div>
+              <p className="bn-track-labels">
+                <span>{BIRTH_HISTORY_FIRST_YEAR}</span>
+                <span>{o.chartLatest}</span>
+              </p>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="bn-out-section bn-out-source" aria-labelledby="bn-out-source">
+        <h2 id="bn-out-source" className="atlas-eyebrow">
+          {o.sourceHeading}
+        </h2>
+        <div>
+          <p>{o.sourceBody}</p>
+          <p className="atlas-dataset-reference">{o.sourceRef}</p>
+          <p className="note">{o.sourceAbsent}</p>
+        </div>
+      </section>
+    </>
+  );
+}
+
 export function BabyNamesView({ data }: { data: BabyNamesData }) {
   const { lang } = data;
   const t = BABY_NAMES_TEXT[lang];
@@ -1225,20 +1639,13 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
       current="babyNames"
       mainClassName="baby-names atlas-v1"
     >
-      <h1 className="page-title">{t.title}</h1>
-      <p className="page-lede">{t.lede}</p>
-      <p className="note">{t.source}</p>
       {data.kind === "signed-out" ? (
-        <>
-          <p>{t.signedOut}</p>
-          <p>
-            <a className="baby-sign-in" href={data.signInHref}>
-              {t.signIn}
-            </a>
-          </p>
-        </>
+        <SignedOut data={data} />
       ) : (
         <>
+          <h1 className="page-title">{t.title}</h1>
+          <p className="page-lede">{t.lede}</p>
+          <p className="note">{t.source}</p>
           <form className="compare-form baby-form" action={BABY_NAMES_PATHS[lang]} method="get">
             <label htmlFor="baby-name">{t.label}</label>
             <input

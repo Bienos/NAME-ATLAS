@@ -135,6 +135,26 @@ const FULL_NAME_COMPARE_HOMES: ReadonlySet<string> = new Set([
   "/en/compare/full-name",
 ]);
 
+/**
+ * The baby-names page with the name a signed-out reader typed (TASK-159): the
+ * language's own field and nothing else, its value as `URLSearchParams` writes
+ * it. No literal `.`, which separates the Google flight cookie's parts.
+ */
+const BABY_NAMES_TYPED =
+  /^\/(?:pl\/imiona-dla-dziecka\?imie=|en\/baby-names\?name=)((?:[A-Za-z0-9*_-]|\+|%[0-9A-Fa-f]{2})+)$/u;
+
+function babyNamesTypedNext(value: string): boolean {
+  const match = BABY_NAMES_TYPED.exec(value);
+  if (match === null) return false;
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent((match[1] ?? "").replaceAll("+", " "));
+  } catch {
+    return false;
+  }
+  return !/\p{C}/u.test(decoded) && decoded.trim() !== "";
+}
+
 /** Whether a `next` leads to the family tree, for the sign-in page's line about it. */
 export function isTreeNext(next: string | null): boolean {
   return next !== null && (TREE_HOMES.has(next) || TREE_INVITATION.test(next));
@@ -144,7 +164,8 @@ export function isTreeNext(next: string | null): boolean {
  * Where a sign-in may send the reader on (TASK-064): the surname page they came
  * from, which the deck's prompt names, the family tree's page (TASK-084),
  * an invitation to a tree with its token (TASK-094), or the baby-names page
- * (TASK-141), and nothing else. It is checked again
+ * (TASK-141), bare or with the name typed before signing in (TASK-159), and
+ * nothing else. It is checked again
  * by the sign-in action, because a form field can say anything, and a redirect
  * to an address a stranger chose is how a sign-in page is turned into a trap.
  *
@@ -170,7 +191,7 @@ const NEXT_PATTERN = new RegExp(
 export function safeNext(value: unknown): string | null {
   if (typeof value !== "string" || value.length > NEXT_MAX_LENGTH) return null;
   if (TREE_HOMES.has(value) || TREE_INVITATION.test(value)) return value;
-  if (BABY_NAMES_HOMES.has(value)) return value;
+  if (BABY_NAMES_HOMES.has(value) || babyNamesTypedNext(value)) return value;
   if (FULL_NAME_COMPARE_HOMES.has(value)) return value;
   const match = NEXT_PATTERN.exec(value);
   if (match === null) return null;

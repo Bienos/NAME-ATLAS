@@ -478,14 +478,14 @@ describe("the baby-names pages (TASK-141)", () => {
       ["pl", "/pl/konto/zaloguj?next=%2Fpl%2Fimiona-dla-dziecka"],
       ["en", "/en/account/sign-in?next=%2Fen%2Fbaby-names"],
     ] as const) {
-      const html = await render(lang, { imie: "Zofia", name: "Zofia" }, null);
+      const html = await render(lang, {}, null);
       const t = BABY_NAMES_TEXT[lang];
-      expect(html, lang).toContain(t.signedOut);
+      expect(html, lang).toContain(t.out.whatHeading);
       expect(html, lang).toContain("dane.gov.pl");
       expect(html, lang).toContain(`href="${signIn}"`);
       expect(html, lang).not.toContain("4415");
       expect(html, lang).not.toContain("4 415");
-      expect(html, lang).not.toContain("<form");
+      expect(html, lang).not.toContain("data-figure");
     }
   });
 
@@ -711,14 +711,16 @@ describe("the register's count beside the birth-year figures (TASK-145)", () => 
 describe("loadBabyNames", () => {
   it("does not read a name's figures for a signed-out reader", async () => {
     const readFacts = vi.fn();
+    const findName = vi.fn();
     const data = await loadBabyNames({
       lang: "pl",
       query: { imie: "Zofia" },
       session: null,
-      deps: { ...deps({}), readFacts },
+      deps: { ...deps({}), readFacts, findName },
     });
     expect(data.kind).toBe("signed-out");
     expect(readFacts).not.toHaveBeenCalled();
+    expect(findName).not.toHaveBeenCalled();
   });
 
   it("asks for the history only when the account holds a tier that includes it", async () => {
@@ -1159,7 +1161,8 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
     expect(held).not.toContain("bn-tile");
     const out = await render("pl", { imie: "zofia" }, null);
     expect(out).toContain('class="baby-names atlas-v1"');
-    expect(out).not.toContain("bn-tile");
+    // The signed-out preview wears the tiles with every number masked (TASK-159): no figure.
+    expect(out).not.toContain("data-figure");
     expect(out).not.toContain("4 415");
     expect(out).not.toContain("wisdom");
   });
@@ -1253,5 +1256,100 @@ describe("a name shows only the sexes it is on (TASK-157)", () => {
     expect(html).toContain('data-sex="MALE"');
     expect(html).toContain('data-sex="FEMALE"');
     expect(html).toContain("bn-tabs");
+  });
+});
+
+describe("the signed-out page (TASK-159)", () => {
+  const field = { pl: "imie", en: "name" } as const;
+  const home = { pl: "/pl/imiona-dla-dziecka", en: "/en/baby-names" } as const;
+  const signIn = { pl: "/pl/konto/zaloguj", en: "/en/account/sign-in" } as const;
+  const signUp = { pl: "/pl/konto/zaloz", en: "/en/account/sign-up" } as const;
+
+  function main(html: string): string {
+    return html.slice(html.indexOf("<main"), html.indexOf("</main>"));
+  }
+
+  /** The preview's words, without its markup. */
+  function previewText(html: string): string {
+    const start = html.indexOf('<figure class="bn-out-preview"');
+    return html.slice(start, html.indexOf("</figure>", start)).replace(/<[^>]*>/gu, " ");
+  }
+
+  it("shows the search box, the masked preview, what you get, the plans and the source (AC-1)", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = main(await render(lang, {}, null));
+      const t = BABY_NAMES_TEXT[lang];
+      expect(html, lang).toContain(`<h1 class="page-title bn-out-title">${t.title}</h1>`);
+      expect(html, lang).toContain(`action="${home[lang]}"`);
+      expect(html, lang).toContain(`name="${field[lang]}"`);
+      expect(html, lang).toContain(t.out.hint);
+      expect(html, lang).toContain(`href="${signUp[lang]}"`);
+      expect(previewText(html), lang).toContain(t.out.previewName);
+      expect(previewText(html), lang).toContain(t.out.previewLocked);
+      // Masked: no number in the preview but the "1" of its own words "1 na".
+      expect(previewText(html).replace(t.out.previewOneIn, ""), lang).not.toMatch(/\d/u);
+      for (const f of Object.values(t.out.features)) expect(html, lang).toContain(f.title);
+      for (const item of t.out.freeItems) expect(html, lang).toContain(item);
+      expect(html, lang).toContain(t.lockedHeading);
+      expect(html, lang).toContain(t.lockedPrice);
+      expect(html, lang).toContain(t.soon);
+      expect(html, lang).toContain(t.out.sourceRef);
+      expect(html, lang).toContain(t.out.sourceAbsent);
+      // One button, the search box's: the tier has none (ADR-0023 §2.5).
+      expect(html.match(/<button/gu)?.length, lang).toBe(1);
+      expect(html, lang).not.toContain("data-figure");
+      expect(html, lang).not.toContain('role="status"');
+    }
+  });
+
+  it("carries a typed name round the sign-in and shows it in the preview (AC-2)", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = main(await render(lang, { [field[lang]]: "  Zofia " }, null));
+      const t = BABY_NAMES_TEXT[lang];
+      const back = `${home[lang]}?${field[lang]}=Zofia`;
+      expect(html, lang).toContain(`href="${signIn[lang]}?next=${encodeURIComponent(back)}"`);
+      expect(html, lang).toContain(t.out.asked("Zofia"));
+      expect(html, lang).toContain('value="Zofia"');
+      expect(previewText(html), lang).toContain(" Zofia ");
+      expect(previewText(html), lang).not.toContain(t.out.previewName);
+      expect(html, lang).not.toContain(t.out.hint);
+      expect(html, lang).not.toContain("data-figure");
+    }
+  });
+
+  it("encodes a name with letters outside ASCII on its way round", async () => {
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "Łucja" },
+      session: null,
+      deps: deps({}),
+    });
+    if (data.kind !== "signed-out") throw new Error(data.kind);
+    expect(data.carried).toBe(true);
+    expect(new URL(data.signInHref, "https://atlas.test").searchParams.get("next")).toBe(
+      "/pl/imiona-dla-dziecka?imie=%C5%81ucja",
+    );
+  });
+
+  it("keeps a name the return address cannot carry in the box, and promises nothing (AC-2)", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const html = main(await render("pl", { imie: "Jan." }, null));
+    expect(html).toContain('value="Jan."');
+    expect(html).toContain('href="/pl/konto/zaloguj?next=%2Fpl%2Fimiona-dla-dziecka"');
+    expect(html).toContain(t.out.hint);
+    expect(html).not.toContain(t.out.asked("Jan."));
+    expect(previewText(html)).toContain(t.out.previewName);
+    expect(previewText(html)).not.toContain("Jan.");
+  });
+
+  it("says how long a name may be for an over-long one, and goes nowhere with it (AC-2)", async () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = main(await render(lang, { [field[lang]]: "A".repeat(61) }, null));
+      const t = BABY_NAMES_TEXT[lang];
+      expect(html, lang).toContain(`role="alert">${t.invalid}`);
+      expect(html, lang).toContain(`href="${signIn[lang]}?next=${encodeURIComponent(home[lang])}"`);
+      expect(html, lang).not.toContain("A".repeat(61));
+      expect(previewText(html), lang).toContain(t.out.previewName);
+    }
   });
 });

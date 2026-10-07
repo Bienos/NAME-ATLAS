@@ -16,7 +16,6 @@ export interface BabyNamesText {
   readonly title: string;
   readonly lede: string;
   readonly source: string;
-  readonly signedOut: string;
   readonly signIn: string;
   readonly label: string;
   readonly placeholder: string;
@@ -127,6 +126,57 @@ export interface BabyNamesText {
   readonly shareEntry: string;
   /** "Karta z tymi liczbami, do wysłania bliskim." */
   readonly shareEntryNote: string;
+  // --- TASK-159: the page for a signed-out reader. ---
+  readonly out: BabyNamesSignedOutText;
+}
+
+/** The six things a signed-in reader gets, one card each on the signed-out page (TASK-159). */
+export type BabyNamesFeature = "count" | "rank" | "direction" | "register" | "meaning" | "lists";
+
+/**
+ * The signed-out page's words (TASK-159). No number from the data: the preview's
+ * figures are masked, and its noun is "dzieci", which names no sex.
+ */
+export interface BabyNamesSignedOutText {
+  /** The hero's eyebrow above the title. */
+  readonly eyebrow: string;
+  readonly label: string;
+  /** Under the search box before a name is typed. */
+  readonly hint: string;
+  readonly noAccount: string;
+  /** "Załóż je": the sign-up link after "Nie masz konta?". */
+  readonly signUpShort: string;
+  readonly signUp: string;
+  /** After a name was typed: "Zaloguj się, a od razu pokażemy wynik dla imienia „Zofia”." */
+  readonly asked: (name: string) => string;
+  readonly previewCaption: string;
+  readonly previewLocked: string;
+  /** The preview's name before one is typed. */
+  readonly previewName: string;
+  readonly previewEyebrow: string;
+  readonly previewPlace: string;
+  /** "1 na", before the masked N. */
+  readonly previewOneIn: string;
+  /** "Udział", before the two masked shares. */
+  readonly previewShare: string;
+  readonly whatHeading: string;
+  readonly whatLede: string;
+  readonly features: Readonly<
+    Record<BabyNamesFeature, { readonly title: string; readonly body: string }>
+  >;
+  readonly plansHeading: string;
+  readonly freeEyebrow: string;
+  readonly freeTitle: string;
+  readonly freeItems: readonly string[];
+  /** "Pakiet · Imiona dla dziecka" */
+  readonly tierEyebrow: (tier: string) => string;
+  readonly oneTime: string;
+  /** The right end of the tier card's masked chart, under "2000" on the left. */
+  readonly chartLatest: string;
+  readonly sourceHeading: string;
+  readonly sourceBody: string;
+  readonly sourceRef: string;
+  readonly sourceAbsent: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -135,8 +185,6 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     lede: "Ile dzieci w Polsce dostało dane imię jako pierwsze, rok po roku.",
     source:
       "Źródło: rejestr PESEL, zbiór „Imiona nadawane dzieciom w Polsce” Ministerstwa Cyfryzacji (dane.gov.pl, zbiór 219). Listy chłopców i dziewczynek są osobne i nie sumujemy ich.",
-    signedOut:
-      "Ta część jest dla zalogowanych. Po zalogowaniu wpiszesz imię i zobaczysz, osobno dla chłopców i dla dziewczynek, ile dzieci dostało je w ostatnim roku, jego miejsce na liście tego roku i czy jego udział rośnie, spada, czy się nie zmienia.",
     signIn: "Zaloguj się",
     label: "Imię",
     placeholder: "np. Zofia",
@@ -232,14 +280,75 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
       `Nie ma go na żadnej liście ${sex === "MALE" ? "chłopców" : "dziewczynek"} od ${first} r.`,
     shareEntry: "Udostępnij",
     shareEntryNote: "Karta z tymi liczbami, do wysłania bliskim.",
+    out: {
+      eyebrow: "Rejestr PESEL · imiona nadawane dzieciom",
+      label: "Wpisz imię",
+      hint: "Wynik zobaczysz po zalogowaniu. Podstawowe liczby są za darmo.",
+      noAccount: "Nie masz konta?",
+      signUpShort: "Załóż je",
+      signUp: "Załóż konto",
+      asked: (name) => `Zaloguj się, a od razu pokażemy wynik dla imienia „${name}”.`,
+      previewCaption: "Podgląd wyniku",
+      previewLocked: "liczby po zalogowaniu",
+      previewName: "Twoje imię",
+      previewEyebrow: "W ostatnim roku listy to imię dostało",
+      previewPlace: "Miejsce",
+      previewOneIn: "1 na",
+      previewShare: "Udział",
+      whatHeading: "Co zobaczysz po zalogowaniu",
+      whatLede: "Wpisujesz imię. Liczby dla chłopców i dla dziewczynek dostajesz osobno.",
+      features: {
+        count: {
+          title: "Ile dzieci",
+          body: "Ile dzieci dostało to imię jako pierwsze w ostatnim roku listy i jaka to część wszystkich dzieci z listy.",
+        },
+        rank: {
+          title: "Miejsce na liście",
+          body: "Które miejsce zajmuje imię na liście tego roku, od najczęstszego do najrzadszego z listy.",
+        },
+        direction: {
+          title: "Kierunek",
+          body: "Czy udział imienia rośnie, spada, czy się nie zmienia, i z porównania których dwóch lat to wynika.",
+        },
+        register: {
+          title: "W rejestrze PESEL",
+          body: "Ile osób w każdym wieku ma to imię jako pierwsze. Tej liczby nie dodajemy do liczb z roku.",
+        },
+        meaning: {
+          title: "Co znaczy",
+          body: "Pochodzenie i znaczenie imienia słowami dzieła, które je objaśnia. Gdy takiego dzieła nie mamy albo nie możemy go pokazać, piszemy to wprost.",
+        },
+        lists: {
+          title: "Dwie osobne listy",
+          body: "Chłopcy i dziewczynki są na osobnych listach. Liczb z dwóch list nigdy nie sumujemy.",
+        },
+      },
+      plansHeading: "Za darmo i w pakiecie",
+      freeEyebrow: "Za darmo",
+      freeTitle: "Po zalogowaniu",
+      freeItems: [
+        "Liczba dzieci w ostatnim roku listy i jej udział",
+        "Miejsce na liście tego roku",
+        "Kierunek: rośnie, spada albo bez większej zmiany",
+        "Liczba z rejestru PESEL",
+        "Pochodzenie i znaczenie, gdy objaśnia je dzieło",
+      ],
+      tierEyebrow: (tier) => `Pakiet · ${tier}`,
+      oneTime: "jednorazowo",
+      chartLatest: "ostatni rok",
+      sourceHeading: "Źródło",
+      sourceBody:
+        "Rejestr PESEL, zbiór „Imiona nadawane dzieciom w Polsce” Ministerstwa Cyfryzacji.",
+      sourceRef: "dane.gov.pl · zbiór 219",
+      sourceAbsent:
+        "Listy pomijają imiona nadane rzadziej niż próg danego roku. Brak imienia na liście nie znaczy, że nikt go nie dostał.",
+    },
   },
   en: {
     title: "Baby names",
     lede: "How many children in Poland were given a first name, year by year.",
     source:
       "Source: the PESEL register, the Ministry of Digital Affairs' dataset “Imiona nadawane dzieciom w Polsce” (first names given to children in Poland; dane.gov.pl, dataset 219). Boys and girls are on separate lists, never added together.",
-    signedOut:
-      "This section is for signed-in readers. Once signed in, you type a first name and see, for boys and for girls separately, how many children were given it in the latest year, its place on that year's list, and whether its share is rising, falling or steady.",
     signIn: "Sign in",
     label: "First name",
     placeholder: "e.g. Zofia",
@@ -335,5 +444,68 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
       `It is on no ${sex === "MALE" ? "boys'" : "girls'"} list since ${first}.`,
     shareEntry: "Share",
     shareEntryNote: "A card with these figures, to send to family.",
+    out: {
+      eyebrow: "PESEL register · names given to children",
+      label: "Type a first name",
+      hint: "You see the result once signed in. The basic figures are free.",
+      noAccount: "No account?",
+      signUpShort: "Create one",
+      signUp: "Create an account",
+      asked: (name) => `Sign in and we show the result for “${name}” straight away.`,
+      previewCaption: "Result preview",
+      previewLocked: "figures once signed in",
+      previewName: "Your name",
+      previewEyebrow: "In the latest year on the list this name went to",
+      previewPlace: "Place",
+      previewOneIn: "1 in",
+      previewShare: "Share",
+      whatHeading: "What you see once signed in",
+      whatLede: "You type a first name. You get the figures for boys and for girls separately.",
+      features: {
+        count: {
+          title: "How many children",
+          body: "How many children were given the name first in the latest year on the list, and what part of all the list's children that is.",
+        },
+        rank: {
+          title: "Place on the list",
+          body: "The name's place on that year's list, from the most common to the rarest on the list.",
+        },
+        direction: {
+          title: "Direction",
+          body: "Whether the name's share is rising, falling or steady, and which two years the comparison is between.",
+        },
+        register: {
+          title: "In the PESEL register",
+          body: "How many people of any age have the name as their first. That figure is never added to a year's figures.",
+        },
+        meaning: {
+          title: "What it means",
+          body: "The name's origin and meaning in the words of a work that explains it. When we have no such work, or cannot show it, we say so.",
+        },
+        lists: {
+          title: "Two separate lists",
+          body: "Boys and girls are on separate lists. We never add the two together.",
+        },
+      },
+      plansHeading: "Free and in the plan",
+      freeEyebrow: "Free",
+      freeTitle: "Once signed in",
+      freeItems: [
+        "The number of children in the latest year on the list, and its share",
+        "The place on that year's list",
+        "The direction: rising, falling or steady",
+        "The PESEL register's figure",
+        "The origin and meaning, when a work explains it",
+      ],
+      tierEyebrow: (tier) => `Plan · ${tier}`,
+      oneTime: "one-time",
+      chartLatest: "latest year",
+      sourceHeading: "Source",
+      sourceBody:
+        "The PESEL register, the Ministry of Digital Affairs' dataset “Imiona nadawane dzieciom w Polsce” (first names given to children in Poland).",
+      sourceRef: "dane.gov.pl · dataset 219",
+      sourceAbsent:
+        "The lists leave out names given fewer times than the year's cut-off. A name missing from a list does not mean no child was given it.",
+    },
   },
 };

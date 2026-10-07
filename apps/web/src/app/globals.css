@@ -8641,7 +8641,8 @@ main.baby-names.atlas-v1 section.bn-tile {
 }
 
 /* The shell gives `.baby-soon` an amber border (TASK-149); on this page amber is the peak bar's alone. */
-main.baby-names.atlas-v1 .baby-locked .baby-soon {
+main.baby-names.atlas-v1 .baby-locked .baby-soon,
+main.baby-names.atlas-v1 .bn-out-plan .baby-soon {
   padding: 3px 10px;
   color: var(--color-accent-text);
   border: 1px solid var(--color-border-default);
@@ -9027,6 +9028,590 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   font: 500 var(--type-data-md) / 1.6 var(--font-data, ui-monospace, monospace);
   letter-spacing: 0.02em;
   color: var(--color-text-tertiary);
+}
+
+/* --- the baby-names page for a signed-out reader (TASK-159) ---
+   The hero with the search box beside a preview of the result's own tiles,
+   every number masked; then what a signed-in reader gets, the free view beside
+   the tier (no buy button), and the source. Same scope and rules as above:
+   Atlas Blue for action and the lit point, no amber. Layouts wrap by their
+   own widths, so a phone gets one column without a breakpoint. */
+
+.baby-names.atlas-v1 .bn-out-hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xl) var(--space-xxl);
+  padding-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-out-art {
+  position: absolute;
+  inset: -64px 0 auto 30%;
+  z-index: -1;
+  height: 520px;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: radial-gradient(closest-side, #000 40%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-out-intro {
+  flex: 1 1 26rem;
+  min-width: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-eyebrow {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-title {
+  margin: 0;
+  font: 500 clamp(3rem, 7vw, 5.5rem) / 0.95 var(--font-display, Georgia, serif);
+  letter-spacing: -0.035em;
+  color: var(--color-text-primary);
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-out-lede {
+  max-width: 30ch;
+  margin: var(--space-lg) 0 0;
+  font-size: var(--type-body-lg);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-form {
+  max-width: 34rem;
+  margin-top: var(--space-xl);
+}
+
+.baby-names.atlas-v1 .bn-out-form label {
+  display: block;
+  margin: 0 0 var(--space-sm);
+  font-size: var(--type-body-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-field {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.baby-names.atlas-v1 .bn-out-field input {
+  flex: 1 1 13rem;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 var(--space-md);
+  font: 500 1.125rem / 1 var(--font-ui, system-ui, sans-serif);
+  color: var(--color-text-primary);
+  background: var(--color-surface-interactive);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .bn-out-field input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-field button,
+.baby-names.atlas-v1 .bn-out-primary,
+.baby-names.atlas-v1 .bn-out-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-lg);
+  font: 600 1rem / 1 var(--font-ui, system-ui, sans-serif);
+  text-decoration: none;
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .bn-out-field button {
+  min-height: 52px;
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border: 0;
+  cursor: pointer;
+}
+
+.baby-names.atlas-v1 .bn-out-field button:hover,
+.baby-names.atlas-v1 a.bn-out-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.baby-names.atlas-v1 a.bn-out-primary {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+}
+
+.baby-names.atlas-v1 a.bn-out-secondary {
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+}
+
+.baby-names.atlas-v1 a.bn-out-secondary:hover {
+  border-color: var(--color-border-strong);
+}
+
+.baby-names.atlas-v1 .bn-out-alert {
+  max-width: 34rem;
+  margin: var(--space-md) 0 0;
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-out-hint {
+  display: grid;
+  gap: 10px;
+  max-width: 34rem;
+  margin-top: var(--space-md);
+  font-size: 0.9375rem;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-hint p {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-lock {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bn-out-lock-glyph {
+  flex: 0 0 auto;
+  margin-top: 3px;
+}
+
+.baby-names.atlas-v1 .bn-out-links a {
+  font-weight: 600;
+}
+
+.baby-names.atlas-v1 .bn-out-asked {
+  max-width: 34rem;
+  margin-top: var(--space-md);
+  padding: 18px 20px;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bn-out-asked > p:first-child {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bn-out-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: var(--space-md) 0 0;
+}
+
+/* The preview: the hero and two small tiles, numbers masked. */
+.baby-names.atlas-v1 .bn-out-preview {
+  flex: 1 1 22rem;
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(18px, 2.4vw, 28px);
+  background: linear-gradient(160deg, var(--color-bg-elevated), var(--color-bg-primary) 78%);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  box-shadow: 0 30px 80px color-mix(in srgb, var(--atlas-plum-950) 60%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-out-preview-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+}
+
+.baby-names.atlas-v1 .bn-out-pill .bn-out-lock-glyph {
+  width: 12px;
+  height: 12px;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-preview-name {
+  margin: 0;
+  font: 500 clamp(2.25rem, 4vw, 3.25rem) / 1 var(--font-display, Georgia, serif);
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-out-preview-name[data-preview-name="typed"] {
+  text-transform: capitalize;
+}
+
+.baby-names.atlas-v1 .bn-mask {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-text-primary) 13%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+}
+
+.baby-names.atlas-v1 .bn-mask-big {
+  width: 9.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .bn-mask-line {
+  display: block;
+  width: 78%;
+  height: 12px;
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-mask-word {
+  width: 4rem;
+  height: 20px;
+}
+
+.baby-names.atlas-v1 .bn-mask-small {
+  width: 2.5rem;
+  height: 18px;
+}
+
+.baby-names.atlas-v1 .bn-out-preview .bn-big {
+  align-items: center;
+}
+
+.baby-names.atlas-v1 .bn-out-mark {
+  left: 24%;
+  box-sizing: border-box;
+  background: var(--color-surface-primary);
+  border: 1.5px solid var(--color-accent-text);
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.baby-names.atlas-v1 .bn-out-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.baby-names.atlas-v1 .bn-out-pair .bn-tile {
+  padding: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-out-oneline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: 0;
+  font: 500 1.375rem / 1 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-out-trend {
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-out-dots {
+  margin-top: 14px;
+}
+
+.baby-names.atlas-v1 .bn-out-dots .bn-dot {
+  width: 9px;
+  height: 9px;
+}
+
+.baby-names.atlas-v1 .bn-out-shares {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0 0;
+  font-size: var(--type-metadata);
+  color: var(--color-text-tertiary);
+}
+
+/* The sections under the hero: the shell's hairline and spacing give way to the page's own. */
+main.baby-names.atlas-v1 section.bn-out-section {
+  margin: var(--space-section) 0 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-sm) var(--space-xl);
+}
+
+.baby-names.atlas-v1 .bn-out-h2 {
+  margin: 0;
+  font: 500 var(--type-heading-lg) / 1.05 var(--font-display, Georgia, serif);
+  letter-spacing: -0.02em;
+}
+
+.baby-names.atlas-v1 .bn-out-sub {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-md);
+  margin: var(--space-xl) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-out-feature {
+  min-width: 0;
+  padding: 26px;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bn-out-feature-rule {
+  background: var(--color-bg-subtle);
+  border: 1px dashed var(--color-border-default);
+}
+
+.baby-names.atlas-v1 .bn-out-feature h3 {
+  margin: 18px 0 var(--space-sm);
+  font: 600 1.1875rem / 1.25 var(--font-ui, system-ui, sans-serif);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-out-feature p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-glyph {
+  display: block;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-lit {
+  fill: var(--color-signal-atlas);
+  stroke: none;
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-dim {
+  fill: color-mix(in srgb, var(--color-text-primary) 28%, transparent);
+  stroke: none;
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-ring {
+  stroke: color-mix(in srgb, var(--color-signal-atlas) 45%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-line {
+  stroke: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-faint {
+  stroke: color-mix(in srgb, var(--color-text-primary) 40%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-out-glyph .is-accent {
+  stroke: var(--color-accent-text);
+  stroke-width: 1.8;
+}
+
+/* The free view beside the tier. */
+.baby-names.atlas-v1 .bn-out-plans {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+}
+
+.baby-names.atlas-v1 .bn-out-plan {
+  flex: 1 1 22rem;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 36px);
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bn-out-plan-free {
+  background: linear-gradient(160deg, var(--color-bg-elevated), var(--color-surface-primary) 70%);
+  border-color: var(--color-border-default);
+}
+
+.baby-names.atlas-v1 .bn-out-plan > * {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-plan h3 {
+  font: 500 var(--type-heading-md) / 1.1 var(--font-display, Georgia, serif);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-out-plan > p {
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-plan-eyebrow {
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-out-plan-tier .bn-out-plan-eyebrow {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-plan-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.baby-names.atlas-v1 .bn-out-checks {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-checks li {
+  display: flex;
+  gap: 12px;
+}
+
+.baby-names.atlas-v1 .bn-out-check {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-out-plan .bn-out-actions {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bn-out-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.baby-names.atlas-v1 .bn-out-price strong {
+  font: 500 2.5rem / 1 var(--font-display, Georgia, serif);
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-out-price span {
+  font-size: var(--type-body-sm);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-chart {
+  margin-top: auto;
+  padding: 18px 16px 10px;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+}
+
+.baby-names.atlas-v1 .bn-out-bars {
+  display: grid;
+  grid-template-columns: repeat(24, minmax(0, 1fr));
+  align-items: end;
+  gap: 3px;
+  height: 72px;
+}
+
+.baby-names.atlas-v1 .bn-out-bars span {
+  height: 60%;
+  border-radius: 2px 2px 0 0;
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-text-primary) 16%, transparent) 0 3px,
+    color-mix(in srgb, var(--color-text-primary) 5%, transparent) 3px 6px
+  );
+}
+
+.baby-names.atlas-v1 .bn-out-chart .bn-track-labels {
+  margin-top: var(--space-sm);
+}
+
+/* The source, last: a hairline, the dataset, and the cut-off line. */
+main.baby-names.atlas-v1 section.bn-out-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md) var(--space-xl);
+  padding-top: 28px;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-out-source h2 {
+  flex: 0 0 8.75rem;
+  margin: 0;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-source > div {
+  flex: 1 1 30rem;
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.baby-names.atlas-v1 .bn-out-source p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-out-source .atlas-dataset-reference,
+.baby-names.atlas-v1 .bn-out-source .note {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-out-source .note {
+  font-size: var(--type-body-sm);
 }
 
 /* --- the baby-names list (TASK-146) --- */

@@ -221,3 +221,14 @@ describe("Google's return (the callback)", () => {
     expect(JSON.stringify(logged)).not.toContain(IDENTITY.email);
   });
 });
+
+describe("the baby-names page with a typed name in the flight (TASK-159)", () => {
+  it("comes back out of the cookie unchanged", () => {
+    for (const next of [
+      "/pl/imiona-dla-dziecka?imie=%C5%81ucja",
+      "/en/baby-names?name=Anna+Maria",
+    ]) {
+      expect(readFlight(cookieFor(next), true)?.next, next).toBe(next);
+    }
+  });
+});

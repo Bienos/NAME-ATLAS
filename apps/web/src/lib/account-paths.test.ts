@@ -225,7 +225,6 @@ describe("the baby-names page as a return address (TASK-141)", () => {
     expect(safeNext("/pl/imiona-dla-dziecka")).toBe("/pl/imiona-dla-dziecka");
     expect(safeNext("/en/baby-names")).toBe("/en/baby-names");
     for (const value of [
-      "/pl/imiona-dla-dziecka?imie=ZOFIA",
       "/pl/imiona-dla-dziecka/",
       "/en/baby-names/x",
       "/pl/baby-names",
@@ -246,6 +245,42 @@ describe("the full-name comparison as a return address (TASK-155)", () => {
       "/en/compare/full-name/x",
       "/pl/compare/full-name",
       "//evil.example/pl/porownaj/imie-i-nazwisko",
+    ]) {
+      expect(safeNext(value), value).toBeNull();
+    }
+  });
+});
+
+describe("the baby-names page with a typed name as a return address (TASK-159)", () => {
+  it("takes the language's own field with the value URLSearchParams writes", () => {
+    for (const value of [
+      "/pl/imiona-dla-dziecka?imie=ZOFIA",
+      "/en/baby-names?name=Zofia",
+      "/pl/imiona-dla-dziecka?imie=%C5%81ucja",
+      "/pl/imiona-dla-dziecka?imie=Anna+Maria",
+      "/pl/imiona-dla-dziecka?imie=Anna-Maria",
+      `/pl/imiona-dla-dziecka?imie=${new URLSearchParams({ x: "Żaneta" }).toString().slice(2)}`,
+    ]) {
+      expect(safeNext(value), value).toBe(value);
+    }
+  });
+
+  it("refuses another field, another path, a dot, a control character or an empty name", () => {
+    for (const value of [
+      "/pl/imiona-dla-dziecka?name=Zofia",
+      "/en/baby-names?imie=Zofia",
+      "/pl/imiona-dla-dziecka?imie=Zofia&sex=girls",
+      "/pl/imiona-dla-dziecka?sex=girls",
+      "/pl/imiona-dla-dziecka?imie=",
+      "/pl/imiona-dla-dziecka?imie=+",
+      "/pl/imiona-dla-dziecka?imie=Jan.",
+      "/pl/imiona-dla-dziecka?imie=Jan%0A",
+      "/pl/imiona-dla-dziecka?imie=%E0%A4",
+      "/pl/imiona-dla-dziecka?imie=Zofia#x",
+      "/pl/imiona-dla-dziecka/?imie=Zofia",
+      "/pl/imiona-dla-dziecka/lista?imie=Zofia",
+      "//evil.example/pl/imiona-dla-dziecka?imie=Zofia",
+      `/pl/imiona-dla-dziecka?imie=${"a".repeat(200)}`,
     ]) {
       expect(safeNext(value), value).toBeNull();
     }
