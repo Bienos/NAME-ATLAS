@@ -70,6 +70,9 @@ const nextConfig: NextConfig = {
     // The share cards (TASK-056) read the same files.
     "/pl/nazwisko/**/karta/**": ["./assets/fonts/*.ttf"],
     "/en/surname/**/card/**": ["./assets/fonts/*.ttf"],
+    // The report as a PDF (TASK-172) embeds the same files.
+    "/pl/przykladowy-raport.pdf": ["./assets/fonts/*.ttf"],
+    "/en/sample-report.pdf": ["./assets/fonts/*.ttf"],
     // The blog (TASK-071) reads its posts from `src/content/blog/` at run time.
     "/pl/blog": ["./src/content/blog/*.md"],
     "/en/blog": ["./src/content/blog/*.md"],

@@ -1,6 +1,7 @@
 import type { Lang } from "./messages.js";
 import {
   REPORT_TEASER_TEXT,
+  SAMPLE_REPORT_PATHS,
   reportInsidePath,
   reportInsideQueryKey,
   reportNotifyHref,
@@ -53,6 +54,19 @@ function Sheet() {
   );
 }
 
+/** The invented sample report as a PDF (TASK-172), with the line that it is invented. */
+export function SampleReportLink({ lang }: { lang: Lang }) {
+  const t = REPORT_TEASER_TEXT[lang];
+  return (
+    <p className="rt-sample-report">
+      <a href={SAMPLE_REPORT_PATHS[lang]}>
+        {t.sampleReport} <span aria-hidden="true">→</span>
+      </a>
+      <span>{t.sampleReportNote}</span>
+    </p>
+  );
+}
+
 /** "Wkrótce." and the waiting-list email. */
 function Soon({ surname, lang }: { surname: string; lang: Lang }) {
   const t = REPORT_TEASER_TEXT[lang];
@@ -99,6 +113,7 @@ export function DeckReportTeaser({
         </a>
         <span className="rt-price">{reportPrice(lang)}</span>
       </div>
+      <SampleReportLink lang={lang} />
       <Soon surname={surname} lang={lang} />
     </section>
   );
@@ -179,6 +194,7 @@ export function StudioReportTeaser({
       <a className="rt-sample rt-wide" href={inside}>
         {t.studioSample} <span aria-hidden="true">→</span>
       </a>
+      <SampleReportLink lang={lang} />
       <Soon surname={surname} lang={lang} />
     </section>
   );
