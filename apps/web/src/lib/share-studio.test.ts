@@ -111,6 +111,7 @@ describe("the share studio (TASK-093)", () => {
       expect(block, gate).toContain("Wkrótce.");
       expect(block, gate).toContain('href="mailto:');
       expect(block, gate).not.toMatch(/checkout/u);
+      expect(block, gate).toContain('href="/pl/przykladowy-raport.pdf"');
     }
     const en = unescape(studio("open", "en"));
     expect(en).toContain('action="/en/surname/kowalski/full-report"');

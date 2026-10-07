@@ -14864,6 +14864,31 @@ a.ri-notify {
   }
 }
 
+/* The invented sample of the report as a PDF (TASK-172). */
+.rt-sample-report {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.rt-sample-report a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--dusk-amber);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rt-sample-report span:not([aria-hidden]) {
+  color: var(--dusk-ink-muted);
+  font-size: 0.8125rem;
+}
+
 /* --- the baby-names search in Brand System v1 (TASK-171, design A "Punkt na mapie") ---
    Before a search: the title, the pill search and example names beside a panel
    of contour art with the Atlas Point and what the result shows; then the two
