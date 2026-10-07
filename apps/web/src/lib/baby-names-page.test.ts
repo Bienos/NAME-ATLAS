@@ -1348,3 +1348,23 @@ describe("the free window (TASK-160, D-051)", () => {
     expect(html).not.toContain("bn-free");
   });
 });
+
+describe("the year-by-year dashboard on the page (TASK-170)", () => {
+  it("paid and in the free window: every panel inside the sex's paid view; free: none", async () => {
+    const paid = await render("pl", { imie: "zofia" }, { userId: "u2" }, { u2: ["babynames"] });
+    const view = paid.slice(paid.indexOf('data-paid="FEMALE"'));
+    for (const panel of ["summary", "metric", "moments", "yoy", "decades", "grid"]) {
+      expect(view, panel).toContain(`data-dash="${panel}"`);
+    }
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "zofia" },
+      session: { userId: "u" },
+      deps: { ...deps({}), freeUntil: () => new Date("2099-01-01T00:00:00Z") },
+    });
+    const free = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(free).toContain('data-dash="grid"');
+    const locked = await render("pl", { imie: "zofia" }, { userId: "u1" });
+    expect(locked).not.toContain("data-dash=");
+  });
+});

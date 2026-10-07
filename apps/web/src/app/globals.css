@@ -9717,6 +9717,377 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   font-size: var(--type-metadata);
 }
 
+/* The year-by-year dashboard (TASK-170). The chart switch and the sort are radio
+   inputs read through :has(); without it the count chart and newest-first stay. */
+.baby-names.atlas-v1 .bn-dash-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bn-dash-tile {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+}
+
+.baby-names.atlas-v1 .bn-dash-label,
+.baby-names.atlas-v1 .bn-dash-foot {
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-dash-value {
+  font: 500 clamp(1.4rem, 3.5vw, 1.75rem) / 1.1 var(--font-display, Georgia, serif);
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-names.atlas-v1 .bn-dash-panel {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-dash-panel .note {
+  margin: 0;
+}
+
+/* The chart switch. */
+.baby-names.atlas-v1 .bn-metric {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.baby-names.atlas-v1 .bn-metric > div {
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.baby-names.atlas-v1 .bn-metric-input,
+.baby-names.atlas-v1 .bn-sort-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.baby-names.atlas-v1 .bn-metric-input + label,
+.baby-names.atlas-v1 .bn-sort-input + label {
+  padding: 4px 12px;
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.baby-names.atlas-v1 .bn-metric-input:checked + label,
+.baby-names.atlas-v1 .bn-sort-input:checked + label {
+  color: var(--color-text-primary);
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+}
+
+.baby-names.atlas-v1 .bn-metric-input:focus-visible + label,
+.baby-names.atlas-v1 .bn-sort-input:focus-visible + label {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+
+.baby-names.atlas-v1 .bn-metric-share {
+  display: none;
+}
+
+.baby-names.atlas-v1 .bn-metric:has(.bn-metric-share-input:checked) .bn-metric-share {
+  display: block;
+}
+
+.baby-names.atlas-v1 .bn-metric:has(.bn-metric-share-input:checked) .bn-metric-count {
+  display: none;
+}
+
+.baby-names.atlas-v1 .bn-share-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.baby-names.atlas-v1 .bn-share-bar {
+  fill: var(--chart-current);
+}
+
+.baby-names.atlas-v1 .bn-share-label {
+  fill: var(--chart-text);
+  font: 500 13px var(--font-data, ui-monospace, monospace);
+}
+
+/* Key moments. */
+.baby-names.atlas-v1 .bn-moments {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-moments li {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--space-sm);
+  padding: 8px 0;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-moments li:first-child {
+  border-top: 0;
+}
+
+.baby-names.atlas-v1 .bn-moments li > span:last-child {
+  display: grid;
+}
+
+.baby-names.atlas-v1 .bn-moments small {
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-moment-year {
+  font: 500 var(--type-body-sm) var(--font-data, ui-monospace, monospace);
+  color: var(--color-accent-text);
+}
+
+/* Year on year: one tile a year, lightness carries the size of the change. */
+.baby-names.atlas-v1 .bn-yoy {
+  display: grid;
+  grid-template-columns: repeat(var(--bn-yoy-n, 26), minmax(0, 1fr));
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-yoy-tile {
+  height: 28px;
+  border-radius: 2px;
+  background: var(--color-surface-secondary);
+}
+
+.baby-names.atlas-v1 .bn-yoy-up-1,
+.baby-names.atlas-v1 .bn-yoy-up-2,
+.baby-names.atlas-v1 .bn-yoy-up-3 {
+  background: var(--chart-current);
+}
+
+.baby-names.atlas-v1 .bn-yoy-up-1 {
+  opacity: 0.4;
+}
+
+.baby-names.atlas-v1 .bn-yoy-up-2 {
+  opacity: 0.7;
+}
+
+.baby-names.atlas-v1 .bn-yoy-down-1,
+.baby-names.atlas-v1 .bn-yoy-down-2,
+.baby-names.atlas-v1 .bn-yoy-down-3 {
+  background: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-yoy-down-1 {
+  opacity: 0.25;
+}
+
+.baby-names.atlas-v1 .bn-yoy-down-2 {
+  opacity: 0.5;
+}
+
+.baby-names.atlas-v1 .bn-yoy-down-3 {
+  opacity: 0.8;
+}
+
+.baby-names.atlas-v1 .bn-yoy-below {
+  background: none;
+  border: 1px dashed var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-yoy-nolist {
+  background: none;
+}
+
+.baby-names.atlas-v1 .bn-yoy-ends {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font: 500 var(--type-metadata) var(--font-data, ui-monospace, monospace);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-yoy-records {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-yoy-records dt {
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-yoy-records dd {
+  margin: 0;
+  font: 500 var(--type-body-sm) var(--font-data, ui-monospace, monospace);
+}
+
+/* Decades. */
+.baby-names.atlas-v1 .bn-decades {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-decades li {
+  display: grid;
+  gap: 4px;
+}
+
+.baby-names.atlas-v1 .bn-decade-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-names.atlas-v1 .bn-decades small {
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-meter {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  background: var(--color-surface-secondary);
+  border-radius: 4px;
+}
+
+.baby-names.atlas-v1 .bn-meter > span {
+  display: block;
+  height: 100%;
+  background: var(--chart-current);
+  border-radius: 4px;
+}
+
+/* The sortable grid of every year. */
+.baby-names.atlas-v1 .bn-sort-by {
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-sort-pair {
+  display: inline-flex;
+}
+
+.baby-names.atlas-v1 .bn-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.baby-names.atlas-v1 .bn-grid > .bn-tile-heading,
+.baby-names.atlas-v1 .bn-grid > .note,
+.baby-names.atlas-v1 .bn-grid > .bn-grid-scroll {
+  flex: 1 0 100%;
+}
+
+.baby-names.atlas-v1 .bn-grid-scroll {
+  min-width: 0;
+  max-height: 26rem;
+  overflow: auto;
+}
+
+.baby-names.atlas-v1 .bn-grid-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-grid-row {
+  display: grid;
+  grid-template-columns: 3.2rem 4.4rem 4.6rem 3.6rem 4.6rem minmax(3rem, 1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 6px 0;
+  font: 400 var(--type-body-sm) var(--font-data, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  border-top: 1px solid var(--color-border-subtle);
+  order: var(--o-year);
+}
+
+.baby-names.atlas-v1 .bn-grid-head {
+  font-size: var(--type-metadata);
+  color: var(--color-text-secondary);
+  border-top: 0;
+}
+
+.baby-names.atlas-v1 .bn-grid:has(.bn-sort-count:checked) .bn-grid-rows .bn-grid-row {
+  order: var(--o-count);
+}
+
+.baby-names.atlas-v1 .bn-grid:has(.bn-sort-rank:checked) .bn-grid-rows .bn-grid-row {
+  order: var(--o-rank);
+}
+
+.baby-names.atlas-v1 .bn-grid:has(.bn-sort-change:checked) .bn-grid-rows .bn-grid-row {
+  order: var(--o-change);
+}
+
+.baby-names.atlas-v1 .bn-grid-wide {
+  grid-column: 2 / -1;
+  font-family: var(--font-ui, system-ui, sans-serif);
+}
+
+.baby-names.atlas-v1 .bn-grid-bar {
+  display: block;
+  height: 8px;
+}
+
+.baby-names.atlas-v1 .bn-grid-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--chart-context);
+  border-radius: 4px;
+}
+
+.baby-names.atlas-v1 .bn-up {
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-down {
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 540px) {
+  .baby-names.atlas-v1 .bn-grid-row {
+    grid-template-columns: 2.8rem 3.8rem 4rem 3.2rem 4.2rem;
+  }
+
+  .baby-names.atlas-v1 .bn-grid-row > :nth-child(6) {
+    display: none;
+  }
+}
+
 .baby-names.atlas-v1 .bn-ladder {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

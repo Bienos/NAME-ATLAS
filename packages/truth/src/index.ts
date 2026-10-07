@@ -416,6 +416,7 @@ export {
   FULL_NAME_SECTION_TYPES,
   isReportVersionId,
   readReportVersion,
+  referenceKey,
   REPORT_SCHEMA_VERSION,
   REPORT_SECTION_TYPES,
   reportSectionsOf,

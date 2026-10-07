@@ -15,6 +15,14 @@ import type { Kysely } from "kysely";
 import type { DB } from "@name-atlas/db";
 import { citationSchema } from "@name-atlas/contracts";
 import type { CitationDto } from "@name-atlas/contracts";
+import type {
+  BirthListInfo,
+  BirthNameFacts,
+  BirthSex,
+  BirthSexFigures,
+  BirthTrendFigure,
+  BirthYearFigures,
+} from "./given-name-birth-facts.js";
 import { evaluateSurface, sectionEligibility } from "./rights.js";
 import type { EffectiveRights, Surface } from "./rights.js";
 
@@ -98,7 +106,10 @@ export interface GivenNameFacts {
   readonly lists: readonly GivenNameListFacts[];
 }
 
-/** The first name's facts a full-name report freezes: the counts, and the meaning (TASK-147). */
+/**
+ * The first name's facts a full-name report freezes: the counts, the meaning
+ * (TASK-147), and the name as one given to children (TASK-159).
+ */
 export interface GivenNameReportFacts extends GivenNameFacts {
   /**
    * The name's origin and meaning, apart from the counts' state. A version
@@ -106,6 +117,12 @@ export interface GivenNameReportFacts extends GivenNameFacts {
    * work could be quoted then.
    */
   readonly meaning: GivenNameMeaningFacts;
+  /**
+   * The name as a first name given to children, each year from 2000, boys and
+   * girls apart (D-044; ADR-0037 as amended by D-044). Null in a version
+   * frozen before `full_name_report@2`, which did not freeze them.
+   */
+  readonly births: BirthNameFacts | null;
 }
 
 /** `structured_value` of the two claim types, as TASK-122 writes them. */
@@ -502,10 +519,192 @@ function meaningFrom(v: unknown): GivenNameMeaningFacts | null {
   return { state, claim_id: x["claim_id"], confidence, works: parsed };
 }
 
+const BIRTH_SEX_VALUES: readonly unknown[] = ["MALE", "FEMALE"];
+const isBirthSex = (v: unknown): v is BirthSex => BIRTH_SEX_VALUES.includes(v);
+const isYear = (v: unknown): v is number =>
+  Number.isInteger(v) && (v as number) >= 1900 && (v as number) <= 2999;
+const isCountOrNull = (v: unknown): v is number | null => v === null || isCount(v);
+const isNumberOrNull = (v: unknown): v is number | null =>
+  v === null || (typeof v === "number" && Number.isFinite(v));
+
+/** A frozen list's description; null when none was stored, undefined when it is not one. */
+function birthListFrom(v: unknown): BirthListInfo | null | undefined {
+  if (v === null) return null;
+  const x = record(v);
+  if (
+    x === null ||
+    !isString(x["list_id"]) ||
+    !isYear(x["birth_year"]) ||
+    !isBirthSex(x["sex"]) ||
+    !isCount(x["publication_threshold"]) ||
+    !isCount(x["people_sum"])
+  ) {
+    return undefined;
+  }
+  return {
+    list_id: x["list_id"],
+    birth_year: x["birth_year"],
+    sex: x["sex"],
+    publication_threshold: x["publication_threshold"],
+    people_sum: x["people_sum"],
+  };
+}
+
+/** One frozen year of one sex; undefined when it is not one. */
+function birthYearFrom(v: unknown): BirthYearFigures | undefined {
+  const x = record(v);
+  if (x === null || !isYear(x["birth_year"])) return undefined;
+  const list = birthListFrom(x["list"]);
+  if (list === undefined) return undefined;
+  let count: BirthYearFigures["count"] = null;
+  if (x["count"] !== null) {
+    const c = record(x["count"]);
+    const citation = citationFrom(c?.["citation"]);
+    if (
+      c === null ||
+      citation === null ||
+      !isString(c["claim_id"]) ||
+      !isCount(c["count"]) ||
+      !isCountOrNull(c["share_per_million"]) ||
+      !isCountOrNull(c["one_in"])
+    ) {
+      return undefined;
+    }
+    count = {
+      claim_id: c["claim_id"],
+      count: c["count"],
+      share_per_million: c["share_per_million"],
+      one_in: c["one_in"],
+      citation,
+    };
+  }
+  let rank: BirthYearFigures["rank"] = null;
+  if (x["rank"] !== null) {
+    const r = record(x["rank"]);
+    const citation = citationFrom(r?.["citation"]);
+    if (
+      r === null ||
+      citation === null ||
+      !isString(r["claim_id"]) ||
+      !isCount(r["rank"]) ||
+      !isCount(r["universe_size"])
+    ) {
+      return undefined;
+    }
+    rank = {
+      claim_id: r["claim_id"],
+      rank: r["rank"],
+      universe_size: r["universe_size"],
+      citation,
+    };
+  }
+  // A figure stands on a stored list of its own year.
+  if (list === null ? count !== null || rank !== null : list.birth_year !== x["birth_year"]) {
+    return undefined;
+  }
+  return { birth_year: x["birth_year"], list, count, rank };
+}
+
+/** A frozen trend; null when none stood, undefined when it is not one. */
+function birthTrendFrom(v: unknown): BirthTrendFigure | null | undefined {
+  if (v === null) return null;
+  const x = record(v);
+  const cited = x?.["citations"];
+  const direction = x?.["direction"];
+  if (
+    x === null ||
+    !isString(x["claim_id"]) ||
+    (direction !== "RISING" && direction !== "STEADY" && direction !== "FALLING") ||
+    !isYear(x["latest_year"]) ||
+    !isYear(x["earlier_year"]) ||
+    !isCount(x["window_years"]) ||
+    typeof x["change_percent"] !== "number" ||
+    !Number.isFinite(x["change_percent"]) ||
+    !isNumberOrNull(x["latest_share_per_million"]) ||
+    !isNumberOrNull(x["earlier_share_per_million"]) ||
+    !Array.isArray(cited) ||
+    cited.length === 0
+  ) {
+    return undefined;
+  }
+  const citations = cited.map(citationFrom);
+  if (!citations.every((c): c is CitationDto => c !== null)) return undefined;
+  return {
+    claim_id: x["claim_id"],
+    direction,
+    latest_year: x["latest_year"],
+    earlier_year: x["earlier_year"],
+    window_years: x["window_years"],
+    change_percent: x["change_percent"],
+    latest_share_per_million: x["latest_share_per_million"],
+    earlier_share_per_million: x["earlier_share_per_million"],
+    citations,
+  };
+}
+
+/** One frozen sex's figures; undefined when they are not. */
+function birthSexFrom(v: unknown): BirthSexFigures | undefined {
+  const x = record(v);
+  if (x === null || !isBirthSex(x["sex"]) || typeof x["on_any_list"] !== "boolean") {
+    return undefined;
+  }
+  const latest = x["latest"] === null ? null : birthYearFrom(x["latest"]);
+  const trend = birthTrendFrom(x["trend"]);
+  let history: BirthYearFigures[] | null = null;
+  if (x["history"] !== null) {
+    if (!Array.isArray(x["history"])) return undefined;
+    const years = x["history"].map(birthYearFrom);
+    if (!years.every((y): y is BirthYearFigures => y !== undefined)) return undefined;
+    history = years;
+  }
+  if (latest === undefined || trend === undefined) return undefined;
+  // Every list a sex's figures stand on is of that sex.
+  const sex = x["sex"];
+  if (
+    ![latest, ...(history ?? [])].every((y) => y === null || y.list === null || y.list.sex === sex)
+  ) {
+    return undefined;
+  }
+  return { sex, on_any_list: x["on_any_list"], latest, trend, history };
+}
+
+/**
+ * The frozen figures as a name given to children. Absent (a version frozen
+ * before `full_name_report@2`) reads as none; null when they are not what
+ * `readBirthNameFacts` writes.
+ */
+function birthsFrom(v: unknown): { readonly births: BirthNameFacts | null } | null {
+  if (v === undefined) return { births: null };
+  const x = record(v);
+  const name = record(x?.["given_name"]);
+  const state = x?.["state"];
+  const sexes = x?.["sexes"];
+  if (
+    x === null ||
+    name === null ||
+    !isString(name["id"]) ||
+    !isString(name["display_name"]) ||
+    (state !== "READY" && state !== "NOT_ON_ANY_LIST" && state !== "RIGHTS_BLOCKED") ||
+    !Array.isArray(sexes)
+  ) {
+    return null;
+  }
+  const parsed = sexes.map(birthSexFrom);
+  if (!parsed.every((s): s is BirthSexFigures => s !== undefined)) return null;
+  if ((state === "READY") !== parsed.length > 0) return null;
+  return {
+    births: {
+      given_name: { id: name["id"], display_name: name["display_name"] },
+      state,
+      sexes: parsed,
+    },
+  };
+}
+
 /**
  * A frozen report's first-name facts, checked field by field; null when the
- * value is not what {@link readGivenNameFacts} and {@link readGivenNameMeaning}
- * write. A page renders only what this returns.
+ * value is not what {@link readGivenNameFacts}, {@link readGivenNameMeaning}
+ * and `readBirthNameFacts` write. A page renders only what this returns.
  */
 export function parseGivenNameFacts(value: unknown): GivenNameReportFacts | null {
   const x = record(value);
@@ -527,10 +726,15 @@ export function parseGivenNameFacts(value: unknown): GivenNameReportFacts | null
   if ((state === "READY") !== parsed.length > 0) return null;
   const meaning = meaningFrom(x["meaning"]);
   if (meaning === null) return null;
+  const births = birthsFrom(x["births"]);
+  if (births === null || (births.births !== null && births.births.given_name.id !== name["id"])) {
+    return null;
+  }
   return {
     given_name: { id: name["id"], display_name: name["display_name"] },
     state,
     lists: parsed,
     meaning,
+    births: births.births,
   };
 }
