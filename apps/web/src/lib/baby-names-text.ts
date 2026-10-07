@@ -186,6 +186,22 @@ export interface BabyNamesText {
   readonly gridShare: string;
   readonly gridChange: string;
   readonly gridBar: string;
+  // --- TASK-171: the search page in Brand System v1 (design A, "Punkt na mapie"). ---
+  /** The mono line above the title. */
+  readonly searchKicker: string;
+  /** The label before the example names. */
+  readonly examplesLabel: string;
+  /** The panel beside the search: what the result shows. */
+  readonly seeHeading: string;
+  readonly seeHeadingSignedOut: string;
+  readonly seeApart: string;
+  readonly seeItems: readonly string[];
+  /** The source chip on the panel's contour art. */
+  readonly sourceTag: string;
+  /** The section with the two list cards. */
+  readonly listsHeading: string;
+  readonly listsBody: string;
+  readonly listsKicker: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -349,6 +365,22 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     gridShare: "Udział",
     gridChange: "Zmiana r/r",
     gridBar: "Na tle szczytu",
+    searchKicker: "Imiona nadawane dzieciom w Polsce",
+    examplesLabel: "Na przykład",
+    seeHeading: "Co zobaczysz",
+    seeHeadingSignedOut: "Co zobaczysz po zalogowaniu",
+    seeApart: "Osobno dla dziewczynek i dla chłopców.",
+    seeItems: [
+      "Ile dzieci dostało to imię w ostatnim roku",
+      "Jego miejsce na liście tego roku",
+      "Jak częste jest: „1 na N” dzieci",
+      "Czy jego udział rośnie, spada, czy się nie zmienia",
+      "Pochodzenie i znaczenie, jeśli podają je źródła",
+    ],
+    sourceTag: "PESEL · zbiór 219",
+    listsHeading: "Cała lista imion",
+    listsBody: "Imiona nadane dzieciom urodzonym w wybranym roku, od najczęściej nadawanego.",
+    listsKicker: "Lista · rok po roku",
   },
   en: {
     title: "Baby names",
@@ -508,5 +540,21 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     gridShare: "Share",
     gridChange: "Change",
     gridBar: "Against the peak",
+    searchKicker: "First names given to children in Poland",
+    examplesLabel: "For example",
+    seeHeading: "What you will see",
+    seeHeadingSignedOut: "What you will see once signed in",
+    seeApart: "For girls and for boys separately.",
+    seeItems: [
+      "How many children were given the name in the latest year",
+      "Its place on that year's list",
+      "How common it is: “1 in N” children",
+      "Whether its share is rising, falling or steady",
+      "Its origin and meaning, where the sources give them",
+    ],
+    sourceTag: "PESEL · dataset 219",
+    listsHeading: "The whole list of names",
+    listsBody: "The names given to children born in a chosen year, most frequent first.",
+    listsKicker: "List · year by year",
   },
 };
