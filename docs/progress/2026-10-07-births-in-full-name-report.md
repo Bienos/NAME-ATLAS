@@ -62,7 +62,16 @@
   - the truth unit tests: 37 files, 433 tests.
 - `full-name-report`, `baby-names` and `given-name-meaning` integration tests: 3 files, 21 tests.
 
-All passed. The whole sequence was not run again on the merged tree; GitHub's CI runs it on the pull request.
+All passed.
+
+**After merging `main` @ `ecfd4a8`** (TASK-160 to TASK-166), the whole sequence was run again from a new empty `name_atlas`, and every step exited 0:
+- `pnpm test`: 2,708 tests (web 1,240, truth 433);
+- `pnpm test:integration`: 547 tests;
+- `pnpm test:golden`: 364 tests;
+- the build;
+- the 10 Playwright tests.
+
+GitHub Actions starts no job in this repository.
 
 **On real data.** The database `gn155` is a copy of the local `gn_full`. It holds the full 2026-01-20 first-name lists, NOWAK and the three meaning files.
 
