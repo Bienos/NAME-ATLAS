@@ -1238,7 +1238,7 @@ function Facts({
         freeUntil === null ? (
           <FullView sexes={sexes} name={facts.given_name.display_name} lang={lang} />
         ) : (
-          <BabyFreeWindow until={freeUntil} lang={lang}>
+          <BabyFreeWindow lang={lang}>
             <FullView sexes={sexes} name={facts.given_name.display_name} lang={lang} />
           </BabyFreeWindow>
         )
@@ -1275,38 +1275,13 @@ function FullView({
   );
 }
 
-/** The window's end as Warsaw reads it: "8 października 2026 r., 23:59". */
-function freeUntilText(iso: string, lang: Lang): string {
-  const when = new Date(iso);
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Warsaw",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(when);
-  const part = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((p) => p.type === type)?.value ?? "";
-  const date = formatDate(`${part("year")}-${part("month")}-${part("day")}`, lang);
-  return `${date}, ${part("hour")}:${part("minute")}`;
-}
-
 /**
  * The locked card while the free window is open (TASK-160, D-051): the same
  * words and price, the price struck, and a button that opens the view. A
- * `<details>`, so it works without script.
+ * `<details>`, so it works without script. No end date is shown (TASK-162):
+ * the owner may keep the window open past any date the card could name.
  */
-function BabyFreeWindow({
-  until,
-  lang,
-  children,
-}: {
-  until: string;
-  lang: Lang;
-  children: ReactNode;
-}) {
+function BabyFreeWindow({ lang, children }: { lang: Lang; children: ReactNode }) {
   const t = BABY_NAMES_TEXT[lang];
   return (
     <section
@@ -1320,7 +1295,6 @@ function BabyFreeWindow({
         <span>{t.lockedTier}</span> <s>{t.lockedPrice}</s>{" "}
         <span className="bn-free-pill">{t.freeToday}</span>
       </p>
-      <p className="note bn-free-until">{t.freeUntil(freeUntilText(until, lang))}</p>
       <details className="bn-free-open">
         <summary className="bn-free-cta">{t.freeCta}</summary>
         {children}

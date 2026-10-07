@@ -1309,7 +1309,8 @@ describe("the free window (TASK-160, D-051)", () => {
     expect(html).toContain('data-year="2000"');
     expect(html).toContain("<s>8,99 zł</s>");
     expect(html).toContain(t.freeToday);
-    expect(html).toContain(t.freeUntil("8 października 2026 r., 23:59"));
+    // No end date on the card (TASK-162): the window can stay open past any date shown.
+    expect(html).not.toMatch(/Za darmo dla zalogowanych do|bn-free-until|2026 r\., 23:59/u);
     expect(html).not.toContain(t.soon);
     expect(html).not.toMatch(/checkout|stripe|kup teraz/iu);
   });
