@@ -19,11 +19,11 @@ export const SITE_COPY = {
 
 /** Public asset: no function invocation or image query string for a preview crawler. */
 export const SITE_PREVIEW_IMAGE = {
-  url: "/share/name-atlas-v3.jpg",
+  url: "/share/name-atlas-v4.jpg",
   width: 1200,
   height: 630,
   type: "image/jpeg",
-  alt: "Name Atlas — Każde nazwisko gdzieś się zaczęło. Sprawdź swoje nazwisko.",
+  alt: "Name Atlas. Każde nazwisko gdzieś się zaczęło. Sprawdź swoje nazwisko: liczby, miejsca i źródła.",
 } as const;
 
 export function landingMetadata(lang: Lang, origin: string | null): Metadata {
