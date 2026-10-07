@@ -1,0 +1,663 @@
+/*
+ * The blog in Brand System v1 (TASK-174, ADR-0046): `/pl/blog`, `/en/blog`
+ * and a post under each, in the `.atlas-v1` scope. The index opens on a
+ * masthead beside contour art; the newest post is a wide feature card and the
+ * others are numbered cards. A post opens on its kicker, title, lede and
+ * metadata, then its sections beside a numbered contents list. The contour art
+ * is decoration only. Motion stays on hover and is off under reduced motion
+ * (`brand-system.css`).
+ */
+
+.site > main.blog.atlas-v1 {
+  max-width: 72rem;
+  padding-block: var(--space-xl) var(--space-section);
+  background: transparent;
+}
+
+main.blog.atlas-v1 a {
+  color: var(--color-accent-text);
+}
+
+main.blog.atlas-v1 .blog-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.blog.atlas-v1 .blog-kicker a {
+  color: inherit;
+  text-decoration: none;
+}
+
+main.blog.atlas-v1 .blog-kicker a:hover {
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .page-title {
+  margin: 0;
+  font-family: var(--font-display, Georgia, serif);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  font-optical-sizing: auto;
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .page-lede {
+  margin: 0;
+  font-size: var(--type-body-lg);
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+main.blog.atlas-v1 .blog-arrow {
+  display: inline-block;
+  transition: transform var(--motion-quick) var(--ease-locate);
+}
+
+/* --- the index: the masthead --- */
+
+main.blog.atlas-v1 .blog-masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: var(--space-xl);
+  align-items: stretch;
+  margin-bottom: var(--space-xxl);
+}
+
+main.blog.atlas-v1 .blog-masthead-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-lg);
+  min-width: 0;
+  padding-block: var(--space-lg);
+}
+
+main.blog.atlas-v1 .blog-masthead .page-title {
+  font-size: var(--type-display-hero);
+  line-height: 0.88;
+}
+
+main.blog.atlas-v1 .blog-masthead .page-lede {
+  max-width: 30ch;
+}
+
+main.blog.atlas-v1 .blog-masthead-art {
+  position: relative;
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  background:
+    radial-gradient(
+      circle at 62% 46%,
+      color-mix(in srgb, var(--color-signal-atlas) 22%, transparent),
+      transparent 46%
+    ),
+    linear-gradient(160deg, var(--color-bg-elevated), var(--color-bg-subtle) 82%);
+}
+
+main.blog.atlas-v1 .blog-masthead-art .contour-field {
+  inset: 6% -18% auto;
+  width: 136%;
+  height: 100%;
+}
+
+main.blog.atlas-v1 .atlas-grid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+main.blog.atlas-v1 .blog-masthead-point {
+  position: absolute;
+  left: 62%;
+  top: 46%;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+
+main.blog.atlas-v1 .blog-masthead-tag {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-bg-primary) 70%, transparent);
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  color: var(--color-text-secondary);
+}
+
+/* --- cards --- */
+
+main.blog.atlas-v1 .blog-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--space-lg);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.blog.atlas-v1 .blog-cards-feature {
+  grid-column: 1 / -1;
+}
+
+main.blog.atlas-v1 .blog-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface-primary);
+  transition:
+    border-color var(--motion-quick) var(--ease-locate),
+    transform var(--motion-base) var(--ease-locate);
+}
+
+main.blog.atlas-v1 .blog-card:hover {
+  border-color: var(--color-border-strong);
+  transform: translateY(-2px);
+}
+
+main.blog.atlas-v1 .blog-card:hover .blog-arrow {
+  transform: translateX(4px);
+}
+
+main.blog.atlas-v1 .blog-card:focus-within {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+
+/* A feature image keeps its 1600 × 840 frame, so nothing moves when it loads. */
+main.blog.atlas-v1 .blog-card-image,
+main.blog.atlas-v1 .blog-hero,
+main.blog.atlas-v1 .blog-post-art {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 40 / 21;
+  overflow: hidden;
+  background: var(--color-bg-subtle);
+}
+
+main.blog.atlas-v1 .blog-card-image img,
+main.blog.atlas-v1 .blog-hero img {
+  object-fit: cover;
+}
+
+main.blog.atlas-v1 .blog-card-image img {
+  transition: transform var(--motion-unfold) var(--ease-unfold);
+}
+
+main.blog.atlas-v1 .blog-card:hover .blog-card-image img {
+  transform: scale(1.03);
+}
+
+/* A post without an image: drawn contours and the Atlas Point. */
+main.blog.atlas-v1 .blog-image-fallback,
+main.blog.atlas-v1 .blog-post-art {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--color-signal-atlas) 16%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(160deg, var(--color-bg-elevated), var(--color-bg-subtle));
+}
+
+main.blog.atlas-v1 .blog-art-point {
+  position: absolute;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+
+main.blog.atlas-v1 .blog-card-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-lg);
+}
+
+main.blog.atlas-v1 .blog-card-n {
+  justify-content: space-between;
+  color: var(--color-accent-text);
+}
+
+main.blog.atlas-v1 .blog-card-flag {
+  padding: 2px 10px;
+  border: 1px solid color-mix(in srgb, var(--color-signal-amber) 55%, transparent);
+  border-radius: var(--radius-pill);
+  color: var(--color-signal-amber);
+}
+
+main.blog.atlas-v1 .blog-card-title {
+  margin: 0;
+  font: 500 1.5rem / 1.15 var(--font-display, Georgia, serif);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+main.blog.atlas-v1 a.blog-card-link {
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+/* The title's link covers the card, so the whole card opens the post. */
+main.blog.atlas-v1 .blog-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+main.blog.atlas-v1 .blog-card-link:focus-visible {
+  outline: none;
+}
+
+main.blog.atlas-v1 .blog-card-description {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+main.blog.atlas-v1 .blog-card-more {
+  margin: auto 0 0;
+  padding-top: var(--space-sm);
+  font: 600 0.875rem / 1.4 var(--font-ui, system-ui, sans-serif);
+  color: var(--color-accent-text);
+}
+
+main.blog.atlas-v1 .blog-date {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  font: 500 var(--type-data-md) / 1.5 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.02em;
+  color: var(--color-text-tertiary);
+}
+
+main.blog.atlas-v1 .blog-meta-sep {
+  opacity: 0.6;
+}
+
+/* The feature card: image and text side by side on a wide screen. */
+@media (min-width: 48rem) {
+  main.blog.atlas-v1 .blog-card-feature {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+
+  main.blog.atlas-v1 .blog-card-feature .blog-card-image {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 22rem;
+  }
+
+  main.blog.atlas-v1 .blog-card-feature .blog-card-text {
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-xl);
+  }
+
+  main.blog.atlas-v1 .blog-card-feature .blog-card-title {
+    font-size: var(--type-heading-lg);
+    line-height: 1.05;
+  }
+
+  main.blog.atlas-v1 .blog-card-feature .blog-card-description {
+    font-size: 1.0625rem;
+  }
+}
+
+main.blog.atlas-v1 .blog-empty {
+  color: var(--color-text-secondary);
+}
+
+/* --- a post --- */
+
+main.blog.atlas-v1 .blog-post-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 52rem;
+  margin-bottom: var(--space-xl);
+}
+
+main.blog.atlas-v1 .blog-post-header .page-title {
+  font-size: var(--type-display-lg);
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+main.blog.atlas-v1 .blog-post-header .page-lede {
+  max-width: 44ch;
+}
+
+main.blog.atlas-v1 .blog-hero,
+main.blog.atlas-v1 .blog-post-art {
+  margin-bottom: var(--space-xxl);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+main.blog.atlas-v1 .blog-post-art {
+  aspect-ratio: 40 / 9;
+}
+
+main.blog.atlas-v1 .blog-post-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 42rem);
+  gap: var(--space-xl);
+}
+
+@media (min-width: 64rem) {
+  main.blog.atlas-v1 .blog-post-grid {
+    grid-template-columns: 14rem minmax(0, 42rem);
+    gap: var(--space-xxl);
+  }
+
+  main.blog.atlas-v1 .blog-toc {
+    position: sticky;
+    top: var(--space-lg);
+    align-self: start;
+  }
+}
+
+main.blog.atlas-v1 .blog-toc {
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+main.blog.atlas-v1 .blog-toc ol {
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+main.blog.atlas-v1 .blog-toc a {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  padding: 7px 0;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+main.blog.atlas-v1 .blog-toc a:hover {
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-toc-n {
+  font: 500 var(--type-data-md) / 1.6 var(--font-data, ui-monospace, monospace);
+  color: var(--color-accent-text);
+}
+
+/* The prose. */
+main.blog.atlas-v1 .blog-body {
+  min-width: 0;
+  counter-reset: blog-section;
+}
+
+main.blog.atlas-v1 .blog-section {
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+  scroll-margin-top: var(--space-lg);
+}
+
+main.blog.atlas-v1 .blog-body p,
+main.blog.atlas-v1 .blog-body li {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+main.blog.atlas-v1 .blog-body p {
+  margin: 0 0 var(--space-md);
+}
+
+main.blog.atlas-v1 .blog-body ul {
+  margin: 0 0 var(--space-md);
+  padding-left: 1.25rem;
+}
+
+main.blog.atlas-v1 .blog-body li + li {
+  margin-top: 6px;
+}
+
+main.blog.atlas-v1 .blog-body li::marker {
+  color: var(--color-signal-amber);
+}
+
+main.blog.atlas-v1 .blog-body strong {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-body > .blog-section:first-child > p:first-child {
+  font-size: 1.1875rem;
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-body h2 {
+  margin: var(--space-xxl) 0 var(--space-md);
+  font: 500 var(--type-heading-md) / 1.15 var(--font-display, Georgia, serif);
+  letter-spacing: -0.015em;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+/* The numbered sections: a mono number above each heading, as in the contents. */
+main.blog.atlas-v1 .blog-section:not(.blog-faq, .blog-sources) > h2 {
+  counter-increment: blog-section;
+}
+
+main.blog.atlas-v1 .blog-section:not(.blog-faq, .blog-sources) > h2::before {
+  content: counter(blog-section, decimal-leading-zero);
+  display: block;
+  width: fit-content;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  border-top: 2px solid var(--color-signal-atlas);
+  font: 500 var(--type-data-md) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  color: var(--color-accent-text);
+}
+
+main.blog.atlas-v1 .blog-body h3 {
+  margin: var(--space-lg) 0 var(--space-sm);
+  font: 500 1.25rem / 1.25 var(--font-display, Georgia, serif);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-body code {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--color-bg-subtle);
+  font: 0.9em var(--font-data, ui-monospace, monospace);
+}
+
+/* The FAQ: a panel, each question with an amber rule. */
+main.blog.atlas-v1 .blog-faq {
+  margin-top: var(--space-xxl);
+  padding: var(--space-xl);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--color-surface-primary);
+}
+
+main.blog.atlas-v1 .blog-faq h2 {
+  margin-top: 0;
+}
+
+main.blog.atlas-v1 .blog-faq h3 {
+  padding-left: 14px;
+  border-left: 2px solid var(--color-signal-amber);
+}
+
+main.blog.atlas-v1 .blog-faq h3 + p {
+  padding-left: 16px;
+}
+
+/* The sources: smaller, under a rule. */
+main.blog.atlas-v1 .blog-sources {
+  margin-top: var(--space-xxl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+main.blog.atlas-v1 .blog-sources h2 {
+  margin-top: 0;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+main.blog.atlas-v1 .blog-sources li {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-text-tertiary);
+}
+
+/* --- the call to action, more posts, back --- */
+
+main.blog.atlas-v1 .blog-cta {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  margin-top: var(--space-xxl);
+  overflow: hidden;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-panel);
+  background: linear-gradient(120deg, var(--color-bg-subtle), var(--color-bg-elevated));
+}
+
+main.blog.atlas-v1 .blog-cta-art {
+  position: relative;
+  min-height: 200px;
+}
+
+main.blog.atlas-v1 .blog-cta-art .contour-field {
+  inset: -10% -30% auto -10%;
+  width: 140%;
+  height: 120%;
+}
+
+main.blog.atlas-v1 .blog-cta-point {
+  position: absolute;
+  left: 58%;
+  top: 50%;
+  display: flex;
+  transform: translate(-50%, -50%);
+}
+
+main.blog.atlas-v1 .blog-cta-text {
+  padding: var(--space-xl);
+}
+
+main.blog.atlas-v1 h2.blog-cta-title {
+  margin: 0 0 var(--space-sm);
+  font: 500 var(--type-heading-lg) / 1.05 var(--font-display, Georgia, serif);
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-cta-body {
+  max-width: 46ch;
+  margin: 0 0 var(--space-lg);
+  color: var(--color-text-secondary);
+}
+
+main.blog.atlas-v1 .blog-cta .search {
+  max-width: none;
+  margin-bottom: 0;
+}
+
+main.blog.atlas-v1 .blog-more {
+  margin-top: var(--space-xxl);
+}
+
+main.blog.atlas-v1 h2.blog-more-title {
+  margin: 0 0 var(--space-lg);
+  font: 500 var(--type-heading-md) / 1.15 var(--font-display, Georgia, serif);
+  color: var(--color-text-primary);
+}
+
+main.blog.atlas-v1 .blog-back {
+  margin-top: var(--space-xl);
+  font: 500 var(--type-data-md) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+main.blog.atlas-v1 .blog-back a {
+  text-decoration: none;
+}
+
+main.blog.atlas-v1 .blog-back a::before {
+  content: "← ";
+}
+
+/* A suffix such as "-czyk" stays on one line (TASK-072). */
+main.blog .nobreak {
+  white-space: nowrap;
+}
+
+/* --- narrow screens --- */
+
+@media (max-width: 48rem) {
+  main.blog.atlas-v1 .blog-masthead {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-xl);
+  }
+
+  main.blog.atlas-v1 .blog-masthead-art {
+    min-height: 160px;
+  }
+
+  main.blog.atlas-v1 .blog-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main.blog.atlas-v1 .blog-cta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  main.blog.atlas-v1 .blog-cta-art {
+    min-height: 110px;
+  }
+
+  main.blog.atlas-v1 .blog-cta-text,
+  main.blog.atlas-v1 .blog-faq {
+    padding: var(--space-lg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.blog.atlas-v1 .blog-card,
+  main.blog.atlas-v1 .blog-card:hover,
+  main.blog.atlas-v1 .blog-card-image img,
+  main.blog.atlas-v1 .blog-arrow {
+    transform: none;
+    transition: none;
+  }
+}
