@@ -251,3 +251,18 @@ describe("the full-name comparison as a return address (TASK-155)", () => {
     }
   });
 });
+
+describe("the couple first-names page as a return address (TASK-156)", () => {
+  it("accepts both pages without a query, and nothing near them", () => {
+    expect(safeNext("/pl/imiona-pary")).toBe("/pl/imiona-pary");
+    expect(safeNext("/en/couple-names")).toBe("/en/couple-names");
+    for (const bad of [
+      "/pl/imiona-pary?a=ANNA&b=JAN",
+      "/pl/imiona-pary/",
+      "/en/couple-names/x",
+      "//evil.example/en/couple-names",
+    ]) {
+      expect(safeNext(bad), bad).toBeNull();
+    }
+  });
+});

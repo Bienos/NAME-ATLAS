@@ -272,6 +272,19 @@ export interface GivenNameCounts {
   source_record_id: string;
 }
 
+export interface GivenNameReadings {
+  claim_a_id: string;
+  claim_b_id: string;
+  created_at: Generated<Timestamp>;
+  given_name_a_id: string;
+  given_name_b_id: string;
+  model: string;
+  prompt_version: string;
+  reading_id: string;
+  text_en: string;
+  text_pl: string;
+}
+
 export interface GivenNames {
   canonical_display: string;
   canonical_key: string;
@@ -536,6 +549,7 @@ export interface DB {
   given_name_birth_counts: GivenNameBirthCounts;
   given_name_birth_lists: GivenNameBirthLists;
   given_name_counts: GivenNameCounts;
+  given_name_readings: GivenNameReadings;
   given_names: GivenNames;
   knowledge_entities: KnowledgeEntities;
   name_forms: NameForms;

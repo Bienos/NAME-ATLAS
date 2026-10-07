@@ -9029,6 +9029,361 @@ main.baby-names.atlas-v1 .baby-locked .baby-soon {
   color: var(--color-text-tertiary);
 }
 
+/* --- the comparison of two first names (TASK-158) ---
+   A page in the same `.baby-names.atlas-v1` scope: two value columns that fit
+   390 px without horizontal overflow (a long name wraps), the two series in
+   the Brand System's chart colours (`--chart-current`, `--chart-context`),
+   Atlas Blue for the action and the focus ring. Amber nowhere: no peak is
+   marked. The form is a GET; the tabs and "Zamień drugie imię" are links. */
+
+.baby-names.atlas-v1.bn-compare-page {
+  --bnc-series-a: var(--chart-current);
+  --bnc-series-b: var(--chart-context);
+  max-width: 40rem;
+}
+
+.baby-names.atlas-v1 .bnc-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-sm);
+  min-height: 44px;
+  margin: 0 0 var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bnc-back {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bnc-eyebrow {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-title {
+  margin: 0 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bnc-form {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: end;
+  max-width: none;
+  margin: var(--space-md) 0;
+}
+
+.baby-names.atlas-v1 .bnc-field {
+  display: grid;
+  gap: var(--space-xs);
+  min-width: 0;
+}
+
+.baby-names.atlas-v1 .bnc-field label {
+  font-size: var(--type-data-md);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 0 var(--space-md);
+  box-sizing: border-box;
+  font-family: var(--font-ui, system-ui, sans-serif);
+  font-size: var(--type-body-lg);
+}
+
+.baby-names.atlas-v1 .bnc-form input:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+.baby-names.atlas-v1 .bnc-form button {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  min-height: 48px;
+}
+
+@media (min-width: 540px) {
+  .baby-names.atlas-v1 .bnc-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  }
+
+  .baby-names.atlas-v1 .bnc-form button {
+    grid-column: auto;
+    justify-self: start;
+  }
+}
+
+.baby-names.atlas-v1 .bnc-body > .baby-locked {
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bnc-problem {
+  margin: var(--space-md) 0 0;
+}
+
+/* One column sized by the space, not by the widest content: the year table scrolls in its own box, the tiles keep the page's width. */
+.baby-names.atlas-v1 .bnc-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bnc-result > * {
+  min-width: 0;
+}
+
+/* The two columns. */
+.baby-names.atlas-v1 .bnc-heads {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+}
+
+.baby-names.atlas-v1 .bnc-head {
+  min-width: 0;
+  padding: var(--space-md);
+  background: var(--color-surface-secondary);
+  border-top: 3px solid var(--bnc-series-a);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bnc-head[data-side="b"] {
+  border-top-color: var(--bnc-series-b);
+}
+
+.baby-names.atlas-v1 .bnc-name {
+  margin: 0;
+  font: 500 clamp(1.375rem, 6vw, 2rem) / 1 var(--font-display, Georgia, serif);
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bnc-head-rank {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-facts {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bnc-row {
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 28%) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0 var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-top: 1px solid var(--color-border-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-names.atlas-v1 .bnc-label {
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-cell {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bnc-big {
+  font: 500 clamp(1.25rem, 5vw, 1.75rem) / 1 var(--font-display, Georgia, serif);
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bnc-sub {
+  font-size: var(--type-data-md);
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bnc-muted {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bnc-register-note {
+  margin: var(--space-sm) 0 0;
+}
+
+/* The chart tile and the ladder. */
+.baby-names.atlas-v1 .bnc-heading {
+  font-size: var(--type-data-md);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.baby-names.atlas-v1 .bnc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  margin: 0 0 var(--space-sm);
+  font-size: var(--type-body-sm);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-legend span,
+.baby-names.atlas-v1 .bnc-series {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bnc-legend span::before,
+.baby-names.atlas-v1 .bnc-series::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: 0;
+  background: var(--bnc-series-a);
+  border-radius: 2px;
+}
+
+.baby-names.atlas-v1 .bnc-legend-b::before,
+.baby-names.atlas-v1 .bnc-series-b::before {
+  background: var(--bnc-series-b);
+}
+
+.baby-names.atlas-v1 .bnc-bar-a {
+  fill: var(--bnc-series-a);
+}
+
+.baby-names.atlas-v1 .bnc-bar-b {
+  fill: var(--bnc-series-b);
+}
+
+.baby-names.atlas-v1 .bnc-grid {
+  width: 100%;
+  margin: var(--space-sm) 0 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.baby-names.atlas-v1 .bnc-grid th,
+.baby-names.atlas-v1 .bnc-grid td {
+  padding: 4px 1px;
+  text-align: center;
+  border: 0;
+}
+
+/* A figure stays on one line; only a name may wrap. */
+.baby-names.atlas-v1 .bnc-grid td {
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .baby-names.atlas-v1 .bnc-grid {
+    font-size: 0.6875rem;
+  }
+
+  .baby-names.atlas-v1 .bnc-grid th[scope="row"] {
+    width: 19%;
+    font-size: var(--type-metadata);
+  }
+}
+
+.baby-names.atlas-v1 .bnc-grid thead th {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bnc-grid thead th[aria-current="true"] {
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bnc-grid th[scope="row"] {
+  width: 22%;
+  text-align: left;
+  font: 600 var(--type-body-sm) / 1.3 var(--font-ui, system-ui, sans-serif);
+}
+
+.baby-names.atlas-v1 .bnc-grid tbody tr {
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bnc-ladder td {
+  font: 500 1.25rem / 1.2 var(--font-display, Georgia, serif);
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bnc-ladder td[data-year] .bnc-rank[data-rank="none"] {
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bnc-note {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-secondary);
+}
+
+/* The year table: a series column pair under each name; the table scrolls in its own box when it must. */
+.baby-names.atlas-v1 .bnc-table thead th {
+  white-space: nowrap;
+}
+
+.baby-names.atlas-v1 .bnc-table thead th[colspan] {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.baby-names.atlas-v1 .bnc-swap {
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bnc-swap-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0 var(--space-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bnc-swap-link:hover,
+.baby-names.atlas-v1 .bnc-swap-link:focus-visible {
+  border-color: var(--color-accent-primary);
+}
+
+.baby-names.atlas-v1 .bnc-footer {
+  margin: var(--space-lg) 0 0;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* The way in from the page's paid view (TASK-158): a link, Atlas Blue as the share entry. */
+.baby-names.atlas-v1 .bn-compare-entry {
+  margin: var(--space-sm) 0 0;
+}
+
+.baby-names.atlas-v1 .bn-compare-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--space-lg);
+  font-weight: 600;
+  color: var(--color-accent-text);
+  border: 1px solid var(--color-accent-primary);
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bn-compare-link:hover {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+}
+
 /* --- the baby-names list (TASK-146) --- */
 
 .baby-list-link {
@@ -12128,4 +12483,79 @@ main.studio h1 {
 .consent-actions button:hover,
 .consent-settings:hover {
   background: var(--hover-light);
+}
+
+/* --- the couple first-names page (TASK-156) --- */
+
+.couple-names {
+  max-width: 52rem;
+}
+
+.couple-names-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-3);
+  align-items: end;
+  margin-top: var(--space-5);
+}
+
+.couple-names-form label {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.couple-names-form input {
+  width: 100%;
+}
+
+/* The two names side by side when there is room, one under the other on a phone. */
+.couple-names-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+.couple-names-side,
+.couple-reading {
+  padding: var(--space-5);
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 20px;
+  min-width: 0;
+}
+
+.couple-names-name {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.couple-names-side h3,
+.couple-reading h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.couple-names-side .report-table {
+  overflow-wrap: anywhere;
+}
+
+.couple-names-links {
+  margin: var(--space-4) 0 0;
+  font-size: 0.9375rem;
+}
+
+.couple-reading {
+  margin-top: var(--space-7);
+}
+
+.couple-reading-text p {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.couple-reading-form {
+  margin-top: var(--space-4);
 }

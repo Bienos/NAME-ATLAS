@@ -54,6 +54,7 @@ describe("MIGRATIONS_DIR", () => {
       "0043_given_name_birth_list_index.ts", // TASK-146 / D-047 — one birth-name list's claims, by list
       "0044_given_name_meaning.ts", // TASK-147 / ADR-0045 — first-name origins and meanings as claims
       "0046_purchases_fullnames_tier.ts", // TASK-155 / D-049 — the 15,99 zł full-name comparison's tier
+      "0047_given_name_readings.ts", // TASK-156 / ADR-0047 — readings of two first names' meanings, written by a model
     ]);
   });
 });

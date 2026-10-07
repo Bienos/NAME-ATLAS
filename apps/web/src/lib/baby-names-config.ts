@@ -36,6 +36,16 @@ export const BABY_NAMES_SHARE_PATHS = {
   en: "/en/baby-names/share",
 } as const;
 
+/**
+ * The comparison's two addresses (TASK-158), without their query: two first
+ * names of one sex side by side, part of the 8,99 zł view (D-044). Same flag,
+ * same rules as the page.
+ */
+export const BABY_NAMES_COMPARE_PATHS = {
+  pl: "/pl/imiona-dla-dziecka/porownaj",
+  en: "/en/baby-names/compare",
+} as const;
+
 /** Rows to a page of the list (the 8,99 zł view), and the rows the free view shows. */
 export const BABY_NAMES_LIST_PAGE_SIZE = 100;
 export const BABY_NAMES_LIST_FREE_ROWS = 10;
@@ -54,8 +64,8 @@ export function babyNamesEnabled(env: Env = process.env): boolean {
 
 /**
  * Whether a request path is the page's, or anything under it: the list
- * (TASK-146), the share sheet and the card images (TASK-152). Everything
- * under either page is one signed-in reader's.
+ * (TASK-146), the share sheet and the card images (TASK-152), the comparison
+ * (TASK-158). Everything under either page is one signed-in reader's.
  */
 export function isBabyNamesPath(pathname: string): boolean {
   return [BABY_NAMES_PATHS.pl, BABY_NAMES_PATHS.en].some(

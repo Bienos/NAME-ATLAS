@@ -479,3 +479,12 @@ export {
   LIST_FACTS_METHOD_VERSION,
   LIST_SUMMARY_METHOD_VERSION,
 } from "./version.js";
+
+// Readings of two first names' meanings — TASK-156, ADR-0047 §2.4: stored once per pair, immutable.
+export {
+  countReadingsSince,
+  findReading,
+  readingKey,
+  storeReading,
+} from "./given-name-readings.js";
+export type { ReadingKey, ReadingSide, StoredReading } from "./given-name-readings.js";

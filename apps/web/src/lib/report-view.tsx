@@ -5,7 +5,6 @@ import { parseGivenNameFacts, referenceKey } from "@name-atlas/truth";
 import type {
   BirthNameFacts,
   BirthSexFigures,
-  GivenNameMeaningFacts,
   GivenNameReportFacts,
   StoredReportVersion,
 } from "@name-atlas/truth";
@@ -22,7 +21,9 @@ import {
   pluralForm,
 } from "./messages.js";
 import type { Lang } from "./messages.js";
+import { GIVEN_NAME_MEANING_TEXT, GivenNameMeaningBlock } from "./given-name-meaning-view.js";
 import { reportPath } from "./report-config.js";
+import { Table } from "./report-table.js";
 import { SiteShell } from "./site-shell.js";
 
 /**
@@ -242,10 +243,7 @@ const STATES: Words = {
 
 /** A full-name report's gaps about the first name, by topic. */
 const GIVEN_GAPS: Words = {
-  MEANING: {
-    pl: "Znaczenie imienia: żadne dzieło, które wolno nam cytować (z domeny publicznej albo za bezpłatną zgodą wydawcy), nie objaśnia tego imienia.",
-    en: "The name's meaning: no work we may quote (in the public domain, or with its publisher's free permission) explains this name.",
-  },
+  MEANING: { pl: GIVEN_NAME_MEANING_TEXT.pl.none, en: GIVEN_NAME_MEANING_TEXT.en.none },
   FULL_NAME_COUNT: {
     pl: "Ile osób nosi to imię i to nazwisko razem: żadne źródło nie łączy imion z nazwiskami, więc raport tego nie podaje i nie szacuje.",
     en: "How many people have this first name and this surname together: no source pairs first names with surnames, so the report neither states nor estimates it.",
@@ -258,17 +256,6 @@ const GIVEN_GAPS: Words = {
     pl: "Imię u dzieci: nie ma go na żadnej liście imion nadanych dzieciom od 2000 r. Lista pomija imię nadane mniej razy, niż wynosi jej próg; to nie znaczy, że nie nadano go wcale.",
     en: "Given to children: the name is on none of the lists of first names given to children since 2000. A list leaves out a name given fewer times than its cut-off; that does not mean it was never given.",
   },
-};
-
-/** The language of origin a work states, by the code its file gives (TASK-147). */
-export const ORIGINS: Words = {
-  he: { pl: "hebrajskie", en: "Hebrew" },
-  arc: { pl: "aramejskie", en: "Aramaic" },
-  grc: { pl: "greckie", en: "Greek" },
-  la: { pl: "łacińskie", en: "Latin" },
-  gem: { pl: "germańskie", en: "Germanic" },
-  sla: { pl: "słowiańskie", en: "Slavic" },
-  lt: { pl: "litewskie", en: "Lithuanian" },
 };
 
 const COPY = {
@@ -320,14 +307,6 @@ const COPY = {
     givenGaps: "Imię",
     rankGap: (list: string) => `Miejsce na liście (${list}): brak zatwierdzonego twierdzenia.`,
     surnameNotOffered: "Dlaczego sama część o nazwisku nie byłaby oferowana",
-    originMeaning: "Pochodzenie i znaczenie",
-    origin: "Pochodzenie",
-    meaning: "Znaczenie",
-    quotation: "Słowa dzieła",
-    quote: (text: string) => `„${text}”`,
-    translatedBy: "przekład Name Atlas",
-    translationNote:
-      "Objaśnienia po angielsku przytaczamy dosłownie. Przekład na polski jest nasz (Name Atlas), dosłowny, i nie pochodzi z dzieła.",
     meaningBlocked: "Znaczenie imienia: prawa źródła nie pozwalają pokazać go w raporcie.",
     births: "Imię nadawane dzieciom",
     birthsIntro:
@@ -401,13 +380,6 @@ const COPY = {
     givenGaps: "First name",
     rankGap: (list: string) => `Rank on the list (${list}): no approved claim.`,
     surnameNotOffered: "Why the surname part alone would not be offered",
-    originMeaning: "Origin and meaning",
-    origin: "Origin",
-    meaning: "Meaning",
-    quotation: "The work's words",
-    quote: (text: string) => `“${text}”`,
-    translatedBy: "translated by Name Atlas",
-    translationNote: "",
     meaningBlocked: "The name's meaning: the source's rights do not allow it in the report.",
     births: "Given to children",
     birthsIntro:
@@ -465,37 +437,6 @@ function Note({ id, numbers }: { id: string; numbers: ReadonlyMap<string, number
     <sup className="report-note">
       <a href={`#zrodlo-${n}`}>[{n}]</a>
     </sup>
-  );
-}
-
-function Table({
-  head,
-  rows,
-}: {
-  head: readonly string[];
-  rows: readonly (readonly ReactNode[])[];
-}) {
-  return (
-    <table className="report-table">
-      <thead>
-        <tr>
-          {head.map((h) => (
-            <th key={h} scope="col">
-              {h}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, i) => (
-          <tr key={i}>
-            {row.map((cell, j) => (
-              <td key={j}>{cell}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 }
 
@@ -677,8 +618,12 @@ function GivenName({
   const t = COPY[lang];
   const meaning = (
     <>
-      <h3>{t.originMeaning}</h3>
-      <GivenNameMeaning meaning={facts.meaning} lang={lang} numbers={numbers} />
+      <h3>{GIVEN_NAME_MEANING_TEXT[lang].heading}</h3>
+      <GivenNameMeaningBlock
+        meaning={facts.meaning}
+        lang={lang}
+        note={(id) => <Note id={id} numbers={numbers} />}
+      />
     </>
   );
   const births = <GivenNameBirths births={facts.births} lang={lang} numbers={numbers} />;
@@ -848,60 +793,6 @@ function BirthYears({
           </p>
         </>
       )}
-    </>
-  );
-}
-
-/**
- * Each work's entry for the first name, in the work's own words (D-046): the
- * origin it states, its meaning, and on the Polish page Name Atlas's literal
- * translation of an English meaning, marked as ours.
- */
-function GivenNameMeaning({
-  meaning,
-  lang,
-  numbers,
-}: {
-  meaning: GivenNameMeaningFacts;
-  lang: Lang;
-  numbers: ReadonlyMap<string, number>;
-}) {
-  const t = COPY[lang];
-  if (meaning.state === "RIGHTS_BLOCKED") return <p>{word(STATES, "RIGHTS_BLOCKED", lang)}</p>;
-  if (meaning.state !== "READY") {
-    return <p className="report-caveat">{word(GIVEN_GAPS, "MEANING", lang)}</p>;
-  }
-  const translated = lang === "pl" && meaning.works.some((w) => w.translation !== null);
-  return (
-    <>
-      <Table
-        head={[t.work, t.origin, t.meaning, t.quotation]}
-        rows={meaning.works.map((w) => [
-          <>
-            {`${w.work.author_or_publisher}, ${w.work.title} (${w.work.year}), ${w.locator}`}
-            <Note id={w.citation.id} numbers={numbers} />
-          </>,
-          w.origin === null
-            ? "—"
-            : `${word(ORIGINS, w.origin.code, lang)} (${t.quote(w.origin.as_printed)})`,
-          w.literal_gloss === null ? (
-            "—"
-          ) : lang === "pl" && w.translation !== null ? (
-            <>
-              {t.quote(w.literal_gloss)}
-              <br />
-              {t.translatedBy}: {t.quote(w.translation.text)}
-            </>
-          ) : (
-            t.quote(w.literal_gloss)
-          ),
-          t.quote(w.quotation),
-        ])}
-      />
-      <p className="report-assessment">
-        {t.assessment}: {assessmentWord(meaning.confidence.status, lang)}
-      </p>
-      {translated ? <p className="report-caveat">{t.translationNote}</p> : null}
     </>
   );
 }
