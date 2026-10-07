@@ -1,13 +1,19 @@
 import type { ReactNode } from "react";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { CitationDto, SurnameResultResponse } from "@name-atlas/contracts";
-import { parseGivenNameFacts } from "@name-atlas/truth";
-import type { GivenNameReportFacts, StoredReportVersion } from "@name-atlas/truth";
+import { parseGivenNameFacts, referenceKey } from "@name-atlas/truth";
+import type {
+  BirthNameFacts,
+  BirthSexFigures,
+  GivenNameReportFacts,
+  StoredReportVersion,
+} from "@name-atlas/truth";
 import {
   assessmentWord,
   changeListLabel,
   formatDate,
   formatInteger,
+  formatPercent,
   formatPercentChange,
   formatShare,
   formationWord,
@@ -32,8 +38,9 @@ import { SiteShell } from "./site-shell.js";
  *
  * A full-name report (TASK-124) adds the first name's chapter before the
  * surname's: its count and rank on each list, apart, from the facts the
- * report froze, and since TASK-147 its origin and meaning as each work states
- * them. It never shows a count of people with both names.
+ * report froze, since TASK-147 its origin and meaning as each work states
+ * them, and since TASK-159 how many children were given it each year. It never
+ * shows a count of people with both names.
  */
 
 /** What the page renders, from one stored version. */
@@ -245,6 +252,10 @@ const GIVEN_GAPS: Words = {
     pl: "Liczba osób z tym imieniem: brak zatwierdzonych danych.",
     en: "People with this first name: no approved data.",
   },
+  BIRTHS: {
+    pl: "Imię u dzieci: nie ma go na żadnej liście imion nadanych dzieciom od 2000 r. Lista pomija imię nadane mniej razy, niż wynosi jej próg; to nie znaczy, że nie nadano go wcale.",
+    en: "Given to children: the name is on none of the lists of first names given to children since 2000. A list leaves out a name given fewer times than its cut-off; that does not mean it was never given.",
+  },
 };
 
 const COPY = {
@@ -297,6 +308,29 @@ const COPY = {
     rankGap: (list: string) => `Miejsce na liście (${list}): brak zatwierdzonego twierdzenia.`,
     surnameNotOffered: "Dlaczego sama część o nazwisku nie byłaby oferowana",
     meaningBlocked: "Znaczenie imienia: prawa źródła nie pozwalają pokazać go w raporcie.",
+    births: "Imię nadawane dzieciom",
+    birthsIntro:
+      "Ilu dzieciom nadano to imię jako pierwsze, rok po roku, i jego miejsce wśród imion nadanych w tym roku. Chłopców i dziewczynki liczymy osobno i nie sumujemy.",
+    sexes: { MALE: "Chłopcy", FEMALE: "Dziewczynki" },
+    year: "Rok",
+    children: "Liczba dzieci",
+    belowCutoff: (threshold: string) => `poniżej progu listy (mniej niż ${threshold})`,
+    noList: "brak listy z tego roku",
+    neverOnList: (sex: string, first: string, last: string) =>
+      `${sex}: imienia nie ma na żadnej z list z lat ${first}–${last}; nadano je mniej razy, niż wynosi próg listy.`,
+    trend: (
+      direction: string,
+      earlier: string,
+      earlierShare: string,
+      latest: string,
+      latestShare: string,
+    ) =>
+      `Udział wśród dzieci: ${earlier} r. ${earlierShare}, ${latest} r. ${latestShare} — ${direction}.`,
+    trendBasis: (percent: string) =>
+      `„Rośnie” albo „spada” znaczy, że udział zmienił się o ponad ${percent}%; inaczej jest „bez większej zmiany”.`,
+    belowCutoffShort: "poniżej progu listy",
+    directions: { RISING: "rośnie", STEADY: "bez większej zmiany", FALLING: "spada" },
+    birthsBlocked: "Imię u dzieci: prawa źródła nie pozwalają pokazać tego w raporcie.",
   },
   en: {
     eyebrow: (v: number, d: string) => `Report · version ${v} · ${d}`,
@@ -347,6 +381,29 @@ const COPY = {
     rankGap: (list: string) => `Rank on the list (${list}): no approved claim.`,
     surnameNotOffered: "Why the surname part alone would not be offered",
     meaningBlocked: "The name's meaning: the source's rights do not allow it in the report.",
+    births: "Given to children",
+    birthsIntro:
+      "How many children were given this as their first name, year by year, and its rank among the names given that year. Boys and girls are counted apart and never added together.",
+    sexes: { MALE: "Boys", FEMALE: "Girls" },
+    year: "Year",
+    children: "Children",
+    belowCutoff: (threshold: string) => `below the list's cut-off (fewer than ${threshold})`,
+    noList: "no list for that year",
+    neverOnList: (sex: string, first: string, last: string) =>
+      `${sex}: the name is on none of the lists of ${first}–${last}; it was given fewer times than the list's cut-off.`,
+    trend: (
+      direction: string,
+      earlier: string,
+      earlierShare: string,
+      latest: string,
+      latestShare: string,
+    ) =>
+      `Share among children: ${earlier} ${earlierShare}, ${latest} ${latestShare} — ${direction}.`,
+    trendBasis: (percent: string) =>
+      `“Rising” or “falling” means the share changed by more than ${percent}%; otherwise it is “steady”.`,
+    belowCutoffShort: "below the list's cut-off",
+    directions: { RISING: "rising", STEADY: "steady", FALLING: "falling" },
+    birthsBlocked: "Given to children: the source's rights do not allow it in the report.",
   },
 } as const;
 
@@ -362,6 +419,9 @@ function citationsById(
       if (k === "citation" && v !== null && typeof v === "object" && "id" in v) {
         const c = v as CitationDto;
         if (!out.has(c.id)) out.set(c.id, c);
+      } else if (k === "citations" && Array.isArray(v)) {
+        // A trend cites each list it compares (TASK-159).
+        for (const c of v as CitationDto[]) if (!out.has(c.id)) out.set(c.id, c);
       } else {
         citationsById(v, out);
       }
@@ -566,10 +626,12 @@ function GivenName({
       />
     </>
   );
+  const births = <GivenNameBirths births={facts.births} lang={lang} numbers={numbers} />;
   if (facts.state !== "READY") {
     return (
       <>
         <p>{word(STATES, facts.state, lang)}</p>
+        {births}
         {meaning}
       </>
     );
@@ -599,7 +661,138 @@ function GivenName({
         ])}
       />
       <p className="report-caveat">{t.listsApart}</p>
+      {births}
       {meaning}
+    </>
+  );
+}
+
+/**
+ * The name as a first name given to children (TASK-159): each sex's years from
+ * 2000, oldest first, as the report froze them. A year the name is not on the
+ * list reads as below that list's cut-off, never 0; a year with no stored list
+ * says so. The boys' and the girls' figures are never added together. Nothing
+ * for a version frozen before `full_name_report@2`.
+ */
+function GivenNameBirths({
+  births,
+  lang,
+  numbers,
+}: {
+  births: BirthNameFacts | null;
+  lang: Lang;
+  numbers: ReadonlyMap<string, number>;
+}) {
+  const t = COPY[lang];
+  if (births === null) return null;
+  return (
+    <>
+      <h3>{t.births}</h3>
+      {births.state === "RIGHTS_BLOCKED" ? (
+        <p>{word(STATES, "RIGHTS_BLOCKED", lang)}</p>
+      ) : births.state !== "READY" ? (
+        <p className="report-caveat">{word(GIVEN_GAPS, "BIRTHS", lang)}</p>
+      ) : (
+        <>
+          <p className="report-caveat">{t.birthsIntro}</p>
+          {births.sexes.map((s) => (
+            <BirthYears key={s.sex} figures={s} lang={lang} numbers={numbers} />
+          ))}
+        </>
+      )}
+    </>
+  );
+}
+
+function BirthYears({
+  figures,
+  lang,
+  numbers,
+}: {
+  figures: BirthSexFigures;
+  lang: Lang;
+  numbers: ReadonlyMap<string, number>;
+}) {
+  const t = COPY[lang];
+  const years = figures.history ?? (figures.latest === null ? [] : [figures.latest]);
+  const listed = years.filter((y) => y.list !== null);
+  const [first] = listed;
+  const last = listed[listed.length - 1];
+  // No list of this sex is stored: nothing to say about it.
+  if (first === undefined || last === undefined) return null;
+  const label = t.sexes[figures.sex];
+  if (years.every((y) => y.count === null)) {
+    return <p>{t.neverOnList(label, String(first.birth_year), String(last.birth_year))}</p>;
+  }
+  const trend = figures.trend;
+  return (
+    <>
+      <h4>{label}</h4>
+      <Table
+        head={[t.year, t.children, t.rank]}
+        rows={years.map((y) => [
+          String(y.birth_year),
+          y.list === null ? (
+            t.noList
+          ) : y.count === null ? (
+            t.belowCutoff(formatInteger(y.list.publication_threshold, lang))
+          ) : (
+            <>
+              {formatInteger(y.count.count, lang)}
+              <Note id={y.count.citation.id} numbers={numbers} />
+            </>
+          ),
+          y.rank === null ? (
+            "—"
+          ) : (
+            <>
+              {t.rankOf(
+                formatInteger(y.rank.rank, lang),
+                formatInteger(y.rank.universe_size, lang),
+              )}
+              {/* The count's mark already names this list. */}
+              {y.count !== null &&
+              numbers.get(y.count.citation.id) === numbers.get(y.rank.citation.id) ? null : (
+                <Note id={y.rank.citation.id} numbers={numbers} />
+              )}
+            </>
+          ),
+        ])}
+      />
+      {trend === null ? null : (
+        <>
+          {/* The two shares the claim states; its change_percent is the rule's threshold, not a change. */}
+          <p className="report-assessment">
+            {t.trend(
+              t.directions[trend.direction],
+              String(trend.earlier_year),
+              trend.earlier_share_per_million === null
+                ? t.belowCutoffShort
+                : formatPercent(trend.earlier_share_per_million / 1_000_000, lang),
+              String(trend.latest_year),
+              trend.latest_share_per_million === null
+                ? "—"
+                : formatPercent(trend.latest_share_per_million / 1_000_000, lang),
+            )}
+            {[...new Set(trend.citations.map((c) => numbers.get(c.id)))]
+              .sort((a, b) => (a ?? 0) - (b ?? 0))
+              .map((n, i) =>
+                n === undefined ? null : (
+                  <sup key={i} className="report-note">
+                    <a href={`#zrodlo-${n}`}>[{n}]</a>
+                  </sup>
+                ),
+              )}
+          </p>
+          <p className="report-caveat">
+            {t.trendBasis(
+              lang === "pl"
+                ? String(trend.change_percent).replace(".", ",")
+                : String(trend.change_percent),
+            )}
+          </p>
+        </>
+      )}
     </>
   );
 }
@@ -677,7 +870,9 @@ function chapterBody(
                     ? t.rankGap(listName(g.comparability_group, lang))
                     : g.topic === "MEANING" && g.reason_code === "RIGHTS_BLOCKED"
                       ? t.meaningBlocked
-                      : word(GIVEN_GAPS, g.topic, lang)}
+                      : g.topic === "BIRTHS" && g.reason_code === "RIGHTS_BLOCKED"
+                        ? t.birthsBlocked
+                        : word(GIVEN_GAPS, g.topic, lang)}
                 </li>
               ))}
             </ul>
@@ -738,8 +933,19 @@ function contentsCount(section: ReportPreview["sections"][number], lang: Lang): 
 export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang: Lang }) {
   const t = COPY[lang];
   const sourceIds = preview.sections.find((s) => s.type === "SOURCES")?.citationIds ?? [];
-  const numbers = new Map(sourceIds.map((id, i) => [id, i + 1]));
   const citations = citationsById([preview.givenName, preview.response]);
+  const numbers = new Map(sourceIds.map((id, i) => [id, i + 1]));
+  // The bibliography lists a publication once (TASK-159): another citation of
+  // it, under another id, takes the number of the one listed.
+  const byReference = new Map<string, number>();
+  for (const [id, n] of numbers) {
+    const c = citations.get(id);
+    if (c !== undefined && !byReference.has(referenceKey(c))) byReference.set(referenceKey(c), n);
+  }
+  for (const [id, c] of citations) {
+    const n = byReference.get(referenceKey(c));
+    if (!numbers.has(id) && n !== undefined) numbers.set(id, n);
+  }
   const date = formatDate(preview.generatedOn, lang);
   const eligible = preview.eligibility.state === "ELIGIBLE";
   const fullName = preview.givenName !== null;
