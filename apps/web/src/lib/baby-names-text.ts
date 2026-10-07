@@ -122,6 +122,11 @@ export interface BabyNamesText {
   readonly latestYearsShown: (n: string) => string;
   /** The other sex's line when it is on no list in any year. */
   readonly noneSince: (sex: "MALE" | "FEMALE", first: number) => string;
+  // --- TASK-152: the way to the share cards. ---
+  /** "Udostępnij": the link to this sex's share sheet. */
+  readonly shareEntry: string;
+  /** "Karta z tymi liczbami, do wysłania bliskim." */
+  readonly shareEntryNote: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -225,6 +230,8 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     latestYearsShown: (n) => `Ostatnie ${n} lat`,
     noneSince: (sex, first) =>
       `Nie ma go na żadnej liście ${sex === "MALE" ? "chłopców" : "dziewczynek"} od ${first} r.`,
+    shareEntry: "Udostępnij",
+    shareEntryNote: "Karta z tymi liczbami, do wysłania bliskim.",
   },
   en: {
     title: "Baby names",
@@ -326,5 +333,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     latestYearsShown: (n) => `The latest ${n} years`,
     noneSince: (sex, first) =>
       `It is on no ${sex === "MALE" ? "boys'" : "girls'"} list since ${first}.`,
+    shareEntry: "Share",
+    shareEntryNote: "A card with these figures, to send to family.",
   },
 };

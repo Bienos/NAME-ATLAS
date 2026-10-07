@@ -25,6 +25,17 @@ export const BABY_NAMES_LIST_PATHS = {
   en: "/en/baby-names/list",
 } as const;
 
+/**
+ * The share sheet's two addresses (TASK-152), without their query: the page's
+ * cards for one name and sex, to share, save or link. The cards themselves are
+ * `/pl/imiona-dla-dziecka/karta/{card}` and `/en/baby-names/card/{card}`
+ * (`baby-names-share-facts.ts`). Same flag, same rules as the page.
+ */
+export const BABY_NAMES_SHARE_PATHS = {
+  pl: "/pl/imiona-dla-dziecka/udostepnij",
+  en: "/en/baby-names/share",
+} as const;
+
 /** Rows to a page of the list (the 8,99 zł view), and the rows the free view shows. */
 export const BABY_NAMES_LIST_PAGE_SIZE = 100;
 export const BABY_NAMES_LIST_FREE_ROWS = 10;
@@ -41,12 +52,13 @@ export function babyNamesEnabled(env: Env = process.env): boolean {
   return env[BABY_NAMES_ENV] === "1";
 }
 
-/** Whether a request path is one of the page's or the list's four addresses. */
+/**
+ * Whether a request path is the page's, or anything under it: the list
+ * (TASK-146), the share sheet and the card images (TASK-152). Everything
+ * under either page is one signed-in reader's.
+ */
 export function isBabyNamesPath(pathname: string): boolean {
-  return (
-    pathname === BABY_NAMES_PATHS.pl ||
-    pathname === BABY_NAMES_PATHS.en ||
-    pathname === BABY_NAMES_LIST_PATHS.pl ||
-    pathname === BABY_NAMES_LIST_PATHS.en
+  return [BABY_NAMES_PATHS.pl, BABY_NAMES_PATHS.en].some(
+    (base) => pathname === base || pathname.startsWith(`${base}/`),
   );
 }

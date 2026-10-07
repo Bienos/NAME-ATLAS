@@ -187,6 +187,46 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(boys.trend?.direction).toBe("FALLING");
   });
 
+  it("gives the share cards their inputs (TASK-152): ZOFIA's girls, JAKUB's boys, and an earlier share the claim does not carry", async () => {
+    // The free cards read the FREE surface: the latest count with its "1 in N", the rank, the trend's two shares.
+    const zofia = sex(await facts("Zofia", false), "FEMALE");
+    expect(zofia.latest?.count).toMatchObject({
+      count: 4415,
+      one_in: 27,
+      share_per_million: 36856,
+    });
+    expect(zofia.trend).toMatchObject({
+      direction: "STEADY",
+      latest_share_per_million: 36856,
+      earlier_share_per_million: 39999,
+    });
+    const jakub = sex(await facts("Jakub", false), "MALE");
+    expect(jakub.latest?.count).toMatchObject({
+      count: 3386,
+      one_in: 37,
+      share_per_million: 26787,
+    });
+    expect(jakub.trend).toMatchObject({
+      direction: "FALLING",
+      latest_share_per_million: 26787,
+      earlier_share_per_million: 38383,
+    });
+    // MYROSLAVA is on the girls' 2025 list and below the 2020 list's cut-off: the claim carries no
+    // earlier share, which the direction tile reads as "poniżej progu", never as 0.
+    const myroslava = sex(await facts("Myroslava", false), "FEMALE");
+    expect(myroslava.latest?.count).toMatchObject({ share_per_million: 275 });
+    expect(myroslava.trend).toMatchObject({
+      direction: "RISING",
+      earlier_year: 2020,
+      latest_share_per_million: 275,
+      earlier_share_per_million: null,
+    });
+    // The paid card reads the PAID surface's history: a year with no count is a cut-off tick, never a zero bar.
+    const history = sex(await facts("Jakub", true), "MALE").history ?? [];
+    expect(history.every((y) => y.count === null || y.count.count > 0)).toBe(true);
+    expect(history.filter((y) => y.list !== null && y.count === null).length).toBeGreaterThan(0);
+  });
+
   it("reads a name on the 2020 list and absent from 2025 as below 2025's cut-off", async () => {
     const kasandra = await facts("Kasandra", false);
     expect(kasandra.state).toBe("READY");
