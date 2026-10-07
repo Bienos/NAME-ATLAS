@@ -346,7 +346,7 @@ describe("with the product (AC-5 to AC-8)", () => {
       const reads: string[] = [];
       const html = await render("pl", TWO, { userId: "u" }, { u: [tier] }, reads);
       expect(html, tier).toContain("cmp-plates");
-      expect(html, tier).not.toContain("cmp-locked");
+      expect(html, tier).not.toContain("fnc-locked");
       expect(reads, tier).toEqual([
         "find:Zofia",
         "given:zofia",
@@ -376,7 +376,9 @@ describe("with the product (AC-5 to AC-8)", () => {
     const women = panel(html, 'data-list="FEMALE"');
     const men = panel(html, 'data-list="MALE"');
     expect(women).toContain(formatInteger(321456, "pl"));
-    expect(women).toContain(t.registerNone);
+    // JAN is in the register but not on the women's list: one line, no bar row (TASK-164).
+    expect(women).toContain(t.notOnList("JAN"));
+    expect(women.match(/class="cmp-bar"/gu) ?? []).toHaveLength(1);
     expect(men).toContain(formatInteger(77, "pl"));
     expect(men).toContain(formatInteger(250000, "pl"));
     expect(html).not.toContain(formatInteger(321456 + 77, "pl"));
@@ -454,5 +456,77 @@ describe("with the product (AC-5 to AC-8)", () => {
   it("carries the typed people to the other language", async () => {
     const html = await render("pl", TWO, { userId: "u" }, { u: ["fullnames"] });
     expect(html).toContain('href="/en/compare/full-name?f1=Zofia&s1=Nowak&f2=Jan&s2=Kowalski"');
+  });
+});
+
+describe("the layout from the owner's canvas (TASK-164)", () => {
+  it("before a result: the steps, two rows, persons 3 and 4 folded, the locked card beside", async () => {
+    const html = await render("pl", TWO, { userId: "u" }, { u: [] });
+    const t = FULL_NAME_COMPARE_TEXT.pl;
+    expect(html).toMatch(/<li data-state="current" aria-current="step">.*Wpisz osoby/su);
+    expect(html).toContain(`${t.steps[1]} · ${t.lockedPrice}`);
+    expect(html).toContain('<details class="fnc-more">');
+    expect(html).toContain(t.addPeople);
+    expect(html).toContain(t.lockedHint);
+    expect(html).toContain('class="fnc-locked"');
+    expect(html).toContain(t.containsLocked);
+    expect(html).toContain(t.togetherHeading);
+    // Each field keeps a label of its own.
+    expect(html).toContain(
+      `<label class="visually-hidden" for="f3">${t.person(3)}: ${t.givenLabel}</label>`,
+    );
+  });
+
+  it("opens persons 3 and 4 when the query carries them, and marks step 2 done with the product", async () => {
+    const html = await render(
+      "pl",
+      { ...TWO, f3: "Ola", s3: "" },
+      { userId: "u" },
+      { u: ["fullnames"] },
+    );
+    expect(html).toContain('<details class="fnc-more" open="">');
+    expect(html).toMatch(/<li data-state="done">.*Odblokuj porównanie/su);
+    expect(html).not.toContain("fnc-locked");
+  });
+
+  it("signed out: the sign-in link, the free link and a preview with no figure", async () => {
+    const html = await render("pl", {}, null);
+    expect(html).toContain('class="fnc-preview" aria-hidden="true"');
+    expect(html).toContain('href="/pl/porownaj"');
+    expect(html).not.toContain("<form");
+  });
+
+  it("the result: the notice before any figure, the chapter bar and one overview row a person", async () => {
+    const html = await render("pl", TWO, { userId: "u" }, { u: ["fullnames"] });
+    const t = FULL_NAME_COMPARE_TEXT.pl;
+    const firstFigure = html.indexOf(formatInteger(321456, "pl"));
+    expect(html.indexOf(t.disclaimer)).toBeLessThan(firstFigure);
+    expect(html.indexOf(t.togetherBody)).toBeLessThan(firstFigure);
+    expect(html).toContain('class="fnc-chapters"');
+    expect(html).toContain('href="#fnc-glance"');
+    expect(html).toContain('id="fnc-ch-4"');
+    // Nothing unresolved: no "Braki" link.
+    expect(html).not.toContain('href="#fnc-missing"');
+    const glance = html.slice(html.indexOf('id="fnc-glance"'), html.indexOf('id="fnc-ch-1"'));
+    expect(glance.match(/<tr data-side=/gu) ?? []).toHaveLength(2);
+    // ZOFIA's two register lists stay two lines, never a sum.
+    expect(glance).toContain(formatInteger(321456, "pl"));
+    expect(glance).toContain(formatInteger(77, "pl"));
+    expect(glance).not.toContain(formatInteger(321456 + 77, "pl"));
+    // JAN has no quoted origin; KOWALSKI has no women's figure: words, never 0.
+    expect(glance).toContain(t.glanceNone);
+    expect(glance).not.toMatch(/fnc-glance-figure">0</u);
+    expect(glance).not.toContain("cmp-bar");
+  });
+
+  it("names the gaps in the chapter bar only when something is unresolved", async () => {
+    const html = await render(
+      "pl",
+      { f1: "Qwxyzzy", s1: "Nowak", f2: "Jan", s2: "Kowalski" },
+      { userId: "u" },
+      { u: ["fullnames"] },
+    );
+    expect(html).toContain('href="#fnc-missing"');
+    expect(html).toContain('id="fnc-missing"');
   });
 });

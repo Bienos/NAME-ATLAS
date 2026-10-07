@@ -33,7 +33,6 @@ export interface FullNameCompareText {
   readonly contains: readonly { readonly title: string; readonly body: string }[];
   readonly lockedHeading: string;
   readonly lockedBody: string;
-  readonly lockedTier: string;
   readonly lockedPrice: string;
   readonly soon: string;
   readonly freeLink: string;
@@ -75,6 +74,31 @@ export interface FullNameCompareText {
   readonly pages: string;
   readonly surnamesOnly: string;
   readonly again: string;
+  readonly stepsLabel: string;
+  readonly steps: readonly [string, string, string];
+  readonly stepNow: string;
+  readonly stepDone: string;
+  readonly peopleHeading: string;
+  readonly peopleHint: string;
+  readonly addPeople: string;
+  readonly lockedHint: string;
+  readonly lockedChip: string;
+  readonly unlockedChip: string;
+  readonly benefits: readonly string[];
+  readonly containsLocked: string;
+  readonly previewLabel: string;
+  readonly chaptersLabel: string;
+  readonly glanceHeading: string;
+  readonly glanceNote: string;
+  readonly glanceCols: Readonly<
+    Record<"person" | "register" | "births" | "origin" | "count" | "rarity", string>
+  >;
+  readonly glanceNone: string;
+  readonly glanceBelow: string;
+  readonly glanceRarest: string;
+  readonly navSurnames: string;
+  readonly navMissing: string;
+  readonly notOnList: (names: string) => string;
 }
 
 export const FULL_NAME_COMPARE_TEXT: Readonly<Record<Lang, FullNameCompareText>> = {
@@ -121,7 +145,6 @@ export const FULL_NAME_COMPARE_TEXT: Readonly<Record<Lang, FullNameCompareText>>
     lockedHeading: "Porównanie imion i nazwisk",
     lockedBody:
       "To porównanie jest płatne: jedna płatność, bez abonamentu. Zawiera je też każdy pakiet od 28,99 zł.",
-    lockedTier: "Porównanie imion i nazwisk",
     lockedPrice: "15,99 zł",
     soon: "Wkrótce",
     freeLink: "Dwa nazwiska porównasz za darmo",
@@ -169,6 +192,40 @@ export const FULL_NAME_COMPARE_TEXT: Readonly<Record<Lang, FullNameCompareText>>
     pages: "Strony nazwisk",
     surnamesOnly: "Porównaj same nazwiska",
     again: "Zmień osoby",
+    stepsLabel: "Kroki",
+    steps: ["Wpisz osoby", "Odblokuj porównanie", "Zobacz je obok siebie"],
+    stepNow: "teraz",
+    stepDone: "zrobione",
+    peopleHeading: "Osoby",
+    peopleHint: "od dwóch do czterech",
+    addPeople: "Dodaj trzecią i czwartą osobę",
+    lockedHint: "Najpierw odblokuj porównanie. Wpisane osoby zostaną w formularzu.",
+    lockedChip: "Zablokowane",
+    unlockedChip: "Odblokowane",
+    benefits: [
+      "Do czterech osób naraz",
+      "Imię i nazwisko każdej osoby obok siebie",
+      "Źródło przy każdej liczbie",
+    ],
+    containsLocked: "Co zobaczysz po odblokowaniu",
+    previewLabel: "Podgląd układu · bez danych",
+    chaptersLabel: "Rozdziały",
+    glanceHeading: "W skrócie",
+    glanceNote: "Jeden wiersz na osobę. Szczegóły i źródła są niżej.",
+    glanceCols: {
+      person: "Osoba",
+      register: "Imię w rejestrze",
+      births: "Imię u dzieci",
+      origin: "Pochodzenie imienia",
+      count: "Nazwisko · liczba osób",
+      rarity: "Nazwisko · rzadkość",
+    },
+    glanceNone: "brak danych",
+    glanceBelow: "poniżej progu listy",
+    glanceRarest: "najrzadsze",
+    navSurnames: "Nazwiska",
+    navMissing: "Braki",
+    notOnList: (names) => `Nie ma na tej liście: ${names}.`,
   },
   en: {
     eyebrow: "Full-name comparison",
@@ -213,7 +270,6 @@ export const FULL_NAME_COMPARE_TEXT: Readonly<Record<Lang, FullNameCompareText>>
     lockedHeading: "Full-name comparison",
     lockedBody:
       "This comparison is paid: one payment, no subscription. Every package from PLN 28.99 holds it too.",
-    lockedTier: "Full-name comparison",
     lockedPrice: "PLN 15.99",
     soon: "Coming soon",
     freeLink: "Compare two surnames for free",
@@ -260,5 +316,39 @@ export const FULL_NAME_COMPARE_TEXT: Readonly<Record<Lang, FullNameCompareText>>
     pages: "Surname pages",
     surnamesOnly: "Compare the surnames only",
     again: "Change the people",
+    stepsLabel: "Steps",
+    steps: ["Type the people", "Unlock the comparison", "See them side by side"],
+    stepNow: "now",
+    stepDone: "done",
+    peopleHeading: "People",
+    peopleHint: "two to four",
+    addPeople: "Add a third and fourth person",
+    lockedHint: "Unlock the comparison first. The people you typed stay in the form.",
+    lockedChip: "Locked",
+    unlockedChip: "Unlocked",
+    benefits: [
+      "Up to four people at once",
+      "Each person's first name and surname side by side",
+      "A source with every figure",
+    ],
+    containsLocked: "What you will see once it is unlocked",
+    previewLabel: "Layout preview · no data",
+    chaptersLabel: "Chapters",
+    glanceHeading: "At a glance",
+    glanceNote: "One row per person. The details and sources are below.",
+    glanceCols: {
+      person: "Person",
+      register: "First name in the register",
+      births: "First name among children",
+      origin: "Origin of the first name",
+      count: "Surname · people",
+      rarity: "Surname · rarity",
+    },
+    glanceNone: "no data",
+    glanceBelow: "below the list's cut-off",
+    glanceRarest: "the rarest",
+    navSurnames: "Surnames",
+    navMissing: "Gaps",
+    notOnList: (names) => `Not on this list: ${names}.`,
   },
 };
