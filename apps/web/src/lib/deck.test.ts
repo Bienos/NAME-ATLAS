@@ -530,6 +530,58 @@ describe("TASK-055 AC-3: one card per ready section, none for the rest", () => {
   });
 });
 
+/** The full report's announcement on the last card (TASK-166). */
+const TEASER = /<section class="rt rt-card"[\s\S]*?<\/section>/u;
+
+describe("the full report announced on the last card (TASK-166)", () => {
+  const mail = (href: string) => {
+    const url = new URL(href.replaceAll("&amp;", "&"));
+    return {
+      subject: url.searchParams.get("subject") ?? "",
+      body: url.searchParams.get("body") ?? "",
+    };
+  };
+
+  for (const lang of ["pl", "en"] as const) {
+    it(`says what the report holds, its price and "soon", in ${lang}`, () => {
+      const path = lang === "en" ? "/en/surname/kowalski" : "/pl/nazwisko/kowalski";
+      const end = deckCards(FULL, lang, { path, shareUrl: null }).at(-1);
+      const html = faces(end === undefined ? [] : [end]);
+      const block = TEASER.exec(html)?.[0] ?? "";
+      expect(block).not.toBe("");
+      const words = text(block);
+      expect(words).toContain(lang === "pl" ? "Pełny raport · PDF" : "Full report · PDF");
+      expect(words).toContain(
+        lang === "pl" ? "KOWALSKI: liczby, mapa i zmiana w czasie" : "KOWALSKI: numbers, map",
+      );
+      expect(words).toContain(lang === "pl" ? "Wkrótce." : "Coming soon.");
+      expect(block).toContain(
+        `href="${lang === "pl" ? "/pl/nazwisko/kowalski/pelny-raport" : "/en/surname/kowalski/full-report"}"`,
+      );
+      // Its only figure is the tier's price: it states nothing about the surname.
+      expect(words.match(/\d[\d\u00a0,.]*/gu)).toEqual([lang === "pl" ? "28,99" : "28.99"]);
+      // The waiting-list email, never a buy button or a checkout.
+      const href = /href="(mailto:[^"]+)"/u.exec(block)?.[1] ?? "";
+      expect(mail(href).subject).toBe(
+        lang === "pl"
+          ? "Lista oczekujących: Małe poszukiwania (28,99 zł)"
+          : "Waiting list: Smaller research (PLN 28.99)",
+      );
+      expect(mail(href).body).toContain("KOWALSKI");
+      expect(block).not.toMatch(/checkout|<button/u);
+    });
+  }
+
+  it("sits between the figures and the way on, on the last card only", () => {
+    const cards = deckCards(FULL, "pl", LINKS);
+    for (const card of cards.slice(0, -1)) expect(faces([card])).not.toMatch(TEASER);
+    const html = faces(cards.slice(-1));
+    const at = html.search(TEASER);
+    expect(at).toBeGreaterThan(html.indexOf("dk-recap"));
+    expect(at).toBeLessThan(html.indexOf("dk-actions"));
+  });
+});
+
 describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
   // A figure: digits, grouped by a no-break space (Polish) or a comma
   // (English), with a decimal part, a sign or a per cent sign where it has one.
@@ -538,7 +590,9 @@ describe("TASK-055 AC-3: every figure on a card is one the page prints", () => {
   for (const lang of ["pl", "en"] as const) {
     it(`holds in ${lang === "pl" ? "Polish" : "English"}`, () => {
       const page = text(renderToStaticMarkup(createElement(Result, { response: FULL, lang })));
-      const deck = text(faces(deckCards(FULL, lang, LINKS)));
+      // The full report's announcement (TASK-166) states its tier's price, not a fact
+      // about the surname; its own test below holds it to that.
+      const deck = text(faces(deckCards(FULL, lang, LINKS)).replace(TEASER, ""));
       const figures = [...new Set(deck.match(FIGURE) ?? [])];
       expect(figures.length).toBeGreaterThan(20);
       const missing = figures.filter((figure) => !page.includes(figure));

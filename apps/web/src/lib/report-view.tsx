@@ -143,7 +143,7 @@ export function toReportPreview(stored: StoredReportVersion): ReportPreview | nu
 type Words = Readonly<Record<string, { readonly pl: string; readonly en: string }>>;
 const word = (words: Words, key: string, lang: Lang): string => words[key]?.[lang] ?? key;
 
-const SECTION_TITLES: Words = {
+export const SECTION_TITLES: Words = {
   GIVEN_NAME: { pl: "Imię", en: "First name" },
   ORIGIN: { pl: "Pochodzenie nazwiska", en: "Origin of the name" },
   DISTRIBUTION: { pl: "Liczebność i rozmieszczenie", en: "Numbers and distribution" },

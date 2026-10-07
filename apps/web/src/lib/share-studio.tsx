@@ -16,6 +16,8 @@ import { comparePagePath, offerPath } from "./site-links.js";
 import { pageSlug } from "./slug.js";
 import { StudioActions, StudioVideo } from "./studio-client.js";
 import { StudioViewer } from "./studio-viewer.js";
+import { StudioReportTeaser } from "./report-teaser.js";
+import { REPORT_TEASER_TEXT } from "./report-teaser-text.js";
 import { fileStem } from "./share-actions.js";
 import { answerSlugForMetadata, canonicalPathFor, siteOrigin } from "./surname-page.js";
 
@@ -198,6 +200,7 @@ export function ShareStudio({
                   motion: t.studioVideoMotion,
                   up: t.studioVideoUp,
                   side: t.studioVideoSide,
+                  outro: REPORT_TEASER_TEXT[lang].videoOutro,
                 }}
               />
               <a className="studio-pdf" href={surnamePdfPath(path)} download>
@@ -206,6 +209,7 @@ export function ShareStudio({
               <p className="studio-hint">{t.studioInstagram}</p>
             </>
           ) : null}
+          <StudioReportTeaser surname={surname} path={path} lang={lang} />
           <h2>{t.studioMore}</h2>
           <div className="studio-more">
             {shareUrl === null ? null : (
