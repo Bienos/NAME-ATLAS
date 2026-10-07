@@ -24,6 +24,8 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 **Amended (2026-10-07, TASK-162):** the owner asked the card to say the window ends tomorrow while keeping it open longer. Not built: a false deadline is a prohibited practice under the unfair commercial practices rules. The owner chose instead to show no end date; the card keeps the struck price, "dziś 0 zł" and "Sprawdź dziś za darmo". The window is set to end 2026-11-07, 23:59 Warsaw time.
 
+**Amended again (2026-10-07, TASK-165):** the owner asked for "last week" on the offer page; told that it is not true while the window runs to 2026-11-07, the owner chose B: the offer page's baby-names card states the window's true last day ("Za darmo dla zalogowanych do 7 listopada 2026 r.") and says "Ostatni tydzień" only within 7 days of its end. The baby-names page's own card is unchanged (no end date).
+
 ---
 
 ## D-050 — RESOLVED as read in this session (2026-10-06): "imiona pary": a reading of two first names' meanings for a couple, written by a model, with shared motifs; the meanings free; the reading free for now, 15,99 zł later
