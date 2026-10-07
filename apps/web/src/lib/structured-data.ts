@@ -1,4 +1,5 @@
 import type { Lang } from "./messages.js";
+import { SOCIAL_LINKS } from "./site-links.js";
 
 /**
  * Structured data (TASK-123; `docs/canonical/21` §72–§80).
@@ -46,6 +47,8 @@ export function siteGraph(origin: string): Record<string, unknown> {
         name: SITE_NAME,
         url: `${origin}/`,
         logo: { "@type": "ImageObject", url: `${origin}/apple-icon.png` },
+        // The site's own social accounts (TASK-168).
+        sameAs: SOCIAL_LINKS.map((link) => link.href),
       },
       {
         "@type": "WebSite",

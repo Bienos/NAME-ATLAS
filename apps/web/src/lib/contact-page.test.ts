@@ -63,7 +63,7 @@ describe("SiteFooter", () => {
       "Follow",
       "Instagram",
       "TikTok",
-      "YouTube",
+      "Facebook",
     ]) {
       expect(html).toContain(`>${label}<`);
     }

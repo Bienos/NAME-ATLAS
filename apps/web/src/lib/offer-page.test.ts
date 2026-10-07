@@ -132,13 +132,14 @@ describe("the offer page (TASK-057, TASK-104, ADR-0037)", () => {
       expect(nav).toContain(`href="${offerPath(lang)}" aria-current="page"`);
       const footer = renderToStaticMarkup(createElement(SiteFooter, { lang }));
       expect(footer).toContain(`href="${offerPath(lang)}"`);
-      for (const label of ["Blog", "Instagram", "TikTok", "YouTube"])
+      for (const label of ["Blog", "Instagram", "TikTok", "Facebook"])
         expect(footer).toContain(`>${label}</a>`);
-      // The blog has its own index since TASK-071; the three social links still lead home.
+      expect(footer).not.toContain("YouTube");
+      // The blog has its own index since TASK-071; the socials lead to the owner's accounts (TASK-168).
       expect(
         followLinks(lang)
           .filter((l) => l.label !== "Blog")
-          .every((l) => l.href === (lang === "en" ? "/?lang=en" : "/")),
+          .every((l) => l.href.startsWith("https://")),
       ).toBe(true);
     }
     expect(offerMetadata("en").alternates?.canonical).toBe("/en/offer");
