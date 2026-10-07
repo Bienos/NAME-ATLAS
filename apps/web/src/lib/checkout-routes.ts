@@ -35,6 +35,8 @@ export interface CheckoutRouteDeps {
   readonly secure: boolean;
   readonly fetch?: typeof fetch;
   readonly log: AccountLog;
+  /** Whether the signed-in account may buy in test mode (`CHECKOUT_TESTERS`, TASK-154). */
+  readonly mayBuy: (email: string) => boolean;
 }
 
 export interface WebhookDeps {
@@ -93,6 +95,12 @@ export async function handleCheckoutPost(
     return see(checkoutReturnPath(lang, "error"));
   }
   if (session === null) return see(accountPath(lang, "sign-in"));
+  // Not a listed tester: as if checkout did not exist. The page offers them no button,
+  // so only a hand-made request gets here. Nothing about the account is logged.
+  if (!deps.mayBuy(session.email)) {
+    deps.log.info("checkout_refused", { reason: "not_tester" });
+    return new Response("Not found", { status: 404, headers: NO_STORE });
+  }
   if (offer === null) return see(checkoutReturnPath(lang, "error"));
 
   try {
