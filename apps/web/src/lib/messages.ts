@@ -869,6 +869,12 @@ export const UI = {
     blogCtaTitle: "Sprawdź swoje nazwisko",
     blogCtaBody:
       "Zobacz, ile osób nosi je dziś, jak jest rzadkie i gdzie występuje najczęściej. Za darmo i bez konta.",
+    // The blog in Brand System v1 (TASK-174).
+    blogKicker: "Name Atlas · zapiski z atlasu",
+    blogFeatured: "Najnowszy wpis",
+    blogRead: "Czytaj wpis",
+    blogMinutes: "min czytania",
+    blogToc: "W tym wpisie",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1618,6 +1624,12 @@ export const UI = {
     blogCtaTitle: "Look up your surname",
     blogCtaBody:
       "See how many people bear it today, how rare it is and where it is most common. Free, no account needed.",
+    // The blog in Brand System v1 (TASK-174).
+    blogKicker: "Name Atlas · field notes",
+    blogFeatured: "Latest post",
+    blogRead: "Read the post",
+    blogMinutes: "min read",
+    blogToc: "In this post",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
