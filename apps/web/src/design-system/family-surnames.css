@@ -1,0 +1,101 @@
+/*
+ * The family surnames view (TASK-169): its fields and its cards. The fields
+ * take the comparison picker's treatment (`compare.css`) from the same tokens;
+ * each card is a panel of its own, so no reader takes two surnames for one
+ * result.
+ */
+
+main.family.atlas-v1 .family-inputs {
+  display: grid;
+  gap: var(--space-4);
+  margin-block: var(--space-6);
+}
+
+main.family.atlas-v1 .family-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2) var(--space-3);
+  align-items: end;
+}
+
+main.family.atlas-v1 .family-input label {
+  grid-column: 1 / -1;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+main.family.atlas-v1 .family-input input,
+main.family.atlas-v1 .family-input select {
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  color: var(--color-text-primary);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+}
+
+main.family.atlas-v1 .family-input input {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+}
+
+main.family.atlas-v1 .family-input select {
+  font: inherit;
+}
+
+main.family.atlas-v1 .family-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+main.family.atlas-v1 .family-actions button,
+main.family.atlas-v1 .family-retry {
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 1px solid var(--color-border-default);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+main.family.atlas-v1 .family-actions .family-submit {
+  color: var(--atlas-ivory-50);
+  background: var(--color-accent-primary);
+  border-color: transparent;
+}
+
+main.family.atlas-v1 .family-actions .family-submit:hover {
+  background: var(--color-accent-hover);
+}
+
+main.family.atlas-v1 :is(input, select, button):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+main.family.atlas-v1 .family-card {
+  margin-block: var(--space-6);
+  padding: var(--space-5);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-control);
+}
+
+main.family.atlas-v1 .family-entered {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 480px) {
+  main.family.atlas-v1 .family-input {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
