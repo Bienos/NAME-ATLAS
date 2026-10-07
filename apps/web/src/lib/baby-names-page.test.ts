@@ -31,6 +31,7 @@ import {
   trackPosition,
 } from "./baby-names-page.js";
 import type { BabyNamesDeps } from "./baby-names-page.js";
+import { babyNamesFreeUntil } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { formatInteger } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -734,7 +735,11 @@ describe("loadBabyNames", () => {
         session: { userId: "u" },
         deps: { ...deps(bought), readFacts },
       });
-      expect(readFacts).toHaveBeenLastCalledWith({ id: "zofia", display_name: "ZOFIA" }, history);
+      expect(readFacts).toHaveBeenLastCalledWith(
+        { id: "zofia", display_name: "ZOFIA" },
+        history,
+        history,
+      );
     }
   });
 });
@@ -1264,5 +1269,81 @@ describe("the link to the couple first-names page (TASK-156)", () => {
     expect(html).toContain('class="baby-couple-link" href="/pl/imiona-pary"');
     expect(html).toContain(BABY_NAMES_TEXT.pl.coupleLink);
     expect(await render("en", {}, { userId: "u1" })).toContain('href="/en/couple-names"');
+  });
+});
+
+describe("the free window (TASK-160, D-051)", () => {
+  const NOW = new Date("2026-10-07T12:00:00Z");
+  const UNTIL = new Date("2026-10-08T21:59:00Z"); // 23:59 in Warsaw
+
+  it("reads BABY_NAMES_FREE_UNTIL as an instant with its offset, open only before it", () => {
+    const at = (value: string | undefined) =>
+      babyNamesFreeUntil({ BABY_NAMES_FREE_UNTIL: value }, NOW);
+    expect(at(undefined)).toBeNull();
+    expect(at("")).toBeNull();
+    expect(at("2026-10-08")).toBeNull();
+    expect(at("2026-10-08T23:59")).toBeNull();
+    expect(at("jutro")).toBeNull();
+    expect(at("2026-10-07T12:00:00Z")).toBeNull();
+    expect(at("2026-10-06T23:59:00+02:00")).toBeNull();
+    expect(at("2026-10-08T23:59:00+02:00")?.toISOString()).toBe(UNTIL.toISOString());
+    expect(at(" 2026-10-08T21:59Z ")?.toISOString()).toBe(UNTIL.toISOString());
+  });
+
+  it("open, no purchase: the card's button opens every year, read on the FREE surface", async () => {
+    const readFacts = vi.fn((_n: unknown, history: boolean) => Promise.resolve(zofia(history)));
+    const readMeaning = vi.fn(() => Promise.resolve(MEANING_READY));
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "zofia" },
+      session: { userId: "u" },
+      deps: { ...deps({}), readFacts, readMeaning, freeUntil: () => UNTIL },
+    });
+    expect(readFacts).toHaveBeenLastCalledWith({ id: "zofia", display_name: "ZOFIA" }, true, false);
+    expect(readMeaning).toHaveBeenLastCalledWith({ id: "zofia", display_name: "ZOFIA" }, false);
+    const t = BABY_NAMES_TEXT.pl;
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).toContain("bn-free");
+    expect(html).toMatch(new RegExp(`<summary class="bn-free-cta">${t.freeCta}</summary>`, "u"));
+    expect(html).toContain(`>${t.historyHeading}</h2>`);
+    expect(html).toContain('data-year="2000"');
+    expect(html).toContain("<s>8,99 zł</s>");
+    expect(html).toContain(t.freeToday);
+    expect(html).toContain(t.freeUntil("8 października 2026 r., 23:59"));
+    expect(html).not.toContain(t.soon);
+    expect(html).not.toMatch(/checkout|stripe|kup teraz/iu);
+  });
+
+  it("open, with a purchase: the paid view as before, on the PAID surface, no free card", async () => {
+    const readFacts = vi.fn((_n: unknown, history: boolean) => Promise.resolve(zofia(history)));
+    const data = await loadBabyNames({
+      lang: "en",
+      query: { name: "Zofia" },
+      session: { userId: "u" },
+      deps: { ...deps({ u: ["babynames"] }), readFacts, freeUntil: () => UNTIL },
+    });
+    expect(readFacts).toHaveBeenLastCalledWith({ id: "zofia", display_name: "ZOFIA" }, true, true);
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).not.toContain("bn-free");
+    expect(html).not.toContain("baby-locked");
+    expect(html).toContain(`>${BABY_NAMES_TEXT.en.historyHeading}</h2>`);
+  });
+
+  it("closed: the locked card, Wkrótce, and no history read", async () => {
+    const readFacts = vi.fn((_n: unknown, history: boolean) => Promise.resolve(zofia(history)));
+    const data = await loadBabyNames({
+      lang: "pl",
+      query: { imie: "zofia" },
+      session: { userId: "u" },
+      deps: { ...deps({}), readFacts, freeUntil: () => null },
+    });
+    expect(readFacts).toHaveBeenLastCalledWith(
+      { id: "zofia", display_name: "ZOFIA" },
+      false,
+      false,
+    );
+    const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+    expect(html).toContain(BABY_NAMES_TEXT.pl.soon);
+    expect(html).not.toContain("bn-free");
   });
 });

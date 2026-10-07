@@ -11,6 +11,7 @@ import {
   BABY_NAMES_LIST_PATHS,
   BABY_NAMES_PATHS,
   babyNamesEnabled,
+  readBabyNamesAccess,
 } from "./baby-names-config.js";
 import { BABY_NAMES_LIST_TEXT } from "./baby-names-list-text.js";
 import { Source, readBabyNamesSession, runningBabyNamesDeps } from "./baby-names-page.js";
@@ -55,6 +56,8 @@ export interface BabyNamesListDeps {
   readonly readPage: (list: BirthListInfo, options: BirthListOptions) => Promise<BirthListPage>;
   /** Whether the account holds a tier that includes the full figures. */
   readonly hasFullView: (userId: string) => Promise<boolean>;
+  /** The free window's end while it is open (TASK-160, D-051). */
+  readonly freeUntil?: () => Date | null;
 }
 
 export type ListTrendFilter = "RISING" | "FALLING";
@@ -129,7 +132,7 @@ export async function loadBabyNamesList(input: {
       signInHref: accountPath(lang, "sign-in", { next: BABY_NAMES_LIST_PATHS[lang] }),
     };
   }
-  const full = await deps.hasFullView(session.userId);
+  const { full, paid } = await readBabyNamesAccess(deps, session.userId);
   const sex = parseListSex(first(query, "sex"));
   const lists = (await deps.readLists()).filter((l) => l.sex === sex);
   if (lists.length === 0) {
@@ -157,7 +160,7 @@ export async function loadBabyNamesList(input: {
   }
   const pageSize = full ? BABY_NAMES_LIST_PAGE_SIZE : BABY_NAMES_LIST_FREE_ROWS;
   const page = await deps.readPage(list, {
-    surface: full ? "PAID" : "FREE",
+    surface: paid ? "PAID" : "FREE",
     limit: pageSize,
     offset: full ? (pageAsked - 1) * pageSize : 0,
     withTrend: year === latestYear,
@@ -460,6 +463,7 @@ export async function BabyNamesListRoute({
       readLists: () => readActiveBirthLists(db()),
       readPage: (list, options) => readBirthListPage(db(), list, options),
       hasFullView: running.hasFullView,
+      freeUntil: running.freeUntil ?? (() => null),
     },
   });
   return <BabyNamesListView data={data} />;

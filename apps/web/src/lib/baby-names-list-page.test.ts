@@ -392,3 +392,31 @@ describe("the baby-names list pages (TASK-146)", () => {
     }
   });
 });
+
+describe("the free window (TASK-160, D-051)", () => {
+  it("open, no purchase: any year and page, read on the FREE surface", async () => {
+    const calls: Calls = { pages: [] };
+    const data = await loadBabyNamesList({
+      lang: "pl",
+      query: { sex: "girls", year: "2020", page: "2" },
+      session: { userId: "u" },
+      deps: { ...deps({}, calls), freeUntil: () => new Date("2026-10-08T21:59:00Z") },
+    });
+    expect(data.kind === "signed-in" && data.body.kind).toBe("ROWS");
+    expect(calls.pages[0]?.options).toMatchObject({ surface: "FREE", limit: 100, offset: 100 });
+  });
+
+  it("open, with a purchase: the PAID surface as before", async () => {
+    const calls: Calls = { pages: [] };
+    await loadBabyNamesList({
+      lang: "pl",
+      query: { sex: "girls" },
+      session: { userId: "u" },
+      deps: {
+        ...deps({ u: ["babynames"] }, calls),
+        freeUntil: () => new Date("2026-10-08T21:59:00Z"),
+      },
+    });
+    expect(calls.pages[0]?.options).toMatchObject({ surface: "PAID", limit: 100 });
+  });
+});

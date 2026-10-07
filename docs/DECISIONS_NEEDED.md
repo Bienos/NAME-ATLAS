@@ -8,6 +8,22 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-051 — RESOLVED (2026-10-07): the baby-names 8,99 zł view free for every signed-in reader until a set date
+
+**Status:** RESOLVED by the owner in a Claude Code session; built by TASK-160.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-07: replace "Wkrótce" on the locked card with "check this today for free" and the full view.
+
+**The question put to the owner:** what "Sprawdź dziś za darmo" means in the product, the view being paid (D-044, 8,99 zł, D-045).
+
+- **A — free until a set date (chosen).** Every signed-in reader sees the view until an instant set by `BABY_NAMES_FREE_UNTIL`; after it, 8,99 zł as before.
+- B — a 24-hour pass per account, once each (a table and a migration).
+- C — free permanently (changes D-044's pricing).
+
+**Read here as:** the window opens the whole 8,99 zł view (the years since 2000, the whole list, the comparison, the paid share card), signed in only; claims are read on the FREE surface for a reader who did not buy (ADR-0001), so rights restricted to the paid surface stay closed to them; the price is shown struck, never removed. The owner sets and ends the window.
+
+---
+
 ## D-050 — RESOLVED as read in this session (2026-10-06): "imiona pary": a reading of two first names' meanings for a couple, written by a model, with shared motifs; the meanings free; the reading free for now, 15,99 zł later
 
 **Status:** RESOLVED in this session's reading of the owner's words; the owner may correct it. Recorded as ADR-0047 (proposed); built by TASK-156 (planned), then the motifs and the price as the next two tasks.

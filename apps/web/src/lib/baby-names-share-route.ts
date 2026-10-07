@@ -1,5 +1,9 @@
 import { accountsRuntime } from "./accounts-runtime.js";
-import { BABY_NAMES_CACHE_CONTROL, babyNamesEnabled } from "./baby-names-config.js";
+import {
+  BABY_NAMES_CACHE_CONTROL,
+  babyNamesEnabled,
+  readBabyNamesAccess,
+} from "./baby-names-config.js";
 import { readBabyNamesSession, runningBabyNamesDeps } from "./baby-names-page.js";
 import type { BabyNamesDeps } from "./baby-names-page.js";
 import { renderBabyCard } from "./baby-names-share-card.js";
@@ -45,11 +49,12 @@ export async function babyCardResponse(input: {
   if (typed === "" || sex === null) return NOT_FOUND();
   const paid = card === "paid";
   // The entitlement first: an account without it learns nothing of the history and costs no claims read.
-  if (paid && !(await deps.hasFullView(session.userId))) return NOT_FOUND();
+  const access = paid ? await readBabyNamesAccess(deps, session.userId) : null;
+  if (access !== null && !access.full) return NOT_FOUND();
   const lookup = await deps.findName(typed);
   if (lookup.kind !== "FOUND") return NOT_FOUND();
   const [facts, stock] = await Promise.all([
-    deps.readFacts(lookup.given_name, paid),
+    deps.readFacts(lookup.given_name, paid, access?.paid ?? false),
     deps.readStock(lookup.given_name),
   ]);
   const origin = requestOrigin(input.hostHeader);
