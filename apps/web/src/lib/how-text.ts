@@ -9,15 +9,47 @@ import type { Lang } from "./messages.js";
  * reused verbatim from `messages.ts`, so the two pages cannot disagree.
  */
 
+/** Which illustration a section is drawn with (TASK-159). */
+export type HowVisual =
+  "count" | "rarity" | "where" | "meaning" | "scale" | "absent" | "never" | "sources";
+
 export interface HowSection {
+  /** The in-page anchor, the same in both languages. */
+  readonly id: string;
+  readonly visual: HowVisual;
+  /** A few words for the jump strip. */
+  readonly short: string;
   readonly heading: string;
   readonly paragraphs: readonly string[];
   readonly items?: readonly string[];
 }
 
+/** The words drawn inside the illustrations; none of them is a figure. */
+export interface HowLabels {
+  readonly jump: string;
+  readonly promises: readonly [string, string, string];
+  readonly anatomyTitle: string;
+  readonly anatomyQuestion: string;
+  readonly anatomyParts: readonly [string, string, string, string];
+  readonly anatomySource: string;
+  readonly male: string;
+  readonly female: string;
+  readonly notSummed: string;
+  readonly common: string;
+  readonly rare: string;
+  readonly noData: string;
+  readonly notZero: string;
+  readonly scaleMore: string;
+  readonly scaleLess: string;
+  /** One plain gloss per word of `ASSESSMENTS`, in its order. */
+  readonly glosses: readonly string[];
+  readonly cta: string;
+}
+
 export interface HowDocument {
   readonly title: string;
   readonly lede: string;
+  readonly labels: HowLabels;
   readonly sections: readonly HowSection[];
 }
 
@@ -41,8 +73,42 @@ export function howDocument(lang: Lang): HowDocument {
         "Name Atlas odpowiada na pytania o nazwisko, nie o rodzinę. Przy każdej odpowiedzi jest " +
         "jej źródło, data i słowo, które mówi, na ile jest pewna. Tam, gdzie danych nie ma, " +
         "piszemy to wprost.",
+      labels: {
+        jump: "Na skróty",
+        promises: ["Źródło", "Data", "Słowo pewności"],
+        anatomyTitle: "Z czego składa się każda odpowiedź",
+        anatomyQuestion: t.chapterCountTitle,
+        anatomyParts: [
+          "Odpowiedź — liczba albo zdanie",
+          "Źródło — skąd to wiemy",
+          "Data — na kiedy to prawda",
+          "Słowo pewności — na ile jesteśmy pewni",
+        ],
+        anatomySource: "PESEL · dane.gov.pl",
+        male: "lista męska",
+        female: "lista żeńska",
+        notSummed: "nigdy nie sumujemy",
+        common: "częstsze",
+        rare: "rzadsze",
+        noData: "brak w zbiorze",
+        notZero: "to nie jest zero",
+        scaleMore: "pewniej",
+        scaleLess: "mniej pewnie",
+        glosses: [
+          "Źródło podaje to wprost.",
+          "Źródła mocno za tym przemawiają.",
+          "Źródła na to wskazują, ale słabiej.",
+          "Jest wzmianka, brak potwierdzenia.",
+          "Źródła mówią różne rzeczy — pokazujemy wszystkie.",
+          "Danych jest za mało, by cokolwiek stwierdzić.",
+        ],
+        cta: "Sprawdź swoje nazwisko",
+      },
       sections: [
         {
+          id: "skad",
+          visual: "count",
+          short: "Źródło liczb",
           heading: "Skąd są liczby",
           paragraphs: [
             "Liczby osób pochodzą z wykazów nazwisk w rejestrze PESEL, które Ministerstwo " +
@@ -51,8 +117,17 @@ export function howDocument(lang: Lang): HowDocument {
             "Przy każdej liczbie podajemy jej zbiór danych i datę, na którą jest aktualna.",
           ],
         },
-        { heading: "Rzadkość", paragraphs: [t.chapterRarityLede, t.rarityNotComparable] },
         {
+          id: "rzadkosc",
+          visual: "rarity",
+          short: "Rzadkość",
+          heading: "Rzadkość",
+          paragraphs: [t.chapterRarityLede, t.rarityNotComparable],
+        },
+        {
+          id: "wojewodztwa",
+          visual: "where",
+          short: "Województwa",
           heading: "Województwa",
           paragraphs: [
             t.chapterWhereLede,
@@ -61,6 +136,9 @@ export function howDocument(lang: Lang): HowDocument {
           ],
         },
         {
+          id: "znaczenie",
+          visual: "meaning",
+          short: "Znaczenie",
           heading: "Znaczenie",
           paragraphs: [
             t.chapterMeaningLede,
@@ -69,6 +147,9 @@ export function howDocument(lang: Lang): HowDocument {
           ],
         },
         {
+          id: "pewnosc",
+          visual: "scale",
+          short: "Skala pewności",
           heading: "Skala pewności",
           paragraphs: [
             "Każde stwierdzenie ma jedno z tych słów. Słowo mówi, na ile pewne jest stwierdzenie. " +
@@ -78,6 +159,9 @@ export function howDocument(lang: Lang): HowDocument {
           items: words,
         },
         {
+          id: "brak-danych",
+          visual: "absent",
+          short: "Brak danych",
           heading: "Brak danych to też odpowiedź",
           paragraphs: [
             "Wykazy PESEL nie podają nazwisk, które nosi tylko jedna osoba. Nazwisko, którego nie " +
@@ -85,6 +169,9 @@ export function howDocument(lang: Lang): HowDocument {
           ],
         },
         {
+          id: "czego-nie",
+          visual: "never",
+          short: "Czego nie robimy",
           heading: "Czego nie robimy",
           paragraphs: [],
           items: [
@@ -94,6 +181,9 @@ export function howDocument(lang: Lang): HowDocument {
           ],
         },
         {
+          id: "zrodla",
+          visual: "sources",
+          short: "Źródła",
           heading: "Źródła",
           paragraphs: [
             "Na dole każdej strony nazwiska są wszystkie jej źródła, każde z linkiem do strony, " +
@@ -109,8 +199,42 @@ export function howDocument(lang: Lang): HowDocument {
       "Name Atlas answers questions about a surname, not about a family. Every answer carries " +
       "its source, its date and a word that says how certain it is. Where there is no data, " +
       "we say so.",
+    labels: {
+      jump: "Jump to",
+      promises: ["Source", "Date", "Certainty word"],
+      anatomyTitle: "What every answer is made of",
+      anatomyQuestion: t.chapterCountTitle,
+      anatomyParts: [
+        "The answer — a figure or a sentence",
+        "The source — how we know",
+        "The date — when it holds",
+        "The certainty word — how sure we are",
+      ],
+      anatomySource: "PESEL · dane.gov.pl",
+      male: "men's list",
+      female: "women's list",
+      notSummed: "never added up",
+      common: "more common",
+      rare: "rarer",
+      noData: "not in the dataset",
+      notZero: "this is not zero",
+      scaleMore: "more certain",
+      scaleLess: "less certain",
+      glosses: [
+        "A source states it directly.",
+        "The sources strongly support it.",
+        "The sources point to it, more weakly.",
+        "It is mentioned, not confirmed.",
+        "The sources say different things — we show them all.",
+        "There is too little data to say anything.",
+      ],
+      cta: "Look up your surname",
+    },
     sections: [
       {
+        id: "skad",
+        visual: "count",
+        short: "Sources of figures",
         heading: "Where the figures come from",
         paragraphs: [
           "The counts come from the surname lists of the PESEL register, which Poland's Ministry " +
@@ -119,8 +243,17 @@ export function howDocument(lang: Lang): HowDocument {
           "Every figure is shown with its dataset and the date it describes.",
         ],
       },
-      { heading: "Rarity", paragraphs: [t.chapterRarityLede, t.rarityNotComparable] },
       {
+        id: "rzadkosc",
+        visual: "rarity",
+        short: "Rarity",
+        heading: "Rarity",
+        paragraphs: [t.chapterRarityLede, t.rarityNotComparable],
+      },
+      {
+        id: "wojewodztwa",
+        visual: "where",
+        short: "Voivodeships",
         heading: "Voivodeships",
         paragraphs: [
           t.chapterWhereLede,
@@ -129,6 +262,9 @@ export function howDocument(lang: Lang): HowDocument {
         ],
       },
       {
+        id: "znaczenie",
+        visual: "meaning",
+        short: "Meaning",
         heading: "Meaning",
         paragraphs: [
           t.chapterMeaningLede,
@@ -137,6 +273,9 @@ export function howDocument(lang: Lang): HowDocument {
         ],
       },
       {
+        id: "pewnosc",
+        visual: "scale",
+        short: "How certain",
         heading: "How certain",
         paragraphs: [
           "Every statement carries one of these words. The word says how certain the statement " +
@@ -145,6 +284,9 @@ export function howDocument(lang: Lang): HowDocument {
         items: words,
       },
       {
+        id: "brak-danych",
+        visual: "absent",
+        short: "No data",
         heading: "No data is also an answer",
         paragraphs: [
           "The PESEL lists leave out surnames that only one person has. A surname missing from " +
@@ -152,6 +294,9 @@ export function howDocument(lang: Lang): HowDocument {
         ],
       },
       {
+        id: "czego-nie",
+        visual: "never",
+        short: "What we don't do",
         heading: "What we do not do",
         paragraphs: [],
         items: [
@@ -161,6 +306,9 @@ export function howDocument(lang: Lang): HowDocument {
         ],
       },
       {
+        id: "zrodla",
+        visual: "sources",
+        short: "Sources",
         heading: "Sources",
         paragraphs: [
           "At the foot of every surname page are all of its sources, each linked to the website " +
