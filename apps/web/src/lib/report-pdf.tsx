@@ -175,7 +175,9 @@ const TEXT = {
     lede: (n: number) =>
       `${n} rozdziałów, przypis przy każdym fakcie. Każda liczba pochodzi ze źródła, które podajemy; brak danych mówimy wprost.`,
     stateOn: (date: string) => `Stan danych na ${date}`,
-    version: (v: number, date: string) => `Wersja ${v} · stan danych ${date}`,
+    // A reader's copy (TASK-173) is composed when asked and never stored: version 0.
+    version: (v: number, date: string) =>
+      v === 0 ? `Stan danych ${date}` : `Wersja ${v} · stan danych ${date}`,
     page: (n: number, of: number) => `${n} / ${of}`,
     inShort: "W skrócie.",
     chapterRef: (n: number) => `rozdz. ${n}`,
@@ -207,7 +209,8 @@ const TEXT = {
     lede: (n: number) =>
       `${n} chapters, a note at every fact. Every figure comes from a source we name; where there is no data, we say so.`,
     stateOn: (date: string) => `Data as of ${date}`,
-    version: (v: number, date: string) => `Version ${v} · data as of ${date}`,
+    version: (v: number, date: string) =>
+      v === 0 ? `Data as of ${date}` : `Version ${v} · data as of ${date}`,
     page: (n: number, of: number) => `${n} / ${of}`,
     inShort: "In short.",
     chapterRef: (n: number) => `ch. ${n}`,
@@ -217,8 +220,8 @@ const TEXT = {
     givenRank: (rank: string, of: string) => `rank ${rank} among ${of} names on this list`,
     births: (sex: "MALE" | "FEMALE", year: number) =>
       sex === "MALE"
-        ? `boys were given this name in ${year}`
-        : `girls were given this name in ${year}`,
+        ? `boys were given this name in ${year}.`
+        : `girls were given this name in ${year}.`,
     meaning: (n: number, origins: string) =>
       `${n === 1 ? "One work explains" : `${n} works explain`} the name; origin: ${origins}.`,
     surnameCount: (list: string) => `people have this surname (${list})`,
@@ -795,7 +798,8 @@ function InShort({ p, lang }: { p: ReportPreview; lang: Lang }) {
         cards.push({
           key: `births-${s.sex}`,
           figure: formatInteger(latest.count.count, lang),
-          line: `${x.births(s.sex, latest.birth_year)}.`,
+          // The sentence ends itself: the Polish one ends in "r." (TASK-173).
+          line: x.births(s.sex, latest.birth_year),
           chapter: chapterOf("GIVEN_NAME"),
         });
       }

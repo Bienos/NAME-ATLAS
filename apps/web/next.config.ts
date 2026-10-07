@@ -73,6 +73,9 @@ const nextConfig: NextConfig = {
     // The report as a PDF (TASK-172) embeds the same files.
     "/pl/przykladowy-raport.pdf": ["./assets/fonts/*.ttf"],
     "/en/sample-report.pdf": ["./assets/fonts/*.ttf"],
+    // A reader's own report as a PDF (TASK-173).
+    "/pl/nazwisko/**/pelny-raport/pdf": ["./assets/fonts/*.ttf"],
+    "/en/surname/**/full-report/pdf": ["./assets/fonts/*.ttf"],
     // The blog (TASK-071) reads its posts from `src/content/blog/` at run time.
     "/pl/blog": ["./src/content/blog/*.md"],
     "/en/blog": ["./src/content/blog/*.md"],

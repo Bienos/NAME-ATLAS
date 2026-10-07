@@ -14628,6 +14628,77 @@ a.ri-notify {
   font-size: 0.8125rem;
 }
 
+/* The report free for signed-in readers (TASK-173, D-052): the price struck,
+   "dziś 0 zł" beside it, and the reader's own PDF under the sample. */
+.rt-price s,
+.rt-split s,
+.ri-price s {
+  color: var(--dusk-ink-muted);
+  text-decoration-thickness: 1px;
+}
+
+.rt-free {
+  color: var(--dusk-amber);
+  white-space: nowrap;
+}
+
+/* Not the "jednorazowo · PDF" beside it: the price's own line, under the struck one. */
+.ri-price span:first-child .rt-free {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.25rem;
+  color: var(--dusk-amber);
+}
+
+/* The deck's row: the sample's button stays on one line; the struck price wraps under it. */
+.rt-row:has(s) {
+  flex-wrap: wrap;
+}
+
+.rt-row:has(s) a.rt-sample {
+  white-space: nowrap;
+}
+
+/* The studio's head line: the label and the struck price each stay whole. */
+.rt-eyebrow.rt-split:has(s) {
+  flex-wrap: wrap;
+  gap: 2px 12px;
+}
+
+.rt-eyebrow.rt-split:has(s) > span {
+  white-space: nowrap;
+}
+
+.ri-download {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.ri-download a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 var(--space-4);
+  border-radius: 999px;
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ri-download span:not([aria-hidden]) {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--dusk-ink-muted);
+  overflow-wrap: anywhere;
+}
+
 /* --- the baby-names search in Brand System v1 (TASK-171, design A "Punkt na mapie") ---
    Before a search: the title, the pill search and example names beside a panel
    of contour art with the Atlas Point and what the result shows; then the two

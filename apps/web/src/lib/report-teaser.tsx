@@ -4,6 +4,7 @@ import {
   SAMPLE_REPORT_PATHS,
   reportInsidePath,
   reportInsideQueryKey,
+  reportFree,
   reportNotifyHref,
   reportPrice,
 } from "./report-teaser-text.js";
@@ -17,6 +18,10 @@ import {
  *
  * They state no fact about any name: what the report holds, never what it
  * says. The sample page reads the claims.
+ *
+ * While the report is free for signed-in readers (TASK-173, D-052), the price
+ * is struck with "dziś 0 zł" beside it, and "Wkrótce" and the waiting-list
+ * email give way to that line; the reader's PDF is on the sample page.
  */
 
 function Check() {
@@ -67,9 +72,21 @@ export function SampleReportLink({ lang }: { lang: Lang }) {
   );
 }
 
-/** "Wkrótce." and the waiting-list email. */
-function Soon({ surname, lang }: { surname: string; lang: Lang }) {
+/** The price, struck with "dziś 0 zł" beside it while the report is free (D-052). */
+export function ReportPrice({ lang, free }: { lang: Lang; free: boolean }) {
+  if (!free) return <>{reportPrice(lang)}</>;
+  return (
+    <>
+      <s>{reportPrice(lang)}</s>{" "}
+      <span className="rt-free">{REPORT_TEASER_TEXT[lang].freeToday}</span>
+    </>
+  );
+}
+
+/** "Wkrótce." and the waiting-list email; while the report is free, that it is free. */
+function Soon({ surname, lang, free }: { surname: string; lang: Lang; free: boolean }) {
   const t = REPORT_TEASER_TEXT[lang];
+  if (free) return <p className="rt-soon">{t.freeNow}</p>;
   return (
     <p className="rt-soon">
       {t.soon}{" "}
@@ -85,11 +102,14 @@ export function DeckReportTeaser({
   surname,
   path,
   lang,
+  free = reportFree(),
 }: {
   surname: string;
   /** The surname page's canonical path. */
   path: string;
   lang: Lang;
+  /** Whether the report is free for signed-in readers (D-052). */
+  free?: boolean;
 }) {
   const t = REPORT_TEASER_TEXT[lang];
   return (
@@ -111,10 +131,12 @@ export function DeckReportTeaser({
         <a className="rt-sample" href={reportInsidePath(path, lang)}>
           {t.sample} <span aria-hidden="true">→</span>
         </a>
-        <span className="rt-price">{reportPrice(lang)}</span>
+        <span className="rt-price">
+          <ReportPrice lang={lang} free={free} />
+        </span>
       </div>
       <SampleReportLink lang={lang} />
-      <Soon surname={surname} lang={lang} />
+      <Soon surname={surname} lang={lang} free={free} />
     </section>
   );
 }
@@ -124,10 +146,13 @@ export function StudioReportTeaser({
   surname,
   path,
   lang,
+  free = reportFree(),
 }: {
   surname: string;
   path: string;
   lang: Lang;
+  /** Whether the report is free for signed-in readers (D-052). */
+  free?: boolean;
 }) {
   const t = REPORT_TEASER_TEXT[lang];
   const inside = reportInsidePath(path, lang);
@@ -151,7 +176,9 @@ export function StudioReportTeaser({
     >
       <p className="rt-eyebrow rt-split">
         <span>{t.eyebrow}</span>
-        <span>{reportPrice(lang)}</span>
+        <span>
+          <ReportPrice lang={lang} free={free} />
+        </span>
       </p>
       <h2 id="rt-studio-heading" className="rt-heading">
         {t.studioHeading}
@@ -195,7 +222,7 @@ export function StudioReportTeaser({
         {t.studioSample} <span aria-hidden="true">→</span>
       </a>
       <SampleReportLink lang={lang} />
-      <Soon surname={surname} lang={lang} />
+      <Soon surname={surname} lang={lang} free={free} />
     </section>
   );
 }

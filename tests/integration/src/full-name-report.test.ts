@@ -19,6 +19,7 @@ import {
 import {
   buildFullNameReport,
   buildReport,
+  composeReaderReport,
   deriveAllBirthNames,
   deriveAllGivenNameMeanings,
   deriveCurrentPopulation,
@@ -444,5 +445,55 @@ describe("the full-name report (TASK-124)", () => {
     // 2000 has no stored list: no figure, never 0.
     expect(boys?.history?.[0]).toMatchObject({ birth_year: 2000, list: null, count: null });
     expect(boys?.trend).toMatchObject({ latest_year: 2025, earlier_year: 2020 });
+  });
+
+  it("composes a signed-in reader's copy on the FREE surface and writes nothing (TASK-173)", async () => {
+    const counts = async () => [
+      await n(sql`SELECT count(*)::text AS n FROM reports`),
+      await n(sql`SELECT count(*)::text AS n FROM report_versions`),
+      await n(sql`SELECT count(*)::text AS n FROM report_sections`),
+      await n(sql`SELECT count(*)::text AS n FROM report_claim_references`),
+    ];
+    const before = await counts();
+    const now = new Date("2026-10-07T12:34:56.789Z");
+    const composed = await composeReaderReport(db(), { givenName: "jan", surname: "Nowak" }, now);
+    if (composed.kind !== "COMPOSED") throw new Error(composed.kind);
+    expect(await counts()).toEqual(before);
+
+    const v = composed.version;
+    expect(v).toMatchObject({
+      report_version_id: "",
+      report_type: "FULL_NAME",
+      version_number: 0,
+      report_schema_version: "full_name_report@2",
+      generated_at: "2026-10-07T12:34:56Z",
+    });
+    expect(v.payload).toMatchObject({ surface: "FREE", entitlement_kind: "FREE_SIGNED_IN" });
+    expect(v.sections.map((s) => s.section_type)).toEqual([...FULL_NAME_SECTION_TYPES]);
+    expect(v.sections.map((s) => s.sequence_number)).toEqual(
+      FULL_NAME_SECTION_TYPES.map((_, i) => i + 1),
+    );
+
+    // The first name's chapter says what the frozen version says, read on the FREE surface.
+    const built = await buildFullNameReport(db(), { givenName: "Jan", surname: "Nowak" });
+    if (built.kind !== "BUILT") throw new Error(built.kind);
+    expect(v.sections[0]?.body_payload).toEqual(
+      section(built.sections, "GIVEN_NAME")?.body_payload,
+    );
+    expect(v.sections[0]?.claims).toEqual(section(built.sections, "GIVEN_NAME")?.claims);
+    const facts = parseGivenNameFacts((v.payload as Record<string, unknown>)["given_name"]);
+    expect(facts?.births?.sexes.find((s) => s.sex === "MALE")?.history?.length).toBeGreaterThan(2);
+  });
+
+  it("composes nothing for an unknown name, a form held for review, or an unknown surname (TASK-173)", async () => {
+    expect(
+      (await composeReaderReport(db(), { givenName: "BRAK DANYCH", surname: "NOWAK" })).kind,
+    ).toBe("GIVEN_NAME_NOT_FOUND");
+    expect((await composeReaderReport(db(), { givenName: "MA.", surname: "NOWAK" })).kind).toBe(
+      "GIVEN_NAME_UNREVIEWED",
+    );
+    expect(
+      (await composeReaderReport(db(), { givenName: "JAN", surname: "ZZZQXWYNOTASURNAME" })).kind,
+    ).toBe("NOT_RESOLVED");
   });
 });
