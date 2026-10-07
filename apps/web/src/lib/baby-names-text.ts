@@ -127,6 +127,9 @@ export interface BabyNamesText {
   readonly shareEntry: string;
   /** "Karta z tymi liczbami, do wysłania bliskim." */
   readonly shareEntryNote: string;
+  // --- TASK-158: the way to the comparison, in the paid view. ---
+  /** "Porównaj z innym imieniem": the link to the comparison with this name as the first. */
+  readonly compareEntry: string;
 }
 
 export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
@@ -183,7 +186,8 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     registerAsOf: (date) => `Stan na ${date}`,
     registerNone: "Nie mamy liczby z listy rejestru PESEL dla tego imienia.",
     listLink: "Cała lista imion",
-    lockedListNote: "Pełna lista imion każdego roku, z kierunkiem, jest w tym samym pakiecie.",
+    lockedListNote:
+      "Pełna lista imion każdego roku, z kierunkiem, i porównanie dwóch imion są w tym samym pakiecie.",
     tabsLabel: "Płeć",
     eyebrowGot: (year) => `W ${year} to imię dostało`,
     noun: { MALE: "chłopców", FEMALE: "dziewczynek" },
@@ -232,6 +236,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
       `Nie ma go na żadnej liście ${sex === "MALE" ? "chłopców" : "dziewczynek"} od ${first} r.`,
     shareEntry: "Udostępnij",
     shareEntryNote: "Karta z tymi liczbami, do wysłania bliskim.",
+    compareEntry: "Porównaj z innym imieniem",
   },
   en: {
     title: "Baby names",
@@ -287,7 +292,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     registerNone: "We have no figure from the PESEL register's list for this name.",
     listLink: "The whole list",
     lockedListNote:
-      "The full list of names for every year, with direction, is in the same package.",
+      "The full list of names for every year, with direction, and a comparison of two names are in the same package.",
     tabsLabel: "Sex",
     eyebrowGot: (year) => `In ${year} this name went to`,
     noun: { MALE: "boys", FEMALE: "girls" },
@@ -335,5 +340,6 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
       `It is on no ${sex === "MALE" ? "boys'" : "girls'"} list since ${first}.`,
     shareEntry: "Share",
     shareEntryNote: "A card with these figures, to send to family.",
+    compareEntry: "Compare with another name",
   },
 };
