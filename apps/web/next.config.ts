@@ -80,6 +80,7 @@ const nextConfig: NextConfig = {
     "/en/blog/**": ["./src/content/blog/*.md"],
     "/sitemap.xml": ["./src/content/blog/*.md"],
     "/sitemap-blog.xml": ["./src/content/blog/*.md"],
+    "/llms.txt": ["./src/content/blog/*.md"],
   },
   /** Keep shared links, including their surname path and query, on one public domain. */
   async redirects() {

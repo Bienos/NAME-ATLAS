@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { indexingEnabled, siteOrigin } from "../../lib/seo.js";
-import { GET } from "./route.js";
+import { GET, aiSearchAgents, aiTrainingAgents } from "./route.js";
 
 vi.mock("../../lib/seo.js", () => ({
   indexingEnabled: vi.fn(),
@@ -39,5 +39,47 @@ describe("preview crawlers and search indexing", () => {
     vi.mocked(indexingEnabled).mockReturnValue(true);
     vi.mocked(siteOrigin).mockReturnValueOnce(null);
     expect(await GET().text()).not.toContain("Sitemap:");
+  });
+});
+
+describe("AI crawlers (TASK-175)", () => {
+  /** The group that names `agent`, as the lines of one blank-line-separated block. */
+  function groupOf(body: string, agent: string): string | undefined {
+    return body.split(/\n\n/).find((group) => group.split("\n").includes(`User-agent: ${agent}`));
+  }
+
+  it.each([true, false])("refuses every training crawler everything (indexing %s)", async (on) => {
+    vi.mocked(indexingEnabled).mockReturnValue(on);
+    const body = await GET().text();
+    for (const agent of aiTrainingAgents) {
+      const group = groupOf(body, agent);
+      expect(group, agent).toBeDefined();
+      expect(group).toContain("Disallow: /\n");
+      expect(group).not.toContain("Allow:");
+    }
+  });
+
+  it("gives the answer engines the search engines' rules when indexing is enabled", async () => {
+    vi.mocked(indexingEnabled).mockReturnValue(true);
+    const body = await GET().text();
+    for (const agent of aiSearchAgents) {
+      const group = groupOf(body, agent);
+      expect(group, agent).toBeDefined();
+      expect(group).toContain("Allow: /pl/nazwisko/");
+      expect(group).toContain("Disallow: /api/");
+      expect(group).toContain("Disallow: /?");
+      expect(group).not.toMatch(/^Disallow: \/$/mu);
+    }
+  });
+
+  it("leaves the answer engines to the closed `*` group when indexing is disabled", async () => {
+    vi.mocked(indexingEnabled).mockReturnValue(false);
+    const body = await GET().text();
+    for (const agent of aiSearchAgents) expect(groupOf(body, agent), agent).toBeUndefined();
+    expect(body).toContain("User-agent: *\nDisallow: /");
+  });
+
+  it("names no crawler as both", () => {
+    expect(aiSearchAgents.filter((agent) => aiTrainingAgents.includes(agent))).toEqual([]);
   });
 });
