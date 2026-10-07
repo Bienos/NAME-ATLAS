@@ -47,6 +47,7 @@ import { ShareButton } from "./share-button.js";
 import { comparePagePath, offerPath } from "./site-links.js";
 import { inDeckOrder, oneInOf, rankOf } from "./deck-order.js";
 import { SHARE_CARDS, shareCardFor, shareFacts, studioPath } from "./share-facts.js";
+import { DeckReportTeaser } from "./report-teaser.js";
 import type { ShareCardKey } from "./share-facts.js";
 
 export interface DeckCard {
@@ -802,6 +803,8 @@ function end(
             ))}
           </dl>
         ) : null}
+        {/* The full-name report, announced where the free cards end (TASK-163). */}
+        <DeckReportTeaser surname={surname} path={links.path} lang={lang} />
         {studio === null ? (
           <div className="dk-actions">
             {links.shareUrl === null ? null : (

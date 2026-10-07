@@ -12,7 +12,8 @@ vi.mock("./share-facts.js", async (importOriginal) => ({
 }));
 vi.mock("./share-card.js", () => ({
   renderShareCard,
-  isCardLayer: (value: string) => ["base", "reveal", "intro", "intro-name"].includes(value),
+  isCardLayer: (value: string) =>
+    ["base", "reveal", "intro", "intro-name", "outro"].includes(value),
 }));
 
 const { shareCardResponse, sharePreviewResponse } = await import("./share-route.js");
@@ -162,6 +163,35 @@ describe("the video's layers (TASK-108)", () => {
     const response = await shareCardResponse("kowalski", "summary", "pl", "atlas.test", "off", "x");
     expect(response.status).toBe(404);
     expect(answerSlug).not.toHaveBeenCalled();
+  });
+
+  it("draws the full report's closing plate with its words and the surname (TASK-163)", async () => {
+    shareFacts.mockReturnValueOnce({ card: "summary", surname: "KOWALSKI" });
+    const response = await shareCardResponse(
+      "kowalski",
+      "summary",
+      "pl",
+      "atlas.test",
+      "open",
+      "outro",
+    );
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(renderShareCard.mock.calls[0]?.[4]).toEqual({
+      layer: "outro",
+      hook: UI.pl.videoHook,
+      outro: {
+        eyebrow: "Pełny raport · PDF",
+        heading: "Imię i nazwisko w 10 rozdziałach",
+        line: "KOWALSKI i Twoje imię, z przypisem przy każdym fakcie.",
+        soon: "Pełny raport PDF · wkrótce",
+      },
+    });
+    // Behind the same gate as every layer.
+    expect(
+      (await shareCardResponse("kowalski", "summary", "pl", "atlas.test", "sign-in", "outro"))
+        .status,
+    ).toBe(401);
   });
 
   it("draws the plain card without a layer", async () => {

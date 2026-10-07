@@ -591,11 +591,18 @@ export async function renderShareCard(
   host: string | null,
   headers: Record<string, string> = {},
   preview: string | null = null,
-  layer: { readonly layer: CardLayer; readonly hook: string } | null = null,
+  layer: {
+    readonly layer: CardLayer;
+    readonly hook: string;
+    readonly outro?: OutroText;
+  } | null = null,
 ): Promise<ImageResponse> {
   const brandFonts = await loadFonts();
   const fonts = brandFonts.length > 0 ? { fonts: brandFonts } : {};
-  const face = cardFace(facts, host, layer?.layer ?? null, layer?.hook ?? null);
+  const face =
+    layer?.layer === "outro" && layer.outro !== undefined
+      ? outroFace(host, layer.outro)
+      : cardFace(facts, host, layer?.layer ?? null, layer?.hook ?? null);
   if (preview === null) return new ImageResponse(face, { ...SHARE_SIZE, headers, ...fonts });
   const scale = PREVIEW_SIZE.width / SHARE_SIZE.width;
   return new ImageResponse(
@@ -654,9 +661,10 @@ export async function renderShareCard(
  * figures in. `base` is the card with its figures and visual hidden, `reveal`
  * only those, on a transparent ground, in the same places. `intro` is the
  * clip's opening plate without the surname, `intro-name` the surname alone.
- * Hiding uses opacity, so every layer keeps the full card's layout.
+ * Hiding uses opacity, so every layer keeps the full card's layout. `outro`
+ * is the clip's closing plate announcing the full report (TASK-163).
  */
-export const CARD_LAYERS = ["base", "reveal", "intro", "intro-name"] as const;
+export const CARD_LAYERS = ["base", "reveal", "intro", "intro-name", "outro"] as const;
 export type CardLayer = (typeof CARD_LAYERS)[number];
 
 export function isCardLayer(value: string): value is CardLayer {
@@ -850,6 +858,109 @@ function ground(paper: boolean) {
       ? `linear-gradient(170deg, ${PAPER.ground} 0%, ${PAPER.deep} 100%)`
       : `radial-gradient(90% 38% at 50% 104%, ${TOKENS["dusk-sky-ember"]} 0%, ${TOKENS["dusk-sky-wine"]} 34%, rgba(31,7,31,0) 80%), linear-gradient(180deg, ${TOKENS["dusk-surface-sunk"]} 0%, ${DUSK.ground} 55%, ${DUSK.raised} 100%)`,
   };
+}
+
+/** The closing plate's words (TASK-163), from `REPORT_TEASER_TEXT`. */
+export interface OutroText {
+  readonly eyebrow: string;
+  readonly heading: string;
+  readonly line: string;
+  readonly soon: string;
+}
+
+/**
+ * The clip's closing plate (TASK-163): the full report announced, with the
+ * surname in its line and "wkrótce". It states no fact, as the opening does not.
+ */
+function outroFace(host: string | null, text: OutroText): ReactElement {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        padding: `96px ${String(PAD_X)}px 80px`,
+        color: DUSK.ink,
+        fontFamily: TYPE_FAMILIES.ui,
+        ...ground(false),
+      }}
+    >
+      <div
+        style={{
+          fontFamily: TYPE_FAMILIES.data,
+          fontSize: 32,
+          letterSpacing: 6,
+          textTransform: "uppercase",
+          color: DUSK.light,
+        }}
+      >
+        Name Atlas
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          marginTop: 64,
+          padding: "56px 56px 60px",
+          borderRadius: 36,
+          border: `3px solid ${DUSK.light}`,
+          backgroundColor: DUSK.raised,
+          boxShadow: `0 0 90px ${DUSK.wash}`,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: TYPE_FAMILIES.data,
+            fontSize: 30,
+            letterSpacing: 4,
+            textTransform: "uppercase",
+            color: DUSK.light,
+          }}
+        >
+          {text.eyebrow}
+        </div>
+        <div
+          style={{
+            marginTop: 36,
+            fontFamily: TYPE_FAMILIES.display,
+            fontSize: 104,
+            lineHeight: 1.02,
+            letterSpacing: -1,
+          }}
+        >
+          {text.heading}
+        </div>
+        <div style={{ marginTop: 40, fontSize: 46, lineHeight: 1.3, color: DUSK.soft }}>
+          {text.line}
+        </div>
+      </div>
+      <div
+        style={{
+          marginTop: 56,
+          fontFamily: TYPE_FAMILIES.data,
+          fontSize: 32,
+          letterSpacing: 2,
+          color: DUSK.light,
+        }}
+      >
+        {text.soon}
+      </div>
+      {host === null ? null : (
+        <div
+          style={{
+            marginTop: 20,
+            fontFamily: TYPE_FAMILIES.data,
+            fontSize: 26,
+            color: DUSK.muted,
+          }}
+        >
+          {host}
+        </div>
+      )}
+    </div>
+  );
 }
 
 /**

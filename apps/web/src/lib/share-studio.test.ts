@@ -94,6 +94,30 @@ describe("the share studio (TASK-093)", () => {
     expect(html).toContain('href="/en/surname/kowalski/share?card=rarity"');
   });
 
+  it("announces the full report under the card, whatever the gate (TASK-163)", () => {
+    for (const gate of ["off", "open", "sign-in"] as const) {
+      const html = unescape(studio(gate));
+      const block = /<section class="rt rt-studio"[\s\S]*?<\/section>/u.exec(html)?.[0] ?? "";
+      expect(block, gate).toContain(
+        "Ten PDF ma jedną stronę. Pełny raport ma dziesięć rozdziałów.",
+      );
+      expect(block, gate).toContain("28,99 zł");
+      // The table: the one-page PDF beside the report, six rows.
+      expect(block.match(/<th scope="row">/gu), gate).toHaveLength(6);
+      // A first name goes to the sample page as its query.
+      expect(block, gate).toContain('action="/pl/nazwisko/kowalski/pelny-raport"');
+      expect(block, gate).toContain('name="imie"');
+      expect(block, gate).toContain('href="/pl/nazwisko/kowalski/pelny-raport"');
+      expect(block, gate).toContain("Wkrótce.");
+      expect(block, gate).toContain('href="mailto:');
+      expect(block, gate).not.toMatch(/checkout/u);
+    }
+    const en = unescape(studio("open", "en"));
+    expect(en).toContain('action="/en/surname/kowalski/full-report"');
+    expect(en).toContain('name="name"');
+    expect(en).toContain("PLN 28.99");
+  });
+
   it("shows the summary for a missing or unknown card, and a card only if the surname has it (AC-5)", () => {
     expect(chosenCard(undefined, OFFERED)).toBe("summary");
     expect(chosenCard("horoscope", OFFERED)).toBe("summary");

@@ -154,7 +154,9 @@ export function isTreeNext(next: string | null): boolean {
  * Only a surname's page of this site is accepted, `/pl/nazwisko/{slug}` or
  * `/en/surname/{slug}`, with `?view=cards` if the deck was open, or its share
  * studio (TASK-093), `/pl/nazwisko/{slug}/udostepnij` or `/en/surname/{slug}/share`,
- * with `?card={card}` naming one of the studio's cards. The slug is
+ * with `?card={card}` naming one of the studio's cards, or the page of what
+ * the full report holds (TASK-163), `/pl/nazwisko/{slug}/pelny-raport` or
+ * `/en/surname/{slug}/full-report`, without its query. The slug is
  * one path segment as `canonicalSlug` writes it (letters percent-encoded, the
  * apostrophe and hyphen kept); an encoded slash, backslash, dot or control
  * character is not a slug, and neither is a segment of dots (`..` would leave
@@ -165,8 +167,8 @@ const NEXT_SLUG = "((?:[A-Za-z0-9_~'-]|%[0-9A-Fa-f]{2})+)";
 /** The share studio's cards (TASK-093), as `SHARE_CARDS` in `share-facts.ts` lists them. */
 const STUDIO_CARD = "(?:rarity|neighbours|where|change|other|meaning|print|summary)";
 const NEXT_PATTERN = new RegExp(
-  `^/(?:pl/nazwisko/${NEXT_SLUG}(?:\\?view=cards|/udostepnij(?:\\?card=${STUDIO_CARD})?)?` +
-    `|en/surname/${NEXT_SLUG}(?:\\?view=cards|/share(?:\\?card=${STUDIO_CARD})?)?)$`,
+  `^/(?:pl/nazwisko/${NEXT_SLUG}(?:\\?view=cards|/udostepnij(?:\\?card=${STUDIO_CARD})?|/pelny-raport)?` +
+    `|en/surname/${NEXT_SLUG}(?:\\?view=cards|/share(?:\\?card=${STUDIO_CARD})?|/full-report)?)$`,
   "u",
 );
 

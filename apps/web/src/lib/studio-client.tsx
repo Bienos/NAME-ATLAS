@@ -123,6 +123,8 @@ export interface VideoLabels {
   readonly motion: string;
   readonly up: string;
   readonly side: string;
+  /** "Na końcu: zapowiedź pełnego raportu" (TASK-163). */
+  readonly outro: string;
 }
 
 /**
@@ -149,6 +151,8 @@ export function StudioVideo({
   const [failure, setFailure] = useState<"failed" | "sign-in" | null>(null);
   const [length, setLength] = useState<VideoLength>(DEFAULT_VIDEO.length);
   const [motion, setMotion] = useState<VideoMotion>(DEFAULT_VIDEO.motion);
+  // The report's closing plate is on unless the reader takes it off (TASK-163).
+  const [outro, setOutro] = useState(true);
   const cancelled = useRef(false);
 
   useEffect(() => {
@@ -171,6 +175,7 @@ export function StudioVideo({
       const video = await makeCardVideo(images, setProgress, () => cancelled.current, {
         length,
         motion,
+        outro,
       });
       await shareOrSaveFile(video, fileName, surname);
     } catch (cause) {
@@ -216,6 +221,16 @@ export function StudioVideo({
         ["up", labels.up],
         ["side", labels.side],
       ])}
+      <label className="studio-outro">
+        <input
+          type="checkbox"
+          name="video-outro"
+          checked={outro}
+          disabled={progress !== null}
+          onChange={() => setOutro((on) => !on)}
+        />
+        <span>{labels.outro}</span>
+      </label>
       {progress === null ? (
         <button type="button" onClick={() => void make()}>
           {labels.make}
