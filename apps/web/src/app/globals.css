@@ -4516,11 +4516,108 @@ body.dusk {
   position: relative;
   margin-inline: calc(var(--gutter) * -1);
   padding: var(--space-9) var(--gutter) var(--space-8);
-  background: var(--dusk-surface);
   /* The ground runs to the window's edges however wide it is, without a
-     horizontal scrollbar: a shadow spread past the box, clipped to its rows. */
-  box-shadow: 0 0 0 100vmax var(--dusk-surface);
+     horizontal scrollbar: a border image drawn past the box, clipped to its
+     rows. It starts clear and closes over the first screen's height, so the
+     horizon dissolves into it rather than ending at a line. */
+  border-image: linear-gradient(
+      180deg,
+      transparent 0,
+      color-mix(in srgb, var(--dusk-surface) 70%, transparent) min(18vh, 10rem),
+      var(--dusk-surface) min(38vh, 22rem)
+    )
+    fill 0 / /0 100vmax;
   clip-path: inset(0 -100vmax);
+}
+
+/* --- the hero's horizon into the ground ---------------------------------
+
+   The horizon does not end at a line. The photograph's last rows fade out,
+   past the hero's edge (the world is clipped across, never down), and its
+   lights carry on below it as a thin scatter of points in a warm haze, under
+   a ground that closes slowly (`.landing-atlas`). Scrolling, the horizon sinks
+   and dims behind the page while the points rise, so leaving the hero reads
+   as the camera lifting off the land. The motion is scroll-driven and exists
+   only where the browser can do that and the reader has not asked for less;
+   otherwise the fade is simply still. Nothing here is a figure. */
+
+.site-hero .dusk-world {
+  overflow: clip visible;
+}
+
+.dusk-world-hero {
+  background: linear-gradient(180deg, var(--dusk-surface-sunk) 70%, var(--dusk-surface));
+}
+
+.dusk-world-hero .dusk-horizon img {
+  mask-image: linear-gradient(180deg, #000 0, #000 91%, rgb(0 0 0 / 0.55) 96%, transparent);
+}
+
+.dusk-world-hero .dusk-horizon::before {
+  content: "";
+  position: absolute;
+  top: 97%;
+  left: 0;
+  right: 0;
+  height: min(46vh, 28rem);
+  pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 400' preserveAspectRatio='xMidYMin slice'%3E%3Cg fill='%23fcbf5b'%3E%3Ccircle cx='96' cy='38' r='1.4' opacity='.7'/%3E%3Ccircle cx='212' cy='92' r='1' opacity='.45'/%3E%3Ccircle cx='331' cy='22' r='1.2' opacity='.6'/%3E%3Ccircle cx='418' cy='148' r='.9' opacity='.35'/%3E%3Ccircle cx='507' cy='61' r='1.6' opacity='.75'/%3E%3Ccircle cx='589' cy='196' r='1' opacity='.3'/%3E%3Ccircle cx='648' cy='30' r='1.1' opacity='.55'/%3E%3Ccircle cx='731' cy='112' r='1.3' opacity='.5'/%3E%3Ccircle cx='802' cy='48' r='.9' opacity='.5'/%3E%3Ccircle cx='871' cy='170' r='1.2' opacity='.35'/%3E%3Ccircle cx='944' cy='18' r='1.5' opacity='.7'/%3E%3Ccircle cx='1013' cy='86' r='1' opacity='.45'/%3E%3Ccircle cx='1102' cy='232' r='.9' opacity='.25'/%3E%3Ccircle cx='1166' cy='54' r='1.3' opacity='.6'/%3E%3Ccircle cx='1251' cy='130' r='1' opacity='.4'/%3E%3Ccircle cx='1338' cy='34' r='1.2' opacity='.6'/%3E%3Ccircle cx='1417' cy='98' r='1.4' opacity='.5'/%3E%3Ccircle cx='1503' cy='26' r='1' opacity='.55'/%3E%3Ccircle cx='158' cy='186' r='.9' opacity='.3'/%3E%3Ccircle cx='277' cy='254' r='1' opacity='.22'/%3E%3Ccircle cx='461' cy='286' r='.8' opacity='.2'/%3E%3Ccircle cx='694' cy='262' r='1' opacity='.22'/%3E%3Ccircle cx='962' cy='300' r='.8' opacity='.18'/%3E%3Ccircle cx='1212' cy='278' r='.9' opacity='.2'/%3E%3Ccircle cx='1466' cy='214' r='1' opacity='.28'/%3E%3C/g%3E%3Cg fill='%23fff7d1'%3E%3Ccircle cx='552' cy='40' r='1.8' opacity='.85'/%3E%3Ccircle cx='1061' cy='34' r='1.6' opacity='.8'/%3E%3Ccircle cx='1302' cy='76' r='1.4' opacity='.6'/%3E%3C/g%3E%3C/svg%3E")
+      center top / cover no-repeat,
+    radial-gradient(
+      ellipse 60% 70% at 50% 0,
+      color-mix(in srgb, var(--dusk-amber) 9%, transparent),
+      transparent 70%
+    );
+  mask-image: linear-gradient(180deg, #000 0, rgb(0 0 0 / 0.6) 40%, transparent 100%);
+}
+
+/* Nothing of the horizon shows once the camera comes down for an answer. */
+:root[data-dusk-zoom] .dusk-world-hero .dusk-horizon::before {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    :root:not([data-dusk-zoom]) .dusk-world-hero .dusk-horizon {
+      animation: horizon-sink linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 var(--hero-height, 100vh);
+    }
+
+    :root:not([data-dusk-zoom]) .dusk-world-hero .dusk-horizon img {
+      animation: horizon-dim linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 var(--hero-height, 100vh);
+    }
+
+    :root:not([data-dusk-zoom]) .dusk-world-hero .dusk-horizon::before {
+      animation: horizon-embers linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 calc(var(--hero-height, 100vh) * 1.4);
+    }
+  }
+}
+
+/* Individual `translate`/`scale`, so the zoom's `transform` is left alone. */
+@keyframes horizon-sink {
+  to {
+    translate: 0 18%;
+    scale: 1.05;
+  }
+}
+
+@keyframes horizon-dim {
+  to {
+    opacity: 0.36;
+  }
+}
+
+@keyframes horizon-embers {
+  to {
+    translate: 0 -34%;
+    opacity: 0.35;
+  }
 }
 
 /* The atlas's plates, where the header's "Atlas" lands (TASK-065). */
