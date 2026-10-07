@@ -8,6 +8,20 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-053 — RESOLVED (2026-10-07): the full-name comparison free for every signed-in reader until the owner ends it
+
+**Status:** RESOLVED by the owner in a Claude Code session.
+**Owner:** project owner.
+**Raised by:** the owner, 2026-10-07, on `/pl/porownaj/imie-i-nazwisko` showing no figures after "Porównaj": "włącz te statystyki jak kliknę porównaj", then "dawaj włącz to dla każdego teraz".
+
+**Read here as:**
+- **Who:** every signed-in reader, as D-051 and D-052. A signed-out reader is still asked to sign in: the page reads nothing without a session (TASK-155).
+- **The surface:** while free, no purchase is looked up and the first names' claims are read on the FREE surface (ADR-0001), as D-052's report is. The surnames were already read as the free comparison reads them.
+- **The off switch:** `FULL_NAME_COMPARE_FREE=0` ends it, and the 15,99 zł product (D-049) is needed again; any other value, or none, keeps it free.
+- **The offer page:** unchanged; it still lists the comparison at 15,99 zł with "Wkrótce". Changing its wording was not asked.
+
+---
+
 ## D-052 — RESOLVED (2026-10-07): the full-name report as a PDF, free for every signed-in reader until the owner ends it
 
 **Status:** RESOLVED by the owner in a Claude Code session; built by TASK-176.
