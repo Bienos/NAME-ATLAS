@@ -14602,3 +14602,448 @@ a.ri-notify {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* --- the baby-names search in Brand System v1 (TASK-171, design A "Punkt na mapie") ---
+   Before a search: the title, the pill search and example names beside a panel
+   of contour art with the Atlas Point and what the result shows; then the two
+   list cards, girls and boys apart. After a search the title and the pill fold
+   into one bar above the answer, which is unchanged. No animation. */
+
+.baby-names.atlas-v1 .bn-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-search-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--space-xl);
+  align-items: start;
+}
+
+.baby-names.atlas-v1 .bn-search-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+  padding-top: var(--space-lg);
+}
+
+.baby-names.atlas-v1 .bn-search-intro .page-title {
+  margin: 0;
+  max-width: 9ch;
+  font-size: var(--type-display-xl);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+  font-optical-sizing: auto;
+}
+
+.baby-names.atlas-v1 .bn-search-intro .page-lede {
+  max-width: 32ch;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-search-form {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 37.5rem;
+  margin-top: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bn-search-form label {
+  font: 600 0.9375rem / 1.3 var(--font-ui, system-ui, sans-serif);
+  letter-spacing: 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-search-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 0 8px 0 22px;
+  background: var(--color-text-primary);
+  border-radius: var(--radius-pill);
+  box-shadow: 0 20px 60px -24px color-mix(in srgb, var(--color-signal-atlas) 70%, transparent);
+}
+
+.baby-names.atlas-v1 .bn-search-pill:focus-within {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+
+.baby-names.atlas-v1 .bn-search-icon {
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--atlas-ink-950);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  opacity: 0.7;
+}
+
+.baby-names.atlas-v1 .bn-search-pill input {
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  min-height: 0;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  font: 400 1.25rem / 1 var(--font-ui, system-ui, sans-serif);
+  color: var(--color-text-inverse);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.baby-names.atlas-v1 .bn-search-pill input:focus-visible {
+  outline: none;
+}
+
+.baby-names.atlas-v1 .bn-search-pill input::placeholder {
+  color: var(--atlas-plum-600);
+}
+
+.baby-names.atlas-v1 .bn-search-pill button {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: var(--radius-pill);
+}
+
+.baby-names.atlas-v1 .bn-examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.baby-names.atlas-v1 .bn-examples-label {
+  margin-right: 6px;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 a.bn-example {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 a.bn-example:hover {
+  border-color: var(--color-border-default);
+}
+
+/* The panel: contour art with the Atlas Point, then what the result shows. */
+.baby-names.atlas-v1 .bn-see {
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--color-bg-elevated), var(--color-bg-primary) 78%);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bn-see-art {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+}
+
+.baby-names.atlas-v1 .bn-see-art .contour-field {
+  inset: 18% -20% auto;
+  width: 140%;
+  height: 110%;
+}
+
+.baby-names.atlas-v1 .bn-see-point {
+  position: absolute;
+  left: 56%;
+  top: 52%;
+  display: flex;
+}
+
+.baby-names.atlas-v1 .bn-see-tag {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-bg-primary) 70%, transparent);
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-see-body {
+  padding: 4px 28px 26px;
+}
+
+.baby-names.atlas-v1 .bn-see-body h2 {
+  margin: 0;
+  font: 500 1.625rem / 1.15 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-see-body > p {
+  margin: 6px 0 14px;
+  font-size: 0.9375rem;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-see-body ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.baby-names.atlas-v1 .bn-see-body li {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  padding: 11px 0;
+  border-top: 1px solid var(--color-border-subtle);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+.baby-names.atlas-v1 .bn-see-n {
+  font: 500 0.8125rem / 1.5 var(--font-data, ui-monospace, monospace);
+  color: var(--color-accent-text);
+}
+
+/* Signed out: the same words as before, on a card, with the sign-in as a button. */
+.baby-names.atlas-v1 .bn-signin {
+  max-width: 35rem;
+  padding: 28px;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+}
+
+.baby-names.atlas-v1 .bn-signin p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-signin p + p {
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-signin .baby-sign-in {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: var(--radius-control);
+  background: var(--color-accent-primary);
+  color: var(--atlas-ivory-50);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 .bn-signin .baby-sign-in:hover {
+  background: var(--color-accent-hover);
+}
+
+/* The two list cards. */
+.baby-names.atlas-v1 .bn-lists {
+  margin-top: var(--space-xxl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-lists h2 {
+  margin: 0;
+  font: 500 var(--type-heading-lg) / 1.1 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-lists > p {
+  margin: 10px 0 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-lists-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.baby-names.atlas-v1 a.bn-list-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 40px;
+  min-height: 180px;
+  padding: 28px;
+  box-sizing: border-box;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.baby-names.atlas-v1 a.bn-list-card:hover {
+  border-color: var(--color-border-default);
+  background: var(--color-surface-secondary);
+}
+
+.baby-names.atlas-v1 .bn-list-card-kicker {
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-list-card-name {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  font: 500 2.25rem / 1 var(--font-display, Georgia, serif);
+}
+
+.baby-names.atlas-v1 .bn-list-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 50%;
+  font: 400 1.25rem / 1 var(--font-ui, system-ui, sans-serif);
+  color: var(--color-accent-text);
+}
+
+.baby-names.atlas-v1 .bn-lists .baby-list-link {
+  margin-top: var(--space-md);
+}
+
+.baby-names.atlas-v1 .bn-source {
+  margin-top: var(--space-xxl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* After a search: the title and the pill in one bar above the answer. */
+.baby-names.atlas-v1 .bn-search-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-search-bar-title {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.baby-names.atlas-v1 .bn-search-bar .page-title {
+  margin: 0;
+  font-size: 1.875rem;
+  line-height: 1.05;
+}
+
+.baby-names.atlas-v1 .bn-search-form-compact {
+  flex: 1 1 26rem;
+  max-width: 34rem;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-search-form-compact .bn-search-pill {
+  min-height: 52px;
+  padding-left: 18px;
+  box-shadow: none;
+}
+
+.baby-names.atlas-v1 .bn-search-form-compact .bn-search-pill input {
+  height: 48px;
+  font-size: 1.0625rem;
+}
+
+.baby-names.atlas-v1 .bn-search-form-compact .bn-search-pill button {
+  min-height: 40px;
+  padding: 0 20px;
+}
+
+.baby-names.atlas-v1 .baby-result .bn-message {
+  margin: var(--space-lg) 0 var(--space-md);
+  padding: 24px 20px;
+  background: var(--color-surface-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-panel);
+  font: 500 1.375rem / 1.3 var(--font-display, Georgia, serif);
+}
+
+@media (max-width: 760px) {
+  .baby-names.atlas-v1 .bn-search-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .baby-names.atlas-v1 .bn-search-intro .page-title {
+    font-size: 3.75rem;
+  }
+
+  .baby-names.atlas-v1 .bn-search-pill {
+    min-height: 60px;
+    padding-left: 18px;
+  }
+
+  .baby-names.atlas-v1 .bn-search-pill input {
+    font-size: 1.125rem;
+  }
+
+  .baby-names.atlas-v1 .bn-search-pill button {
+    padding: 0 20px;
+  }
+
+  .baby-names.atlas-v1 .bn-see-art {
+    height: 190px;
+  }
+
+  .baby-names.atlas-v1 .bn-see-body {
+    padding: 4px 20px 20px;
+  }
+
+  .baby-names.atlas-v1 .bn-lists-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .baby-names.atlas-v1 a.bn-list-card {
+    flex-direction: row;
+    align-items: center;
+    min-height: 76px;
+    padding: 0 16px 0 20px;
+  }
+
+  .baby-names.atlas-v1 .bn-list-card-kicker {
+    display: none;
+  }
+
+  .baby-names.atlas-v1 .bn-list-card-name {
+    flex: 1;
+    align-items: center;
+    font-size: 1.625rem;
+  }
+
+  .baby-names.atlas-v1 .bn-search-bar .page-title {
+    font-size: 1.75rem;
+  }
+}

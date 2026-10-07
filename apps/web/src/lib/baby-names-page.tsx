@@ -52,6 +52,7 @@ import { BABY_NAMES_TEXT } from "./baby-names-text.js";
 import { COUPLE_NAMES_PATHS, coupleNamesEnabled } from "./couple-names-config.js";
 import { db } from "./db.js";
 import { ConfidenceBadge, Tabs } from "../design-system/components/index.js";
+import { AtlasPoint, ContourField } from "../design-system/graphics/index.js";
 import { formatDate, formatDecimal, formatInteger, formatPercent } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ORIGINS } from "./given-name-meaning-view.js";
@@ -1333,10 +1334,151 @@ function BabyFreeWindow({ lang, children }: { lang: Lang; children: ReactNode })
   );
 }
 
+/** The example names under the search (TASK-171): links that search, nothing more. */
+const BABY_NAMES_EXAMPLES = ["Zofia", "Antoni", "Hanna", "Jan"] as const;
+
+function SearchForm({ lang, typed, compact }: { lang: Lang; typed: string; compact: boolean }) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <form
+      className={`compare-form baby-form bn-search-form${compact ? " bn-search-form-compact" : ""}`}
+      action={BABY_NAMES_PATHS[lang]}
+      method="get"
+    >
+      <label htmlFor="baby-name" className={compact ? "visually-hidden" : undefined}>
+        {t.label}
+      </label>
+      <div className="bn-search-pill">
+        <svg
+          className="bn-search-icon"
+          viewBox="0 0 24 24"
+          width="20"
+          height="20"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="11" cy="11" r="7.5" />
+          <path d="m20.5 20.5-4.2-4.2" />
+        </svg>
+        <input
+          id="baby-name"
+          name={BABY_NAMES_FIELD[lang]}
+          type="text"
+          defaultValue={typed.slice(0, 80)}
+          placeholder={t.placeholder}
+          autoComplete="off"
+          spellCheck={false}
+          autoCapitalize="words"
+        />
+        <button type="submit">{t.submit}</button>
+      </div>
+    </form>
+  );
+}
+
+function Examples({ lang }: { lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <div className="bn-examples">
+      <span className="bn-examples-label">{t.examplesLabel}</span>
+      {BABY_NAMES_EXAMPLES.map((name) => (
+        <a
+          key={name}
+          className="bn-example"
+          href={`${BABY_NAMES_PATHS[lang]}?${BABY_NAMES_FIELD[lang]}=${encodeURIComponent(name)}`}
+        >
+          {name}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function ListLinks({ lang }: { lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <p className="baby-list-link">
+      <a href={BABY_NAMES_LIST_PATHS[lang]}>{t.listLink}</a>
+      {coupleNamesEnabled() ? (
+        <>
+          {" · "}
+          <a className="baby-couple-link" href={COUPLE_NAMES_PATHS[lang]}>
+            {t.coupleLink}
+          </a>
+        </>
+      ) : null}
+    </p>
+  );
+}
+
+/** The panel beside the search: contour art, the Atlas Point and what the result shows. */
+function SeePanel({ lang, signedOut }: { lang: Lang; signedOut: boolean }) {
+  const t = BABY_NAMES_TEXT[lang];
+  return (
+    <aside className="bn-see" aria-labelledby="bn-see-heading">
+      <div className="bn-see-art" aria-hidden="true">
+        <ContourField seed={19} density={9} opacity={0.7} focusPoint={{ x: 58, y: 46 }} />
+        <span className="bn-see-point">
+          <AtlasPoint size={12} glow />
+        </span>
+        <span className="bn-see-tag">{t.sourceTag}</span>
+      </div>
+      <div className="bn-see-body">
+        <h2 id="bn-see-heading">{signedOut ? t.seeHeadingSignedOut : t.seeHeading}</h2>
+        <p>{t.seeApart}</p>
+        <ol>
+          {t.seeItems.map((item, index) => (
+            <li key={item}>
+              <span className="bn-see-n">{String(index + 1).padStart(2, "0")}</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </aside>
+  );
+}
+
+/** The two list cards, girls and boys apart, each opening the list on that sex. */
+function ListCards({ lang }: { lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  const cards = [
+    ["girls", t.sex.FEMALE],
+    ["boys", t.sex.MALE],
+  ] as const;
+  return (
+    <section className="bn-lists" aria-labelledby="bn-lists-heading">
+      <h2 id="bn-lists-heading">{t.listsHeading}</h2>
+      <p>{t.listsBody}</p>
+      <div className="bn-lists-cards">
+        {cards.map(([param, label]) => (
+          <a
+            key={param}
+            className="bn-list-card"
+            href={`${BABY_NAMES_LIST_PATHS[lang]}?sex=${param}`}
+          >
+            <span className="bn-list-card-kicker">{t.listsKicker}</span>
+            <span className="bn-list-card-name">
+              {label}
+              <span className="bn-list-card-arrow" aria-hidden="true">
+                →
+              </span>
+            </span>
+          </a>
+        ))}
+      </div>
+      <ListLinks lang={lang} />
+    </section>
+  );
+}
+
 export function BabyNamesView({ data }: { data: BabyNamesData }) {
   const { lang } = data;
   const t = BABY_NAMES_TEXT[lang];
   const other: Lang = lang === "pl" ? "en" : "pl";
+  // Before a search (and signed out) the page opens on the search beside the
+  // panel; once a name is asked the search folds into a bar above the answer.
+  const compact = data.kind === "signed-in" && data.result.kind !== "NONE";
   return (
     <SiteShell
       lang={lang}
@@ -1345,49 +1487,29 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
       current="babyNames"
       mainClassName="baby-names atlas-v1"
     >
-      <h1 className="page-title">{t.title}</h1>
-      <p className="page-lede">{t.lede}</p>
-      <p className="note">{t.source}</p>
-      {data.kind === "signed-out" ? (
+      {data.kind === "signed-in" && compact ? (
         <>
-          <p>{t.signedOut}</p>
-          <p>
-            <a className="baby-sign-in" href={data.signInHref}>
-              {t.signIn}
-            </a>
-          </p>
-        </>
-      ) : (
-        <>
-          <form className="compare-form baby-form" action={BABY_NAMES_PATHS[lang]} method="get">
-            <label htmlFor="baby-name">{t.label}</label>
-            <input
-              id="baby-name"
-              name={BABY_NAMES_FIELD[lang]}
-              type="text"
-              defaultValue={data.typed.slice(0, 80)}
-              placeholder={t.placeholder}
-              autoComplete="off"
-              spellCheck={false}
-              autoCapitalize="words"
-            />
-            <button type="submit">{t.submit}</button>
-          </form>
-          <p className="baby-list-link">
-            <a href={BABY_NAMES_LIST_PATHS[lang]}>{t.listLink}</a>
-            {coupleNamesEnabled() ? (
-              <>
-                {" · "}
-                <a className="baby-couple-link" href={COUPLE_NAMES_PATHS[lang]}>
-                  {t.coupleLink}
-                </a>
-              </>
-            ) : null}
-          </p>
+          <div className="bn-search-bar">
+            <div className="bn-search-bar-title">
+              <h1 className="page-title">{t.title}</h1>
+              <p className="bn-kicker">{t.sourceTag}</p>
+            </div>
+            <SearchForm lang={lang} typed={data.typed} compact />
+          </div>
+          <ListLinks lang={lang} />
           <div className="baby-result" aria-live="polite">
-            {data.result.kind === "INVALID" ? <p role="alert">{t.invalid}</p> : null}
-            {data.result.kind === "NOT_FOUND" ? <p>{t.notFound(data.typed)}</p> : null}
-            {data.result.kind === "HELD" ? <p>{t.held}</p> : null}
+            {data.result.kind === "INVALID" ? (
+              <p className="bn-message" role="alert">
+                {t.invalid}
+              </p>
+            ) : null}
+            {data.result.kind === "NOT_FOUND" ? (
+              <p className="bn-message">{t.notFound(data.typed)}</p>
+            ) : null}
+            {data.result.kind === "HELD" ? <p className="bn-message">{t.held}</p> : null}
+            {data.result.kind === "INVALID" || data.result.kind === "NOT_FOUND" ? (
+              <Examples lang={lang} />
+            ) : null}
             {data.result.kind === "FACTS" ? (
               <Facts
                 facts={data.result.facts}
@@ -1412,6 +1534,40 @@ export function BabyNamesView({ data }: { data: BabyNamesData }) {
               />
             ) : null}
           </div>
+          <p className="note bn-source">{t.source}</p>
+        </>
+      ) : (
+        <>
+          <section className="bn-search-hero" aria-labelledby="bn-search-title">
+            <div className="bn-search-intro">
+              <p className="bn-kicker">
+                <AtlasPoint size={8} glow />
+                {t.searchKicker}
+              </p>
+              <h1 id="bn-search-title" className="page-title">
+                {t.title}
+              </h1>
+              <p className="page-lede">{t.lede}</p>
+              {data.kind === "signed-out" ? (
+                <div className="bn-signin">
+                  <p>{t.signedOut}</p>
+                  <p>
+                    <a className="baby-sign-in" href={data.signInHref}>
+                      {t.signIn}
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <SearchForm lang={lang} typed={data.typed} compact={false} />
+                  <Examples lang={lang} />
+                </>
+              )}
+            </div>
+            <SeePanel lang={lang} signedOut={data.kind === "signed-out"} />
+          </section>
+          {data.kind === "signed-in" ? <ListCards lang={lang} /> : null}
+          <p className="note bn-source">{t.source}</p>
         </>
       )}
     </SiteShell>
