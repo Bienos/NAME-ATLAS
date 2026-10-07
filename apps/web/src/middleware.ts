@@ -9,6 +9,7 @@ import {
   FULL_NAME_COMPARE_CACHE_CONTROL,
   isFullNameComparePath,
 } from "./lib/full-name-compare-config.js";
+import { COUPLE_NAMES_CACHE_CONTROL, isCoupleNamesPath } from "./lib/couple-names-config.js";
 import { isReportPath, REPORT_CACHE_CONTROL } from "./lib/report-config.js";
 
 /**
@@ -77,6 +78,10 @@ export function middleware(request: NextRequest): NextResponse {
   // The full-name comparison is one signed-in reader's: never kept by a browser or a cache (TASK-155).
   if (isFullNameComparePath(pathname)) {
     response.headers.set("cache-control", FULL_NAME_COMPARE_CACHE_CONTROL);
+  }
+  // The couple first-names page is one signed-in reader's: never kept by a browser or a cache (TASK-156).
+  if (isCoupleNamesPath(pathname)) {
+    response.headers.set("cache-control", COUPLE_NAMES_CACHE_CONTROL);
   }
   return response;
 }

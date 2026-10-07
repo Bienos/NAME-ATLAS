@@ -1255,3 +1255,14 @@ describe("a name shows only the sexes it is on (TASK-157)", () => {
     expect(html).toContain("bn-tabs");
   });
 });
+
+describe("the link to the couple first-names page (TASK-156)", () => {
+  it("is drawn only while that page exists", async () => {
+    expect(await render("pl", {}, { userId: "u1" })).not.toContain("baby-couple-link");
+    vi.stubEnv("COUPLE_NAMES_ENABLED", "1");
+    const html = await render("pl", {}, { userId: "u1" });
+    expect(html).toContain('class="baby-couple-link" href="/pl/imiona-pary"');
+    expect(html).toContain(BABY_NAMES_TEXT.pl.coupleLink);
+    expect(await render("en", {}, { userId: "u1" })).toContain('href="/en/couple-names"');
+  });
+});

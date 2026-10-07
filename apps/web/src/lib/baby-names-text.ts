@@ -59,6 +59,8 @@ export interface BabyNamesText {
   /** The link to the whole list (TASK-146), on the page and in the locked card. */
   readonly listLink: string;
   readonly lockedListNote: string;
+  /** The link to the couple first-names page (TASK-156), only while it exists. */
+  readonly coupleLink: string;
   // --- TASK-151: the redesigned page. Every number comes in as a formatted string. ---
   /** The sex tabs' accessible name. */
   readonly tabsLabel: string;
@@ -188,6 +190,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     listLink: "Cała lista imion",
     lockedListNote:
       "Pełna lista imion każdego roku, z kierunkiem, i porównanie dwóch imion są w tym samym pakiecie.",
+    coupleLink: "Dwa imiona razem",
     tabsLabel: "Płeć",
     eyebrowGot: (year) => `W ${year} to imię dostało`,
     noun: { MALE: "chłopców", FEMALE: "dziewczynek" },
@@ -293,6 +296,7 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     listLink: "The whole list",
     lockedListNote:
       "The full list of names for every year, with direction, and a comparison of two names are in the same package.",
+    coupleLink: "Two names together",
     tabsLabel: "Sex",
     eyebrowGot: (year) => `In ${year} this name went to`,
     noun: { MALE: "boys", FEMALE: "girls" },

@@ -12484,3 +12484,78 @@ main.studio h1 {
 .consent-settings:hover {
   background: var(--hover-light);
 }
+
+/* --- the couple first-names page (TASK-156) --- */
+
+.couple-names {
+  max-width: 52rem;
+}
+
+.couple-names-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--space-3);
+  align-items: end;
+  margin-top: var(--space-5);
+}
+
+.couple-names-form label {
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.couple-names-form input {
+  width: 100%;
+}
+
+/* The two names side by side when there is room, one under the other on a phone. */
+.couple-names-sides {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+.couple-names-side,
+.couple-reading {
+  padding: var(--space-5);
+  background: var(--dusk-tile);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 20px;
+  min-width: 0;
+}
+
+.couple-names-name {
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.75rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.couple-names-side h3,
+.couple-reading h2 {
+  margin: 0 0 var(--space-2);
+}
+
+.couple-names-side .report-table {
+  overflow-wrap: anywhere;
+}
+
+.couple-names-links {
+  margin: var(--space-4) 0 0;
+  font-size: 0.9375rem;
+}
+
+.couple-reading {
+  margin-top: var(--space-7);
+}
+
+.couple-reading-text p {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.couple-reading-form {
+  margin-top: var(--space-4);
+}
