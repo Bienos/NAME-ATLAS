@@ -56,7 +56,27 @@ They were told that a struck price never charged reads as a false reduction (the
 
 ## Verification (commands run, results as returned)
 
-__CI__
+`.github/workflows/ci.yml`'s steps were run locally, in order, on `6955985`, with `main` @ `0356a33` merged in:
+- **database:** PostgreSQL 16.14;
+- **`DATABASE_URL`:** a new empty `name_atlas`.
+
+GitHub Actions starts no job in this repository.
+
+| Command | Result |
+|---|---|
+| `pnpm install --frozen-lockfile` | exit 0 |
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0 |
+| `pnpm test` | exit 0, 2,809 tests (web 1,341) |
+| `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0, no diff |
+| `pnpm test:integration` | exit 0: 549 tests |
+| `pnpm test:golden` | exit 0: 364 tests |
+| `pnpm build` | exit 0 |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 12 Playwright tests passed |
+
+The same steps had passed on `fcf449d`, before the renumbering and the merge.
+
+**What the routes ship.** The routes' traced files (`route.js.nft.json` from that build) were copied alone into an empty folder for each route. `@react-pdf/renderer`'s `renderToBuffer` was run from there, as #210 checked for the sample: an A4 page in Instrument Sans with pdfkit's default Helvetica. It rendered (4,623 bytes) for both of this task's routes.
 
 **On the real lists, locally.** The database is `gn163`, a local copy of the full 2026-01-20 lists with the four birth lists. A local account and session were inserted into it for the check and removed after. `next start` ran with accounts on.
 - **`/pl/nazwisko/nowak/pelny-raport/pdf?imie=Anna`:**
