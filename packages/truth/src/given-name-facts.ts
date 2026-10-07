@@ -108,7 +108,7 @@ export interface GivenNameFacts {
 
 /**
  * The first name's facts a full-name report freezes: the counts, the meaning
- * (TASK-147), and the name as one given to children (TASK-155).
+ * (TASK-147), and the name as one given to children (TASK-159).
  */
 export interface GivenNameReportFacts extends GivenNameFacts {
   /**
@@ -645,7 +645,9 @@ function birthTrendFrom(v: unknown): BirthTrendFigure | null | undefined {
 /** One frozen sex's figures; undefined when they are not. */
 function birthSexFrom(v: unknown): BirthSexFigures | undefined {
   const x = record(v);
-  if (x === null || !isBirthSex(x["sex"])) return undefined;
+  if (x === null || !isBirthSex(x["sex"]) || typeof x["on_any_list"] !== "boolean") {
+    return undefined;
+  }
   const latest = x["latest"] === null ? null : birthYearFrom(x["latest"]);
   const trend = birthTrendFrom(x["trend"]);
   let history: BirthYearFigures[] | null = null;
@@ -663,7 +665,7 @@ function birthSexFrom(v: unknown): BirthSexFigures | undefined {
   ) {
     return undefined;
   }
-  return { sex, latest, trend, history };
+  return { sex, on_any_list: x["on_any_list"], latest, trend, history };
 }
 
 /**

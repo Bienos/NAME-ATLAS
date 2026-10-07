@@ -455,7 +455,7 @@ describe("the first name's origin and meaning (TASK-147)", () => {
 });
 
 /**
- * TASK-155: PIOTR as a first name given to children. GENUINE counts and ranks:
+ * TASK-159: PIOTR as a first name given to children. GENUINE counts and ranks:
  * the boys' lists of 2020 and 2025 (`fixtures/pesel-given-name-births/`, the
  * full files of resources 28020 and 1159536), and their sums and cut-offs. The
  * history is shortened to three years, the citations' ids and dates and the
@@ -528,6 +528,7 @@ const BIRTHS = {
   sexes: [
     {
       sex: "MALE",
+      on_any_list: true,
       latest: BOYS_2025,
       trend: {
         claim_id: "bt-2025",
@@ -544,6 +545,7 @@ const BIRTHS = {
     },
     {
       sex: "FEMALE",
+      on_any_list: false,
       latest: girlsYear(2025),
       trend: null,
       history: [girlsYear(2020), girlsYear(2025)],
@@ -567,7 +569,7 @@ function withBirths(births: unknown = BIRTHS): StoredReportVersion {
   };
 }
 
-describe("the name given to children (TASK-155)", () => {
+describe("the name given to children (TASK-159)", () => {
   it("shows each boys' year, oldest first, a year without a list, and the trend in words", () => {
     const page = html(preview(withBirths()));
     expect(page).toContain("<h3>Imię nadawane dzieciom</h3>");

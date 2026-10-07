@@ -1,10 +1,10 @@
-# 2026-10-07 — The first name as given to children, in the full-name report (TASK-155)
+# 2026-10-07 — The first name as given to children, in the full-name report (TASK-159)
 
-**Request.** The owner was shown mockups of the paid report and asked for this step first ("tak, zrób to zadanie"); the PDF export comes after it (`tasks/155-births-in-full-name-report.md`). The authority is D-044 as ADR-0037 records it: every tier from 28,99 zł up holds the baby-names figures.
+**Request.** The owner was shown mockups of the paid report and asked for this step first ("tak, zrób to zadanie"); the PDF export comes after it (`tasks/159-births-in-full-name-report.md`). The authority is D-044 as ADR-0037 records it: every tier from 28,99 zł up holds the baby-names figures.
 
-**Where it stands.** Built on `main` @ `461f024`. No migration is added. Nothing is deployed, built on production or sold.
+**Where it stands.** Built on `main` @ `461f024`; `main` @ `2fd44be` merged in. No migration is added. Nothing is deployed, built on production or sold.
 
-**Numbering.** The open pull requests #185 and #187 both use TASK-154 and migration 0045, and `main` already has a TASK-154 (#186). This change takes TASK-155.
+**Numbering.** Built as TASK-155. The open pull request #185 then took TASK-155, and `main` gained TASK-157 (#188); #187 holds TASK-156 and #189 TASK-158. So this change is TASK-159. `main` was merged in, and with it TASK-157's `BirthSexFigures.on_any_list`, which the parser now reads.
 
 ## What changed
 
@@ -54,6 +54,15 @@
 | `pnpm test:golden` | exit 0: 4 files, 364 tests |
 | `pnpm build` | exit 0 |
 | `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
+
+**After merging `main` @ `2fd44be` and renumbering to TASK-159:**
+- `pnpm typecheck`, `lint`, `format:check` and `check:ids`: exit 0.
+- Against a new empty `name_atlas`:
+  - the web unit tests: 100 files, 1,094 tests;
+  - the truth unit tests: 37 files, 433 tests.
+- `full-name-report`, `baby-names` and `given-name-meaning` integration tests: 3 files, 21 tests.
+
+All passed. The whole sequence was not run again on the merged tree; GitHub's CI runs it on the pull request.
 
 **On real data.** The database `gn155` is a copy of the local `gn_full`. It holds the full 2026-01-20 first-name lists, NOWAK and the three meaning files.
 

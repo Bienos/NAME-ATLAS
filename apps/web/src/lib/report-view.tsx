@@ -38,7 +38,7 @@ import { SiteShell } from "./site-shell.js";
  * A full-name report (TASK-124) adds the first name's chapter before the
  * surname's: its count and rank on each list, apart, from the facts the
  * report froze, since TASK-147 its origin and meaning as each work states
- * them, and since TASK-155 how many children were given it each year. It never
+ * them, and since TASK-159 how many children were given it each year. It never
  * shows a count of people with both names.
  */
 
@@ -448,7 +448,7 @@ function citationsById(
         const c = v as CitationDto;
         if (!out.has(c.id)) out.set(c.id, c);
       } else if (k === "citations" && Array.isArray(v)) {
-        // A trend cites each list it compares (TASK-155).
+        // A trend cites each list it compares (TASK-159).
         for (const c of v as CitationDto[]) if (!out.has(c.id)) out.set(c.id, c);
       } else {
         citationsById(v, out);
@@ -723,7 +723,7 @@ function GivenName({
 }
 
 /**
- * The name as a first name given to children (TASK-155): each sex's years from
+ * The name as a first name given to children (TASK-159): each sex's years from
  * 2000, oldest first, as the report froze them. A year the name is not on the
  * list reads as below that list's cut-off, never 0; a year with no stored list
  * says so. The boys' and the girls' figures are never added together. Nothing
@@ -1044,7 +1044,7 @@ export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang:
   const sourceIds = preview.sections.find((s) => s.type === "SOURCES")?.citationIds ?? [];
   const citations = citationsById([preview.givenName, preview.response]);
   const numbers = new Map(sourceIds.map((id, i) => [id, i + 1]));
-  // The bibliography lists a publication once (TASK-155): another citation of
+  // The bibliography lists a publication once (TASK-159): another citation of
   // it, under another id, takes the number of the one listed.
   const byReference = new Map<string, number>();
   for (const [id, n] of numbers) {

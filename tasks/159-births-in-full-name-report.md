@@ -1,7 +1,7 @@
-# TASK-155 — The first name as given to children, in the full-name report
+# TASK-159 — The first name as given to children, in the full-name report
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-births-in-full-name-report.md`). Nothing is built on production or sold.
-- **Number:** 155. `main` holds TASK-154 (#186); the open pull requests #185 and #187 also use TASK-154 and migration 0045. This change adds no migration.
+- **Number:** 159. `main` holds TASK-154 (#186) and TASK-157 (#188); the open pull requests hold TASK-155 (#185), TASK-156 (#187) and TASK-158 (#189). This was built as TASK-155 until #185 took that number. This change adds no migration.
 - **Requested by:** the project owner, 2026-10-07. Shown mockups of the paid report and asked for this step first ("tak, zrób to zadanie"): add "imię u dzieci" to the report; the PDF export comes after it.
 - **Decision:** D-044 as ADR-0037 records it (amended 2026-10-06): every tier from 28,99 zł up holds the baby-names figures. The full-name report is in the 28,99 zł tier (D-043). Format: ADR-0041, amended here.
 - **Model guidance:** implementation session.

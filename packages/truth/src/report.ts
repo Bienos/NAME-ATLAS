@@ -48,7 +48,7 @@ export const REPORT_SCHEMA_VERSION = "report@0";
  * The full-name report's payload: `report@0`'s, plus the first name's facts
  * (TASK-124). `@1` adds the name's origin and meaning (TASK-147); a version
  * frozen under `@0` has none. `@2` adds the name as a first name given to
- * children, every year from 2000 (TASK-155); a version frozen earlier has none.
+ * children, every year from 2000 (TASK-159); a version frozen earlier has none.
  */
 export const FULL_NAME_REPORT_SCHEMA_VERSION = "full_name_report@2";
 
@@ -280,7 +280,7 @@ function givenNameGaps(facts: GivenNameReportFacts): Record<string, unknown>[] {
               facts.meaning.state === "RIGHTS_BLOCKED" ? "RIGHTS_BLOCKED" : "NO_ADMISSIBLE_SOURCE",
           },
         ]),
-    // TASK-155: on no list of names given to children, or not to be shown.
+    // TASK-159: on no list of names given to children, or not to be shown.
     ...(facts.births === null || facts.births.state === "READY"
       ? []
       : [{ topic: "BIRTHS", reason_code: facts.births.state }]),

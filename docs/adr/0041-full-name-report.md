@@ -20,7 +20,7 @@ D-043 made the full-name report a paid part of the 28,99 zł tier, for every lis
 5. **Who may be named.** A placeholder is not a first name. A form held for review (ADR-0032 §4) gets no report. A first name with no claims yet gets a chapter that says so.
 6. **Privacy.** The preview's address holds only the version id. The build command takes the two names as arguments and prints neither. The pair is two name entities, never a person.
 7. **Eligibility.** `eligibility@0` judges a surname report. A full-name report freezes the surname's eligibility and shows it only as "why the surname part alone would not be offered". It is not a verdict on the full-name report, whose tier D-043 set.
-8. **The name given to children (amended 2026-10-07, TASK-155).** D-044, as ADR-0037 records it, puts the baby-names figures in every tier from 28,99 zł. So `full_name_report@2` freezes them in the first-name chapter:
+8. **The name given to children (amended 2026-10-07, TASK-159).** D-044, as ADR-0037 records it, puts the baby-names figures in every tier from 28,99 zł. So `full_name_report@2` freezes them in the first-name chapter:
    - **What is frozen:** the name's `GIVEN_NAME_BIRTH_*` claims as `readBirthNameFacts` reads them on the PAID surface. That is each sex's years from 2000, with count and rank, and the trend on the latest list.
    - **How a year reads:** a year the name is not on a list reads as below that list's cut-off, never 0. Boys and girls are never added together.
    - **Claims:** the claims shown support the chapter.
@@ -40,4 +40,4 @@ D-043 made the full-name report a paid part of the 28,99 zł tier, for every lis
 - `pnpm report:build -- --surname NAME --given-name NAME` builds one. The preview at `/pl/raport/{id}` and `/en/report/{id}` shows it, still dark unless `REPORT_PREVIEW_ENABLED=1`.
 - Nothing is sold. The offer page still names the report only once it can be bought (ADR-0037 §2).
 - A meaning section for first names, and any change to the surname eligibility policy for full-name reports, need their own decisions.
-- With §8 (TASK-155), a report holds its first name's figures as given to children, frozen with the rest. A version built before the birth claims existed, or before `@2`, does not.
+- With §8 (TASK-159), a report holds its first name's figures as given to children, frozen with the rest. A version built before the birth claims existed, or before `@2`, does not.

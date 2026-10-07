@@ -187,6 +187,27 @@ describe("the baby-names reader (TASK-141)", () => {
     expect(boys.trend?.direction).toBe("FALLING");
   });
 
+  it("says per sex whether a name is on any of its lists (TASK-157)", async () => {
+    const onAny = (f: BirthNameFacts) => f.sexes.map((s) => [s.sex, s.on_any_list]);
+    expect(onAny(await facts("ZOFIA", false))).toEqual([
+      ["MALE", false],
+      ["FEMALE", true],
+    ]);
+    // IGOR: 2 982 boys and 2 girls on the 2020 lists, 1 475 boys and no girls on 2025's.
+    const igor = await facts("IGOR", false);
+    expect(onAny(igor)).toEqual([
+      ["MALE", true],
+      ["FEMALE", true],
+    ]);
+    expect(sex(igor, "MALE").latest?.count?.count).toBe(1475);
+    expect(sex(igor, "FEMALE").latest?.count).toBeNull();
+    // KASANDRA: the girls' 2020 list only.
+    expect(onAny(await facts("Kasandra", false))).toEqual([
+      ["MALE", false],
+      ["FEMALE", true],
+    ]);
+  });
+
   it("gives the share cards their inputs (TASK-152): ZOFIA's girls, JAKUB's boys, and an earlier share the claim does not carry", async () => {
     // The free cards read the FREE surface: the latest count with its "1 in N", the rank, the trend's two shares.
     const zofia = sex(await facts("Zofia", false), "FEMALE");
