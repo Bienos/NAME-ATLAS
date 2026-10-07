@@ -111,6 +111,12 @@ export interface BabyNamesText {
   /** Empty on the English page. */
   readonly translationNote: string;
   readonly assessment: string;
+  /** The label over a work's own line, quoted verbatim. */
+  readonly quotationLabel: string;
+  /** "Dzieło 1 z 2" */
+  readonly workOf: (n: number, of: number) => string;
+  /** Said under the assessment when it is CONFLICTING. */
+  readonly conflictingNote: string;
   /** "Buryan, Title (1933), s. 12" */
   readonly workLine: (author: string, title: string, year: number, locator: string) => string;
   /** "×4,8" and its wording; `more` is latest ≥ first. */
@@ -292,6 +298,10 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     translationNote:
       "Objaśnienia po angielsku przytaczamy dosłownie. Przekład na polski jest nasz (Name Atlas), dosłowny, i nie pochodzi z dzieła.",
     assessment: "Ocena",
+    quotationLabel: "W dziele",
+    workOf: (n, of) => `Dzieło ${n} z ${of}`,
+    conflictingNote:
+      "Opracowania podają co innego. Nie wybieramy za nie: pokazujemy, co mówi każde z nich.",
     workLine: (author, title, year, locator) => `${author}, ${title} (${year}), ${locator}`,
     times: (factor) => `×${factor}`,
     timesWording: (more, year) => `tyle razy ${more ? "częściej" : "rzadziej"} niż w ${year} r.`,
@@ -468,6 +478,10 @@ export const BABY_NAMES_TEXT: Readonly<Record<Lang, BabyNamesText>> = {
     translatedBy: "translated by Name Atlas",
     translationNote: "",
     assessment: "Assessment",
+    quotationLabel: "In the work",
+    workOf: (n, of) => `Work ${n} of ${of}`,
+    conflictingNote:
+      "The works say different things. We do not pick between them: we show what each one says.",
     workLine: (author, title, year, locator) => `${author}, ${title} (${year}), ${locator}`,
     times: (factor) => `×${factor}`,
     timesWording: (more, year) => `times ${more ? "more" : "less"} often than in ${year}`,
