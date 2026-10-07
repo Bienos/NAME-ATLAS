@@ -8352,6 +8352,11 @@ a.tree-card:hover {
   .baby-names.atlas-v1 .bn-sexes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  /* A name of one sex (TASK-157): its section takes the whole width. */
+  .baby-names.atlas-v1 .bn-sexes > :only-child {
+    grid-column: 1 / -1;
+  }
 }
 
 .baby-names.atlas-v1 .bn-sex {
