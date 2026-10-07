@@ -10,7 +10,7 @@ The task file is `tasks/172-report-pdf-and-sample.md`; the decision is ADR-0049.
 **Numbering.** Built as TASK-171. `main` then gave TASK-171 to the baby-names search (#205), so this change is TASK-172. The reader's own PDF, once TASK-172 in these documents, is TASK-173.
 
 **Where it stands.**
-- **Base:** built on `main` @ `7db2909`; `main` @ `faabc6a` and @ `ae14c98` merged in.
+- **Base:** built on `main` @ `7db2909`; `main` @ `faabc6a`, @ `ae14c98`, @ `493438e` and @ `e0c42a8` merged in.
 - **No migration.** No report is built, stored or sold.
 - **One new dependency:** `@react-pdf/renderer` 4.9.0. A multi-page A4 report needs page flow, repeated heads and selectable text in the brand fonts. `next/og` draws one fixed-size image, and `pdf-lib` has no layout (ADR-0049 §1).
 
@@ -45,7 +45,7 @@ The task file is `tasks/172-report-pdf-and-sample.md`; the decision is ADR-0049.
 
 ## Verification (commands run, results as returned)
 
-`.github/workflows/ci.yml`'s steps were run locally, in order, on `01a568e`, with `main` @ `ae14c98` (TASK-170, TASK-167) merged in:
+`.github/workflows/ci.yml`'s steps were run locally, in order, on `6dcdea2`, with `main` @ `e0c42a8` (up to TASK-171, #205) merged in:
 - **database:** PostgreSQL 16.14;
 - **`DATABASE_URL`:** a new empty `name_atlas`.
 
@@ -56,14 +56,16 @@ GitHub Actions starts no job in this repository.
 | `pnpm install --frozen-lockfile` | exit 0 |
 | `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
 | `python3 scripts/test-backup.py` | exit 0 |
-| `pnpm test` | exit 0, 2,731 tests (web 1,263) |
+| `pnpm test` | exit 0, 2,793 tests (web 1,325) |
 | `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0, no diff |
 | `pnpm test:integration` | exit 0: 547 tests |
 | `pnpm test:golden` | exit 0: 364 tests |
 | `pnpm build` | exit 0 |
-| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 12 Playwright tests passed |
 
 The first full run, on `a8673e1`, failed one unit test: `design-tokens.test.ts`, "no TypeScript in the web app writes a colour by hand". `report-pdf.tsx` had three hex colours. They are tokens now: `paper`, `paper-line` and `dusk-line-control`. The page was looked at again after the change.
+
+After `main` @ `493438e` was merged in, one run of the web app's unit tests reported one failed test, which was not identified from that run's output. The same command passed in four further runs, and in the full run above.
 
 **The PDF, looked at.**
 - **Rendered by the test** with `REPORT_PDF_OUT`, then rasterised with poppler (`pdftoppm`) and read page by page:
