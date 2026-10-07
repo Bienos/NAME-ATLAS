@@ -13,14 +13,23 @@ The mockup's four questions were not answered; the task takes its stated default
 
 ## Verification (run in this session)
 
-- `pnpm format:check` — exit 0, "All matched files use Prettier code style!"
-- `pnpm check:ids` — exit 0, "every task, ADR, migration and decision number is used once"
-- `pnpm lint` — exit 0
-- `pnpm typecheck` — exit 0
-- `pnpm test` — exit 0; `apps/web` 108 files, 1237 tests passed; every other package passed (run again after the rebase onto `ecfd4a8`).
+GitHub Actions starts no job in this repository ("recent account payments have failed or your spending limit needs to be increased"; `verify` failed after 2 s on `a55c14b` and `cd57f68`, as on `main` @ `ecfd4a8`). Every step of `.github/workflows/ci.yml` was therefore run locally, in order, on this branch's tree (`main` @ `ecfd4a8` plus this change), with `DATABASE_URL` a new empty `name_atlas` on the image CI uses, `postgis/postgis:16-3.4`:
+
+| Command | Result |
+|---|---|
+| `pnpm typecheck`, `lint`, `format:check`, `check:ids`, `check:vm` | exit 0 |
+| `python3 scripts/test-backup.py` | exit 0, 6 tests |
+| `pnpm test` | exit 0 (`apps/web` 108 files, 1237 tests) |
+| `pnpm db:migrate`; `db:generate-types` and `git diff --exit-code -- packages/db/src/generated` | exit 0, no diff |
+| `pnpm test:integration` | exit 0, 50 files, 546 tests |
+| `pnpm test:golden` | exit 0, 4 files, 364 tests |
+| `pnpm build` | exit 0; `/pl/oferta` and `/en/offer` are dynamic (`ƒ`) |
+| `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
+
+The built site was served with `next start` and `/pl/oferta` screenshotted in Chromium at 1280 and 390 px wide (signed out, no free window). At 390 px the page first scrolled sideways, to 714 px: the table cells' visually-hidden labels are absolutely positioned and escaped the table's scroll box. `.offer-table-box` now has `position: relative`; after a rebuild, neither width scrolls sideways. `pnpm format:check` and `pnpm lint` were run again after that CSS change: exit 0.
 
 ## Not verified
 
-- No `next build`, no browser rendering and no screenshot of the page; the layout was checked only through the rendered markup in tests.
+- The page was looked at signed out only; the signed-in, tester and free-window states were checked through the rendered markup in tests.
 - No test-mode purchase was made from the page against Stripe; the form posts the same fields as the account page's, which TASK-111 and TASK-154 verified.
 - Not deployed. Making the page dynamic means it is no longer served from the static cache; its response time in production was not measured.
