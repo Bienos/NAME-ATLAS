@@ -18,6 +18,7 @@ import { middleware } from "../middleware.js";
 import { resetAccountsRuntimeForTests } from "./accounts-runtime.js";
 import type { ComparisonSide } from "./compare-view.js";
 import { resolved } from "./couple-fixture.js";
+import { fullNameCompareFree } from "./full-name-compare-config.js";
 import { FullNameCompareView, loadFullNameCompare } from "./full-name-compare-page.js";
 import type { FullNameCompareDeps, GivenNameAll } from "./full-name-compare-page.js";
 import { FULL_NAME_COMPARE_TEXT } from "./full-name-compare-text.js";
@@ -226,8 +227,8 @@ function deps(bought: Record<string, readonly PurchaseTier[]>, reads: string[] =
           : { kind: "FOUND", given_name: facts.stock.given_name },
       );
     },
-    readGivenName: (name) => {
-      reads.push(`given:${name.id}`);
+    readGivenName: (name, surface) => {
+      reads.push(surface === "PAID" ? `given:${name.id}` : `given:${name.id}:${surface}`);
       return Promise.resolve(FACTS[name.id]!);
     },
     loadSurname: (typed) => {
@@ -257,7 +258,7 @@ function panel(html: string, attribute: string): string {
 async function render(
   lang: Lang,
   query: Record<string, string>,
-  session: { userId: string } | null,
+  session: { userId: string; tester?: boolean } | null,
   bought: Record<string, readonly PurchaseTier[]> = {},
   reads: string[] = [],
 ): Promise<string> {
@@ -337,6 +338,65 @@ describe("signed in without the product (AC-4)", () => {
       expect(html).not.toContain("checkout");
       expect(reads).toEqual([]);
     }
+  });
+
+  it("offers a listed tester a test-mode purchase of fullnames, and still reads no claim", async () => {
+    const reads: string[] = [];
+    const html = await render("pl", TWO, { userId: "u", tester: true }, {}, reads);
+    const t = FULL_NAME_COMPARE_TEXT.pl;
+    expect(html).toContain(t.lockedHeading);
+    expect(html).toContain('action="/api/checkout"');
+    expect(html).toContain('name="tier" value="fullnames"');
+    expect(html).not.toContain(t.soon);
+    expect(html).not.toContain("cmp-plates");
+    expect(reads).toEqual([]);
+  });
+});
+
+describe("free for signed-in readers (D-053)", () => {
+  it("is free unless FULL_NAME_COMPARE_FREE is exactly 0", () => {
+    expect(fullNameCompareFree({})).toBe(true);
+    expect(fullNameCompareFree({ FULL_NAME_COMPARE_FREE: "1" })).toBe(true);
+    expect(fullNameCompareFree({ FULL_NAME_COMPARE_FREE: "0" })).toBe(false);
+  });
+
+  it("opens the result without a purchase, read on the FREE surface", async () => {
+    const reads: string[] = [];
+    let looked = false;
+    const d = deps({}, reads);
+    const data = await loadFullNameCompare({
+      lang: "pl",
+      query: TWO,
+      session: { userId: "u" },
+      deps: {
+        ...d,
+        hasFullView: (id) => {
+          looked = true;
+          return d.hasFullView(id);
+        },
+      },
+      free: true,
+    });
+    const html = renderToStaticMarkup(createElement(FullNameCompareView, { data }));
+    expect(looked).toBe(false);
+    expect(html).toContain("cmp-plates");
+    expect(html).not.toContain("fnc-locked");
+    const given = reads.filter((r) => r.startsWith("given:"));
+    expect(given.length).toBeGreaterThan(0);
+    expect(given.every((r) => r.endsWith(":FREE"))).toBe(true);
+  });
+
+  it("still asks a signed-out reader to sign in", async () => {
+    const reads: string[] = [];
+    const data = await loadFullNameCompare({
+      lang: "pl",
+      query: TWO,
+      session: null,
+      deps: deps({}, reads),
+      free: true,
+    });
+    expect(data.kind).toBe("signed-out");
+    expect(reads).toEqual([]);
   });
 });
 

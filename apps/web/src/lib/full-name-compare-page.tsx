@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { createAccountsDb, createPurchases, FULL_NAME_COMPARE_TIERS } from "@name-atlas/accounts";
 import type { Purchases } from "@name-atlas/accounts";
@@ -18,11 +19,14 @@ import type {
   BirthSex,
   GivenNameFacts,
   GivenNameMeaningFacts,
+  Surface,
 } from "@name-atlas/truth";
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
 import { accountsRuntime } from "./accounts-runtime.js";
-import { readBabyNamesSession, Source } from "./baby-names-page.js";
+import { isCheckoutTester } from "./checkout-config.js";
+import { checkoutRuntime } from "./checkout-runtime.js";
+import { Source } from "./baby-names-page.js";
 import {
   compareDistributionMany,
   comparePopulationMany,
@@ -47,6 +51,7 @@ import { db } from "./db.js";
 import {
   FULL_NAME_COMPARE_MAX_PEOPLE,
   FULL_NAME_COMPARE_PATHS,
+  fullNameCompareFree,
   fullNameCompareEnabled,
 } from "./full-name-compare-config.js";
 import { fullNameQuery, fullNameRequest } from "./full-name-compare-request.js";
@@ -55,6 +60,8 @@ import { FULL_NAME_COMPARE_TEXT } from "./full-name-compare-text.js";
 import { formatDate, formatInteger, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ORIGINS } from "./given-name-meaning-view.js";
+import { BuyForm } from "./offer-page.js";
+import { sessionCookieName } from "./session-cookie.js";
 import { SiteShell } from "./site-shell.js";
 
 /**
@@ -65,7 +72,8 @@ import { SiteShell } from "./site-shell.js";
  * Signed out, it explains and links to sign-in. Signed in without the 15,99 zł
  * product or a tier that holds it (`FULL_NAME_COMPARE_TIERS`), the form, what
  * the comparison holds and the locked card ("Wkrótce", no button, ADR-0023
- * §2.5), and nothing is read. With it, per person: the first name's register
+ * §2.5), and nothing is read. A listed tester (`CHECKOUT_TESTERS`) gets the
+ * test-mode buy button there instead, as on the offer page (TASK-167). With it, per person: the first name's register
  * count and rank per list, the children given it in the latest year, its
  * origin and meaning as each work states them, and the surname's count,
  * rarity and map; across the people, a figure is drawn on one scale only
@@ -101,10 +109,11 @@ export interface FullNameCompareDeps {
   /** Whether the account holds a tier that includes the comparison. */
   readonly hasFullView: (userId: string) => Promise<boolean>;
   readonly findGivenName: (typed: string) => Promise<BirthNameLookup>;
-  readonly readGivenName: (givenName: {
-    readonly id: string;
-    readonly display_name: string;
-  }) => Promise<GivenNameAll>;
+  /** PAID for an account that bought it; FREE while the comparison is free (D-053). */
+  readonly readGivenName: (
+    givenName: { readonly id: string; readonly display_name: string },
+    surface: Surface,
+  ) => Promise<GivenNameAll>;
   /** A typed surname to its side: resolved, or with no response. */
   readonly loadSurname: (typed: string) => Promise<ComparisonSide>;
 }
@@ -129,6 +138,8 @@ export type FullNameCompareData =
       readonly kind: "signed-in";
       readonly lang: Lang;
       readonly full: boolean;
+      /** A listed tester with checkout on: the locked card offers a test-mode purchase. */
+      readonly tester?: boolean;
       readonly request: FullNameRequest;
       /** The people compared; null before a comparison, or without the product. */
       readonly people: readonly PersonResult[] | null;
@@ -138,8 +149,10 @@ export type FullNameCompareData =
 export async function loadFullNameCompare(input: {
   readonly lang: Lang;
   readonly query: Query;
-  readonly session: { readonly userId: string } | null;
+  readonly session: { readonly userId: string; readonly tester?: boolean } | null;
   readonly deps: FullNameCompareDeps;
+  /** Free for every signed-in reader (D-053): no purchase is looked up, claims are FREE. */
+  readonly free?: boolean;
 }): Promise<FullNameCompareData> {
   const { lang, session, deps } = input;
   if (session === null) {
@@ -150,9 +163,18 @@ export async function loadFullNameCompare(input: {
     };
   }
   const request = fullNameRequest(input.query);
-  const full = await deps.hasFullView(session.userId);
+  const free = input.free === true;
+  const full = free || (await deps.hasFullView(session.userId));
+  const surface: Surface = free ? "FREE" : "PAID";
   if (!full || request.error !== null || request.people.length < 2) {
-    return { kind: "signed-in", lang, full, request, people: null };
+    return {
+      kind: "signed-in",
+      lang,
+      full,
+      tester: session.tester === true,
+      request,
+      people: null,
+    };
   }
   // One person at a time, so four people never hold four pool connections at once.
   const people: PersonResult[] = [];
@@ -163,7 +185,7 @@ export async function loadFullNameCompare(input: {
         ? {
             kind: "FOUND",
             name: lookup.given_name,
-            facts: await deps.readGivenName(lookup.given_name),
+            facts: await deps.readGivenName(lookup.given_name, surface),
           }
         : { kind: lookup.kind };
     people.push({ typed, given, surname: await deps.loadSurname(typed.surname) });
@@ -411,9 +433,10 @@ function Contains({ lang, locked }: { lang: Lang; locked: boolean }) {
   );
 }
 
-function Locked({ lang, freePath }: { lang: Lang; freePath: string }) {
+function Locked({ lang, freePath, tester }: { lang: Lang; freePath: string; tester: boolean }) {
   const t = FULL_NAME_COMPARE_TEXT[lang];
-  // ADR-0023 §2.5: no buy button until the product can lawfully be sold.
+  // ADR-0023 §2.5: no buy button until the product can lawfully be sold;
+  // a listed tester alone may buy in test mode (TASK-167).
   return (
     <aside className="fnc-locked" aria-labelledby="cmp-locked-heading">
       <p className="fnc-chip" data-state="locked">
@@ -423,9 +446,10 @@ function Locked({ lang, freePath }: { lang: Lang; freePath: string }) {
       <h2 id="cmp-locked-heading">{t.lockedHeading}</h2>
       <p className="cmp-upsell-price">
         <span className="cmp-price">{t.lockedPrice}</span>{" "}
-        <span className="cmp-soon">{t.soon}</span>
+        {tester ? null : <span className="cmp-soon">{t.soon}</span>}
       </p>
       <p>{t.lockedBody}</p>
+      {tester ? <BuyForm tier="fullnames" lang={lang} /> : null}
       <ul className="fnc-benefits">
         {t.benefits.map((line) => (
           <li key={line}>
@@ -1178,7 +1202,9 @@ export function FullNameCompareView({ data }: { data: FullNameCompareData }) {
               error={data.request.error}
               locked={!data.full}
             />
-            {data.full ? null : <Locked lang={lang} freePath={freePath} />}
+            {data.full ? null : (
+              <Locked lang={lang} freePath={freePath} tester={data.tester === true} />
+            )}
           </div>
           <Contains lang={lang} locked={!data.full} />
           <Together lang={lang} />
@@ -1209,11 +1235,11 @@ export function runningFullNameCompareDeps(
   return {
     hasFullView: (userId) => store.hasPurchaseOf(userId, FULL_NAME_COMPARE_TIERS),
     findGivenName: (typed) => findBirthGivenName(db(), typed),
-    readGivenName: async (givenName) => {
+    readGivenName: async (givenName, surface) => {
       const [stock, births, meaning] = await Promise.all([
-        readGivenNameFacts(db(), givenName, "PAID"),
-        readBirthNameFacts(db(), givenName, { surface: "PAID", history: false }),
-        readGivenNameMeaning(db(), givenName.id, "PAID"),
+        readGivenNameFacts(db(), givenName, surface),
+        readBirthNameFacts(db(), givenName, { surface, history: false }),
+        readGivenNameMeaning(db(), givenName.id, surface),
       ]);
       return { stock, births, meaning };
     },
@@ -1239,6 +1265,24 @@ export function fullNameCompareMetadata(lang: Lang): Metadata {
   return fullNameCompareEnabled() ? FULL_NAME_COMPARE_METADATA[lang] : {};
 }
 
+/** The session's account, and whether it is a listed tester with checkout on. */
+async function readCompareSession(
+  accounts: NonNullable<ReturnType<typeof accountsRuntime>>,
+): Promise<{ userId: string; tester: boolean } | null> {
+  const token = (await cookies()).get(sessionCookieName(accounts.secure))?.value;
+  try {
+    const found = token === undefined ? null : await accounts.accounts.sessionFromToken(token);
+    if (found === null) return null;
+    const checkout = checkoutRuntime();
+    return {
+      userId: found.userId,
+      tester: checkout !== null && isCheckoutTester(found.email, checkout.testers),
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** The route's page: a 404 when off; reads the session cookie, loads, renders. */
 export async function FullNameCompareRoute({
   lang,
@@ -1251,12 +1295,13 @@ export async function FullNameCompareRoute({
   const accounts = accountsRuntime();
   if (accounts === null) notFound();
   const query = await searchParams;
-  const session = await readBabyNamesSession(accounts);
+  const session = await readCompareSession(accounts);
   const data = await loadFullNameCompare({
     lang,
     query,
     session,
     deps: runningFullNameCompareDeps(accounts.pool, lang),
+    free: fullNameCompareFree(),
   });
   return <FullNameCompareView data={data} />;
 }

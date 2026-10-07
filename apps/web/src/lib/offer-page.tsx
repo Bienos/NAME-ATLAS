@@ -116,7 +116,7 @@ export async function readOfferReader(): Promise<OfferReader> {
 }
 
 /** A test-mode purchase: the account page's form (`checkout-section.tsx`), here per card. */
-function BuyForm({ tier, lang }: { readonly tier: CheckoutTier; readonly lang: Lang }) {
+export function BuyForm({ tier, lang }: { readonly tier: CheckoutTier; readonly lang: Lang }) {
   const doc = offerDocument(lang);
   const offer = tierOffer(tier);
   if (offer === null) return null;
