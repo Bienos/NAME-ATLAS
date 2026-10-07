@@ -89,7 +89,7 @@ export function middleware(request: NextRequest): NextResponse {
 /**
  * What the limiter sees.
  *
- * `robots.txt`, `sitemap.xml` and the sitemap pages are **excluded on purpose**:
+ * `robots.txt`, `llms.txt`, `sitemap.xml` and the sitemap pages are **excluded on purpose**:
  * they are how a crawler discovers what it may read, and rate-limiting the map
  * while publishing the territory would be self-defeating. Static assets are
  * excluded because they never reach the database — the three icons included,
@@ -97,6 +97,6 @@ export function middleware(request: NextRequest): NextResponse {
  */
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|robots.txt|sitemap).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|robots.txt|llms.txt|sitemap).*)",
   ],
 };
