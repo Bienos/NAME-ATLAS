@@ -68,7 +68,14 @@ The authority is ADR-0037 §2, amended here; the task file is `tasks/166-full-re
 | `pnpm build` | exit 0 |
 | `pnpm e2e:seed`; `pnpm test:e2e` | exit 0, 10 Playwright tests passed |
 
-The first build of this change, before that run, failed Next's type check: `studio-client.tsx`'s checkbox read `event.target.checked`, which the repository's `lib: ["ES2022"]` does not type. It now toggles the state instead. `pnpm typecheck` had passed; only the build caught it.
+**After the renumbering and merging `main` @ `fd0d75b`**, the whole sequence was run again on `113f965`. Every step exited 0:
+- `pnpm test`: 2,701 tests (web 1,233);
+- `pnpm test:integration`: 546 tests;
+- `pnpm test:golden`: 364 tests;
+- the build;
+- the 10 Playwright tests.
+
+The first build of this change, before those runs, failed Next's type check: `studio-client.tsx`'s checkbox read `event.target.checked`, which the repository's `lib: ["ES2022"]` does not type. It now toggles the state instead. `pnpm typecheck` had passed; only the build caught it.
 
 **On real data.** The database `gn163` is a copy of the local `gn_full`, which holds the 2026-01-20 first-name lists, NOWAK and the meaning files.
 - **Migrations:** migrated to `0047`, after its 0044 row was deleted and its check dropped. The original had 0044 without 0043.
