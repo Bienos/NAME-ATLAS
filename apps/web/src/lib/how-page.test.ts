@@ -21,6 +21,36 @@ describe("the how-it-works pages (TASK-052)", () => {
     expect(howDocument("pl").sections.length).toBe(howDocument("en").sections.length);
   });
 
+  it("anchor every section once and link each from the jump strip (TASK-159)", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const html = renderToStaticMarkup(createElement(HowView, { lang }));
+      const doc = howDocument(lang);
+      expect(doc.sections.map((s) => s.id)).toEqual(howDocument("pl").sections.map((s) => s.id));
+      expect(new Set(doc.sections.map((s) => s.id)).size).toBe(doc.sections.length);
+      for (const section of doc.sections) {
+        expect(html).toContain(`id="${section.id}"`);
+        expect(html).toContain(`href="#${section.id}"`);
+      }
+      expect(html).toContain(doc.labels.anatomyTitle);
+      expect(doc.labels.glosses).toHaveLength(ASSESSMENTS.length);
+      for (const gloss of doc.labels.glosses) expect(html).toContain(gloss);
+    }
+  });
+
+  it("draw no figure: the illustrations hold no digit but the step numbers and pins", () => {
+    for (const lang of ["pl", "en"] as const) {
+      const { labels } = howDocument(lang);
+      const drawn = [
+        labels.male,
+        labels.female,
+        labels.noData,
+        labels.notZero,
+        labels.anatomySource,
+      ];
+      for (const word of drawn) expect(word, `${lang}: ${word}`).not.toMatch(/[1-9]/);
+    }
+  });
+
   it("mark their place in the header and switch language to the same page", () => {
     const pl = renderToStaticMarkup(createElement(HowView, { lang: "pl" }));
     expect(pl).toContain('href="/pl/jak-to-dziala" aria-current="page"');

@@ -4579,6 +4579,630 @@ body.dusk {
   font-size: 0.875rem;
 }
 
+/* --- how it works (TASK-159): hero, answer anatomy, jump strip, illustrated steps --- */
+
+.site > main.reading.how {
+  max-width: 64rem;
+}
+
+.how-hero {
+  position: relative;
+  margin-bottom: var(--space-8);
+}
+
+.how-hero .page-lede {
+  max-width: 46ch;
+  margin-bottom: var(--space-6);
+}
+
+.how-promises,
+.how-anatomy-parts,
+.how-jump ol,
+.how-scale,
+.how-never {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.how-promises {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.how-promises li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-pill);
+  background: var(--dusk-glass);
+  color: var(--dusk-ink);
+  font-weight: 500;
+}
+
+.how-pin {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border-radius: 50%;
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* The anatomy: a sample answer with its four parts pinned, and the key. */
+.how-anatomy {
+  margin: 0 0 var(--space-8);
+  padding: var(--space-7);
+  border: 1px solid var(--dusk-line);
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, var(--dusk-amber-wash), transparent 55%), var(--dusk-tile);
+  box-shadow: var(--atlas-shadow-soft);
+}
+
+.how-anatomy-title {
+  margin-bottom: var(--space-6);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.625rem;
+  font-weight: 500;
+  color: var(--dusk-ink);
+}
+
+.how-anatomy-grid {
+  display: grid;
+  gap: var(--space-7);
+  align-items: center;
+}
+
+@media (min-width: 760px) {
+  .how-anatomy-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.how-sample {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 14px;
+  background: var(--dusk-surface-sunk);
+}
+
+.how-sample-question {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 1.125rem;
+  color: var(--dusk-ink);
+}
+
+.how-sample-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-block-size: 1.75rem;
+}
+
+.how-skeleton {
+  display: block;
+  border-radius: var(--atlas-radius-pill);
+  background: linear-gradient(90deg, var(--dusk-track), var(--dusk-tile-line), var(--dusk-track));
+  background-size: 200% 100%;
+}
+
+.how-skeleton-figure {
+  inline-size: 60%;
+  block-size: 1.5rem;
+}
+
+.how-skeleton-date {
+  inline-size: 36%;
+  block-size: 0.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .how-skeleton {
+    animation: how-shimmer 2.4s var(--atlas-ease-resolve) infinite;
+  }
+}
+
+@keyframes how-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.how-sample-source {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.875rem;
+  color: var(--dusk-ink-soft);
+}
+
+.how-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--dusk-amber);
+  border-radius: var(--atlas-radius-pill);
+  color: var(--dusk-amber);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.how-chip-dot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px var(--dusk-amber-wash);
+}
+
+.how-anatomy-parts {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.how-anatomy-parts li {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.how-anatomy-parts strong {
+  color: var(--dusk-ink);
+  font-weight: 600;
+}
+
+/* The jump strip. */
+.how-jump {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: 0 calc(-1 * var(--space-3)) var(--space-7);
+  padding: var(--space-3);
+  background: linear-gradient(var(--dusk-surface) 70%, transparent);
+}
+
+.how-jump ol {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.how-jump li {
+  flex: none;
+}
+
+.how-jump a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-pill);
+  color: var(--dusk-ink-soft);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition:
+    background var(--atlas-duration-quick) var(--atlas-ease-resolve),
+    color var(--atlas-duration-quick) var(--atlas-ease-resolve),
+    border-color var(--atlas-duration-quick) var(--atlas-ease-resolve);
+}
+
+.how-jump a:hover {
+  border-color: var(--dusk-amber);
+  background: var(--dusk-amber-wash);
+  color: var(--dusk-ink);
+}
+
+.how-jump a:focus-visible {
+  outline: 2px solid var(--dusk-amber);
+  outline-offset: 2px;
+}
+
+.how-jump-number {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--dusk-amber);
+}
+
+/* The steps: a numbered rail, the text, and a drawing. */
+.how-steps {
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.reading .how-step {
+  display: grid;
+  margin: 0;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: var(--space-5) var(--space-6);
+  padding: var(--space-7);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 20px;
+  background: var(--dusk-tile);
+  scroll-margin-top: 5rem;
+}
+
+.how-step-mark {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-3);
+}
+
+.how-step-number {
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.how-icon {
+  inline-size: 3rem;
+  block-size: 3rem;
+  padding: 0.6rem;
+  border-radius: 14px;
+  background: var(--dusk-amber-wash);
+  color: var(--dusk-amber);
+}
+
+.reading .how-step h3 {
+  margin-bottom: var(--space-4);
+}
+
+.how-step-body > p:last-child {
+  margin-bottom: 0;
+}
+
+.how-visual {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: 14px;
+  background: var(--dusk-surface-sunk);
+  color: var(--dusk-ink-soft);
+}
+
+@media (min-width: 900px) {
+  .reading .how-step:has(.how-visual) {
+    grid-template-columns: 3.5rem minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+
+  .how-visual {
+    grid-column: auto;
+    align-self: center;
+  }
+}
+
+.how-visual-note {
+  flex-basis: 100%;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.how-visual-count {
+  justify-content: center;
+}
+
+.how-list-pill {
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--dusk-line);
+  border-radius: var(--atlas-radius-pill);
+  background: var(--dusk-glass);
+  color: var(--dusk-ink);
+  font-weight: 500;
+}
+
+.how-not-plus {
+  position: relative;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 1.5rem;
+  color: var(--dusk-ink-muted);
+}
+
+.how-not-plus::after {
+  position: absolute;
+  inset: 50% -0.3rem auto;
+  block-size: 2px;
+  background: var(--dusk-warning);
+  content: "";
+  transform: rotate(-45deg);
+}
+
+.how-visual-count .how-visual-note,
+.how-visual-absent .how-visual-note {
+  text-align: center;
+}
+
+.how-visual-rarity {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.how-big {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: clamp(2.5rem, 1.8rem + 2.5vw, 3.5rem);
+  line-height: 1;
+  color: var(--dusk-amber);
+}
+
+.how-ramp {
+  display: block;
+  block-size: 0.5rem;
+  border-radius: var(--atlas-radius-pill);
+  background: linear-gradient(
+    90deg,
+    var(--dusk-amber),
+    var(--atlas-dusk-500),
+    var(--atlas-aubergine-600)
+  );
+}
+
+.how-ramp-ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
+.how-visual-where {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-3);
+}
+
+.how-bar {
+  display: block;
+  block-size: 0.625rem;
+  border-radius: var(--atlas-radius-pill);
+  background: linear-gradient(90deg, var(--dusk-amber), var(--atlas-amber-600));
+  opacity: 0.9;
+}
+
+.how-bar:nth-child(2) {
+  opacity: 0.75;
+}
+
+.how-bar:nth-child(3) {
+  opacity: 0.6;
+}
+
+.how-bar:nth-child(4) {
+  opacity: 0.45;
+}
+
+.how-bar-none {
+  block-size: auto;
+  padding: var(--space-2) var(--space-4);
+  border: 1px dashed var(--dusk-line-control);
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, var(--dusk-tile) 6px 12px);
+  color: var(--dusk-ink-muted);
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  opacity: 1;
+}
+
+.how-visual-absent {
+  justify-content: center;
+  gap: var(--space-5);
+}
+
+.how-empty-ring {
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border: 2px dashed var(--dusk-ink-muted);
+  border-radius: 50%;
+}
+
+.how-neq {
+  font-size: 2rem;
+  color: var(--dusk-warning);
+}
+
+.how-zero {
+  font-family: var(--font-display, Georgia, serif);
+  font-size: 3rem;
+  line-height: 1;
+  color: var(--dusk-ink-muted);
+}
+
+/* The certainty ladder. */
+.how-scale-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.how-scale {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.reading .how-scale-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 11rem) minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 12px;
+  background: var(--dusk-surface-sunk);
+}
+
+.how-meter {
+  display: inline-flex;
+  gap: 3px;
+  align-items: flex-end;
+  block-size: 1.25rem;
+}
+
+.how-pip {
+  inline-size: 5px;
+  border-radius: 2px;
+  background: var(--dusk-track);
+}
+
+.how-pip:nth-child(1) {
+  block-size: 35%;
+}
+.how-pip:nth-child(2) {
+  block-size: 55%;
+}
+.how-pip:nth-child(3) {
+  block-size: 78%;
+}
+.how-pip:nth-child(4) {
+  block-size: 100%;
+}
+
+.how-pip-on {
+  background: var(--dusk-amber);
+}
+
+.how-scale-conflicting .how-pip:nth-child(odd) {
+  background: var(--dusk-warning);
+}
+
+.how-scale-insufficient_data .how-pip {
+  border: 1px dashed var(--dusk-line-control);
+  background: transparent;
+}
+
+.reading .how-scale-word {
+  color: var(--dusk-ink);
+  font-weight: 600;
+}
+
+.reading .how-scale-gloss {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--dusk-ink-soft);
+}
+
+.how-scale-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0;
+  padding-inline-start: var(--space-4);
+  border-inline-start: 2px solid transparent;
+  border-image: linear-gradient(var(--dusk-amber), var(--dusk-track)) 1;
+  font-family: var(--font-data, ui-monospace, monospace);
+  font-size: 0.75rem;
+  color: var(--dusk-ink-muted);
+}
+
+@media (max-width: 640px) {
+  .reading .how-scale-step {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .how-scale-gloss {
+    grid-column: 2;
+  }
+
+  .how-scale-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .how-scale-axis {
+    display: none;
+  }
+}
+
+/* What we do not do. */
+.how-never {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.reading .how-never li {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--dusk-tile-line);
+  border-radius: 12px;
+  background: var(--dusk-surface-sunk);
+  color: var(--dusk-ink);
+}
+
+.how-never li::before {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  inline-size: 1.5rem;
+  block-size: 1.5rem;
+  border: 1px solid var(--dusk-warning);
+  border-radius: 50%;
+  color: var(--dusk-warning);
+  content: "✕";
+  font-size: 0.75rem;
+}
+
+/* The way out: back to the search. */
+.how-cta {
+  margin: var(--space-8) 0 0;
+  text-align: center;
+}
+
+.reading a.how-cta-link {
+  display: inline-flex;
+  padding: var(--space-4) var(--space-7);
+  border-radius: var(--atlas-radius-pill);
+  background: var(--dusk-amber);
+  color: var(--dusk-on-amber);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background var(--atlas-duration-quick) var(--atlas-ease-resolve);
+}
+
+.reading a.how-cta-link:hover {
+  background: var(--dusk-amber-hover);
+}
+
+.reading a.how-cta-link:focus-visible {
+  outline: 2px solid var(--dusk-ink);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .how-anatomy,
+  .reading .how-step {
+    padding: var(--space-5);
+  }
+
+  .reading .how-step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .how-step-mark {
+    display: flex;
+    justify-items: start;
+    align-items: center;
+  }
+}
+
 /* --- the surname directory (TASK-129): letters, then plain links, then pages --- */
 
 .site > main.directory {
