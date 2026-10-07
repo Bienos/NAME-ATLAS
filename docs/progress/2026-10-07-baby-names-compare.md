@@ -14,7 +14,7 @@ Task: `tasks/154-baby-names-compare.md`. Decisions: D-044 (comparing names is in
 
 ## Verification
 
-Run locally on PostgreSQL 16 with PostGIS 3 (`apt-get install postgresql-16-postgis-3`, `pg_ctlcluster 16 main start`), `TEST_DATABASE_URL=postgres://postgres:…@localhost:5432/postgres`. **CI did not run:** GitHub Actions starts no job in this repository (an account-level block the owner must lift).
+The table is the last run, after `origin/main` (`2fd44be`) was merged in and the task renumbered; the same commands passed on the pre-merge tree too. Run locally on PostgreSQL 16 with PostGIS 3 (`apt-get install postgresql-16-postgis-3`, `pg_ctlcluster 16 main start`), `TEST_DATABASE_URL=postgres://postgres:…@localhost:5432/postgres`. **CI did not run:** GitHub Actions starts no job in this repository (an account-level block the owner must lift).
 
 | Command | Result |
 |---|---|
@@ -23,9 +23,9 @@ Run locally on PostgreSQL 16 with PostGIS 3 (`apt-get install postgresql-16-post
 | `pnpm check:ids` | exit 0: "every task, ADR, migration and decision number is used once" |
 | `pnpm typecheck` | exit 0 |
 | `pnpm lint` | exit 0 |
-| `pnpm test` | exit 0: web 102 files, 1,099 tests (1,078 before this change); truth 432, sources 615; every package passes |
-| `pnpm test:integration` | exit 0: 49 files, 541 tests (`TEST_DATABASE_URL` on the local server; 537 before this change, the other three new ones are TASK-153's) |
-| `pnpm build` (`DATABASE_URL` on the local database, `BABY_NAMES_ENABLED=1`) | exit 0; `/pl/imiona-dla-dziecka/porownaj` and `/en/baby-names/compare` are dynamic (`ƒ`). The first run printed "Compiled with warnings" for the web app without the lines being captured; a second run of the web build alone printed no warning line |
+| `pnpm test` | exit 0 on the merged tree: web 102 files, 1,108 tests (1,087 on `main` @ `2fd44be`; 21 new); truth 433, sources 615; every package passes |
+| `pnpm test:integration` | exit 0 on the merged tree: 49 files, 542 tests (`TEST_DATABASE_URL` on the local server; 541 on `main` @ `2fd44be`; one new) |
+| `pnpm build` (`DATABASE_URL` on the local database, `BABY_NAMES_ENABLED=1`) | exit 0 on the merged tree, "Compiled successfully"; `/pl/imiona-dla-dziecka/porownaj` and `/en/baby-names/compare` are dynamic (`ƒ`) |
 
 **Chromium, real data.** Disposable database `atlas_154`: migrated to 0044; the five birth files from `fixtures/pesel-given-name-births/` (the 2000–2019 excerpt, the full 2020 and 2025 files) imported with `pnpm import:given-name-births` (the fixtures' own checksums), `pnpm truth:derive-given-name-births` (14 s). The register's lists were not imported, so "Nosi dziś" read the plain "Nie mamy liczby…" line locally. Two accounts inserted by SQL (`accounts.users` verified with terms accepted, `accounts.sessions` with a known token's SHA-256, one `babynames` row in `accounts.purchases`). `next dev --webpack` with accounts on and `BABY_NAMES_ENABLED=1`; Playwright 1.56 with the pre-installed Chromium, the session cookie set by hand; twelve pages at 390 × 844 or 1280 × 800, each screenshotted and its layout measured:
 
