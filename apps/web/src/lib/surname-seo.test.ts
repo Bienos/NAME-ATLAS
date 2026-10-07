@@ -98,16 +98,16 @@ describe("TASK-123 AC-1: the title names only what the page has (canonical/21 §
   it("follows the patterns, in both languages", () => {
     const all: ValueFamily[] = ["CURRENT_STATS", "GEOGRAPHY", "ONOMASTICS"];
     expect(surnameTitle("NOWAK", all, "pl")).toBe(
-      "Nazwisko NOWAK — znaczenie, pochodzenie i występowanie | Name Atlas",
+      "Nazwisko NOWAK | znaczenie, pochodzenie i występowanie | Name Atlas",
     );
     expect(surnameTitle("NOWAK", all, "en")).toBe(
-      "NOWAK surname — meaning, origin and distribution | Name Atlas",
+      "NOWAK surname | meaning, origin and distribution | Name Atlas",
     );
     expect(surnameTitle("NOWAK", ["CURRENT_STATS", "GEOGRAPHY"], "pl")).toBe(
-      "Nazwisko NOWAK — ile osób je nosi i gdzie występuje | Name Atlas",
+      "Nazwisko NOWAK | ile osób je nosi i gdzie występuje | Name Atlas",
     );
     expect(surnameTitle("NOWAK", ["CURRENT_STATS"], "en")).toBe(
-      "NOWAK surname — how many people have it | Name Atlas",
+      "NOWAK surname | how many people have it | Name Atlas",
     );
     expect(surnameTitle("NOWAK", [], "pl")).toBe("Nazwisko NOWAK | Name Atlas");
   });

@@ -30,7 +30,7 @@ import type { TreeLandingText } from "./tree-text.js";
 export function treeLandingMetadata(lang: Lang): Metadata {
   const t = TREE_TEXT[lang].landing;
   return {
-    title: `${t.title} — Name Atlas`,
+    title: `${t.title} | Name Atlas`,
     description: t.lede,
     alternates: {
       canonical: treeLandingPath(lang),

@@ -431,8 +431,8 @@ describe("the Konstelacja view (TASK-091)", () => {
   });
 
   it("names the page in the metadata and switches to the pedigree from the Rodowód too (AC-6)", () => {
-    expect(treeMetadata("pl", "constellation").title).toBe("Konstelacja — Name Atlas");
-    expect(treeMetadata("en", "constellation").title).toBe("Constellation — Name Atlas");
+    expect(treeMetadata("pl", "constellation").title).toBe("Konstelacja | Name Atlas");
+    expect(treeMetadata("en", "constellation").title).toBe("Constellation | Name Atlas");
     const rodowod = render(treeData("pl"));
     expect(rodowod).toContain(
       `href="${treePath("pl", { page: "tree", treeId: TREE_ID })}" aria-current="page"`,
@@ -552,8 +552,8 @@ describe("the Mapa view (TASK-092)", () => {
     expect(viewer).toContain(TREE_TEXT.pl.pedigree.viewer);
     expect(viewer).not.toContain("/osoba/");
     expect(viewer).toContain(TREE_TEXT.pl.map.offMap(1));
-    expect(treeMetadata("pl", "map").title).toBe("Mapa — Name Atlas");
-    expect(treeMetadata("en", "map").title).toBe("Map — Name Atlas");
+    expect(treeMetadata("pl", "map").title).toBe("Mapa | Name Atlas");
+    expect(treeMetadata("en", "map").title).toBe("Map | Name Atlas");
   });
 });
 
@@ -749,7 +749,7 @@ describe("invitations and claims (TASK-094, AC-6)", () => {
 
   it("names the three new pages in their metadata", () => {
     for (const page of ["invitation", "cards", "card"] as const) {
-      expect(treeMetadata("pl", page).title).toBe(`${TREE_TEXT.pl.headings[page]} — Name Atlas`);
+      expect(treeMetadata("pl", page).title).toBe(`${TREE_TEXT.pl.headings[page]} | Name Atlas`);
     }
   });
 });

@@ -61,7 +61,7 @@ import { statusChip, TREE_TEXT, treeStatusWords, yearsLine } from "./tree-text.j
 
 export function treeMetadata(lang: Lang, page: TreePageName): Metadata {
   return {
-    title: `${TREE_TEXT[lang].headings[page]} — Name Atlas`,
+    title: `${TREE_TEXT[lang].headings[page]} | Name Atlas`,
     robots: { index: false, follow: false },
     referrer: "same-origin",
   };

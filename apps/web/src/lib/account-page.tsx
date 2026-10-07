@@ -150,7 +150,7 @@ export function decideAccountPage(input: {
 export function accountMetadata(lang: Lang, step: AccountStep): Metadata {
   const carriesToken = step === "confirm" || step === "new-password" || step === "welcome";
   return {
-    title: `${ACCOUNT_TEXT[lang].headings[step]} — Name Atlas`,
+    title: `${ACCOUNT_TEXT[lang].headings[step]} | Name Atlas`,
     robots: { index: false, follow: false },
     // `same-origin`, not `no-referrer`: a page with `no-referrer` makes the browser
     // post its own form with `Origin: null`. Other sites still get no Referer.

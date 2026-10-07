@@ -45,7 +45,7 @@ function locale(lang: Lang): string {
 
 export function blogIndexMetadata(lang: Lang, enabled: boolean = indexingEnabled()): Metadata {
   const t = UI[lang];
-  const title = `${t.blogTitle} — Name Atlas`;
+  const title = `${t.blogTitle} | Name Atlas`;
   return {
     title,
     description: t.blogLede,
@@ -72,7 +72,7 @@ export function blogPostMetadata(
   enabled: boolean = indexingEnabled(),
 ): Metadata {
   const path = blogPostPath(post.lang, post.slug);
-  const title = `${post.title} — Name Atlas`;
+  const title = `${post.title} | Name Atlas`;
   const languages: Record<string, string> = { [post.lang]: path };
   if (pair !== null) languages[pair.lang] = blogPostPath(pair.lang, pair.slug);
   return {
