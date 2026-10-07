@@ -77,8 +77,8 @@ const INK = TOKENS["paper-ink"];
 const SOFT = TOKENS["paper-ink-soft"];
 const MUTED = TOKENS["paper-ink-muted"];
 const ACCENT = TOKENS["paper-accent"];
-const PAPER = "#fbf4ea";
-const RULE = "#d9c9b6";
+const PAPER = TOKENS.paper;
+const RULE = TOKENS["paper-line"];
 const DUSK = TOKENS["dusk-surface"];
 const AMBER = TOKENS["dusk-amber"];
 const DUSK_INK = TOKENS["dusk-ink"];
@@ -1017,7 +1017,7 @@ function Cover({
             fontSize: 8,
             color: DUSK_SOFT,
             borderTopWidth: 0.6,
-            borderTopColor: "#5a3a4c",
+            borderTopColor: TOKENS["dusk-line-control"],
             paddingTop: 8,
           }}
         >
