@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { STUDIO_METADATA, ShareStudio, chosenCard } from "./share-studio.js";
 import type { GateVerdict } from "./download-gate.js";
 import { UI } from "./messages.js";
@@ -94,7 +94,13 @@ describe("the share studio (TASK-093)", () => {
     expect(html).toContain('href="/en/surname/kowalski/share?card=rarity"');
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("announces the full report under the card, whatever the gate (TASK-166)", () => {
+    // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-176).
+    vi.stubEnv("FULL_REPORT_FREE", "0");
     for (const gate of ["off", "open", "sign-in"] as const) {
       const html = unescape(studio(gate));
       const block = /<section class="rt rt-studio"[\s\S]*?<\/section>/u.exec(html)?.[0] ?? "";
@@ -111,11 +117,23 @@ describe("the share studio (TASK-093)", () => {
       expect(block, gate).toContain("Wkrótce.");
       expect(block, gate).toContain('href="mailto:');
       expect(block, gate).not.toMatch(/checkout/u);
+      expect(block, gate).toContain('href="/pl/przykladowy-raport.pdf"');
     }
     const en = unescape(studio("open", "en"));
     expect(en).toContain('action="/en/surname/kowalski/full-report"');
     expect(en).toContain('name="name"');
     expect(en).toContain("PLN 28.99");
+  });
+
+  it("while free, strikes the price and says 0 zł instead of the waiting list (TASK-176)", () => {
+    const html = unescape(studio("open"));
+    const block = /<section class="rt rt-studio"[\s\S]*?<\/section>/u.exec(html)?.[0] ?? "";
+    expect(block).toContain("<s>28,99 zł</s>");
+    expect(block).toContain("dziś 0 zł");
+    expect(block).toContain("Na razie za darmo dla zalogowanych.");
+    expect(block).not.toContain("Wkrótce");
+    expect(block).not.toContain('href="mailto:');
+    expect(block).toContain('action="/pl/nazwisko/kowalski/pelny-raport"');
   });
 
   it("shows the summary for a missing or unknown card, and a card only if the surname has it (AC-5)", () => {

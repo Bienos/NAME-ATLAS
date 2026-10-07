@@ -869,6 +869,12 @@ export const UI = {
     blogCtaTitle: "Sprawdź swoje nazwisko",
     blogCtaBody:
       "Zobacz, ile osób nosi je dziś, jak jest rzadkie i gdzie występuje najczęściej. Za darmo i bez konta.",
+    // The blog in Brand System v1 (TASK-174).
+    blogKicker: "Name Atlas · zapiski z atlasu",
+    blogFeatured: "Najnowszy wpis",
+    blogRead: "Czytaj wpis",
+    blogMinutes: "min czytania",
+    blogToc: "W tym wpisie",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1116,6 +1122,30 @@ export const UI = {
     compareTooClose:
       "Te wartości są zbyt bliskie, aby je rozróżnić po zaokrągleniu — nie wskazujemy, które " +
       "nazwisko jest rzadsze.",
+    // The family surnames view (TASK-169). Never "nazwisko rodowe matki" (U-2).
+    familyTitle: "Nazwiska z Twojej rodziny",
+    familyIntro:
+      "Wpisz do czterech nazwisk. Dla każdego pokażemy ten sam bezpłatny wynik co na jego " +
+      "stronie. Etykiety zostają w Twojej przeglądarce i nie są nigdzie wysyłane. Nic nie " +
+      "zapisujemy: po odświeżeniu strony wszystko znika.",
+    familyInputLabel: "Nazwisko z Twojej rodziny",
+    familyLabelLabel: "Etykieta (opcjonalnie)",
+    familyNoLabel: "Bez etykiety",
+    familyLabelSelf: "Twoje nazwisko",
+    familyLabelFather: "Strona ojca",
+    familyLabelMother: "Strona matki",
+    familyLabelOther: "Inne",
+    familyAdd: "Dodaj nazwisko",
+    familySubmit: "Pokaż wyniki",
+    familyNotice:
+      "Każdy wynik opisuje nazwisko jako całość — wszystkie osoby, które je noszą — a nie " +
+      "Twoich krewnych.",
+    familyEntered: "Wpisano",
+    familyLoading: "Sprawdzamy…",
+    familyFullPage: "Pełna strona nazwiska",
+    familyRetry: "Spróbuj ponownie",
+    familyRateLimitedHeading: "Za dużo zapytań naraz",
+    familyRateLimitedBody: "Odczekaj chwilę i spróbuj ponownie dla tego nazwiska.",
     compareDisclaimer:
       "Porównujemy liczby z tego samego zbioru. Wspólne lub podobne nazwisko nie oznacza " +
       "wspólnej rodziny, wspólnych korzeni ani wspólnej narodowości.",
@@ -1594,6 +1624,12 @@ export const UI = {
     blogCtaTitle: "Look up your surname",
     blogCtaBody:
       "See how many people bear it today, how rare it is and where it is most common. Free, no account needed.",
+    // The blog in Brand System v1 (TASK-174).
+    blogKicker: "Name Atlas · field notes",
+    blogFeatured: "Latest post",
+    blogRead: "Read the post",
+    blogMinutes: "min read",
+    blogToc: "In this post",
     navMenu: "Menu",
     langNamePl: "Polski",
     langNameEn: "English",
@@ -1833,6 +1869,30 @@ export const UI = {
     compareEqualRarity: "Both surnames are equally rare in this dataset.",
     compareTooClose:
       "These figures are too close to separate once rounded, so neither is called rarer.",
+    // The family surnames view (TASK-169). Never "mother's maiden name" (U-2).
+    familyTitle: "Surnames from your family",
+    familyIntro:
+      "Enter up to four surnames. For each one we show the same free result as on its own " +
+      "page. Labels stay in your browser and are never sent anywhere. Nothing is saved: " +
+      "refresh the page and it is all gone.",
+    familyInputLabel: "A surname from your family",
+    familyLabelLabel: "Label (optional)",
+    familyNoLabel: "No label",
+    familyLabelSelf: "Your surname",
+    familyLabelFather: "Father's side",
+    familyLabelMother: "Mother's side",
+    familyLabelOther: "Other",
+    familyAdd: "Add a surname",
+    familySubmit: "Show results",
+    familyNotice:
+      "Each result describes the surname as a whole — everyone who carries it — not your " +
+      "relatives.",
+    familyEntered: "Entered",
+    familyLoading: "Looking it up…",
+    familyFullPage: "The surname's full page",
+    familyRetry: "Try again",
+    familyRateLimitedHeading: "Too many lookups at once",
+    familyRateLimitedBody: "Wait a moment and try again for this surname.",
     compareDisclaimer:
       "We compare figures from the same dataset. A shared or similar surname does not mean a " +
       "shared family, shared roots or shared nationality.",

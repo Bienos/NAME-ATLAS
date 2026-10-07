@@ -30,11 +30,13 @@ import type { Lang } from "./messages.js";
 import { SECTION_TITLES } from "./report-view.js";
 import {
   REPORT_TEASER_TEXT,
+  readerReportPdfHref,
+  reportFree,
   reportInsidePath,
   reportInsideQueryKey,
   reportNotifyHref,
-  reportPrice,
 } from "./report-teaser-text.js";
+import { ReportPrice, SampleReportLink } from "./report-teaser.js";
 import { SiteShell } from "./site-shell.js";
 import { pageSlug } from "./slug.js";
 import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
@@ -57,6 +59,11 @@ import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
  * sign in that returns here. It reads the session, so it is its own dynamic
  * page; never indexed, never in a sitemap. The report cannot be bought yet:
  * "Wkrótce" and the waiting-list email, no buy button (ADR-0037 §2 as amended).
+ *
+ * While the report is free for signed-in readers (TASK-176, D-052), the price
+ * is struck with "dziś 0 zł", and a reader with a session gets a button under
+ * the sample that downloads their own report as a PDF
+ * (`report-reader-pdf.ts`).
  */
 
 export const REPORT_INSIDE_METADATA: Metadata = {
@@ -439,6 +446,8 @@ export function ReportInside({
   otherPath,
   typed,
   sample,
+  free,
+  download,
 }: {
   lang: Lang;
   surname: string;
@@ -448,6 +457,10 @@ export function ReportInside({
   otherPath: string;
   typed: string | null;
   sample: SampleState;
+  /** Whether the report is free for signed-in readers (D-052). */
+  free: boolean;
+  /** The reader's own report as a PDF: free, signed in and a name shown; else null. */
+  download: string | null;
 }) {
   const t = TEXT[lang];
   const r = REPORT_TEASER_TEXT[lang];
@@ -500,6 +513,14 @@ export function ReportInside({
       ) : sample.kind === "ready" ? (
         <ReportSample lang={lang} surname={surname} given={sample.given} facts={sample.facts} />
       ) : null}
+      {download === null || pair === null ? null : (
+        <p className="ri-download" data-report-download="">
+          <a href={download}>
+            {r.download} <span aria-hidden="true">↓</span>
+          </a>
+          <span>{r.downloadNote(pair)}</span>
+        </p>
+      )}
       <section className="ri-toc" aria-labelledby="ri-toc-heading">
         <h2 id="ri-toc-heading">{t.chapters}</h2>
         <ol>
@@ -510,17 +531,29 @@ export function ReportInside({
           ))}
         </ol>
         <p className="ri-unknown">{t.unknown(pair, surname)}</p>
+        <SampleReportLink lang={lang} />
       </section>
       <section className="ri-buy" aria-label={r.eyebrow}>
         <p className="ri-price">
-          <span>{reportPrice(lang)}</span>
+          <span>
+            <ReportPrice lang={lang} free={free} />
+          </span>
           <span>{t.once}</span>
         </p>
-        <p className="ri-soon">{r.soon}</p>
-        <a className="ri-notify" href={reportNotifyHref(surname, lang)}>
-          {r.notify}
-        </a>
-        <p className="ri-hint">{r.notifyHint}</p>
+        {free ? (
+          <>
+            <p className="ri-soon">{r.freeNow}</p>
+            {download === null ? <p className="ri-hint">{r.freeHint}</p> : null}
+          </>
+        ) : (
+          <>
+            <p className="ri-soon">{r.soon}</p>
+            <a className="ri-notify" href={reportNotifyHref(surname, lang)}>
+              {r.notify}
+            </a>
+            <p className="ri-hint">{r.notifyHint}</p>
+          </>
+        )}
         <p className="ri-buy-note">{t.buyNote}</p>
       </section>
     </SiteShell>
@@ -543,6 +576,7 @@ export async function reportInsidePage(
   rawSlug: string,
   query: Record<string, string | string[] | undefined>,
   deps: SampleDeps = RUNNING_SAMPLE_DEPS,
+  free: boolean = reportFree(),
 ) {
   const slug = pageSlug(rawSlug);
   const answer = await answerSlugForMetadata(slug, lang);
@@ -557,6 +591,10 @@ export async function reportInsidePage(
   const gate =
     typed === null ? "off" : await downloadGate(accountsRuntime(), (await headers()).get("cookie"));
   const sample = await loadSample(typed, gate, accountPath(lang, "sign-in", { next: here }), deps);
+  const download =
+    free && gate === "open" && sample.kind === "ready"
+      ? readerReportPdfHref(path, lang, sample.given.display_name)
+      : null;
   const otherLang: Lang = lang === "pl" ? "en" : "pl";
   return (
     <ReportInside
@@ -572,6 +610,8 @@ export async function reportInsidePage(
       }
       typed={typed}
       sample={sample}
+      free={free}
+      download={download}
     />
   );
 }

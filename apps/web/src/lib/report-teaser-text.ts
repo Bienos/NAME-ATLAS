@@ -9,6 +9,13 @@ import type { Lang } from "./messages.js";
  * way to ask is the tier's waiting-list email (ADR-0037 §2.5), never a buy
  * button (ADR-0026 §2.2, ADR-0023 §2.5).
  *
+ * Since TASK-176 (D-052) the report is free for signed-in readers until the
+ * owner ends it: every place shows the price struck and "dziś 0 zł" instead of
+ * "Wkrótce", and the page of what the report holds gives a signed-in reader
+ * their own report as a PDF. `FULL_REPORT_FREE=0` ends it; any other value,
+ * or none, keeps it open. Pages built ahead read it at build time, so a change
+ * shows on the next deploy.
+ *
  * Pure data and addresses, with nothing that reaches the database, so the
  * share-card renderer can read it too.
  */
@@ -19,6 +26,27 @@ const REPORT_TIER = "smaller";
 /** The page that says what the report holds: `/pl/nazwisko/{slug}/pelny-raport`. */
 export function reportInsidePath(pagePath: string, lang: Lang): string {
   return `${pagePath}/${lang === "en" ? "full-report" : "pelny-raport"}`;
+}
+
+/** The invented sample of the report as a PDF (TASK-172): public, every page marked as such. */
+export const SAMPLE_REPORT_PATHS = {
+  pl: "/pl/przykladowy-raport.pdf",
+  en: "/en/sample-report.pdf",
+} as const;
+
+/** The variable that ends the free report (D-052): exactly `0` ends it. */
+export const REPORT_FREE_ENV = "FULL_REPORT_FREE";
+
+/** Whether the report is free for signed-in readers now (TASK-176, D-052). */
+export function reportFree(
+  env: Readonly<Record<string, string | undefined>> = process.env,
+): boolean {
+  return env[REPORT_FREE_ENV] !== "0";
+}
+
+/** A signed-in reader's own report as a PDF: `/pl/nazwisko/{slug}/pelny-raport/pdf?imie=…`. */
+export function readerReportPdfHref(pagePath: string, lang: Lang, givenName: string): string {
+  return `${reportInsidePath(pagePath, lang)}/pdf?${reportInsideQueryKey(lang)}=${encodeURIComponent(givenName)}`;
 }
 
 /** The query key the page reads the typed first name from. */
@@ -49,9 +77,18 @@ export const REPORT_TEASER_TEXT = {
     ],
     sample: "Zobacz próbkę",
     show: "Pokaż",
+    sampleReport: "Przejrzyj przykładowy raport (PDF)",
+    sampleReportNote: "Imię, nazwisko i dane w przykładzie są zmyślone.",
     soon: "Wkrótce.",
     notify: "Powiadom mnie",
     notifyHint: "Otworzy się e-mail do nas. Odpiszemy, gdy raport będzie gotowy.",
+    // TASK-176 (D-052): while the report is free for signed-in readers.
+    freeToday: "dziś 0 zł",
+    freeNow: "Na razie za darmo dla zalogowanych.",
+    freeHint: "Wpisz imię i pobierz swój raport jako PDF.",
+    download: "Pobierz pełny raport (PDF)",
+    downloadNote: (pair: string) =>
+      `Raport dla imienia i nazwiska ${pair}, 10 rozdziałów, z przypisami.`,
     studioHeading: "Ten PDF ma jedną stronę. Pełny raport ma dziesięć rozdziałów.",
     studioTry: (surname: string) =>
       `Wpisz imię, a pokażemy pierwszą stronę raportu dla imienia i nazwiska ${surname}.`,
@@ -73,6 +110,7 @@ export const REPORT_TEASER_TEXT = {
     outroHeading: "Imię i nazwisko w 10 rozdziałach",
     outroLine: (surname: string) => `${surname} i Twoje imię, z przypisem przy każdym fakcie.`,
     outroSoon: "Pełny raport PDF · wkrótce",
+    outroFree: "Pełny raport PDF · dziś 0 zł",
   },
   en: {
     eyebrow: "Full report · PDF",
@@ -86,9 +124,17 @@ export const REPORT_TEASER_TEXT = {
     ],
     sample: "See a sample",
     show: "Show",
+    sampleReport: "Browse a sample report (PDF)",
+    sampleReportNote: "The names and the data in the sample are invented.",
     soon: "Coming soon.",
     notify: "Notify me",
     notifyHint: "This opens an email to us. We will write back when the report is ready.",
+    freeToday: "PLN 0 today",
+    freeNow: "Free for signed-in readers, for now.",
+    freeHint: "Type a first name and download your report as a PDF.",
+    download: "Download the full report (PDF)",
+    downloadNote: (pair: string) =>
+      `The report for the first name and surname ${pair}: 10 chapters, with footnotes.`,
     studioHeading: "This PDF is one page. The full report has ten chapters.",
     studioTry: (surname: string) =>
       `Type a first name and we will show the report's first page for it and ${surname}.`,
@@ -111,5 +157,6 @@ export const REPORT_TEASER_TEXT = {
     outroLine: (surname: string) =>
       `${surname} and your first name, with a footnote on every fact.`,
     outroSoon: "Full PDF report · coming soon",
+    outroFree: "Full PDF report · PLN 0 today",
   },
 } as const;

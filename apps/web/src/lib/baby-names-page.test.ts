@@ -1368,3 +1368,47 @@ describe("the year-by-year dashboard on the page (TASK-170)", () => {
     expect(locked).not.toContain("data-dash=");
   });
 });
+
+describe("the search in Brand System v1 (TASK-171)", () => {
+  it("before a search: the pill search, example names, the panel and the two list cards", async () => {
+    for (const [lang, list, field] of [
+      ["pl", "/pl/imiona-dla-dziecka/lista", "imie"],
+      ["en", "/en/baby-names/list", "name"],
+    ] as const) {
+      const t = BABY_NAMES_TEXT[lang];
+      const html = await render(lang, {}, { userId: "u" });
+      expect(html, lang).toContain("bn-search-hero");
+      expect(html, lang).toContain("bn-search-pill");
+      expect(html, lang).toContain(t.searchKicker);
+      expect(html, lang).toContain(t.seeHeading);
+      for (const item of t.seeItems) expect(html, lang).toContain(item);
+      expect(html, lang).toContain(`?${field}=Zofia"`);
+      expect(html, lang).toContain(`href="${list}?sex=girls"`);
+      expect(html, lang).toContain(`href="${list}?sex=boys"`);
+      expect(html, lang).toContain(t.source);
+      expect(html, lang).not.toContain("bn-search-bar");
+    }
+  });
+
+  it("after a search: the search folds into a bar; a missing name keeps the example names", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const found = await render("pl", { imie: "Zofia" }, { userId: "u" });
+    expect(found).toContain("bn-search-bar");
+    expect(found).toContain('value="Zofia"');
+    expect(found).not.toContain("bn-search-hero");
+    expect(found).not.toContain("bn-lists");
+    const missing = await render("pl", { imie: "nikt" }, { userId: "u" });
+    expect(missing).toContain("bn-search-bar");
+    expect(missing).toContain(t.notFound("nikt"));
+    expect(missing).toContain("bn-examples");
+  });
+
+  it("signed out: the panel, the same words on a card, no form and no list cards", async () => {
+    const t = BABY_NAMES_TEXT.pl;
+    const html = await render("pl", {}, null);
+    expect(html).toContain(t.seeHeadingSignedOut);
+    expect(html).toContain(t.signedOut);
+    expect(html).not.toContain("<form");
+    expect(html).not.toContain("bn-list-card");
+  });
+});

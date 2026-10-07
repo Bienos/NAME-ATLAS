@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createElement, Fragment } from "react";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
@@ -542,8 +542,14 @@ describe("the full report announced on the last card (TASK-166)", () => {
     };
   };
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   for (const lang of ["pl", "en"] as const) {
-    it(`says what the report holds, its price and "soon", in ${lang}`, () => {
+    it(`says what the report holds, its price and "soon", in ${lang}, once the free report ends`, () => {
+      // D-052: `FULL_REPORT_FREE=0` ends the free report (TASK-176).
+      vi.stubEnv("FULL_REPORT_FREE", "0");
       const path = lang === "en" ? "/en/surname/kowalski" : "/pl/nazwisko/kowalski";
       const end = deckCards(FULL, lang, { path, shareUrl: null }).at(-1);
       const html = faces(end === undefined ? [] : [end]);
@@ -569,8 +575,29 @@ describe("the full report announced on the last card (TASK-166)", () => {
       );
       expect(mail(href).body).toContain("KOWALSKI");
       expect(block).not.toMatch(/checkout|<button/u);
+      // The invented sample as a PDF (TASK-172), said to be invented.
+      expect(block).toContain(
+        `href="${lang === "pl" ? "/pl/przykladowy-raport.pdf" : "/en/sample-report.pdf"}"`,
+      );
+      expect(words).toContain(
+        lang === "pl" ? "dane w przykładzie są zmyślone" : "data in the sample are invented",
+      );
     });
   }
+
+  it("while free, strikes the price, says 0 zł for signed-in readers, and offers no waiting list (TASK-176)", () => {
+    const end = deckCards(FULL, "pl", { path: "/pl/nazwisko/kowalski", shareUrl: null }).at(-1);
+    const block = TEASER.exec(faces(end === undefined ? [] : [end]))?.[0] ?? "";
+    const words = text(block);
+    expect(block).toContain("<s>28,99 zł</s>");
+    expect(words).toContain("dziś 0 zł");
+    expect(words).toContain("Na razie za darmo dla zalogowanych.");
+    expect(words).not.toContain("Wkrótce");
+    expect(block).not.toContain("mailto:");
+    // Its only figures are the price and the 0: nothing about the surname.
+    expect(words.match(/\d[\d\u00a0,.]*/gu)).toEqual(["28,99", "0"]);
+    expect(block).toContain('href="/pl/nazwisko/kowalski/pelny-raport"');
+  });
 
   it("sits between the figures and the way on, on the last card only", () => {
     const cards = deckCards(FULL, "pl", LINKS);

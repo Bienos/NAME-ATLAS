@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 import { SECURITY_HEADERS } from "./src/lib/security-headers";
 
+/**
+ * pdfkit's built-in fonts as `require` loads them (`#standard-fonts/*` →
+ * `js/standard-fonts/*.cjs`, and the `chunks/` they require), from the
+ * workspace's store, any version.
+ */
+const PDFKIT_STANDARD_FONTS =
+  "../../node_modules/.pnpm/pdfkit@*/node_modules/pdfkit/js/standard-fonts/**/*.cjs";
+
 const nextConfig: NextConfig = {
   /**
    * The workspace packages are consumed as TypeScript source — each exports
@@ -70,6 +78,16 @@ const nextConfig: NextConfig = {
     // The share cards (TASK-056) read the same files.
     "/pl/nazwisko/**/karta/**": ["./assets/fonts/*.ttf"],
     "/en/surname/**/card/**": ["./assets/fonts/*.ttf"],
+    // The report as a PDF (TASK-172) embeds the same files. pdfkit, under
+    // `@react-pdf/renderer`, loads its built-in Helvetica whenever it opens a
+    // document, through `require("#standard-fonts/…")`, which resolves to the
+    // `.cjs` files; the trace follows only the `.mjs` ones. Without these, the
+    // route answered 500 on Vercel ("Cannot find module …/Helvetica.cjs").
+    "/pl/przykladowy-raport.pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
+    "/en/sample-report.pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
+    // A reader's own report as a PDF (TASK-176): the same.
+    "/pl/nazwisko/**/pelny-raport/pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
+    "/en/surname/**/full-report/pdf": ["./assets/fonts/*.ttf", PDFKIT_STANDARD_FONTS],
     // The blog (TASK-071) reads its posts from `src/content/blog/` at run time.
     "/pl/blog": ["./src/content/blog/*.md"],
     "/en/blog": ["./src/content/blog/*.md"],

@@ -16,7 +16,7 @@ vi.mock("./share-card.js", () => ({
     ["base", "reveal", "intro", "intro-name", "outro"].includes(value),
 }));
 
-const { shareCardResponse, sharePreviewResponse } = await import("./share-route.js");
+const { outroText, shareCardResponse, sharePreviewResponse } = await import("./share-route.js");
 const { UI } = await import("./messages.js");
 
 const PUBLIC_CACHE = "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
@@ -184,7 +184,9 @@ describe("the video's layers (TASK-108)", () => {
         eyebrow: "Pełny raport · PDF",
         heading: "Imię i nazwisko w 10 rozdziałach",
         line: "KOWALSKI i Twoje imię, z przypisem przy każdym fakcie.",
-        soon: "Pełny raport PDF · wkrótce",
+        // While the report is free for signed-in readers (TASK-176, D-052).
+        soon: "Pełny raport PDF · dziś 0 zł",
+        struck: "28,99 zł",
       },
     });
     // Behind the same gate as every layer.
@@ -192,6 +194,17 @@ describe("the video's layers (TASK-108)", () => {
       (await shareCardResponse("kowalski", "summary", "pl", "atlas.test", "sign-in", "outro"))
         .status,
     ).toBe(401);
+  });
+
+  it('says "wkrótce" on the closing plate once the free report ends (TASK-176)', () => {
+    expect(outroText("KOWALSKI", "pl", false)).toMatchObject({
+      soon: "Pełny raport PDF · wkrótce",
+      struck: null,
+    });
+    expect(outroText("KOWALSKI", "en", true)).toMatchObject({
+      soon: "Full PDF report · PLN 0 today",
+      struck: "PLN 28.99",
+    });
   });
 
   it("draws the plain card without a layer", async () => {

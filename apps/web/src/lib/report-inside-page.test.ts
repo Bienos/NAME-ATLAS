@@ -135,7 +135,12 @@ const MEANING: GivenNameMeaningFacts = {
 
 const FACTS: SampleFacts = { stock: STOCK, births: BIRTHS, meaning: MEANING };
 
-function page(sample: SampleState, lang: Lang = "pl", typed: string | null = "Piotr"): string {
+function page(
+  sample: SampleState,
+  lang: Lang = "pl",
+  typed: string | null = "Piotr",
+  offer: { free: boolean; download: string | null } = { free: false, download: null },
+): string {
   const path = lang === "en" ? "/en/surname/kowalski" : "/pl/nazwisko/kowalski";
   return renderToStaticMarkup(
     createElement(ReportInside, {
@@ -146,6 +151,7 @@ function page(sample: SampleState, lang: Lang = "pl", typed: string | null = "Pi
         lang === "en" ? "/pl/nazwisko/kowalski/pelny-raport" : "/en/surname/kowalski/full-report",
       typed,
       sample,
+      ...offer,
     }),
   ).replaceAll("&amp;", "&");
 }
@@ -262,6 +268,8 @@ describe("the full report's page (TASK-166)", () => {
     );
     expect(html).not.toMatch(/checkout|Kup raport/u);
     expect(html).not.toContain("data-report-sample");
+    // The invented sample as a PDF (TASK-172).
+    expect(html).toContain('href="/pl/przykladowy-raport.pdf"');
   });
 
   it("asks a reader without a session to sign in, and comes back here", () => {
@@ -272,6 +280,34 @@ describe("the full report's page (TASK-166)", () => {
     expect(html).not.toContain("data-report-sample");
     // The typed name stays in the field.
     expect(html).toContain('value="Piotr"');
+  });
+
+  it("while free, strikes the price and offers a signed-in reader their report (TASK-176)", () => {
+    const pdf = "/pl/nazwisko/kowalski/pelny-raport/pdf?imie=PIOTR";
+    const html = page(ready, "pl", "Piotr", { free: true, download: pdf });
+    const words = text(html);
+    expect(html).toContain("<s>28,99 zł</s>");
+    expect(words).toContain("dziś 0 zł");
+    expect(words).toContain("Na razie za darmo dla zalogowanych.");
+    expect(html).toContain(`href="${pdf}"`);
+    expect(words).toContain("Pobierz pełny raport (PDF)");
+    expect(words).toContain("Raport dla imienia i nazwiska PIOTR KOWALSKI, 10 rozdziałów");
+    // The button follows the sample; no "Wkrótce", no waiting list, no buy button.
+    expect(html.indexOf("data-report-download")).toBeGreaterThan(
+      html.indexOf("data-report-sample"),
+    );
+    expect(words).not.toContain("Wkrótce");
+    expect(html).not.toContain("mailto:");
+    expect(html).not.toMatch(/checkout|Kup raport/u);
+  });
+
+  it("while free, offers no file without a session or a name, and says how to get one (TASK-176)", () => {
+    for (const sample of [{ kind: "none" } as const, { kind: "sign-in", href: "/x" } as const]) {
+      const html = page(sample, "pl", null, { free: true, download: null });
+      expect(html).not.toContain("data-report-download");
+      expect(text(html)).toContain("Wpisz imię i pobierz swój raport jako PDF.");
+      expect(html).toContain("<s>28,99 zł</s>");
+    }
   });
 
   it("speaks English on the English page", () => {
