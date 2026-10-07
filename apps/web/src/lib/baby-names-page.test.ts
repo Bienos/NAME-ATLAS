@@ -33,7 +33,7 @@ import {
 import type { BabyNamesDeps } from "./baby-names-page.js";
 import { babyNamesFreeUntil } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
-import { formatInteger } from "./messages.js";
+import { assessmentWord, formatInteger } from "./messages.js";
 import type { Lang } from "./messages.js";
 
 /**
@@ -957,6 +957,12 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
     expect(meaning).toContain('href="https://polona.pl/buryan"');
     expect(meaning).toContain('data-confidence="LIKELY"');
     expect(meaning).not.toContain(t.meaningNone);
+    // Each work's own line, verbatim, and the assessment as a word (TASK-177).
+    expect(meaning).toContain(`<p>${t.quote("Zofja (grec.) — mądrość.")}</p>`);
+    expect(meaning).toContain(`<p>${t.quote("Zofia, Gr., wisdom.")}</p>`);
+    expect(meaning).toContain(t.workOf(1, 2));
+    expect(meaning).toContain(`</span>${assessmentWord("LIKELY", "pl")}</span>`);
+    expect(meaning).not.toContain(t.conflictingNote);
     // The English page: Yonge in English, no translation and no note about one.
     const en = await render("en", { name: "zofia" }, { userId: "u" });
     const enMeaning = tile(en, 'data-meaning="READY"');
@@ -964,8 +970,28 @@ describe("the redesigned page (TASK-151, ADR-0046)", () => {
       `data-meaning-origin="grc">Greek (${BABY_NAMES_TEXT.en.quote("Gr.")})<`,
     );
     expect(enMeaning).toContain(BABY_NAMES_TEXT.en.quote("wisdom"));
-    expect(enMeaning).not.toContain("mądrość");
+    expect(enMeaning).not.toContain(`${BABY_NAMES_TEXT.en.quote("mądrość")}<`);
     expect(enMeaning).not.toContain("Name Atlas");
+  });
+
+  it("the meaning tile when the works disagree: the word and one line saying we do not pick (TASK-177)", async () => {
+    const conflicting: GivenNameMeaningFacts = {
+      ...(MEANING_READY as Extract<GivenNameMeaningFacts, { state: "READY" }>),
+      confidence: { status: "CONFLICTING", methodology_code: "given_name_meaning@1" },
+    };
+    for (const lang of ["pl", "en"] as const) {
+      const data = await loadBabyNames({
+        lang,
+        query: { [field[lang]]: "zofia" },
+        session: { userId: "u" },
+        deps: { ...deps({ u: ["babynames"] }), readMeaning: () => Promise.resolve(conflicting) },
+      });
+      const html = renderToStaticMarkup(createElement(BabyNamesView, { data }));
+      const meaning = tile(html, 'data-meaning="READY"');
+      expect(meaning, lang).toContain('data-confidence="CONFLICTING"');
+      expect(meaning, lang).toContain(assessmentWord("CONFLICTING", lang));
+      expect(meaning, lang).toContain(BABY_NAMES_TEXT[lang].conflictingNote);
+    }
   });
 
   it("the meaning tile without a work: one muted line and nothing else; blocked: the refusal (AC-1)", async () => {

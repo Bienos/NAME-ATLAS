@@ -53,7 +53,13 @@ import { COUPLE_NAMES_PATHS, coupleNamesEnabled } from "./couple-names-config.js
 import { db } from "./db.js";
 import { ConfidenceBadge, Tabs } from "../design-system/components/index.js";
 import { AtlasPoint, ContourField } from "../design-system/graphics/index.js";
-import { formatDate, formatDecimal, formatInteger, formatPercent } from "./messages.js";
+import {
+  assessmentWord,
+  formatDate,
+  formatDecimal,
+  formatInteger,
+  formatPercent,
+} from "./messages.js";
 import type { Lang } from "./messages.js";
 import { ORIGINS } from "./given-name-meaning-view.js";
 import { sessionCookieName } from "./session-cookie.js";
@@ -608,20 +614,21 @@ function Meaning({ meaning, lang }: { meaning: GivenNameMeaningFacts; lang: Lang
         <p className="note bn-muted">{t.meaningNone}</p>
       ) : (
         <>
-          <ul className="bn-works">
-            {meaning.works.map((w) => {
+          <ol className="bn-works" data-works={meaning.works.length}>
+            {meaning.works.map((w, i) => {
               const origin = originWords(w, lang);
               return (
                 <li key={w.citation.id} className="bn-work">
+                  <p className="bn-work-head">
+                    {meaning.works.length > 1 ? (
+                      <span className="bn-work-index">{t.workOf(i + 1, meaning.works.length)}</span>
+                    ) : null}
+                    <span className="bn-work-author">{w.work.author_or_publisher}</span>
+                    <span className="bn-work-year">{w.work.year}</span>
+                  </p>
                   <dl className="bn-work-facts">
-                    {origin === null ? null : (
-                      <div>
-                        <dt>{t.origin}</dt>
-                        <dd data-meaning-origin={w.origin?.code}>{origin}</dd>
-                      </div>
-                    )}
                     {w.literal_gloss === null ? null : (
-                      <div>
+                      <div className="bn-work-gloss">
                         <dt>{t.meaning}</dt>
                         <dd data-meaning-gloss="">
                           {t.quote(w.literal_gloss)}
@@ -636,7 +643,19 @@ function Meaning({ meaning, lang }: { meaning: GivenNameMeaningFacts; lang: Lang
                         </dd>
                       </div>
                     )}
+                    {origin === null ? null : (
+                      <div>
+                        <dt>{t.origin}</dt>
+                        <dd data-meaning-origin={w.origin?.code}>{origin}</dd>
+                      </div>
+                    )}
                   </dl>
+                  <figure className="bn-quotation" data-meaning-quotation="">
+                    <figcaption>{t.quotationLabel}</figcaption>
+                    <blockquote>
+                      <p>{t.quote(w.quotation)}</p>
+                    </blockquote>
+                  </figure>
                   <p className="bn-evidence">
                     <cite className="atlas-citation">
                       {t.workLine(w.work.author_or_publisher, w.work.title, w.work.year, w.locator)}
@@ -651,15 +670,20 @@ function Meaning({ meaning, lang }: { meaning: GivenNameMeaningFacts; lang: Lang
                 </li>
               );
             })}
-          </ul>
-          <p className="bn-assessment">
-            <span className="bn-assessment-word">{t.assessment}</span>{" "}
-            {level === null ? (
-              <span>{meaning.confidence.status}</span>
-            ) : (
-              <ConfidenceBadge level={level} />
-            )}
-          </p>
+          </ol>
+          <div className="bn-assessment" data-assessment={meaning.confidence.status}>
+            <p className="bn-assessment-line">
+              <span className="bn-assessment-word">{t.assessment}</span>{" "}
+              {level === null ? (
+                <span>{meaning.confidence.status}</span>
+              ) : (
+                <ConfidenceBadge level={level} label={assessmentWord(level, lang)} />
+              )}
+            </p>
+            {level === "CONFLICTING" ? (
+              <p className="bn-assessment-note">{t.conflictingNote}</p>
+            ) : null}
+          </div>
           {translated ? <p className="note bn-muted">{t.translationNote}</p> : null}
         </>
       )}

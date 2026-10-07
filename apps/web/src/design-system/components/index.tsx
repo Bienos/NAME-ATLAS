@@ -57,13 +57,16 @@ export function Badge({ children, className = "" }: { children: ReactNode; class
 
 export function ConfidenceBadge({
   level,
+  label,
 }: {
   level: "VERIFIED" | "LIKELY" | "POSSIBLE" | "UNCONFIRMED" | "CONFLICTING" | "INSUFFICIENT_DATA";
+  /** The status as a word in the page's language; the raw status when absent. */
+  label?: string;
 }) {
   return (
     <span className="atlas-confidence" data-confidence={level}>
       <span aria-hidden="true">●</span>
-      {level.replaceAll("_", " ")}
+      {label ?? level.replaceAll("_", " ")}
     </span>
   );
 }

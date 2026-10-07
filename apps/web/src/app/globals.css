@@ -9613,22 +9613,62 @@ main.baby-names.atlas-v1 section.bn-tile {
 
 .baby-names.atlas-v1 .bn-works {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   gap: var(--space-md);
-  margin: 0;
+  margin: var(--space-md) 0 0;
   padding: 0;
   list-style: none;
 }
 
+/* One work: who says it, what it says, its own line, where to check it. */
+.baby-names.atlas-v1 .bn-work {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+  padding: clamp(16px, 2.2vw, 22px);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.baby-names.atlas-v1 .bn-work-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.baby-names.atlas-v1 .bn-work-index {
+  flex-basis: 100%;
+  font: 500 var(--type-metadata) / 1.4 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-work-author {
+  font: 500 var(--type-body-lg) / 1.25 var(--font-display, Georgia, serif);
+  color: var(--color-text-primary);
+}
+
+.baby-names.atlas-v1 .bn-work-year {
+  font: 500 var(--type-data-md) / 1.4 var(--font-data, ui-monospace, monospace);
+  color: var(--color-text-tertiary);
+}
+
 .baby-names.atlas-v1 .bn-work-facts {
   display: grid;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   margin: 0;
 }
 
 .baby-names.atlas-v1 .bn-work-facts div {
   display: grid;
-  grid-template-columns: minmax(84px, 0.4fr) 2fr;
-  gap: 12px;
+  gap: 2px;
 }
 
 .baby-names.atlas-v1 .bn-work-facts dt {
@@ -9642,16 +9682,67 @@ main.baby-names.atlas-v1 section.bn-tile {
   margin: 0;
 }
 
+/* The gloss is the answer to "co znaczy", so it reads first and largest. */
+.baby-names.atlas-v1 .bn-work-gloss dd {
+  font: 500 var(--type-heading-md) / 1.15 var(--font-display, Georgia, serif);
+  color: var(--color-text-primary);
+}
+
 .baby-names.atlas-v1 .bn-translation {
+  display: inline-block;
+  margin-top: 4px;
+  font: 400 var(--type-body-md) / 1.4 var(--font-ui, system-ui, sans-serif);
   color: var(--color-text-secondary);
 }
 
+.baby-names.atlas-v1 .bn-quotation {
+  margin: 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--color-accent-primary);
+}
+
+.baby-names.atlas-v1 .bn-quotation figcaption {
+  font: 500 var(--type-metadata) / 1.5 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-tertiary);
+}
+
+.baby-names.atlas-v1 .bn-quotation blockquote {
+  margin: 4px 0 0;
+}
+
+.baby-names.atlas-v1 .bn-quotation p {
+  margin: 0;
+  font: italic 400 var(--type-body-md) / 1.5 var(--font-display, Georgia, serif);
+  color: var(--color-text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.baby-names.atlas-v1 .bn-work .bn-evidence {
+  margin-top: auto;
+  overflow-wrap: anywhere;
+}
+
 .baby-names.atlas-v1 .bn-assessment {
+  margin: var(--space-md) 0 0;
+}
+
+.baby-names.atlas-v1 .bn-assessment-line {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin: var(--space-md) 0 0;
+  margin: 0;
+}
+
+.baby-names.atlas-v1 .bn-assessment-note {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.baby-names.atlas-v1 .bn-meaning > .note {
+  margin-top: var(--space-sm);
 }
 
 .baby-names.atlas-v1 .bn-assessment-word {
