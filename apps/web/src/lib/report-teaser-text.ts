@@ -21,6 +21,12 @@ export function reportInsidePath(pagePath: string, lang: Lang): string {
   return `${pagePath}/${lang === "en" ? "full-report" : "pelny-raport"}`;
 }
 
+/** The invented sample of the report as a PDF (TASK-171): public, every page marked as such. */
+export const SAMPLE_REPORT_PATHS = {
+  pl: "/pl/przykladowy-raport.pdf",
+  en: "/en/sample-report.pdf",
+} as const;
+
 /** The query key the page reads the typed first name from. */
 export function reportInsideQueryKey(lang: Lang): string {
   return lang === "en" ? "name" : "imie";
@@ -49,6 +55,8 @@ export const REPORT_TEASER_TEXT = {
     ],
     sample: "Zobacz próbkę",
     show: "Pokaż",
+    sampleReport: "Przejrzyj przykładowy raport (PDF)",
+    sampleReportNote: "Imię, nazwisko i dane w przykładzie są zmyślone.",
     soon: "Wkrótce.",
     notify: "Powiadom mnie",
     notifyHint: "Otworzy się e-mail do nas. Odpiszemy, gdy raport będzie gotowy.",
@@ -86,6 +94,8 @@ export const REPORT_TEASER_TEXT = {
     ],
     sample: "See a sample",
     show: "Show",
+    sampleReport: "Browse a sample report (PDF)",
+    sampleReportNote: "The names and the data in the sample are invented.",
     soon: "Coming soon.",
     notify: "Notify me",
     notifyHint: "This opens an email to us. We will write back when the report is ready.",

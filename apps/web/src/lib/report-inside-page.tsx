@@ -35,6 +35,7 @@ import {
   reportNotifyHref,
   reportPrice,
 } from "./report-teaser-text.js";
+import { SampleReportLink } from "./report-teaser.js";
 import { SiteShell } from "./site-shell.js";
 import { pageSlug } from "./slug.js";
 import { answerSlugForMetadata, canonicalPathFor } from "./surname-page.js";
@@ -510,6 +511,7 @@ export function ReportInside({
           ))}
         </ol>
         <p className="ri-unknown">{t.unknown(pair, surname)}</p>
+        <SampleReportLink lang={lang} />
       </section>
       <section className="ri-buy" aria-label={r.eyebrow}>
         <p className="ri-price">

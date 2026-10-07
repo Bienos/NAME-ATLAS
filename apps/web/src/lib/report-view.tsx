@@ -147,8 +147,8 @@ export function toReportPreview(stored: StoredReportVersion): ReportPreview | nu
   };
 }
 
-type Words = Readonly<Record<string, { readonly pl: string; readonly en: string }>>;
-const word = (words: Words, key: string, lang: Lang): string => words[key]?.[lang] ?? key;
+export type Words = Readonly<Record<string, { readonly pl: string; readonly en: string }>>;
+export const word = (words: Words, key: string, lang: Lang): string => words[key]?.[lang] ?? key;
 
 export const SECTION_TITLES: Words = {
   GIVEN_NAME: { pl: "Imię", en: "First name" },
@@ -163,7 +163,7 @@ export const SECTION_TITLES: Words = {
   LIMITATIONS: { pl: "Czego nie wiemy", en: "What we don't know" },
 };
 
-const SOURCELESS: Words = {
+export const SOURCELESS: Words = {
   VARIANTS: { pl: "dawnych form nazwiska", en: "historical forms of the surname" },
   PLACES: {
     pl: "dawnych miejsc związanych z nazwiskiem",
@@ -172,7 +172,7 @@ const SOURCELESS: Words = {
   MIGRATION: { pl: "migracji nazwiska", en: "the surname's migration" },
 };
 
-const REASONS: Words = {
+export const REASONS: Words = {
   NO_PREMIUM_INVENTORY: { pl: "nie ma głębszych materiałów", en: "there is no deeper material" },
   ALL_SHOWN_FREE: {
     pl: "wszystko, co jest, widać już za darmo",
@@ -196,7 +196,7 @@ const REASONS: Words = {
   },
 };
 
-const DIMENSIONS: Words = {
+export const DIMENSIONS: Words = {
   POPULATION: { pl: "Liczebność", en: "Population" },
   RARITY: { pl: "Rzadkość", en: "Rarity" },
   MODERN_GEOGRAPHY: { pl: "Rozmieszczenie dziś", en: "Today's geography" },
@@ -211,7 +211,7 @@ const DIMENSIONS: Words = {
   MIGRATION: { pl: "Migracje", en: "Migration" },
 };
 
-const AVAILABILITY: Words = {
+export const AVAILABILITY: Words = {
   PARTIAL: { pl: "częściowo", en: "partial" },
   NONE: { pl: "nic nie znaleziono", en: "nothing found" },
   BLOCKED_RIGHTS: { pl: "zablokowane przez prawa źródła", en: "blocked by the source's rights" },
@@ -228,7 +228,7 @@ const ROLES: Words = {
 };
 
 /** Why a section shows no figures, by its state. */
-const STATES: Words = {
+export const STATES: Words = {
   UNAVAILABLE: { pl: "Brak zatwierdzonych danych.", en: "No approved data." },
   RIGHTS_BLOCKED: {
     pl: "Prawa źródła nie pozwalają pokazać tego w raporcie.",
@@ -242,7 +242,7 @@ const STATES: Words = {
 };
 
 /** A full-name report's gaps about the first name, by topic. */
-const GIVEN_GAPS: Words = {
+export const GIVEN_GAPS: Words = {
   MEANING: { pl: GIVEN_NAME_MEANING_TEXT.pl.none, en: GIVEN_NAME_MEANING_TEXT.en.none },
   FULL_NAME_COUNT: {
     pl: "Ile osób nosi to imię i to nazwisko razem: żadne źródło nie łączy imion z nazwiskami, więc raport tego nie podaje i nie szacuje.",
@@ -258,7 +258,7 @@ const GIVEN_GAPS: Words = {
   },
 };
 
-const COPY = {
+export const COPY = {
   pl: {
     eyebrow: (v: number, d: string) => `Raport · wersja ${v} · ${d}`,
     fullEyebrow: (v: number, d: string) => `Raport imienia i nazwiska · wersja ${v} · ${d}`,
@@ -408,7 +408,7 @@ const COPY = {
 } as const;
 
 /** Every citation in the response, by id. */
-function citationsById(
+export function citationsById(
   value: unknown,
   out = new Map<string, CitationDto>(),
 ): Map<string, CitationDto> {
@@ -440,7 +440,7 @@ function Note({ id, numbers }: { id: string; numbers: ReadonlyMap<string, number
   );
 }
 
-function listName(group: string | null, lang: Lang): string {
+export function listName(group: string | null, lang: Lang): string {
   return partitionLabel(group, lang) ?? "—";
 }
 
@@ -798,7 +798,7 @@ function BirthYears({
 }
 
 /** A citation's locator in words: a dataset's resource number, or the locator as written. */
-function locatorWords(locator: string, lang: Lang): string {
+export function locatorWords(locator: string, lang: Lang): string {
   const resource = /^resource:(\S+)$/u.exec(locator);
   if (resource === null) return locator;
   return `${lang === "pl" ? "zasób" : "resource"} ${resource[1]}`;
@@ -917,7 +917,7 @@ function chapterBody(
 }
 
 /** The contents line's count: the chapter's claims, or its sources. */
-function contentsCount(section: ReportPreview["sections"][number], lang: Lang): string {
+export function contentsCount(section: ReportPreview["sections"][number], lang: Lang): string {
   const t = COPY[lang];
   if (section.type === "SOURCES") {
     const n = section.citationIds.length;
@@ -930,8 +930,14 @@ function contentsCount(section: ReportPreview["sections"][number], lang: Lang): 
 }
 
 /** The dossier itself, without the site's shell. */
-export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang: Lang }) {
-  const t = COPY[lang];
+/**
+ * The report's citations by id, and each one's number in the bibliography.
+ * Shared by the preview and the PDF (TASK-171).
+ */
+export function reportNumbers(preview: ReportPreview): {
+  readonly citations: ReadonlyMap<string, CitationDto>;
+  readonly numbers: ReadonlyMap<string, number>;
+} {
   const sourceIds = preview.sections.find((s) => s.type === "SOURCES")?.citationIds ?? [];
   const citations = citationsById([preview.givenName, preview.response]);
   const numbers = new Map(sourceIds.map((id, i) => [id, i + 1]));
@@ -946,6 +952,12 @@ export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang:
     const n = byReference.get(referenceKey(c));
     if (!numbers.has(id) && n !== undefined) numbers.set(id, n);
   }
+  return { citations, numbers };
+}
+
+export function ReportDossier({ preview, lang }: { preview: ReportPreview; lang: Lang }) {
+  const t = COPY[lang];
+  const { citations, numbers } = reportNumbers(preview);
   const date = formatDate(preview.generatedOn, lang);
   const eligible = preview.eligibility.state === "ELIGIBLE";
   const fullName = preview.givenName !== null;
