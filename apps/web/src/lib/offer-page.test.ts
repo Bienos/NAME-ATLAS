@@ -151,6 +151,22 @@ describe("the offer page (TASK-057, TASK-104, TASK-167, ADR-0037)", () => {
     });
   });
 
+  it("leads from a row of prices to every card, and folds each form away (TASK-173)", () => {
+    for (const lang of LANGS) {
+      const html = render(lang);
+      const doc = offerDocument(lang);
+      for (const item of [...doc.tiers, ...doc.products]) {
+        expect(html).toContain(`href="#tier-${item.key}"`);
+        expect(html).toContain(`id="tier-${item.key}"`);
+      }
+      const folded = html.match(/<details class="offer-ask">/gu) ?? [];
+      // Five waiting lists (two products, three packs) and the 800 zł enquiry.
+      expect(folded).toHaveLength(6);
+      expect(html).toContain(`<summary class="offer-ask-toggle">${doc.waitlist.heading}</summary>`);
+      expect(html).toContain(`<summary class="offer-ask-toggle">${doc.enquiry.heading}</summary>`);
+    }
+  });
+
   it("draws the table from the entitlement lists (AC-5)", () => {
     const yes = (row: TableRow) =>
       TABLE_COLUMNS.filter((column) => tableCell(row, column, "pl") === true);
