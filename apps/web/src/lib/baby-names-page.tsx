@@ -33,6 +33,7 @@ import {
   BABY_NAMES_FIELD,
   BABY_NAMES_LIST_PATHS,
   BABY_NAMES_PATHS,
+  BABY_NAMES_SHARE_PATHS,
   babyNamesEnabled,
 } from "./baby-names-config.js";
 import { BABY_NAMES_TEXT } from "./baby-names-text.js";
@@ -140,10 +141,18 @@ export type BabyNamesData =
           };
     };
 
-/** The sex tabs' query field and values, the list page's (TASK-146). */
+/** The sex tabs' query field and values, the list page's (TASK-146) and the share cards' (TASK-152). */
 export const BABY_NAMES_SEX_FIELD = "sex";
-const SEX_VALUES: Readonly<Record<string, BirthSex>> = { boys: "MALE", girls: "FEMALE" };
-const SEX_PARAM: Readonly<Record<BirthSex, string>> = { MALE: "boys", FEMALE: "girls" };
+export const BABY_NAMES_SEX_VALUES: Readonly<Record<string, BirthSex>> = {
+  boys: "MALE",
+  girls: "FEMALE",
+};
+export const BABY_NAMES_SEX_PARAM: Readonly<Record<BirthSex, string>> = {
+  MALE: "boys",
+  FEMALE: "girls",
+};
+const SEX_VALUES = BABY_NAMES_SEX_VALUES;
+const SEX_PARAM = BABY_NAMES_SEX_PARAM;
 
 /** The latest stored list of one sex: the year and cut-off a rare name stayed below. */
 export interface BirthCutoff {
@@ -465,10 +474,32 @@ function SexSection({
             lang={lang}
           />
           <Direction figures={figures} lang={lang} />
+          <ShareEntry name={name} sex={figures.sex} lang={lang} />
         </>
       )}
       <Register stock={stock} sex={figures.sex} lang={lang} />
     </section>
+  );
+}
+
+/**
+ * "Udostępnij" (TASK-152): the way to this sex's share cards, shown only where
+ * the free view has figures to put on a card. A link to the sheet, which
+ * works without script; the sheet does the sharing.
+ */
+function ShareEntry({ name, sex, lang }: { name: string; sex: BirthSex; lang: Lang }) {
+  const t = BABY_NAMES_TEXT[lang];
+  const href = `${BABY_NAMES_SHARE_PATHS[lang]}?${new URLSearchParams({
+    [BABY_NAMES_FIELD[lang]]: name,
+    [BABY_NAMES_SEX_FIELD]: SEX_PARAM[sex],
+  }).toString()}`;
+  return (
+    <p className="bn-share-entry">
+      <a className="bn-share-link" href={href} data-share={sex}>
+        {t.shareEntry}
+      </a>
+      <span className="note bn-share-note">{t.shareEntryNote}</span>
+    </p>
   );
 }
 

@@ -153,6 +153,40 @@ export async function shareOrSaveFile(
 }
 
 /**
+ * An image by its address, under a file name the caller chose (the baby-names
+ * sheet, TASK-152, whose card addresses carry a query): the share sheet where
+ * the browser takes files, a download everywhere else.
+ */
+export async function shareOrSaveImage(
+  url: string,
+  fileName: string,
+  title: string,
+): Promise<ShareOutcome> {
+  const blob = await fetchImage(url);
+  if (typeof blob === "string") return blob;
+  const shared = await shareBlob(blob, fileName, title);
+  return shared === "failed" ? save(blob, fileName) : shared;
+}
+
+/** The same image through the share sheet only. */
+export async function shareImage(
+  url: string,
+  fileName: string,
+  title: string,
+): Promise<ShareOutcome> {
+  const blob = await fetchImage(url);
+  if (typeof blob === "string") return blob;
+  return shareBlob(blob, fileName, title);
+}
+
+/** The same image as a download. */
+export async function saveImage(url: string, fileName: string): Promise<ShareOutcome> {
+  const blob = await fetchImage(url);
+  if (typeof blob === "string") return blob;
+  return save(blob, fileName);
+}
+
+/**
  * The deck's button: the system share sheet where the browser can share files,
  * a download everywhere else.
  */
@@ -161,11 +195,7 @@ export async function shareOrSave(
   surname: string,
   key: string,
 ): Promise<ShareOutcome> {
-  const blob = await fetchImage(url);
-  if (typeof blob === "string") return blob;
-  const name = cardFileName(surname, url, key);
-  const shared = await shareBlob(blob, name, surname);
-  return shared === "failed" ? save(blob, name) : shared;
+  return shareOrSaveImage(url, cardFileName(surname, url, key), surname);
 }
 
 /** The studio's "Udostępnij": the share sheet only. */
