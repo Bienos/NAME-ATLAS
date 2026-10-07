@@ -93,7 +93,9 @@ export function SiteFooter({ lang }: { readonly lang: Lang }) {
           <ul>
             {social.map((link) => (
               <li key={link.label}>
-                <a href={link.href}>{link.label}</a>
+                <a href={link.href} rel="me noopener noreferrer" target="_blank">
+                  {link.label}
+                </a>
               </li>
             ))}
           </ul>
