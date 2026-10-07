@@ -1,4 +1,4 @@
-# 2026-10-07 — TASK-165: the offer page redesigned, with test-mode purchases for testers
+# 2026-10-07 — TASK-167: the offer page redesigned, with test-mode purchases for testers
 
 ## What changed
 
@@ -9,7 +9,7 @@
 - `offer-page.test.ts`: rewritten for AC-1 to AC-5; the mail, nav, partner and privacy tests kept.
 - ADR-0037 §2.1: the full-name comparison's "not yet on the offer page" amended.
 
-The mockup's four questions were not answered; the task takes its stated defaults; the owner's later answers ("B, tak, zostaw") are in `tasks/165-pricing-page-redesign.md`. Numbered 165 after rebasing onto `main` @ `fd0d75b`, where 163 and 164 were taken.
+The mockup's four questions were not answered; the task takes its stated defaults; the owner's later answers ("B, tak, zostaw") are in `tasks/167-pricing-page-redesign.md`. Numbered 167: `main` took 163, 164 and 166, and open pull requests #196 and #199 both name 165.
 
 ## Verification (run in this session)
 

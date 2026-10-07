@@ -49,8 +49,8 @@ function render(lang: "pl" | "en", reader: OfferReader = GUEST): string {
 const OPEN = { until: "2026-11-07", lastWeek: false } as const;
 const MEMBER: OfferReader = { accounts: true, signedIn: true, tester: false, freeWindow: null };
 
-describe("the offer page (TASK-057, TASK-104, TASK-165, ADR-0037)", () => {
-  it("lists every price with its name: free now, the products and packs coming (TASK-165 AC-1)", () => {
+describe("the offer page (TASK-057, TASK-104, TASK-167, ADR-0037)", () => {
+  it("lists every price with its name: free now, the products and packs coming (TASK-167 AC-1)", () => {
     const prices = {
       pl: ["0 zł", "8,99 zł", "15,99 zł", "28,99 zł", "89,99 zł", "199 zł", "800 zł"],
       en: ["PLN 0", "PLN 8.99", "PLN 15.99", "PLN 28.99", "PLN 89.99", "PLN 199", "PLN 800"],
@@ -78,7 +78,7 @@ describe("the offer page (TASK-057, TASK-104, TASK-165, ADR-0037)", () => {
     }
   });
 
-  it("offers no purchase to anyone but a listed tester (TASK-165 AC-3)", () => {
+  it("offers no purchase to anyone but a listed tester (TASK-167 AC-3)", () => {
     for (const lang of LANGS) {
       for (const reader of [GUEST, MEMBER, { ...MEMBER, freeWindow: OPEN }]) {
         const html = render(lang, reader);
@@ -130,7 +130,7 @@ describe("the offer page (TASK-057, TASK-104, TASK-165, ADR-0037)", () => {
       expect(member).toContain(`href="${BABY_NAMES_PATHS[lang]}"`);
       expect(member).toContain(doc.freeWindow.signedIn);
       expect(member).toContain(`href="${accountPath(lang, "account")}"`);
-      // The true end is shown (D-051, TASK-165); "the last week" only when it is.
+      // The true end is shown (D-051, TASK-167); "the last week" only when it is.
       expect(member).toContain(doc.freeWindow.when(formatDate("2026-11-07", lang), false));
       const last = render(lang, { ...MEMBER, freeWindow: { ...OPEN, lastWeek: true } });
       expect(last).toContain(doc.freeWindow.when(formatDate("2026-11-07", lang), true));

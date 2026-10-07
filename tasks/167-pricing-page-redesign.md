@@ -1,10 +1,10 @@
-# TASK-165 — The offer page redesigned with every product, and test-mode checkout for testers
+# TASK-167 — The offer page redesigned with every product, and test-mode checkout for testers
 
 - **Status:** IMPLEMENTED 2026-10-07 (`docs/progress/2026-10-07-pricing-page-redesign.md`).
 - **Requested by:** the project owner, 2026-10-07, in a Claude Code session: "redesign me pricing page with correct info and we connect checkout as well, give me mock up and then we code". After the mockup: "prosze czy mozesz to teraz zrobic mi tak samo" ("please build it now the same way").
 - **Mockup:** https://claude.ai/artifact/LfJ7prnaaYzQVELeuK2QPx (private to the owner).
 - **Decision:** none new. The owner did not answer the mockup's four questions; this task takes the mockup's stated defaults: (1) buy buttons only for listed testers in test mode, the exception TASK-111 and TASK-154 already made for the account page, and no button for anyone else (ADR-0023 §2.5 still holds); (2) the 15,99 zł product in the mockup's words, which answers D-049's "the offer page's wording"; (3) the addresses stay `/pl/oferta` and `/en/offer`; (4) no FAQ line about invoices. Then, the same day, the owner answered three follow-ups: "B, tak, zostaw" — the baby-names card states the window's true end, and "the last week" only in its last 7 days (D-051 amended, option B); "Co mówią Wasze imiona razem" is listed in the three packs as coming (D-050 §3 already holds it in every dearer pack); the 199 zł pack gets nothing new. ADR-0037 §2.1's "not yet on the offer page" is amended.
-- **Numbers:** TASK-165. 163 and 164 are on `main` (`fd0d75b`); open pull request #196 also names TASK-164; #190 (TASK-159), #191 and #181 hold no newer number.
+- **Numbers:** TASK-167. 163, 164 and 166 are on `main` (`ecfd4a8`); open pull requests #196 and #199 both name TASK-165 and #198 names TASK-163, so this task, first numbered 163 and then 165, takes 167.
 
 ## 1. Facts (`main` @ `f753f4e`)
 

@@ -22,7 +22,7 @@ import { SiteShell } from "./site-shell.js";
 import { homePath, offerPath } from "./site-links.js";
 
 /**
- * `/pl/oferta` and `/en/offer` (TASK-057, TASK-104, TASK-165, ADR-0037): the
+ * `/pl/oferta` and `/en/offer` (TASK-057, TASK-104, TASK-167, ADR-0037): the
  * free plan as it is, the two one-off products, the three tree packs and the
  * 800 zł research, a table of what each holds, and how paying will work.
  *

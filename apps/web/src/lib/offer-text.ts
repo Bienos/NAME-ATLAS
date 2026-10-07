@@ -2,14 +2,14 @@ import { CONTACT_EMAIL } from "./contact.js";
 import type { Lang } from "./messages.js";
 
 /**
- * The offer page's words (TASK-057, TASK-104, TASK-165, ADR-0037), and the two
+ * The offer page's words (TASK-057, TASK-104, TASK-167, ADR-0037), and the two
  * emails its forms prepare. Pure: the server page and the form's client island
  * both read it.
  *
  * What the page may say is what ADR-0037 records: the free plan as it is
  * today, the two one-off products (D-045, D-049) and the four paid tiers as
  * coming, with their prices and what the owner has confirmed they hold. Only a
- * listed tester is offered a test-mode purchase (TASK-165, the exception of
+ * listed tester is offered a test-mode purchase (TASK-167, the exception of
  * TASK-111 and TASK-154); the page itself sells nothing. The genealogy partner
  * is described by its service and never named (ADR-0026 §2.4).
  */
@@ -104,7 +104,7 @@ export interface OfferDocument {
   readonly packsHeading: string;
   readonly packsLede: string;
   readonly freeWindow: {
-    /** The window's true end (D-051, TASK-165); "the last week" only when it is. */
+    /** The window's true end (D-051, TASK-167); "the last week" only when it is. */
     readonly when: (date: string, lastWeek: boolean) => string;
     readonly signedIn: string;
     readonly signedOut: string;
