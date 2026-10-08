@@ -26,7 +26,8 @@
 #      each, a count claim and a rank claim for every stored row, nothing
 #      refused, one ACTIVE record per meaning file, as many ACTIVE meaning
 #      claims as the derivation tallied, one ACTIVE claim per claim_key; then
-#      read access for the web role.
+#      read access for the web role, and INSERT on given_name_readings (0047,
+#      the couple first-names page's readings, TASK-156).
 #
 # Repeatable: a second run downloads, imports and derives nothing, and passes
 # the gate. Runs after finalize.sh, and not while the register build, the
@@ -195,6 +196,12 @@ check "tables $WEB_ROLE cannot read" 0 "$(q "
   SELECT count(*) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
    WHERE n.nspname = 'public' AND c.relkind IN ('r', 'v', 'm', 'p')
      AND NOT has_table_privilege('$WEB_ROLE', c.oid, 'SELECT')")"
+# The couple first-names page stores each reading it asks for (TASK-156,
+# migration 0047): the one table in public the web role writes. Insert only;
+# the table's trigger refuses UPDATE and DELETE.
+q "GRANT INSERT ON given_name_readings TO $WEB_ROLE" >/dev/null
+check "$WEB_ROLE can insert readings" t "$(q "
+  SELECT has_table_privilege('$WEB_ROLE', 'given_name_readings', 'INSERT')")"
 [ "$fail" = 0 ] || die "the gate failed"
 
 date -u +%Y-%m-%dT%H:%M:%SZ >"$STATE/given-names-loaded"
