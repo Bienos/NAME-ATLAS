@@ -107,14 +107,13 @@ function numbersOf(value: unknown, at = ""): { path: string; value: number }[] {
 function printed(value: number, lang: Lang): string[] {
   if (Number.isInteger(value)) return [formatInteger(value, lang)];
   if (value >= 0 && value <= 1) return [formatShare(value, lang), formatQuantile(value, lang)];
-  return [];
+  // An expected value (plate 10's `expected_distinct`) is read "about N": rounded, never recomputed.
+  return [formatInteger(Math.round(value), lang)];
 }
 
-/** The sections of a list that the plates print: all but `dots`, `collision` and `crowd`. */
+/** The sections of a list that the plates print: all but `dots` (plates 09 and 10 print `collision` and `crowd` since TASK-178). */
 function printedSections(list: ListFacts): Record<string, unknown> {
-  return Object.fromEntries(
-    Object.entries(list).filter(([key]) => !["dots", "collision", "crowd"].includes(key)),
-  );
+  return Object.fromEntries(Object.entries(list).filter(([key]) => key !== "dots"));
 }
 
 function allowed(subtrees: readonly unknown[], lang: Lang): Set<string> {
@@ -151,12 +150,15 @@ function dateNumbers(facts: ListFactsArtefact, lang: Lang): string[] {
 }
 
 /**
- * Numbers that are copy, not figures: the year of the editions plate VII
+ * Numbers that are copy, not figures: the year of the editions plate 11
  * leaves out (ADR-0019 §2.2), which the page must name and the artefact does
- * not carry.
+ * not carry, and the plates' own numbering (01–11 since TASK-178).
  */
 function copyNumbers(lang: Lang): string[] {
-  return numbersIn(UI[lang].lfP7Foot, lang);
+  return [
+    ...numbersIn(UI[lang].lfP7Foot, lang),
+    ...Array.from({ length: 11 }, (_, i) => String(i + 1).padStart(2, "0")),
+  ];
 }
 
 /** The markup of one plate. */
@@ -235,7 +237,8 @@ const CAUSES = [
   /ukrai/u,
   /przybył/u,
   /ubył/u,
-  /\bbirth/u,
+  // "birthday" is plate 09's paradox, not a cause.
+  /\bbirth(?!day)/u,
   /\bdeath/u,
   /\bdied\b/u,
   /marriag/u,
@@ -277,23 +280,39 @@ describe("ListAtlas", () => {
     expect(render(null, "en")).toBe("");
   });
 
-  it("renders the seven plates in order, headed with the snapshot date; the coda is gone", () => {
+  it("renders the eleven plates in order, headed with the snapshot date; the coda is gone", () => {
     for (const lang of LANGS) {
       const t = UI[lang];
       const html = render(LIST_FACTS_FIXTURE, lang);
-      expect(html.match(/<article /gu)).toHaveLength(7);
-      const ids = [...html.matchAll(/<article id="(lf-p\d)"/gu)].map((m) => m[1]);
-      expect(ids).toEqual(["lf-p1", "lf-p2", "lf-p3", "lf-p4", "lf-p5", "lf-p6", "lf-p7"]);
+      expect(html.match(/<article /gu)).toHaveLength(11);
+      const ids = [...html.matchAll(/<article id="(lf-p\d\d)"/gu)].map((m) => m[1]);
+      expect(ids).toEqual([
+        "lf-p01",
+        "lf-p02",
+        "lf-p03",
+        "lf-p04",
+        "lf-p05",
+        "lf-p06",
+        "lf-p07",
+        "lf-p08",
+        "lf-p09",
+        "lf-p10",
+        "lf-p11",
+      ]);
       const names = [
+        t.lfTopName,
         t.lfP1Name,
         t.lfP2Name,
         t.lfP3Name,
+        t.lfThName,
         t.lfP4Name,
         t.lfP5Name,
         t.lfP6Name,
+        t.lfColName,
+        t.lfCrName,
         t.lfP7Name,
       ];
-      const numerals = ["I", "II", "III", "IV", "V", "VI", "VII"];
+      const numerals = ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11"];
       const heads = [...html.matchAll(/<p class="lf-plate-no">([\s\S]*?)<\/p>/gu)].map((m) =>
         text(m[1] ?? "").trim(),
       );
@@ -302,7 +321,7 @@ describe("ListAtlas", () => {
       // TASK-044: plate VII replaces the one-edition coda.
       expect(html).not.toContain("lf-coda");
       expect(text(html)).not.toMatch(/Trend potrzebuje|A trend needs/u);
-      expect(html.lastIndexOf("</article>")).toBeGreaterThan(html.indexOf('<article id="lf-p7"'));
+      expect(html.lastIndexOf("</article>")).toBeGreaterThan(html.indexOf('<article id="lf-p11"'));
       expect(text(html)).toContain(lang === "pl" ? "wydanie 2026" : "2026 edition");
       // The date's own "r." is never followed by a second full stop.
       expect(text(html)).not.toMatch(/\.\s*\./u);
@@ -316,8 +335,10 @@ describe("ListAtlas", () => {
 
   it("renders every plate for both lists, each variant naming its own list", () => {
     const html = render(LIST_FACTS_FIXTURE, "pl");
-    const plates = [...html.matchAll(/<article id="lf-p\d"[\s\S]*?<\/article>/gu)].map((m) => m[0]);
-    expect(plates).toHaveLength(7);
+    const plates = [...html.matchAll(/<article id="lf-p\d\d"[\s\S]*?<\/article>/gu)].map(
+      (m) => m[0],
+    );
+    expect(plates).toHaveLength(11);
     for (const plate of plates) {
       const parts = byList(plate);
       expect(parts.male.length).toBeGreaterThan(0);
@@ -393,7 +414,9 @@ describe("ListAtlas", () => {
       false,
     ]);
     const title = (lang: Lang) => {
-      const plate = /<article id="lf-p4"[\s\S]*?<\/h3>/u.exec(render(LIST_FACTS_FIXTURE, lang))![0];
+      const plate = /<article id="lf-p06"[\s\S]*?<\/h3>/u.exec(
+        render(LIST_FACTS_FIXTURE, lang),
+      )![0];
       const parts = byList(plate);
       return { male: text(parts.male.join(" ")), female: text(parts.female.join(" ")) };
     };
@@ -477,7 +500,10 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
         // The sections no plate prints are left out, so a computed figure
         // cannot pass by matching one of their many values.
         const own = (list: ListFacts) =>
-          new Set([...allowed([printedSections(list), facts.overlap], lang), ...date]);
+          new Set([
+            ...allowed([printedSections(list), facts.overlap, facts.birthday_reference], lang),
+            ...date,
+          ]);
         for (const [side, list] of [
           ["male", male],
           ["female", female],
@@ -488,7 +514,7 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
           }
         }
         const any = new Set([
-          ...allowed([male, female, facts.overlap], lang),
+          ...allowed([male, female, facts.overlap, facts.birthday_reference], lang),
           ...date,
           ...copyNumbers(lang),
         ]);
@@ -510,7 +536,7 @@ describe("the atlas derives nothing (TASK-043 AC-04)", () => {
       sums.push(o.male_only + o.both + o.female_only);
       if (o.on_both_top !== null) sums.push(o.on_both_top.male.count + o.on_both_top.female.count);
       for (const lang of LANGS) {
-        const legit = allowed([male, female, o], lang);
+        const legit = allowed([male, female, o, facts.birthday_reference], lang);
         const shown = new Set(numbersIn(readable(render(facts, lang)), lang));
         for (const sum of sums) {
           const form = formatInteger(sum, lang);
@@ -594,13 +620,13 @@ describe("plate VII: change over time (TASK-044 AC-04, AC-05)", () => {
   const SIDES = ["male", "female"] as const;
   /** Plate VII's markup for one list. */
   const variant = (facts: ListFactsArtefact, lang: Lang, side: Side) =>
-    byList(plate(render(facts, lang), "lf-p7"))[side].join(" ");
+    byList(plate(render(facts, lang), "lf-p11"))[side].join(" ");
   /** Its headline for one list, as text (a tag's space before punctuation dropped). */
   const headline = (facts: ListFactsArtefact, lang: Lang, side: Side) =>
     text(
-      byList(/<h3 id="lf-p7-title"[\s\S]*?<\/h3>/u.exec(render(facts, lang))?.[0] ?? "")[side].join(
-        " ",
-      ),
+      byList(/<h3 id="lf-p11-title"[\s\S]*?<\/h3>/u.exec(render(facts, lang))?.[0] ?? "")[
+        side
+      ].join(" "),
     )
       .replace(/ +([.,:])/gu, "$1")
       .trim();
@@ -610,12 +636,12 @@ describe("plate VII: change over time (TASK-044 AC-04, AC-05)", () => {
   it("renders for both lists, each variant naming its own list", () => {
     for (const [, facts] of ARTEFACTS) {
       for (const lang of LANGS) {
-        const parts = byList(plate(render(facts, lang), "lf-p7"));
+        const parts = byList(plate(render(facts, lang), "lf-p11"));
         expect(parts.male.length).toBeGreaterThan(0);
         expect(parts.female.length).toBe(parts.male.length);
       }
     }
-    const parts = byList(plate(render(LIST_FACTS_FIXTURE, "pl"), "lf-p7"));
+    const parts = byList(plate(render(LIST_FACTS_FIXTURE, "pl"), "lf-p11"));
     const male = text(parts.male.join(" "));
     const female = text(parts.female.join(" "));
     expect(male).toContain("mężczyzn");

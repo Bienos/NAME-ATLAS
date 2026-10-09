@@ -196,6 +196,34 @@ export type {
   OnBothTop,
 } from "./list-facts.js";
 
+// --- TASK-178: statistics about the first-name birth lists (ADR-0051) ---------
+export {
+  GIVEN_NAME_LIST_FACTS_SCHEMA_VERSION,
+  GIVEN_NAME_LIST_TOP_SIZE,
+  NAMED_GIVEN_NAME_FLOOR,
+  givenNameListAssessmentSchema,
+  givenNameListChangeSchema,
+  givenNameListFactsArtefactSchema,
+  givenNameListResourceSchema,
+  givenNameListSexFactsSchema,
+  givenNameListSexSchema,
+  givenNameListThreshold,
+  givenNameListYearSchema,
+  inGivenNameSelectionOrder,
+  namedGivenNameSchema,
+  numberOneRunSchema,
+} from "./given-name-list-facts.js";
+export type {
+  GivenNameListChange,
+  GivenNameListFactsArtefact,
+  GivenNameListResource,
+  GivenNameListSex,
+  GivenNameListSexFacts,
+  GivenNameListYear,
+  NamedGivenName,
+  NumberOneRun,
+} from "./given-name-list-facts.js";
+
 // --- TASK-066: the family tree (ADR-0029) --------------------------------
 export {
   TREE_SCHEMA_VERSION,

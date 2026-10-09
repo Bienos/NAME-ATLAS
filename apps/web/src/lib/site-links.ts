@@ -8,9 +8,9 @@ export function homePath(lang: Lang): string {
   return lang === "en" ? "/?lang=en" : "/";
 }
 
-/** The landing's atlas section: the plates about each whole published list. */
+/** The Atlas page (TASK-178): statistics about each whole published list of surnames and first names. */
 export function atlasPath(lang: Lang): string {
-  return `${homePath(lang)}#atlas`;
+  return lang === "en" ? "/en/atlas" : "/pl/atlas";
 }
 
 export function comparePagePath(lang: Lang): string {

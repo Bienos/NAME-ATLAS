@@ -33,6 +33,7 @@
     "truth:derive-given-name-births": "pnpm --filter @name-atlas/truth run derive-given-name-births",
     "truth:derive-given-name-meanings": "pnpm --filter @name-atlas/truth run derive-given-name-meanings",
     "truth:list-facts": "pnpm --filter @name-atlas/truth run build-list-facts",
+    "truth:given-name-list-facts": "pnpm --filter @name-atlas/truth run build-given-name-list-facts",
     "truth:archive-load": "pnpm --filter @name-atlas/truth run archive-load",
     "truth:bearers-load": "pnpm --filter @name-atlas/truth run bearers-load",
     "coverage:report": "pnpm --silent --filter @name-atlas/truth run coverage-report",

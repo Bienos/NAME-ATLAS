@@ -77,11 +77,17 @@ export function ListAtlasShell({
   labels,
   labelledBy,
   head,
+  name = "lf-list",
+  className = "lf",
   children,
 }: {
   labels: AtlasSwitchLabels;
   labelledBy: string;
   head: ReactNode;
+  /** The radio group's name: two sections on one page (TASK-178) switch apart. */
+  name?: string;
+  /** The section's class beside `lf`, for a part's own styles. */
+  className?: string;
   children: ReactNode;
 }) {
   const root = useRef<HTMLElement>(null);
@@ -123,19 +129,18 @@ export function ListAtlasShell({
   }, []);
 
   return (
-    <section ref={root} className="lf" aria-labelledby={labelledBy}>
+    <section
+      ref={root}
+      className={className === "lf" ? "lf" : `lf ${className}`}
+      aria-labelledby={labelledBy}
+    >
       {head}
       <div className="lf-switchbar">
         <fieldset className="lf-switch">
           <legend className="lf-sr">{labels.group}</legend>
           {(["male", "female"] as const).map((option) => (
             <label key={option}>
-              <input
-                type="radio"
-                name="lf-list"
-                value={option}
-                defaultChecked={option === "male"}
-              />
+              <input type="radio" name={name} value={option} defaultChecked={option === "male"} />
               <span>{option === "male" ? labels.male : labels.female}</span>
             </label>
           ))}

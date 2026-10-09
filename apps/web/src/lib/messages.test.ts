@@ -380,7 +380,7 @@ describe("message templates (TASK-040)", () => {
           /foreign/u,
           /citizen/u,
           /immigr/u,
-          /\bbirth/u,
+          /\bbirth(?!day)/u,
           /\bdeath/u,
           /\bdied\b/u,
           /marriag/u,

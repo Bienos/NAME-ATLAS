@@ -478,6 +478,8 @@ export {
 // List facts — TASK-040, ADR-0015: statistics about one whole published list,
 // derived offline into a committed artefact. The web app reads `listFacts()`.
 export { listFacts } from "./list-facts/artefact.js";
+// TASK-178 (ADR-0051): statistics about the first-name birth lists, the same way.
+export { givenNameListFacts } from "./given-name-list-facts/artefact.js";
 export {
   LIST_COLLISION_METHOD_VERSION,
   LIST_CROWD_METHOD_VERSION,

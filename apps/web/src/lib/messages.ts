@@ -1226,14 +1226,14 @@ export const UI = {
     // nothing here adds the two lists up. A named surname is the artefact's
     // published string, linked to its search answer (ADR-0019 §2.6).
     lfEyebrow: "Rejestr PESEL · wydanie {year}",
-    lfTitle: "Atlas nazwisk",
+    lfTitle: "Dwie listy. Zero sum.",
     lfLede:
-      "Siedem plansz o nazwiskach z rejestru PESEL (stan na {date}). Mężczyźni i kobiety są w " +
-      "nim na dwóch osobnych listach: przełącz listę, a plansze I–V i VII pokażą tę listę, a " +
-      "plansza VI porówna obie. Nigdy ich nie sumujemy.",
+      "Jedenaście plansz o nazwiskach z rejestru PESEL (stan na {date}). Mężczyźni i kobiety są " +
+      "w nim na dwóch osobnych listach: przełącz listę, a plansze pokażą tę listę, a plansza " +
+      "o dwóch listach porówna obie. Nigdy ich nie sumujemy.",
     lfScope:
       "Każda liczba opisuje jedną opublikowaną listę rejestru PESEL: nazwiska noszone przez co " +
-      "najmniej 2 osoby, osoby żyjące, nazwisko aktualne. Plansza VII zestawia też wcześniejsze " +
+      "najmniej 2 osoby, osoby żyjące, nazwisko aktualne. Ostatnia plansza zestawia też wcześniejsze " +
       "wydania tej samej listy. Stan\u00a0na\u00a0{date}",
     lfSwitchLabel: "Która lista",
     lfSwitchMale: "Mężczyźni",
@@ -1512,6 +1512,320 @@ export const UI = {
     contactMailInstead: "Otwórz w programie pocztowym",
     contactDirect: "Wolisz pisać bezpośrednio?",
     contactPrivacyNote: "Serwis nie zapisuje wiadomości: trafia ona tylko na skrzynkę Name Atlas.",
+    // --- The Atlas page (TASK-178): the hero, the chapter nav, the two parts and the method. ---
+    atMetaTitle: "Atlas nazwisk i imion | Name Atlas",
+    atMetaDescription:
+      "Statystyki o wszystkich nazwiskach i imionach w Polsce: ile nazwisk nosi połowa ludzi, jak rzadkie jest typowe nazwisko, które imię było numerem jeden w każdym roku od 2000. Rejestr PESEL, osobne listy, nigdy sumowane.",
+    atTitle: "Atlas",
+    atSub: "Nazwiska i imiona w Polsce w liczbach.",
+    atEyebrow: "Rejestr PESEL · stan na {date} · imiona dzieci: roczniki {from}–{to}",
+    atLede:
+      "Statystyki o całych listach, nie o jednym nazwisku. Rejestr PESEL publikuje osobno listę nazwisk mężczyzn i listę nazwisk kobiet, a imiona dzieci osobno dla chłopców i dziewczynek. Pokazujemy je obok siebie i nigdy ich nie sumujemy. Każda liczba ma źródło, datę i metodę.",
+    atLedgerSurnames: "Część I · Nazwiska",
+    atLedgerAsOf: "stan na {date}",
+    atLedgerGiven: "Część II · Imiona dzieci",
+    atLedgerYear: "rocznik {year}",
+    atNever: "osobne listy · nigdy nie sumowane",
+    atChapters: "Plansze",
+    atPartI: "I · Nazwiska",
+    atPartII: "II · Imiona",
+    atMethodEyebrow: "Jak liczymy",
+    atMethodTitle: "Cztery zasady, które trzymają każdą planszę.",
+    atMethodPoints: [
+      [
+        "Dwie listy to dwa światy.",
+        "Lista mężczyzn i lista kobiet, a także listy chłopców i dziewczynek, są publikowane osobno. Żadna liczba na tej stronie nie jest ich sumą: nazwiska wspólne obu listom liczyłyby się dwa razy.",
+      ],
+      [
+        "Brak to nie zero.",
+        "Wydawca nie publikuje nazwisk noszonych przez jedną osobę ani imion nadanych rzadziej niż próg. Czego nie ma na liście, o tym nie mówimy.",
+      ],
+      [
+        "Liczymy poza stroną.",
+        "Każda statystyka jest policzona z pełnego pliku, z sumą kontrolną i wersją metody, i zapisana jako artefakt. Strona niczego nie dodaje, nie dzieli i nie szacuje: tylko rysuje.",
+      ],
+      [
+        "Nazwisko pojawia się tylko, gdy nosi je wiele osób.",
+        "Tak małe liczby, które mogłyby wskazać konkretne osoby, nie dostają przykładu.",
+      ],
+    ],
+    atUnavailable: "Statystyki nazwisk nie są dziś dostępne. Spróbuj później.",
+    // Part I's head on the Atlas page (the `lf*` keys below keep their plates).
+    lfEyebrowAtlas: "Część I · Nazwiska · rejestr PESEL · wydanie {year}",
+    // Plate 01: the most common surnames, from the rank claims.
+    lfTopName: "Najczęstsze",
+    lfTopTitle: "{a}, {b}, {c}.",
+    lfTopLedeMale:
+      "Dziesięć najczęstszych nazwisk z listy mężczyzn, w kolejności z rejestru. Liczby pokazujemy dla trzech pierwszych; dla pozostałych tylko miejsce.",
+    lfTopLedeFemale:
+      "Dziesięć najczęstszych nazwisk z listy kobiet, w kolejności z rejestru. Liczby pokazujemy dla trzech pierwszych; dla pozostałych tylko miejsce.",
+    lfTopListMale: "Najczęstsze nazwiska listy mężczyzn",
+    lfTopListFemale: "Najczęstsze nazwiska listy kobiet",
+    lfTopUnavailable:
+      "Lista dziesięciu najczęstszych nie jest dziś dostępna; trzy pierwsze pochodzą z artefaktu.",
+    lfTopThresholdMale:
+      "{n:nazwisko nosi|nazwiska nosi|nazwisk nosi} co najmniej {k} mężczyzn; razem {p} {p:mężczyzna|mężczyzn|mężczyzn}",
+    lfTopThresholdFemale:
+      "{n:nazwisko nosi|nazwiska nosi|nazwisk nosi} co najmniej {k} kobiet; razem {p} {p:kobieta|kobiety|kobiet}",
+    lfTopShareMale: "mężczyzn nosi nazwisko {name}: najczęstsze na liście mężczyzn",
+    lfTopShareFemale: "kobiet nosi nazwisko {name}: najczęstsze na liście kobiet",
+    lfTopFoot:
+      "Miejsca pochodzą z listy jako takiej; nic tu nie jest przeliczane. Nazwisko męskie i żeńskie (na -ski i na -ska) to dwa różne wpisy na dwóch listach.",
+    // Plate 05: the thresholds ladder.
+    lfThName: "Progi",
+    lfThTitleMale:
+      "Tylko {n} {n:nazwisko nosi|nazwiska nosi|nazwisk nosi} co najmniej {k} mężczyzn.",
+    lfThTitleFemale:
+      "Tylko {n} {n:nazwisko nosi|nazwiska nosi|nazwisk nosi} co najmniej {k} kobiet.",
+    lfThLedeMale:
+      "Drabina progów: ile nazwisk z listy mężczyzn ma co najmniej tylu nosicieli i ilu mężczyzn razem je nosi. Pasek w skali logarytmicznej.",
+    lfThLedeFemale:
+      "Drabina progów: ile nazwisk z listy kobiet ma co najmniej tylu nosicieli i ile kobiet razem je nosi. Pasek w skali logarytmicznej.",
+    lfThRow: "≥ {k} {k:osoba|osoby|osób}",
+    lfThSurnames: "{n} {n:nazwisko|nazwiska|nazwisk}",
+    lfThPeopleMale: "{p} {p:mężczyzna|mężczyzn|mężczyzn}",
+    lfThPeopleFemale: "{p} {p:kobieta|kobiety|kobiet}",
+    lfThListMale: "Progi liczby nosicieli na liście mężczyzn: nazwiska i mężczyźni na każdym",
+    lfThListFemale: "Progi liczby nosicieli na liście kobiet: nazwiska i kobiety na każdym",
+    lfThFoot:
+      "Każdy próg zawiera się w poprzednim: nazwisko z górnego szczebla liczy się także na każdym niższym.",
+    // Plate 09: the surname "birthday problem".
+    lfColName: "Zbieg nazwisk",
+    lfColTitleMale:
+      "{n} losowych mężczyzn z listy: szansa pół na pół, że dwóch nosi to samo nazwisko.",
+    lfColTitleFemale:
+      "{n} losowych kobiet z listy: szansa pół na pół, że dwie noszą to samo nazwisko.",
+    lfColLede:
+      "Jak w paradoksie dnia urodzin, gdzie {b:wystarczy|wystarczą|wystarczy} {b} {b:osoba|osoby|osób}. Krzywa pokazuje prawdopodobieństwo, że w grupie n osób wylosowanych z listy co najmniej dwie mają wspólne nazwisko.",
+    lfColChart: "Prawdopodobieństwo wspólnego nazwiska w grupie n osób wylosowanych z listy",
+    lfColAxis: "osób wylosowanych z listy (n)",
+    lfColMarkBirthday: "{b} {b:osoba|osoby|osób}: wspólne urodziny, {p}",
+    lfColMarkSurname: "{n} {n:osoba|osoby|osób}: wspólne nazwisko, {p}",
+    lfColStatHalf: "osób: od tej liczby szansa na wspólne nazwisko przekracza połowę ({p})",
+    lfColStatPairMale: "dwóch losowych mężczyzn z listy nosi to samo nazwisko",
+    lfColStatPairFemale: "dwie losowe kobiety z listy noszą to samo nazwisko",
+    lfColStatBirthday:
+      "{b:osoba wystarczy|osoby wystarczą|osób wystarczy}, by dwie miały urodziny tego samego dnia ({p}): dla porównania",
+    lfColOneIn: "1 na {k}",
+    lfColFoot:
+      "Model: losowanie osób z listy bez zwracania, z udziałami nazwisk takimi, jak na liście. Liczby pochodzą z artefaktu (krzywa dla n od {from} do {to}), nie z pomiaru.",
+    // Plate 10: a crowd of a thousand.
+    lfCrName: "Tysiąc osób",
+    lfCrTitleMale: "{n} losowych mężczyzn nosi około {d} różnych nazwisk.",
+    lfCrTitleFemale: "{n} losowych kobiet nosi około {d} różnych nazwisk.",
+    lfCrLede:
+      "{s} z nich nie ma w tej grupie nikogo o tym samym nazwisku. Poniżej jedno losowanie: każda kropka to osoba, niebieskie mają w tej grupie kogoś o wspólnym nazwisku (największa grupa: {g} {g:osoba|osoby|osób}).",
+    lfCrChart: "Jedno losowanie: {n} osób, kropki z kimś o wspólnym nazwisku wyróżnione",
+    lfCrExample:
+      "W tym losowaniu: {d} różnych nazwisk, {w} {w:osoba|osoby|osób} bez nikogo o tym samym nazwisku.",
+    lfCrLadderKicker: "Ile różnych nazwisk w losowej grupie (wartość oczekiwana)",
+    lfCrLadderRow: "{n} osób",
+    lfCrLadderValue: "około {d} nazwisk",
+    lfCrReachKicker: "Ilu ludzi, żeby spotkać…",
+    lfCrReachTop1Male:
+      "…kogoś o nazwisku {name} z szansą pół na pół: {n} {n:osoba|osoby|osób} (nosi je {s} listy mężczyzn).",
+    lfCrReachTop1Female:
+      "…kogoś o nazwisku {name} z szansą pół na pół: {n} {n:osoba|osoby|osób} (nosi je {s} listy kobiet).",
+    lfCrReachTop10: "…kogoś z pierwszej dziesiątki nazwisk: {n} {n:osoba|osoby|osób} ({s} listy).",
+    lfCrReachTop100: "…kogoś z pierwszej setki: {n} {n:osoba|osoby|osób} ({s} listy).",
+    lfCrFoot:
+      "Model jak na planszy 09: losowanie bez zwracania z udziałami z listy. Losowanie przykładowe ma zapisane ziarno, więc jest takie samo przy każdym wejściu. „Około” to wartość oczekiwana zaokrąglona do całości.",
+    // --- Part II: the first-name birth lists (TASK-178, ADR-0051). ---
+    gnEyebrow:
+      "Część II · Imiona nadawane dzieciom · roczniki {from}–{to} · {n:plansza|plansze|plansz}",
+    gnTitle: "Które imię było numerem jeden i jak bardzo imiona się rozproszyły.",
+    gnLede:
+      "Imiona pierwsze nadane dzieciom urodzonym w każdym roku od {from} do {to}, z rejestru PESEL (dane.gov.pl, zbiór 219). Osobno chłopcy i dziewczynki. Imię nadane rzadziej niż próg publikacji nie jest na liście: to brak, nie zero.",
+    gnScope:
+      "Każda liczba opisuje jedną opublikowaną listę: imiona pierwsze dzieci jednej płci urodzonych w jednym roku. Udział to udział wśród dzieci z listy, nie wśród wszystkich urodzonych.",
+    gnSwitchLabel: "Która lista",
+    gnSwitchBoys: "Chłopcy",
+    gnSwitchGirls: "Dziewczynki",
+    gnListBoys: "lista chłopców",
+    gnListGirls: "lista dziewczynek",
+    gnNamesBoys: "{n:imię|imiona|imion} na liście chłopców",
+    gnNamesGirls: "{n:imię|imiona|imion} na liście dziewczynek",
+    gnChildrenBoys: "{k} {k:chłopiec|chłopców|chłopców}",
+    gnChildrenGirls: "{k} {k:dziewczynka|dziewczynki|dziewczynek}",
+    gnSource: "Źródło: {link} · listy {from}–{to} · {list}",
+    gnSourceName: "rejestr PESEL, dane.gov.pl, zbiór 219",
+    gnPlate: "Plansza",
+    // Plate 12: how many names.
+    gnP12Name: "Ile imion",
+    gnP12TitleBoys:
+      "W {y1} r. chłopcy dostali {n} {n:różne imię|różne imiona|różnych imion}. W {y0} r.: {m}.",
+    gnP12TitleGirls:
+      "W {y1} r. dziewczynki dostały {n} {n:różne imię|różne imiona|różnych imion}. W {y0} r.: {m}.",
+    gnP12Lede:
+      "Liczba imion na liście rocznika. Od {yt} r. wydawca publikuje imiona nadane co najmniej {t2} razy, wcześniej co najmniej {t1}, więc lista z {yt} r. jest dłuższa także z tego powodu. Niżej: ile dzieci jest na liście każdego roku.",
+    gnP12LedePlain:
+      "Liczba imion na liście rocznika. Niżej: ile dzieci jest na liście każdego roku.",
+    gnP12Break: "od {yt} r. próg publikacji: {t2} (wcześniej {t1})",
+    gnP12ChartNames: "Liczba imion na liście w każdym roku",
+    gnP12ChartChildrenBoys: "Chłopcy na liście rocznika",
+    gnP12ChartChildrenGirls: "Dziewczynki na liście rocznika",
+    gnP12StatNamesBoys: "{n:imię|imiona|imion} na liście chłopców z rocznika {y}",
+    gnP12StatNamesGirls: "{n:imię|imiona|imion} na liście dziewczynek z rocznika {y}",
+    gnP12StatChildrenBoys:
+      "{k:chłopiec|chłopców|chłopców} na tej liście (imiona poniżej progu nie są liczone)",
+    gnP12StatChildrenGirls:
+      "{k:dziewczynka|dziewczynki|dziewczynek} na tej liście (imiona poniżej progu nie są liczone)",
+    gnP12StatFirstBoys: "{k:chłopiec|chłopców|chłopców} na liście rocznika {y}",
+    gnP12StatFirstGirls: "{k:dziewczynka|dziewczynki|dziewczynek} na liście rocznika {y}",
+    gnP12Foot:
+      "Imiona nadane rzadziej niż próg nie są na liście, więc liczba dzieci na liście to nie liczba urodzeń. Słupki sprzed {yt} r. są przyciemnione: inny próg, inna lista.",
+    gnP12FootPlain:
+      "Imiona nadane rzadziej niż próg nie są na liście, więc liczba dzieci na liście to nie liczba urodzeń.",
+    // Plate 13: number one.
+    gnP13Name: "Numer jeden",
+    gnP13TitleBoys: "{name} był numerem jeden najdłużej: {n} {n:rok|lata|lat} ({span}).",
+    gnP13TitleGirls: "{name} była numerem jeden najdłużej: {n} {n:rok|lata|lat} ({span}).",
+    gnP13LedeBoys:
+      "Najczęściej nadawane imię chłopców w każdym roczniku od {y0} do {y1}. Szerokość pola to liczba lat na pierwszym miejscu.",
+    gnP13LedeGirls:
+      "Najczęściej nadawane imię dziewczynek w każdym roczniku od {y0} do {y1}. Szerokość pola to liczba lat na pierwszym miejscu.",
+    gnP13Chart: "Imię numer jeden w każdym roku, jako kolejne odcinki",
+    gnP13Run: "{name}: {span}, {n} {n:rok|lata|lat}",
+    gnP13StatAlwaysOne: "jedyne imię w pierwszej dziesiątce w każdym roku od {y0} do {y1}",
+    gnP13StatAlwaysMany: "imiona w pierwszej dziesiątce w każdym roku od {y0} do {y1}",
+    gnP13StatAlwaysNone:
+      "Żadne imię nie jest w pierwszej dziesiątce w każdym roku od {y0} do {y1}.",
+    gnP13StatShareBoys:
+      "udział imienia numer jeden wśród chłopców z listy: {y0} ({a}) → {y1} ({b})",
+    gnP13StatShareGirls:
+      "udział imienia numer jeden wśród dziewczynek z listy: {y0} ({a}) → {y1} ({b})",
+    gnP13StatRuns: "{n:zmiana|zmiany|zmian} imienia numer jeden od {y0} do {y1}",
+    gnP13Foot:
+      "Kolor oznacza imię i jest podpisany. Imiona z pierwszego miejsca nosi po kilka tysięcy dzieci rocznie, więc można je nazwać.",
+    // Plate 14: the ten.
+    gnP14Name: "Dziesiątka",
+    gnP14TitleBoys: "Dziesięć najczęstszych imion dostaje {s1} chłopców. W {y0} r. było to {s0}.",
+    gnP14TitleGirls:
+      "Dziesięć najczęstszych imion dostaje {s1} dziewczynek. W {y0} r. było to {s0}.",
+    gnP14LedeBoys:
+      "Połowa chłopców z rocznika {y1} nosi jedno z {h1} imion; w {y0} r. wystarczało {h0}. Dwa wykresy, dwie miary: udział pierwszej dziesiątki i liczba imion, które obejmują połowę dzieci.",
+    gnP14LedeGirls:
+      "Połowa dziewczynek z rocznika {y1} nosi jedno z {h1} imion; w {y0} r. wystarczało {h0}. Dwa wykresy, dwie miary: udział pierwszej dziesiątki i liczba imion, które obejmują połowę dzieci.",
+    gnP14ChartShareBoys: "Udział pierwszej dziesiątki imion wśród chłopców z listy",
+    gnP14ChartShareGirls: "Udział pierwszej dziesiątki imion wśród dziewczynek z listy",
+    gnP14ChartHalfBoys: "Ile najczęstszych imion obejmuje połowę chłopców",
+    gnP14ChartHalfGirls: "Ile najczęstszych imion obejmuje połowę dziewczynek",
+    gnP14StatShare: "udział dziesięciu najczęstszych imion: {y0} → {y1}",
+    gnP14StatHalfBoys: "imion wystarcza na połowę chłopców: {y0} → {y1}",
+    gnP14StatHalfGirls: "imion wystarcza na połowę dziewczynek: {y0} → {y1}",
+    gnP14StatTop: "udział samego numeru jeden: {y0} → {y1}",
+    gnP14Foot:
+      "Udział liczony wśród dzieci na liście rocznika (imiona poniżej progu nie wchodzą do mianownika). Zmiana progu nie zmienia pierwszej dziesiątki ani połowy: to imiona z góry listy.",
+    // Plate 15: first year and last year, side by side.
+    gnP15Name: "{y0} → {y1}",
+    gnP15TitleOne: "Tylko {names} jest w pierwszej dziesiątce w każdym roku od {y0} do {y1}.",
+    gnP15TitleMany: "W pierwszej dziesiątce w każdym roku od {y0} do {y1}: {names}.",
+    gnP15TitleNone: "Żadne imię nie jest w pierwszej dziesiątce w każdym roku od {y0} do {y1}.",
+    gnP15LedeBoys:
+      "Dziesięć najczęściej nadawanych imion chłopców w pierwszym i w ostatnim roczniku, z liczbą dzieci. Pasek jest proporcjonalny w obrębie swojego roku; roczników nie porównujemy wprost, bo listy są różnej wielkości.",
+    gnP15LedeGirls:
+      "Dziesięć najczęściej nadawanych imion dziewczynek w pierwszym i w ostatnim roczniku, z liczbą dzieci. Pasek jest proporcjonalny w obrębie swojego roku; roczników nie porównujemy wprost, bo listy są różnej wielkości.",
+    gnP15Year: "Rocznik {y}",
+    gnP15Foot:
+      "Bursztyn: rocznik {y0} (dawniejszy). Niebieski: rocznik {y1} (bieżący). Imię z pierwszej dziesiątki każdego roku jest wyróżnione.",
+    // Plate 16: new names.
+    gnP16Name: "Nowe imiona",
+    gnP16Title: "{n} {n:imienia|imion|imion} z listy {y1} r. nie było na liście z {y0} r.",
+    gnP16Lede:
+      "{m} {m:imienia|imion|imion} z {y0} r. nie ma na liście z {y1} r.; {b} {b:jest|są|jest} na obu. Część różnicy to niższy próg publikacji od {yt} r.: imię nadane co najmniej {t2} razy, ale rzadziej niż {t1}, było w {y0} r. poniżej progu.",
+    gnP16OnlyFirst:
+      "tylko na liście {y0}: imiona, których w {y1} r. nie nadano co najmniej {t2} razy",
+    gnP16Both: "na obu listach",
+    gnP16OnlyLast:
+      "tylko na liście {y1}: nowe imiona, albo imiona, które w {y0} r. były poniżej progu {t1}",
+    gnP16Foot: "Brak na liście to nie zero. Porównanie po dokładnym zapisie imienia.",
+    // Plate 17: the first letter and the -a ending.
+    gnP17Name: "Litera i końcówka",
+    gnP17TitleBoys:
+      "{s1} chłopców z rocznika {y1} ma imię na {l1}. W {y0} r. najczęstsza litera to {l0}: {s0}.",
+    gnP17TitleGirls: "{s1} dziewczynek z rocznika {y1} ma imię na -a. W {y0} r.: {s0}.",
+    gnP17LedeBoys:
+      "Pierwsza litera i ostatnia głoska, liczone w zapisie imienia. Niżej: udział chłopców z imieniem na -a (margines) i udział najczęstszej pierwszej litery w każdym roku.",
+    gnP17LedeGirls:
+      "Pierwsza litera i ostatnia głoska, liczone w zapisie imienia. Niemal każde imię dziewczynki kończy się na -a; niżej jego udział w każdym roku i udział najczęstszej pierwszej litery.",
+    gnP17ChartEndsBoys: "Udział chłopców, których imię kończy się na -a",
+    gnP17ChartEndsGirls: "Udział dziewczynek, których imię kończy się na -a",
+    gnP17ChartLetter: "Udział najczęstszej pierwszej litery w roku (litery: {letters})",
+    gnP17StatLetterBoys: "najczęstsza pierwsza litera imion chłopców w {y} r.: {s} dzieci z listy",
+    gnP17StatLetterGirls:
+      "najczęstsza pierwsza litera imion dziewczynek w {y} r.: {s} dzieci z listy",
+    gnP17StatEnds: "imiona na -a: {y0} → {y1}",
+    gnP17Foot: "Liczymy zapis imienia, nie jego pochodzenie.",
+    // --- The landing's four sections below the hero (TASK-178). ---
+    ldWhatEyebrow: "Co to jest · po co",
+    ldWhatTitle: "Uczciwa, udokumentowana odpowiedź o nazwisku.",
+    ldWhatParagraphs: [
+      "Name Atlas odpowiada na pytania o polskie nazwisko: ile osób je nosi, jak jest rzadkie, gdzie w Polsce występuje, jak zmieniało się od 2019 roku, co może znaczyć i gdzie pojawia się w dawnych drukach.",
+      "Powstał, bo w sieci są dziś dwie drogi: strony, które podają pochodzenie nazwiska bez żadnego źródła, albo badania genealogiczne, które wymagają czasu, umiejętności i dostępu do archiwów. Tu każda liczba jest wzięta z rejestru PESEL albo ze zbiorów Polony, ma datę i źródło, a tam, gdzie danych nie ma, mówimy to wprost.",
+      "Mówimy o nazwisku jako takim. Nigdy o Twojej rodzinie i nigdy o konkretnych osobach.",
+    ],
+    ldPromises: [
+      [
+        "Każda liczba ma źródło i datę.",
+        "Rejestr PESEL publikowany na dane.gov.pl, Polona, Wikidane. Przy każdym fakcie: skąd, z kiedy, na ile pewne.",
+      ],
+      [
+        "Brak danych to też odpowiedź.",
+        "Nie zgadujemy znaczenia i nie dorabiamy historii. Gdy źródła milczą, karta mówi, że milczą.",
+      ],
+      [
+        "Mówimy o nazwisku, nie o Twojej rodzinie.",
+        "Żadnych przodków, herbów ani pochodzenia etnicznego wyczytanego z nazwiska.",
+      ],
+    ],
+    ldHowEyebrow: "Jak korzystać",
+    ldHowTitle: "Trzy kroki. Bez konta, bez karty.",
+    ldHowLede:
+      "Wyszukiwanie nazwiska jest darmowe i nie wymaga logowania. Konto przydaje się dopiero przy imionach dla dziecka i drzewie rodzinnym.",
+    ldSteps: [
+      [
+        "Wpisz nazwisko",
+        "Dokładnie tak, jak się pisze, z polskimi znakami. Jeśli pisownia jest niejasna, zaproponujemy podobne nazwiska z listy.",
+      ],
+      [
+        "Przeczytaj karty",
+        "Sześć odpowiedzi, każda na osobnej karcie z datą i źródłem. Kartę można udostępnić albo zapisać na telefonie jako obraz.",
+      ],
+      [
+        "Idź dalej",
+        "Porównaj dwa nazwiska, sprawdź do czterech nazwisk z rodziny na jednej stronie albo zajrzyj do Atlasu: statystyk o wszystkich nazwiskach i imionach.",
+      ],
+    ],
+    ldExpectTitle: "Sześć pytań, sześć kart.",
+    ldExampleLede: "Jedna z kart dla nazwiska",
+    ldExampleNote: "Listy mężczyzn i kobiet są osobne i nigdy nie są sumowane.",
+    ldToolsEyebrow: "Więcej niż jedno nazwisko",
+    ldToolsTitle: "Dalej: porównania, rodzina, imiona i Atlas.",
+    ldToolsLede:
+      "Wszystko o nazwisku jest za darmo. Pełne liczby imion, większe drzewo i raporty: {offer}, każdy jako jednorazowa płatność.",
+    ldToolsOffer: "w ofercie",
+    ldTileAtlasTag: "Atlas · statystyki ogólne",
+    ldTileAtlasTitle: "Nazwiska i imiona w Polsce w liczbach.",
+    ldTileAtlasBody:
+      "Ile nazwisk nosi połowa ludzi z listy, jak rzadkie jest typowe nazwisko, które imię było numerem jeden w każdym roku od 2000. Osobne listy, nigdy sumowane.",
+    ldTileAtlasGo: "Zobacz Atlas",
+    ldTileCompareTag: "Porównaj",
+    ldTileCompareTitle: "Dwa nazwiska obok siebie.",
+    ldTileCompareBody: "Liczby, rzadkość i województwa z tego samego zbioru i z tą samą datą.",
+    ldTileCompareGo: "Porównaj",
+    ldTileFamilyTag: "Nazwiska w rodzinie",
+    ldTileFamilyTitle: "Do czterech nazwisk na jednej stronie.",
+    ldTileFamilyBody: "Każde to jego własny darmowy wynik. Nic nie łączymy i nic nie zapisujemy.",
+    ldTileFamilyGo: "Sprawdź rodzinę",
+    ldTileBabyTag: "Imiona dla dziecka · z kontem",
+    ldTileBabyTitle: "Ile dzieci dostało to imię.",
+    ldTileBabyBody: "Liczba i miejsce w ostatnim pełnym roku, i czy imię rośnie, czy spada.",
+    ldTileBabyGo: "Sprawdź imię",
+    ldTileTreeTag: "Drzewo rodzinne · z kontem",
+    ldTileTreeTitle: "Twoje drzewo zaczyna się od Ciebie.",
+    ldTileTreeBody:
+      "Rodzice, dziadkowie, pradziadkowie. Żyjące osoby widzisz tylko Ty. Darmowe konto, bez karty.",
+    ldTileTreeGo: "Zacznij drzewo",
     footerExplore: "Odkrywaj",
     footerRead: "Czytaj",
     footerSite: "Serwis",
@@ -1964,14 +2278,14 @@ export const UI = {
     noFigures: "There is nothing to show.",
     notSummed: "The male and female datasets are separate and are never summed.",
     lfEyebrow: "PESEL register · {year} edition",
-    lfTitle: "Surname atlas",
+    lfTitle: "Two lists. Zero sums.",
     lfLede:
-      "Seven plates about the surnames in the PESEL register (as of {date}). Men and women are " +
-      "on two separate lists: switch the list and plates I–V and VII show that list, while " +
-      "plate VI compares both. We never add them up.",
+      "Eleven plates about the surnames in the PESEL register (as of {date}). Men and women are " +
+      "on two separate lists: switch the list and the plates show that list, while the plate " +
+      "on the two lists compares both. We never add them up.",
     lfScope:
       "Every figure describes one published list of the PESEL register: surnames borne by at " +
-      "least 2 people, living persons, current surname. Plate VII also sets out earlier " +
+      "least 2 people, living persons, current surname. The last plate also sets out earlier " +
       "editions of the same list. As\u00a0of\u00a0{date}",
     lfSwitchLabel: "Which list",
     lfSwitchMale: "Men",
@@ -2226,6 +2540,296 @@ export const UI = {
     contactDirect: "Prefer to write directly?",
     contactPrivacyNote:
       "The site does not store your message: it only reaches the Name Atlas inbox.",
+    // --- The Atlas page (TASK-178): the hero, the chapter nav, the two parts and the method. ---
+    atMetaTitle: "Atlas of surnames and first names | Name Atlas",
+    atMetaDescription:
+      "Statistics about every surname and first name in Poland: how many surnames half the people carry, how rare a typical surname is, which first name was number one in every year since 2000. The PESEL register, separate lists, never summed.",
+    atTitle: "Atlas",
+    atSub: "Surnames and first names in Poland, in figures.",
+    atEyebrow: "PESEL register · as of {date} · children's first names: {from}–{to}",
+    atLede:
+      "Statistics about whole lists, not about one surname. The PESEL register publishes the men's and the women's surname lists separately, and children's first names separately for boys and girls. We show them side by side and never add them up. Every figure has a source, a date and a method.",
+    atLedgerSurnames: "Part I · Surnames",
+    atLedgerAsOf: "as of {date}",
+    atLedgerGiven: "Part II · Children's first names",
+    atLedgerYear: "born in {year}",
+    atNever: "separate lists · never summed",
+    atChapters: "Plates",
+    atPartI: "I · Surnames",
+    atPartII: "II · First names",
+    atMethodEyebrow: "How we count",
+    atMethodTitle: "Four rules that hold every plate.",
+    atMethodPoints: [
+      [
+        "Two lists are two worlds.",
+        "The men's and the women's lists, and the boys' and the girls', are published separately. No figure on this page is their sum: a surname on both lists would count twice.",
+      ],
+      [
+        "Absence is not zero.",
+        "The publisher leaves out surnames borne by one person and first names given fewer times than the threshold. What is not on a list, we do not speak about.",
+      ],
+      [
+        "We count off the page.",
+        "Every statistic is computed from the whole file, with its checksum and a method version, and stored as an artefact. The page adds, divides and estimates nothing: it only draws.",
+      ],
+      [
+        "A name appears only when many people carry it.",
+        "Figures small enough to point at particular people get no example.",
+      ],
+    ],
+    atUnavailable: "Surname statistics are not available today. Try again later.",
+    lfEyebrowAtlas: "Part I · Surnames · PESEL register · {year} edition",
+    lfTopName: "Most common",
+    lfTopTitle: "{a}, {b}, {c}.",
+    lfTopLedeMale:
+      "The ten most common surnames on the male list, in the register's order. Counts are shown for the first three; the rest keep their rank only.",
+    lfTopLedeFemale:
+      "The ten most common surnames on the female list, in the register's order. Counts are shown for the first three; the rest keep their rank only.",
+    lfTopListMale: "The male list's most common surnames",
+    lfTopListFemale: "The female list's most common surnames",
+    lfTopUnavailable:
+      "The list of ten is not available today; the first three come from the artefact.",
+    lfTopThresholdMale:
+      "{n:surname is|surnames are} borne by at least {k} men; {p} {p:man|men} in all",
+    lfTopThresholdFemale:
+      "{n:surname is|surnames are} borne by at least {k} women; {p} {p:woman|women} in all",
+    lfTopShareMale: "men bear the surname {name}: the most common on the male list",
+    lfTopShareFemale: "women bear the surname {name}: the most common on the female list",
+    lfTopFoot:
+      "The ranks are the list's own; nothing is recomputed here. A male and a female form (-ski and -ska) are two different entries on two lists.",
+    lfThName: "Thresholds",
+    lfThTitleMale: "Only {n} {n:surname is|surnames are} borne by at least {k} men.",
+    lfThTitleFemale: "Only {n} {n:surname is|surnames are} borne by at least {k} women.",
+    lfThLedeMale:
+      "A ladder of thresholds: how many surnames on the male list have at least that many bearers, and how many men carry them in all. The bar is logarithmic.",
+    lfThLedeFemale:
+      "A ladder of thresholds: how many surnames on the female list have at least that many bearers, and how many women carry them in all. The bar is logarithmic.",
+    lfThRow: "≥ {k} {k:person|people}",
+    lfThSurnames: "{n} {n:surname|surnames}",
+    lfThPeopleMale: "{p} {p:man|men}",
+    lfThPeopleFemale: "{p} {p:woman|women}",
+    lfThListMale: "Thresholds of bearers on the male list: surnames and men at each",
+    lfThListFemale: "Thresholds of bearers on the female list: surnames and women at each",
+    lfThFoot:
+      "Each threshold contains the one before: a surname on the top rung counts on every rung below it.",
+    lfColName: "Shared surnames",
+    lfColTitleMale: "{n} random men from the list: an even chance that two share a surname.",
+    lfColTitleFemale: "{n} random women from the list: an even chance that two share a surname.",
+    lfColLede:
+      "As in the birthday paradox, where {b} {b:person is|people are} enough. The curve shows the probability that, among n people drawn from the list, at least two share a surname.",
+    lfColChart: "The probability of a shared surname among n people drawn from the list",
+    lfColAxis: "people drawn from the list (n)",
+    lfColMarkBirthday: "{b} {b:person|people}: a shared birthday, {p}",
+    lfColMarkSurname: "{n} {n:person|people}: a shared surname, {p}",
+    lfColStatHalf: "people: from here the chance of a shared surname passes one half ({p})",
+    lfColStatPairMale: "two random men from the list share a surname",
+    lfColStatPairFemale: "two random women from the list share a surname",
+    lfColStatBirthday:
+      "{b:person is|people are} enough for two to share a birthday ({p}): for comparison",
+    lfColOneIn: "1 in {k}",
+    lfColFoot:
+      "Model: people drawn from the list without replacement, with the surname shares as on the list. The figures come from the artefact (the curve for n from {from} to {to}), not from a measurement.",
+    lfCrName: "A thousand people",
+    lfCrTitleMale: "{n} random men carry about {d} different surnames.",
+    lfCrTitleFemale: "{n} random women carry about {d} different surnames.",
+    lfCrLede:
+      "{s} of them have nobody in the group with the same surname. Below, one draw: each dot is a person, and the highlighted ones have someone in the group with a shared surname (the largest group: {g} {g:person|people}).",
+    lfCrChart: "One draw: {n} people, the dots with a shared surname highlighted",
+    lfCrExample:
+      "In this draw: {d} different surnames, {w} {w:person|people} with nobody of the same surname.",
+    lfCrLadderKicker: "How many different surnames in a random group (expected value)",
+    lfCrLadderRow: "{n} people",
+    lfCrLadderValue: "about {d} surnames",
+    lfCrReachKicker: "How many people to meet…",
+    lfCrReachTop1Male:
+      "…someone named {name}, with an even chance: {n} {n:person|people} (it is {s} of the male list).",
+    lfCrReachTop1Female:
+      "…someone named {name}, with an even chance: {n} {n:person|people} (it is {s} of the female list).",
+    lfCrReachTop10:
+      "…someone with one of the ten most common surnames: {n} {n:person|people} ({s} of the list).",
+    lfCrReachTop100:
+      "…someone with one of the hundred most common: {n} {n:person|people} ({s} of the list).",
+    lfCrFoot:
+      "The model of plate 09: draws without replacement with the list's shares. The example draw has a stored seed, so it is the same on every visit. “About” is an expected value rounded to a whole number.",
+    gnEyebrow: "Part II · First names given to children · {from}–{to} · {n:plate|plates}",
+    gnTitle: "Which first name was number one, and how far the names have spread out.",
+    gnLede:
+      "First names given to children born in each year from {from} to {to}, from the PESEL register (dane.gov.pl, dataset 219). Boys and girls apart. A name given fewer times than the publication threshold is not on the list: that is absence, not zero.",
+    gnScope:
+      "Every figure describes one published list: the first names of the children of one sex born in one year. A share is a share of the children on the list, not of all births.",
+    gnSwitchLabel: "Which list",
+    gnSwitchBoys: "Boys",
+    gnSwitchGirls: "Girls",
+    gnListBoys: "boys' list",
+    gnListGirls: "girls' list",
+    gnNamesBoys: "{n:name|names} on the boys' list",
+    gnNamesGirls: "{n:name|names} on the girls' list",
+    gnChildrenBoys: "{k} {k:boy|boys}",
+    gnChildrenGirls: "{k} {k:girl|girls}",
+    gnSource: "Source: {link} · lists {from}–{to} · {list}",
+    gnSourceName: "PESEL register, dane.gov.pl, dataset 219",
+    gnPlate: "Plate",
+    gnP12Name: "How many names",
+    gnP12TitleBoys: "In {y1}, boys were given {n} different {n:name|names}. In {y0}: {m}.",
+    gnP12TitleGirls: "In {y1}, girls were given {n} different {n:name|names}. In {y0}: {m}.",
+    gnP12Lede:
+      "The names on each year's list. From {yt} the publisher lists names given at least {t2} times, before that at least {t1}, so the {yt} list is longer for that reason too. Below: how many children are on each year's list.",
+    gnP12LedePlain:
+      "The names on each year's list. Below: how many children are on each year's list.",
+    gnP12Break: "from {yt} the publication threshold is {t2} (before: {t1})",
+    gnP12ChartNames: "Names on the list in each year",
+    gnP12ChartChildrenBoys: "Boys on the year's list",
+    gnP12ChartChildrenGirls: "Girls on the year's list",
+    gnP12StatNamesBoys: "{n:name|names} on the boys' list for {y}",
+    gnP12StatNamesGirls: "{n:name|names} on the girls' list for {y}",
+    gnP12StatChildrenBoys: "{k:boy|boys} on that list (names below the threshold are not counted)",
+    gnP12StatChildrenGirls:
+      "{k:girl|girls} on that list (names below the threshold are not counted)",
+    gnP12StatFirstBoys: "{k:boy|boys} on the list for {y}",
+    gnP12StatFirstGirls: "{k:girl|girls} on the list for {y}",
+    gnP12Foot:
+      "Names given fewer times than the threshold are not on the list, so the children on a list are not the births. The bars before {yt} are dimmed: a different threshold, a different list.",
+    gnP12FootPlain:
+      "Names given fewer times than the threshold are not on the list, so the children on a list are not the births.",
+    gnP13Name: "Number one",
+    gnP13TitleBoys: "{name} was number one the longest: {n} {n:year|years} ({span}).",
+    gnP13TitleGirls: "{name} was number one the longest: {n} {n:year|years} ({span}).",
+    gnP13LedeBoys:
+      "The most-given boys' name in each year from {y0} to {y1}. A field's width is its years in first place.",
+    gnP13LedeGirls:
+      "The most-given girls' name in each year from {y0} to {y1}. A field's width is its years in first place.",
+    gnP13Chart: "The number-one name in each year, as consecutive runs",
+    gnP13Run: "{name}: {span}, {n} {n:year|years}",
+    gnP13StatAlwaysOne: "the only name in the top ten in every year from {y0} to {y1}",
+    gnP13StatAlwaysMany: "names in the top ten in every year from {y0} to {y1}",
+    gnP13StatAlwaysNone: "No name is in the top ten in every year from {y0} to {y1}.",
+    gnP13StatShareBoys: "the number-one name's share of boys on the list: {y0} ({a}) → {y1} ({b})",
+    gnP13StatShareGirls:
+      "the number-one name's share of girls on the list: {y0} ({a}) → {y1} ({b})",
+    gnP13StatRuns: "{n:change|changes} of the number-one name from {y0} to {y1}",
+    gnP13Foot:
+      "Colour marks a name and is labelled. A year's number-one name is given to thousands of children, so it can be named.",
+    gnP14Name: "The ten",
+    gnP14TitleBoys: "The ten most common names go to {s1} of boys. In {y0} it was {s0}.",
+    gnP14TitleGirls: "The ten most common names go to {s1} of girls. In {y0} it was {s0}.",
+    gnP14LedeBoys:
+      "Half the boys born in {y1} have one of {h1} names; in {y0}, {h0} were enough. Two charts, two measures: the top ten's share, and how many names cover half the children.",
+    gnP14LedeGirls:
+      "Half the girls born in {y1} have one of {h1} names; in {y0}, {h0} were enough. Two charts, two measures: the top ten's share, and how many names cover half the children.",
+    gnP14ChartShareBoys: "The ten most common names' share of boys on the list",
+    gnP14ChartShareGirls: "The ten most common names' share of girls on the list",
+    gnP14ChartHalfBoys: "How many of the most common names cover half the boys",
+    gnP14ChartHalfGirls: "How many of the most common names cover half the girls",
+    gnP14StatShare: "the ten most common names' share: {y0} → {y1}",
+    gnP14StatHalfBoys: "names cover half the boys: {y0} → {y1}",
+    gnP14StatHalfGirls: "names cover half the girls: {y0} → {y1}",
+    gnP14StatTop: "the number-one name's share alone: {y0} → {y1}",
+    gnP14Foot:
+      "Shares are of the children on the year's list (names below the threshold are not in the denominator). The threshold change does not touch the top ten or the half: those names are at the top of the list.",
+    gnP15Name: "{y0} → {y1}",
+    gnP15TitleOne: "Only {names} is in the top ten in every year from {y0} to {y1}.",
+    gnP15TitleMany: "In the top ten in every year from {y0} to {y1}: {names}.",
+    gnP15TitleNone: "No name is in the top ten in every year from {y0} to {y1}.",
+    gnP15LedeBoys:
+      "The ten most-given boys' names in the first and the last year, with the children. A bar is proportional within its own year; the years are not compared directly, since the lists differ in size.",
+    gnP15LedeGirls:
+      "The ten most-given girls' names in the first and the last year, with the children. A bar is proportional within its own year; the years are not compared directly, since the lists differ in size.",
+    gnP15Year: "Born in {y}",
+    gnP15Foot:
+      "Amber: {y0} (the earlier year). Blue: {y1} (the current year). A name in every year's top ten is highlighted.",
+    gnP16Name: "New names",
+    gnP16Title: "{n} {n:name|names} on the {y1} list {n:was|were} not on the {y0} list.",
+    gnP16Lede:
+      "{m} {m:name|names} from {y0} {m:is|are} not on the {y1} list; {b} {b:is|are} on both. Part of the difference is the lower publication threshold from {yt}: a name given at least {t2} times but fewer than {t1} was below the threshold in {y0}.",
+    gnP16OnlyFirst: "on the {y0} list only: names not given at least {t2} times in {y1}",
+    gnP16Both: "on both lists",
+    gnP16OnlyLast: "on the {y1} list only: new names, or names below the threshold of {t1} in {y0}",
+    gnP16Foot: "Not on a list is not zero. Names are compared by exact spelling.",
+    gnP17Name: "First letter and ending",
+    gnP17TitleBoys:
+      "{s1} of boys born in {y1} have a name starting with {l1}. In {y0} the most common letter was {l0}: {s0}.",
+    gnP17TitleGirls: "{s1} of girls born in {y1} have a name ending in -a. In {y0}: {s0}.",
+    gnP17LedeBoys:
+      "The first letter and the last sound, counted as spelled. Below: the share of boys with a name ending in -a (a margin) and the share of the most common first letter in each year.",
+    gnP17LedeGirls:
+      "The first letter and the last sound, counted as spelled. Almost every girl's name ends in -a; below, its share in each year and the share of the most common first letter.",
+    gnP17ChartEndsBoys: "Share of boys whose name ends in -a",
+    gnP17ChartEndsGirls: "Share of girls whose name ends in -a",
+    gnP17ChartLetter: "Share of the year's most common first letter (letters: {letters})",
+    gnP17StatLetterBoys: "the most common first letter of boys' names in {y}: {s} of the list",
+    gnP17StatLetterGirls: "the most common first letter of girls' names in {y}: {s} of the list",
+    gnP17StatEnds: "names ending in -a: {y0} → {y1}",
+    gnP17Foot: "We count the name as spelled, never its origin.",
+    ldWhatEyebrow: "What it is · why",
+    ldWhatTitle: "An honest, sourced answer about a surname.",
+    ldWhatParagraphs: [
+      "Name Atlas answers questions about a Polish surname: how many people carry it, how rare it is, where in Poland it occurs, how it has changed since 2019, what it may mean and where it appears in old prints.",
+      "It exists because the web offers two roads today: pages that assert a surname's origin with no source at all, or genealogical research that takes time, skill and archive access. Here every figure is taken from the PESEL register or Polona's collections, with a date and a source, and where there is no data we say so.",
+      "We speak about the surname itself. Never about your family, and never about particular people.",
+    ],
+    ldPromises: [
+      [
+        "Every figure has a source and a date.",
+        "The PESEL register published on dane.gov.pl, Polona, Wikidata. On every fact: where from, as of when, how certain.",
+      ],
+      [
+        "No data is also an answer.",
+        "We do not guess a meaning or invent a history. When the sources are silent, the card says so.",
+      ],
+      [
+        "We speak about the surname, never about your family.",
+        "No ancestors, coats of arms or ethnic origin read off a surname.",
+      ],
+    ],
+    ldHowEyebrow: "How to use it",
+    ldHowTitle: "Three steps. No account, no card.",
+    ldHowLede:
+      "Searching a surname is free and needs no sign-in. An account matters only for baby names and the family tree.",
+    ldSteps: [
+      [
+        "Type a surname",
+        "Exactly as it is written, Polish letters included. If the spelling is unclear, we suggest similar surnames from the list.",
+      ],
+      [
+        "Read the cards",
+        "Six answers, each on its own card with a date and a source. A card can be shared or saved to your phone as an image.",
+      ],
+      [
+        "Go further",
+        "Compare two surnames, look up to four surnames from your family on one page, or open the Atlas: statistics about every surname and first name.",
+      ],
+    ],
+    ldExpectTitle: "Six questions, six cards.",
+    ldExampleLede: "One of the cards for",
+    ldExampleNote: "The men's and the women's lists are separate and never summed.",
+    ldToolsEyebrow: "More than one surname",
+    ldToolsTitle: "Next: comparisons, family, first names and the Atlas.",
+    ldToolsLede:
+      "Everything about a surname is free. Full first-name figures, a bigger tree and reports: {offer}, each a one-time payment.",
+    ldToolsOffer: "in the offer",
+    ldTileAtlasTag: "Atlas · general statistics",
+    ldTileAtlasTitle: "Surnames and first names in Poland, in figures.",
+    ldTileAtlasBody:
+      "How many surnames half the people on the list carry, how rare a typical surname is, which first name was number one in every year since 2000. Separate lists, never summed.",
+    ldTileAtlasGo: "See the Atlas",
+    ldTileCompareTag: "Compare",
+    ldTileCompareTitle: "Two surnames side by side.",
+    ldTileCompareBody: "Counts, rarity and voivodeships from the same dataset and the same date.",
+    ldTileCompareGo: "Compare",
+    ldTileFamilyTag: "Family surnames",
+    ldTileFamilyTitle: "Up to four surnames on one page.",
+    ldTileFamilyBody: "Each is its own free result. Nothing is combined and nothing is stored.",
+    ldTileFamilyGo: "Check your family",
+    ldTileBabyTag: "Baby names · with an account",
+    ldTileBabyTitle: "How many children were given this name.",
+    ldTileBabyBody:
+      "The count and rank in the latest full year, and whether the name is rising or falling.",
+    ldTileBabyGo: "Check a name",
+    ldTileTreeTag: "Family tree · with an account",
+    ldTileTreeTitle: "Your tree starts with you.",
+    ldTileTreeBody:
+      "Parents, grandparents, great-grandparents. Only you see living people. A free account, no card.",
+    ldTileTreeGo: "Start a tree",
     footerExplore: "Explore",
     footerRead: "Read",
     footerSite: "The site",

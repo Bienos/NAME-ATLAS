@@ -190,3 +190,82 @@ export function columnPath(column: TrendColumn, h: number): string {
     "Z",
   ].join(" ");
 }
+
+// --- plates 05, 09 and 10 (TASK-178) --------------------------------------------
+
+/**
+ * `value` on a logarithmic scale from 1 to `max`, as a fraction: a ladder whose
+ * rungs differ by orders of magnitude keeps every rung visible. 0 for a value
+ * of 1 or less.
+ */
+export function logScale(value: number, max: number): number {
+  if (!(max > 1) || !(value > 1)) return 0;
+  return clamp01(Math.log(value) / Math.log(max));
+}
+
+/** The shared-surname curve's drawing box (plate 09). */
+export const CURVE = { width: 1000, height: 360 } as const;
+
+/** A point of the curve: `n` on the x axis between `nMin` and `nMax`, `p` up the y axis. */
+export function curvePoint(
+  n: number,
+  p: number,
+  nMin: number,
+  nMax: number,
+): { readonly x: number; readonly y: number } {
+  const span = nMax - nMin;
+  const x = span > 0 ? ((n - nMin) / span) * CURVE.width : 0;
+  return { x: round4(x), y: round4(CURVE.height - clamp01(p) * CURVE.height) };
+}
+
+/** The curve as an SVG path through its stored points, in their stored order. */
+export function curvePath(points: readonly { readonly n: number; readonly p: number }[]): string {
+  const first = points[0];
+  const last = points[points.length - 1];
+  if (first === undefined || last === undefined) return "";
+  return points
+    .map((point, i) => {
+      const { x, y } = curvePoint(point.n, point.p, first.n, last.n);
+      return `${i === 0 ? "M" : "L"}${String(x)} ${String(y)}`;
+    })
+    .join(" ");
+}
+
+/** The crowd's grid (plate 10): `cols` dots to a row, `cell` units apart. */
+export const CROWD = { cols: 50, cell: 20, radius: 6 } as const;
+
+/** Where the k-th person of the crowd sits: row by row, left to right. */
+export function crowdDot(k: number): { readonly cx: number; readonly cy: number } {
+  const col = k % CROWD.cols;
+  const row = Math.floor(k / CROWD.cols);
+  return { cx: CROWD.cell / 2 + col * CROWD.cell, cy: CROWD.cell / 2 + row * CROWD.cell };
+}
+
+/** The grid's height in drawing units for `n` people. */
+export function crowdHeight(n: number): number {
+  return Math.ceil(n / CROWD.cols) * CROWD.cell;
+}
+
+// --- Part II (TASK-178): a line over the years --------------------------------
+
+/** The year charts' drawing box. */
+export const YEARS = { width: 1000, height: 220 } as const;
+
+/** The i-th of n years as an x position across the box. */
+export function yearX(i: number, n: number): number {
+  return n <= 1 ? 0 : round4((i / (n - 1)) * YEARS.width);
+}
+
+/** A value between `min` and `max` as a y position up the box, with a little headroom. */
+export function yearY(value: number, min: number, max: number): number {
+  const span = max - min;
+  const t = span > 0 ? clamp01((value - min) / span) : 0.5;
+  return round4(YEARS.height - 12 - t * (YEARS.height - 24));
+}
+
+/** A polyline through one value per year. */
+export function yearLine(values: readonly number[], min: number, max: number): string {
+  return values
+    .map((value, i) => `${String(yearX(i, values.length))},${String(yearY(value, min, max))}`)
+    .join(" ");
+}
