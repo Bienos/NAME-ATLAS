@@ -1,19 +1,22 @@
 import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
-import { accountPath, googleStartPath } from "./account-paths.js";
-import { googleEnabled } from "./accounts-config.js";
+import { accountPath } from "./account-paths.js";
+import { accountsEnabled } from "./accounts-config.js";
+import { BABY_NAMES_PATHS, babyNamesEnabled } from "./baby-names-config.js";
 import { familyTreeEnabled } from "./family-config.js";
-import { UI } from "./messages.js";
+import { FAMILY_SURNAMES_PATHS } from "./family-surnames-page.js";
+import { fillTemplate, formatInteger, UI } from "./messages.js";
+import { rich } from "./list-atlas.js";
 import type { Lang } from "./messages.js";
-import { offerDocument } from "./offer-text.js";
-import { comparePagePath, howPath, offerPath } from "./site-links.js";
+import { atlasPath, comparePagePath, howPath, offerPath } from "./site-links.js";
 import { treeLandingPath, treePath } from "./tree-paths.js";
 
 /**
- * The landing's sections below the hero (TASK-053; extended and reordered in
- * TASK-065): the second screen says what you get and shows it, then the
- * offer, how it works and compare. Each is static or renders what it is
- * given; none derives a figure. The hero itself keeps ADR-0021's words.
+ * The landing's sections below the hero (TASK-053, TASK-065; four sections
+ * since TASK-178): what Name Atlas is and why, how to use it, what to expect
+ * (the six questions and one real card), and one tile per other tool. Each is
+ * static or renders what it is given; none derives a figure. The hero itself
+ * keeps ADR-0021's words.
  */
 
 /**
@@ -130,86 +133,61 @@ export interface LandingExample {
   }[];
 }
 
-/**
- * The second screen, "Co dostaniesz": what a search gives, as six questions
- * with what answers each, the surnames to try, and the example's cards laid
- * flat on the ground, each the deck's own face with its source and date, with
- * the way to the whole deck. Without an example the cards are left out and
- * the rest stands.
- */
-export function LandingPitch({ example, lang }: { example: LandingExample | null; lang: Lang }) {
-  const t = UI[lang];
-  const cards = example !== null && example.cards.length > 0 ? example : null;
+/** A section's head: the eyebrow, the heading and, beside it, an optional lede. */
+function SectionHead({
+  id,
+  eyebrow,
+  heading,
+  lede,
+  blue = false,
+}: {
+  id: string;
+  eyebrow: string;
+  heading: string;
+  lede?: ReactNode;
+  blue?: boolean;
+}) {
   return (
-    <section id="pitch" className="landing-pitch" aria-labelledby="landing-pitch-heading">
-      <div className="pitch-head">
-        <p className="pitch-eyebrow">{t.pitchEyebrow}</p>
-        <h2 id="landing-pitch-heading">
-          <Scatter text={t.pitchHeading} />
+    <div className="ld-head">
+      <div>
+        <p className={blue ? "ld-eyebrow ld-eyebrow-blue" : "ld-eyebrow"}>{eyebrow}</p>
+        <h2 id={id}>
+          <Scatter text={heading} />
         </h2>
       </div>
-      <p className="pitch-lede">{t.pitchLede}</p>
-      <ol className="pitch-answers">
-        {t.pitchAnswers.map(([question, answer]) => (
-          <li key={question}>
-            <h3>{question}</h3>
-            <p>{answer}</p>
-          </li>
-        ))}
-      </ol>
-      <p className="pitch-note">{t.pitchNote}</p>
-      <LandingTries lang={lang} />
-      {cards === null ? null : (
-        <div className="pitch-cards">
-          <h3 className="pitch-cards-title">
-            {t.previewLede} <span lang="pl">{cards.surname}</span>:
-          </h3>
-          <ul className="preview-cards">
-            {cards.cards.map((card, i) => (
-              <li key={card.key}>
-                {/* Dealt face down and turned over as it comes into view
-                    (the stylesheet; nothing here moves). The back is
-                    decoration and says only whose deck it is. */}
-                <div className="flip" style={{ "--i": i } as CSSProperties}>
-                  <div className="flip-back" aria-hidden="true">
-                    <span className="flip-back-name">{cards.surname}</span>
-                    <span className="flip-back-brand">NAME ATLAS</span>
-                  </div>
-                  <article className="dk-card preview-card" aria-label={card.title}>
-                    <span className="dk-spine" aria-hidden="true">
-                      {cards.surname} · NAME ATLAS
-                    </span>
-                    <span className="dk-index" aria-hidden="true">
-                      {String(card.number).padStart(2, "0")}
-                    </span>
-                    {card.face}
-                  </article>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="landing-more">
-            <a href={cards.deckPath}>
-              {t.previewAll} <span lang="pl">{cards.surname}</span>
-            </a>
-          </p>
-        </div>
-      )}
-    </section>
+      {lede === undefined ? null : <p className="ld-head-lede">{lede}</p>}
+    </div>
   );
 }
 
-/** How it works, in three sentences, then the page that says it in full. */
-export function LandingHow({ lang }: { lang: Lang }) {
+/**
+ * What it is and why it exists (TASK-178): `PRODUCT.md` §1 in three
+ * paragraphs, and the three promises the how-it-works page keeps, with the
+ * way to that page.
+ */
+export function LandingWhat({ lang }: { lang: Lang }) {
   const t = UI[lang];
   return (
-    <section id="how" className="landing-how" aria-labelledby="landing-how-heading">
-      <h2 id="landing-how-heading">{t.navHow}</h2>
-      <ol>
-        {t.landingHowPoints.map((point) => (
-          <li key={point}>{point}</li>
-        ))}
-      </ol>
+    <section id="what" className="ld-section ld-what" aria-labelledby="ld-what-heading">
+      <SectionHead id="ld-what-heading" eyebrow={t.ldWhatEyebrow} heading={t.ldWhatTitle} />
+      <div className="ld-cols">
+        <div className="ld-prose">
+          {t.ldWhatParagraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+        </div>
+        <ol className="ld-promises">
+          {t.ldPromises.map(([title, body], i) => (
+            <li key={title}>
+              <span className="ld-k">{String(i + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{title}</h3>
+                <p>{body}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
       <p className="landing-more">
         <a href={howPath(lang)}>{t.landingHowMore}</a>
       </p>
@@ -217,69 +195,201 @@ export function LandingHow({ lang }: { lang: Lang }) {
   );
 }
 
-/**
- * The offer in one strip (TASK-065): the tiers as the offer page words
- * them — `offerDocument` is the one owner of their names, prices and status —
- * then the page itself and its waiting list. Nothing here can be bought.
- */
-export function LandingOffer({ lang }: { lang: Lang }) {
+/** How to use it (TASK-178): three steps, a real sequence, then the surnames to try. */
+export function LandingSteps({ lang }: { lang: Lang }) {
   const t = UI[lang];
-  const doc = offerDocument(lang);
   return (
-    <section id="offer" className="landing-offer" aria-labelledby="landing-offer-heading">
-      <h2 id="landing-offer-heading">{t.offerHeading}</h2>
-      <p className="landing-offer-lede">{doc.lede}</p>
-      <ul className="offer-strip">
-        {doc.tiers.map((tier) => (
-          <li key={tier.key} className={tier.soon ? "is-soon" : "is-now"}>
-            <p className="strip-status">{tier.soon ? doc.soon : doc.now}</p>
-            <h3>{tier.name}</h3>
-            <p className="strip-price">{tier.price}</p>
-            <p className="strip-lede">{tier.lede}</p>
+    <section id="how" className="ld-section ld-how" aria-labelledby="ld-how-heading">
+      <SectionHead
+        id="ld-how-heading"
+        eyebrow={t.ldHowEyebrow}
+        heading={t.ldHowTitle}
+        lede={t.ldHowLede}
+      />
+      <ol className="ld-steps">
+        {t.ldSteps.map(([title, body], i) => (
+          <li key={title}>
+            <span className="ld-k">{String(i + 1).padStart(2, "0")}</span>
+            <h3>{title}</h3>
+            <p>{body}</p>
           </li>
         ))}
-      </ul>
-      <p className="landing-more">
-        <a href={offerPath(lang)}>{t.offerAll}</a>
-        <a href={`${offerPath(lang)}#tier-smaller`}>{t.offerWaitlist}</a>
-      </p>
+      </ol>
+      <LandingTries lang={lang} />
     </section>
   );
 }
 
 /**
- * Two fields that open the comparison. The same `GET` as the comparison's own
- * picker (`compare-request.ts`): typed surnames become the pair's address.
- * Its own ids, so they never collide with the search field's.
+ * What to expect (TASK-178): the six questions a search answers
+ * (`pitchAnswers`, TASK-065) and one of the example surname's cards, the
+ * deck's own face with its source and date, with the way to the whole deck.
+ * Without an example the questions stand alone.
  */
-export function LandingCompare({ lang }: { lang: Lang }) {
+export function LandingExpect({ example, lang }: { example: LandingExample | null; lang: Lang }) {
   const t = UI[lang];
+  const card = example?.cards[0] ?? null;
   return (
-    <section className="landing-compare" aria-labelledby="landing-compare-heading">
-      <h2 id="landing-compare-heading">{t.compareHeading}</h2>
-      <p>{t.compareIntro}</p>
-      <form className="compare-form" action={comparePagePath(lang)} method="get">
-        <label htmlFor="landing-qa">{t.compareFirstLabel}</label>
-        <input
-          id="landing-qa"
-          name="qa"
-          type="text"
-          placeholder={t.searchPlaceholder}
-          autoComplete="off"
-          spellCheck={false}
-          autoCapitalize="words"
+    <section id="expect" className="ld-section ld-expect" aria-labelledby="ld-expect-heading">
+      <SectionHead
+        id="ld-expect-heading"
+        eyebrow={t.pitchEyebrow}
+        heading={t.ldExpectTitle}
+        lede={t.pitchLede}
+      />
+      <div className="ld-expect-grid">
+        <ol className="ld-qa">
+          {t.pitchAnswers.map(([question, answer], i) => (
+            <li key={question}>
+              <span className="ld-k">{String(i + 1).padStart(2, "0")}</span>
+              <h3>{question}</h3>
+              <p>{answer}</p>
+            </li>
+          ))}
+        </ol>
+        {example === null || card === null ? null : (
+          <div className="ld-example">
+            <p className="ld-example-lede">
+              {t.ldExampleLede} <span lang="pl">{example.surname}</span>:
+            </p>
+            <article className="dk-card preview-card ld-card" aria-label={card.title}>
+              <span className="dk-spine" aria-hidden="true">
+                {example.surname} · NAME ATLAS
+              </span>
+              <span className="dk-index" aria-hidden="true">
+                {String(card.number).padStart(2, "0")}
+              </span>
+              {card.face}
+            </article>
+            <p className="ld-example-note">
+              {t.ldExampleNote}{" "}
+              <a href={example.deckPath}>
+                {t.previewAll} <span lang="pl">{example.surname}</span>
+              </a>
+            </p>
+          </div>
+        )}
+      </div>
+      <p className="ld-note">{t.pitchNote}</p>
+    </section>
+  );
+}
+
+/** The two surname lists' sizes for the Atlas tile: one figure per list, never summed. */
+export interface AtlasFigures {
+  readonly male: number;
+  readonly female: number;
+}
+
+function Tile({
+  href,
+  tag,
+  title,
+  body,
+  go,
+  featured = false,
+  children,
+}: {
+  href: string;
+  tag: string;
+  title: string;
+  body: string;
+  go: string;
+  featured?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <a className={featured ? "ld-tile ld-tile-feat" : "ld-tile"} href={href}>
+      <span className="ld-tile-tag">{tag}</span>
+      <h3>{title}</h3>
+      {children}
+      <p>{body}</p>
+      <span className="ld-tile-go">
+        {go} <span aria-hidden="true">→</span>
+      </span>
+    </a>
+  );
+}
+
+/**
+ * Everything else, one tile each (TASK-178): the Atlas, featured, with one
+ * figure per surname list from the artefact; the comparison; the family
+ * surnames; baby names and the tree only when they are on. The offer is one
+ * line; the price list lives on its page.
+ */
+export function LandingTools({ figures, lang }: { figures: AtlasFigures | null; lang: Lang }) {
+  const t = UI[lang];
+  const treeOn = familyTreeEnabled();
+  const babyOn = babyNamesEnabled() && accountsEnabled();
+  return (
+    <section id="tools" className="ld-section ld-tools" aria-labelledby="ld-tools-heading">
+      <SectionHead
+        id="ld-tools-heading"
+        eyebrow={t.ldToolsEyebrow}
+        heading={t.ldToolsTitle}
+        blue
+        lede={rich(
+          t.ldToolsLede,
+          { offer: <a href={offerPath(lang)}>{t.ldToolsOffer}</a> },
+          {},
+          lang,
+        )}
+      />
+      <div className="ld-tiles">
+        <Tile
+          href={atlasPath(lang)}
+          tag={t.ldTileAtlasTag}
+          title={t.ldTileAtlasTitle}
+          body={t.ldTileAtlasBody}
+          go={t.ldTileAtlasGo}
+          featured
+        >
+          {figures === null ? null : (
+            <p className="ld-tile-figs">
+              <span>
+                <b>{formatInteger(figures.male, lang)}</b>
+                <span>{fillTemplate(t.lfP1SurnamesMale, {}, { n: figures.male }, lang)}</span>
+              </span>
+              <span>
+                <b>{formatInteger(figures.female, lang)}</b>
+                <span>{fillTemplate(t.lfP1SurnamesFemale, {}, { n: figures.female }, lang)}</span>
+              </span>
+            </p>
+          )}
+        </Tile>
+        <Tile
+          href={comparePagePath(lang)}
+          tag={t.ldTileCompareTag}
+          title={t.ldTileCompareTitle}
+          body={t.ldTileCompareBody}
+          go={t.ldTileCompareGo}
         />
-        <label htmlFor="landing-qb">{t.compareSecondLabel}</label>
-        <input
-          id="landing-qb"
-          name="qb"
-          type="text"
-          autoComplete="off"
-          spellCheck={false}
-          autoCapitalize="words"
+        <Tile
+          href={FAMILY_SURNAMES_PATHS[lang]}
+          tag={t.ldTileFamilyTag}
+          title={t.ldTileFamilyTitle}
+          body={t.ldTileFamilyBody}
+          go={t.ldTileFamilyGo}
         />
-        <button type="submit">{t.compareAction}</button>
-      </form>
+        {babyOn ? (
+          <Tile
+            href={BABY_NAMES_PATHS[lang]}
+            tag={t.ldTileBabyTag}
+            title={t.ldTileBabyTitle}
+            body={t.ldTileBabyBody}
+            go={t.ldTileBabyGo}
+          />
+        ) : null}
+        {treeOn ? (
+          <Tile
+            href={treeLandingPath(lang)}
+            tag={t.ldTileTreeTag}
+            title={t.ldTileTreeTitle}
+            body={t.ldTileTreeBody}
+            go={t.ldTileTreeGo}
+          />
+        ) : null}
+      </div>
     </section>
   );
 }
@@ -302,45 +412,5 @@ export function LandingTreeLine({ lang }: { lang: Lang }) {
       <span aria-hidden="true"> · </span>
       <a href={treeSignInPath(lang)}>{t.landingTreeSignIn}</a>
     </p>
-  );
-}
-
-/**
- * The family tree's section on the landing (TASK-084), after what the cards
- * give: what the tree is in three lines, then Google's one-click start (when
- * Google is configured) and the other ways in. Only when the tree is on; it
- * is free with an account (D-034).
- */
-export function LandingTree({ lang }: { lang: Lang }) {
-  if (!familyTreeEnabled()) return null;
-  const t = UI[lang];
-  const next = treePath(lang, { page: "trees" });
-  return (
-    <section className="landing-tree" aria-labelledby="landing-tree-heading">
-      <p className="landing-tree-eyebrow">{t.landingTreeEyebrow}</p>
-      <h2 id="landing-tree-heading">{t.landingTreeHeading}</h2>
-      <ul>
-        {t.landingTreePoints.map((point) => (
-          <li key={point}>{point}</li>
-        ))}
-      </ul>
-      <p className="tree-actions">
-        {googleEnabled() ? (
-          <a className="offer-send" href={googleStartPath(lang, next)}>
-            {t.landingTreeGoogle}
-          </a>
-        ) : null}
-        <a
-          className={googleEnabled() ? "offer-send tree-ghost" : "offer-send"}
-          href={treeSignInPath(lang)}
-        >
-          {googleEnabled() ? t.landingTreeOther : t.landingTreeStart}
-        </a>
-      </p>
-      <p className="landing-more">
-        <a href={treeLandingPath(lang)}>{t.landingTreeMore}</a>
-      </p>
-      <p className="landing-tree-free">{t.landingTreeFree}</p>
-    </section>
   );
 }

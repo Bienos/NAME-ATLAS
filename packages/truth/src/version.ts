@@ -290,6 +290,23 @@ export const LIST_CHANGE_METHOD_VERSION = "list_change@1";
 /** How many of the most common surnames `change.top10_unchanged` compares. */
 export const LIST_CHANGE_TOP_SIZE = 10;
 
+// --- TASK-178, ADR-0051: statistics about the first-name birth lists -----------
+
+/**
+ * The pipeline from the registry's thirteen pinned birth-list files to the
+ * `given_name_list_facts@1` artefact (`docs/contracts/given-name-list-facts.md`).
+ */
+export const GIVEN_NAME_LIST_FACTS_METHOD_VERSION = "given_name_list_facts_pipeline@1";
+
+/** One list's block: names, children, extremes, `TOP_1`, the ten's share, the half, the letter, the ending. */
+export const GIVEN_NAME_LIST_YEAR_METHOD_VERSION = "given_name_list_year@1";
+
+/** The sets of names of the first and the last year compared by exact spelling. */
+export const GIVEN_NAME_LIST_CHANGE_METHOD_VERSION = "given_name_list_change@1";
+
+/** Each year's `TOP_1` as maximal runs of consecutive years; the names in every year's ten. */
+export const GIVEN_NAME_LIST_SEQUENCE_METHOD_VERSION = "given_name_list_sequence@1";
+
 /** The shares q of a list's people `concentration` reports; compared as exact thousandths. */
 export const LIST_CONCENTRATION_QUANTILES: readonly number[] = [0.1, 0.5, 0.9];
 

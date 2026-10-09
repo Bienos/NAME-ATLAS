@@ -4,48 +4,40 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { searchTarget } from "../lib/deck-target.js";
 import { createLogger } from "@name-atlas/logging";
-import { listFacts, mostCommonSurnames, querySurnameResult } from "@name-atlas/truth";
-import { currentSlugsFor } from "@name-atlas/seo";
+import { listFacts, querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
 import type { SurnameResultResponse } from "@name-atlas/contracts";
 import { parseIntent, parseLang, UI } from "../lib/messages.js";
 import type { Lang } from "../lib/messages.js";
 import { Result } from "../lib/result-view.js";
 import { SearchForm } from "../lib/search-form.js";
-import { CommonSurnames } from "../lib/common-surnames.js";
-import type { CommonList } from "../lib/common-surnames.js";
-import { currentPathFor, pathForSlug } from "../lib/slug.js";
+import { currentPathFor } from "../lib/slug.js";
 import { referrerPath, requestOrigin, searchOrigin, siteOrigin } from "../lib/surname-page.js";
 import { landingMetadata } from "../lib/site-metadata.js";
 import { jsonLd, siteGraph } from "../lib/structured-data.js";
 import { DuskZoom } from "../lib/dusk-zoom.js";
-import { ListAtlas } from "../lib/list-atlas.js";
 import { loadListFacts } from "../lib/list-atlas-load.js";
 import { SiteShell } from "../lib/site-shell.js";
 import { deckCards } from "../lib/deck.js";
 import {
   LANDING_EXAMPLE,
-  LandingCompare,
-  LandingHow,
-  LandingOffer,
-  LandingPitch,
-  LandingTree,
+  LandingExpect,
+  LandingSteps,
+  LandingTools,
   LandingTreeLine,
+  LandingWhat,
   Scatter,
 } from "../lib/landing-sections.js";
-import type { LandingExample } from "../lib/landing-sections.js";
+import type { AtlasFigures, LandingExample } from "../lib/landing-sections.js";
 
 /**
  * The search page (TASK-017; TASK-024 gave resolved results an address).
  *
  * A server component: a `GET` form and server rendering answer this journey,
  * and `PRODUCT.md` §2's user is on mobile. It is not free of client code: the
- * search field is a client island (`surname-combobox.tsx`), and so are the
- * landing atlas's section (`list-atlas-shell.tsx`), whose only script is the
- * plates' entrance motion — its list switch is HTML and CSS — its plate I
- * sky (`list-atlas-sky.tsx`), a canvas drawn from the stored figures, and the
- * dusk world behind the hero with its zoom (`dusk-world.tsx`, `dusk-zoom.tsx`;
- * TASK-052, ADR-0021).
+ * search field is a client island (`surname-combobox.tsx`), and so is the dusk
+ * world behind the hero with its zoom (`dusk-world.tsx`, `dusk-zoom.tsx`;
+ * TASK-052, ADR-0021). The atlas's plates moved to `/pl/atlas` (TASK-178).
  *
  * A query that resolves to exactly one surname is **redirected** to that
  * surname's canonical page (ADR-0009) — `/pl/nazwisko/{slug}` — so the address
@@ -159,49 +151,15 @@ async function answer(
 }
 
 /**
- * The most common surnames for the bare landing page, from rank claims
- * (`mostCommonSurnames`). A failure here costs the section, never the page.
+ * The card the landing shows before a search (TASK-065; one card since
+ * TASK-178): the example surname's own first face, rendered by `deckCards`
+ * from its validated response, so it carries its source and date and nothing
+ * is drawn a second way. A failure costs the card, never the page. An answer
+ * is kept for ten minutes per process, as the card images are kept at the
+ * edge: it is one surname's whole page, which would otherwise be read on
+ * every visit.
  */
-async function commonLists(lang: Lang): Promise<CommonList[]> {
-  try {
-    const db = sharedDb();
-    const lists = await mostCommonSurnames(db, { limit: 10 });
-    const ids = lists.flatMap((l) => l.items.map((i) => i.surname_id));
-    const slugs = await currentSlugsFor(db, lang, ids);
-    return lists.map((l) => ({
-      comparability_group: l.comparability_group,
-      snapshot_date: l.snapshot_date,
-      items: l.items.map((i) => {
-        const slug = slugs.get(i.surname_id);
-        const path = slug === undefined ? null : pathForSlug(slug, lang);
-        const search = new URLSearchParams({
-          surname: i.display_name,
-          ...(lang === "en" ? { lang } : {}),
-        });
-        return {
-          display_name: i.display_name,
-          rank: i.rank,
-          path: path ?? `/?${search.toString()}`,
-        };
-      }),
-    }));
-  } catch (cause: unknown) {
-    createLogger({ service: "web", base: { route: "/" } }).error("common_surnames_failed", {
-      cause,
-    });
-    return [];
-  }
-}
-
-/**
- * The cards the landing shows before a search (TASK-065): three of the example
- * surname's own faces, rendered by `deckCards` from its validated response, so
- * each carries its source and date and nothing is drawn a second way. A
- * failure costs the section, never the page. An answer is kept for ten minutes
- * per process, as the card images are kept at the edge: it is one surname's
- * whole page, which would otherwise be read on every visit.
- */
-const EXAMPLE_KEYS: readonly string[] = ["rarity", "where", "change"];
+const EXAMPLE_KEYS: readonly string[] = ["hello"];
 const EXAMPLE_KEEP_MS = 10 * 60 * 1000;
 const exampleKept = new Map<Lang, { readonly at: number; readonly value: LandingExample }>();
 
@@ -227,7 +185,7 @@ async function loadExample(lang: Lang): Promise<LandingExample | null> {
     const cards = deckCards(response, lang, { path, shareUrl: null })
       .map((card, i) => ({ number: i + 1, key: card.key, title: card.title, face: card.face }))
       .filter((card) => EXAMPLE_KEYS.includes(card.key));
-    if (cards.length < 2) return null;
+    if (cards.length < 1) return null;
     return {
       surname: response.surname.display_name,
       deckPath: searchTarget(path, "default"),
@@ -276,12 +234,15 @@ export default async function HomePage({ searchParams }: PageProps) {
   const origin = searchOrigin(referrerPath(h.get("referer"), requestOrigin(h.get("host"))));
 
   const given = await answer(query, origin, lang);
-  const [common, example] =
-    given.kind === "NONE" ? await Promise.all([commonLists(lang), exampleDeck(lang)]) : [[], null];
-  // The landing atlas (TASK-040, TASK-043): statistics about each whole
-  // published list, from the committed artefact. Fails soft: no facts, no
-  // section.
+  const example = given.kind === "NONE" ? await exampleDeck(lang) : null;
+  // The artefact's two list sizes for the Atlas tile and the register line
+  // (TASK-040; TASK-178 moved the plates to `/pl/atlas`). Fails soft: no
+  // facts, no figures.
   const atlas = given.kind === "NONE" ? loadListFacts(listFacts) : null;
+  const figures: AtlasFigures | null =
+    atlas === null
+      ? null
+      : { male: atlas.lists.male.summary.surnames, female: atlas.lists.female.summary.surnames };
 
   if (given.kind === "RESULT" && given.path !== null) {
     // The result has an address of its own. `?intent=` travels with it; the
@@ -300,9 +261,9 @@ export default async function HomePage({ searchParams }: PageProps) {
 
   // The bare page is the landing (ADR-0021; TASK-052): the dusk hero — the
   // register line, the headline, the field as the second-largest object,
-  // Poland on the horizon behind them — then, on the ground (TASK-065's
-  // order): what you get with the example's cards, the offer, how it works,
-  // the comparison, the most common surnames and the atlas's plates.
+  // Poland on the horizon behind them — then, on the ground (TASK-178's
+  // order): what it is and why, how to use it, what to expect with the
+  // example's card, and one tile per other tool.
   if (given.kind === "NONE") {
     // The register line names the artefact's own date; without the artefact
     // it names the register alone. Never a count, and never the two lists
@@ -357,15 +318,10 @@ export default async function HomePage({ searchParams }: PageProps) {
           <p className="landing-trust">{t.landingTrust}</p>
         </section>
         <div className="landing-atlas">
-          <LandingPitch example={example} lang={lang} />
-          <LandingTree lang={lang} />
-          <LandingOffer lang={lang} />
-          <LandingHow lang={lang} />
-          <LandingCompare lang={lang} />
-          <CommonSurnames lists={common} lang={lang} />
-          <div id="atlas" className="landing-plates">
-            <ListAtlas facts={atlas} lang={lang} />
-          </div>
+          <LandingWhat lang={lang} />
+          <LandingSteps lang={lang} />
+          <LandingExpect example={example} lang={lang} />
+          <LandingTools figures={figures} lang={lang} />
         </div>
       </SiteShell>
     );

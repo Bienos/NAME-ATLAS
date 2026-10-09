@@ -28,7 +28,14 @@ import { ListAtlasSky } from "./list-atlas-sky.js";
 import type { SkyList } from "./list-atlas-sky.js";
 import {
   columnPath,
+  CROWD,
+  crowdDot,
+  crowdHeight,
+  CURVE,
+  curvePath,
+  curvePoint,
   linearScale,
+  logScale,
   RIBBON,
   ribbonPath,
   round4,
@@ -37,11 +44,13 @@ import {
   trendColumn,
   vennLayout,
 } from "./list-atlas-geometry.js";
+import type { CommonList } from "./common-surnames.js";
 
 /**
- * The landing atlas (TASK-040; six plates since TASK-043, seven since
- * TASK-044): seven plates about the two published PESEL surname lists,
- * rendered from `listFacts()`.
+ * The surname atlas (TASK-040; six plates since TASK-043, seven since
+ * TASK-044; eleven since TASK-178, when it moved from the landing to the Atlas
+ * page): eleven plates about the two published PESEL surname lists, rendered
+ * from `listFacts()`, and plate 01 from the rank claims (`mostCommonSurnames`).
  *
  * **This view derives nothing.** Every figure a reader sees is a value the
  * artefact carries, formatted by `messages.ts`: nothing is added, subtracted,
@@ -75,7 +84,7 @@ function of<T>(side: Side, male: T, female: T): T {
 }
 
 /** A template as React nodes: `{key}` slots, agreeing words and `**emphasis**`. */
-function rich(
+export function rich(
   template: string,
   slots: Readonly<Record<string, ReactNode>>,
   counts: Readonly<Record<string, number>>,
@@ -94,7 +103,7 @@ function rich(
 }
 
 /** A figure in a headline or a counter: sans, tabular, in Atlas Blue. */
-function Num({ children }: { children: ReactNode }) {
+export function Num({ children }: { children: ReactNode }) {
   return <span className="lf-n">{children}</span>;
 }
 
@@ -115,7 +124,7 @@ function Name({ surname, lang }: { surname: string; lang: Lang }) {
 }
 
 /** Custom properties for the stylesheet: positions and scales as unitless fractions. */
-function vars(values: Readonly<Record<string, number>>): CSSProperties {
+export function vars(values: Readonly<Record<string, number>>): CSSProperties {
   const style: Record<string, string> = {};
   for (const [key, value] of Object.entries(values)) style[`--${key}`] = String(round4(value));
   return style as CSSProperties;
@@ -127,7 +136,7 @@ function vars(values: Readonly<Record<string, number>>): CSSProperties {
  * with `visibility`, so the block is as tall as the taller variant and
  * flipping lists moves nothing below it.
  */
-function Alt({
+export function Alt({
   male,
   female,
   inline = false,
@@ -174,7 +183,7 @@ function PerList({
  * together by non-breaking spaces, so a narrow line breaks between the two
  * and never inside either ("20 stycznia 2026 r.", "20 January 2026").
  */
-function keptDate(iso: string, lang: Lang): string {
+export function keptDate(iso: string, lang: Lang): string {
   const words = formatDate(iso, lang).split(" ");
   if (words.length < 3) return words.join("\u00a0");
   return `${words.slice(0, 2).join("\u00a0")} ${words.slice(2).join("\u00a0")}`;
@@ -246,7 +255,7 @@ function SourceLine({
   );
 }
 
-function Plate({
+export function Plate({
   id,
   number,
   name,
@@ -388,8 +397,8 @@ function PlateSky({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
   const t = UI[lang];
   return (
     <Plate
-      id="lf-p1"
-      number="I"
+      id="lf-p02"
+      number="02"
       name={t.lfP1Name}
       title={t.lfP1Title}
       foot={t.lfP1Foot}
@@ -522,8 +531,8 @@ function PlateHalf({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
   );
   return (
     <Plate
-      id="lf-p2"
-      number="II"
+      id="lf-p03"
+      number="03"
       name={t.lfP2Name}
       title={<PerList facts={facts} inline render={title} />}
       lede={<PerList facts={facts} render={lede} />}
@@ -633,8 +642,8 @@ function PlateRarity({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) 
   };
   return (
     <Plate
-      id="lf-p3"
-      number="III"
+      id="lf-p04"
+      number="04"
       name={t.lfP3Name}
       title={<PerList facts={facts} inline render={title} />}
       lede={<PerList facts={facts} render={lede} />}
@@ -821,8 +830,8 @@ function PlateEndings({ facts, lang }: { facts: ListFactsArtefact; lang: Lang })
   };
   return (
     <Plate
-      id="lf-p4"
-      number="IV"
+      id="lf-p06"
+      number="06"
       name={t.lfP4Name}
       title={<PerList facts={facts} inline render={title} />}
       foot={t.lfP4Foot}
@@ -966,8 +975,8 @@ function PlateAlphabet({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }
   };
   return (
     <Plate
-      id="lf-p5"
-      number="V"
+      id="lf-p07"
+      number="07"
       name={t.lfP5Name}
       title={<PerList facts={facts} inline render={title} />}
       lede={<PerList facts={facts} render={lede} />}
@@ -1097,8 +1106,8 @@ function PlateTwoLists({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }
   ].filter((sentence) => sentence !== null);
   return (
     <Plate
-      id="lf-p6"
-      number="VI"
+      id="lf-p08"
+      number="08"
       name={t.lfP6Name}
       title={rich(
         t.lfP6Title,
@@ -1436,8 +1445,8 @@ function PlateChange({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) 
   };
   return (
     <Plate
-      id="lf-p7"
-      number="VII"
+      id="lf-p11"
+      number="11"
       name={t.lfP7Name}
       title={<PerList facts={facts} inline render={title} />}
       lede={<PerList facts={facts} render={lede} />}
@@ -1478,11 +1487,646 @@ function PlateChange({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) 
 
 // --- the section ------------------------------------------------------------------
 
+// --- plate 01: the most common surnames (TASK-178) --------------------------------
+
+/** The rank claims' list for one side, matched by its comparability group. */
+function commonFor(common: readonly CommonList[], side: Side): CommonList | null {
+  const group = of(side, "national_male", "national_female");
+  return common.find((list) => list.comparability_group === group) ?? null;
+}
+
+function TopList({
+  list,
+  ranks,
+  side,
+  lang,
+}: {
+  list: ListFacts;
+  ranks: CommonList | null;
+  side: Side;
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const named = new Map(list.named_top.items.map((item) => [item.published, item.count]));
+  const max = list.summary.max_count;
+  const th = list.summary.thresholds;
+  const fifty = th[th.length - 1] ?? null;
+  const top = list.named_top.items[0] ?? null;
+  return (
+    <div className="lf-top-wrap lf-rv">
+      <div>
+        {ranks === null ? (
+          <>
+            <p className="lf-top-note">{t.lfTopUnavailable}</p>
+            <ol className="lf-top-list" aria-label={of(side, t.lfTopListMale, t.lfTopListFemale)}>
+              {list.named_top.items.map((item) => (
+                <li key={item.key} style={vars({ w: linearScale(item.count, max) })}>
+                  <span className="lf-top-rank" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="lf-top-name">
+                    <Name surname={item.published} lang={lang} />
+                    <i className="lf-top-bar" aria-hidden="true" />
+                  </span>
+                  <span className="lf-count">{formatInteger(item.count, lang)}</span>
+                </li>
+              ))}
+            </ol>
+          </>
+        ) : (
+          <ol className="lf-top-list" aria-label={of(side, t.lfTopListMale, t.lfTopListFemale)}>
+            {ranks.items.map((item) => {
+              const count = named.get(item.display_name) ?? null;
+              return (
+                <li
+                  key={`${item.display_name}-${String(item.rank)}`}
+                  style={count === null ? undefined : vars({ w: linearScale(count, max) })}
+                >
+                  <span className="lf-top-rank">{String(item.rank)}.</span>
+                  <span className="lf-top-name">
+                    <a className="lf-name" href={item.path}>
+                      {item.display_name}
+                    </a>
+                    {count === null ? null : <i className="lf-top-bar" aria-hidden="true" />}
+                  </span>
+                  {count === null ? null : (
+                    <span className="lf-count">{formatInteger(count, lang)}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </div>
+      <div className="lf-big">
+        {fifty === null ? null : (
+          <p className="lf-big-fig">
+            <span className="lf-big-v">
+              <Num>{formatInteger(fifty.surnames, lang)}</Num>
+            </span>
+            <span className="lf-big-l">
+              {fillTemplate(
+                of(side, t.lfTopThresholdMale, t.lfTopThresholdFemale),
+                { k: formatInteger(fifty.at_least, lang), p: formatInteger(fifty.people, lang) },
+                { n: fifty.surnames, p: fifty.people },
+                lang,
+              )}
+            </span>
+          </p>
+        )}
+        {top === null ? null : (
+          <p className="lf-big-fig">
+            <span className="lf-big-v">
+              <Num>{formatInteger(top.count, lang)}</Num>
+            </span>
+            <span className="lf-big-l">
+              {rich(
+                of(side, t.lfTopShareMale, t.lfTopShareFemale),
+                { name: <Name surname={top.published} lang={lang} /> },
+                {},
+                lang,
+              )}
+            </span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PlateTop({
+  facts,
+  common,
+  lang,
+}: {
+  facts: ListFactsArtefact;
+  common: readonly CommonList[];
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const title = (list: ListFacts) => {
+    const [a, b, c] = list.named_top.items;
+    if (a === undefined || b === undefined || c === undefined) {
+      return list.named_top.items.map((item, i) => (
+        <Fragment key={item.key}>
+          {i > 0 ? ", " : null}
+          <Name surname={item.published} lang={lang} />
+        </Fragment>
+      ));
+    }
+    return rich(
+      t.lfTopTitle,
+      {
+        a: <Name surname={a.published} lang={lang} />,
+        b: <Name surname={b.published} lang={lang} />,
+        c: <Name surname={c.published} lang={lang} />,
+      },
+      {},
+      lang,
+    );
+  };
+  return (
+    <Plate
+      id="lf-p01"
+      number="01"
+      name={t.lfTopName}
+      title={<PerList facts={facts} inline render={title} />}
+      lede={
+        <PerList
+          facts={facts}
+          render={(_list, side) => <p>{of(side, t.lfTopLedeMale, t.lfTopLedeFemale)}</p>}
+        />
+      }
+      foot={t.lfTopFoot}
+      lang={lang}
+      source={
+        <SourceLine
+          facts={facts}
+          lang={lang}
+          methods={(l) => [l.summary.method_version, l.named_top.method_version]}
+        />
+      }
+    >
+      <PerList
+        facts={facts}
+        render={(list, side) => (
+          <TopList list={list} ranks={commonFor(common, side)} side={side} lang={lang} />
+        )}
+      />
+    </Plate>
+  );
+}
+
+// --- plate 05: the thresholds ladder (TASK-178) -----------------------------------
+
+/** The threshold the headline names: at least 10 000 bearers, else the second-highest rung. */
+function headlineThreshold(list: ListFacts) {
+  const th = list.summary.thresholds;
+  return th.find((t) => t.at_least === 10000) ?? th[th.length - 2] ?? th[0] ?? null;
+}
+
+function Ladder({ list, side, lang }: { list: ListFacts; side: Side; lang: Lang }) {
+  const t = UI[lang];
+  const max = list.summary.thresholds[0]?.surnames ?? 0;
+  const hi = headlineThreshold(list);
+  return (
+    <ol className="lf-ladder" aria-label={of(side, t.lfThListMale, t.lfThListFemale)}>
+      {list.summary.thresholds.map((th) => (
+        <li
+          key={th.at_least}
+          data-hi={hi !== null && th.at_least === hi.at_least ? "" : undefined}
+          style={vars({ w: logScale(th.surnames, max) })}
+        >
+          <span className="lf-ladder-k">
+            {fillTemplate(
+              t.lfThRow,
+              { k: formatInteger(th.at_least, lang) },
+              { k: th.at_least },
+              lang,
+            )}
+          </span>
+          <span className="lf-ladder-track">
+            <i aria-hidden="true" />
+          </span>
+          <span className="lf-ladder-s">
+            {fillTemplate(
+              t.lfThSurnames,
+              { n: formatInteger(th.surnames, lang) },
+              { n: th.surnames },
+              lang,
+            )}
+          </span>
+          <span className="lf-ladder-p">
+            {fillTemplate(
+              of(side, t.lfThPeopleMale, t.lfThPeopleFemale),
+              { p: formatInteger(th.people, lang) },
+              { p: th.people },
+              lang,
+            )}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function PlateThresholds({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
+  const t = UI[lang];
+  const title = (list: ListFacts, side: Side) => {
+    const hi = headlineThreshold(list);
+    if (hi === null) return t.lfThName;
+    return rich(
+      of(side, t.lfThTitleMale, t.lfThTitleFemale),
+      { n: <Num>{formatInteger(hi.surnames, lang)}</Num>, k: formatInteger(hi.at_least, lang) },
+      { n: hi.surnames },
+      lang,
+    );
+  };
+  return (
+    <Plate
+      id="lf-p05"
+      number="05"
+      name={t.lfThName}
+      title={<PerList facts={facts} inline render={title} />}
+      lede={
+        <PerList
+          facts={facts}
+          render={(_list, side) => <p>{of(side, t.lfThLedeMale, t.lfThLedeFemale)}</p>}
+        />
+      }
+      foot={t.lfThFoot}
+      lang={lang}
+      source={<SourceLine facts={facts} lang={lang} methods={(l) => [l.summary.method_version]} />}
+    >
+      <div className="lf-ladder-wrap lf-rv">
+        <PerList
+          facts={facts}
+          render={(list, side) => <Ladder list={list} side={side} lang={lang} />}
+        />
+      </div>
+    </Plate>
+  );
+}
+
+// --- plate 09: shared surnames, the "birthday problem" (TASK-178) ---------------
+
+function CollisionChart({
+  list,
+  birthday,
+  lang,
+}: {
+  list: ListFacts;
+  birthday: ListFactsArtefact["birthday_reference"];
+  lang: Lang;
+}) {
+  const t = UI[lang];
+  const c = list.collision;
+  const first = c.curve[0];
+  const last = c.curve[c.curve.length - 1];
+  if (first === undefined || last === undefined) return null;
+  const mark = curvePoint(c.n_half, c.p_at_n_half, first.n, last.n);
+  const bday = curvePoint(birthday.n_half, birthday.p_at_n_half, first.n, last.n);
+  const ticks = c.curve.filter((point) => point.n % 50 === 0);
+  return (
+    <div className="lf-col-fig" aria-hidden="true">
+      <svg
+        className="lf-col"
+        viewBox={`0 0 ${String(CURVE.width)} ${String(CURVE.height + 40)}`}
+        aria-hidden="true"
+      >
+        <line className="lf-col-grid" x1="0" x2={CURVE.width} y1={mark.y} y2={mark.y} />
+        <path className="lf-col-curve" d={curvePath(c.curve)} />
+        <line
+          className="lf-col-stem lf-col-b"
+          x1={bday.x}
+          x2={bday.x}
+          y1={bday.y}
+          y2={CURVE.height}
+        />
+        <circle className="lf-col-dot lf-col-b" cx={bday.x} cy={bday.y} r="7" />
+        <text className="lf-col-label lf-col-b" x={bday.x + 12} y={bday.y - 10}>
+          {fillTemplate(
+            t.lfColMarkBirthday,
+            { b: formatInteger(birthday.n_half, lang), p: formatShare(birthday.p_at_n_half, lang) },
+            { b: birthday.n_half },
+            lang,
+          )}
+        </text>
+        <line
+          className="lf-col-stem lf-col-n"
+          x1={mark.x}
+          x2={mark.x}
+          y1={mark.y}
+          y2={CURVE.height}
+        />
+        <circle className="lf-col-dot lf-col-n" cx={mark.x} cy={mark.y} r="8" />
+        <text className="lf-col-label lf-col-n" x={mark.x + 14} y={mark.y + 6}>
+          {fillTemplate(
+            t.lfColMarkSurname,
+            { n: formatInteger(c.n_half, lang), p: formatShare(c.p_at_n_half, lang) },
+            { n: c.n_half },
+            lang,
+          )}
+        </text>
+        <line className="lf-col-base" x1="0" x2={CURVE.width} y1={CURVE.height} y2={CURVE.height} />
+        {ticks.map((point) => {
+          const { x } = curvePoint(point.n, 0, first.n, last.n);
+          return (
+            <text key={point.n} className="lf-col-tick" x={x} y={CURVE.height + 22}>
+              {formatInteger(point.n, lang)}
+            </text>
+          );
+        })}
+        <text className="lf-col-axis" x={CURVE.width / 2} y={CURVE.height + 38}>
+          {t.lfColAxis}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function CollisionFigures({ list, side, lang }: { list: ListFacts; side: Side; lang: Lang }) {
+  const t = UI[lang];
+  const c = list.collision;
+  return (
+    <div className="lf-big">
+      <p className="lf-big-fig">
+        <span className="lf-big-v">
+          <Num>{formatInteger(c.n_half, lang)}</Num>
+        </span>
+        <span className="lf-big-l">
+          {fillTemplate(t.lfColStatHalf, { p: formatShare(c.p_at_n_half, lang) }, {}, lang)}
+        </span>
+      </p>
+      <p className="lf-big-fig">
+        <span className="lf-big-v">
+          <Num>
+            {fillTemplate(t.lfColOneIn, { k: formatInteger(c.pair_one_in, lang) }, {}, lang)}
+          </Num>
+        </span>
+        <span className="lf-big-l">{of(side, t.lfColStatPairMale, t.lfColStatPairFemale)}</span>
+      </p>
+    </div>
+  );
+}
+
+function PlateCollision({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
+  const t = UI[lang];
+  const b = facts.birthday_reference;
+  const title = (list: ListFacts, side: Side) =>
+    rich(
+      of(side, t.lfColTitleMale, t.lfColTitleFemale),
+      { n: <Num>{formatInteger(list.collision.n_half, lang)}</Num> },
+      { n: list.collision.n_half },
+      lang,
+    );
+  const lede = fillTemplate(
+    t.lfColLede,
+    { b: formatInteger(b.n_half, lang) },
+    { b: b.n_half },
+    lang,
+  );
+  const foot = (list: ListFacts) => {
+    const first = list.collision.curve[0];
+    const last = list.collision.curve[list.collision.curve.length - 1];
+    return fillTemplate(
+      t.lfColFoot,
+      {
+        from: formatInteger(first?.n ?? 0, lang),
+        to: formatInteger(last?.n ?? 0, lang),
+      },
+      {},
+      lang,
+    );
+  };
+  return (
+    <Plate
+      id="lf-p09"
+      number="09"
+      name={t.lfColName}
+      title={<PerList facts={facts} inline render={title} />}
+      lede={<p>{lede}</p>}
+      foot={foot(facts.lists.male)}
+      lang={lang}
+      source={
+        <SourceLine facts={facts} lang={lang} methods={(l) => [l.collision.method_version]} />
+      }
+    >
+      <div className="lf-col-wrap lf-rv">
+        <PerList
+          facts={facts}
+          render={(list) => <CollisionChart list={list} birthday={b} lang={lang} />}
+        />
+        <div>
+          <PerList
+            facts={facts}
+            render={(list, side) => <CollisionFigures list={list} side={side} lang={lang} />}
+          />
+          <p className="lf-col-birthday">
+            <Num>{formatInteger(b.n_half, lang)}</Num>{" "}
+            {fillTemplate(
+              t.lfColStatBirthday,
+              { p: formatShare(b.p_at_n_half, lang) },
+              { b: b.n_half },
+              lang,
+            )}
+          </p>
+        </div>
+      </div>
+    </Plate>
+  );
+}
+
+// --- plate 10: a crowd of a thousand (TASK-178) -------------------------------------
+
+/** The expected number of different surnames, rounded to a whole number for reading. */
+function aboutInteger(value: number, lang: Lang): string {
+  return formatInteger(Math.round(value), lang);
+}
+
+function CrowdGrid({ list, side }: { list: ListFacts; side: Side }) {
+  const ex = list.crowd.example;
+  const groups = ex.group_sizes;
+  const id = `lf-cr-${side}`;
+  let k = 0;
+  const dots: { cx: number; cy: number; g: number }[] = [];
+  groups.forEach((size, g) => {
+    for (let i = 0; i < size; i++) dots.push({ ...crowdDot(k++), g });
+  });
+  const height = crowdHeight(ex.n);
+  return (
+    <svg
+      className="lf-cr"
+      viewBox={`0 0 ${String(CROWD.cols * CROWD.cell)} ${String(height)}`}
+      aria-hidden="true"
+    >
+      <defs>
+        <pattern id={id} width={CROWD.cell} height={CROWD.cell} patternUnits="userSpaceOnUse">
+          <circle
+            className="lf-cr-single"
+            cx={CROWD.cell / 2}
+            cy={CROWD.cell / 2}
+            r={CROWD.radius * 0.75}
+          />
+        </pattern>
+      </defs>
+      <rect width={CROWD.cols * CROWD.cell} height={height} fill={`url(#${id})`} />
+      {dots.map((dot, i) => (
+        <circle
+          key={i}
+          className="lf-cr-dot"
+          data-odd={dot.g % 2 === 1 ? "" : undefined}
+          cx={dot.cx}
+          cy={dot.cy}
+          r={CROWD.radius}
+        />
+      ))}
+    </svg>
+  );
+}
+
+function CrowdFigures({ list, side, lang }: { list: ListFacts; side: Side; lang: Lang }) {
+  const t = UI[lang];
+  const cr = list.crowd;
+  const reach = Object.fromEntries(cr.reach_half.map((r) => [r.set, r]));
+  const top = list.named_top.items[0] ?? null;
+  const t1 = reach["TOP_1"];
+  const t10 = reach["TOP_10"];
+  const t100 = reach["TOP_100"];
+  return (
+    <div className="lf-cr-figs">
+      <p className="lf-kicker">{t.lfCrLadderKicker}</p>
+      <ol className="lf-ladder lf-ladder-cr">
+        {cr.expected_distinct.map((entry) => (
+          <li key={entry.n} style={vars({ w: linearScale(entry.value, entry.n) })}>
+            <span className="lf-ladder-k">
+              {fillTemplate(t.lfCrLadderRow, { n: formatInteger(entry.n, lang) }, {}, lang)}
+            </span>
+            <span className="lf-ladder-track">
+              <i aria-hidden="true" />
+            </span>
+            <span className="lf-ladder-s">
+              {fillTemplate(t.lfCrLadderValue, { d: aboutInteger(entry.value, lang) }, {}, lang)}
+            </span>
+          </li>
+        ))}
+      </ol>
+      {t1 === undefined || t10 === undefined || t100 === undefined ? null : (
+        <div className="lf-omit lf-cr-reach">
+          <p className="lf-kicker">{t.lfCrReachKicker}</p>
+          {top === null ? null : (
+            <p>
+              {rich(
+                of(side, t.lfCrReachTop1Male, t.lfCrReachTop1Female),
+                {
+                  name: <Name surname={top.published} lang={lang} />,
+                  n: <b>{formatInteger(t1.n_half, lang)}</b>,
+                  s: formatShare(t1.share_of_people, lang),
+                },
+                { n: t1.n_half },
+                lang,
+              )}
+            </p>
+          )}
+          <p>
+            {rich(
+              t.lfCrReachTop10,
+              {
+                n: <b>{formatInteger(t10.n_half, lang)}</b>,
+                s: formatShare(t10.share_of_people, lang),
+              },
+              { n: t10.n_half },
+              lang,
+            )}
+          </p>
+          <p>
+            {rich(
+              t.lfCrReachTop100,
+              {
+                n: <b>{formatInteger(t100.n_half, lang)}</b>,
+                s: formatShare(t100.share_of_people, lang),
+              },
+              { n: t100.n_half },
+              lang,
+            )}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PlateCrowd({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) {
+  const t = UI[lang];
+  const title = (list: ListFacts, side: Side) => {
+    const expected = list.crowd.expected_distinct.find((e) => e.n === list.crowd.crowd_size);
+    return rich(
+      of(side, t.lfCrTitleMale, t.lfCrTitleFemale),
+      {
+        n: formatInteger(list.crowd.crowd_size, lang),
+        d: <Num>{expected === undefined ? "" : aboutInteger(expected.value, lang)}</Num>,
+      },
+      {},
+      lang,
+    );
+  };
+  const lede = (list: ListFacts) => {
+    const largest = list.crowd.example.group_sizes[0] ?? 0;
+    return (
+      <p>
+        {rich(
+          t.lfCrLede,
+          {
+            s: <b>{formatShare(list.crowd.share_without_namesake, lang)}</b>,
+            g: formatInteger(largest, lang),
+          },
+          { g: largest },
+          lang,
+        )}
+      </p>
+    );
+  };
+  return (
+    <Plate
+      id="lf-p10"
+      number="10"
+      name={t.lfCrName}
+      title={<PerList facts={facts} inline render={title} />}
+      lede={<PerList facts={facts} render={lede} />}
+      foot={t.lfCrFoot}
+      lang={lang}
+      source={
+        <SourceLine
+          facts={facts}
+          lang={lang}
+          methods={(l) => [l.crowd.method_version, l.named_top.method_version]}
+        />
+      }
+    >
+      <div className="lf-cr-wrap lf-rv">
+        <div className="lf-cr-box">
+          <PerList facts={facts} render={(list, side) => <CrowdGrid list={list} side={side} />} />
+          <PerList
+            facts={facts}
+            render={(list) => (
+              <p className="lf-axis-note">
+                {fillTemplate(
+                  t.lfCrExample,
+                  {
+                    d: formatInteger(list.crowd.example.distinct, lang),
+                    w: formatInteger(list.crowd.example.without_namesake, lang),
+                  },
+                  { w: list.crowd.example.without_namesake },
+                  lang,
+                )}
+              </p>
+            )}
+          />
+        </div>
+        <PerList
+          facts={facts}
+          render={(list, side) => <CrowdFigures list={list} side={side} lang={lang} />}
+        />
+      </div>
+    </Plate>
+  );
+}
+
 /**
- * The atlas section. No facts, no section: when `listFacts()` failed the page
- * renders without it rather than with figures from anywhere else.
+ * The surname atlas: Part I of the Atlas page (TASK-178). No facts, no
+ * section: when `listFacts()` failed the page renders without it rather than
+ * with figures from anywhere else. `common` is the rank claims' lists for
+ * plate 01, empty when the database did not answer.
  */
-export function ListAtlas({ facts, lang }: { facts: ListFactsArtefact | null; lang: Lang }) {
+export function ListAtlas({
+  facts,
+  common = [],
+  lang,
+}: {
+  facts: ListFactsArtefact | null;
+  common?: readonly CommonList[];
+  lang: Lang;
+}) {
   if (facts === null) return null;
   const t: Messages = UI[lang];
   const date = keptDate(facts.snapshot_date, lang);
@@ -1490,7 +2134,7 @@ export function ListAtlas({ facts, lang }: { facts: ListFactsArtefact | null; la
     <header className="lf-head">
       <div className="lf-head-title">
         <p className="lf-eyebrow">
-          {fillTemplate(t.lfEyebrow, { year: facts.snapshot_date.slice(0, 4) }, {}, lang)}
+          {fillTemplate(t.lfEyebrowAtlas, { year: facts.snapshot_date.slice(0, 4) }, {}, lang)}
         </p>
         <h2 id="lf-title" className="lf-title">
           {t.lfTitle}
@@ -1513,12 +2157,16 @@ export function ListAtlas({ facts, lang }: { facts: ListFactsArtefact | null; la
       }}
       head={head}
     >
+      <PlateTop facts={facts} common={common} lang={lang} />
       <PlateSky facts={facts} lang={lang} />
       <PlateHalf facts={facts} lang={lang} />
       <PlateRarity facts={facts} lang={lang} />
+      <PlateThresholds facts={facts} lang={lang} />
       <PlateEndings facts={facts} lang={lang} />
       <PlateAlphabet facts={facts} lang={lang} />
       <PlateTwoLists facts={facts} lang={lang} />
+      <PlateCollision facts={facts} lang={lang} />
+      <PlateCrowd facts={facts} lang={lang} />
       <PlateChange facts={facts} lang={lang} />
     </ListAtlasShell>
   );
