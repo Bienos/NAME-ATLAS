@@ -19,6 +19,7 @@ export async function loadCommonLists(lang: Lang, route = "/pl/atlas"): Promise<
     const slugs = await currentSlugsFor(db, lang, ids);
     return lists.map((l) => ({
       comparability_group: l.comparability_group,
+      external_record_id: l.external_record_id,
       snapshot_date: l.snapshot_date,
       items: l.items.map((i) => {
         const slug = slugs.get(i.surname_id);

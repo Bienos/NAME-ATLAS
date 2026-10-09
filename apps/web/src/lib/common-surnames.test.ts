@@ -8,6 +8,7 @@ import type { CommonList } from "./common-surnames.js";
 const LISTS: CommonList[] = [
   {
     comparability_group: "pesel_2026_national_female",
+    external_record_id: "1148811",
     snapshot_date: "2026-01-20",
     items: [
       { display_name: "NOWAK", rank: 1, path: "/pl/nazwisko/nowak" },
@@ -16,6 +17,7 @@ const LISTS: CommonList[] = [
   },
   {
     comparability_group: "pesel_2026_national_male",
+    external_record_id: "1148808",
     snapshot_date: "2026-01-20",
     items: [{ display_name: "NOWAK", rank: 1, path: "/pl/nazwisko/nowak" }],
   },

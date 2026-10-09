@@ -3,6 +3,8 @@ import type { Lang } from "./messages.js";
 
 export interface CommonList {
   readonly comparability_group: string;
+  /** The ranked universe's dane.gov.pl resource id, from the claim (`mostCommonSurnames`). */
+  readonly external_record_id: string | null;
   readonly snapshot_date: string | null;
   readonly items: readonly {
     readonly display_name: string;
