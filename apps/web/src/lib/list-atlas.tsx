@@ -1489,10 +1489,16 @@ function PlateChange({ facts, lang }: { facts: ListFactsArtefact; lang: Lang }) 
 
 // --- plate 01: the most common surnames (TASK-178) --------------------------------
 
-/** The rank claims' list for one side, matched by its comparability group. */
-function commonFor(common: readonly CommonList[], side: Side): CommonList | null {
-  const group = of(side, "national_male", "national_female");
-  return common.find((list) => list.comparability_group === group) ?? null;
+/**
+ * The rank claims' list for one of the artefact's lists: the one ranked over
+ * the same dane.gov.pl resource (`source.external_record_id`), so the ranks and
+ * the counts beside them are of one register list. Matching by the group's
+ * name was wrong: the claims say `pesel_2026_national_male`, the artefact
+ * `national_male`, and production showed the fallback (2026-10-09).
+ */
+function commonFor(common: readonly CommonList[], list: ListFacts): CommonList | null {
+  const record = list.source.external_record_id;
+  return common.find((ranks) => ranks.external_record_id === record) ?? null;
 }
 
 function TopList({
@@ -1650,7 +1656,7 @@ function PlateTop({
       <PerList
         facts={facts}
         render={(list, side) => (
-          <TopList list={list} ranks={commonFor(common, side)} side={side} lang={lang} />
+          <TopList list={list} ranks={commonFor(common, list)} side={side} lang={lang} />
         )}
       />
     </Plate>

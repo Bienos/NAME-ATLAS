@@ -11,10 +11,15 @@ import { atlasPath } from "./site-links.js";
 
 const LANGS = ["pl", "en"] as const;
 
-/** Rank claims as `loadCommonLists` returns them; invented, for the markup only. */
+/**
+ * Rank claims as `loadCommonLists` returns them; invented names, for the markup
+ * only. The groups and record ids are the registry's, as the claims carry them
+ * (`pesel_2026_national_male` over resource 1148808, the fixture's source).
+ */
 const COMMON: CommonList[] = [
   {
-    comparability_group: "national_male",
+    comparability_group: "pesel_2026_national_male",
+    external_record_id: "1148808",
     snapshot_date: "2026-01-20",
     items: [
       { display_name: "ABACKI", rank: 1, path: "/pl/nazwisko/abacki" },
@@ -22,7 +27,8 @@ const COMMON: CommonList[] = [
     ],
   },
   {
-    comparability_group: "national_female",
+    comparability_group: "pesel_2026_national_female",
+    external_record_id: "1148811",
     snapshot_date: "2026-01-20",
     items: [{ display_name: "ABACKA", rank: 1, path: "/pl/nazwisko/abacka" }],
   },
@@ -93,6 +99,40 @@ describe("the Atlas page", () => {
     // Without Part II's artefact, no Part II and no chapter for it.
     expect(html).not.toContain('id="gn-title"');
     expect(html).not.toContain('href="#gn-p12"');
+  });
+
+  it("matches a rank list to its side by the source record, never by the group's name", () => {
+    // The group's name alone is not the match (production carried
+    // `pesel_2026_national_male` and the plate fell back, 2026-10-09): a list
+    // ranked over another resource is not shown, whatever its group is called.
+    const other = COMMON.map((list, i) => ({
+      ...list,
+      comparability_group: i === 0 ? "national_male" : "national_female",
+      external_record_id: i === 0 ? "1148809" : null,
+    }));
+    const fallback = renderToStaticMarkup(
+      createElement(AtlasBody, {
+        facts: LIST_FACTS_FIXTURE,
+        given: null,
+        common: other,
+        lang: "pl",
+      }),
+    );
+    expect(fallback).toContain(UI.pl.lfTopUnavailable);
+    expect(fallback).not.toContain('href="/pl/nazwisko/abacki"');
+    // And the record id is the match even when the group is named anyhow.
+    const renamed = COMMON.map((list) => ({ ...list, comparability_group: "anything" }));
+    const html = renderToStaticMarkup(
+      createElement(AtlasBody, {
+        facts: LIST_FACTS_FIXTURE,
+        given: null,
+        common: renamed,
+        lang: "pl",
+      }),
+    );
+    expect(html).toContain('href="/pl/nazwisko/abacki"');
+    expect(html).toContain('href="/pl/nazwisko/abacka"');
+    expect(html).not.toContain(UI.pl.lfTopUnavailable);
   });
 
   it("falls back to the artefact's three names on plate 01 without rank claims", () => {

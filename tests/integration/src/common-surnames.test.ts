@@ -40,19 +40,26 @@ describe("mostCommonSurnames", () => {
     return database.db;
   };
 
+  /** The registry's resource id for each rank universe, as `rank.ts` writes it. */
+  const RECORD: Readonly<Record<string, string>> = {
+    pesel_2026_national_male: "1148808",
+    pesel_2026_national_female: "1148811",
+  };
+
   async function rankClaim(
     surname: string,
     group: string,
     rank: number,
     status: "ACTIVE" | "SUPERSEDED" = "ACTIVE",
   ): Promise<void> {
+    const universe = { comparability_group: group, external_record_id: RECORD[group] ?? null };
     await sql`
       INSERT INTO claims (claim_id, claim_key, claim_type, epistemic_type, scope,
                           subject_entity_id, structured_value, claim_status,
                           created_by_run_id, method_version)
       SELECT gen_random_uuid(), ${`CURRENT_RANK|TEST|${surname}|${group}|${status}`}, 'CURRENT_RANK',
              c.epistemic_type, c.scope, c.subject_entity_id,
-             ${JSON.stringify({ rank, universe: { comparability_group: group }, snapshot_date: "2026-01-20" })}::jsonb,
+             ${JSON.stringify({ rank, universe, snapshot_date: "2026-01-20" })}::jsonb,
              ${status}, c.created_by_run_id, c.method_version
       FROM claims c JOIN surnames s ON s.surname_id = c.subject_entity_id
       WHERE s.canonical_display = ${surname} AND c.claim_type = 'CURRENT_POPULATION'
@@ -102,6 +109,7 @@ describe("mostCommonSurnames", () => {
     expect(lists).toEqual([
       {
         comparability_group: "pesel_2026_national_female",
+        external_record_id: "1148811",
         snapshot_date: "2026-01-20",
         items: [
           expect.objectContaining({ display_name: "NOWAK", rank: 1 }),
@@ -110,6 +118,7 @@ describe("mostCommonSurnames", () => {
       },
       {
         comparability_group: "pesel_2026_national_male",
+        external_record_id: "1148808",
         snapshot_date: "2026-01-20",
         items: [
           expect.objectContaining({ display_name: "NOWAK", rank: 1 }),

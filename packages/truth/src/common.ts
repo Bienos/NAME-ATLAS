@@ -23,6 +23,12 @@ export interface CommonSurname {
 
 export interface CommonSurnameList {
   readonly comparability_group: string;
+  /**
+   * The dane.gov.pl resource id of the universe the ranks were computed over,
+   * from the claim's `universe` — the key that ties a list to the list-facts
+   * artefact's source (`listSourceSchema.external_record_id`).
+   */
+  readonly external_record_id: string | null;
   readonly snapshot_date: string | null;
   readonly items: readonly CommonSurname[];
 }
@@ -38,12 +44,14 @@ export async function mostCommonSurnames(
     display_name: string;
     rank: number;
     comparability_group: string | null;
+    external_record_id: string | null;
     snapshot_date: string | null;
   }>`
     SELECT s.surname_id,
            s.canonical_display AS display_name,
            (c.structured_value->>'rank')::int AS rank,
            c.structured_value->'universe'->>'comparability_group' AS comparability_group,
+           c.structured_value->'universe'->>'external_record_id' AS external_record_id,
            c.structured_value->>'snapshot_date' AS snapshot_date
     FROM claims c
     JOIN surnames s ON s.surname_id = c.subject_entity_id
@@ -54,10 +62,17 @@ export async function mostCommonSurnames(
     ORDER BY comparability_group, rank, s.canonical_key
   `.execute(db);
 
-  const lists = new Map<string, { snapshot_date: string | null; items: CommonSurname[] }>();
+  const lists = new Map<
+    string,
+    { external_record_id: string | null; snapshot_date: string | null; items: CommonSurname[] }
+  >();
   for (const r of rows.rows) {
     if (r.comparability_group === null) continue;
-    const list = lists.get(r.comparability_group) ?? { snapshot_date: r.snapshot_date, items: [] };
+    const list = lists.get(r.comparability_group) ?? {
+      external_record_id: r.external_record_id,
+      snapshot_date: r.snapshot_date,
+      items: [],
+    };
     list.items.push({
       surname_id: r.surname_id,
       display_name: r.display_name,
