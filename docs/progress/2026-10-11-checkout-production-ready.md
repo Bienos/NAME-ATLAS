@@ -18,4 +18,6 @@
 - `pnpm test`: exit 0; web 1377 tests, accounts 52, db 15, truth 449, sources 615, the other packages as before, all passed.
 - `pnpm test:integration` with `TEST_DATABASE_URL` against a local PostgreSQL 16 with PostGIS 3 (Testcontainers has no Docker daemon here): 50 files, 551 tests passed, exit 0. A first run failed 2 tests that list every migration by name (`canonical-key-v2.test.ts`, `extensions.test.ts`); both now name 0048.
 
+- `pnpm build`: exit 0. It started before the `.checkout-consent` rule was added to `globals.css`; that rule was not built here.
+
 **Not verified.** `pnpm test:golden` and `pnpm test:e2e` were not run. GitHub Actions still starts no job (STATUS.md). No real or test payment was made through Stripe; no email was sent through Resend. Migration 0048 is not on the VM. No production variable was set and no webhook endpoint registered. The statement's wording and the confirmation's content have had no legal review (D-054).
