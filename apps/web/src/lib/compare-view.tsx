@@ -6,10 +6,13 @@ import {
   Chapter,
   DistributionMaps,
   FigureBars,
+  CouplesCard,
   FullNamesCard,
+  NO_COUPLE_LINKS,
   NamePlates,
   OddsFigures,
 } from "./compare-figures.js";
+import type { CoupleLinks } from "./compare-figures.js";
 import { COMPARE_EXAMPLES, COMPARE_TEXT } from "./compare-text.js";
 import { formatDate, formatInteger, partitionLabel, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
@@ -115,6 +118,7 @@ export function ComparisonView({
   lang,
   origin = null,
   fullNamesHref = null,
+  couples = NO_COUPLE_LINKS,
 }: {
   a: ComparisonSide;
   b: ComparisonSide;
@@ -123,6 +127,8 @@ export function ComparisonView({
   origin?: string | null;
   /** The full-name comparison's address, only while that page exists (D-049). */
   fullNamesHref?: string | null;
+  /** The couple pages that exist now (TASK-180). */
+  couples?: CoupleLinks;
 }) {
   const t = UI[lang];
   const c = COMPARE_TEXT[lang];
@@ -291,6 +297,8 @@ export function ComparisonView({
         {fullNamesHref === null ? null : <FullNamesCard href={fullNamesHref} lang={lang} />}
       </div>
 
+      <CouplesCard links={couples} lang={lang} pair={bothResolved ? [a.slug, b.slug] : null} />
+
       <ReportLink
         surnames={[a.display, b.display].filter((d): d is string => d !== null)}
         pageUrl={`${origin ?? ""}${comparePath(a.slug, b.slug, lang)}`}
@@ -384,6 +392,7 @@ export function ComparePicker({
   error,
   copy = null,
   fullNamesHref = null,
+  couples = NO_COUPLE_LINKS,
 }: {
   lang: Lang;
   first: string;
@@ -393,6 +402,8 @@ export function ComparePicker({
   copy?: PickerCopy | null;
   /** The full-name comparison's address, only while that page exists (D-049). */
   fullNamesHref?: string | null;
+  /** The couple pages that exist now (TASK-180). */
+  couples?: CoupleLinks;
 }) {
   const t = UI[lang];
   const c = COMPARE_TEXT[lang];
@@ -441,6 +452,7 @@ export function ComparePicker({
             </ol>
           </section>
           {fullNamesHref === null ? null : <FullNamesCard href={fullNamesHref} lang={lang} />}
+          <CouplesCard links={couples} lang={lang} />
         </>
       ) : null}
     </SiteShell>

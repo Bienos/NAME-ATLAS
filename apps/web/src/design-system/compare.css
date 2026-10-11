@@ -716,6 +716,36 @@ main.cmp.atlas-v1 .cmp-upsell-link {
   font-weight: 600;
 }
 
+/* The card for couples (TASK-180): one block per couple page that exists. */
+main.cmp.atlas-v1 .cmp-couples {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (min-width: 900px) {
+  main.cmp.atlas-v1 .cmp-couples:has(> .cmp-couples-item + .cmp-couples-item) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  main.cmp.atlas-v1 .cmp-couples > :is(.cmp-eyebrow, h2) {
+    grid-column: 1 / -1;
+  }
+}
+
+main.cmp.atlas-v1 .cmp-couples > :is(.cmp-eyebrow, h2) {
+  margin: 0;
+}
+
+main.cmp.atlas-v1 .cmp-couples-item h3 {
+  margin: 0 0 var(--space-2);
+  font-size: 1.125rem;
+}
+
+main.cmp.atlas-v1 .cmp-couples-item p {
+  margin: 0 0 var(--space-2);
+  max-width: var(--measure);
+}
+
 main.cmp.atlas-v1 .cmp-change {
   margin: var(--space-6) 0;
 }

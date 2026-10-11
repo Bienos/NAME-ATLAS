@@ -4,6 +4,7 @@ import {
   COMPARISON_METADATA,
   ComparePicker,
   ComparisonView,
+  coupleLinks,
   loadComparison,
 } from "../../../lib/compare-page.js";
 import { comparisonRequest } from "../../../lib/compare-request.js";
@@ -32,6 +33,7 @@ export default async function Page({ searchParams }: Props) {
         second={request.second}
         error={request.error}
         fullNamesHref={fullNameCompareHref("en")}
+        couples={coupleLinks()}
       />
     );
   }
@@ -43,6 +45,7 @@ export default async function Page({ searchParams }: Props) {
       lang="en"
       origin={siteOrigin()}
       fullNamesHref={fullNameCompareHref("en")}
+      couples={coupleLinks()}
     />
   );
 }
