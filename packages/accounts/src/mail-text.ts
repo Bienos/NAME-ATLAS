@@ -1,5 +1,6 @@
 /**
- * The two messages accounts send (ADR-0027), in Polish and English.
+ * The messages accounts send (ADR-0027), in Polish and English: the two with a
+ * link, and the purchase confirmation (TASK-179, ADR-0052).
  *
  * Plain on purpose: a sentence, one link, and what to do if the reader did not
  * ask. The link carries a token that is spent by the form on the page it opens
@@ -116,4 +117,105 @@ export function verificationMail(to: string, language: Language, link: string): 
 
 export function resetMail(to: string, language: Language, link: string): OutgoingMail {
   return compose(to, link, RESET[language]);
+}
+
+/** What the purchase confirmation states, already worded in the buyer's language. */
+export interface PurchaseMailFacts {
+  /** "Name Atlas — Imiona dla dziecka". */
+  readonly product: string;
+  /** "8,99 zł", VAT included. */
+  readonly price: string;
+  /** "11 października 2026". */
+  readonly paidOn: string;
+  /** The withdrawal statement the buyer ticked, word for word. */
+  readonly consent: string;
+  /** Where the buyer uses what they bought: the account page. */
+  readonly accountLink: string;
+  readonly contact: string;
+}
+
+const PURCHASE: Record<
+  Language,
+  {
+    readonly subject: (product: string) => string;
+    readonly greeting: string;
+    readonly thanks: string;
+    readonly product: string;
+    readonly price: string;
+    readonly paidOn: string;
+    readonly consentLead: string;
+    readonly accountLead: string;
+    readonly contactLead: string;
+    readonly signature: string;
+  }
+> = {
+  pl: {
+    subject: (product) => `Potwierdzenie zakupu: ${product}`,
+    greeting: "Dzień dobry,",
+    thanks:
+      "Dziękujemy za zakup. Ta wiadomość potwierdza zawarcie umowy o dostarczenie treści cyfrowych.",
+    product: "Produkt:",
+    price: "Cena (z VAT):",
+    paidOn: "Data płatności:",
+    consentLead: "Oświadczenie zaznaczone przed zapłatą:",
+    accountLead: "Dostęp masz od razu na swoim koncie:",
+    contactLead: "Pytania i reklamacje:",
+    signature: "Name Atlas",
+  },
+  en: {
+    subject: (product) => `Purchase confirmation: ${product}`,
+    greeting: "Hello,",
+    thanks:
+      "Thank you for your purchase. This message confirms the contract for the supply of digital content.",
+    product: "Product:",
+    price: "Price (VAT included):",
+    paidOn: "Paid on:",
+    consentLead: "The statement ticked before paying:",
+    accountLead: "Your access is ready in your account:",
+    contactLead: "Questions and complaints:",
+    signature: "Name Atlas",
+  },
+};
+
+/**
+ * The confirmation on a durable medium that a consumer contract for digital
+ * content needs (TASK-179): what was bought, its price and date, and the
+ * withdrawal statement the buyer ticked, word for word.
+ */
+export function purchaseMail(
+  to: string,
+  language: Language,
+  facts: PurchaseMailFacts,
+): OutgoingMail {
+  const w = PURCHASE[language];
+  const rows: readonly (readonly [string, string])[] = [
+    [w.product, facts.product],
+    [w.price, facts.price],
+    [w.paidOn, facts.paidOn],
+  ];
+  const text = [
+    w.greeting,
+    "",
+    w.thanks,
+    "",
+    ...rows.map(([label, value]) => `${label} ${value}`),
+    "",
+    w.consentLead,
+    `„${facts.consent}”`,
+    "",
+    `${w.accountLead} ${facts.accountLink}`,
+    `${w.contactLead} ${facts.contact}`,
+    "",
+    w.signature,
+  ].join("\n");
+  const html = [
+    `<p>${escapeHtml(w.greeting)}</p>`,
+    `<p>${escapeHtml(w.thanks)}</p>`,
+    `<p>${rows.map(([label, value]) => `${escapeHtml(label)} ${escapeHtml(value)}`).join("<br>")}</p>`,
+    `<p>${escapeHtml(w.consentLead)}<br>„${escapeHtml(facts.consent)}”</p>`,
+    `<p>${escapeHtml(w.accountLead)} <a href="${escapeHtml(facts.accountLink)}">${escapeHtml(facts.accountLink)}</a></p>`,
+    `<p>${escapeHtml(w.contactLead)} ${escapeHtml(facts.contact)}</p>`,
+    `<p>${escapeHtml(w.signature)}</p>`,
+  ].join("\n");
+  return { to, subject: w.subject(facts.product), text, html };
 }

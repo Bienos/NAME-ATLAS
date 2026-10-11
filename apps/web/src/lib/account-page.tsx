@@ -23,7 +23,7 @@ import { accountsEnabled, googleEnabled, mailEnabled } from "./accounts-config.j
 import { accountsRuntime } from "./accounts-runtime.js";
 import type { AccountsRuntime } from "./accounts-runtime.js";
 import { babyNamesEnabled } from "./baby-names-config.js";
-import { isCheckoutTester } from "./checkout-config.js";
+import { mayBuy } from "./checkout-config.js";
 import { checkoutRuntime } from "./checkout-runtime.js";
 import { CheckoutSection, checkoutStatusFrom } from "./checkout-section.js";
 import { familyTreeEnabled } from "./family-config.js";
@@ -567,13 +567,11 @@ export async function AccountPage({
     });
   }
 
-  // Test-mode checkout (TASK-111): on the account step only, with the purchases just read,
-  // and only for an account on `CHECKOUT_TESTERS` (TASK-154).
+  // Checkout (TASK-111, TASK-179): on the account step only, with the purchases just read,
+  // for every account in live mode and only for one on `CHECKOUT_TESTERS` in test mode (TASK-154).
   const runtimeCheckout = step === "account" && userId !== null ? checkoutRuntime() : null;
   const checkout =
-    runtimeCheckout !== null &&
-    session !== null &&
-    isCheckoutTester(session.email, runtimeCheckout.testers)
+    runtimeCheckout !== null && session !== null && mayBuy(session.email, runtimeCheckout)
       ? runtimeCheckout
       : null;
   let purchases: ReactNode = null;
@@ -582,6 +580,7 @@ export async function AccountPage({
     purchases = (
       <CheckoutSection
         lang={lang}
+        mode={checkout.mode}
         status={checkoutStatusFrom(typeof word === "string" ? word : null)}
         purchases={overview?.purchases ?? []}
       />

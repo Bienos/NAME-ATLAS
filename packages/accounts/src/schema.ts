@@ -67,7 +67,7 @@ export interface IdentitiesTable {
   last_used_at: Date;
 }
 
-/** What a reader bought (migration 0036, TASK-111): one row per paid test-mode Checkout Session. */
+/** What a reader bought (migration 0036, TASK-111; 0048, TASK-179): one row per paid Checkout Session. */
 export interface PurchasesTable {
   purchase_id: string;
   /** Null once the account is deleted; the record of the sale stays. */
@@ -77,9 +77,18 @@ export interface PurchasesTable {
   /** In grosze, VAT included. */
   amount_total: number;
   currency: "pln";
-  /** Always false: the table refuses a live purchase (ADR-0023 §2.5). */
+  /** True for a real payment; the site records one only with `CHECKOUT_LIVE=1` (ADR-0052). */
   livemode: boolean;
   paid_at: Date;
+  /** The PaymentIntent, which refund and dispute events name. Required when live (0048). */
+  payment_intent_id: string | null;
+  /** The version of the withdrawal statement the buyer ticked. Required when live (0048). */
+  withdrawal_consent: string | null;
+  /** When the confirmation email went out; null until it has. */
+  receipt_sent_at: Date | null;
+  /** Set with `revoked_reason` when the payment was refunded in full or disputed. */
+  revoked_at: Date | null;
+  revoked_reason: "refunded" | "disputed" | null;
 }
 
 /**

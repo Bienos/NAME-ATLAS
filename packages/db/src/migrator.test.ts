@@ -55,6 +55,7 @@ describe("MIGRATIONS_DIR", () => {
       "0044_given_name_meaning.ts", // TASK-147 / ADR-0045 — first-name origins and meanings as claims
       "0046_purchases_fullnames_tier.ts", // TASK-155 / D-049 — the 15,99 zł full-name comparison's tier
       "0047_given_name_readings.ts", // TASK-156 / ADR-0047 — readings of two first names' meanings, written by a model
+      "0048_purchases_live.ts", // TASK-179 / ADR-0052 — real payments: consent, refunds, receipts
     ]);
   });
 });

@@ -10,9 +10,10 @@ import { accountPath } from "./account-paths.js";
 import { accountsRuntime } from "./accounts-runtime.js";
 import { sessionCookieName } from "./session-cookie.js";
 import { BABY_NAMES_PATHS, babyNamesEnabled, babyNamesFreeUntil } from "./baby-names-config.js";
-import { CHECKOUT_TIERS, formatPrice, isCheckoutTester, tierOffer } from "./checkout-config.js";
+import { CHECKOUT_TIERS, formatPrice, mayBuy, tierOffer } from "./checkout-config.js";
 import type { CheckoutTier } from "./checkout-config.js";
 import { checkoutRuntime } from "./checkout-runtime.js";
+import { ConsentField } from "./checkout-section.js";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { OfferForm } from "./offer-form.js";
@@ -28,7 +29,8 @@ import { homePath, offerPath } from "./site-links.js";
  *
  * It reads the session cookie, so the free plan and the baby-names free window
  * (D-051) point a signed-in reader to the account and the page itself. A
- * listed tester with test-mode checkout on (TASK-111, TASK-154) gets a buy form
+ * reader who may buy (a listed tester in test mode, TASK-111 and TASK-154; any
+ * signed-in reader once the owner turns live mode on, TASK-179) gets a buy form
  * per product posting to `/api/checkout`; nobody else is offered a purchase
  * (ADR-0023 §2.5). Without accounts it reads nothing and is the same for all.
  */
@@ -38,8 +40,13 @@ export interface OfferReader {
   /** Accounts are on: sign-up and sign-in exist. */
   readonly accounts: boolean;
   readonly signedIn: boolean;
-  /** Signed in, test-mode checkout on, and the account is on `CHECKOUT_TESTERS`. */
+  /**
+   * Signed in and may buy: checkout on, and in test mode the account is on
+   * `CHECKOUT_TESTERS`. The name predates live mode (TASK-179).
+   */
   readonly tester: boolean;
+  /** Checkout runs with real payments (`CHECKOUT_LIVE`, TASK-179). */
+  readonly live?: boolean;
   /**
    * The baby-names view is free for signed-in readers now (D-051): the window's
    * last day in Warsaw (`YYYY-MM-DD`), and whether it ends within 7 days. Null
@@ -110,24 +117,35 @@ export async function readOfferReader(): Promise<OfferReader> {
   return {
     accounts: true,
     signedIn: email !== null,
-    tester: email !== null && checkout !== null && isCheckoutTester(email, checkout.testers),
+    tester: email !== null && checkout !== null && mayBuy(email, checkout),
+    live: checkout?.mode === "live",
     freeWindow,
   };
 }
 
-/** A test-mode purchase: the account page's form (`checkout-section.tsx`), here per card. */
-export function BuyForm({ tier, lang }: { readonly tier: CheckoutTier; readonly lang: Lang }) {
+/** A purchase: the account page's form (`checkout-section.tsx`), here per card. */
+export function BuyForm({
+  tier,
+  lang,
+  live = false,
+}: {
+  readonly tier: CheckoutTier;
+  readonly lang: Lang;
+  readonly live?: boolean;
+}) {
   const doc = offerDocument(lang);
   const offer = tierOffer(tier);
   if (offer === null) return null;
+  const price = formatPrice(offer.amount, lang);
   return (
     <form className="offer-buy" method="post" action="/api/checkout" aria-label={offer.name[lang]}>
       <input type="hidden" name="lang" value={lang} />
       <input type="hidden" name="tier" value={tier} />
+      <ConsentField lang={lang} />
       <button type="submit" className="offer-send">
-        {doc.buy(formatPrice(offer.amount, lang))}
+        {live ? doc.buyLive(price) : doc.buy(price)}
       </button>
-      <p className="offer-test-note">{doc.testNote}</p>
+      {live ? null : <p className="offer-test-note">{doc.testNote}</p>}
     </form>
   );
 }
@@ -162,7 +180,13 @@ function PaidCard({
   const window = key === "babynames" ? reader.freeWindow : null;
   const free = window !== null;
   const test = reader.tester && isSellable(key);
-  const status = test ? doc.testMode : free ? doc.freeToday : doc.soon;
+  const status = test
+    ? reader.live === true
+      ? doc.available
+      : doc.testMode
+    : free
+      ? doc.freeToday
+      : doc.soon;
   const freeHref = reader.signedIn
     ? BABY_NAMES_PATHS[lang]
     : accountPath(lang, "sign-in", { next: BABY_NAMES_PATHS[lang] });
@@ -200,7 +224,7 @@ function PaidCard({
         </p>
       ) : null}
       {test && isSellable(key) ? (
-        <BuyForm tier={key} lang={lang} />
+        <BuyForm tier={key} lang={lang} live={reader.live === true} />
       ) : free || key === "free" || key === "genealogy" ? null : (
         <Waitlist tier={key} lang={lang} />
       )}

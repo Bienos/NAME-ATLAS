@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { resetMail, verificationMail } from "./mail-text.js";
+import { purchaseMail, resetMail, verificationMail } from "./mail-text.js";
 
 const LINK = "https://name-atlas-two.vercel.app/pl/konto/zaloz?token=abc_DEF-123";
 
@@ -42,5 +42,38 @@ describe("TASK-061: the messages", () => {
     expect(mail.html).not.toContain("<script>");
     expect(mail.html).toContain("&lt;script&gt;");
     expect(mail.html).toContain("&amp;b=&quot;2&quot;");
+  });
+});
+
+describe("the purchase confirmation (TASK-179)", () => {
+  const facts = {
+    product: "Name Atlas — Imiona dla dziecka",
+    price: "8,99 zł",
+    paidOn: "11 października 2026",
+    consent: "Żądam dostępu <od razu> & tracę prawo do odstąpienia od umowy.",
+    accountLink: "https://name-atlas.pl/pl/konto",
+    contact: "kontakt@name-atlas.pl",
+  };
+
+  it("states the product, price, date and the statement word for word, in both parts", () => {
+    const mail = purchaseMail("buyer@example.com", "pl", facts);
+    expect(mail.to).toBe("buyer@example.com");
+    expect(mail.subject).toBe("Potwierdzenie zakupu: Name Atlas — Imiona dla dziecka");
+    for (const part of [facts.price, facts.paidOn, facts.accountLink, facts.contact]) {
+      expect(mail.text).toContain(part);
+      expect(mail.html).toContain(part);
+    }
+    expect(mail.text).toContain(`„${facts.consent}”`);
+    expect(mail.html).toContain("Żądam dostępu &lt;od razu&gt; &amp; tracę prawo");
+    expect(mail.html).not.toContain("<od razu>");
+  });
+
+  it("speaks English to an English buyer", () => {
+    const mail = purchaseMail("buyer@example.com", "en", {
+      ...facts,
+      product: "Name Atlas — Baby names",
+    });
+    expect(mail.subject).toBe("Purchase confirmation: Name Atlas — Baby names");
+    expect(mail.text).toContain("Price (VAT included): 8,99 zł");
   });
 });

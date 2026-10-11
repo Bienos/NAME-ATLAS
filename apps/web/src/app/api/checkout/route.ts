@@ -1,11 +1,11 @@
 import { createLogger } from "@name-atlas/logging";
-import { isCheckoutTester } from "../../../lib/checkout-config.js";
+import { mayBuy } from "../../../lib/checkout-config.js";
 import { checkoutRuntime } from "../../../lib/checkout-runtime.js";
 import { handleCheckoutPost } from "../../../lib/checkout-routes.js";
 
 /**
- * `POST /api/checkout` — the account page's buy form (TASK-111): a hosted
- * Stripe Checkout Session in test mode. Checkout off, or an account not on
+ * `POST /api/checkout` — a buy form (TASK-111, TASK-179): a hosted Stripe
+ * Checkout Session. Checkout off, or in test mode an account not on
  * `CHECKOUT_TESTERS` (TASK-154): 404, as if the route did not exist. The
  * handler is in `lib/checkout-routes.ts`; a Next route module may export only
  * its handlers.
@@ -23,6 +23,6 @@ export async function POST(request: Request): Promise<Response> {
     origin: runtime.origin,
     secure: runtime.secure,
     log: createLogger({ service: "web", base: { route: "/api/checkout" } }),
-    mayBuy: (email) => isCheckoutTester(email, runtime.testers),
+    mayBuy: (email) => mayBuy(email, runtime),
   });
 }
