@@ -1,19 +1,26 @@
 import type { Lang } from "./messages.js";
 
 /**
- * Test-mode checkout (TASK-111): whether it exists, and the tiers it sells.
+ * Checkout (TASK-111, TASK-179): whether it exists, in which mode, and the
+ * tiers it sells.
  *
  * On only when all of these hold, else every checkout route answers 404 and
  * the account page shows no purchases section:
  *
  * - `CHECKOUT_ENABLED` is exactly `1`;
- * - `STRIPE_SECRET_KEY` is a **test** key (`sk_test_` or, preferred, a
- *   restricted `rk_test_`). A live key turns checkout off: real payments wait on
- *   the owner's legal and tax gates (ADR-0023 §2.4–§2.5);
+ * - `STRIPE_SECRET_KEY` is a key of the mode `CHECKOUT_LIVE` names:
+ *   - test mode (`CHECKOUT_LIVE` unset): a **test** key (`sk_test_` or,
+ *     preferred, a restricted `rk_test_`); only the accounts on
+ *     `CHECKOUT_TESTERS` may buy;
+ *   - live mode (`CHECKOUT_LIVE` exactly `1`, ADR-0052): a **live** key
+ *     (`rk_live_` preferred, or `sk_live_`); every signed-in account may buy.
+ *     Only the owner sets it, once ADR-0023 §2.5's legal and tax gates are met.
+ *   A key of the other mode turns checkout off, so neither variable alone can
+ *   take a real payment;
  * - `STRIPE_WEBHOOK_SECRET` is set (`whsec_…`): a purchase is recorded only
  *   from a signed webhook, so without the secret nothing could be bought;
- * - accounts are on (a purchase belongs to an account); `checkout-runtime.ts`
- *   checks that.
+ * - accounts are on (a purchase belongs to an account), and in live mode the
+ *   mailer too (the purchase confirmation); `checkout-runtime.ts` checks that.
  *
  * `STRIPE_AUTOMATIC_TAX=1` turns on Stripe Tax for the session. Off by
  * default: Stripe Tax collects nothing without an active registration and a
@@ -26,6 +33,8 @@ export const CHECKOUT_ENV = "CHECKOUT_ENABLED";
 export const STRIPE_KEY_ENV = "STRIPE_SECRET_KEY";
 export const STRIPE_WEBHOOK_ENV = "STRIPE_WEBHOOK_SECRET";
 export const STRIPE_TAX_ENV = "STRIPE_AUTOMATIC_TAX";
+/** Exactly `1`: real payments with a live key (TASK-179, ADR-0052). The owner's switch. */
+export const CHECKOUT_LIVE_ENV = "CHECKOUT_LIVE";
 /**
  * The accounts that may use test-mode checkout (TASK-154): email addresses,
  * comma-separated, compared without case. Unset or empty: nobody. A test-mode
@@ -111,13 +120,28 @@ export function isTestKey(key: string): boolean {
   return /^(sk|rk)_test_[A-Za-z0-9]+$/u.test(key);
 }
 
-/** The flag, a test key and the webhook's secret. Accounts are checked by the runtime. */
+/** Whether a key is a Stripe live key: secret or restricted. */
+export function isLiveKey(key: string): boolean {
+  return /^(sk|rk)_live_[A-Za-z0-9]+$/u.test(key);
+}
+
+export type CheckoutMode = "test" | "live";
+
+/**
+ * The mode checkout runs in, or null when it is off: the flag, a key of the
+ * mode `CHECKOUT_LIVE` names, and the webhook's secret. Accounts and the mailer
+ * are checked by the runtime.
+ */
+export function checkoutMode(env: Env = process.env): CheckoutMode | null {
+  if (value(env, CHECKOUT_ENV) !== "1") return null;
+  if (!value(env, STRIPE_WEBHOOK_ENV).startsWith("whsec_")) return null;
+  const key = value(env, STRIPE_KEY_ENV);
+  if (value(env, CHECKOUT_LIVE_ENV) === "1") return isLiveKey(key) ? "live" : null;
+  return isTestKey(key) ? "test" : null;
+}
+
 export function checkoutEnabled(env: Env = process.env): boolean {
-  return (
-    value(env, CHECKOUT_ENV) === "1" &&
-    isTestKey(value(env, STRIPE_KEY_ENV)) &&
-    value(env, STRIPE_WEBHOOK_ENV).startsWith("whsec_")
-  );
+  return checkoutMode(env) !== null;
 }
 
 /** The listed testers' addresses, trimmed and lower-cased; empty when none is listed. */
@@ -134,6 +158,30 @@ export function checkoutTesters(env: Env = process.env): ReadonlySet<string> {
 export function isCheckoutTester(email: string, testers: ReadonlySet<string>): boolean {
   return testers.has(email.trim().toLowerCase());
 }
+
+/** Whether a signed-in account may buy: every one in live mode, a listed tester in test mode. */
+export function mayBuy(
+  email: string,
+  checkout: { readonly mode: CheckoutMode; readonly testers: ReadonlySet<string> },
+): boolean {
+  return checkout.mode === "live" || isCheckoutTester(email, checkout.testers);
+}
+
+/**
+ * The statement a buyer ticks before paying (TASK-179, ADR-0052): access to the
+ * digital content at once, before the 14-day withdrawal period ends, and the
+ * loss of the right of withdrawal that follows (art. 38 ust. 1 pkt 13 of the
+ * Polish consumer rights act). Its version is recorded with the purchase and
+ * the confirmation email repeats it word for word, so a new wording takes a
+ * new version. Legal review is advised before real sales (ADR-0052 §4).
+ */
+export const WITHDRAWAL_CONSENT_VERSION = "v1";
+export const WITHDRAWAL_CONSENT_FIELD = "withdrawal_consent";
+
+export const WITHDRAWAL_CONSENT: Readonly<Record<Lang, string>> = {
+  pl: "Żądam dostępu do zakupionych treści cyfrowych od razu po zapłacie, przed upływem 14 dni na odstąpienie od umowy, i przyjmuję do wiadomości, że w ten sposób tracę prawo do odstąpienia od umowy.",
+  en: "I ask for access to the digital content I am buying straight after payment, before the 14-day period for withdrawing from the contract ends, and I acknowledge that I thereby lose my right to withdraw from the contract.",
+};
 
 export function automaticTaxEnabled(env: Env = process.env): boolean {
   return value(env, STRIPE_TAX_ENV) === "1";

@@ -24,7 +24,7 @@ import type {
 import { accountPath } from "./account-paths.js";
 import { accountsEnabled } from "./accounts-config.js";
 import { accountsRuntime } from "./accounts-runtime.js";
-import { isCheckoutTester } from "./checkout-config.js";
+import { mayBuy } from "./checkout-config.js";
 import { checkoutRuntime } from "./checkout-runtime.js";
 import { Source } from "./baby-names-page.js";
 import {
@@ -138,8 +138,10 @@ export type FullNameCompareData =
       readonly kind: "signed-in";
       readonly lang: Lang;
       readonly full: boolean;
-      /** A listed tester with checkout on: the locked card offers a test-mode purchase. */
+      /** May buy with checkout on (a listed tester in test mode): the locked card offers a purchase. */
       readonly tester?: boolean;
+      /** Checkout runs with real payments (TASK-179). */
+      readonly live?: boolean;
       readonly request: FullNameRequest;
       /** The people compared; null before a comparison, or without the product. */
       readonly people: readonly PersonResult[] | null;
@@ -149,7 +151,11 @@ export type FullNameCompareData =
 export async function loadFullNameCompare(input: {
   readonly lang: Lang;
   readonly query: Query;
-  readonly session: { readonly userId: string; readonly tester?: boolean } | null;
+  readonly session: {
+    readonly userId: string;
+    readonly tester?: boolean;
+    readonly live?: boolean;
+  } | null;
   readonly deps: FullNameCompareDeps;
   /** Free for every signed-in reader (D-053): no purchase is looked up, claims are FREE. */
   readonly free?: boolean;
@@ -172,6 +178,7 @@ export async function loadFullNameCompare(input: {
       lang,
       full,
       tester: session.tester === true,
+      live: session.live === true,
       request,
       people: null,
     };
@@ -433,7 +440,17 @@ function Contains({ lang, locked }: { lang: Lang; locked: boolean }) {
   );
 }
 
-function Locked({ lang, freePath, tester }: { lang: Lang; freePath: string; tester: boolean }) {
+function Locked({
+  lang,
+  freePath,
+  tester,
+  live,
+}: {
+  lang: Lang;
+  freePath: string;
+  tester: boolean;
+  live: boolean;
+}) {
   const t = FULL_NAME_COMPARE_TEXT[lang];
   // ADR-0023 §2.5: no buy button until the product can lawfully be sold;
   // a listed tester alone may buy in test mode (TASK-167).
@@ -449,7 +466,7 @@ function Locked({ lang, freePath, tester }: { lang: Lang; freePath: string; test
         {tester ? null : <span className="cmp-soon">{t.soon}</span>}
       </p>
       <p>{t.lockedBody}</p>
-      {tester ? <BuyForm tier="fullnames" lang={lang} /> : null}
+      {tester ? <BuyForm tier="fullnames" lang={lang} live={live} /> : null}
       <ul className="fnc-benefits">
         {t.benefits.map((line) => (
           <li key={line}>
@@ -1203,7 +1220,12 @@ export function FullNameCompareView({ data }: { data: FullNameCompareData }) {
               locked={!data.full}
             />
             {data.full ? null : (
-              <Locked lang={lang} freePath={freePath} tester={data.tester === true} />
+              <Locked
+                lang={lang}
+                freePath={freePath}
+                tester={data.tester === true}
+                live={data.live === true}
+              />
             )}
           </div>
           <Contains lang={lang} locked={!data.full} />
@@ -1268,7 +1290,7 @@ export function fullNameCompareMetadata(lang: Lang): Metadata {
 /** The session's account, and whether it is a listed tester with checkout on. */
 async function readCompareSession(
   accounts: NonNullable<ReturnType<typeof accountsRuntime>>,
-): Promise<{ userId: string; tester: boolean } | null> {
+): Promise<{ userId: string; tester: boolean; live: boolean } | null> {
   const token = (await cookies()).get(sessionCookieName(accounts.secure))?.value;
   try {
     const found = token === undefined ? null : await accounts.accounts.sessionFromToken(token);
@@ -1276,7 +1298,8 @@ async function readCompareSession(
     const checkout = checkoutRuntime();
     return {
       userId: found.userId,
-      tester: checkout !== null && isCheckoutTester(found.email, checkout.testers),
+      tester: checkout !== null && mayBuy(found.email, checkout),
+      live: checkout?.mode === "live",
     };
   } catch {
     return null;

@@ -3,10 +3,13 @@ import {
   automaticTaxEnabled,
   CHECKOUT_TIERS,
   checkoutEnabled,
+  checkoutMode,
   checkoutTesters,
   formatPrice,
   isCheckoutTester,
+  isLiveKey,
   isTestKey,
+  mayBuy,
   tierOffer,
 } from "./checkout-config.js";
 
@@ -30,11 +33,31 @@ describe("checkout's gate (TASK-111)", () => {
     expect(checkoutEnabled({ ...ON, STRIPE_WEBHOOK_SECRET: "abc" })).toBe(false);
   });
 
-  it("refuses a live key: real payments wait on the owner's gates (ADR-0023 §2.5)", () => {
+  it("refuses a live key without CHECKOUT_LIVE: real payments wait on the owner's gates (ADR-0023 §2.5)", () => {
     expect(isTestKey("sk_live_abc")).toBe(false);
     expect(isTestKey("rk_live_abc")).toBe(false);
     expect(isTestKey("pk_test_abc")).toBe(false);
     expect(checkoutEnabled({ ...ON, STRIPE_SECRET_KEY: "sk_live_abc123" })).toBe(false);
+    expect(checkoutMode(ON)).toBe("test");
+  });
+
+  it("runs live only with CHECKOUT_LIVE exactly 1 and a live key, never with a test key (TASK-179)", () => {
+    const LIVE = { ...ON, CHECKOUT_LIVE: "1", STRIPE_SECRET_KEY: "rk_live_abc123" };
+    expect(checkoutMode(LIVE)).toBe("live");
+    expect(checkoutMode({ ...LIVE, STRIPE_SECRET_KEY: "sk_live_abc123" })).toBe("live");
+    expect(checkoutMode({ ...LIVE, STRIPE_SECRET_KEY: "rk_test_abc123" })).toBeNull();
+    expect(checkoutMode({ ...LIVE, CHECKOUT_LIVE: "true" })).toBeNull();
+    expect(checkoutMode({ ...LIVE, CHECKOUT_ENABLED: undefined })).toBeNull();
+    expect(checkoutMode({ ...LIVE, STRIPE_WEBHOOK_SECRET: undefined })).toBeNull();
+    expect(isLiveKey("pk_live_abc")).toBe(false);
+    expect(isLiveKey("sk_test_abc")).toBe(false);
+  });
+
+  it("lets every account buy in live mode and only a listed tester in test mode (TASK-179)", () => {
+    const testers = checkoutTesters({ CHECKOUT_TESTERS: "owner@example.com" });
+    expect(mayBuy("owner@example.com", { mode: "test", testers })).toBe(true);
+    expect(mayBuy("reader@example.com", { mode: "test", testers })).toBe(false);
+    expect(mayBuy("reader@example.com", { mode: "live", testers: new Set() })).toBe(true);
   });
 
   it("leaves Stripe Tax off unless asked for", () => {

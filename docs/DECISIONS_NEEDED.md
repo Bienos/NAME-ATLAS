@@ -8,6 +8,21 @@ Status legend: **BLOCKS TASK-00N** · **BLOCKS MILESTONE** · **NON-BLOCKING NOW
 
 ---
 
+## D-054 — real sales: the withdrawal statement, the confirmation, and the tree unlock as digital content or a digital service
+
+**Status:** BLOCKS turning on live checkout (`CHECKOUT_LIVE=1`, ADR-0052), together with ADR-0023 §2.5's gates. NON-BLOCKING for everything else. **Owner:** project owner, legal counsel. **Raised by:** TASK-179 (ADR-0052 §4).
+
+Facts: every buy form now carries a required checkbox with the statement `WITHDRAWAL_CONSENT` v1 (`apps/web/src/lib/checkout-config.ts`): access at once after payment, before the 14-day withdrawal period ends, and the loss of the right of withdrawal that follows (art. 38 ust. 1 pkt 13 of the consumer rights act). The purchase records its version, and a confirmation email repeats it word for word with the product, price and date (art. 21 ust. 1). The terms (`/pl/regulamin`) say nothing yet about purchases, payment, withdrawal or complaints (D-040, D-041).
+
+Open:
+1. Is the statement's wording right, and is the confirmation's content enough as confirmation on a durable medium?
+2. The tiers from 28,99 zł up unlock the family tree, which the reader keeps using. If counsel reads that as a digital service rather than digital content, the right of withdrawal ends only once the service is fully performed, and the statement and terms differ for those tiers.
+3. The terms' sections on purchases, payment, withdrawal, refunds and complaints, and the privacy notice's on orders (Stripe as a processor of payment data, what the purchase row keeps and for how long).
+
+**Recommendation (not a decision):** one review by counsel covering D-040, D-041 and this record before the first real sale; launch with the 8,99 zł baby-names product first, which is plainly digital content.
+
+---
+
 ## D-053 — RESOLVED (2026-10-07): the full-name comparison free for every signed-in reader until the owner ends it
 
 **Status:** RESOLVED by the owner in a Claude Code session.

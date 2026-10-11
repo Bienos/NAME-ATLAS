@@ -514,6 +514,8 @@ describe("family tree (TASK-066, ADR-0029)", () => {
               amountTotal: amounts[tier],
               currency: "pln",
               livemode: false,
+              paymentIntentId: `pi_tree_unlock_${tier}`,
+              withdrawalConsent: "v1",
             }),
           ).toBe(true);
         }

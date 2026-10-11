@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { checkoutReturnPath, handleCheckoutPost, handleStripeWebhook } from "./checkout-routes.js";
 import type { CheckoutRouteDeps, WebhookDeps } from "./checkout-routes.js";
+import type { OutgoingMail } from "@name-atlas/accounts";
 import { signStripePayload } from "./stripe.js";
 
 const ORIGIN = "https://atlas.test";
@@ -8,6 +9,8 @@ const SESSION = "S".repeat(43);
 const USER = "0199a1b2-0000-7000-8000-00000000aa11";
 const SECRET = "whsec_test";
 const NOW = 1_790_000_000;
+const CONSENT = { withdrawal_consent: "v1" };
+const META = { user_id: USER, lang: "pl", ...CONSENT };
 
 function log() {
   const logged: { event: string; fields: unknown }[] = [];
@@ -64,7 +67,7 @@ function buy(
       host: "atlas.test",
       cookie,
     },
-    body: new URLSearchParams(fields).toString(),
+    body: new URLSearchParams({ ...CONSENT, ...fields }).toString(),
   });
 }
 
@@ -138,6 +141,19 @@ describe("POST /api/checkout (TASK-111)", () => {
     expect(stripe).not.toHaveBeenCalled();
   });
 
+  it("refuses a form without the withdrawal statement, and calls nobody (TASK-179)", async () => {
+    const { deps, stripe, logged } = checkoutFakes();
+    for (const consent of ["", "v0", "on"]) {
+      const response = await handleCheckoutPost(
+        buy({ tier: "babynames", withdrawal_consent: consent }),
+        deps,
+      );
+      expect(response.headers.get("location"), consent).toBe(checkoutReturnPath("pl", "consent"));
+    }
+    expect(stripe).not.toHaveBeenCalled();
+    expect(logged.map((l) => l.event)).toContain("checkout_refused");
+  });
+
   it("returns to the account page with an error when Stripe refuses", async () => {
     const { deps, logged } = checkoutFakes(401);
     const response = await handleCheckoutPost(buy({ tier: "smaller" }), deps);
@@ -163,23 +179,51 @@ function sessionEvent(
         client_reference_id: USER,
         amount_total: 2899,
         currency: "pln",
-        metadata: { tier: "smaller", user_id: USER },
+        payment_intent: "pi_test_1",
+        customer_details: { email: "buyer@example.com" },
+        metadata: { ...META, tier: "smaller" },
         ...object,
       },
     },
   };
 }
 
-function webhookFakes(fail = false) {
-  const record = vi.fn(() => (fail ? Promise.reject(new Error("db down")) : Promise.resolve(true)));
+function webhookFakes(
+  fail = false,
+  { mode = "test" as "test" | "live", mailFails = false, receiptDue = true } = {},
+) {
+  const record = vi.fn((_paid: unknown) =>
+    fail ? Promise.reject(new Error("db down")) : Promise.resolve(true),
+  );
+  const revoke = vi.fn((_paymentIntent: string, _reason: string) =>
+    fail ? Promise.reject(new Error("db down")) : Promise.resolve("REVOKED" as const),
+  );
+  const markReceiptSent = vi.fn((_session: string) => Promise.resolve());
+  const sent: OutgoingMail[] = [];
+  const mailer = {
+    send: vi.fn((mail: OutgoingMail) => {
+      if (mailFails) return Promise.reject(new Error("mail down"));
+      sent.push(mail);
+      return Promise.resolve();
+    }),
+  };
   const { logged, log: l } = log();
   const deps: WebhookDeps = {
-    purchases: { record },
+    mode,
+    purchases: {
+      record,
+      revoke,
+      markReceiptSent,
+      receiptDue: vi.fn(() => Promise.resolve(receiptDue)),
+    },
+    mailer,
+    origin: ORIGIN,
     webhookSecret: SECRET,
     nowSeconds: () => NOW,
+    now: () => new Date("2026-10-11T22:30:00Z"),
     log: l,
   };
-  return { deps, record, logged };
+  return { deps, record, revoke, markReceiptSent, sent, logged };
 }
 
 function deliver(event: unknown, signature?: string): Request {
@@ -206,12 +250,14 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
       amountTotal: 2899,
       currency: "pln",
       livemode: false,
+      paymentIntentId: "pi_test_1",
+      withdrawalConsent: "v1",
     });
   });
 
   it("records a baby-names purchase at 899 grosze only (TASK-144)", async () => {
     const { deps, record } = webhookFakes();
-    const babynames = { metadata: { tier: "babynames", user_id: USER } };
+    const babynames = { metadata: { ...META, tier: "babynames" } };
     for (const amount_total of [2899, 100]) {
       const response = await handleStripeWebhook(
         deliver(sessionEvent("checkout.session.completed", { ...babynames, amount_total })),
@@ -231,12 +277,14 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
       amountTotal: 899,
       currency: "pln",
       livemode: false,
+      paymentIntentId: "pi_test_1",
+      withdrawalConsent: "v1",
     });
   });
 
   it("records a full-name comparison purchase at 1599 grosze only (TASK-155)", async () => {
     const { deps, record } = webhookFakes();
-    const fullnames = { metadata: { tier: "fullnames", user_id: USER } };
+    const fullnames = { metadata: { ...META, tier: "fullnames" } };
     for (const amount_total of [899, 2899, 1600]) {
       const response = await handleStripeWebhook(
         deliver(sessionEvent("checkout.session.completed", { ...fullnames, amount_total })),
@@ -256,6 +304,8 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
       amountTotal: 1599,
       currency: "pln",
       livemode: false,
+      paymentIntentId: "pi_test_1",
+      withdrawalConsent: "v1",
     });
   });
 
@@ -302,7 +352,7 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
 
   it("acknowledges other events without recording", async () => {
     const { deps, record } = webhookFakes();
-    const response = await handleStripeWebhook(deliver(sessionEvent("charge.refunded")), deps);
+    const response = await handleStripeWebhook(deliver(sessionEvent("customer.created")), deps);
     expect(response.status).toBe(200);
     expect(record).not.toHaveBeenCalled();
   });
@@ -312,6 +362,122 @@ describe("POST /api/stripe/webhook (TASK-111)", () => {
     const response = await handleStripeWebhook(
       deliver(sessionEvent("checkout.session.completed")),
       deps,
+    );
+    expect(response.status).toBe(500);
+  });
+});
+
+function chargeEvent(type: string, object: Record<string, unknown>, livemode = false) {
+  return { id: "evt_2", type, livemode, data: { object: { id: "ch_1", ...object } } };
+}
+
+describe("POST /api/stripe/webhook: live mode, consent, receipts, refunds (TASK-179)", () => {
+  it("records only events of its own mode", async () => {
+    const live = webhookFakes(false, { mode: "live" });
+    await handleStripeWebhook(deliver(sessionEvent("checkout.session.completed")), live.deps);
+    expect(live.record).not.toHaveBeenCalled();
+    await handleStripeWebhook(
+      deliver(sessionEvent("checkout.session.completed", {}, true)),
+      live.deps,
+    );
+    expect(live.record).toHaveBeenCalledWith(
+      expect.objectContaining({ livemode: true, paymentIntentId: "pi_test_1" }),
+    );
+  });
+
+  it("never records a session without the withdrawal statement, or a live one without its PaymentIntent", async () => {
+    const test = webhookFakes();
+    for (const metadata of [
+      { user_id: USER, tier: "smaller" },
+      { ...META, tier: "smaller", withdrawal_consent: "Yes!" },
+    ]) {
+      await handleStripeWebhook(
+        deliver(sessionEvent("checkout.session.completed", { metadata })),
+        test.deps,
+      );
+    }
+    expect(test.record).not.toHaveBeenCalled();
+    const live = webhookFakes(false, { mode: "live" });
+    await handleStripeWebhook(
+      deliver(sessionEvent("checkout.session.completed", { payment_intent: null }, true)),
+      live.deps,
+    );
+    expect(live.record).not.toHaveBeenCalled();
+  });
+
+  it("sends the confirmation once, in the buyer's language, with the statement word for word", async () => {
+    const { deps, sent, markReceiptSent } = webhookFakes();
+    const response = await handleStripeWebhook(
+      deliver(
+        sessionEvent("checkout.session.completed", {
+          metadata: { ...META, lang: "en", tier: "babynames" },
+          amount_total: 899,
+        }),
+      ),
+      deps,
+    );
+    expect(response.status).toBe(200);
+    expect(sent).toHaveLength(1);
+    const mail = sent[0];
+    expect(mail?.to).toBe("buyer@example.com");
+    expect(mail?.subject).toBe("Purchase confirmation: Name Atlas — Baby names");
+    expect(mail?.text).toContain("PLN 8.99");
+    // 22:30 UTC on 11 October is already 12 October in Warsaw.
+    expect(mail?.text).toContain("12 October 2026");
+    expect(mail?.text).toContain("I thereby lose my right to withdraw from the contract");
+    expect(mail?.text).toContain(`${ORIGIN}/en/account`);
+    expect(markReceiptSent).toHaveBeenCalledWith("cs_test_1");
+  });
+
+  it("does not send it again once sent, and asks Stripe to retry when the mail fails", async () => {
+    const done = webhookFakes(false, { receiptDue: false });
+    await handleStripeWebhook(deliver(sessionEvent("checkout.session.completed")), done.deps);
+    expect(done.sent).toHaveLength(0);
+
+    const failing = webhookFakes(false, { mailFails: true });
+    const response = await handleStripeWebhook(
+      deliver(sessionEvent("checkout.session.completed")),
+      failing.deps,
+    );
+    expect(response.status).toBe(500);
+    expect(failing.record).toHaveBeenCalledTimes(1);
+    expect(failing.markReceiptSent).not.toHaveBeenCalled();
+    expect(JSON.stringify(failing.logged)).not.toContain("buyer@example.com");
+  });
+
+  it("revokes on a full refund or a dispute, not on a partial refund", async () => {
+    const { deps, revoke } = webhookFakes();
+    await handleStripeWebhook(
+      deliver(chargeEvent("charge.refunded", { payment_intent: "pi_test_1", refunded: false })),
+      deps,
+    );
+    expect(revoke).not.toHaveBeenCalled();
+    await handleStripeWebhook(
+      deliver(chargeEvent("charge.refunded", { payment_intent: "pi_test_1", refunded: true })),
+      deps,
+    );
+    expect(revoke).toHaveBeenLastCalledWith("pi_test_1", "refunded");
+    await handleStripeWebhook(
+      deliver(chargeEvent("charge.dispute.created", { payment_intent: "pi_test_2" })),
+      deps,
+    );
+    expect(revoke).toHaveBeenLastCalledWith("pi_test_2", "disputed");
+  });
+
+  it("ignores a refund of the other mode or without a PaymentIntent, and retries a failed store", async () => {
+    const { deps, revoke } = webhookFakes();
+    for (const event of [
+      chargeEvent("charge.refunded", { payment_intent: "pi_test_1", refunded: true }, true),
+      chargeEvent("charge.refunded", { refunded: true }),
+      chargeEvent("charge.dispute.created", { payment_intent: "not_a_pi" }),
+    ]) {
+      expect((await handleStripeWebhook(deliver(event), deps)).status).toBe(200);
+    }
+    expect(revoke).not.toHaveBeenCalled();
+    const failing = webhookFakes(true);
+    const response = await handleStripeWebhook(
+      deliver(chargeEvent("charge.dispute.created", { payment_intent: "pi_test_1" })),
+      failing.deps,
     );
     expect(response.status).toBe(500);
   });

@@ -1064,6 +1064,8 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       amountTotal: 2899,
       currency: "pln" as const,
       livemode: false,
+      paymentIntentId: `pi_${session}`,
+      withdrawalConsent: "v1",
     });
 
     it("records a paid session once, as the app role, and lists it for its reader", async () => {
@@ -1118,11 +1120,17 @@ describe("accounts (TASK-061, ADR-0027)", () => {
       }
     });
 
-    it("refuses a live purchase, an unknown tier and another currency", async () => {
+    it("refuses a live purchase without its consent or PaymentIntent, an unknown tier and another currency", async () => {
       const userId = await account("refused.buyer@example.com");
       const purchases = createPurchases({ db: createAccountsDb(app()) });
       await expect(
-        purchases.record({ ...paid(userId, "cs_live_x"), livemode: true }),
+        purchases.record({ ...paid(userId, "cs_live_x"), livemode: true, withdrawalConsent: null }),
+      ).rejects.toMatchObject({ code: "23514" });
+      await expect(
+        purchases.record({ ...paid(userId, "cs_live_y"), livemode: true, paymentIntentId: null }),
+      ).rejects.toMatchObject({ code: "23514" });
+      await expect(
+        purchases.record({ ...paid(userId, "cs_test_badpi"), paymentIntentId: "ch_123" }),
       ).rejects.toMatchObject({ code: "23514" });
       await expect(
         purchases.record({ ...paid(userId, "cs_test_tier"), tier: "genealogy" as never }),
@@ -1131,6 +1139,43 @@ describe("accounts (TASK-061, ADR-0027)", () => {
         purchases.record({ ...paid(userId, "cs_test_eur"), currency: "eur" as never }),
       ).rejects.toMatchObject({ code: "23514" });
       expect(await purchases.listForUser(userId)).toEqual([]);
+    });
+
+    it("records a live purchase, sends its receipt once, and revokes it on a refund (TASK-179)", async () => {
+      const purchases = createPurchases({ db: createAccountsDb(app()), now: () => clock });
+      const userId = await account("live.buyer@example.com");
+      const live = { ...paid(userId, "cs_live_ok"), tier: "babynames" as const, amountTotal: 899 };
+      expect(await purchases.record({ ...live, livemode: true })).toBe(true);
+      expect(await purchases.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS)).toBe(true);
+
+      // The receipt is due until it is marked sent, and only once.
+      expect(await purchases.receiptDue("cs_live_ok")).toBe(true);
+      await purchases.markReceiptSent("cs_live_ok");
+      expect(await purchases.receiptDue("cs_live_ok")).toBe(false);
+      expect(await purchases.receiptDue("cs_live_unknown")).toBe(false);
+
+      // A refund revokes it, by its PaymentIntent; the row stays, and nothing is unlocked or listed.
+      expect(await purchases.revoke("pi_cs_live_ok", "refunded")).toBe("REVOKED");
+      expect(await purchases.revoke("pi_cs_live_ok", "disputed")).toBe("ALREADY");
+      expect(await purchases.revoke("pi_unknown", "refunded")).toBe("UNKNOWN");
+      expect(await purchases.hasPurchaseOf(userId, BABY_NAMES_FULL_TIERS)).toBe(false);
+      expect(await purchases.listForUser(userId)).toEqual([]);
+      expect(
+        await rows<{ livemode: boolean; revoked_reason: string; withdrawal_consent: string }>(
+          `SELECT livemode, revoked_reason, withdrawal_consent FROM accounts.purchases
+            WHERE checkout_session_id = 'cs_live_ok'`,
+        ),
+      ).toEqual([{ livemode: true, revoked_reason: "refunded", withdrawal_consent: "v1" }]);
+
+      // A second session may not reuse the PaymentIntent.
+      await expect(
+        purchases.record({ ...live, checkoutSessionId: "cs_live_again", livemode: true }),
+      ).rejects.toMatchObject({ code: "23505" });
+
+      // Removed here only, so the migration tests below can step down past 0048.
+      await db().pool.query(
+        "DELETE FROM accounts.purchases WHERE checkout_session_id = 'cs_live_ok'",
+      );
     });
 
     it("keeps the record of a sale when the account is deleted, before or after the webhook", async () => {
@@ -1235,6 +1280,35 @@ describe("accounts (TASK-061, ADR-0027)", () => {
   });
 
   describe("the migration (AC-8)", () => {
+    it("0048 refuses to go down while a live or revoked purchase is stored (TASK-179)", async () => {
+      const migrator = createMigrator(db().db);
+      const userId = await account("down.0048@example.com");
+      await db().pool.query(
+        `INSERT INTO accounts.purchases (purchase_id, user_id, tier, checkout_session_id, amount_total, currency, livemode, paid_at, payment_intent_id, withdrawal_consent, revoked_at, revoked_reason)
+         VALUES (gen_random_uuid(), $1, 'smaller', 'cs_test_down_0048', 2899, 'pln', false, now(), 'pi_down_0048', 'v1', now(), 'refunded')`,
+        [userId],
+      );
+      const refused = await migrator.migrateTo("0047_given_name_readings");
+      expect(String(refused.error)).toMatch(/refusing to undo 0048/u);
+
+      // Without it (deleted here only) it goes down, and the old test-only check holds.
+      await db().pool.query(
+        "DELETE FROM accounts.purchases WHERE checkout_session_id = 'cs_test_down_0048'",
+      );
+      const down = await migrator.migrateTo("0047_given_name_readings");
+      expect(down.error).toBeUndefined();
+      await expect(
+        db().pool.query(
+          `INSERT INTO accounts.purchases (purchase_id, user_id, tier, checkout_session_id, amount_total, currency, livemode, paid_at)
+           VALUES (gen_random_uuid(), $1, 'smaller', 'cs_live_down_0048', 2899, 'pln', true, now())`,
+          [userId],
+        ),
+      ).rejects.toMatchObject({ code: "23514" });
+      const up = await migrator.migrateToLatest();
+      expect(up.error).toBeUndefined();
+      await sql.raw(ROLES_SQL).execute(db().db);
+    });
+
     it("0046 allows the fullnames tier and refuses to go down while one is stored (TASK-155)", async () => {
       const migrator = createMigrator(db().db);
       expect(

@@ -98,6 +98,8 @@ export interface OfferDocument {
   readonly soon: string;
   readonly freeToday: string;
   readonly testMode: string;
+  /** A product on sale for real (TASK-179, live mode). */
+  readonly available: string;
   readonly once: string;
   readonly freeCta: string;
   readonly signUp: string;
@@ -116,6 +118,8 @@ export interface OfferDocument {
     readonly signedOut: string;
   };
   readonly buy: (price: string) => string;
+  /** The buy button in live mode (TASK-179). */
+  readonly buyLive: (price: string) => string;
   readonly testNote: string;
   readonly table: {
     readonly heading: string;
@@ -187,6 +191,7 @@ const PL: OfferDocument = {
   soon: "Wkrótce",
   freeToday: "Dziś za darmo",
   testMode: "Tryb testowy",
+  available: "Dostępne",
   once: "jednorazowo",
   freeCta: "Sprawdź nazwisko",
   signUp: "Załóż darmowe konto",
@@ -291,6 +296,7 @@ const PL: OfferDocument = {
     signedOut: "Zaloguj się i sprawdź za darmo",
   },
   buy: (price) => `Kup testowo — ${price}`,
+  buyLive: (price) => `Kup — ${price}`,
   testNote:
     "Płatność testowa Stripe: żadna karta nie zostanie obciążona. Karta testowa 4242 4242 4242 4242.",
   table: {
@@ -386,6 +392,7 @@ const EN: OfferDocument = {
   soon: "Coming soon",
   freeToday: "Free today",
   testMode: "Test mode",
+  available: "Available",
   once: "one-time",
   freeCta: "Look up a surname",
   signUp: "Create a free account",
@@ -489,6 +496,7 @@ const EN: OfferDocument = {
     signedOut: "Sign in and see it free",
   },
   buy: (price) => `Test purchase — ${price}`,
+  buyLive: (price) => `Buy — ${price}`,
   testNote: "A Stripe test payment: no card is charged. Test card 4242 4242 4242 4242.",
   table: {
     heading: "What each includes",

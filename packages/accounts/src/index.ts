@@ -12,8 +12,8 @@ export type { PasswordHasher, ScryptParams } from "./password.js";
 export { emailKey, hashToken, isTokenShape, newToken, TOKEN_BYTES } from "./tokens.js";
 export { checkEmail, checkPassword } from "./validation.js";
 export type { EmailCheck, PasswordProblem } from "./validation.js";
-export { resetMail, verificationMail } from "./mail-text.js";
-export type { Language, OutgoingMail } from "./mail-text.js";
+export { purchaseMail, resetMail, verificationMail } from "./mail-text.js";
+export type { Language, OutgoingMail, PurchaseMailFacts } from "./mail-text.js";
 export { createMemoryMailer, createResendMailer, MailError } from "./mailer.js";
 export type { Mailer, ResendConfig } from "./mailer.js";
 export { loadMailConfig } from "./config.js";
@@ -36,7 +36,13 @@ export {
   FULL_NAME_COMPARE_TIERS,
   TREE_UNLOCK_TIERS,
 } from "./purchases.js";
-export type { PaidCheckout, Purchases, PurchaseView } from "./purchases.js";
+export type {
+  PaidCheckout,
+  Purchases,
+  PurchaseView,
+  RevokeOutcome,
+  RevokeReason,
+} from "./purchases.js";
 export {
   createAccounts,
   FAILURES_KEEP_HOURS,

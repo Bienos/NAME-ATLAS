@@ -4,12 +4,17 @@ import type { Kysely } from "kysely";
 import type { AccountsDB, PurchaseTier } from "./schema.js";
 
 /**
- * What a reader bought (TASK-111, migration 0036). Written only from Stripe's
- * signed webhook; read by the account page.
+ * What a reader bought (TASK-111, migration 0036; TASK-179, migration 0048).
+ * Written only from Stripe's signed webhook; read by the account page and the
+ * entitlement checks.
  *
  * `record` is idempotent on the Checkout Session's id: Stripe may send the
  * same event more than once, and both `checkout.session.completed` and
  * `checkout.session.async_payment_succeeded` can name one session.
+ *
+ * A purchase refunded in full or disputed is revoked (`revoke`, by its
+ * PaymentIntent): its row stays as the record of the sale, and it unlocks
+ * nothing and is not listed.
  */
 
 export interface PaidCheckout {
@@ -19,7 +24,16 @@ export interface PaidCheckout {
   readonly amountTotal: number;
   readonly currency: "pln";
   readonly livemode: boolean;
+  /** Null only for a test session that carried none; a live purchase must have it (0048). */
+  readonly paymentIntentId: string | null;
+  /** The withdrawal statement's version the buyer ticked; a live purchase must have it (0048). */
+  readonly withdrawalConsent: string | null;
 }
+
+export type RevokeReason = "refunded" | "disputed";
+
+/** `REVOKED` by this call, `ALREADY` revoked before, `UNKNOWN`: no purchase has that PaymentIntent. */
+export type RevokeOutcome = "REVOKED" | "ALREADY" | "UNKNOWN";
 
 export interface PurchaseView {
   readonly tier: PurchaseTier;
@@ -30,12 +44,22 @@ export interface PurchaseView {
 export interface Purchases {
   /** True when this call stored the purchase, false when it was already stored. */
   record(paid: PaidCheckout): Promise<boolean>;
+  /**
+   * Whether the session's purchase is stored, not revoked, and its confirmation
+   * email not yet sent. The webhook sends it then, and Stripe's retries send it
+   * once the mail provider answers.
+   */
+  receiptDue(checkoutSessionId: string): Promise<boolean>;
+  markReceiptSent(checkoutSessionId: string): Promise<void>;
+  /** Revokes the purchase paid by `paymentIntentId`. Idempotent. */
+  revoke(paymentIntentId: string, reason: RevokeReason): Promise<RevokeOutcome>;
+  /** The account's purchases that are not revoked, newest first. */
   listForUser(userId: string): Promise<readonly PurchaseView[]>;
   /**
    * Whether the account has a recorded purchase of one of `tiers` (TASK-141,
    * TASK-144). Every entitlement names its tiers, never "any purchase": the
    * 8,99 zł baby-names product must not unlock the tree (D-044 §5). A purchase
-   * is a one-time payment, so it never expires.
+   * is a one-time payment, so it never expires; a revoked one counts for nothing.
    */
   hasPurchaseOf(userId: string, tiers: readonly PurchaseTier[]): Promise<boolean>;
 }
@@ -96,17 +120,54 @@ export function createPurchases(deps: {
           currency: paid.currency,
           livemode: paid.livemode,
           paid_at: now(),
+          payment_intent_id: paid.paymentIntentId,
+          withdrawal_consent: paid.withdrawalConsent,
         })
         .onConflict((c) => c.column("checkout_session_id").doNothing())
         .returning("purchase_id")
         .executeTakeFirst();
       return inserted !== undefined;
     },
+    async receiptDue(checkoutSessionId) {
+      const row = await deps.db
+        .selectFrom("purchases")
+        .select("purchase_id")
+        .where("checkout_session_id", "=", checkoutSessionId)
+        .where("receipt_sent_at", "is", null)
+        .where("revoked_at", "is", null)
+        .executeTakeFirst();
+      return row !== undefined;
+    },
+    async markReceiptSent(checkoutSessionId) {
+      await deps.db
+        .updateTable("purchases")
+        .set({ receipt_sent_at: now() })
+        .where("checkout_session_id", "=", checkoutSessionId)
+        .where("receipt_sent_at", "is", null)
+        .execute();
+    },
+    async revoke(paymentIntentId, reason) {
+      const updated = await deps.db
+        .updateTable("purchases")
+        .set({ revoked_at: now(), revoked_reason: reason })
+        .where("payment_intent_id", "=", paymentIntentId)
+        .where("revoked_at", "is", null)
+        .returning("purchase_id")
+        .executeTakeFirst();
+      if (updated !== undefined) return "REVOKED";
+      const known = await deps.db
+        .selectFrom("purchases")
+        .select("purchase_id")
+        .where("payment_intent_id", "=", paymentIntentId)
+        .executeTakeFirst();
+      return known === undefined ? "UNKNOWN" : "ALREADY";
+    },
     async listForUser(userId) {
       const rows = await deps.db
         .selectFrom("purchases")
         .select(["tier", "amount_total", "paid_at"])
         .where("user_id", "=", userId)
+        .where("revoked_at", "is", null)
         .orderBy("paid_at", "desc")
         .execute();
       return rows.map((r) => ({ tier: r.tier, amountTotal: r.amount_total, paidAt: r.paid_at }));
@@ -118,6 +179,7 @@ export function createPurchases(deps: {
         .select("purchase_id")
         .where("user_id", "=", userId)
         .where("tier", "in", [...tiers])
+        .where("revoked_at", "is", null)
         .limit(1)
         .executeTakeFirst();
       return row !== undefined;

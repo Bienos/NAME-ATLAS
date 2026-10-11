@@ -19,6 +19,7 @@ const INPUT: CheckoutSessionInput = {
   successUrl: "https://atlas.test/pl/konto?checkout=success",
   cancelUrl: "https://atlas.test/pl/konto?checkout=cancelled",
   automaticTax: false,
+  withdrawalConsent: "v1",
 };
 
 describe("the Checkout Session's form (TASK-111)", () => {
@@ -32,6 +33,9 @@ describe("the Checkout Session's form (TASK-111)", () => {
     expect(form.get("client_reference_id")).toBe(INPUT.userId);
     expect(form.get("metadata[tier]")).toBe("couple");
     expect(form.get("locale")).toBe("pl");
+    // The webhook records the statement's version and words the confirmation in this language (TASK-179).
+    expect(form.get("metadata[withdrawal_consent]")).toBe("v1");
+    expect(form.get("metadata[lang]")).toBe("pl");
   });
 
   it("never names payment methods, so the Dashboard decides them", () => {

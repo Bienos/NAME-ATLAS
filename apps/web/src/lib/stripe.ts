@@ -31,6 +31,8 @@ export interface CheckoutSessionInput {
   readonly successUrl: string;
   readonly cancelUrl: string;
   readonly automaticTax: boolean;
+  /** The version of the withdrawal statement the buyer ticked (TASK-179). */
+  readonly withdrawalConsent: string;
 }
 
 export interface CreatedSession {
@@ -62,6 +64,8 @@ export function checkoutSessionForm(input: CheckoutSessionInput): URLSearchParam
     customer_email: input.email,
     "metadata[user_id]": input.userId,
     "metadata[tier]": input.tier,
+    "metadata[lang]": input.lang,
+    "metadata[withdrawal_consent]": input.withdrawalConsent,
     "payment_intent_data[metadata][user_id]": input.userId,
     "payment_intent_data[metadata][tier]": input.tier,
     locale: input.lang,
