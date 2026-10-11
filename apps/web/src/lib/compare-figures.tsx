@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { DistributionEntry } from "@name-atlas/contracts";
 import { COMPARE_TEXT } from "./compare-text.js";
+import { COUPLE_PATHS } from "./couple-config.js";
+import { COUPLE_NAMES_PATHS } from "./couple-names-config.js";
 import { coverageWarning, formatDate, formatPercent, UI } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { MapLegend, VoivodeshipMap } from "./voivodeship-map.js";
@@ -182,6 +184,59 @@ export function FullNamesCard({ href, lang }: { href: string; lang: Lang }) {
           {t.link} →
         </a>
       </p>
+    </aside>
+  );
+}
+
+/** Which couple pages exist now (TASK-180): each is a 404 until its flag is on. */
+export interface CoupleLinks {
+  /** `COUPLE_REPORT_ENABLED`: the couple surnames page (ADR-0035). */
+  readonly report: boolean;
+  /** `COUPLE_NAMES_ENABLED` with accounts on: the couple first names page (ADR-0047). */
+  readonly names: boolean;
+}
+
+export const NO_COUPLE_LINKS: CoupleLinks = { report: false, names: false };
+
+/**
+ * The card for couples (TASK-180): a link to each couple page that exists, or
+ * nothing at all. `pair` carries the two compared surnames' slugs into the
+ * couple surnames page, so it opens on the same two; without it, its picker.
+ */
+export function CouplesCard({
+  links,
+  lang,
+  pair = null,
+}: {
+  links: CoupleLinks;
+  lang: Lang;
+  pair?: readonly [string, string] | null;
+}) {
+  if (!links.report && !links.names) return null;
+  const t = COMPARE_TEXT[lang].couples;
+  const reportHref =
+    pair === null
+      ? COUPLE_PATHS[lang]
+      : `${COUPLE_PATHS[lang]}?a=${encodeURIComponent(pair[0])}&b=${encodeURIComponent(pair[1])}`;
+  const items = [
+    ...(links.report ? [{ key: "report", ...t.surnames, href: reportHref }] : []),
+    ...(links.names ? [{ key: "names", ...t.names, href: COUPLE_NAMES_PATHS[lang] }] : []),
+  ];
+  return (
+    <aside className="cmp-upsell cmp-couples" aria-labelledby="cmp-couples-title">
+      <p className="cmp-eyebrow">{t.eyebrow}</p>
+      <h2 id="cmp-couples-title">{t.title}</h2>
+      {items.map((item) => (
+        <div key={item.key} className="cmp-couples-item">
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+          <p>
+            <a className="cmp-upsell-link" href={item.href}>
+              {item.link} →
+            </a>
+          </p>
+        </div>
+      ))}
     </aside>
   );
 }

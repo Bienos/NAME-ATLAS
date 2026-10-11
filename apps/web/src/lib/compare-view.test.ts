@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ComparePicker, ComparisonView, comparePath } from "./compare-view.js";
+import type { ComparisonSide } from "./compare-view.js";
 import { resolved } from "./couple-fixture.js";
 import { UI } from "./messages.js";
 
@@ -136,6 +137,51 @@ describe("the redesigned comparison (TASK-155)", () => {
     expect(pl).not.toMatch(/checkout|<button[^>]*>Kup/iu);
     expect(html("en", "/en/compare/full-name")).toContain("PLN 15.99");
   });
+
+  describe("the card for couples (TASK-180)", () => {
+    const view = (
+      couples: { report: boolean; names: boolean },
+      lang: "pl" | "en" = "pl",
+      b: ComparisonSide = zaremba,
+    ) => renderToStaticMarkup(createElement(ComparisonView, { a: nowak, b, lang, couples }));
+
+    it("is absent while both couple pages are off, as in production today", () => {
+      expect(html()).not.toContain("cmp-couples");
+      expect(view({ report: false, names: false })).not.toContain("cmp-couples");
+    });
+
+    it("opens the couple surnames page on the two compared surnames", () => {
+      const pl = view({ report: true, names: false });
+      expect(pl).toContain("Dla par");
+      expect(pl).toContain('href="/pl/para?a=nowak&amp;b=zaremba"');
+      expect(pl).not.toContain("/pl/imiona-pary");
+      expect(view({ report: true, names: false }, "en")).toContain(
+        'href="/en/couple?a=nowak&amp;b=zaremba"',
+      );
+    });
+
+    it("links the couple first names page alone, and both when both are on", () => {
+      const names = view({ report: false, names: true });
+      expect(names).toContain('href="/pl/imiona-pary"');
+      expect(names).not.toContain("/pl/para");
+      const both = view({ report: true, names: true });
+      expect(both.match(/class="cmp-couples-item"/gu)).toHaveLength(2);
+      expect(view({ report: false, names: true }, "en")).toContain('href="/en/couple-names"');
+    });
+
+    it("opens the couple surnames picker when a side did not resolve", () => {
+      const unresolved = { ...zaremba, display: null, response: null, path: null };
+      expect(view({ report: true, names: false }, "pl", unresolved)).toContain('href="/pl/para"');
+    });
+
+    it("states no verdict or score about the couple", () => {
+      const both = view({ report: true, names: true });
+      const card = both.slice(both.indexOf('<aside class="cmp-upsell cmp-couples"'));
+      expect(card.slice(0, card.indexOf("</aside>"))).not.toMatch(
+        /pasuj|zgodn|procent|%|match|score/iu,
+      );
+    });
+  });
 });
 
 describe("the redesigned picker (TASK-155)", () => {
@@ -170,5 +216,25 @@ describe("the redesigned picker (TASK-155)", () => {
     expect(html).toContain('action="/pl/para"');
     expect(html).not.toContain("cmp-try");
     expect(html).not.toContain("cmp-upsell");
+  });
+
+  it("shows the card for couples only for the pages that are on (TASK-180)", () => {
+    expect(picker()).not.toContain("cmp-couples");
+    const html = picker({ couples: { report: true, names: true } });
+    expect(html).toContain('href="/pl/para"');
+    expect(html).toContain('href="/pl/imiona-pary"');
+    // The couple page's own picker never advertises itself.
+    expect(
+      picker({
+        copy: {
+          action: "/pl/para",
+          otherPath: "/en/couple",
+          heading: "x",
+          intro: "x",
+          submit: "x",
+        },
+        couples: { report: true, names: true },
+      }),
+    ).not.toContain("cmp-couples");
   });
 });

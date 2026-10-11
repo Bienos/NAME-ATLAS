@@ -29,6 +29,16 @@ export interface CompareText {
     readonly soon: string;
     readonly link: string;
   };
+  /**
+   * The card for couples (TASK-180): the couple surnames page (ADR-0035) and the
+   * couple first names page (ADR-0047), each listed only while it is on.
+   */
+  readonly couples: {
+    readonly eyebrow: string;
+    readonly title: string;
+    readonly surnames: { readonly title: string; readonly body: string; readonly link: string };
+    readonly names: { readonly title: string; readonly body: string; readonly link: string };
+  };
 }
 
 export const COMPARE_TEXT: Readonly<Record<Lang, CompareText>> = {
@@ -65,6 +75,20 @@ export const COMPARE_TEXT: Readonly<Record<Lang, CompareText>> = {
       soon: "Wkrótce",
       link: "Zobacz, co zawiera",
     },
+    couples: {
+      eyebrow: "Dla par",
+      title: "Dwa nazwiska, dwa imiona — dla pary",
+      surnames: {
+        title: "Wasze nazwiska razem",
+        body: "Jakie nazwiska może nosić para i co wiadomo o każdym z nich, obok siebie.",
+        link: "Zobacz nazwiska pary",
+      },
+      names: {
+        title: "Imiona pary",
+        body: "Skąd pochodzą i co znaczą dwa imiona, według źródeł. Bez oceny i bez wyniku.",
+        link: "Sprawdź imiona pary",
+      },
+    },
   },
   en: {
     eyebrow: "Surname comparison",
@@ -98,6 +122,20 @@ export const COMPARE_TEXT: Readonly<Record<Lang, CompareText>> = {
       once: "one payment",
       soon: "Coming soon",
       link: "See what it includes",
+    },
+    couples: {
+      eyebrow: "For couples",
+      title: "Two surnames, two first names — for a couple",
+      surnames: {
+        title: "Your surnames together",
+        body: "The surnames a couple could carry, and what is known about each of them, side by side.",
+        link: "See the couple's surnames",
+      },
+      names: {
+        title: "A couple's first names",
+        body: "Where two first names come from and what they mean, according to the sources. No verdict and no score.",
+        link: "Look up the couple's first names",
+      },
     },
   },
 };

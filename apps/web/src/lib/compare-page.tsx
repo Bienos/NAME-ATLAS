@@ -5,7 +5,11 @@ import type { Metadata } from "next";
 import { createLogger } from "@name-atlas/logging";
 import { querySurnameResult } from "@name-atlas/truth";
 import { surnameResultResponseSchema } from "@name-atlas/contracts";
+import { accountsRuntime } from "./accounts-runtime.js";
+import type { CoupleLinks } from "./compare-figures.js";
 import { ComparePicker, ComparisonView } from "./compare-view.js";
+import { coupleReportEnabled } from "./couple-config.js";
+import { coupleNamesEnabled } from "./couple-names-config.js";
 import type { ComparisonSide } from "./compare-view.js";
 import { currentPathFor, resolveSlug } from "./slug.js";
 import type { Lang } from "./messages.js";
@@ -65,6 +69,18 @@ export async function loadComparison(
       b: { slug: bSlug, display: null, response: null, path: null },
     };
   }
+}
+
+/**
+ * The couple pages that exist now (TASK-180), so the comparison links only to
+ * pages that answer: each answers 404 until its flag is on, and the first-names
+ * page also needs accounts, as `CoupleNamesRoute` does.
+ */
+export function coupleLinks(): CoupleLinks {
+  return {
+    report: coupleReportEnabled(),
+    names: coupleNamesEnabled() && accountsRuntime() !== null,
+  };
 }
 
 export { ComparePicker, ComparisonView };
