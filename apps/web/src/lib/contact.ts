@@ -9,5 +9,13 @@
  */
 export const CONTACT_EMAIL = "kontakt@name-atlas.pl";
 
+/**
+ * The operator's tax identification number (NIP), given by the owner on
+ * 2026-10-12 for selling (TASK-182). At the owner's request the site names no
+ * person or place: the operator is "the owner of the service", identified by
+ * this number (D-054 records what that leaves open for real sales).
+ */
+export const OPERATOR_NIP = "7441837423";
+
 /** The longest message the contact form takes, in characters (form and route alike). */
 export const CONTACT_MESSAGE_MAX = 5_000;

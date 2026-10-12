@@ -132,6 +132,8 @@ export interface PurchaseMailFacts {
   /** Where the buyer uses what they bought: the account page. */
   readonly accountLink: string;
   readonly contact: string;
+  /** Who sells, as the site states it: "the owner of the service, NIP …" (TASK-182). */
+  readonly seller: string;
 }
 
 const PURCHASE: Record<
@@ -143,6 +145,7 @@ const PURCHASE: Record<
     readonly product: string;
     readonly price: string;
     readonly paidOn: string;
+    readonly seller: string;
     readonly consentLead: string;
     readonly accountLead: string;
     readonly contactLead: string;
@@ -157,6 +160,7 @@ const PURCHASE: Record<
     product: "Produkt:",
     price: "Cena (z VAT):",
     paidOn: "Data płatności:",
+    seller: "Sprzedawca:",
     consentLead: "Oświadczenie zaznaczone przed zapłatą:",
     accountLead: "Dostęp masz od razu na swoim koncie:",
     contactLead: "Pytania i reklamacje:",
@@ -170,6 +174,7 @@ const PURCHASE: Record<
     product: "Product:",
     price: "Price (VAT included):",
     paidOn: "Paid on:",
+    seller: "Seller:",
     consentLead: "The statement ticked before paying:",
     accountLead: "Your access is ready in your account:",
     contactLead: "Questions and complaints:",
@@ -192,6 +197,7 @@ export function purchaseMail(
     [w.product, facts.product],
     [w.price, facts.price],
     [w.paidOn, facts.paidOn],
+    [w.seller, facts.seller],
   ];
   const text = [
     w.greeting,

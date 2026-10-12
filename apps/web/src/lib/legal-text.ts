@@ -1,6 +1,7 @@
-import { CONTACT_EMAIL } from "./contact.js";
+import { CONTACT_EMAIL, OPERATOR_NIP } from "./contact.js";
 import { accountsVariant } from "./legal-accounts.js";
 import { googleVariant } from "./legal-google.js";
+import { salesVariant } from "./legal-sales.js";
 import { treeVariant } from "./legal-tree.js";
 import type { Lang } from "./messages.js";
 
@@ -15,7 +16,9 @@ import type { Lang } from "./messages.js";
  *
  * At the owner's request (2026-10-07) neither document names the owner or a
  * place: the controller is "the owner of the service", and the only contact is
- * `CONTACT_EMAIL`.
+ * `CONTACT_EMAIL`. Since 2026-10-12 (TASK-182) both give the owner's NIP,
+ * `OPERATOR_NIP`, and still no name. What a real sale adds is in
+ * `legal-sales.ts`, shown only while checkout runs live.
  */
 
 /**
@@ -27,11 +30,11 @@ import type { Lang } from "./messages.js";
  * ban on unlawful content, then for Google Analytics on every page, its
  * cookies only with consent (TASK-115), and for Vercel Speed Insights. Both
  * changed on 2026-10-07: no owner's name or place, and the contact address on
- * the site's domain.
+ * the site's domain; and on 2026-10-12: the owner's NIP (TASK-182).
  */
 export const LEGAL_UPDATED: Readonly<Record<LegalKind, string>> = {
-  privacy: "2026-10-07",
-  terms: "2026-10-07",
+  privacy: "2026-10-12",
+  terms: "2026-10-12",
 };
 
 /**
@@ -57,6 +60,13 @@ export const TREE_LEGAL_UPDATED = "2026-10-04";
  */
 export const GOOGLE_LEGAL_UPDATED = "2026-10-04";
 
+/**
+ * The date of the sales variant of both documents (TASK-182): shown only while
+ * checkout runs live (`legal-sales.ts`). Display only: a buyer ticks the
+ * withdrawal statement at each purchase, and the confirmation email repeats it.
+ */
+export const SALES_LEGAL_UPDATED = "2026-10-12";
+
 export interface LegalSection {
   readonly heading: string;
   readonly paragraphs: readonly string[];
@@ -79,7 +89,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Kto jest administratorem",
         paragraphs: [
-          `Administratorem danych osobowych w serwisie Name Atlas jest jego właściciel. Kontakt we wszystkich sprawach, także w sprawie danych osobowych: ${CONTACT_EMAIL}.`,
+          `Administratorem danych osobowych w serwisie Name Atlas jest jego właściciel, NIP ${OPERATOR_NIP}. Kontakt we wszystkich sprawach, także w sprawie danych osobowych: ${CONTACT_EMAIL}.`,
         ],
       },
       {
@@ -162,7 +172,7 @@ const PRIVACY: Record<Lang, LegalDocument> = {
       {
         heading: "Who is responsible",
         paragraphs: [
-          `The controller of personal data on Name Atlas is the owner of the service. Contact for everything, personal data included: ${CONTACT_EMAIL}.`,
+          `The controller of personal data on Name Atlas is the owner of the service, tax identification number (NIP) ${OPERATOR_NIP}. Contact for everything, personal data included: ${CONTACT_EMAIL}.`,
         ],
       },
       {
@@ -246,7 +256,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "Usługa",
         paragraphs: [
-          `Name Atlas to bezpłatny serwis z informacjami o polskich nazwiskach, Kontakt: ${CONTACT_EMAIL}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
+          `Name Atlas to serwis z informacjami o polskich nazwiskach, prowadzony przez jego właściciela, NIP ${OPERATOR_NIP}. Kontakt: ${CONTACT_EMAIL}. Korzystanie z serwisu nie wymaga rejestracji. Wystarczy urządzenie z dostępem do internetu i aktualna przeglądarka.`,
         ],
       },
       {
@@ -306,7 +316,7 @@ const TERMS: Record<Lang, LegalDocument> = {
       {
         heading: "The service",
         paragraphs: [
-          `Name Atlas is a free information service about Polish surnames. Contact: ${CONTACT_EMAIL}. No registration is needed. You need an internet-connected device and a current browser.`,
+          `Name Atlas is an information service about Polish surnames, run by its owner, tax identification number (NIP) ${OPERATOR_NIP}. Contact: ${CONTACT_EMAIL}. No registration is needed. You need an internet-connected device and a current browser.`,
         ],
       },
       {
@@ -374,12 +384,15 @@ export function legalDocument(
   accounts = false,
   tree = false,
   google = false,
+  sales = false,
 ): LegalDocument {
   const base = kind === "privacy" ? PRIVACY[lang] : TERMS[lang];
   if (!accounts) return base;
   const withAccounts = accountsVariant(kind, lang, base);
   const withGoogle = google ? googleVariant(kind, lang, withAccounts) : withAccounts;
-  return tree ? treeVariant(kind, lang, withGoogle) : withGoogle;
+  const withTree = tree ? treeVariant(kind, lang, withGoogle) : withGoogle;
+  // Live checkout needs accounts (`checkout-runtime.ts`), so sales never stand alone.
+  return sales ? salesVariant(kind, lang, withTree) : withTree;
 }
 
 /** The date the document last changed, for the page and for the version recorded. */
@@ -394,6 +407,7 @@ export function legalUpdated(
   accounts = false,
   tree = false,
   google = false,
+  sales = false,
 ): string {
   const own = LEGAL_UPDATED[kind];
   const dates = [own];
@@ -401,6 +415,7 @@ export function legalUpdated(
   if (accounts && tree) dates.push(TREE_LEGAL_UPDATED);
   // The Google variant changes the notice only (`legal-google.ts`).
   if (accounts && google && kind === "privacy") dates.push(GOOGLE_LEGAL_UPDATED);
+  if (accounts && sales) dates.push(SALES_LEGAL_UPDATED);
   return dates.reduce((latest, date) => (date > latest ? date : latest));
 }
 

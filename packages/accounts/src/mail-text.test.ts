@@ -53,13 +53,20 @@ describe("the purchase confirmation (TASK-179)", () => {
     consent: "Żądam dostępu <od razu> & tracę prawo do odstąpienia od umowy.",
     accountLink: "https://name-atlas.pl/pl/konto",
     contact: "kontakt@name-atlas.pl",
+    seller: "właściciel serwisu Name Atlas, NIP 7441837423",
   };
 
   it("states the product, price, date and the statement word for word, in both parts", () => {
     const mail = purchaseMail("buyer@example.com", "pl", facts);
     expect(mail.to).toBe("buyer@example.com");
     expect(mail.subject).toBe("Potwierdzenie zakupu: Name Atlas — Imiona dla dziecka");
-    for (const part of [facts.price, facts.paidOn, facts.accountLink, facts.contact]) {
+    for (const part of [
+      facts.price,
+      facts.paidOn,
+      facts.accountLink,
+      facts.contact,
+      facts.seller,
+    ]) {
       expect(mail.text).toContain(part);
       expect(mail.html).toContain(part);
     }
