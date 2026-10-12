@@ -14,7 +14,7 @@ function directives(policy: string): Map<string, string> {
 describe("security headers (TASK-048)", () => {
   it("next.config applies every header to every path", async () => {
     const rules = await nextConfig.headers?.();
-    expect(rules).toEqual([{ source: "/:path*", headers: [...SECURITY_HEADERS] }]);
+    expect(rules?.[0]).toEqual({ source: "/:path*", headers: [...SECURITY_HEADERS] });
   });
 
   it("carries the baseline set", () => {

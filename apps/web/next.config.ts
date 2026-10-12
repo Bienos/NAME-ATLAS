@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { SECURITY_HEADERS } from "./src/lib/security-headers";
+import { SURNAME_CDN_CACHE_RULES } from "./src/lib/surname-cdn-cache";
 
 /**
  * pdfkit's built-in fonts as `require` loads them (`#standard-fonts/*` →
@@ -109,10 +110,11 @@ const nextConfig: NextConfig = {
   /**
    * The security headers (TASK-048) on every path: pages, the API and the share
    * cards. What each one is and why, and what is deliberately left out, is in
-   * `src/lib/security-headers.ts`.
+   * `src/lib/security-headers.ts`. Then Vercel's CDN caching for the surname
+   * pages and their Open Graph images (TASK-181, `src/lib/surname-cdn-cache.ts`).
    */
   async headers() {
-    return [{ source: "/:path*", headers: [...SECURITY_HEADERS] }];
+    return [{ source: "/:path*", headers: [...SECURITY_HEADERS] }, ...SURNAME_CDN_CACHE_RULES];
   },
 };
 
