@@ -5886,6 +5886,12 @@ body.dusk {
   margin: 0.15em 0 0;
 }
 
+.checkout-terms {
+  margin: 0 0 var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--dusk-ink-muted);
+}
+
 .offer-table-box {
   /* Holds the cells' visually-hidden labels, which would otherwise widen the page. */
   position: relative;

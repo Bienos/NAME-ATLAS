@@ -1511,6 +1511,7 @@ export const UI = {
       "Wysyłka z formularza nie jest jeszcze włączona. Wyślij wiadomość ze swojej poczty.",
     contactMailInstead: "Otwórz w programie pocztowym",
     contactDirect: "Wolisz pisać bezpośrednio?",
+    contactOperator: (nip: string) => `Serwis prowadzi jego właściciel, NIP ${nip}.`,
     contactPrivacyNote: "Serwis nie zapisuje wiadomości: trafia ona tylko na skrzynkę Name Atlas.",
     // --- The Atlas page (TASK-178): the hero, the chapter nav, the two parts and the method. ---
     atMetaTitle: "Atlas nazwisk i imion | Name Atlas",
@@ -2538,6 +2539,8 @@ export const UI = {
       "Sending from the form is not switched on yet. Send the message from your own mail.",
     contactMailInstead: "Open in your mail program",
     contactDirect: "Prefer to write directly?",
+    contactOperator: (nip: string) =>
+      `The service is run by its owner, tax identification number (NIP) ${nip}.`,
     contactPrivacyNote:
       "The site does not store your message: it only reaches the Name Atlas inbox.",
     // --- The Atlas page (TASK-178): the hero, the chapter nav, the two parts and the method. ---

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { UI } from "./messages.js";
 import type { Lang } from "./messages.js";
+import { OPERATOR_NIP } from "./contact.js";
 import { ContactForm } from "./contact-form.js";
 import { CONTACT_EMAIL, contactPath } from "./site-footer.js";
 import { SiteShell } from "./site-shell.js";
@@ -45,6 +46,7 @@ export function ContactView({ lang }: { readonly lang: Lang }) {
         <p className="contact-direct">
           {t.contactDirect} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </p>
+        <p className="contact-operator">{t.contactOperator(OPERATOR_NIP)}</p>
       </section>
       <section className="contact-card">
         <ContactForm lang={lang} />

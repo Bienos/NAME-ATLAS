@@ -12,7 +12,7 @@ import {
   WITHDRAWAL_CONSENT_VERSION,
 } from "./checkout-config.js";
 import type { CheckoutMode, TierOffer } from "./checkout-config.js";
-import { CONTACT_EMAIL } from "./contact.js";
+import { CONTACT_EMAIL, OPERATOR_NIP } from "./contact.js";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 import { cookieValue, sessionCookieName } from "./session-cookie.js";
@@ -338,6 +338,10 @@ async function sendReceipt(
         consent: WITHDRAWAL_CONSENT[lang],
         accountLink: `${deps.origin}${accountPath(lang, "account")}`,
         contact: CONTACT_EMAIL,
+        seller:
+          lang === "en"
+            ? `the owner of the Name Atlas service, tax identification number (NIP) ${OPERATOR_NIP}`
+            : `właściciel serwisu Name Atlas, NIP ${OPERATOR_NIP}`,
       }),
     );
     await deps.purchases.markReceiptSent(sessionId);

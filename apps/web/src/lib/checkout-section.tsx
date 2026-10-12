@@ -7,6 +7,7 @@ import {
   WITHDRAWAL_CONSENT_VERSION,
 } from "./checkout-config.js";
 import type { CheckoutMode } from "./checkout-config.js";
+import { legalPath } from "./legal-text.js";
 import { formatDate } from "./messages.js";
 import type { Lang } from "./messages.js";
 
@@ -85,17 +86,28 @@ export function checkoutStatusFrom(value: string | null): CheckoutStatus | null 
  */
 export function ConsentField({ lang }: { readonly lang: Lang }) {
   return (
-    <label className="checkout-consent">
-      <input
-        type="checkbox"
-        name={WITHDRAWAL_CONSENT_FIELD}
-        value={WITHDRAWAL_CONSENT_VERSION}
-        required
-      />{" "}
-      {WITHDRAWAL_CONSENT[lang]}
-    </label>
+    <>
+      <label className="checkout-consent">
+        <input
+          type="checkbox"
+          name={WITHDRAWAL_CONSENT_FIELD}
+          value={WITHDRAWAL_CONSENT_VERSION}
+          required
+        />{" "}
+        {WITHDRAWAL_CONSENT[lang]}
+      </label>
+      <p className="checkout-terms">
+        {TERMS_LINK[lang].lead} <a href={legalPath("terms", lang)}>{TERMS_LINK[lang].link}</a>.
+      </p>
+    </>
   );
 }
+
+/** Where the purchase rules are (TASK-182): the terms' "Zakupy" section while live. */
+const TERMS_LINK = {
+  pl: { lead: "Zasady zakupu, odstąpienia i reklamacji opisuje", link: "regulamin" },
+  en: { lead: "The rules on purchases, withdrawal and complaints are in the", link: "terms" },
+} as const;
 
 export function CheckoutSection({
   lang,

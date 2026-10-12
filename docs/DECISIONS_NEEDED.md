@@ -19,6 +19,10 @@ Open:
 2. The tiers from 28,99 zł up unlock the family tree, which the reader keeps using. If counsel reads that as a digital service rather than digital content, the right of withdrawal ends only once the service is fully performed, and the statement and terms differ for those tiers.
 3. The terms' sections on purchases, payment, withdrawal, refunds and complaints, and the privacy notice's on orders (Stripe as a processor of payment data, what the purchase row keeps and for how long).
 
+4. **The seller's identity (2026-10-12, TASK-182).** The owner gave the business's NIP for the site and asked that the business name not be published. The terms, the privacy notice, the contact page and the purchase confirmation now name the operator as "the owner of the service" with that NIP, and no name or address. Art. 12 ust. 1 pkt 2–3 of the consumer rights act asks the seller of a distance contract to give its identity (name or business name) and its address; the NIP lets a buyer look the business up in CEIDG, but counsel should say whether that suffices or the name and address must be shown before live sales. Invoices (KSeF) carry the name regardless.
+
+The sales sections of the terms and the notice (`apps/web/src/lib/legal-sales.ts`) answer item 3 in a first draft. They are shown only while checkout runs live.
+
 **Recommendation (not a decision):** one review by counsel covering D-040, D-041 and this record before the first real sale; launch with the 8,99 zł baby-names product first, which is plainly digital content.
 
 ---

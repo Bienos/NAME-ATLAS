@@ -5,6 +5,7 @@ import { SiteShell } from "./site-shell.js";
 import { ConsentSettingsButton } from "./consent-banner.js";
 import { CONSENT_COPY } from "./google-analytics.js";
 import { accountsEnabled, googleEnabled } from "./accounts-config.js";
+import { checkoutMode } from "./checkout-config.js";
 import { familyTreeEnabled } from "./family-config.js";
 import { legalDocument, legalPath, legalUpdated } from "./legal-text.js";
 import type { LegalKind } from "./legal-text.js";
@@ -32,8 +33,10 @@ export function LegalView({ kind, lang }: { readonly kind: LegalKind; readonly l
   const accounts = accountsEnabled();
   const tree = familyTreeEnabled();
   const google = googleEnabled();
-  const doc = legalDocument(kind, lang, accounts, tree, google);
-  const updated = legalUpdated(kind, accounts, tree, google);
+  // The purchase sections only while checkout takes real payments (TASK-182).
+  const sales = checkoutMode() === "live";
+  const doc = legalDocument(kind, lang, accounts, tree, google, sales);
+  const updated = legalUpdated(kind, accounts, tree, google, sales);
   const other: Lang = lang === "pl" ? "en" : "pl";
   return (
     <SiteShell

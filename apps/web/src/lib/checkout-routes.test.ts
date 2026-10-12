@@ -426,6 +426,10 @@ describe("POST /api/stripe/webhook: live mode, consent, receipts, refunds (TASK-
     expect(mail?.text).toContain("12 October 2026");
     expect(mail?.text).toContain("I thereby lose my right to withdraw from the contract");
     expect(mail?.text).toContain(`${ORIGIN}/en/account`);
+    // The seller by its NIP, and by no name (TASK-182).
+    expect(mail?.text).toContain(
+      "Seller: the owner of the Name Atlas service, tax identification number (NIP) 7441837423",
+    );
     expect(markReceiptSent).toHaveBeenCalledWith("cs_test_1");
   });
 
