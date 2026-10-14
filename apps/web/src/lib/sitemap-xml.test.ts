@@ -4,6 +4,7 @@ import {
   BLOG_SITEMAP_PATH,
   blogSitemapXml,
   escapeXml,
+  indexedPageCount,
   pageCount,
   SITEMAP_PAGE_SIZE,
   sitemapIndexXml,
@@ -61,6 +62,15 @@ describe("pageCount", () => {
     expect(xml.match(/<url>/gu)).toHaveLength(SITEMAP_PAGE_SIZE);
     expect(xml).toContain("szczepa%C5%84ska");
     expect(new TextEncoder().encode(xml).length).toBeLessThan(5_000_000);
+  });
+});
+
+describe("indexedPageCount", () => {
+  it("names at most one page, however many URLs there are", () => {
+    expect(indexedPageCount(0)).toBe(0);
+    expect(indexedPageCount(10_000)).toBe(1);
+    expect(indexedPageCount(10_001)).toBe(1);
+    expect(indexedPageCount(598_476)).toBe(1);
   });
 });
 

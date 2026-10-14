@@ -28,6 +28,18 @@ export function pageCount(total: number): number {
 }
 
 /**
+ * How many surname pages the index names. Capped at one page (10,000 URLs) so
+ * the sitemap stops advertising the whole register to crawlers.
+ * Pages past the cap still answer if asked for directly.
+ */
+export const SITEMAP_INDEX_MAX_PAGES = 1;
+
+/** The pages the sitemap index names for `total` URLs. */
+export function indexedPageCount(total: number): number {
+  return Math.min(pageCount(total), SITEMAP_INDEX_MAX_PAGES);
+}
+
+/**
  * The sitemap index. 598,476 surnames cannot be one sitemap — the protocol caps
  * a file at 50,000 URLs, and this site at 10,000 so the CDN can store each one
  * (`SITEMAP_PAGE_SIZE`, TASK-128) — so the root document names the pages.
