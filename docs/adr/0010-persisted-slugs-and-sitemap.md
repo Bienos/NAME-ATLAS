@@ -82,6 +82,14 @@ Both the listing query and the per-page assessment must agree, so a page in the 
 carries `index` and a page carrying `noindex` is never listed. An integration test asserts that
 agreement over real data rather than trusting two implementations of one policy.
 
+**Amendment, 2026-10-14: the index names one page.** `/sitemap.xml` names at most
+`SITEMAP_INDEX_MAX_PAGES` (1, so 10,000 URLs) sitemap pages, whatever the count. The listing
+policy above is unchanged, and `/sitemap/{n}.xml` still answers for every page directly. The
+reason is load: the index advertised the whole register to crawlers while the team's Vercel usage
+was over its limits. The listing is ordered by the sum of each surname's `CURRENT_POPULATION` counts, most first, then
+by `surname_id`, so the one page the index names holds the 10,000 most-occurring eligible surnames.
+This is an ordering, not a threshold: no population cut-off is chosen.
+
 ## 4. What this deliberately does not do
 
 - **§25 ASCII aliases.** The table accepts them; none is generated. An ASCII alias is a second
