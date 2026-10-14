@@ -182,7 +182,15 @@ export async function sitemapEntries(
       )                  AS last_modified
       FROM (
         ${eligible(locale, await seoBlockedSurnameIds(db, options))}
-         ORDER BY s.surname_id
+         -- Most-occurring surnames first (sum of the cited population counts),
+         -- so the first sitemap page holds the names people look up most.
+         ORDER BY (
+           SELECT sum((p.structured_value->>'count')::bigint)
+             FROM claims p
+            WHERE p.subject_entity_id = s.surname_id
+              AND p.claim_type = 'CURRENT_POPULATION'
+              AND p.claim_status = 'ACTIVE'
+         ) DESC NULLS LAST, s.surname_id
          LIMIT ${options.limit} OFFSET ${options.offset}
       ) e
      ORDER BY e.surname_id

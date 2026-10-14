@@ -86,9 +86,9 @@ agreement over real data rather than trusting two implementations of one policy.
 `SITEMAP_INDEX_MAX_PAGES` (1, so 10,000 URLs) sitemap pages, whatever the count. The listing
 policy above is unchanged, and `/sitemap/{n}.xml` still answers for every page directly. The
 reason is load: the index advertised the whole register to crawlers while the team's Vercel usage
-was over its limits. The first page is the first 10,000 eligible surnames by `surname_id`, which
-is arbitrary. Choosing by population (a `CURRENT_POPULATION` threshold, to list the surnames
-people look up) is a later decision and would change the ordering of the listing query.
+was over its limits. The listing is ordered by the sum of each surname's `CURRENT_POPULATION` counts, most first, then
+by `surname_id`, so the one page the index names holds the 10,000 most-occurring eligible surnames.
+This is an ordering, not a threshold: no population cut-off is chosen.
 
 ## 4. What this deliberately does not do
 
