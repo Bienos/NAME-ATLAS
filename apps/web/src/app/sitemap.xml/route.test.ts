@@ -28,7 +28,10 @@ describe("/sitemap.xml caching (TASK-127)", () => {
     expect(response.headers.get("cache-control")).toBe(SITEMAP_CACHE_CONTROL);
     expect(SITEMAP_CACHE_CONTROL).toMatch(/s-maxage=\d+/u);
     expect(SITEMAP_CACHE_CONTROL).toMatch(/stale-while-revalidate=\d+/u);
-    expect(await response.text()).toContain("https://name-atlas.pl/sitemap/3.xml");
+    // One page is named however many URLs there are.
+    const body = await response.text();
+    expect(body).toContain("https://name-atlas.pl/sitemap/1.xml");
+    expect(body).not.toContain("https://name-atlas.pl/sitemap/2.xml");
   });
 
   it("never caches a failure", async () => {

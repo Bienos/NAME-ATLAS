@@ -6,7 +6,7 @@ import { seoBlockedProfileIds } from "../../lib/seo-surface.js";
 import {
   BLOG_SITEMAP_PATH,
   CACHED_SITEMAP_HEADERS,
-  pageCount,
+  indexedPageCount,
   sitemapIndexXml,
 } from "../../lib/sitemap-xml.js";
 import { blogPosts } from "../../lib/blog-posts.js";
@@ -42,7 +42,7 @@ export async function GET(): Promise<Response> {
     // The blog's sitemap (TASK-071), only when it has a post to list.
     const extra = blogPosts().length > 0 ? [BLOG_SITEMAP_PATH] : [];
     // Cached at the CDN (TASK-127): only this response reads the database.
-    return new Response(sitemapIndexXml(origin, pageCount(total), extra), {
+    return new Response(sitemapIndexXml(origin, indexedPageCount(total), extra), {
       status: 200,
       headers: CACHED_SITEMAP_HEADERS,
     });
