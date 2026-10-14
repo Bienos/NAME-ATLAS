@@ -302,7 +302,7 @@ export function DuskWorld({
       {mode === "hero" ? (
         <div className="dusk-horizon">
           <Image
-            src="/images/landing-dusk.png"
+            src="/images/landing-dusk.webp"
             alt=""
             fill
             preload
